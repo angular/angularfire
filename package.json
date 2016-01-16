@@ -1,6 +1,6 @@
 {
-  "name": "indy",
-  "version": "0.0.1",
+  "name": "angularfire2",
+  "version": "2.0.0-alpha.1",
   "description": "",
   "main": "index.js",
   "scripts": {
