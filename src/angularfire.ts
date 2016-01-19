@@ -1,4 +1,4 @@
-import {Inject, OpaqueToken, provide} from 'angular2/core';
+import {OpaqueToken, provide} from 'angular2/core';
 import * as Firebase from 'firebase';
 
 export const DEFAULT_FIREBASE = new OpaqueToken('DEFAULT_FIREBASE');
