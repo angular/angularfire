@@ -9,3 +9,5 @@ export const FIREBASE_PROVIDERS:any[] = [
     useFactory: (url:string) => new Firebase(url),
     deps: [DEFAULT_FIREBASE]})
 ];
+
+export {FirebaseList} from './providers/firebase_list';
