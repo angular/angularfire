@@ -1,4 +1,3 @@
-import 'zone.js';
 import {Component, Inject, OnInit, ViewChild, provide} from 'angular2/core';
 
 import {fakeAsync, beforeEach, fit, inject, it, describe, expect, TestComponentBuilder} from 'angular2/testing';
@@ -8,12 +7,6 @@ import * as Firebase from 'firebase';
 
 import {FirebaseList} from './firebase_list';
 import {DEFAULT_FIREBASE} from '../angularfire';
-
-var FirebaseServer = require('firebase-server');
-new FirebaseServer(5000, 'test.firebaseio.com');
-
-import {Parse5DomAdapter} from 'angular2/platform/server';
-Parse5DomAdapter.makeCurrent();
 
 class Todo {
   done:boolean;

@@ -1,4 +1,4 @@
-require('reflect-metadata');
+
 import {describe,it,beforeEach} from 'angular2/testing';
 import {Injector, provide} from 'angular2/core';
 import {FIREBASE_PROVIDERS, DEFAULT_FIREBASE, DEFAULT_FIREBASE_REF} from './angularfire';
