@@ -15,17 +15,19 @@ class Todo {
 
 const rootFirebase = 'ws://test.firebaseio.com:5000';
 
+const sharedTemplate = `
+  <h1>Todos</h1>
+  <div *ngFor="#todo of todos | async" class="todo">
+    {{todo.val().title}}
+  </div>
+  <h1>Posts</h1>
+  <div *ngFor="#post of posts | async" class="post">
+    {{post.val().title}}
+  </div>
+`;
+
 @Component({
-  template: `
-    <h1>Todos</h1>
-    <div *ngFor="#todo of todos | async" class="todo">
-      {{todo.val().title}}
-    </div>
-    <h1>Posts</h1>
-    <div *ngFor="#post of posts | async" class="post">
-      {{post.val().title}}
-    </div>
-  `,
+  template: sharedTemplate,
   inputs:[],
   directives: [NgFor],
   pipes: [AsyncPipe],
@@ -46,7 +48,26 @@ const rootFirebase = 'ws://test.firebaseio.com:5000';
 class MyComponent {
   constructor(
     @Inject('posts') public posts:FirebaseObservable<any>,
-    @Inject(Todo) public todos:FirebaseObservable<Todo>) {}
+    @Inject(Todo) public todos:FirebaseObservable<any>) {}
+}
+
+@Component({
+  template: sharedTemplate,
+  inputs:[],
+  directives: [NgFor],
+  pipes: [AsyncPipe],
+  providers: [
+    FirebaseList('/posts'),
+    FirebaseList('/todos'),
+    provide(DEFAULT_FIREBASE, {
+      useValue: rootFirebase
+    })
+  ]
+})
+class MyComponentStringArg {
+  constructor(
+    @Inject('/posts') public posts:FirebaseObservable<any>,
+    @Inject('/todos') public todos:FirebaseObservable<any>) {}
 }
 
 
@@ -57,6 +78,29 @@ describe('FirebaseList', () => {
   });
 
   it('should assign an Observable to the designated parameters', inject([TestComponentBuilder], (tcb:TestComponentBuilder) => {
+    tcb.createAsync(MyComponent)
+      .then(f => {
+        var ref = new Firebase(rootFirebase);
+        ref.child('todos').push({
+          title: 'write post about angular 2'
+        });
+        ref.child('posts').push({
+          title: 'Angular 2 Beta'
+        });
+        f.detectChanges();
+        expect(f.componentInstance.posts instanceof FirebaseObservable).toBe(true);
+        expect(f.componentInstance.todos instanceof FirebaseObservable).toBe(true);
+
+        var todoRows = f.nativeElement.querySelectorAll('div.todo');
+        expect(todoRows.length).toBe(1);
+
+        var postRows = f.nativeElement.querySelectorAll('div.post');
+        expect(postRows.length).toBe(1);
+      });
+  }));
+
+
+  it('should accept a single string as path and token', inject([TestComponentBuilder], (tcb:TestComponentBuilder) => {
     tcb.createAsync(MyComponent)
       .then(f => {
         var ref = new Firebase(rootFirebase);
