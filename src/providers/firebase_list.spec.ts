@@ -2,7 +2,6 @@ import {Component, Inject, OnInit, ViewChild, provide} from 'angular2/core';
 
 import {fakeAsync, beforeEach, fit, inject, it, describe, expect, TestComponentBuilder} from 'angular2/testing';
 import {Observable} from 'rxjs';
-import {Observer} from 'rxjs/Observer';
 import {VirtualTimeScheduler} from 'rxjs/scheduler/VirtualTimeScheduler';
 import * as Firebase from 'firebase';
 
@@ -12,13 +11,6 @@ import {DEFAULT_FIREBASE} from '../angularfire';
 class Todo {
   done:boolean;
 }
-
-const empty: Observer<any> = {
-  isUnsubscribed: true,
-  next(value: any): void { /* noop */},
-  error(err: any): void { throw err; },
-  complete(): void { /*noop*/ }
-};
 
 @Component({
   template: '<h1>Hi</h1>',
@@ -63,10 +55,7 @@ describe('FirebaseList', () => {
 
   describe('onChildAdded', () => {
     it('should add the child to the end of the array', () => {
-      var spy = jasmine.createSpy('next');
-      empty.next = spy;
-      onChildAdded(empty, [1], 2);
-      expect(spy.calls.argsFor(0)[0]).toEqual([1,2]);
+      expect(onChildAdded([1], 2)).toEqual([1,2]);
     });
   });
 });
