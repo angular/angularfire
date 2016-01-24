@@ -6,10 +6,12 @@
     "noImplicitAny": true,
     "outDir": "dist",
     "rootDir": "src",
-    "sourceMap": true
+    "sourceMap": true,
+    "declaration": true
   },
   "exclude": [
     "node_modules",
-    "typings"
+    "typings",
+    "dist"
   ]
 }
