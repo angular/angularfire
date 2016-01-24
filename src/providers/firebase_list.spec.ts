@@ -5,12 +5,14 @@ import {Observable} from 'rxjs';
 import {VirtualTimeScheduler} from 'rxjs/scheduler/VirtualTimeScheduler';
 import * as Firebase from 'firebase';
 
-import {FirebaseList, onChildAdded, onChildMoved} from './firebase_list';
+import {FirebaseList, FirebaseListFactory, onChildAdded, onChildMoved} from './firebase_list';
 import {DEFAULT_FIREBASE} from '../angularfire';
 
 class Todo {
   done:boolean;
 }
+
+const rootFirebase = 'ws://test.firebaseio.com';
 
 @Component({
   template: '<h1>Hi</h1>',
@@ -25,7 +27,7 @@ class Todo {
       path: '/todos'
     }),
     provide(DEFAULT_FIREBASE, {
-      useValue: 'ws://test.firebaseio.com'
+      useValue: rootFirebase
     })
   ]
 })
@@ -39,7 +41,7 @@ class MyComponent {
 
 describe('FirebaseList', () => {
   afterEach(() => {
-    var fb = new Firebase('ws://test.firebaseio.com');
+    var fb = new Firebase(rootFirebase);
     fb.remove();
   });
 
@@ -51,6 +53,30 @@ describe('FirebaseList', () => {
         expect(f.componentInstance.todos instanceof Observable).toBe(true);
       });
   }));
+
+
+  describe('FirebaseListFactory', () => {
+    it('should emit a new value when a child moves', () => {
+      var ref = new Firebase(`${rootFirebase}/questions`);
+      var o = FirebaseListFactory(`${rootFirebase}/questions`);
+      var nextSpy = jasmine.createSpy('next');
+      o.subscribe(nextSpy);
+      expect(nextSpy.calls.count()).toBe(0);
+
+      var child1 = ref.push(1);
+      expect(nextSpy.calls.count()).toBe(1);
+
+      ref.push(2);
+      expect(nextSpy.calls.count()).toBe(2);
+
+      child1.setPriority('ZZZZ');
+      expect(nextSpy.calls.count()).toBe(3);
+      expect(
+        nextSpy.calls.mostRecent().args[0].map((v:any) => v.val())
+      ).toEqual([2,1]);
+    });
+  });
+
 
 
   describe('onChildAdded', () => {

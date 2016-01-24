@@ -1,9 +1,8 @@
 import {Provider} from 'angular2/core';
 import {DEFAULT_FIREBASE} from '../angularfire';
-import {Observable} from 'rxjs/Observable';
 import {Observer} from 'rxjs/Observer';
 import {FirebaseObservable} from '../utils/firebase_observable';
-import {List} from 'immutable';
+import {absolutePathResolver} from '../utils/absolute_path_resolver';
 
 export interface FirebaseListConfig {
   token?:any;
@@ -13,22 +12,24 @@ export interface FirebaseListConfig {
 
 export function FirebaseList (config?:FirebaseListConfig):Provider {
   return new Provider(config.token || FirebaseList, {
-    useFactory: (url:string) => {
-      return new FirebaseObservable((obs:Observer<any[]>) => {
-        var arr:any[] = [];
-        this._ref = new Firebase(config.path);
-
-        this._ref.on('child_added', (child:any) => {
-          obs.next(arr = onChildAdded(arr, child));
-        });
-
-        this._ref.on('child_moved', (child:any, prevKey:any) => {
-          obs.next(arr = onChildMoved(arr, child, prevKey));
-        });
-      });
-    },
+    useFactory: (url:string) => FirebaseListFactory(absolutePathResolver(url, config.path)),
     deps: [DEFAULT_FIREBASE]
   })
+}
+
+export function FirebaseListFactory (absoluteUrl:string): FirebaseObservable<any> {
+  return new FirebaseObservable((obs:Observer<any[]>) => {
+    var arr:any[] = [];
+    this._ref = new Firebase(absoluteUrl);
+
+    this._ref.on('child_added', (child:any) => {
+      obs.next(arr = onChildAdded(arr, child));
+    });
+
+    this._ref.on('child_moved', (child:any, prevKey:any) => {
+      obs.next(arr = onChildMoved(arr, child, prevKey));
+    });
+  });
 }
 
 export function onChildAdded(arr:any[], child:any): any[] {
