@@ -7,12 +7,12 @@ import {absolutePathResolver} from '../utils/absolute_path_resolver';
 export interface FirebaseListConfig {
   token?:any;
   path?: string;
-  query?: Array<Array<any>>;
 }
 
-export function FirebaseList (config?:FirebaseListConfig):Provider {
-  return new Provider(config.token || FirebaseList, {
-    useFactory: (url:string) => FirebaseListFactory(absolutePathResolver(url, config.path)),
+export function FirebaseList (config?:FirebaseListConfig|string):Provider {
+  var normalConfig = normalizeConfig(config);
+  return new Provider(normalConfig.token, {
+    useFactory: (url:string) => FirebaseListFactory(absolutePathResolver(url, normalConfig.path)),
     deps: [DEFAULT_FIREBASE]
   })
 }
@@ -30,6 +30,39 @@ export function FirebaseListFactory (absoluteUrl:string): FirebaseObservable<any
       obs.next(arr = onChildMoved(arr, child, prevKey));
     });
   });
+}
+
+export function normalizeConfig(config?:FirebaseListConfig|string):FirebaseListConfig {
+  switch (typeof config) {
+    case 'string':
+      // If string, it's just the path of the collection.
+      // The path automatically becomes the injectable token
+      let strConf:string = <string>config;
+      return {
+        token: strConf,
+        path: strConf
+      };
+    case 'object':
+      let conf:FirebaseListConfig = config;
+      let token:any;
+      if (conf.token) {
+        token = conf.token;
+      } else if (conf.path) {
+        token = conf.path;
+      } else {
+        token = FirebaseList;
+      }
+      return {
+        token: token,
+        path: conf.path
+      };
+    default:
+      // Presumably no config info provided, default to root
+      return {
+        token: FirebaseList,
+        path: ''
+      }
+  }
 }
 
 export function onChildAdded(arr:any[], child:any): any[] {
