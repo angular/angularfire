@@ -17,10 +17,7 @@ export function FirebaseList (config?:FirebaseListConfig):Provider {
         var arr:any[] = [];
         this._ref = new Firebase(config.path);
 
-        this._ref.on('child_added', (child:any) => {
-          arr.push(child);
-          obs.next(arr);
-        });
+        this._ref.on('child_added', (child:any) => onChildAdded(obs, arr, child));
 
         this._ref.on('child_moved', (child:any, prevKey:any) => {
           arr = arr.reduce((accumulator:any[], val:any, i:number) => {
@@ -40,4 +37,9 @@ export function FirebaseList (config?:FirebaseListConfig):Provider {
     },
     deps: [DEFAULT_FIREBASE]
   })
+}
+
+export function onChildAdded(obs:Observer<any[]>, arr:any[], child:any) {
+  arr.push(child);
+  obs.next(arr);
 }
