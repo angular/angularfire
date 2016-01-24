@@ -56,18 +56,19 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'node_modules/traceur/traceur.js',
+      'node_modules/traceur/traceur.+(js|map)',
       {pattern: 'node_modules/systemjs/dist/**/*.map', included: false, watched: false},
-      {pattern: 'node_modules/angular2/**/*.js', included: false, watched: false},
+      {pattern: 'node_modules/angular2/**/*.+(js|map)', included: false, watched: false},
       {pattern: 'node_modules/angular2/bundles/testing.dev.js', included: false, watched: false},
-      {pattern: 'node_modules/reflect-metadata/**/*.js', included: false, watched: false},
+      {pattern: 'node_modules/reflect-metadata/**/*.+(js|map)', included: false, watched: false},
       {pattern: 'node_modules/reflect-metadata/temp/Reflect.js', included: true, watched: false},
       {pattern: 'node_modules/zone.js/lib/**/*.js', included: false, watched: false},
       'node_modules/zone.js/lib/zone.js',
       {pattern: 'karma-test-shim.js', included: true, watched: true},
-      {pattern: 'node_modules/rxjs/**/*.js', included: false, watched: false},
+      {pattern: 'node_modules/rxjs/**/*.+(js|map)', included: false, watched: false},
       {pattern: 'node_modules/firebase/lib/firebase-web.js', included: false, watched: false},
       {pattern: 'dist/**/*.js', included: false, watched: true},
+      {pattern: 'src/**/*.ts', included: false, watched: false},
       'dist/**/*.spec.js',
       'dist/*.spec.js',
       {pattern: 'dist/**/*.js.map', included: false, watched: false},
