@@ -1,22 +1,34 @@
-import {Component, Inject, OnInit, ViewChild, provide} from 'angular2/core';
+import {Component, Inject, OnInit, ViewChild, enableProdMode, provide} from 'angular2/core';
+import {AsyncPipe, NgFor} from 'angular2/common';
 
-import {fakeAsync, beforeEach, fit, inject, it, describe, expect, TestComponentBuilder} from 'angular2/testing';
-import {Observable} from 'rxjs';
-import {VirtualTimeScheduler} from 'rxjs/scheduler/VirtualTimeScheduler';
+import {beforeEach, fit, inject, it, describe, expect, TestComponentBuilder} from 'angular2/testing';
 import * as Firebase from 'firebase';
 
 import {FirebaseList, FirebaseListFactory, onChildAdded, onChildMoved} from './firebase_list';
-import {DEFAULT_FIREBASE} from '../angularfire';
+import {DEFAULT_FIREBASE, FirebaseObservable} from '../angularfire';
+
+enableProdMode();
 
 class Todo {
   done:boolean;
 }
 
-const rootFirebase = 'ws://test.firebaseio.com';
+const rootFirebase = 'ws://test.firebaseio.com:5000';
 
 @Component({
-  template: '<h1>Hi</h1>',
+  template: `
+    <h1>Todos</h1>
+    <div *ngFor="#todo of todos | async" class="todo">
+      {{todo.val().title}}
+    </div>
+    <h1>Posts</h1>
+    <div *ngFor="#post of posts | async" class="post">
+      {{post.val().title}}
+    </div>
+  `,
   inputs:[],
+  directives: [NgFor],
+  pipes: [AsyncPipe],
   providers: [
     FirebaseList({
       token: 'posts',
@@ -33,9 +45,8 @@ const rootFirebase = 'ws://test.firebaseio.com';
 })
 class MyComponent {
   constructor(
-    @Inject('posts') public posts:Observable<any>,
-    @Inject(Todo) public todos:Observable<Todo>) {
-  }
+    @Inject('posts') public posts:FirebaseObservable<any>,
+    @Inject(Todo) public todos:FirebaseObservable<Todo>) {}
 }
 
 
@@ -48,9 +59,22 @@ describe('FirebaseList', () => {
   it('should assign an Observable to the designated parameters', inject([TestComponentBuilder], (tcb:TestComponentBuilder) => {
     tcb.createAsync(MyComponent)
       .then(f => {
+        var ref = new Firebase(rootFirebase);
+        ref.child('todos').push({
+          title: 'write post about angular 2'
+        });
+        ref.child('posts').push({
+          title: 'Angular 2 Beta'
+        });
         f.detectChanges();
-        expect(f.componentInstance.posts instanceof Observable).toBe(true);
-        expect(f.componentInstance.todos instanceof Observable).toBe(true);
+        expect(f.componentInstance.posts instanceof FirebaseObservable).toBe(true);
+        expect(f.componentInstance.todos instanceof FirebaseObservable).toBe(true);
+
+        var todoRows = f.nativeElement.querySelectorAll('div.todo');
+        expect(todoRows.length).toBe(1);
+
+        var postRows = f.nativeElement.querySelectorAll('div.post');
+        expect(postRows.length).toBe(1);
       });
   }));
 

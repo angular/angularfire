@@ -12,7 +12,7 @@ export interface FirebaseListConfig {
 export function FirebaseList (config?:FirebaseListConfig|string):Provider {
   var normalConfig = normalizeConfig(config);
   return new Provider(normalConfig.token, {
-    useFactory: (url:string) => FirebaseListFactory(absolutePathResolver(url, normalConfig.path)),
+    useFactory: (defaultFirebase:string) => FirebaseListFactory(absolutePathResolver(defaultFirebase, normalConfig.path)),
     deps: [DEFAULT_FIREBASE]
   })
 }
