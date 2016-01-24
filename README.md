@@ -55,3 +55,39 @@ bootstrap(App, [
   })
 ]);
 ```
+
+### FirebaseList
+
+A convenient provider to inject a remote list of
+Firebase into a component.
+
+Type: Provider (from angular2/core)
+Usage:
+
+```typescript
+import {Component, Inject} from 'angular2/core';
+import {FirebaseList} from 'angularfire2';
+
+@Component({
+  selector: 'questions-list',
+  providers: [
+    FirebaseList({
+      token: '/questions', // Token used to inject in the constructor
+      path: '/questions', // Will append to the DEFAULT_FIREBASE if relative
+    })
+  ],
+  template: `
+    <ul>
+      <li *ngFor="#question of questions | async">
+        Asked by: {{question.author}}
+        Question: {{question.body}}
+      </li>
+    </ul>
+  `
+})
+class QuestionsList {
+  constructor(@Inject('/questions') public questions:Observable<Question>) {
+  }
+}
+
+```
