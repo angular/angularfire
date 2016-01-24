@@ -7,6 +7,7 @@
 Contains all AngularFire provider configuration for Angular's dependency injection.
 
 Type: `any[]`
+
 Usage:
 
 ```
@@ -23,6 +24,7 @@ Injectable symbol to create a Firebase reference based on
 the url provided by `DEFAULT_FIREBASE`.
 
 Type: `Firebase`
+
 Usage:
 
 ```
@@ -40,7 +42,8 @@ class MyComponent {
 
 URL for the app's default Firebase database.
 
-Type: string
+Type: `string`
+
 Usage:
 
 ```
@@ -61,7 +64,8 @@ bootstrap(App, [
 A convenient provider to inject a remote list of
 Firebase into a component.
 
-Type: Provider (from angular2/core)
+Type: `(FirebaseListConfig | string) => Provider` (from angular2/core)
+
 Usage:
 
 ```typescript
@@ -72,22 +76,48 @@ import {FirebaseList} from 'angularfire2';
   selector: 'questions-list',
   providers: [
     FirebaseList({
-      token: '/questions', // Token used to inject in the constructor
+      token: Question, // Token used to inject in the constructor
       path: '/questions', // Will append to the DEFAULT_FIREBASE if relative
-    })
+    }),
+    // Passing just a string will make that the path AND the token used with @Inject
+    FirebaseList('/topics')
   ],
   template: `
+    <h1>Questions</h1>
     <ul>
       <li *ngFor="#question of questions | async">
         Asked by: {{question.author}}
         Question: {{question.body}}
       </li>
     </ul>
+    <h1>Hot Topics</h1>
+
   `
 })
 class QuestionsList {
-  constructor(@Inject('/questions') public questions:Observable<Question>) {
+  constructor(
+    @Inject('/questions') public questions:FirebaseObservable<Question>,
+    @Inject('/topics') public topics:FirebaseObservable<any>) {
   }
 }
-
 ```
+
+### FirebaseListConfig
+
+Interface for config object that can be provided to `FirebaseList`
+
+Type:
+```
+interface FirebaseListConfig {
+  token?:any;
+  path?: string;
+}
+```
+
+### FirebaseObservable
+
+Subclass of `rxjs/Observable` with instance methods for updating Firebase
+data. Typically this is instantiated by the AngularFire library, not by end
+users.
+
+type: `class`

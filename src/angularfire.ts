@@ -12,5 +12,5 @@ export const FIREBASE_PROVIDERS:any[] = [
     deps: [DEFAULT_FIREBASE]})
 ];
 
-export {FirebaseList} from './providers/firebase_list';
+export {FirebaseList, FirebaseListConfig} from './providers/firebase_list';
 export {FirebaseObservable} from './utils/firebase_observable';
