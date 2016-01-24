@@ -10,6 +10,8 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
+  hosts:
+    - test.firebaseio.com
 
 cache:
   directories:
