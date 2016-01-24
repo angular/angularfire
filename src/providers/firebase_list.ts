@@ -3,6 +3,7 @@ import {DEFAULT_FIREBASE} from '../angularfire';
 import {Observable} from 'rxjs/Observable';
 import {Observer} from 'rxjs/Observer';
 import {FirebaseObservable} from '../utils/firebase_observable';
+import {List} from 'immutable';
 
 export interface FirebaseListConfig {
   token?:any;
@@ -18,7 +19,7 @@ export function FirebaseList (config?:FirebaseListConfig):Provider {
         this._ref = new Firebase(config.path);
 
         this._ref.on('child_added', (child:any) => {
-          obs.next(onChildAdded(arr, child));
+          obs.next(arr = onChildAdded(arr, child));
         });
 
         this._ref.on('child_moved', (child:any, prevKey:any) => {
@@ -42,6 +43,7 @@ export function FirebaseList (config?:FirebaseListConfig):Provider {
 }
 
 export function onChildAdded(arr:any[], child:any): any[] {
-  arr.push(child);
-  return arr;
+  var newArray = arr.slice();
+  newArray.push(child);
+  return newArray;
 }

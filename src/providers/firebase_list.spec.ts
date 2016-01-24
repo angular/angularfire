@@ -57,5 +57,11 @@ describe('FirebaseList', () => {
     it('should add the child to the end of the array', () => {
       expect(onChildAdded([1], 2)).toEqual([1,2]);
     });
+
+
+    it('should not mutate the input array', () => {
+      var inputArr = [1];
+      expect(onChildAdded(inputArr, 2)).not.toEqual(inputArr);
+    });
   });
 });
