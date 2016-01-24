@@ -13,3 +13,4 @@ export const FIREBASE_PROVIDERS:any[] = [
 ];
 
 export {FirebaseList} from './providers/firebase_list';
+export {FirebaseObservable} from './utils/firebase_observable';
