@@ -23,18 +23,7 @@ export function FirebaseList (config?:FirebaseListConfig):Provider {
         });
 
         this._ref.on('child_moved', (child:any, prevKey:any) => {
-          arr = arr.reduce((accumulator:any[], val:any, i:number) => {
-            if (!prevKey && i==0) {
-              accumulator.push(child);
-            } else if(val.key() === prevKey) {
-              accumulator.push(val);
-              accumulator.push(child);
-            } else if (val.key() !== child.key()) {
-              accumulator.push(val);
-            }
-            return accumulator;
-          }, []);
-          obs.next(arr);
+          obs.next(arr = onChildMoved(arr, child, prevKey));
         });
       });
     },
@@ -46,4 +35,19 @@ export function onChildAdded(arr:any[], child:any): any[] {
   var newArray = arr.slice();
   newArray.push(child);
   return newArray;
+}
+
+export function onChildMoved(arr:any[], child:any, prevKey:string): any[] {
+  return arr.reduce((accumulator:any[], val:any, i:number) => {
+    if (!prevKey && i==0) {
+      accumulator.push(child);
+      accumulator.push(val);
+    } else if(val.key() === prevKey) {
+      accumulator.push(val);
+      accumulator.push(child);
+    } else if (val.key() !== child.key()) {
+      accumulator.push(val);
+    }
+    return accumulator;
+  }, []);
 }
