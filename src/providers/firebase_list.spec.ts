@@ -4,7 +4,7 @@ import {AsyncPipe, NgFor} from 'angular2/common';
 import {beforeEach, fit, inject, it, describe, expect, TestComponentBuilder} from 'angular2/testing';
 import * as Firebase from 'firebase';
 
-import {FirebaseList, FirebaseListFactory, onChildAdded, onChildMoved} from './firebase_list';
+import {FirebaseList, FirebaseListFactory, onChildAdded, onChildMoved, onChildRemoved} from './firebase_list';
 import {FirebaseUrl, FirebaseObservable} from '../angularfire';
 
 enableProdMode();
@@ -186,6 +186,26 @@ describe('FirebaseList', () => {
     it('should not mutate the input array', () => {
       var inputArr = [val1, val2];
       expect(onChildMoved(inputArr, val1, 'key2')).not.toEqual(inputArr);
+    });
+  });
+
+
+  describe('onChildRemoved', () => {
+    var val1:any;
+    var val2:any;
+    var val3:any;
+
+    beforeEach(() => {
+      val1 = {key:() => 'key1'};
+      val2 = {key:() => 'key2'};
+      val3 = {key:() => 'key3'};
+    });
+
+
+    it('should remove the child', () => {
+      expect(
+        onChildRemoved([val1, val2, val3], val2)
+      ).toEqual([val1, val3]);
     });
   });
 });

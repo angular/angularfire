@@ -29,6 +29,10 @@ export function FirebaseListFactory (absoluteUrl:string): FirebaseObservable<any
     ref.on('child_moved', (child:any, prevKey:any) => {
       obs.next(arr = onChildMoved(arr, child, prevKey));
     });
+
+    ref.on('child_removed', (child:any) => {
+      obs.next(arr = onChildRemoved(arr, child));
+    });
   }, ref);
 }
 
@@ -84,4 +88,8 @@ export function onChildMoved(arr:any[], child:any, prevKey:string): any[] {
     }
     return accumulator;
   }, []);
+}
+
+export function onChildRemoved(arr:any[], child:any): any[] {
+  return arr.filter(c => c.key() !== child.key());
 }
