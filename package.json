@@ -30,6 +30,7 @@
     "firebase-server": "^0.5.2",
     "gulp-jasmine": "^2.2.1",
     "gulp-typescript": "^2.10.0",
+    "http-server": "^0.8.5",
     "jasmine": "^2.4.1",
     "jasmine-core": "^2.4.1",
     "karma": "^0.13.19",

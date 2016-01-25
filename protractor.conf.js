@@ -1,10 +1,11 @@
+var httpServer = require('http-server');
 // An example configuration file.
 exports.config = {
   baseUrl: 'http://localhost:8080/test/e2e/',
 
   directConnect: true,
-  seleniumAddress: 'http://localhost:4444/wd/hub',
-  // seleniumServerJar: 'node_modules/protractor/selenium/selenium-server-standalone-2.48.2.jar',
+  // seleniumAddress: 'http://localhost:4444/wd/hub',
+  seleniumServerJar: 'node_modules/protractor/selenium/selenium-server-standalone-2.48.2.jar',
   // Capabilities to be passed to the webdriver instance.
   capabilities: {
     'browserName': 'chrome'
@@ -21,8 +22,15 @@ exports.config = {
   onPrepare: function() {
     browser.ignoreSynchronization = true;
   },
+  beforeLaunch: function () {
+    httpServer.createServer({
+      showDir: false
+    }).listen('8080', 'localhost');
+    require('./tools/test-server');
+  },
   // Options to be passed to Jasmine.
   jasmineNodeOpts: {
     defaultTimeoutInterval: 30000
-  }
+  },
+  useAllAngular2AppRoots: true
 };
