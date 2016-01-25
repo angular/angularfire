@@ -18,18 +18,18 @@ export function FirebaseList (config?:FirebaseListConfig|string):Provider {
 }
 
 export function FirebaseListFactory (absoluteUrl:string): FirebaseObservable<any> {
+  var ref = new Firebase(absoluteUrl);
   return new FirebaseObservable((obs:Observer<any[]>) => {
     var arr:any[] = [];
-    this._ref = new Firebase(absoluteUrl);
 
-    this._ref.on('child_added', (child:any) => {
+    ref.on('child_added', (child:any) => {
       obs.next(arr = onChildAdded(arr, child));
     });
 
-    this._ref.on('child_moved', (child:any, prevKey:any) => {
+    ref.on('child_moved', (child:any, prevKey:any) => {
       obs.next(arr = onChildMoved(arr, child, prevKey));
     });
-  });
+  }, ref);
 }
 
 export function normalizeConfig(config?:FirebaseListConfig|string):FirebaseListConfig {
