@@ -1,8 +1,14 @@
 <html>
   <head>
-    <script src="firebase_list_example.js"></script>
+    <script src="/node_modules/systemjs/dist/system.src.js"></script>
+    <script src="/node_modules/rxjs/bundles/Rx.js"></script>
+    <script src="/node_modules/angular2/bundles/angular2-polyfills.js"></script>
+    <script src="/node_modules/angular2/bundles/angular2.dev.js"></script>
   </head>
   <body>
-    <h1>Hi</h1>
+    <app></app>
+    <script>
+      System.import('./firebase_list_example.js');
+    </script>
   </body>
 </html>
