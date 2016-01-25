@@ -8,7 +8,21 @@
   <body>
     <app></app>
     <script>
-      System.import('./firebase_list_example.js');
+      System.config({
+        transpiler: 'typescript',
+        map: {
+          'firebase': '/node_modules/firebase/lib/firebase-web.js',
+          'angularfire2': '/dist',
+          'typescript': '/node_modules/typescript/lib/typescript.js'
+        },
+        packages: {
+          'angularfire2': {
+            main: 'angularfire.js',
+            defaultExtension: 'js'
+          }
+        }
+      })
+      System.import('./firebase_list_example.ts');
     </script>
   </body>
 </html>
