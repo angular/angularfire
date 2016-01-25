@@ -1,5 +1,7 @@
 # AngularFire2
 
+Status: In-Development
+
 ## API
 
 ### FIREBASE_PROVIDERS
