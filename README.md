@@ -1,5 +1,7 @@
 # AngularFire2
 
+[![Build Status](https://travis-ci.org/angular/indy.svg?branch=master)](https://travis-ci.org/angular/indy)
+
 Status: In-Development
 
 ## API
