@@ -10,6 +10,7 @@
     "declaration": true
   },
   "exclude": [
+    "test",
     "node_modules",
     "typings",
     "dist"
