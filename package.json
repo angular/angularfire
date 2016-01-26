@@ -1,16 +1,17 @@
 {
   "name": "angularfire2",
-  "version": "2.0.0-alpha.2",
+  "version": "2.0.0-alpha.3",
   "description": "",
-  "main": "dist/angularfire.js",
+  "main": "angularfire.js",
   "scripts": {
     "test": "npm run build; karma start",
-    "build": "tsc",
+    "build": "rm -rf dist; tsc && cp package.json README.md LICENSE .npmignore dist/",
     "install_webdriver": "./node_modules/.bin/webdriver-manager update"
   },
-  "files": [
-    "dist",
-    "LICENSE"
+  "keywords": [
+    "angular2",
+    "angular",
+    "firebase"
   ],
   "repository": {
     "type": "git",
