@@ -1,2 +1,2 @@
 npm run build
-npm pack dist
+npm publish dist
