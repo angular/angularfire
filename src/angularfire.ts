@@ -1,5 +1,3 @@
-/// <reference path="../typings/main.d.ts" />
-
 import {OpaqueToken, provide} from 'angular2/core';
 import * as Firebase from 'firebase';
 

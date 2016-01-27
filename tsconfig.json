@@ -7,12 +7,14 @@
     "outDir": "dist",
     "rootDir": "src",
     "sourceMap": true,
-    "declaration": true
+    "declaration": true,
+    "removeComments": true
   },
   "exclude": [
     "test",
     "node_modules",
-    "typings",
+    "typings/main",
+    "typings/main.d.ts",
     "dist"
   ]
 }
