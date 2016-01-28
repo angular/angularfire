@@ -17,7 +17,7 @@ Usage:
 ```
 import {bootstrap} from 'angular2/core';
 import {App} from './app';
-import {FIREBASE_PROVIDERS} from 'angularFire2';
+import {FIREBASE_PROVIDERS} from 'angularfire2';
 
 bootstrap(App, FIREBASE_PROVIDERS);
 ```
@@ -33,7 +33,7 @@ Usage:
 
 ```
 import {Inject} from 'angular2/core';
-import {DEFAULT_FIREBASE_REF} from 'angular2fire';
+import {DEFAULT_FIREBASE_REF} from 'angularfire2';
 ...
 class MyComponent {
   constructor(@Inject(DEFAULT_FIREBASE_REF) ref:Firebase) {
