@@ -6,7 +6,8 @@
   "scripts": {
     "test": "npm run build; karma start",
     "build": "rm -rf dist; tsc && cp package.json README.md LICENSE .npmignore dist/",
-    "install_webdriver": "./node_modules/.bin/webdriver-manager update"
+    "install_webdriver": "./node_modules/.bin/webdriver-manager update",
+    "install_typings": "./node_modules/.bin/typings install"
   },
   "keywords": [
     "angular2",

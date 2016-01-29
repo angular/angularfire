@@ -24,6 +24,7 @@ env:
 install:
   - npm install
   - npm run install_webdriver
+  - npm run install_typings
 
 before_script:
   - export DISPLAY=:99.0
