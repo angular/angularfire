@@ -1,13 +1,13 @@
 import {OpaqueToken, provide} from 'angular2/core';
 import * as Firebase from 'firebase';
 
-export const DEFAULT_FIREBASE = new OpaqueToken('DEFAULT_FIREBASE');
-export const DEFAULT_FIREBASE_REF = new OpaqueToken('DEFAULT_FIREBASE_REF')
+export const FirebaseUrl = new OpaqueToken('FirebaseUrl');
+export const FirebaseRef = new OpaqueToken('FirebaseRef');
 
 export const FIREBASE_PROVIDERS:any[] = [
-  provide(DEFAULT_FIREBASE_REF, {
+  provide(FirebaseRef, {
     useFactory: (url:string) => new Firebase(url),
-    deps: [DEFAULT_FIREBASE]})
+    deps: [FirebaseUrl]})
 ];
 
 export {FirebaseList, FirebaseListConfig} from './providers/firebase_list';

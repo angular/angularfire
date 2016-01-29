@@ -22,10 +22,10 @@ import {FIREBASE_PROVIDERS} from 'angularfire2';
 bootstrap(App, FIREBASE_PROVIDERS);
 ```
 
-### DEFAULT_FIREBASE_REF
+### FirebaseRef
 
 Injectable symbol to create a Firebase reference based on
-the url provided by `DEFAULT_FIREBASE`.
+the url provided by `FirebaseUrl`.
 
 Type: `Firebase`
 
@@ -33,16 +33,16 @@ Usage:
 
 ```
 import {Inject} from 'angular2/core';
-import {DEFAULT_FIREBASE_REF} from 'angularfire2';
+import {FirebaseRef} from 'angularfire2';
 ...
 class MyComponent {
-  constructor(@Inject(DEFAULT_FIREBASE_REF) ref:Firebase) {
+  constructor(@Inject(FirebaseRef) ref:Firebase) {
     ref.on('value', this.doSomething);
   }
 }
 ```
 
-### DEFAULT_FIREBASE
+### FirebaseUrl
 
 URL for the app's default Firebase database.
 
@@ -53,11 +53,11 @@ Usage:
 ```
 import {App} from './app';
 import {bootstrap, provide} from 'angular2/core';
-import {DEFAULT_FIREBASE, FIREBASE_PROVIDERS} from 'angularfire2';
+import {FirebaseUrl, FIREBASE_PROVIDERS} from 'angularfire2';
 
 bootstrap(App, [
   FIREBASE_PROVIDERS,
-  provide(DEFAULT_FIREBASE, {
+  provide(FirebaseUrl, {
     useValue: 'https://my.firebaseio.com'
   })
 ]);
@@ -81,7 +81,7 @@ import {FirebaseList} from 'angularfire2';
   providers: [
     FirebaseList({
       token: Question, // Token used to inject in the constructor
-      path: '/questions', // Will append to the DEFAULT_FIREBASE if relative
+      path: '/questions', // Will append to the FirebaseUrl if relative
     }),
     // Passing just a string will make that the path AND the token used with @Inject
     FirebaseList('/topics')

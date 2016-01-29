@@ -5,7 +5,7 @@ import {beforeEach, fit, inject, it, describe, expect, TestComponentBuilder} fro
 import * as Firebase from 'firebase';
 
 import {FirebaseList, FirebaseListFactory, onChildAdded, onChildMoved} from './firebase_list';
-import {DEFAULT_FIREBASE, FirebaseObservable} from '../angularfire';
+import {FirebaseUrl, FirebaseObservable} from '../angularfire';
 
 enableProdMode();
 
@@ -40,7 +40,7 @@ const sharedTemplate = `
       token: Todo,
       path: '/todos'
     }),
-    provide(DEFAULT_FIREBASE, {
+    provide(FirebaseUrl, {
       useValue: rootFirebase
     })
   ]
@@ -59,7 +59,7 @@ class MyComponent {
   providers: [
     FirebaseList('/posts'),
     FirebaseList('/todos'),
-    provide(DEFAULT_FIREBASE, {
+    provide(FirebaseUrl, {
       useValue: rootFirebase
     })
   ]

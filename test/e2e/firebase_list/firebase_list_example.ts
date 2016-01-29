@@ -1,6 +1,6 @@
 import {Component, Inject, provide} from 'angular2/core';
 import {bootstrap} from 'angular2/platform/browser';
-import {DEFAULT_FIREBASE, FirebaseList, FirebaseObservable} from 'angularfire2';
+import {FIREBASE_URL, FirebaseList, FirebaseObservable} from 'angularfire2';
 // var Firebase = require('firebase');
 import Firebase from 'firebase';
 const rootFirebase = 'https://answers-mobile.firebaseio.com/';
@@ -27,6 +27,6 @@ class App {
 }
 
 bootstrap(App, [
-  provide(DEFAULT_FIREBASE, {
+  provide(FIREBASE_URL, {
     useValue: rootFirebase
   })]);

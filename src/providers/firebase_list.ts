@@ -1,5 +1,5 @@
 import {Provider} from 'angular2/core';
-import {DEFAULT_FIREBASE} from '../angularfire';
+import {FirebaseUrl} from '../angularfire';
 import {Observer} from 'rxjs/Observer';
 import {FirebaseObservable} from '../utils/firebase_observable';
 import {absolutePathResolver} from '../utils/absolute_path_resolver';
@@ -13,7 +13,7 @@ export function FirebaseList (config?:FirebaseListConfig|string):Provider {
   var normalConfig = normalizeConfig(config);
   return new Provider(normalConfig.token, {
     useFactory: (defaultFirebase:string) => FirebaseListFactory(absolutePathResolver(defaultFirebase, normalConfig.path)),
-    deps: [DEFAULT_FIREBASE]
+    deps: [FirebaseUrl]
   })
 }
 
