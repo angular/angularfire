@@ -22,6 +22,24 @@ import {FIREBASE_PROVIDERS} from 'angularfire2';
 bootstrap(App, FIREBASE_PROVIDERS);
 ```
 
+### defaultFirebase
+
+Define the root url for the library, to resolve relative paths.
+
+Type: `string`
+
+Usage:
+
+```
+import {bootstrap} from 'angular2/core';
+import {FIREBASE_PROVIDERS, defaultFirebase} from 'angularfire2';
+
+bootstrap(App, [
+  FIREBASE_PROVIDERS,
+  defaultFirebase('https://my.firebaseio.com')
+]);
+```
+
 ### FirebaseRef
 
 Injectable symbol to create a Firebase reference based on
@@ -40,27 +58,6 @@ class MyComponent {
     ref.on('value', this.doSomething);
   }
 }
-```
-
-### FirebaseUrl
-
-URL for the app's default Firebase database.
-
-Type: `string`
-
-Usage:
-
-```
-import {App} from './app';
-import {bootstrap, provide} from 'angular2/core';
-import {FirebaseUrl, FIREBASE_PROVIDERS} from 'angularfire2';
-
-bootstrap(App, [
-  FIREBASE_PROVIDERS,
-  provide(FirebaseUrl, {
-    useValue: 'https://my.firebaseio.com'
-  })
-]);
 ```
 
 ### FirebaseList
@@ -104,6 +101,32 @@ class QuestionsList {
     @Inject('/topics') public topics:FirebaseObservable<any>) {
   }
 }
+```
+
+### FirebaseUrl
+
+URL for the app's default Firebase database.
+
+Type: `string`
+
+Usage:
+
+```
+import {bootstrap, Inject} from 'angular2/core';
+import {FirebaseUrl, FIREBASE_PROVIDERS, defaultFirebase} from 'angularfire2';
+
+@Component({
+  selector: 'app',
+  template: `<a [href]="url">{{ url }}</a>`
+})
+class App {
+  constructor(@Inject(FirebaseUrl) public url: string) {}
+}
+
+bootstrap(App, [
+  FIREBASE_PROVIDERS,
+  defaultFirebase('https://my.firebaseio.com')
+]);
 ```
 
 ### FirebaseListConfig
