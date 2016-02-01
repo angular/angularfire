@@ -1,4 +1,4 @@
-import {OpaqueToken, provide} from 'angular2/core';
+import {OpaqueToken, provide, Provider} from 'angular2/core';
 import * as Firebase from 'firebase';
 
 export const FirebaseUrl = new OpaqueToken('FirebaseUrl');
@@ -10,7 +10,7 @@ export const FIREBASE_PROVIDERS:any[] = [
     deps: [FirebaseUrl]})
 ];
 
-export const defaultFirebase = (url: string) => {
+export const defaultFirebase = (url: string):Provider => {
   return provide(FirebaseUrl, {
     useValue: url
   });
