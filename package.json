@@ -52,5 +52,6 @@
     "typescript": "^1.7.5",
     "typings": "^0.6.2",
     "zone.js": "0.5.10"
-  }
+  },
+  "typings": "angularfire.d.ts"
 }
