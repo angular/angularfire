@@ -34,6 +34,8 @@ export function FirebaseListFactory (absoluteUrl:string): FirebaseObservable<any
       // This also manages when the only change is prevKey change
       obs.next(arr = onChildChanged(arr, child, prevKey));
     });
+
+    return ref.off;
   }, ref);
 }
 

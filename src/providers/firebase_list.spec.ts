@@ -150,6 +150,15 @@ describe('FirebaseList', () => {
         nextSpy.calls.mostRecent().args[0].map((v:any) => v.val())
       ).toEqual([2,1]);
     });
+
+
+    it('should call off on all events when disposed', () => {
+      var firebaseSpy = spyOn(Firebase.prototype, 'off');
+      var subscribed = FirebaseListFactory('ws://test.firebaseio.com:5000').subscribe();
+      expect(firebaseSpy).not.toHaveBeenCalled();
+      subscribed.unsubscribe();
+      expect(firebaseSpy).toHaveBeenCalled();
+    });
   });
 
 
