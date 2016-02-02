@@ -148,3 +148,7 @@ data. Typically this is instantiated by the AngularFire library, not by end
 users.
 
 type: `class`
+
+additional methods:
+
+`add:(val) => void`: Add an element to the Firebase ref.

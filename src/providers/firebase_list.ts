@@ -18,18 +18,25 @@ export function FirebaseList (config?:FirebaseListConfig|string):Provider {
 }
 
 export function FirebaseListFactory (absoluteUrl:string): FirebaseObservable<any> {
+  var ref = new Firebase(absoluteUrl);
   return new FirebaseObservable((obs:Observer<any[]>) => {
     var arr:any[] = [];
-    this._ref = new Firebase(absoluteUrl);
 
-    this._ref.on('child_added', (child:any) => {
+    ref.on('child_added', (child:any) => {
       obs.next(arr = onChildAdded(arr, child));
     });
 
-    this._ref.on('child_moved', (child:any, prevKey:any) => {
-      obs.next(arr = onChildMoved(arr, child, prevKey));
+    ref.on('child_removed', (child:any) => {
+      obs.next(arr = onChildRemoved(arr, child));
     });
-  });
+
+    ref.on('child_changed', (child:any, prevKey: string) => {
+      // This also manages when the only change is prevKey change
+      obs.next(arr = onChildChanged(arr, child, prevKey));
+    });
+
+    return ref.off;
+  }, ref);
 }
 
 export function normalizeConfig(config?:FirebaseListConfig|string):FirebaseListConfig {
@@ -71,7 +78,7 @@ export function onChildAdded(arr:any[], child:any): any[] {
   return newArray;
 }
 
-export function onChildMoved(arr:any[], child:any, prevKey:string): any[] {
+export function onChildChanged(arr:any[], child:any, prevKey:string): any[] {
   return arr.reduce((accumulator:any[], val:any, i:number) => {
     if (!prevKey && i==0) {
       accumulator.push(child);
@@ -84,4 +91,20 @@ export function onChildMoved(arr:any[], child:any, prevKey:string): any[] {
     }
     return accumulator;
   }, []);
+}
+
+export function onChildRemoved(arr:any[], child:any): any[] {
+  return arr.filter(c => c.key() !== child.key());
+}
+
+export function onChildUpdated(arr:any[], child:any, prevKey:string): any[] {
+  return arr.map((v, i, arr) => {
+    if(!prevKey && !i) {
+      return child;
+    } else if (i > 0 && arr[i-1].key() === prevKey) {
+      return child;
+    } else {
+      return v;
+    }
+  });
 }
