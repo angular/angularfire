@@ -129,6 +129,28 @@ bootstrap(App, [
 ]);
 ```
 
+### FirebaseAuth
+
+Injectable service for managing authentication state. It currently only supports
+reading auth state.
+
+Type: `class FirebaseAuth extends ReplaySubject<FirebaseAuthState>`
+
+Usage:
+```Typescript
+import {FirebaseAuth} from 'angularfire2';
+@Component({
+  selector: 'auth-status',
+  template: `
+    <div *ng-if="auth | async">You are logged in</div>
+    <div *ng-if="!(auth | async)">Please log in</div>
+  `
+})
+class App {
+  constructor (@Inject(FirebaseAuth) public auth: FirebaseAuth) {}
+}
+```
+
 ### FirebaseListConfig
 
 Interface for config object that can be provided to `FirebaseList`
