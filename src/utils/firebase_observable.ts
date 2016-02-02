@@ -4,7 +4,7 @@ import {Subscriber} from 'rxjs/Subscriber';
 import {Subscription} from 'rxjs/Subscription';
 
 export class FirebaseObservable<T> extends Observable<T> {
-  constructor(subscribe?: <R>(subscriber: Subscriber<R>) => Subscription<T> | Function | void, private _ref?:Firebase) {
+  constructor(subscribe?: <R>(subscriber: Subscriber<R>) => Subscription | Function | void, private _ref?:Firebase) {
     super(subscribe);
   }
   lift<T, R>(operator: Operator<T, R>): Observable<R> {
