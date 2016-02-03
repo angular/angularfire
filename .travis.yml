@@ -11,7 +11,7 @@ addons:
     packages:
       - g++-4.8
   hosts:
-    - test.firebaseio.com
+    - localhost.firebaseio.test
 
 cache:
   directories:
