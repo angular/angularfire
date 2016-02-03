@@ -1,9 +1,12 @@
-import {Component, Inject, provide} from 'angular2/core';
+import {Component, enableProdMode, Inject, provide} from 'angular2/core';
 import {bootstrap} from 'angular2/platform/browser';
-import {FIREBASE_URL, FirebaseList, FirebaseObservable} from 'angularfire2';
+import {FirebaseUrl, FirebaseList, FirebaseObservable} from 'angularfire2';
 // var Firebase = require('firebase');
 import Firebase from 'firebase';
-const rootFirebase = 'https://answers-mobile.firebaseio.com/';
+
+enableProdMode();
+
+const rootFirebase = 'ws://localhost.firebaseio.test:5000/';
 
 var ref = new Firebase(rootFirebase);
 ref.child('questions').set([{
@@ -27,6 +30,6 @@ class App {
 }
 
 bootstrap(App, [
-  provide(FIREBASE_URL, {
+  provide(FirebaseUrl, {
     useValue: rootFirebase
   })]);
