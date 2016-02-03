@@ -7,7 +7,9 @@ import {FirebaseUrl, FirebaseRef} from './tokens';
 
 @Injectable()
 export class AngularFire {
-  constructor(@Inject(FirebaseUrl) private fbUrl:string) {
+  constructor(
+    @Inject(FirebaseUrl) private fbUrl:string,
+    public auth:FirebaseAuth) {
   }
   list (url:string):FirebaseObservable<any[]> {
     // TODO: check if relative or absolute

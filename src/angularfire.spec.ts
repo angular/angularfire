@@ -7,7 +7,14 @@ import {
   inject
 } from 'angular2/testing';
 import {Injector, provide, Provider} from 'angular2/core';
-import {AngularFire, FIREBASE_PROVIDERS, FirebaseUrl, FirebaseRef, defaultFirebase} from './angularfire';
+import {
+  AngularFire,
+  FIREBASE_PROVIDERS,
+  FirebaseAuth,
+  FirebaseUrl,
+  FirebaseRef,
+  defaultFirebase
+} from './angularfire';
 
 const testUrl = 'http://test.firebaseio.com:5000/';
 
@@ -26,6 +33,15 @@ describe('angularfire', () => {
       questions.subscribe(nextSpy);
       questions.add(['hello']);
       expect(nextSpy.calls.first().args[0][0].val()).toEqual(['hello']);
+    }));
+  });
+
+
+  describe('.auth', () => {
+    beforeEachProviders(() => [FIREBASE_PROVIDERS, defaultFirebase(testUrl)]);
+
+    it('should be an instance of AuthService', inject([AngularFire], (af:AngularFire) => {
+      expect(af.auth).toBeAnInstanceOf(FirebaseAuth);
     }));
   });
 

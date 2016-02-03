@@ -1,15 +1,16 @@
-import {Provider, Inject} from 'angular2/core';
+import {Provider, Inject, Injectable} from 'angular2/core';
 import {ReplaySubject} from 'rxjs/subject/ReplaySubject';
 import {FirebaseRef} from '../tokens';
 
 import * as Firebase from 'firebase';
 
-const kBufferSize = 1; 
+const kBufferSize = 1;
 
 export enum AuthProviders {
   Github
 };
 
+@Injectable()
 export class FirebaseAuth extends ReplaySubject<FirebaseAuthState> {
   constructor (@Inject(FirebaseRef) private _fbRef: Firebase) {
     super (kBufferSize);
@@ -50,7 +51,7 @@ export interface FirebaseAuthDataGithub {
   scope?: [string];
 }
 
-// Firebase only provides typings for 
+// Firebase only provides typings for
 interface FirebaseAuthDataAllProviders extends FirebaseAuthData {
   github?: FirebaseAuthDataGithub;
 }
