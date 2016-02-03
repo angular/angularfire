@@ -23,7 +23,7 @@ describe('FirebaseObservable', () => {
 
 
     it('should call push on the underlying ref', () => {
-      var fbref =new Firebase('ws://test.firebaseio.com:5000');
+      var fbref =new Firebase('ws://localhost.firebaseio.test:5000');
       var pushSpy = spyOn(fbref, 'push');
       var O:FirebaseObservable<any> = new FirebaseObservable((observer:Observer<any>) => {
       }, fbref);

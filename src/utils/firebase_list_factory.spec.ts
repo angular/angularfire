@@ -6,7 +6,7 @@ onChildUpdated} from '../utils/firebase_list_factory';
 
 import {beforeEach, it, describe, expect} from 'angular2/testing';
 
-const rootFirebase = 'ws://test.firebaseio.com:5000';
+const rootFirebase = 'ws://localhost.firebaseio.test:5000';
 
 describe('FirebaseListFactory', () => {
   it('should emit a new value when a child moves', () => {
@@ -32,7 +32,7 @@ describe('FirebaseListFactory', () => {
 
   it('should call off on all events when disposed', () => {
     var firebaseSpy = spyOn(Firebase.prototype, 'off');
-    var subscribed = FirebaseListFactory('ws://test.firebaseio.com:5000').subscribe();
+    var subscribed = FirebaseListFactory(rootFirebase).subscribe();
     expect(firebaseSpy).not.toHaveBeenCalled();
     subscribed.unsubscribe();
     expect(firebaseSpy).toHaveBeenCalled();

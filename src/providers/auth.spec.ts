@@ -35,7 +35,7 @@ describe('FirebaseAuth', () => {
     authCb = null;
     injector = Injector.resolveAndCreate([
       provide(FirebaseUrl, {
-        useValue: 'https://ng2-forum-demo.firebaseio.com'
+        useValue: 'ws://localhost.firebaseio.test:5000'
       }),
       FIREBASE_PROVIDERS
     ]);

@@ -16,7 +16,7 @@ import {
   defaultFirebase
 } from './angularfire';
 
-const testUrl = 'http://test.firebaseio.com:5000/';
+const testUrl = 'http://localhost.firebaseio.test:5000/';
 
 describe('angularfire', () => {
   it('should be injectable via FIREBASE_PROVIDERS', () => {

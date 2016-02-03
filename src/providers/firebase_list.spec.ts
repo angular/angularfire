@@ -14,7 +14,7 @@ class Todo {
   done:boolean;
 }
 
-const rootFirebase = 'ws://test.firebaseio.com:5000';
+const rootFirebase = 'ws://localhost.firebaseio.test:5000';
 
 const sharedTemplate = `
   <h1>Todos</h1>
@@ -122,5 +122,5 @@ describe('FirebaseList', () => {
         expect(postRows.length).toBe(1);
       });
   }));
-  
+
 });
