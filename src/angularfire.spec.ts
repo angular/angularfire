@@ -31,8 +31,8 @@ describe('angularfire', () => {
       var nextSpy = jasmine.createSpy('next');
       var questions = af.list('list-of-questions');
       questions.subscribe(nextSpy);
-      questions.add(['hello']);
-      expect(nextSpy.calls.first().args[0][0].val()).toEqual(['hello']);
+      questions.add('hello');
+      expect(nextSpy.calls.first().args[0][0].val()).toEqual('hello');
     }));
   });
 

@@ -15,7 +15,7 @@ export class FirebaseObservable<T> extends Observable<T> {
     return observable;
   }
 
-  add(val:T):void {
+  add(val:any):void {
     if(!this._ref) {
       // _ref gets created when the observable is subscribed
       throw new Error('No ref specified for this Observable!');

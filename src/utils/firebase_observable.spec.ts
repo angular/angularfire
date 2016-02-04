@@ -4,6 +4,8 @@ import {Observer} from 'rxjs/Observer';
 import 'rxjs/add/operator/map';
 import * as Firebase from 'firebase';
 
+const rootUrl = 'ws://localhost.firebaseio.test:5000';
+
 describe('FirebaseObservable', () => {
   it('should return an instance of FirebaseObservable when calling operators', () => {
     var O:FirebaseObservable<number> = new FirebaseObservable((observer:Observer<number>) => {
@@ -23,7 +25,7 @@ describe('FirebaseObservable', () => {
 
 
     it('should call push on the underlying ref', () => {
-      var fbref =new Firebase('ws://localhost.firebaseio.test:5000');
+      var fbref = new Firebase(rootUrl);
       var pushSpy = spyOn(fbref, 'push');
       var O:FirebaseObservable<any> = new FirebaseObservable((observer:Observer<any>) => {
       }, fbref);
@@ -33,6 +35,14 @@ describe('FirebaseObservable', () => {
       O.add(1);
 
       expect(pushSpy).toHaveBeenCalledWith(1);
+    });
+
+
+    it('should accept any type of value without compilation error', () => {
+      var O:FirebaseObservable<any> = new FirebaseObservable((observer:Observer<any>) => {
+      }, new Firebase(rootUrl));
+
+      O.add('foo');
     });
   });
 });
