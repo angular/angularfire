@@ -2,26 +2,37 @@ import {FirebaseObservable} from './firebase_observable';
 import {Observer} from 'rxjs/Observer';
 import * as Firebase from 'firebase';
 
-export function FirebaseListFactory (absoluteUrl:string): FirebaseObservable<any> {
+export function FirebaseListFactory (absoluteUrl:string, {preserveSnapshot}:FirebaseListFactoryOpts = {}): FirebaseObservable<any> {
   var ref = new Firebase(absoluteUrl);
   return new FirebaseObservable((obs:Observer<any[]>) => {
     var arr:any[] = [];
 
     ref.on('child_added', (child:any) => {
-      obs.next(arr = onChildAdded(arr, child));
+      arr = onChildAdded(arr, child);
+      obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
     });
 
     ref.on('child_removed', (child:any) => {
-      obs.next(arr = onChildRemoved(arr, child));
+      arr = onChildRemoved(arr, child)
+      obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
     });
 
     ref.on('child_changed', (child:any, prevKey: string) => {
+      arr = onChildChanged(arr, child, prevKey)
       // This also manages when the only change is prevKey change
-      obs.next(arr = onChildChanged(arr, child, prevKey));
+      obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
     });
 
     return () => ref.off();
   }, ref);
+}
+
+export interface FirebaseListFactoryOpts {
+  preserveSnapshot?: boolean;
+}
+
+function unwrapMapFn (snapshot:FirebaseDataSnapshot): any {
+  return snapshot.val();
 }
 
 export function onChildAdded(arr:any[], child:any): any[] {

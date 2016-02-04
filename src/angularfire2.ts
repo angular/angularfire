@@ -2,7 +2,7 @@ import {Inject, Injectable, OpaqueToken, provide, Provider} from 'angular2/core'
 import {FirebaseAuth} from './providers/auth';
 import * as Firebase from 'firebase';
 import {FirebaseObservable} from './utils/firebase_observable';
-import {FirebaseListFactory} from './utils/firebase_list_factory';
+import {FirebaseListFactory, FirebaseListFactoryOpts} from './utils/firebase_list_factory';
 import {FirebaseUrl, FirebaseRef} from './tokens';
 
 @Injectable()
@@ -11,9 +11,9 @@ export class AngularFire {
     @Inject(FirebaseUrl) private fbUrl:string,
     public auth:FirebaseAuth) {
   }
-  list (url:string):FirebaseObservable<any[]> {
+  list (url:string, opts?:FirebaseListFactoryOpts):FirebaseObservable<any[]> {
     // TODO: check if relative or absolute
-    return FirebaseListFactory(this.fbUrl+url);
+    return FirebaseListFactory(this.fbUrl+url, opts);
   }
 }
 

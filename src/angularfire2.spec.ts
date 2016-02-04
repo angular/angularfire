@@ -32,6 +32,15 @@ describe('angularfire', () => {
       var questions = af.list('list-of-questions');
       questions.subscribe(nextSpy);
       questions.add('hello');
+      expect(nextSpy.calls.first().args[0][0]).toEqual('hello');
+    }));
+
+
+    it('should preserve snapshots in the list if preserveSnapshot option specified', inject([AngularFire], (af:AngularFire) => {
+      var nextSpy = jasmine.createSpy('next');
+      var questions = af.list('list-of-questions', {preserveSnapshot: true});
+      questions.subscribe(nextSpy);
+      questions.add('hello');
       expect(nextSpy.calls.first().args[0][0].val()).toEqual('hello');
     }));
   });

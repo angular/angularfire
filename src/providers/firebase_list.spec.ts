@@ -25,11 +25,11 @@ const rootFirebase = 'ws://localhost.firebaseio.test:5000';
 const sharedTemplate = `
   <h1>Todos</h1>
   <div *ngFor="#todo of todos | async" class="todo">
-    {{todo.val().title}}
+    {{todo.title}}
   </div>
   <h1>Posts</h1>
   <div *ngFor="#post of posts | async" class="post">
-    {{post.val().title}}
+    {{post.title}}
   </div>
 `;
 
