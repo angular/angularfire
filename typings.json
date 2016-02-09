@@ -5,6 +5,7 @@
 
   },
   "ambientDependencies": {
+    "jasmine": "github:DefinitelyTyped/DefinitelyTyped/jasmine/jasmine.d.ts#64b25f63f0ec821040a5d3e049a976865062ed9d",
     "firebase": "github:DefinitelyTyped/DefinitelyTyped/firebase/firebase.d.ts#64b25f63f0ec821040a5d3e049a976865062ed9d"
   }
 }

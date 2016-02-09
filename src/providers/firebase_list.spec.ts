@@ -1,14 +1,20 @@
 import {Component, Inject, OnInit, ViewChild, enableProdMode, provide} from 'angular2/core';
 import {AsyncPipe, NgFor} from 'angular2/common';
+import {beforeEach, beforeEachProviders, fit, inject, it, describe, expect, setBaseTestProviders, TestComponentBuilder, xit} from 'angular2/testing';
+import {
+  TEST_BROWSER_PLATFORM_PROVIDERS,
+  TEST_BROWSER_APPLICATION_PROVIDERS
+} from 'angular2/platform/testing/browser';
 
-import {beforeEach, fit, inject, it, describe, expect, TestComponentBuilder} from 'angular2/testing';
 import * as Firebase from 'firebase';
-
 import {FirebaseList} from './firebase_list';
-
 import {FirebaseUrl, FirebaseObservable} from '../angularfire';
 
+// Get rid of this when angular/angular#6928 is released
 enableProdMode();
+
+setBaseTestProviders(TEST_BROWSER_PLATFORM_PROVIDERS,
+                     TEST_BROWSER_APPLICATION_PROVIDERS);
 
 class Todo {
   done:boolean;
@@ -78,7 +84,8 @@ describe('FirebaseList', () => {
     fb.remove();
   });
 
-  it('should assign an Observable to the designated parameters', inject([TestComponentBuilder], (tcb:TestComponentBuilder) => {
+  // Enable when angular/angular #6928 is released
+  xit('should assign an Observable to the designated parameters', inject([TestComponentBuilder], (tcb:TestComponentBuilder) => {
     tcb.createAsync(MyComponent)
       .then(f => {
         var ref = new Firebase(rootFirebase);
@@ -100,8 +107,8 @@ describe('FirebaseList', () => {
       });
   }));
 
-
-  it('should accept a single string as path and token', inject([TestComponentBuilder], (tcb:TestComponentBuilder) => {
+  // Enable when angular/angular#6928 is released
+  xit('should accept a single string as path and token', inject([TestComponentBuilder], (tcb:TestComponentBuilder) => {
     tcb.createAsync(MyComponent)
       .then(f => {
         var ref = new Firebase(rootFirebase);

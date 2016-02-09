@@ -1,13 +1,13 @@
 {
   "name": "angularfire2",
-  "version": "2.0.0-alpha.5",
+  "version": "2.0.0-alpha.6",
   "description": "",
   "main": "angularfire.js",
   "scripts": {
     "test": "npm run build; karma start",
     "build": "rm -rf dist; tsc && cp package.json README.md LICENSE .npmignore dist/",
-    "install_webdriver": "./node_modules/.bin/webdriver-manager update",
-    "install_typings": "./node_modules/.bin/typings install"
+    "install_webdriver": "webdriver-manager update",
+    "install_typings": "typings install"
   },
   "keywords": [
     "angular2",
@@ -25,10 +25,10 @@
   },
   "homepage": "https://github.com/angular/indy#readme",
   "dependencies": {
-    "angular2": "2.0.0-beta.0",
-    "firebase": "2.3.2",
+    "angular2": "2.0.0-beta.3",
+    "firebase": "2.4.0",
     "gulp": "^3.9.0",
-    "rxjs": "^5.0.0-beta.0"
+    "rxjs": "5.0.0-beta.0"
   },
   "devDependencies": {
     "es6-module-loader": "^0.17.10",
