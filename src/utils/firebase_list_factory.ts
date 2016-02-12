@@ -20,7 +20,7 @@ export function FirebaseListFactory (absoluteUrl:string): FirebaseObservable<any
       obs.next(arr = onChildChanged(arr, child, prevKey));
     });
 
-    return ref.off;
+    return () => ref.off();
   }, ref);
 }
 
