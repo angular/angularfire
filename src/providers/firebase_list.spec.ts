@@ -8,7 +8,7 @@ import {
 
 import * as Firebase from 'firebase';
 import {FirebaseList} from './firebase_list';
-import {FirebaseUrl, FirebaseObservable} from '../angularfire';
+import {FirebaseUrl, FirebaseObservable} from '../angularfire2';
 
 // Get rid of this when angular/angular#6928 is released
 enableProdMode();

@@ -14,7 +14,7 @@ import {
   FirebaseUrl,
   FirebaseRef,
   defaultFirebase
-} from './angularfire';
+} from './angularfire2';
 
 const testUrl = 'http://localhost.firebaseio.test:5000/';
 

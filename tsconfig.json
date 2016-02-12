@@ -11,11 +11,8 @@
     "declaration": true,
     "removeComments": true
   },
-  "exclude": [
-    "test",
-    "node_modules",
-    "typings/main",
-    "typings/main.d.ts",
-    "dist"
+  "files": [
+    "src/angularfire2.ts",
+    "typings/main.d.ts"
   ]
 }

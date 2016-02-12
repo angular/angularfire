@@ -9,7 +9,7 @@ import {
   FirebaseAuthState,
   FirebaseAuthDataGithub,
   AuthProviders
-} from '../angularfire';
+} from '../angularfire2';
 import * as Firebase from 'firebase';
 
 describe('FirebaseAuth', () => {

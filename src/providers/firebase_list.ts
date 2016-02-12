@@ -1,5 +1,5 @@
 import {Provider} from 'angular2/core';
-import {FirebaseUrl} from '../angularfire';
+import {FirebaseUrl} from '../angularfire2';
 import {Observer} from 'rxjs/Observer';
 import {FirebaseObservable} from '../utils/firebase_observable';
 import {absolutePathResolver} from '../utils/absolute_path_resolver';
