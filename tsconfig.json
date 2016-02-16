@@ -18,7 +18,6 @@
     "src/utils/firebase_list_factory.spec.ts",
     "src/utils/firebase_observable.spec.ts",
     "src/providers/auth.spec.ts",
-    "src/providers/firebase_list.spec.ts",
     "typings/main.d.ts"
   ]
 }

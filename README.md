@@ -60,49 +60,6 @@ class MyComponent {
 }
 ```
 
-### FirebaseList
-
-A convenient provider to inject a remote list of
-Firebase into a component.
-
-Type: `(FirebaseListConfig | string) => Provider` (from angular2/core)
-
-Usage:
-
-```typescript
-import {Component, Inject} from 'angular2/core';
-import {FirebaseList} from 'angularfire2';
-
-@Component({
-  selector: 'questions-list',
-  providers: [
-    FirebaseList({
-      token: Question, // Token used to inject in the constructor
-      path: '/questions', // Will append to the FirebaseUrl if relative
-    }),
-    // Passing just a string will make that the path AND the token used with @Inject
-    FirebaseList('/topics')
-  ],
-  template: `
-    <h1>Questions</h1>
-    <ul>
-      <li *ngFor="#question of questions | async">
-        Asked by: {{question.author}}
-        Question: {{question.body}}
-      </li>
-    </ul>
-    <h1>Hot Topics</h1>
-
-  `
-})
-class QuestionsList {
-  constructor(
-    @Inject('/questions') public questions:FirebaseObservable<Question>,
-    @Inject('/topics') public topics:FirebaseObservable<any>) {
-  }
-}
-```
-
 ### FirebaseUrl
 
 URL for the app's default Firebase database.
@@ -148,18 +105,6 @@ import {FirebaseAuth} from 'angularfire2';
 })
 class App {
   constructor (@Inject(FirebaseAuth) public auth: FirebaseAuth) {}
-}
-```
-
-### FirebaseListConfig
-
-Interface for config object that can be provided to `FirebaseList`
-
-Type:
-```
-interface FirebaseListConfig {
-  token?:any;
-  path?: string;
 }
 ```
 

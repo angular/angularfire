@@ -31,7 +31,6 @@ export const defaultFirebase = (url: string): Provider => {
   });
 };
 
-export {FirebaseList, FirebaseListConfig} from './providers/firebase_list';
 export {FirebaseObservable} from './utils/firebase_observable';
 export {
   FirebaseAuth,
