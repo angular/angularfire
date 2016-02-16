@@ -1,7 +1,7 @@
 import {Inject, Injectable, OpaqueToken, provide, Provider} from 'angular2/core';
 import {FirebaseAuth} from './providers/auth';
 import * as Firebase from 'firebase';
-import {FirebaseListObservable} from './utils/firebase_observable';
+import {FirebaseListObservable} from './utils/firebase_list_observable';
 import {FirebaseListFactory, FirebaseListFactoryOpts} from './utils/firebase_list_factory';
 import {FirebaseUrl, FirebaseRef} from './tokens';
 
@@ -31,7 +31,7 @@ export const defaultFirebase = (url: string): Provider => {
   });
 };
 
-export {FirebaseListObservable} from './utils/firebase_observable';
+export {FirebaseListObservable} from './utils/firebase_list_observable';
 export {
   FirebaseAuth,
   FirebaseAuthState,

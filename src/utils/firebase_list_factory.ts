@@ -1,4 +1,4 @@
-import {FirebaseListObservable} from './firebase_observable';
+import {FirebaseListObservable} from './firebase_list_observable';
 import {Observer} from 'rxjs/Observer';
 import * as Firebase from 'firebase';
 
