@@ -1,10 +1,10 @@
-import {FirebaseObservable} from './firebase_observable';
+import {FirebaseListObservable} from './firebase_observable';
 import {Observer} from 'rxjs/Observer';
 import * as Firebase from 'firebase';
 
-export function FirebaseListFactory (absoluteUrl:string, {preserveSnapshot}:FirebaseListFactoryOpts = {}): FirebaseObservable<any> {
+export function FirebaseListFactory (absoluteUrl:string, {preserveSnapshot}:FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
   var ref = new Firebase(absoluteUrl);
-  return new FirebaseObservable((obs:Observer<any[]>) => {
+  return new FirebaseListObservable((obs:Observer<any[]>) => {
     var arr:any[] = [];
 
     ref.on('child_added', (child:any) => {

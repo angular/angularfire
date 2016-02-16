@@ -147,11 +147,10 @@ class App {
 }
 ```
 
-### FirebaseObservable
+### FirebaseListObservable
 
-Subclass of `rxjs/Observable` with instance methods for updating Firebase
-data. Typically this is instantiated by the AngularFire library, not by end
-users.
+Subclass of rxjs `Observable` which also has methods for updating
+list-like Firebase data.
 
 type: `class`
 

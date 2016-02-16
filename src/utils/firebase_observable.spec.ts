@@ -1,5 +1,5 @@
 import {describe,it,beforeEach} from 'angular2/testing';
-import {FirebaseObservable} from './firebase_observable';
+import {FirebaseListObservable} from './firebase_observable';
 import {Observer} from 'rxjs/Observer';
 import 'rxjs/add/operator/map';
 import * as Firebase from 'firebase';
@@ -8,15 +8,15 @@ const rootUrl = 'ws://localhost.firebaseio.test:5000';
 
 describe('FirebaseObservable', () => {
   it('should return an instance of FirebaseObservable when calling operators', () => {
-    var O:FirebaseObservable<number> = new FirebaseObservable((observer:Observer<number>) => {
+    var O:FirebaseListObservable<number> = new FirebaseListObservable((observer:Observer<number>) => {
     });
-    expect(O.map(noop) instanceof FirebaseObservable).toBe(true);
+    expect(O.map(noop) instanceof FirebaseListObservable).toBe(true);
   });
 
 
   describe('add', () => {
     it('should throw an exception if pushed when not subscribed', () => {
-      var O:FirebaseObservable<any> = new FirebaseObservable((observer:Observer<any>) => {});
+      var O:FirebaseListObservable<any> = new FirebaseListObservable((observer:Observer<any>) => {});
 
       expect(() => {
         O.add('foo');
@@ -27,7 +27,7 @@ describe('FirebaseObservable', () => {
     it('should call push on the underlying ref', () => {
       var fbref = new Firebase(rootUrl);
       var pushSpy = spyOn(fbref, 'push');
-      var O:FirebaseObservable<any> = new FirebaseObservable((observer:Observer<any>) => {
+      var O:FirebaseListObservable<any> = new FirebaseListObservable((observer:Observer<any>) => {
       }, fbref);
 
       O.subscribe();
@@ -39,7 +39,7 @@ describe('FirebaseObservable', () => {
 
 
     it('should accept any type of value without compilation error', () => {
-      var O:FirebaseObservable<any> = new FirebaseObservable((observer:Observer<any>) => {
+      var O:FirebaseListObservable<any> = new FirebaseListObservable((observer:Observer<any>) => {
       }, new Firebase(rootUrl));
 
       O.add('foo');
