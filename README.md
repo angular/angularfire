@@ -6,6 +6,44 @@ Status: In-Development
 
 ## API
 
+### AngularFire Service
+
+The recommended way to take advantage of the AngularFire library is to
+use the injectable AngularFire service.
+
+```typescript
+import {Component} from 'angular2/core';
+import {bootstrap} from 'angular2/platform/browser';
+import {Observable} from 'rxjs/Observable';
+import {FIREBASE_PROVIDERS, defaultFirebase, AngularFire} from 'angularfire2';
+import {Question} from './services/question';
+
+@Component({
+  template:`
+    <ul>
+      <li *ngFor="#question of questions | async">
+        {{question.text}}
+      </li>
+    </ul>
+  `
+})
+class App {
+  questions:Observable<Question[]>
+  constructor(af:AngularFire) {
+    // Get an observable of a synchronized array from <firebase-root>/questions
+    this.questions = af.list('/questions');
+  }
+}
+
+bootstrap(App, [
+  // Common injectable providers from the AngularFire lib
+  FIREBASE_PROVIDERS,
+  // Tell AngularFire the base URL for the Firebase used throughout
+  defaultFirebase('https://<some-firebase>.firebaseio.com')
+]);
+
+```
+
 ### FIREBASE_PROVIDERS
 
 Contains all AngularFire provider configuration for Angular's dependency injection.
@@ -15,7 +53,7 @@ Type: `any[]`
 Usage:
 
 ```
-import {bootstrap} from 'angular2/core';
+import {bootstrap} from 'angular2/platform/browser';
 import {App} from './app';
 import {FIREBASE_PROVIDERS} from 'angularfire2';
 
@@ -31,7 +69,7 @@ Type: `string`
 Usage:
 
 ```
-import {bootstrap} from 'angular2/core';
+import {bootstrap} from 'angular2/platform/browser';
 import {FIREBASE_PROVIDERS, defaultFirebase} from 'angularfire2';
 
 bootstrap(App, [
@@ -69,7 +107,8 @@ Type: `string`
 Usage:
 
 ```
-import {bootstrap, Inject} from 'angular2/core';
+import {bootstrap} from 'angular2/platform/browser';
+import {Inject} from 'angular2/core';
 import {FirebaseUrl, FIREBASE_PROVIDERS, defaultFirebase} from 'angularfire2';
 
 @Component({
