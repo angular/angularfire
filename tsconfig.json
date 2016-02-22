@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "module": "commonjs",
     "target": "es5",
     "noImplicitAny": true,
@@ -10,11 +11,13 @@
     "declaration": true,
     "removeComments": true
   },
-  "exclude": [
-    "test",
-    "node_modules",
-    "typings/main",
-    "typings/main.d.ts",
-    "dist"
+  "files": [
+    "src/angularfire2.ts",
+    "src/angularfire2.spec.ts",
+    "src/utils/absolute_path_resolver.ts",
+    "src/utils/firebase_list_factory.spec.ts",
+    "src/utils/firebase_list_observable.spec.ts",
+    "src/providers/auth.spec.ts",
+    "typings/main.d.ts"
   ]
 }

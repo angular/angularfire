@@ -6,9 +6,14 @@ onChildUpdated} from '../utils/firebase_list_factory';
 
 import {beforeEach, it, describe, expect} from 'angular2/testing';
 
-const rootFirebase = 'ws://test.firebaseio.com:5000';
+const rootFirebase = 'ws://localhost.firebaseio.test:5000';
 
 describe('FirebaseListFactory', () => {
+  beforeEach(() => {
+    (new Firebase(rootFirebase)).remove();
+  });
+
+
   it('should emit a new value when a child moves', () => {
     var ref = new Firebase(`${rootFirebase}/questions`);
     var o = FirebaseListFactory(`${rootFirebase}/questions`);
@@ -24,15 +29,35 @@ describe('FirebaseListFactory', () => {
 
     child1.setPriority('ZZZZ');
     expect(nextSpy.calls.count()).toBe(3);
-    expect(
-      nextSpy.calls.mostRecent().args[0].map((v: any) => v.val())
-    ).toEqual([2, 1]);
+    expect(nextSpy.calls.mostRecent().args[0]).toEqual([2, 1]);
+  });
+
+
+  it('should emit unwrapped data by default', () => {
+    var ref = new Firebase(`${rootFirebase}/questions`);
+    var o = FirebaseListFactory(`${rootFirebase}/questions`);
+    var nextSpy = jasmine.createSpy('next');
+    o.subscribe(nextSpy);
+
+    ref.push('hello!');
+    expect(nextSpy).toHaveBeenCalledWith(['hello!']);
+  });
+
+
+  it('should emit snapshots if preserveSnapshot option is true', () => {
+    var ref = new Firebase(`${rootFirebase}/questions`);
+    var o = FirebaseListFactory(`${rootFirebase}/questions`, {preserveSnapshot: true});
+    var nextSpy = jasmine.createSpy('next');
+    o.subscribe(nextSpy);
+
+    ref.push('hello!');
+    expect(nextSpy.calls.argsFor(0)[0][0].val()).toEqual('hello!');
   });
 
 
   it('should call off on all events when disposed', () => {
     var firebaseSpy = spyOn(Firebase.prototype, 'off');
-    var subscribed = FirebaseListFactory('ws://test.firebaseio.com:5000').subscribe();
+    var subscribed = FirebaseListFactory(rootFirebase).subscribe();
     expect(firebaseSpy).not.toHaveBeenCalled();
     subscribed.unsubscribe();
     expect(firebaseSpy).toHaveBeenCalled();

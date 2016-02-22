@@ -1,10 +1,48 @@
 # AngularFire2
 
-[![Build Status](https://travis-ci.org/angular/indy.svg?branch=master)](https://travis-ci.org/angular/indy)
+[![Build Status](https://travis-ci.org/angular/angularfire2.svg?branch=master)](https://travis-ci.org/angular/angularfire2)
 
 Status: In-Development
 
 ## API
+
+### AngularFire Service
+
+The recommended way to take advantage of the AngularFire library is to
+use the injectable AngularFire service.
+
+```typescript
+import {Component} from 'angular2/core';
+import {bootstrap} from 'angular2/platform/browser';
+import {Observable} from 'rxjs/Observable';
+import {FIREBASE_PROVIDERS, defaultFirebase, AngularFire} from 'angularfire2';
+import {Question} from './services/question';
+
+@Component({
+  template:`
+    <ul>
+      <li *ngFor="#question of questions | async">
+        {{question.text}}
+      </li>
+    </ul>
+  `
+})
+class App {
+  questions:Observable<Question[]>
+  constructor(af:AngularFire) {
+    // Get an observable of a synchronized array from <firebase-root>/questions
+    this.questions = af.list('/questions');
+  }
+}
+
+bootstrap(App, [
+  // Common injectable providers from the AngularFire lib
+  FIREBASE_PROVIDERS,
+  // Tell AngularFire the base URL for the Firebase used throughout
+  defaultFirebase('https://<some-firebase>.firebaseio.com')
+]);
+
+```
 
 ### FIREBASE_PROVIDERS
 
@@ -15,7 +53,7 @@ Type: `any[]`
 Usage:
 
 ```
-import {bootstrap} from 'angular2/core';
+import {bootstrap} from 'angular2/platform/browser';
 import {App} from './app';
 import {FIREBASE_PROVIDERS} from 'angularfire2';
 
@@ -31,7 +69,7 @@ Type: `string`
 Usage:
 
 ```
-import {bootstrap} from 'angular2/core';
+import {bootstrap} from 'angular2/platform/browser';
 import {FIREBASE_PROVIDERS, defaultFirebase} from 'angularfire2';
 
 bootstrap(App, [
@@ -60,49 +98,6 @@ class MyComponent {
 }
 ```
 
-### FirebaseList
-
-A convenient provider to inject a remote list of
-Firebase into a component.
-
-Type: `(FirebaseListConfig | string) => Provider` (from angular2/core)
-
-Usage:
-
-```typescript
-import {Component, Inject} from 'angular2/core';
-import {FirebaseList} from 'angularfire2';
-
-@Component({
-  selector: 'questions-list',
-  providers: [
-    FirebaseList({
-      token: Question, // Token used to inject in the constructor
-      path: '/questions', // Will append to the FirebaseUrl if relative
-    }),
-    // Passing just a string will make that the path AND the token used with @Inject
-    FirebaseList('/topics')
-  ],
-  template: `
-    <h1>Questions</h1>
-    <ul>
-      <li *ngFor="#question of questions | async">
-        Asked by: {{question.author}}
-        Question: {{question.body}}
-      </li>
-    </ul>
-    <h1>Hot Topics</h1>
-
-  `
-})
-class QuestionsList {
-  constructor(
-    @Inject('/questions') public questions:FirebaseObservable<Question>,
-    @Inject('/topics') public topics:FirebaseObservable<any>) {
-  }
-}
-```
-
 ### FirebaseUrl
 
 URL for the app's default Firebase database.
@@ -112,7 +107,8 @@ Type: `string`
 Usage:
 
 ```
-import {bootstrap, Inject} from 'angular2/core';
+import {bootstrap} from 'angular2/platform/browser';
+import {Inject} from 'angular2/core';
 import {FirebaseUrl, FIREBASE_PROVIDERS, defaultFirebase} from 'angularfire2';
 
 @Component({
@@ -129,23 +125,32 @@ bootstrap(App, [
 ]);
 ```
 
-### FirebaseListConfig
+### FirebaseAuth
 
-Interface for config object that can be provided to `FirebaseList`
+Injectable service for managing authentication state. It currently only supports
+reading auth state.
 
-Type:
-```
-interface FirebaseListConfig {
-  token?:any;
-  path?: string;
+Type: `class FirebaseAuth extends ReplaySubject<FirebaseAuthState>`
+
+Usage:
+```Typescript
+import {FirebaseAuth} from 'angularfire2';
+@Component({
+  selector: 'auth-status',
+  template: `
+    <div *ng-if="auth | async">You are logged in</div>
+    <div *ng-if="!(auth | async)">Please log in</div>
+  `
+})
+class App {
+  constructor (@Inject(FirebaseAuth) public auth: FirebaseAuth) {}
 }
 ```
 
-### FirebaseObservable
+### FirebaseListObservable
 
-Subclass of `rxjs/Observable` with instance methods for updating Firebase
-data. Typically this is instantiated by the AngularFire library, not by end
-users.
+Subclass of rxjs `Observable` which also has methods for updating
+list-like Firebase data.
 
 type: `class`
 
