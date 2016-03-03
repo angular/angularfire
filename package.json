@@ -55,7 +55,7 @@
     "systemjs-builder": "^0.15.7",
     "traceur": "0.0.96",
     "tsd": "^0.6.5",
-    "typescript": "^1.7.5",
+    "typescript": "1.7.5",
     "typings": "^0.6.2",
     "zone.js": "0.5.15"
   },
