@@ -127,8 +127,72 @@ bootstrap(App, [
 
 ### FirebaseAuth
 
-Injectable service for managing authentication state. It currently only supports
-reading auth state.
+Injectable service for managing authentication state.
+
+#### Logging In
+To log in a user, call the `login` method on an instance of `FirebaseAuth` class. The method has
+the following two signatures:
+
+```typescript
+login(config?: AuthConfiguration): Promise<FirebaseAuthState>;
+login(credentials: AuthCredentials, config?: AuthConfiguration): Promise<FirebaseAuthState>;
+```
+The signature that is used depends on which AuthMethod you chose to use to login.
+AuthMethods.Popup, AuthMethods.Redirect, and AuthMethods.Anonymous all use the first signature whereas
+AuthMethods.CustomToken, AuthMethods.OAuthToken, and AuthMethods.Password use the second signature. This is
+because if you use these three AuthMethods you need to provide a credentials argument to login.
+
+##### AuthConfiguration
+You **MUST** provide an `AuthConfiguration` object to use the `login` method, however you do not need
+to pass it to login correctly. Instead you may choose to pass the configuration in through DI. This helps
+keep your components modular because they can simply call `login` and it will use whichever options were
+provided through DI.
+You can use the `firebaseAuthConfigMethod` to generate a `Provider` object which you can pass to DI like so:
+
+```typescript
+import {bootstrap} from 'angular2/core';
+import {
+  FIREBASE_PROVIDERS,
+  defaultFirebase,
+  firebaseAuthConfig,
+  AuthProviders,
+  AuthMethods
+} from 'angularfire2';
+bootstrap(MyApp, [
+  FIREBASE_PROVIDERS,
+  defaultFirebase('https://<some-firebase>.firebaseio.com'),
+  firebaseAuthConfig({
+    provider: AuthProviders.Facebook,
+    method: AuthMethods.Popup,
+    remember: 'default',
+    scope: ['email']
+  })
+]);
+```
+Once you've done that you can simply call `login` on the auth object. This will automatically use the options that were configured with DI. You can override those options by providing an optional configuration object to the `login` method like so:
+
+```typescript
+import {Component} from 'angular2/core';
+import {FirebaseAuth} from 'angularfire2';
+
+@Component({
+  selector: 'my-component'
+  templateUrl: 'my_template.html'
+})
+export class MyApp {
+  constructor (private _auth: FirebaseAuth) {}
+
+  public doLogin () {
+    // This will perform popup auth with google oauth and the scope will be email
+    // Because those options were provided through bootstrap to DI, and we're overriding the provider.
+    this._auth.login({
+      provider: AuthProviders.Google
+    });
+  }
+}
+```
+
+#### Subscribing to Authentication State
 
 Type: `class FirebaseAuth extends ReplaySubject<FirebaseAuthState>`
 

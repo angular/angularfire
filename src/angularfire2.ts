@@ -35,10 +35,11 @@ export {FirebaseListObservable} from './utils/firebase_list_observable';
 export {
   FirebaseAuth,
   FirebaseAuthState,
-  FirebaseAuthDataGithub,
-  AuthProviders
+  AuthMethods,
+  AuthProviders,
+  firebaseAuthConfig
 } from './providers/auth';
-export {FirebaseUrl, FirebaseRef} from './tokens';
+export {FirebaseUrl, FirebaseRef, FirebaseAuthConfig} from './tokens';
 
 // Helps Angular-CLI automatically add providers
 export default {
