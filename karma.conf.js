@@ -19,6 +19,7 @@ module.exports = function(config) {
           angular2: 'node_modules/angular2',
           'zone.js': 'node_modules/zone.js/lib',
           firebase: 'node_modules/firebase/lib/firebase-web.js',
+          'mock-promises': 'node_modules/mock-promises/lib/mock-promises.js',
           'reflect-metadata': 'node_modules/reflect-metadata/temp/Reflect.js',
         },
         packages: {
@@ -67,6 +68,7 @@ module.exports = function(config) {
       {pattern: 'karma-test-shim.js', included: true, watched: true},
       {pattern: 'node_modules/rxjs/**/*.+(js|map)', included: false, watched: false},
       {pattern: 'node_modules/firebase/lib/firebase-web.js', included: false, watched: false},
+      {pattern: 'node_modules/mock-promises/lib/mock-promises.js', included: false, watched: false},
       {pattern: 'dist/**/*.js', included: false, watched: true},
       {pattern: 'src/**/*.ts', included: false, watched: false},
       'dist/**/*.spec.js',
