@@ -13,6 +13,8 @@ import {
   firebaseAuthConfig,
   AuthProviders
 } from '../angularfire2';
+import {AuthBackend} from './auth_backend';
+import {FirebaseSdkAuthBackend} from './firebase_sdk_auth_backend';
 import * as Firebase from 'firebase';
 import * as mockPromises from 'mock-promises';
 
@@ -21,6 +23,7 @@ describe('FirebaseAuth', () => {
   let ref: Firebase = null;
   let authData: any = null;
   let authCb: any = null;
+  let backend: AuthBackend = null;
 
   const providerMetadata = {
     accessToken: 'accessToken',
@@ -74,7 +77,7 @@ describe('FirebaseAuth', () => {
           authCb(authData);
         }
       });
-
+      backend = new FirebaseSdkAuthBackend(ref);
     });
     function updateAuthState(_authData: any): void {
       authData = _authData;
@@ -144,6 +147,7 @@ describe('FirebaseAuth', () => {
           'unauth','getAuth', 'onAuth', 'offAuth',
           'createUser','changePassword','changeEmail','removeUser','resetPassword'
         ]);
+        backend = new FirebaseSdkAuthBackend(ref);
     });
 
     it('should return a provider', () => {
@@ -154,7 +158,7 @@ describe('FirebaseAuth', () => {
       let config= {
         method: AuthMethods.Anonymous
       };
-      let auth = new FirebaseAuth(ref, config);
+      let auth = new FirebaseAuth(backend, config);
       auth.login();
       expect(ref.authAnonymously).toHaveBeenCalled();
     });
@@ -164,7 +168,7 @@ describe('FirebaseAuth', () => {
         method: AuthMethods.Anonymous,
         remember: 'default'
       };
-      let auth = new FirebaseAuth(ref, config);
+      let auth = new FirebaseAuth(backend, config);
       auth.login();
       expect(ref.authAnonymously).toHaveBeenCalledWith(jasmine.any(Function), {remember: 'default'});
     });
@@ -173,7 +177,7 @@ describe('FirebaseAuth', () => {
       let config = {
         method: AuthMethods.Anonymous
       };
-      let auth = new FirebaseAuth(ref, config);
+      let auth = new FirebaseAuth(backend, config);
       auth.login({
         method: AuthMethods.Popup,
         provider: AuthProviders.Google
@@ -187,7 +191,7 @@ describe('FirebaseAuth', () => {
         provider: AuthProviders.Google,
         scope: ['email']
       };
-      let auth = new FirebaseAuth(ref, config);
+      let auth = new FirebaseAuth(backend, config);
       auth.login({
         provider: AuthProviders.Github
       });
@@ -210,7 +214,8 @@ describe('FirebaseAuth', () => {
           'unauth','getAuth', 'onAuth', 'offAuth',
           'createUser','changePassword','changeEmail','removeUser','resetPassword'
         ]);
-      auth = new FirebaseAuth(ref);
+      backend = new FirebaseSdkAuthBackend(ref);
+      auth = new FirebaseAuth(backend);
 
       result = null;
       status = null;
@@ -235,7 +240,7 @@ describe('FirebaseAuth', () => {
       let config = {
         method: AuthMethods.Password
       };
-      let auth = new FirebaseAuth(ref, config);
+      let auth = new FirebaseAuth(backend, config);
       let promise = wrapPromise(auth.login());
       mockPromises.executeForPromise(promise);
       expect(failure).not.toBeNull();
@@ -245,7 +250,7 @@ describe('FirebaseAuth', () => {
       let config = {
         method: AuthMethods.CustomToken
       };
-      let auth = new FirebaseAuth(ref, config);
+      let auth = new FirebaseAuth(backend, config);
       let promise = wrapPromise(auth.login());
       mockPromises.executeForPromise(promise);
       expect(failure).not.toBeNull();
@@ -255,7 +260,7 @@ describe('FirebaseAuth', () => {
       let config = {
         method: AuthMethods.OAuthToken
       };
-      let auth = new FirebaseAuth(ref, config);
+      let auth = new FirebaseAuth(backend, config);
       let promise = wrapPromise(auth.login());
       mockPromises.executeForPromise(promise);
       expect(failure).not.toBeNull();
@@ -265,7 +270,7 @@ describe('FirebaseAuth', () => {
       let config = {
         method: AuthMethods.Redirect
       };
-      let auth = new FirebaseAuth(ref, config);
+      let auth = new FirebaseAuth(backend, config);
       let promise = wrapPromise(auth.login());
       mockPromises.executeForPromise(promise);
       expect(failure).not.toBeNull();
@@ -275,7 +280,7 @@ describe('FirebaseAuth', () => {
       let config = {
         method: AuthMethods.Popup
       };
-      let auth = new FirebaseAuth(ref, config);
+      let auth = new FirebaseAuth(backend, config);
       let promise = wrapPromise(auth.login());
       mockPromises.executeForPromise(promise);
       expect(failure).not.toBeNull();
