@@ -10,6 +10,7 @@ import {Injector, provide, Provider} from 'angular2/core';
 import {
   AngularFire,
   FIREBASE_PROVIDERS,
+  WORKER_APP_FIREBASE_PROVIDERS,
   FirebaseAuth,
   FirebaseUrl,
   FirebaseRef,

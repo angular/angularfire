@@ -1,57 +1,125 @@
-import {Provider, Inject, Injectable} from 'angular2/core';
+import {Provider, Inject, provide, Injectable, Optional} from 'angular2/core';
 import {ReplaySubject} from 'rxjs/subject/ReplaySubject';
-import {FirebaseRef} from '../tokens';
-
-import * as Firebase from 'firebase';
+import {FirebaseRef, FirebaseAuthConfig} from '../tokens';
+import {isPresent} from '../utils/utils';
+import {
+  AuthBackend,
+  AuthProviders,
+  AuthMethods,
+  OAuthCredentials,
+  OAuth1Credentials,
+  OAuth2Credentials,
+  AuthCredentials,
+  FirebaseAuthState,
+  AuthConfiguration,
+  FirebaseAuthDataAllProviders,
+  authDataToAuthState
+} from './auth_backend';
 
 const kBufferSize = 1;
 
-export enum AuthProviders {
-  Github
+export const firebaseAuthConfig = (config: AuthConfiguration): Provider => {
+  return provide(FirebaseAuthConfig, {
+    useValue: config
+  });
 };
 
 @Injectable()
 export class FirebaseAuth extends ReplaySubject<FirebaseAuthState> {
-  constructor (@Inject(FirebaseRef) private _fbRef: Firebase) {
+  constructor (private _authBackend: AuthBackend,
+               @Optional() @Inject(FirebaseAuthConfig) private _config?: AuthConfiguration) {
     super (kBufferSize);
 
-    this._fbRef.onAuth((authData) => this._emitAuthData(authData));
+    this._authBackend.onAuth((authData) => this._emitAuthData(authData));
   }
+
+  public login(config?: AuthConfiguration): Promise<FirebaseAuthState>;
+  public login(credentials: AuthCredentials, config?: AuthConfiguration): Promise<FirebaseAuthState>;
+  public login(obj1?: any, obj2?: AuthConfiguration): Promise<FirebaseAuthState> {
+    let config: AuthConfiguration = null;
+    let credentials: AuthCredentials = null;
+    if (arguments.length > 2) {
+      return this._reject('Login only accepts a maximum of two arguments.');
+    } else if (arguments.length == 2) {
+      credentials = obj1;
+      config = obj2;
+    } else if (arguments.length == 1) {
+      config = obj1;
+    }
+    config = this._mergeConfigs(config);
+
+    if (!isPresent(config.method)) {
+      return this._reject('You must provide a login method');
+    }
+    let providerMethods = [AuthMethods.Popup, AuthMethods.Redirect, AuthMethods.OAuthToken];
+    if (providerMethods.indexOf(config.method) != -1){
+        if (!isPresent(config.provider)) {
+          return this._reject('You must include a provider to use this auth method.');
+        }
+    }
+    let credentialsMethods = [AuthMethods.Password, AuthMethods.OAuthToken, AuthMethods.CustomToken];
+    if (credentialsMethods.indexOf(config.method) != -1){
+      if (!credentials) {
+        return this._reject('You must include credentials to use this auth method.');
+      }
+    }
+
+    switch (config.method) {
+      case AuthMethods.Popup:
+        return this._authBackend.authWithOAuthPopup(config.provider, this._scrubConfig(config));
+      case AuthMethods.Redirect:
+        return this._authBackend.authWithOAuthRedirect(config.provider, this._scrubConfig(config));
+      case AuthMethods.Anonymous:
+        return this._authBackend.authAnonymously(this._scrubConfig(config));
+      case AuthMethods.Password:
+        return this._authBackend.authWithPassword(<FirebaseCredentials> credentials, this._scrubConfig(config, false));
+      case AuthMethods.OAuthToken:
+        return this._authBackend.authWithOAuthToken(config.provider, <OAuthCredentials> credentials,
+                                         this._scrubConfig(config));
+      case AuthMethods.CustomToken:
+        return this._authBackend.authWithCustomToken((<OAuth2Credentials> credentials).token,
+                                         this._scrubConfig(config, false));
+    }
+  }
+
+  public logout(): void {
+    if (this._authBackend.getAuth() !== null) {
+      this._authBackend.unauth();
+    }
+  }
+
+  /**
+   * Merges the config object that is passed in with the configuration
+   * provided through DI. Giving precendence to the one that was passed.
+   */
+  private _mergeConfigs(config: AuthConfiguration): AuthConfiguration {
+    if (this._config == null)
+      return config;
+
+    return Object.assign({}, this._config, config);
+  }
+
+  private _reject(msg: string): Promise<FirebaseAuthState> {
+    return new Promise((res, rej) => {
+      return rej (msg);
+    });
+  }
+
+  private _scrubConfig (config: AuthConfiguration, scrubProvider = true): any {
+    let scrubbed = Object.assign ({}, config);
+    if (scrubProvider) {
+      delete scrubbed.provider;
+    }
+    delete scrubbed.method;
+    return scrubbed;
+  }
+
 
   private _emitAuthData(authData: FirebaseAuthDataAllProviders): void {
     if (authData == null) {
       this.next(null);
     } else {
-      let {uid, provider, github} = authData;
-      let authState: FirebaseAuthState = {uid, provider: null};
-      switch (provider) {
-        case "github":
-          authState.github = github;
-          authState.provider = AuthProviders.Github;
-          break;
-        default:
-          throw new Error(`Unsupported firebase auth provider ${provider}`);
-      }
-      this.next(authState);
+      this.next(authDataToAuthState(authData));
     }
   }
-}
-
-export interface FirebaseAuthState {
-  uid: string;
-  provider: AuthProviders;
-  github?: FirebaseAuthDataGithub;
-}
-
-export interface FirebaseAuthDataGithub {
-  id: string;
-  username: string;
-  accessToken: string;
-  displayName?: string;
-  scope?: [string];
-}
-
-// Firebase only provides typings for
-interface FirebaseAuthDataAllProviders extends FirebaseAuthData {
-  github?: FirebaseAuthDataGithub;
 }
