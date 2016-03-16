@@ -1,14 +1,18 @@
 import {
   describe,
+  ddescribe,
   it,
+  iit,
   beforeEach,
   beforeEachProviders,
   expect,
-  inject
+  inject,
+  injectAsync
 } from 'angular2/testing';
 import {Injector, provide, Provider} from 'angular2/core';
 import {
   AngularFire,
+  FirebaseObjectObservable,
   FIREBASE_PROVIDERS,
   WORKER_APP_FIREBASE_PROVIDERS,
   FirebaseAuth,
@@ -16,74 +20,95 @@ import {
   FirebaseRef,
   defaultFirebase
 } from './angularfire2';
-import {FirebaseObjectObservable} from './utils/firebase_object_observable';
 import {Subscription} from 'rxjs';
+import 'rxjs/add/operator/toPromise';
+import 'rxjs/add/operator/take';
+import 'rxjs/add/operator/do';
 
-const testUrl = 'http://localhost.firebaseio.test:5000/';
+const localServerUrl = 'http://localhost.firebaseio.test:5000/';
 
 describe('angularfire', () => {
+  var subscription:Subscription;
+
+  afterEach((done:any) => {
+    // Clear out the Firebase to prevent leaks between tests
+    (new Firebase(localServerUrl)).remove(done);
+    if(subscription && !subscription.isUnsubscribed) {
+      subscription.unsubscribe();
+    }
+  });
+
+
   it('should be injectable via FIREBASE_PROVIDERS', () => {
-    var injector = Injector.resolveAndCreate([FIREBASE_PROVIDERS, defaultFirebase(testUrl)]);
+    var injector = Injector.resolveAndCreate([FIREBASE_PROVIDERS, defaultFirebase(localServerUrl)]);
     expect(injector.get(AngularFire)).toBeAnInstanceOf(AngularFire);
   });
 
   describe('.list()', () => {
-    beforeEachProviders(() => [FIREBASE_PROVIDERS, defaultFirebase(testUrl)]);
-
-    it('should return an observable of the path', inject([AngularFire], (af:AngularFire) => {
-      var nextSpy = jasmine.createSpy('next');
-      var questions = af.list('list-of-questions');
-      questions.subscribe(nextSpy);
-      questions.add('hello');
-      expect(nextSpy.calls.first().args[0][0]).toEqual('hello');
+    var af:AngularFire;
+    beforeEachProviders(() => [FIREBASE_PROVIDERS, defaultFirebase(localServerUrl)]);
+    beforeEach(inject([AngularFire], (_af:AngularFire) => {
+      af = _af;
     }));
 
+    it('should return an observable of the path', (done:any) => {
+      var questions = af.list(`/questions`);
+      (<any>questions)._ref.push('hello path observable', () => {
+        subscription = questions
+          .take(1)
+          .do((data:any) => {
+            expect(data).toEqual(['hello path observable']);
+          })
+          .subscribe(done, done.fail);
+      });
+    });
 
-    it('should preserve snapshots in the list if preserveSnapshot option specified', inject([AngularFire], (af:AngularFire) => {
-      var nextSpy = jasmine.createSpy('next');
-      var questions = af.list('list-of-questions', {preserveSnapshot: true});
-      questions.subscribe(nextSpy);
-      questions.add('hello');
-      expect(nextSpy.calls.first().args[0][0].val()).toEqual('hello');
-    }));
+
+    it('should preserve snapshots in the list if preserveSnapshot option specified', (done:any) => {
+      var questions = af.list(`list-of-questions`, {preserveSnapshot: true});
+      (<any>questions)._ref.push('hello', () => {
+        subscription = questions
+          .take(1)
+          .do((data:any) => {
+            expect(data[0].val()).toEqual('hello');
+          })
+          .subscribe(done, done.fail);
+      });
+    });
   });
 
 
   describe('.object()', () => {
-    var nextSpy:jasmine.Spy;
-    var ref = new Firebase(`${testUrl}list-of-questions/1`);
     var observable:FirebaseObjectObservable<any>;
-    var subscription:Subscription;
-    beforeEachProviders(() => [FIREBASE_PROVIDERS, defaultFirebase(testUrl)]);
+
+    beforeEachProviders(() => [FIREBASE_PROVIDERS, defaultFirebase(localServerUrl)]);
     beforeEach(inject([AngularFire], (af:AngularFire) => {
-      nextSpy = jasmine.createSpy('next');
-      observable = af.object('/list-of-questions/1')
-      ref.remove();
-    }));
-
-    afterEach(() => {
-      subscription.unsubscribe();
-    });
-
-    it('should return an observable of the path', inject([AngularFire], (af:AngularFire) => {
-      ref.set({title: 'how to firebase?'});
-      subscription = observable.subscribe(nextSpy);
-      expect(nextSpy.calls.first().args[0]).toEqual({title: 'how to firebase?'});
-      console.log(nextSpy.calls.count())
+      observable = af.object(`/list-of-questions/1`)
     }));
 
 
-    it('should preserve snapshot if preserveSnapshot option specified', inject([AngularFire], (af:AngularFire) => {
-      observable = af.object('list-of-questions/1', {preserveSnapshot: true});
-      ref.set({title: 'how to firebase?'});
-      subscription = observable.subscribe(nextSpy);
-      expect(nextSpy.calls.first().args[0].val()).toEqual({title: 'how to firebase?'});
+    it('should return an observable of the path', injectAsync([AngularFire], (af:AngularFire) => {
+      return (<any>observable)._ref.set({title: 'how to firebase?'})
+        .then(() => observable.take(1).toPromise())
+        .then((data:any) => {
+          expect(data).toEqual({title: 'how to firebase?'});
+        });
+    }));
+
+
+    it('should preserve snapshot if preserveSnapshot option specified', injectAsync([AngularFire], (af:AngularFire) => {
+      observable = af.object(`list-of-questions/`, {preserveSnapshot: true});
+      return (<any>observable)._ref.set({title: 'how to firebase?'})
+        .then(() => observable.take(1).toPromise())
+        .then((data:any) => {
+          expect(data.val()).toEqual({title: 'how to firebase?'});
+        });
     }));
   });
 
 
   describe('.auth', () => {
-    beforeEachProviders(() => [FIREBASE_PROVIDERS, defaultFirebase(testUrl)]);
+    beforeEachProviders(() => [FIREBASE_PROVIDERS, defaultFirebase(localServerUrl)]);
 
     it('should be an instance of AuthService', inject([AngularFire], (af:AngularFire) => {
       expect(af.auth).toBeAnInstanceOf(FirebaseAuth);
@@ -95,7 +120,7 @@ describe('angularfire', () => {
     it('should provide a FirebaseRef for the FIREBASE_REF binding', () => {
       var injector = Injector.resolveAndCreate([
         provide(FirebaseUrl, {
-          useValue: testUrl
+          useValue: localServerUrl
         }),
         FIREBASE_PROVIDERS
       ]);
@@ -105,14 +130,14 @@ describe('angularfire', () => {
 
   describe('defaultFirebase', () => {
     it('should create a provider', () => {
-      const provider = defaultFirebase(testUrl);
+      const provider = defaultFirebase(localServerUrl);
       expect(provider).toBeAnInstanceOf(Provider);
     });
 
 
     it('should inject a FIR reference', () => {
-      const injector = Injector.resolveAndCreate([defaultFirebase(testUrl), FIREBASE_PROVIDERS]);
-      expect(injector.get(FirebaseRef).toString()).toBe(testUrl);
+      const injector = Injector.resolveAndCreate([defaultFirebase(localServerUrl), FIREBASE_PROVIDERS]);
+      expect(injector.get(FirebaseRef).toString()).toBe(localServerUrl);
     });
   });
 

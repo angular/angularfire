@@ -1,65 +1,118 @@
-import {FirebaseListFactory,
-onChildAdded,
-onChildChanged,
-onChildRemoved,
-onChildUpdated} from '../utils/firebase_list_factory';
-
-import {beforeEach, it, describe, expect} from 'angular2/testing';
+declare var require:any;
+import {
+  FirebaseListFactory,
+  onChildAdded,
+  onChildChanged,
+  onChildRemoved,
+  onChildUpdated
+} from './firebase_list_factory';
+import {FirebaseListObservable} from './firebase_list_observable';
+import {
+  beforeEach,
+  it,
+  iit,
+  ddescribe,
+  describe,
+  expect
+} from 'angular2/testing';
+import {Subscription} from 'rxjs';
+import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/skip';
+import 'rxjs/add/operator/take';
 
 const rootFirebase = 'ws://localhost.firebaseio.test:5000';
 
 describe('FirebaseListFactory', () => {
-  beforeEach(() => {
-    (new Firebase(rootFirebase)).remove();
+  var subscription:Subscription;
+  var questions:FirebaseListObservable<any>;
+  var questionsSnapshotted:FirebaseListObservable<any>;
+  var ref:any;
+  var refSnapshotted:any;
+  beforeEach((done:any) => {
+    (new Firebase(rootFirebase)).remove(done);
+    questions = FirebaseListFactory(`${rootFirebase}/questions`);
+    questionsSnapshotted = FirebaseListFactory(`${rootFirebase}/questionssnapshot`, {preserveSnapshot: true});
+    ref = (<any>questions)._ref;
+    refSnapshotted = (<any>questionsSnapshotted)._ref;
+  });
+
+  afterEach((done:any) => {
+    if (subscription && !subscription.isUnsubscribed) {
+      subscription.unsubscribe();
+    }
+    Promise.all([ref.remove(), refSnapshotted.remove()]).then(done, done.fail);
   });
 
 
-  it('should emit a new value when a child moves', () => {
-    var ref = new Firebase(`${rootFirebase}/questions`);
-    var o = FirebaseListFactory(`${rootFirebase}/questions`);
-    var nextSpy = jasmine.createSpy('next');
-    o.subscribe(nextSpy);
-    expect(nextSpy.calls.count()).toBe(0);
-
-    var child1 = ref.push(1);
-    expect(nextSpy.calls.count()).toBe(1);
-
-    ref.push(2);
-    expect(nextSpy.calls.count()).toBe(2);
-
-    child1.setPriority('ZZZZ');
-    expect(nextSpy.calls.count()).toBe(3);
-    expect(nextSpy.calls.mostRecent().args[0]).toEqual([2, 1]);
+  it('should emit only when the initial data set has been loaded', (done:any) => {
+    // TODO: Fix Firebase server event order. srsly
+    // Use set to populate and erase previous values
+    // Populate with mutliple values to see the initial data load
+    (<any>questions)._ref.set(['initial1', 'initial2', 'initial3', 'initial4'])
+      .then(() => questions.take(1).toPromise())
+      .then((val:any[]) => {
+        expect(val.length).toBe(4);
+      })
+      .then(() => {
+        done();
+      }, done.fail);
   });
 
 
-  it('should emit unwrapped data by default', () => {
-    var ref = new Firebase(`${rootFirebase}/questions`);
-    var o = FirebaseListFactory(`${rootFirebase}/questions`);
-    var nextSpy = jasmine.createSpy('next');
-    o.subscribe(nextSpy);
+  it('should emit a new value when a child moves', (done:any) => {
+    subscription = questions
+      .skip(2)
+      .take(1)
+      .do((data:any) => {
+        expect(data).toEqual(['push2', 'push1']);
+      })
+      .subscribe(() => {
+        done();
+      }, done.fail);
 
-    ref.push('hello!');
-    expect(nextSpy).toHaveBeenCalledWith(['hello!']);
+    var child1 = ref.push('push1', () => {
+      ref.push('push2', () => {
+        child1.setPriority('ZZZZ')
+      });
+    });
   });
 
 
-  it('should emit snapshots if preserveSnapshot option is true', () => {
-    var ref = new Firebase(`${rootFirebase}/questions`);
-    var o = FirebaseListFactory(`${rootFirebase}/questions`, {preserveSnapshot: true});
-    var nextSpy = jasmine.createSpy('next');
-    o.subscribe(nextSpy);
+  it('should emit unwrapped data by default', (done:any) => {
+    ref.remove(() => {
+      ref.push('hello unwrapped!', () => {
+        subscription = questions
+          .take(1)
+          .do((data:any) => {
+            expect(data).toEqual(['hello unwrapped!']);
+          })
+          .subscribe(() => {
+            done();
+          }, done.fail);
+      });
+    });
+  });
 
-    ref.push('hello!');
-    expect(nextSpy.calls.argsFor(0)[0][0].val()).toEqual('hello!');
+
+  it('should emit snapshots if preserveSnapshot option is true', (done:any) => {
+    refSnapshotted.push('hello snapshot!', () => {
+      subscription = questionsSnapshotted
+        .take(1)
+        .do((data:any) => {
+          expect(data[0].val()).toEqual('hello snapshot!');
+        })
+        .subscribe(() => {
+          done();
+        }, done.fail);
+      });
   });
 
 
   it('should call off on all events when disposed', () => {
-    var firebaseSpy = spyOn(Firebase.prototype, 'off');
-    var subscribed = FirebaseListFactory(rootFirebase).subscribe();
+    var firebaseSpy = spyOn(Firebase.prototype, 'off').and.callThrough();
+    subscription = FirebaseListFactory(rootFirebase).subscribe();
     expect(firebaseSpy).not.toHaveBeenCalled();
-    subscribed.unsubscribe();
+    subscription.unsubscribe();
     expect(firebaseSpy).toHaveBeenCalled();
   });
 });
