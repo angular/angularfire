@@ -14,35 +14,28 @@ export function FirebaseListFactory (absoluteUrl:string, {preserveSnapshot}:Fire
     // This way a complete array is emitted which leads
     // to better rendering performance
     ref.once('value', (snap) => {
-      console.log('once value', snap.val())
       hasInitialLoad = true;
       obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
     });
 
     ref.on('child_added', (child:any) => {
-      console.log('child_added callback');
       arr = onChildAdded(arr, child);
       // only emit the array after the initial load
       if (hasInitialLoad) {
-        console.log('emitting child_added')
         obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn)); 
       }
     });
 
     ref.on('child_removed', (child:any) => {
-      console.log('child_removed callback');
       arr = onChildRemoved(arr, child)
       if (hasInitialLoad) {
-        console.log('emitting child_removed')
         obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
       }
     });
 
     ref.on('child_changed', (child:any, prevKey: string) => {
-      console.log('child_changed callback');
       arr = onChildChanged(arr, child, prevKey)
       if (hasInitialLoad) {
-        console.log('emitting child_changed')
         // This also manages when the only change is prevKey change
         obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
       }
