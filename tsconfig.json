@@ -17,6 +17,7 @@
     "src/utils/absolute_path_resolver.ts",
     "src/utils/firebase_list_factory.spec.ts",
     "src/utils/firebase_list_observable.spec.ts",
+    "src/utils/firebase_object_observable.spec.ts",
     "src/providers/auth.spec.ts",
     "typings/main.d.ts"
   ]
