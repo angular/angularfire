@@ -1,10 +1,20 @@
 import {APP_INITIALIZER, Inject, Injectable, OpaqueToken, provide, Provider} from 'angular2/core';
-import {FirebaseAuth} from './providers/auth';
+import {FirebaseAuth, firebaseAuthConfig} from './providers/auth';
 import * as Firebase from 'firebase';
 import {FirebaseListObservable} from './utils/firebase_list_observable';
+import {FirebaseObjectObservable} from './utils/firebase_object_observable';
 import {FirebaseListFactory, FirebaseListFactoryOpts} from './utils/firebase_list_factory';
+import {
+  FirebaseObjectFactoryOpts,
+  FirebaseObjectFactory
+} from './utils/firebase_object_factory';
 import {FirebaseUrl, FirebaseRef} from './tokens';
-import {AuthBackend} from './providers/auth_backend';
+import {
+  AuthBackend,
+  AuthMethods,
+  AuthProviders,
+  FirebaseAuthState
+} from './providers/auth_backend';
 import {FirebaseSdkAuthBackend} from './providers/firebase_sdk_auth_backend';
 import {WebWorkerFirebaseAuth} from './providers/web_workers/worker/auth';
 import {MessageBasedFirebaseAuth} from './providers/web_workers/ui/auth';
@@ -18,6 +28,9 @@ export class AngularFire {
   list (url:string, opts?:FirebaseListFactoryOpts):FirebaseListObservable<any[]> {
     // TODO: check if relative or absolute
     return FirebaseListFactory(this.fbUrl+url, opts);
+  }
+  object(url: string, opts?:FirebaseObjectFactoryOpts):FirebaseObjectObservable<any> {
+    return FirebaseObjectFactory(this.fbUrl+url, opts);
   }
 }
 
@@ -57,17 +70,16 @@ export const defaultFirebase = (url: string): Provider => {
   });
 };
 
-export {FirebaseListObservable} from './utils/firebase_list_observable';
-export {FirebaseObjectObservable} from './utils/firebase_object_observable';
 export {
   FirebaseAuth,
-  firebaseAuthConfig
-} from './providers/auth';
-export {
+  FirebaseListObservable,
+  FirebaseObjectObservable,
+  firebaseAuthConfig,
   FirebaseAuthState,
   AuthMethods,
   AuthProviders,
-} from './providers/auth_backend';
+}
+
 export {FirebaseUrl, FirebaseRef, FirebaseAuthConfig} from './tokens';
 export {MessageBasedFirebaseAuth} from './providers/web_workers/ui/auth';
 

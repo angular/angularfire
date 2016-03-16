@@ -16,6 +16,8 @@ import {
   FirebaseRef,
   defaultFirebase
 } from './angularfire2';
+import {FirebaseObjectObservable} from './utils/firebase_object_observable';
+import {Subscription} from 'rxjs';
 
 const testUrl = 'http://localhost.firebaseio.test:5000/';
 
@@ -43,6 +45,39 @@ describe('angularfire', () => {
       questions.subscribe(nextSpy);
       questions.add('hello');
       expect(nextSpy.calls.first().args[0][0].val()).toEqual('hello');
+    }));
+  });
+
+
+  describe('.object()', () => {
+    var nextSpy:jasmine.Spy;
+    var ref = new Firebase(`${testUrl}list-of-questions/1`);
+    var observable:FirebaseObjectObservable<any>;
+    var subscription:Subscription;
+    beforeEachProviders(() => [FIREBASE_PROVIDERS, defaultFirebase(testUrl)]);
+    beforeEach(inject([AngularFire], (af:AngularFire) => {
+      nextSpy = jasmine.createSpy('next');
+      observable = af.object('/list-of-questions/1')
+      ref.remove();
+    }));
+
+    afterEach(() => {
+      subscription.unsubscribe();
+    });
+
+    it('should return an observable of the path', inject([AngularFire], (af:AngularFire) => {
+      ref.set({title: 'how to firebase?'});
+      subscription = observable.subscribe(nextSpy);
+      expect(nextSpy.calls.first().args[0]).toEqual({title: 'how to firebase?'});
+      console.log(nextSpy.calls.count())
+    }));
+
+
+    it('should preserve snapshot if preserveSnapshot option specified', inject([AngularFire], (af:AngularFire) => {
+      observable = af.object('list-of-questions/1', {preserveSnapshot: true});
+      ref.set({title: 'how to firebase?'});
+      subscription = observable.subscribe(nextSpy);
+      expect(nextSpy.calls.first().args[0].val()).toEqual({title: 'how to firebase?'});
     }));
   });
 
