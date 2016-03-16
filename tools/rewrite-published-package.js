@@ -7,7 +7,8 @@ var fs = require('fs');
 var srcPackage = require('../package.json');
 var outPackage = Object.assign({}, srcPackage, {
   peerDependencies: srcPackage.dependencies,
-  main: "angularfire2.js"
+  main: "angularfire2.js",
+  typings: "angularfire2.d.ts"
 });
 delete outPackage.dependencies;
 
