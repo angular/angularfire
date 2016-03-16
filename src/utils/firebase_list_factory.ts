@@ -14,14 +14,17 @@ export function FirebaseListFactory (absoluteUrl:string, {preserveSnapshot}:Fire
     // This way a complete array is emitted which leads
     // to better rendering performance
     ref.once('value', (snap) => {
+      //console.log('once');
       hasInitialLoad = true;
       obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
     });
 
     ref.on('child_added', (child:any) => {
+      //console.log('child_added')
       arr = onChildAdded(arr, child);
       // only emit the array after the initial load
       if (hasInitialLoad) {
+        //console.log('emitting child added')
         obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn)); 
       }
     });

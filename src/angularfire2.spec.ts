@@ -1,6 +1,7 @@
 import {
   describe,
   it,
+  iit,
   beforeEach,
   beforeEachProviders,
   expect,
@@ -18,10 +19,11 @@ import {
 } from './angularfire2';
 
 const testUrl = 'http://localhost.firebaseio.test:5000/';
+const realUrl = 'http://lololol.firebaseio-demo.com/';
 
 describe('angularfire', () => {
   it('should be injectable via FIREBASE_PROVIDERS', () => {
-    var injector = Injector.resolveAndCreate([FIREBASE_PROVIDERS, defaultFirebase(testUrl)]);
+    var injector = Injector.resolveAndCreate([FIREBASE_PROVIDERS, defaultFirebase(realUrl)]);
     expect(injector.get(AngularFire)).toBeAnInstanceOf(AngularFire);
   });
 
@@ -31,16 +33,23 @@ describe('angularfire', () => {
     it('should return an observable of the path', inject([AngularFire], (af:AngularFire) => {
       var nextSpy = jasmine.createSpy('next');
       var questions = af.list('list-of-questions');
-      questions.subscribe(nextSpy);
+      questions.subscribe((data) => {
+        console.log(data);
+        nextSpy();
+      });
       questions.add('hello');
-      expect(nextSpy.calls.first().args[0][0]).toEqual('hello');
+      expect(nextSpy.calls.first().args[0]).toBeUndefined();
+      expect(nextSpy.calls.mostRecent().args[1]).toBe('hello');
     }));
 
 
     it('should preserve snapshots in the list if preserveSnapshot option specified', inject([AngularFire], (af:AngularFire) => {
       var nextSpy = jasmine.createSpy('next');
       var questions = af.list('list-of-questions', {preserveSnapshot: true});
-      questions.subscribe(nextSpy);
+      questions.subscribe((data) => {
+        console.log(data);
+        nextSpy();
+      });
       questions.add('hello');
       expect(nextSpy.calls.first().args[0][0].val()).toEqual('hello');
     }));
