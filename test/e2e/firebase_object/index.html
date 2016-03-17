@@ -1,0 +1,32 @@
+<html>
+  <head>
+    <script src="/node_modules/systemjs/dist/system.src.js"></script>
+    <script src="/node_modules/rxjs/bundles/Rx.js"></script>
+    <script src="/node_modules/angular2/bundles/angular2-polyfills.js"></script>
+    <script src="/node_modules/angular2/bundles/angular2.dev.js"></script>
+  </head>
+  <body>
+    <app></app>
+    <script>
+      System.config({
+
+        map: {
+          'firebase': '/node_modules/firebase/lib/firebase-web.js',
+          'angularfire2': '/dist',
+          'typescript': '/node_modules/typescript/lib/typescript.js',
+          'angular2': '/node_modules/angular2'
+        },
+        packages: {
+          'angular2': {
+            defaultExtension: 'js'
+          },
+          'angularfire2': {
+            main: 'angularfire2.js',
+            defaultExtension: 'js'
+          }
+        }
+      })
+      System.import('./firebase_object_example.js');
+    </script>
+  </body>
+</html>

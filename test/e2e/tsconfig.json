@@ -10,6 +10,7 @@
     "removeComments": true
   },
   "files": [
-    "firebase_list/firebase_list_example.ts"
+    "firebase_list/firebase_list_example.ts",
+    "firebase_object/firebase_object_example.ts"
   ]
 }

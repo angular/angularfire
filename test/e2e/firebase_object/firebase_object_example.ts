@@ -1,6 +1,6 @@
 import {Component, enableProdMode, Inject, provide} from 'angular2/core';
 import {bootstrap} from 'angular2/platform/browser';
-import {defaultFirebase, AngularFire, FIREBASE_PROVIDERS, FirebaseListObservable} from 'angularfire2';
+import {defaultFirebase, AngularFire, FIREBASE_PROVIDERS, FirebaseObjectObservable} from 'angularfire2';
 
 import * as Firebase from 'firebase';
 
@@ -10,21 +10,20 @@ const rootFirebase = 'ws://localhost.firebaseio.test:5000/';
 
 @Component({
   template: `
-    <h1>Hello</h1>
-    <div *ngFor="#question of questions | async">
-      {{question.question}}
-    </div>
+    <h1>
+      Question
+    </h1>
+    {{ (question | async).title }}
   `,
   selector: 'app'
 })
 class App {
-  questions:FirebaseListObservable<any>;
+  question:FirebaseObjectObservable<any>;
   constructor(public af:AngularFire) {
     var ref = new Firebase(rootFirebase);
     ref.remove();
-    this.questions = af.list('/questions');
-    this.questions.add({question: 'why?'});
-    this.questions.add({question: 'how?'});
+    this.question = af.object('/questions/1');
+    ref.child('/questions/1').set({title: 'how to firebase?'});
   }
 }
 
