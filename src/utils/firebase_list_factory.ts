@@ -3,24 +3,45 @@ import {Observer} from 'rxjs/Observer';
 import * as Firebase from 'firebase';
 
 export function FirebaseListFactory (absoluteUrl:string, {preserveSnapshot}:FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
-  var ref = new Firebase(absoluteUrl);
+  const ref = new Firebase(absoluteUrl);
   return new FirebaseListObservable((obs:Observer<any[]>) => {
-    var arr:any[] = [];
+    let arr:any[] = [];
+    let hasInitialLoad = false;
+    
+    // The list should only emit after the initial load 
+    // comes down from the Firebase database, (e.g.) all
+    // the initial child_added events have fired.
+    // This way a complete array is emitted which leads
+    // to better rendering performance
+    ref.once('value', (snap) => {
+      //console.log('once');
+      hasInitialLoad = true;
+      obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
+    });
 
     ref.on('child_added', (child:any) => {
+      //console.log('child_added')
       arr = onChildAdded(arr, child);
-      obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
+      // only emit the array after the initial load
+      if (hasInitialLoad) {
+        //console.log('emitting child added')
+        obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn)); 
+      }
     });
 
     ref.on('child_removed', (child:any) => {
       arr = onChildRemoved(arr, child)
-      obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
+      if (hasInitialLoad) {
+        obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
+      }
     });
 
     ref.on('child_changed', (child:any, prevKey: string) => {
       arr = onChildChanged(arr, child, prevKey)
-      // This also manages when the only change is prevKey change
-      obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
+      if (hasInitialLoad) {
+        // This also manages when the only change is prevKey change
+        obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
+      }
     });
 
     return () => ref.off();
