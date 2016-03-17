@@ -1,35 +1,37 @@
 import {Component, enableProdMode, Inject, provide} from 'angular2/core';
 import {bootstrap} from 'angular2/platform/browser';
-import {FirebaseUrl, FirebaseList, FirebaseObservable} from 'angularfire2';
-// var Firebase = require('firebase');
-import Firebase from 'firebase';
+import {defaultFirebase, AngularFire, FIREBASE_PROVIDERS, FirebaseListObservable} from 'angularfire2';
+
+import * as Firebase from 'firebase';
 
 enableProdMode();
 
 const rootFirebase = 'ws://localhost.firebaseio.test:5000/';
 
-var ref = new Firebase(rootFirebase);
-ref.child('questions').set([{
-  question: 'why?'
-},{
-  question: 'how?'
-}]);
 @Component({
   template: `
     <h1>Hello</h1>
     <div *ngFor="#question of questions | async">
-      {{question.val().question}}
+      {{question.question}}
     </div>
   `,
-  selector: 'app',
-  providers: [FirebaseList('/questions')]
+  selector: 'app'
 })
 class App {
-  constructor(@Inject('/questions') public questions:FirebaseObservable<any>) {
+  questions:FirebaseListObservable<any>;
+  constructor(public af:AngularFire) {
+    var ref = new Firebase(rootFirebase);
+    ref.remove();
+    this.questions = af.list('/questions');
+    this.questions.add({question: 'why?'});
+    this.questions.add({question: 'how?'});
   }
 }
 
 bootstrap(App, [
-  provide(FirebaseUrl, {
-    useValue: rootFirebase
-  })]);
+  FIREBASE_PROVIDERS,
+  defaultFirebase(rootFirebase)]).then(() => {
+    console.log('bootstrap success');
+  }, e => {
+    console.error('bootstrap failed', e);
+  });

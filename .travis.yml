@@ -23,8 +23,6 @@ env:
 
 install:
   - npm install
-  - npm run install_webdriver
-  - npm run install_typings
 
 before_script:
   - export DISPLAY=:99.0
@@ -33,6 +31,8 @@ before_script:
 script:
   - npm run build
   - ./node_modules/.bin/karma start --single-run --browsers Firefox
+  # Can't run until https://github.com/angular/protractor/issues/2784 is resolved
+  #- ./node_modules/.bin/protractor protractor.conf.js --browser firefox
 
 notifications:
   webhooks:

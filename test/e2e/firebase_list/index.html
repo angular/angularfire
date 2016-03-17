@@ -9,20 +9,24 @@
     <app></app>
     <script>
       System.config({
-        transpiler: 'typescript',
+
         map: {
           'firebase': '/node_modules/firebase/lib/firebase-web.js',
           'angularfire2': '/dist',
-          'typescript': '/node_modules/typescript/lib/typescript.js'
+          'typescript': '/node_modules/typescript/lib/typescript.js',
+          'angular2': '/node_modules/angular2'
         },
         packages: {
+          'angular2': {
+            defaultExtension: 'js'
+          },
           'angularfire2': {
-            main: 'angularfire.js',
+            main: 'angularfire2.js',
             defaultExtension: 'js'
           }
         }
       })
-      System.import('./firebase_list_example.ts');
+      System.import('./firebase_list_example.js');
     </script>
   </body>
 </html>
