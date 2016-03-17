@@ -44,6 +44,33 @@ bootstrap(App, [
 
 ```
 
+The AngularFire service exposes methods to get Observables of Firebase data: `list` and `object`. `list` returns an observable that will emit a new array any time data at the specified location is updated.
+
+```typescript
+var questions = angularFire.list('/questions');
+questions.subscribe(questions => {
+  console.log(questions);
+});
+questions.add({title: 'how to Angular?'});
+// log [{title: 'how to Angular?'}]
+questions.add({title: 'how to Firebase?'});
+// log [{title: 'how to Angular?'},{title: 'how to Firebase?'}]
+```
+
+`object` returns an observable that will emit a new object any time data at the specified location is updated.
+
+```typescript
+var question = angularFire.object('/questions/1');
+question.subscribe(question => {
+  console.log(question);
+});
+ref.set({title: 'how to Angular?'});
+// log {title: 'how to Angular?'}
+ref.set({title: 'how to ANGULAR?'});
+// log {title: 'how to ANGULAR?'}
+```
+
+
 ### FIREBASE_PROVIDERS
 
 Contains all AngularFire provider configuration for Angular's dependency injection.

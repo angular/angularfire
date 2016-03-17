@@ -77,7 +77,7 @@ export {
   firebaseAuthConfig,
   FirebaseAuthState,
   AuthMethods,
-  AuthProviders,
+  AuthProviders
 }
 
 export {FirebaseUrl, FirebaseRef, FirebaseAuthConfig} from './tokens';
