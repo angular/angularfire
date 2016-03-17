@@ -2,7 +2,14 @@
 
 [![Build Status](https://travis-ci.org/angular/angularfire2.svg?branch=master)](https://travis-ci.org/angular/angularfire2)
 
-Status: In-Development
+Status: In-Development. This is an early alpha preview, with many breaking changes
+happening between releases.
+
+## Install
+
+```
+$ npm install --save angularfire2
+```
 
 ## API
 
