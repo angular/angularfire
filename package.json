@@ -7,8 +7,7 @@
     "test": "npm run build; karma start",
     "build": "rm -rf dist; tsc && cp package.json README.md LICENSE .npmignore dist/",
     "postbuild": "node tools/rewrite-published-package.js",
-    "install_webdriver": "webdriver-manager update",
-    "install_typings": "typings install",
+    "postinstall": "typings install; webdriver-manager update",
     "build_bundle": "cp -r src angularfire2 && tsc typings/main.d.ts angularfire2.ts --rootDir . --module system -t es5 --outFile dist/bundles/angularfire2.js  --moduleResolution node --emitDecoratorMetadata --experimentalDecorators"
   },
   "keywords": [
