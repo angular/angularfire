@@ -3,3 +3,6 @@ dist/
 typings/
 npm-debug.log
 .idea/
+test/e2e/firebase_list/firebase_list_example.js
+test/e2e/firebase_list/firebase_list_example.js.map
+test/e2e/firebase_list/firebase_list_example.d.ts
