@@ -22,6 +22,24 @@ export class FirebaseListObservable<T> extends Observable<T> {
     }
     this._ref.push(val);
   }
+
+  remove(item:string | Firebase | FirebaseDataSnapshot | AFUnwrappedDataSnapshot): Promise<FirebaseDataSnapshot> {
+    // TODO: remove override when typings are updated to include
+    // remove() returning a promise.
+    if (typeof item === 'string') {
+      return (<any>this._ref).child(item).remove();
+    } else if (item instanceof Firebase) {
+      // Firebase ref
+      return (<any>item).remove();
+    } else if (typeof (<any>item).key === 'function') {
+      // Snapshot
+      return (<any>(<FirebaseDataSnapshot>item).ref().remove());
+    } else if (typeof (<any>item).$key === 'string') {
+      // Unwrapped snapshot
+      return (<any>this._ref).child((<AFUnwrappedDataSnapshot>item).$key).remove();
+    }
+    throw new Error(`FirebaseListObservable.remove requires a key, snapshot, reference, or unwrapped snapshot. Got: ${typeof item}`);
+  }
 }
 
 export interface AFUnwrappedDataSnapshot {

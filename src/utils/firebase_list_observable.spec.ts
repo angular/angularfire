@@ -3,10 +3,26 @@ import {FirebaseListObservable} from './firebase_list_observable';
 import {Observer} from 'rxjs/Observer';
 import 'rxjs/add/operator/map';
 import * as Firebase from 'firebase';
+import {unwrapMapFn} from './firebase_list_factory';
 
 const rootUrl = 'ws://localhost.firebaseio.test:5000';
 
 describe('FirebaseObservable', () => {
+  var O:FirebaseListObservable<any>;
+  var ref:Firebase;
+
+  beforeEach(() => {
+    ref = new Firebase(rootUrl);
+    O = new FirebaseListObservable((observer:Observer<any>) => {
+    }, ref);
+  });
+
+  afterEach((done:any) => {
+    ref.off();
+    ref.remove(done);
+  });
+
+
   it('should return an instance of FirebaseObservable when calling operators', () => {
     var O:FirebaseListObservable<number> = new FirebaseListObservable((observer:Observer<number>) => {
     });
@@ -16,7 +32,7 @@ describe('FirebaseObservable', () => {
 
   describe('add', () => {
     it('should throw an exception if pushed when not subscribed', () => {
-      var O:FirebaseListObservable<any> = new FirebaseListObservable((observer:Observer<any>) => {});
+      O = new FirebaseListObservable((observer:Observer<any>) => {});
 
       expect(() => {
         O.add('foo');
@@ -25,10 +41,7 @@ describe('FirebaseObservable', () => {
 
 
     it('should call push on the underlying ref', () => {
-      var fbref = new Firebase(rootUrl);
-      var pushSpy = spyOn(fbref, 'push');
-      var O:FirebaseListObservable<any> = new FirebaseListObservable((observer:Observer<any>) => {
-      }, fbref);
+      var pushSpy = spyOn(ref, 'push');
 
       O.subscribe();
 
@@ -39,11 +52,83 @@ describe('FirebaseObservable', () => {
 
 
     it('should accept any type of value without compilation error', () => {
-      var O:FirebaseListObservable<any> = new FirebaseListObservable((observer:Observer<any>) => {
-      }, new Firebase(rootUrl));
-
       O.add('foo');
     });
+  });
+
+
+  describe('remove', () => {
+    var orphan = { orphan: true };
+    var child:Firebase;
+
+    beforeEach(() => {
+      child = ref.push(orphan);
+    });
+
+
+    it('should remove the item from Firebase when given the key', (done:any) => {
+      var childAddedSpy = jasmine.createSpy('childAdded');
+
+      ref.on('child_added', childAddedSpy);
+      O.remove(child.key())
+        .then(() => (<any>ref).once('value'))
+        .then((data:FirebaseDataSnapshot) => {
+          expect(childAddedSpy.calls.argsFor(0)[0].val()).toEqual(orphan);
+          expect(data.val()).toBeNull();
+          ref.off();
+        })
+        .then(done, done.fail);
+    });
+
+
+    it('should remove the item from Firebase when given the reference', (done:any) => {
+      var childAddedSpy = jasmine.createSpy('childAdded');
+
+      ref.on('child_added', childAddedSpy);
+
+      O.remove(child)
+        .then(() => (<any>ref).once('value'))
+        .then((data:FirebaseDataSnapshot) => {
+          expect(childAddedSpy.calls.argsFor(0)[0].val()).toEqual(orphan);
+          expect(data.val()).toBeNull();
+          ref.off();
+        })
+        .then(done, done.fail);
+    });
+
+
+    it('should remove the item from Firebase when given the snapshot', (done:any) => {
+      ref.on('child_added', (data:FirebaseDataSnapshot) => {
+        expect(data.val()).toEqual(orphan);
+        O.remove(data)
+          .then(() => (<any>ref).once('value'))
+          .then((data:FirebaseDataSnapshot) => {
+            expect(data.val()).toBeNull();
+            ref.off();
+          })
+          .then(done, done.fail);
+      });
+    });
+
+
+    it('should remove the item from Firebase when given the unwrapped snapshot', (done:any) => {
+      ref.on('child_added', (data:FirebaseDataSnapshot) => {
+        expect(data.val()).toEqual(orphan);
+        O.remove(unwrapMapFn(data))
+          .then(() => (<any>ref).once('value'))
+          .then((data:FirebaseDataSnapshot) => {
+            expect(data.val()).toBeNull();
+            ref.off();
+          })
+          .then(done, done.fail);
+      });
+    });
+
+
+    it('should throw an exception if input is not supported', () => {
+      var input = (<any>{lol:true});
+      expect(() => O.remove(input)).toThrowError(`FirebaseListObservable.remove requires a key, snapshot, reference, or unwrapped snapshot. Got: ${typeof input}`);
+    })
   });
 });
 

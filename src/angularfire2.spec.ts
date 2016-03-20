@@ -53,11 +53,12 @@ describe('angularfire', () => {
 
     it('should return an observable of the path', (done:any) => {
       var questions = af.list(`/questions`);
-      (<any>questions)._ref.push('hello path observable', () => {
+      (<any>questions)._ref.push({pathObservable:true}, () => {
         subscription = questions
           .take(1)
           .do((data:any) => {
-            expect(data).toEqual(['hello path observable']);
+            expect(data.length).toBe(1);
+            expect(data[0].pathObservable).toBe(true);
           })
           .subscribe(done, done.fail);
       });

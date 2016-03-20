@@ -56,7 +56,7 @@ describe('FirebaseListFactory', () => {
     // TODO: Fix Firebase server event order. srsly
     // Use set to populate and erase previous values
     // Populate with mutliple values to see the initial data load
-    (<any>questions)._ref.set(['initial1', 'initial2', 'initial3', 'initial4'])
+    (<any>questions)._ref.set([{initial1:true}, {initial2:true}, {initial3:true}, {initial4:true}])
       .then(() => questions.take(1).toPromise())
       .then((val:any[]) => {
         expect(val.length).toBe(4);
@@ -72,14 +72,16 @@ describe('FirebaseListFactory', () => {
       .skip(2)
       .take(1)
       .do((data:any) => {
-        expect(data).toEqual(['push2', 'push1']);
+        expect(data.length).toBe(2);
+        expect(data[0].push2).toBe(true);
+        expect(data[1].push1).toBe(true);
       })
       .subscribe(() => {
         done();
       }, done.fail);
 
-    var child1 = ref.push('push1', () => {
-      ref.push('push2', () => {
+    var child1 = ref.push({push1:true}, () => {
+      ref.push({push2:true}, () => {
         child1.setPriority('ZZZZ')
       });
     });
@@ -88,11 +90,12 @@ describe('FirebaseListFactory', () => {
 
   it('should emit unwrapped data by default', (done:any) => {
     ref.remove(() => {
-      ref.push('hello unwrapped!', () => {
+      ref.push({unwrapped: true}, () => {
         subscription = questions
           .take(1)
           .do((data:any) => {
-            expect(data).toEqual(['hello unwrapped!']);
+            expect(data.length).toBe(1);
+            expect(data[0].unwrapped).toBe(true);
           })
           .subscribe(() => {
             done();
