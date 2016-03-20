@@ -23,3 +23,8 @@ export class FirebaseListObservable<T> extends Observable<T> {
     this._ref.push(val);
   }
 }
+
+export interface AFUnwrappedDataSnapshot {
+  $key: string;
+  $value?: string | number | boolean;
+}

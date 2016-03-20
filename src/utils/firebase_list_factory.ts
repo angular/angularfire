@@ -1,4 +1,4 @@
-import {FirebaseListObservable} from './firebase_list_observable';
+import {FirebaseListObservable, AFUnwrappedDataSnapshot} from './firebase_list_observable';
 import {Observer} from 'rxjs/Observer';
 import * as Firebase from 'firebase';
 
@@ -49,8 +49,15 @@ export interface FirebaseListFactoryOpts {
   preserveSnapshot?: boolean;
 }
 
-function unwrapMapFn (snapshot:FirebaseDataSnapshot): any {
-  return snapshot.val();
+export function unwrapMapFn (snapshot:FirebaseDataSnapshot): AFUnwrappedDataSnapshot {
+  var unwrapped = snapshot.val();
+  if ((/string|number|boolean/).test(typeof unwrapped)) {
+    unwrapped = {
+      $value: unwrapped
+    };
+  }
+  unwrapped.$key = snapshot.key();
+  return unwrapped;
 }
 
 export function onChildAdded(arr:any[], child:any, prevKey:string): any[] {

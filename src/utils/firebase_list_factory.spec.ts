@@ -4,7 +4,8 @@ import {
   onChildAdded,
   onChildChanged,
   onChildRemoved,
-  onChildUpdated
+  onChildUpdated,
+  unwrapMapFn
 } from './firebase_list_factory';
 import {FirebaseListObservable} from './firebase_list_observable';
 import {
@@ -183,6 +184,37 @@ describe('FirebaseListFactory', () => {
         onChildRemoved([val1, val2, val3], val2)
       ).toEqual([val1, val3]);
     });
+  });
 
+
+  describe('unwrapMapFn', () => {
+    var val = {unwrapped: true};
+    var snapshot = {
+      key: () => 'key',
+      val: () => val
+    };
+
+    it('should return an object value with a $key property', () => {
+      expect(unwrapMapFn(snapshot as FirebaseDataSnapshot)).toEqual({
+        $key: 'key',
+        unwrapped: true
+      });
+    });
+
+
+    it('should return an object value with a $value property if value is scalar', () => {
+      expect(unwrapMapFn(Object.assign(snapshot, {val: () => 5}) as FirebaseDataSnapshot)).toEqual({
+        $key: 'key',
+        $value: 5
+      });
+      expect(unwrapMapFn(Object.assign(snapshot, {val: () => false}) as FirebaseDataSnapshot)).toEqual({
+        $key: 'key',
+        $value: false
+      });
+      expect(unwrapMapFn(Object.assign(snapshot, {val: () => 'lol'}) as FirebaseDataSnapshot)).toEqual({
+        $key: 'key',
+        $value: 'lol'
+      });
+    });
   });
 });
