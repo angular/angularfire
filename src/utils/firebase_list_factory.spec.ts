@@ -28,7 +28,14 @@ describe('FirebaseListFactory', () => {
   var questionsSnapshotted:FirebaseListObservable<any>;
   var ref:any;
   var refSnapshotted:any;
+  var val1: any;
+  var val2: any;
+  var val3: any;
+
   beforeEach((done:any) => {
+    val1 = { key: () => 'key1' };
+    val2 = { key: () => 'key2' };
+    val3 = { key: () => 'key3' };
     (new Firebase(rootFirebase)).remove(done);
     questions = FirebaseListFactory(`${rootFirebase}/questions`);
     questionsSnapshotted = FirebaseListFactory(`${rootFirebase}/questionssnapshot`, {preserveSnapshot: true});
@@ -115,76 +122,67 @@ describe('FirebaseListFactory', () => {
     subscription.unsubscribe();
     expect(firebaseSpy).toHaveBeenCalled();
   });
-});
 
-describe('onChildAdded', () => {
-  it('should add the child to the end of the array', () => {
-    expect(onChildAdded([1], 2)).toEqual([1, 2]);
+
+  describe('onChildAdded', () => {
+    it('should add the child after the prevKey', () => {
+      expect(onChildAdded([val1, val2], val3, 'key1')).toEqual([val1, val3, val2]);
+    });
+
+
+    it('should not mutate the input array', () => {
+      var inputArr = [val1];
+      expect(onChildAdded(inputArr, val2, 'key1')).not.toEqual(inputArr);
+    });
   });
 
 
-  it('should not mutate the input array', () => {
-    var inputArr = [1];
-    expect(onChildAdded(inputArr, 2)).not.toEqual(inputArr);
-  });
-});
+  describe('onChildChanged', () => {
+    it('should move the child after the specified prevKey', () => {
+      expect(onChildChanged([val1, val2], val1, 'key2')).toEqual([val2, val1]);
+    });
 
 
-describe('onChildChanged', () => {
-  var val1: any;
-  var val2: any;
-  var val3: any;
-  beforeEach(() => {
-    val1 = { key: () => 'key1' };
-    val2 = { key: () => 'key2' };
-    val3 = { key: () => 'key3' };
-  });
+    it('should move the child to the beginning if prevKey is null', () => {
+      expect(
+        onChildChanged([val1, val2, val3], val2, null)
+      ).toEqual([val2, val1, val3]);
+    });
 
 
-  it('should move the child after the specified prevKey', () => {
-    expect(onChildChanged([val1, val2], val1, 'key2')).toEqual([val2, val1]);
-  });
+    it('should not mutate the input array', () => {
+      var inputArr = [val1, val2];
+      expect(onChildChanged(inputArr, val1, 'key2')).not.toEqual(inputArr);
+    });
 
 
-  it('should move the child to the beginning if prevKey is null', () => {
-    expect(
-      onChildChanged([val1, val2, val3], val2, null)
-    ).toEqual([val2, val1, val3]);
-  });
-
-
-  it('should not mutate the input array', () => {
-    var inputArr = [val1, val2];
-    expect(onChildChanged(inputArr, val1, 'key2')).not.toEqual(inputArr);
+    it('should update the child', () => {
+      expect(
+        onChildUpdated([val1, val2, val3], {
+          key: () => 'newkey'
+        }, 'key1').map(v => v.key())
+      ).toEqual(['key1', 'newkey', 'key3']);
+    });
   });
 
 
-  it('should update the child', () => {
-    expect(
-      onChildUpdated([val1, val2, val3], {
-        key: () => 'newkey'
-      }, 'key1').map(v => v.key())
-    ).toEqual(['key1', 'newkey', 'key3']);
+  describe('onChildRemoved', () => {
+    var val1: any;
+    var val2: any;
+    var val3: any;
+
+    beforeEach(() => {
+      val1 = { key: () => 'key1' };
+      val2 = { key: () => 'key2' };
+      val3 = { key: () => 'key3' };
+    });
+
+
+    it('should remove the child', () => {
+      expect(
+        onChildRemoved([val1, val2, val3], val2)
+      ).toEqual([val1, val3]);
+    });
+
   });
-});
-
-
-describe('onChildRemoved', () => {
-  var val1: any;
-  var val2: any;
-  var val3: any;
-
-  beforeEach(() => {
-    val1 = { key: () => 'key1' };
-    val2 = { key: () => 'key2' };
-    val3 = { key: () => 'key3' };
-  });
-
-
-  it('should remove the child', () => {
-    expect(
-      onChildRemoved([val1, val2, val3], val2)
-    ).toEqual([val1, val3]);
-  });
-
 });
