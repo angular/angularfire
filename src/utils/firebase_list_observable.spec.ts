@@ -54,6 +54,11 @@ describe('FirebaseObservable', () => {
     it('should accept any type of value without compilation error', () => {
       O.add('foo');
     });
+
+
+    it('should resolve returned thenable when successful', (done:any) => {
+      O.add('foo').then(done, done.fail);
+    });
   });
 
 

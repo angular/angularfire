@@ -15,28 +15,27 @@ export class FirebaseListObservable<T> extends Observable<T> {
     return observable;
   }
 
-  add(val:any):void {
+  add(val:any):FirebaseWithPromise<void> {
     if(!this._ref) {
-      // _ref gets created when the observable is subscribed
       throw new Error('No ref specified for this Observable!');
     }
-    this._ref.push(val);
+    return this._ref.push(val);
   }
 
-  remove(item:string | Firebase | FirebaseDataSnapshot | AFUnwrappedDataSnapshot): Promise<FirebaseDataSnapshot> {
+  remove(item:string | Firebase | FirebaseDataSnapshot | AFUnwrappedDataSnapshot): Promise<void> {
     // TODO: remove override when typings are updated to include
     // remove() returning a promise.
     if (typeof item === 'string') {
-      return (<any>this._ref).child(item).remove();
+      return this._ref.child(item).remove();
     } else if (item instanceof Firebase) {
       // Firebase ref
-      return (<any>item).remove();
+      return item.remove();
     } else if (typeof (<any>item).key === 'function') {
       // Snapshot
-      return (<any>(<FirebaseDataSnapshot>item).ref().remove());
+      return (<FirebaseDataSnapshot>item).ref().remove();
     } else if (typeof (<any>item).$key === 'string') {
       // Unwrapped snapshot
-      return (<any>this._ref).child((<AFUnwrappedDataSnapshot>item).$key).remove();
+      return this._ref.child((<AFUnwrappedDataSnapshot>item).$key).remove();
     }
     throw new Error(`FirebaseListObservable.remove requires a key, snapshot, reference, or unwrapped snapshot. Got: ${typeof item}`);
   }
