@@ -5,6 +5,7 @@
   "main": "./dist/angularfire2.js",
   "scripts": {
     "test": "npm run build; karma start",
+    "docs": "typedoc --out docs/api/ --module commonjs --mode modules --name AngularFire2 src",
     "build": "rm -rf dist; tsc && cp package.json README.md LICENSE .npmignore dist/",
     "postbuild": "node tools/rewrite-published-package.js",
     "postinstall": "typings install; webdriver-manager update",
@@ -54,6 +55,7 @@
     "systemjs-builder": "^0.15.7",
     "traceur": "0.0.96",
     "tsd": "^0.6.5",
+    "typedoc": "github:jeffbcross/typedoc",
     "typescript": "1.7.5",
     "typings": "^0.6.2",
     "zone.js": "0.5.15"

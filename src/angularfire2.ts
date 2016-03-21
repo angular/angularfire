@@ -63,7 +63,10 @@ export const WORKER_RENDER_FIREBASE_PROVIDERS: any[] = [
   }),
   MessageBasedFirebaseAuth
 ];
-
+/**
+ * Used to define the default Firebase root location to be
+ * used throughout an application.
+ */
 export const defaultFirebase = (url: string): Provider => {
   return provide(FirebaseUrl, {
     useValue: url
