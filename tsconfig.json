@@ -13,6 +13,8 @@
   },
   "files": [
     "src/angularfire2.ts",
+    "src/angularfire2_worker_app.ts",
+    "src/angularfire2_worker_render.ts",
     "src/angularfire2.spec.ts",
     "src/utils/absolute_path_resolver.ts",
     "src/utils/firebase_list_factory.spec.ts",

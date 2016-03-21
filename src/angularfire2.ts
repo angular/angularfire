@@ -16,8 +16,6 @@ import {
   FirebaseAuthState
 } from './providers/auth_backend';
 import {FirebaseSdkAuthBackend} from './providers/firebase_sdk_auth_backend';
-import {WebWorkerFirebaseAuth} from './providers/web_workers/worker/auth';
-import {MessageBasedFirebaseAuth} from './providers/web_workers/ui/auth';
 
 @Injectable()
 export class AngularFire {
@@ -41,7 +39,7 @@ function getAbsUrl (root:string, url:string) {
   return url;
 }
 
-const COMMON_PROVIDERS: any[] = [
+export const COMMON_PROVIDERS: any[] = [
   provide(FirebaseRef, {
     useFactory: (url:string) => new Firebase(url),
     deps: [FirebaseUrl]}),
@@ -57,19 +55,6 @@ export const FIREBASE_PROVIDERS:any[] = [
   })
 ];
 
-export const WORKER_APP_FIREBASE_PROVIDERS: any[] = [
-  COMMON_PROVIDERS,
-  provide(AuthBackend, {useClass: WebWorkerFirebaseAuth})
-];
-
-export const WORKER_RENDER_FIREBASE_PROVIDERS: any[] = [
-  COMMON_PROVIDERS,
-  provide(FirebaseSdkAuthBackend, {
-    useFactory: (ref: Firebase) => new FirebaseSdkAuthBackend(ref, true),
-    deps: [FirebaseRef]
-  }),
-  MessageBasedFirebaseAuth
-];
 /**
  * Used to define the default Firebase root location to be
  * used throughout an application.
@@ -91,7 +76,6 @@ export {
 }
 
 export {FirebaseUrl, FirebaseRef, FirebaseAuthConfig} from './tokens';
-export {MessageBasedFirebaseAuth} from './providers/web_workers/ui/auth';
 
 // Helps Angular-CLI automatically add providers
 export default {

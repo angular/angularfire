@@ -14,7 +14,6 @@ import {
   AngularFire,
   FirebaseObjectObservable,
   FIREBASE_PROVIDERS,
-  WORKER_APP_FIREBASE_PROVIDERS,
   FirebaseAuth,
   FirebaseUrl,
   FirebaseRef,
