@@ -26,12 +26,19 @@ export class AngularFire {
     public auth:FirebaseAuth) {
   }
   list (url:string, opts?:FirebaseListFactoryOpts):FirebaseListObservable<any[]> {
-    // TODO: check if relative or absolute
-    return FirebaseListFactory(this.fbUrl+url, opts);
+    return FirebaseListFactory(getAbsUrl(this.fbUrl, url), opts);
   }
   object(url: string, opts?:FirebaseObjectFactoryOpts):FirebaseObjectObservable<any> {
-    return FirebaseObjectFactory(this.fbUrl+url, opts);
+    return FirebaseObjectFactory(getAbsUrl(this.fbUrl, url), opts);
   }
+}
+
+function getAbsUrl (root:string, url:string) {
+  if (!(/^[a-z]+:\/\/.*/.test(url))) {
+    // Provided url is relative.
+    url = root + url;
+  }
+  return url;
 }
 
 const COMMON_PROVIDERS: any[] = [

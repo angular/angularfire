@@ -51,6 +51,12 @@ describe('angularfire', () => {
       af = _af;
     }));
 
+
+    it('should accept an absolute url', () => {
+      expect((<any>af.list(localServerUrl))._ref.toString()).toBe(localServerUrl);
+    });
+
+
     it('should return an observable of the path', (done:any) => {
       var questions = af.list(`/questions`);
       (<any>questions)._ref.push({pathObservable:true}, () => {
@@ -81,11 +87,18 @@ describe('angularfire', () => {
 
   describe('.object()', () => {
     var observable:FirebaseObjectObservable<any>;
+    var af:AngularFire;
 
     beforeEachProviders(() => [FIREBASE_PROVIDERS, defaultFirebase(localServerUrl)]);
-    beforeEach(inject([AngularFire], (af:AngularFire) => {
-      observable = af.object(`/list-of-questions/1`)
+    beforeEach(inject([AngularFire], (_af:AngularFire) => {
+      observable = _af.object(`/list-of-questions/1`)
+      af = _af;
     }));
+
+
+    it('should accept an absolute url', () => {
+      expect((<any>af.object(localServerUrl))._ref.toString()).toBe(localServerUrl);
+    });
 
 
     it('should return an observable of the path', injectAsync([AngularFire], (af:AngularFire) => {
