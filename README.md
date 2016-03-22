@@ -2,14 +2,223 @@
 
 [![Build Status](https://travis-ci.org/angular/angularfire2.svg?branch=master)](https://travis-ci.org/angular/angularfire2)
 
-Status: In-Development. This is an early alpha preview, with many breaking changes
-happening between releases.
+Status: In-Development
+
+## Realtime bindings and authentication for Angular 2
+
+AngularFire2 integrates Firebase's realtime observers and authentication with Angular2.
+
+### Example use:
+
+```ts
+import {Component} from 'angular2/core';
+import {AngularFire} from 'angularfire2';
+import {Observable} from 'rxjs/Observable';
+
+@Component({
+  selector: 'project-name-app',
+  providers: [],
+  templateUrl: 'app/project-name-app.html',
+  directives: [],
+  pipes: []
+})
+export class MyApp {
+  items: Observable<any[]>;
+  constructor(af: AngularFire) {
+    this.items = af.list('/items');
+  }
+}
+```
 
 ## Install
 
+```bash
+npm install angularfire2 --save
 ```
-$ npm install --save angularfire2
+
+## 10 steps to AngularFire2
+
+*Don't worry, we're working to make this shorter.*
+
+To build with AngularFire 2, make sure you have the Angular CLI installed. Then follow the steps below.
+
+### 1. Create a new project
+
+```bash
+ng new <project-name>
+cd <project-name>
+``` 
+
+The Angular CLI's `new` command will set up the latest Angular build in a new project structure.
+
+### 2. Install AngularFire 2 and Firebase
+
+```bash
+npm install angularfire2 && firebase --save
 ```
+
+Now that you have a new project setup, install AngularFire 2 and Firebase from NPM.
+
+
+### 3. Install typings
+
+```bash
+npm install typings -g 
+typings install --save --ambient firebase
+```
+
+AngularFire 2 is written in Typescript and depends on typings for the Firebase SDK. To get a clean build, install typings and download the Firebase typings.
+
+### 4. Include AngularFire 2 and Firebase in the vendor files
+
+Open ember-cli-build.js (yes, I said Ember).
+
+Include AngularFire2 and Firebase in the `vendorNpmFiles` array:
+
+```js
+/* global require, module */
+
+var Angular2App = require('angular-cli/lib/broccoli/angular2-app');
+
+module.exports = function(defaults) {
+  var app = new Angular2App(defaults, {
+    vendorNpmFiles: [
+      'angularfire2/**/*.js',
+      'firebase/lib/*.js'
+    ]
+  });
+  return app.toTree();
+}
+```
+
+### 5. Build
+
+```bash
+ng build
+```
+
+Run a build and check the `/dist/vendor` folder for the `angularfire2` and `firebase` folders.
+
+### 6. System.js
+
+Open `/src/index.html`. Modify the `System.config` like below:
+
+```js
+System.config({
+  map: {
+    firebase: 'vendor/firebase/lib/firebase-web.js',
+    angularfire2: 'vendor/angularfire2'
+  },    
+  packages: {
+    app: {
+      format: 'register',
+      defaultExtension: 'js'
+    },
+    angularfire2: {
+      defaultExtension: 'js',
+      main: 'angularfire2.js'
+    }
+  }
+});
+```
+
+AngularFire 2 and Firebase need to be mapped with System.js for module loading.
+
+### 7. Bootstrap
+
+Open `/src/app.ts`:
+
+```ts
+import {bootstrap} from 'angular2/platform/browser';
+import {MyAppClass} from './app/<my-app-class>';
+import {ROUTER_PROVIDERS} from 'angular2/router';
+import {FIREBASE_PROVIDERS, defaultFirebase, AngularFire} from 'angularfire2';
+
+bootstrap(<MyAppClass>, [
+  FIREBASE_PROVIDERS,
+  defaultFirebase('https://<your-firebase>.firebaseio.com'),
+  ROUTER_PROVIDERS
+]);
+```
+
+### 8. Inject AngularFire
+
+Open `/src/app/project-name.ts`:
+
+```ts
+import {Component} from 'angular2/core';
+import {RouteConfig, ROUTER_DIRECTIVES} from 'angular2/router';
+import {AngularFire} from 'angularfire2';
+import {Observable} from 'rxjs/Observable';
+
+@Component({
+  selector: 'project-name-app',
+  providers: [],
+  templateUrl: 'app/project-name-app.html',
+  directives: [ROUTER_DIRECTIVES],
+  pipes: []
+})
+@RouteConfig([
+
+])
+export class ProjectNameApp {
+  constructor(af: AngularFire) {
+    
+  }
+}
+``` 
+
+### 9. Bind to a list
+
+In `/src/app/project-name.ts`:
+
+```ts
+import {Component} from 'angular2/core';
+import {RouteConfig, ROUTER_DIRECTIVES} from 'angular2/router';
+import {AngularFire} from 'angularfire2';
+import {Observable} from 'rxjs/Observable';
+
+@Component({
+  selector: 'project-name-app',
+  providers: [],
+  templateUrl: 'app/project-name-app.html',
+  directives: [ROUTER_DIRECTIVES],
+  pipes: []
+})
+@RouteConfig([
+
+])
+export class ProjectNameApp {
+  items: Observable<any[]>;
+  constructor(af: AngularFire) {
+    // create a list at /items
+    this.items = af.list('/items');
+  }
+}
+```
+
+Open `/src/app/project-name.html`:
+
+```html
+<ul *ngFor="#item of items | async">
+  <li class="text">
+    {{item}}
+  </li>
+</ul>
+```
+
+The `async` pipe unwraps the each item in the people 
+observable as they arrive. 
+
+### 10. Serve
+
+```bash
+ng serve
+```
+
+Run the serve command and go to `localhost:4200` in your browser.
+
+And that's it! If it totally borke, file an issue and let us know.
 
 ## API
 
@@ -50,33 +259,6 @@ bootstrap(App, [
 ]);
 
 ```
-
-The AngularFire service exposes methods to get Observables of Firebase data: `list` and `object`. `list` returns an observable that will emit a new array any time data at the specified location is updated.
-
-```typescript
-var questions = angularFire.list('/questions');
-questions.subscribe(questions => {
-  console.log(questions);
-});
-questions.add({title: 'how to Angular?'});
-// log [{title: 'how to Angular?'}]
-questions.add({title: 'how to Firebase?'});
-// log [{title: 'how to Angular?'},{title: 'how to Firebase?'}]
-```
-
-`object` returns an observable that will emit a new object any time data at the specified location is updated.
-
-```typescript
-var question = angularFire.object('/questions/1');
-question.subscribe(question => {
-  console.log(question);
-});
-ref.set({title: 'how to Angular?'});
-// log {title: 'how to Angular?'}
-ref.set({title: 'how to ANGULAR?'});
-// log {title: 'how to ANGULAR?'}
-```
-
 
 ### FIREBASE_PROVIDERS
 
