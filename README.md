@@ -40,7 +40,7 @@ npm install angularfire2 --save
 
 *Don't worry, we're working to make this shorter.*
 
-To build with AngularFire 2, make sure you have the Angular CLI installed. Then follow the steps below.
+To build with AngularFire 2, make sure you have the [Angular CLI](https://github.com/angular/angular-cli) installed. Then follow the steps below.
 
 ### 1. Create a new project
 
