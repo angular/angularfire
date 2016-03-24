@@ -1,5 +1,5 @@
 import {APP_INITIALIZER, Inject, Injectable, OpaqueToken, provide, Provider} from 'angular2/core';
-import {FirebaseAuth, firebaseAuthConfig} from './providers/auth';
+import {FirebaseAuth, firebaseAuthConfig} from './auth/auth';
 import * as Firebase from 'firebase';
 import {FirebaseListObservable} from './utils/firebase_list_observable';
 import {FirebaseObjectObservable} from './utils/firebase_object_observable';
@@ -9,34 +9,21 @@ import {
   FirebaseObjectFactory
 } from './utils/firebase_object_factory';
 import {FirebaseUrl, FirebaseRef} from './tokens';
+import {FirebaseDatabase} from './database/database';
 import {
   AuthBackend,
   AuthMethods,
   AuthProviders,
   FirebaseAuthState
-} from './providers/auth_backend';
-import {FirebaseSdkAuthBackend} from './providers/firebase_sdk_auth_backend';
+} from './auth/auth_backend';
+import {FirebaseSdkAuthBackend} from './auth/firebase_sdk_auth_backend';
 
 @Injectable()
 export class AngularFire {
   constructor(
-    @Inject(FirebaseUrl) private fbUrl:string,
+    public database: FirebaseDatabase,
     public auth:FirebaseAuth) {
   }
-  list (url:string, opts?:FirebaseListFactoryOpts):FirebaseListObservable<any[]> {
-    return FirebaseListFactory(getAbsUrl(this.fbUrl, url), opts);
-  }
-  object(url: string, opts?:FirebaseObjectFactoryOpts):FirebaseObjectObservable<any> {
-    return FirebaseObjectFactory(getAbsUrl(this.fbUrl, url), opts);
-  }
-}
-
-function getAbsUrl (root:string, url:string) {
-  if (!(/^[a-z]+:\/\/.*/.test(url))) {
-    // Provided url is relative.
-    url = root + url;
-  }
-  return url;
 }
 
 export const COMMON_PROVIDERS: any[] = [
@@ -67,6 +54,7 @@ export const defaultFirebase = (url: string): Provider => {
 
 export {
   FirebaseAuth,
+  FirebaseDatabase,
   FirebaseListObservable,
   FirebaseObjectObservable,
   firebaseAuthConfig,
