@@ -25,7 +25,7 @@ import {Observable} from 'rxjs/Observable';
 export class MyApp {
   items: Observable<any[]>;
   constructor(af: AngularFire) {
-    this.items = af.list('/items');
+    this.items = af.database.list('/items');
   }
 }
 ```
@@ -47,7 +47,7 @@ To build with AngularFire 2, make sure you have the [Angular CLI](https://github
 ```bash
 ng new <project-name>
 cd <project-name>
-``` 
+```
 
 The Angular CLI's `new` command will set up the latest Angular build in a new project structure.
 
@@ -63,7 +63,7 @@ Now that you have a new project setup, install AngularFire 2 and Firebase from N
 ### 3. Install typings
 
 ```bash
-npm install typings -g 
+npm install typings -g
 typings install --save --ambient firebase
 ```
 
@@ -108,7 +108,7 @@ System.config({
   map: {
     firebase: 'vendor/firebase/lib/firebase-web.js',
     angularfire2: 'vendor/angularfire2'
-  },    
+  },
   packages: {
     app: {
       format: 'register',
@@ -163,10 +163,10 @@ import {Observable} from 'rxjs/Observable';
 ])
 export class ProjectNameApp {
   constructor(af: AngularFire) {
-    
+
   }
 }
-``` 
+```
 
 ### 9. Bind to a list
 
@@ -192,7 +192,7 @@ export class ProjectNameApp {
   items: Observable<any[]>;
   constructor(af: AngularFire) {
     // create a list at /items
-    this.items = af.list('/items');
+    this.items = af.database.list('/items');
   }
 }
 ```
@@ -207,8 +207,8 @@ Open `/src/app/project-name.html`:
 </ul>
 ```
 
-The `async` pipe unwraps the each item in the people 
-observable as they arrive. 
+The `async` pipe unwraps the each item in the people
+observable as they arrive.
 
 ### 10. Serve
 
@@ -247,7 +247,7 @@ class App {
   questions:Observable<Question[]>
   constructor(af:AngularFire) {
     // Get an observable of a synchronized array from <firebase-root>/questions
-    this.questions = af.list('/questions');
+    this.questions = af.database.list('/questions');
   }
 }
 

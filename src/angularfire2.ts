@@ -16,19 +16,20 @@ import {
   FirebaseAuthState
 } from './providers/auth_backend';
 import {FirebaseSdkAuthBackend} from './providers/firebase_sdk_auth_backend';
+import {FirebaseDatabase} from './database/database';
 
 @Injectable()
 export class AngularFire {
+  list: (url:string, opts?:FirebaseListFactoryOpts) => FirebaseListObservable<any[]>;
+  object: (url: string, opts?:FirebaseObjectFactoryOpts) => FirebaseObjectObservable<any>;
   constructor(
     @Inject(FirebaseUrl) private fbUrl:string,
-    public auth:FirebaseAuth) {
+    public auth:FirebaseAuth,
+    public database: FirebaseDatabase) {
+      this.list = database.list.bind(database);
+      this.object = database.object.bind(database);
   }
-  list (url:string, opts?:FirebaseListFactoryOpts):FirebaseListObservable<any[]> {
-    return FirebaseListFactory(getAbsUrl(this.fbUrl, url), opts);
-  }
-  object(url: string, opts?:FirebaseObjectFactoryOpts):FirebaseObjectObservable<any> {
-    return FirebaseObjectFactory(getAbsUrl(this.fbUrl, url), opts);
-  }
+
 }
 
 function getAbsUrl (root:string, url:string) {
@@ -44,7 +45,8 @@ export const COMMON_PROVIDERS: any[] = [
     useFactory: (url:string) => new Firebase(url),
     deps: [FirebaseUrl]}),
   FirebaseAuth,
-  AngularFire
+  AngularFire,
+  FirebaseDatabase
 ];
 
 export const FIREBASE_PROVIDERS:any[] = [
