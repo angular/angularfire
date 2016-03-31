@@ -1,10 +1,11 @@
-import {Inject} from 'angular2/core';
+import {Inject, Injectable} from 'angular2/core';
 import {FirebaseUrl} from '../tokens';
 import {FirebaseListObservable} from '../utils/firebase_list_observable';
 import {FirebaseObjectObservable} from '../utils/firebase_object_observable';
 import {FirebaseListFactory, FirebaseListFactoryOpts} from '../utils/firebase_list_factory';
 import {FirebaseObjectFactoryOpts, FirebaseObjectFactory} from '../utils/firebase_object_factory';
 
+@Injectable()
 export class FirebaseDatabase {
   constructor(@Inject(FirebaseUrl) private fbUrl:string) {}
   list (url:string, opts?:FirebaseListFactoryOpts):FirebaseListObservable<any[]> {
