@@ -46,7 +46,8 @@ export const COMMON_PROVIDERS: any[] = [
     useFactory: (url:string) => new Firebase(url),
     deps: [FirebaseUrl]}),
   FirebaseAuth,
-  AngularFire
+  AngularFire,
+  FirebaseDatabase
 ];
 
 export const FIREBASE_PROVIDERS:any[] = [
