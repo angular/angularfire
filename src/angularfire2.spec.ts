@@ -23,11 +23,14 @@ import {Subscription} from 'rxjs';
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/delay';
 
-const localServerUrl = 'http://localhost.firebaseio.test:5000/';
+const localServerUrl = 'https://angularfire2.firebaseio-demo.com/';
 
 describe('angularfire', () => {
   var subscription:Subscription;
+  const questionsRef = new Firebase(localServerUrl).child('questions');
+  const listOfQuestionsRef = new Firebase(localServerUrl).child('list-of-questions');
 
   afterEach((done:any) => {
     // Clear out the Firebase to prevent leaks between tests
@@ -58,7 +61,7 @@ describe('angularfire', () => {
 
     it('should return an observable of the path', (done:any) => {
       var questions = af.list(`/questions`);
-      (<any>questions)._ref.push({pathObservable:true}, () => {
+      questionsRef.push({pathObservable:true}, () => {
         subscription = questions
           .take(1)
           .do((data:any) => {
@@ -72,7 +75,7 @@ describe('angularfire', () => {
 
     it('should preserve snapshots in the list if preserveSnapshot option specified', (done:any) => {
       var questions = af.list(`list-of-questions`, {preserveSnapshot: true});
-      (<any>questions)._ref.push('hello', () => {
+      listOfQuestionsRef.push('hello', () => {
         subscription = questions
           .take(1)
           .do((data:any) => {

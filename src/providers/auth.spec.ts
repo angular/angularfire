@@ -55,7 +55,7 @@ describe('FirebaseAuth', () => {
     authCb = null;
     injector = Injector.resolveAndCreate([
       provide(FirebaseUrl, {
-        useValue: 'ws://localhost.firebaseio.test:5000'
+        useValue: 'https://angularfire2.firebaseio-demo.com/'
       }),
       FIREBASE_PROVIDERS
     ]);

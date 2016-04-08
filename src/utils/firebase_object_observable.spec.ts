@@ -4,7 +4,7 @@ import {Observer} from 'rxjs/Observer';
 import 'rxjs/add/operator/map';
 import * as Firebase from 'firebase';
 
-const rootUrl = 'ws://localhost.firebaseio.test:5000';
+const rootUrl = 'https://angularfire2-obs.firebaseio-demo.com/';
 
 describe('FirebaseObservable', () => {
   it('should return an instance of FirebaseObservable when calling operators', () => {

@@ -3,7 +3,7 @@ import {FirebaseObjectObservable} from '../utils/firebase_object_observable';
 import {beforeEach, it, describe, expect} from 'angular2/testing';
 import {Subscription} from 'rxjs';
 
-const rootFirebase = 'https://angularfire2.firebaseio-demo.com';
+const rootFirebase = 'https://angularfire2-object-factory.firebaseio-demo.com';
 
 describe('FirebaseObjectFactory', () => {
   var i = 0;

@@ -21,7 +21,7 @@ import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/skip';
 import 'rxjs/add/operator/take';
 
-const rootFirebase = 'ws://localhost.firebaseio.test:5000';
+const rootFirebase = 'https://angularfire2-list-factory.firebaseio-demo.com/';
 
 describe('FirebaseListFactory', () => {
   var subscription:Subscription;

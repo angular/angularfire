@@ -6,7 +6,7 @@ import * as Firebase from 'firebase';
 
 enableProdMode();
 
-const rootFirebase = 'ws://localhost.firebaseio.test:5000/';
+const rootFirebase = 'https://angularfire2.firebaseio-demo.com/';
 
 @Component({
   template: `

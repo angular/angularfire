@@ -5,7 +5,7 @@ import 'rxjs/add/operator/map';
 import * as Firebase from 'firebase';
 import {unwrapMapFn} from './firebase_list_factory';
 
-const rootUrl = 'ws://localhost.firebaseio.test:5000';
+const rootUrl = 'https://angularfire2-list-obs.firebaseio-demo.com/';
 
 describe('FirebaseObservable', () => {
   var O:FirebaseListObservable<any>;
