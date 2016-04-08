@@ -25,6 +25,7 @@ import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/delay';
 
+// Only use this URL for angularfire2.spec.ts
 const localServerUrl = 'https://angularfire2.firebaseio-demo.com/';
 
 describe('angularfire', () => {
