@@ -24,6 +24,7 @@ import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/do';
 
+// Only use this URL for angularfire2.spec.ts
 const localServerUrl = 'http://localhost.firebaseio.test:5000/';
 
 describe('angularfire', () => {
