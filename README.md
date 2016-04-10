@@ -71,7 +71,7 @@ AngularFire 2 is written in Typescript and depends on typings for the Firebase S
 
 ### 4. Include AngularFire 2 and Firebase in the vendor files
 
-Open ember-cli-build.js (yes, I said Ember).
+Open `angular-cli-build.js`.
 
 Include AngularFire2 and Firebase in the `vendorNpmFiles` array:
 
