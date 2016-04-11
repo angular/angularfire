@@ -69,8 +69,11 @@ export const defaultFirebase = (url: string): Provider => {
 
 export {
   FirebaseAuth,
+  FirebaseDatabase,
   FirebaseListObservable,
   FirebaseObjectObservable,
+  FirebaseListFactory,
+  FirebaseObjectFactory,
   firebaseAuthConfig,
   FirebaseAuthState,
   AuthMethods,

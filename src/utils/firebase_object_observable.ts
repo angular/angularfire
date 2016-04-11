@@ -14,4 +14,22 @@ export class FirebaseObjectObservable<T> extends Observable<T> {
     observable._ref = this._ref;
     return observable;
   }
+  set(value: any): Promise<void> {
+    if(!this._ref) {
+      throw new Error('No ref specified for this Observable!');
+    }
+    return this._ref.set(value);
+  }
+  update(value: Object): Promise<void> {
+    if(!this._ref) {
+      throw new Error('No ref specified for this Observable!');
+    }
+    return this._ref.update(value);
+  }
+  remove(): Promise<void> {
+    if(!this._ref) {
+      throw new Error('No ref specified for this Observable!');
+    }
+    return this._ref.remove();
+  }
 }
