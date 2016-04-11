@@ -13,3 +13,5 @@ export const WORKER_RENDER_FIREBASE_PROVIDERS: any[] = [
   }),
   MessageBasedFirebaseAuth
 ];
+
+export {MessageBasedFirebaseAuth} from './providers/web_workers/ui/auth';
