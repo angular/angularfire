@@ -128,6 +128,14 @@ describe('FirebaseObservable', () => {
           .then(done, done.fail);
       });
     });
+    
+    it('should remove the whole list if no item is added', () => {
+      O.remove()
+        .then(() => (<any>ref).once('value'))
+        .then((data:FirebaseDataSnapshot) => {
+          expect(data.val()).toBe(null);
+        });
+    });
 
 
     it('should throw an exception if input is not supported', () => {
