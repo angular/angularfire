@@ -1,9 +1,17 @@
 import {FirebaseListObservable, AFUnwrappedDataSnapshot} from './firebase_list_observable';
 import {Observer} from 'rxjs/Observer';
 import * as Firebase from 'firebase';
+import * as utils from './utils';
 
-export function FirebaseListFactory (absoluteUrl:string, {preserveSnapshot}:FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
-  const ref = new Firebase(absoluteUrl);
+export function FirebaseListFactory (absoluteUrlOrDbRef:string | Firebase, {preserveSnapshot}:FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
+  let ref: Firebase;
+  
+  if (utils.isString(absoluteUrlOrDbRef)) {  
+    ref = new Firebase(<string>absoluteUrlOrDbRef);
+  } else {
+    ref = <Firebase>absoluteUrlOrDbRef;
+  }
+  
   return new FirebaseListObservable((obs:Observer<any[]>) => {
     let arr:any[] = [];
     let hasInitialLoad = false;

@@ -4,12 +4,18 @@ import {FirebaseListObservable} from '../utils/firebase_list_observable';
 import {FirebaseObjectObservable} from '../utils/firebase_object_observable';
 import {FirebaseListFactory, FirebaseListFactoryOpts} from '../utils/firebase_list_factory';
 import {FirebaseObjectFactoryOpts, FirebaseObjectFactory} from '../utils/firebase_object_factory';
+import * as utils from '../utils/utils'
 
 @Injectable()
 export class FirebaseDatabase {
   constructor(@Inject(FirebaseUrl) private fbUrl:string) {}
-  list (url:string, opts?:FirebaseListFactoryOpts):FirebaseListObservable<any[]> {
-    return FirebaseListFactory(getAbsUrl(this.fbUrl, url), opts);
+  list (urlOrRef:string | Firebase, opts?:FirebaseListFactoryOpts):FirebaseListObservable<any[]> {
+    if (utils.isString(urlOrRef)) {
+      return FirebaseListFactory(getAbsUrl(this.fbUrl, <string>urlOrRef), opts);  
+    }
+    if (utils.isFirebaseRef(urlOrRef)) {
+      return FirebaseListFactory(<Firebase>urlOrRef);
+    }
   }
   object(url: string, opts?:FirebaseObjectFactoryOpts):FirebaseObjectObservable<any> {
     return FirebaseObjectFactory(getAbsUrl(this.fbUrl, url), opts);
