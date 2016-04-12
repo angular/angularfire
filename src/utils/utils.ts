@@ -23,7 +23,7 @@ export interface CheckUrlRef {
   isRef: () => any;
 }
 
-export function checkForUrlOrFirebaseRef(urlOrRef: string | Firebase, cases: CheckUrlRef): boolean {
+export function checkForUrlOrFirebaseRef(urlOrRef: string | Firebase, cases: CheckUrlRef): any {
   if (isString(urlOrRef)) {
     return cases.isUrl();
   }

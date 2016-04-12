@@ -10,15 +10,16 @@ import * as utils from '../utils/utils'
 export class FirebaseDatabase {
   constructor(@Inject(FirebaseUrl) private fbUrl:string) {}
   list (urlOrRef:string | Firebase, opts?:FirebaseListFactoryOpts):FirebaseListObservable<any[]> {
-    if (utils.isString(urlOrRef)) {
-      return FirebaseListFactory(getAbsUrl(this.fbUrl, <string>urlOrRef), opts);  
-    }
-    if (utils.isFirebaseRef(urlOrRef)) {
-      return FirebaseListFactory(<Firebase>urlOrRef);
-    }
+    return utils.checkForUrlOrFirebaseRef(urlOrRef, {
+      isUrl: () => FirebaseListFactory(getAbsUrl(this.fbUrl, <string>urlOrRef), opts),
+      isRef: () => FirebaseListFactory(<Firebase>urlOrRef)
+    });
   }
-  object(url: string, opts?:FirebaseObjectFactoryOpts):FirebaseObjectObservable<any> {
-    return FirebaseObjectFactory(getAbsUrl(this.fbUrl, url), opts);
+  object(urlOrRef: string | Firebase, opts?:FirebaseObjectFactoryOpts):FirebaseObjectObservable<any> {
+    return utils.checkForUrlOrFirebaseRef(urlOrRef, {
+      isUrl: () => FirebaseObjectFactory(getAbsUrl(this.fbUrl, <string>urlOrRef), opts),
+      isRef: () => FirebaseObjectFactory(urlOrRef)
+    });
   }
 }
 

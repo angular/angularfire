@@ -6,11 +6,16 @@ import * as utils from './utils';
 export function FirebaseListFactory (absoluteUrlOrDbRef:string | Firebase, {preserveSnapshot}:FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
   let ref: Firebase;
   
-  if (utils.isString(absoluteUrlOrDbRef)) {  
-    ref = new Firebase(<string>absoluteUrlOrDbRef);
-  } else {
-    ref = <Firebase>absoluteUrlOrDbRef;
-  }
+  utils.checkForUrlOrFirebaseRef(absoluteUrlOrDbRef, {
+    isUrl: () => ref = new Firebase(<string>absoluteUrlOrDbRef),
+    isRef: () => ref = <Firebase>absoluteUrlOrDbRef
+  });
+  
+  // if (utils.isString(absoluteUrlOrDbRef)) {  
+  //   ref = new Firebase(<string>absoluteUrlOrDbRef);
+  // } else {
+  //   ref = <Firebase>absoluteUrlOrDbRef;
+  // }
   
   return new FirebaseListObservable((obs:Observer<any[]>) => {
     let arr:any[] = [];
