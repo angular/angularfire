@@ -1,9 +1,15 @@
 import {FirebaseObjectObservable} from './firebase_object_observable';
 import {Observer} from 'rxjs/Observer';
 import * as Firebase from 'firebase';
+import * as utils from './utils';
 
-export function FirebaseObjectFactory (absoluteUrl:string, {preserveSnapshot}:FirebaseObjectFactoryOpts = {}): FirebaseObjectObservable<any> {
-  var ref = new Firebase(absoluteUrl);
+export function FirebaseObjectFactory (absoluteUrlOrDbRef:string | Firebase, {preserveSnapshot}:FirebaseObjectFactoryOpts = {}): FirebaseObjectObservable<any> {
+  let ref: Firebase;
+  utils.checkForUrlOrFirebaseRef(absoluteUrlOrDbRef, {
+    isUrl: () => ref = new Firebase(<string>absoluteUrlOrDbRef),
+    isRef: () => ref = <Firebase>absoluteUrlOrDbRef
+  });
+  
   return new FirebaseObjectObservable((obs:Observer<any[]>) => {
     ref.on('value', (snapshot) => {
       obs.next(preserveSnapshot ? snapshot : snapshot.val())
