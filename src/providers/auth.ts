@@ -2,6 +2,7 @@ import {Provider, Inject, provide, Injectable, Optional} from 'angular2/core';
 import {ReplaySubject} from 'rxjs/subject/ReplaySubject';
 import {FirebaseRef, FirebaseAuthConfig} from '../tokens';
 import {isPresent} from '../utils/utils';
+import * as utils from '../utils/utils';
 import {
   AuthBackend,
   AuthProviders,
@@ -15,6 +16,11 @@ import {
   FirebaseAuthDataAllProviders,
   authDataToAuthState
 } from './auth_backend';
+
+export interface PasswordCredentials {
+  email: string;
+  password: string;
+}
 
 const kBufferSize = 1;
 
@@ -34,6 +40,7 @@ export class FirebaseAuth extends ReplaySubject<FirebaseAuthState> {
   }
 
   public login(config?: AuthConfiguration): Promise<FirebaseAuthState>;
+  public login(credentials?: PasswordCredentials): Promise<FirebaseAuthState>;
   public login(credentials: AuthCredentials, config?: AuthConfiguration): Promise<FirebaseAuthState>;
   public login(obj1?: any, obj2?: AuthConfiguration): Promise<FirebaseAuthState> {
     let config: AuthConfiguration = null;

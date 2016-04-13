@@ -174,22 +174,6 @@ describe('FirebaseAuth', () => {
       let auth = new FirebaseAuth(backend, config);
       auth.login();
       expect(ref.authAnonymously).toHaveBeenCalledWith(jasmine.any(Function), {remember: 'default'});
-    });
-    
-    it('should login with password credentials', () => {
-      let config = {
-        method: AuthMethods.Password,
-        provider: AuthProviders.Password
-      };
-      const credentials = {
-        email: 'david@fire.com',
-        password: 'supersecretpassword'
-      };
-      let auth = new FirebaseAuth(backend, config);
-      auth.login(credentials);
-      expect(ref.authWithPassword).toHaveBeenCalledWith(credentials, 
-        jasmine.any(Function), 
-        { provider: config.provider});
     });    
 
     it('should be overridden by login\'s arguments', () => {
@@ -330,6 +314,22 @@ describe('FirebaseAuth', () => {
     describe('authWithPassword', () => {
       let options = {remember: 'default', method: AuthMethods.Password};
       let credentials = {email:'myname', password:'password'};
+
+     it('should login with password credentials', () => {
+      let config = {
+        method: AuthMethods.Password,
+        provider: AuthProviders.Password
+      };
+      const credentials = {
+        email: 'david@fire.com',
+        password: 'supersecretpassword'
+      };
+      let auth = new FirebaseAuth(backend, config);
+      auth.login(credentials);
+      expect(ref.authWithPassword).toHaveBeenCalledWith(credentials, 
+        jasmine.any(Function), 
+        { provider: config.provider});
+    });
 
       it('passes options and credentials object to underlying method', () => {
         auth.login(credentials, options);
