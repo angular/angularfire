@@ -1,6 +1,6 @@
 /// <reference path="../../manual_typings/manual_typings.d.ts" />
 
-import {expect, describe,it,beforeEach} from 'angular2/testing';
+import {expect, describe, it, iit, beforeEach} from 'angular2/testing';
 import {Injector, provide, Provider} from 'angular2/core';
 import {Observable} from 'rxjs/Observable'
 import {
@@ -29,7 +29,8 @@ describe('FirebaseAuth', () => {
     accessToken: 'accessToken',
     displayName: 'github User',
     username: 'githubUsername',
-    id: '12345'
+    id: '12345',
+    expires: 0
   }
 
   const authObj = {
@@ -40,22 +41,24 @@ describe('FirebaseAuth', () => {
     provider: 'github',
     uid: 'github:12345',
     github: providerMetadata,
-    auth: authObj
+    auth: authObj,
+    expires: 0
   };
 
   const AngularFireAuthState = {
     provider: AuthProviders.Github,
     uid: 'github:12345',
     github: providerMetadata,
-    auth: authObj
+    auth: authObj,
+    expires: 0
   }
 
-  beforeEach (() => {
+  beforeEach(() => {
     authData = null;
     authCb = null;
     injector = Injector.resolveAndCreate([
       provide(FirebaseUrl, {
-        useValue: 'https://angularfire2.firebaseio-demo.com/'
+        useValue: 'https://angularfire2-auth.firebaseio-demo.com/'
       }),
       FIREBASE_PROVIDERS
     ]);
@@ -121,41 +124,41 @@ describe('FirebaseAuth', () => {
 
   function getArgIndex(callbackName: string): number {
     //In the firebase API, the completion callback is the second argument for all but a few functions.
-    switch (callbackName){
+    switch (callbackName) {
       case 'authAnonymously':
       case 'onAuth':
         return 0;
       case 'authWithOAuthToken':
         return 2;
-      default :
+      default:
         return 1;
     }
   }
 
   // calls the firebase callback
-  function callback(callbackName: string, callIndex?: number): Function{
+  function callback(callbackName: string, callIndex?: number): Function {
     callIndex = callIndex || 0; //assume the first call.
     var argIndex = getArgIndex(callbackName);
-    return (<any> ref)[callbackName].calls.argsFor(callIndex)[argIndex];
+    return (<any>ref)[callbackName].calls.argsFor(callIndex)[argIndex];
   }
 
-  describe ('firebaseAuthConfig', () => {
+  describe('firebaseAuthConfig', () => {
     beforeEach(() => {
       ref = jasmine.createSpyObj('ref',
-        ['authWithCustomToken','authAnonymously','authWithPassword',
-          'authWithOAuthPopup','authWithOAuthRedirect','authWithOAuthToken',
-          'unauth','getAuth', 'onAuth', 'offAuth',
-          'createUser','changePassword','changeEmail','removeUser','resetPassword'
+        ['authWithCustomToken', 'authAnonymously', 'authWithPassword',
+          'authWithOAuthPopup', 'authWithOAuthRedirect', 'authWithOAuthToken',
+          'unauth', 'getAuth', 'onAuth', 'offAuth',
+          'createUser', 'changePassword', 'changeEmail', 'removeUser', 'resetPassword'
         ]);
-        backend = new FirebaseSdkAuthBackend(ref);
+      backend = new FirebaseSdkAuthBackend(ref);
     });
 
     it('should return a provider', () => {
-      expect(firebaseAuthConfig({method: AuthMethods.Password})).toBeAnInstanceOf(Provider);
+      expect(firebaseAuthConfig({ method: AuthMethods.Password })).toBeAnInstanceOf(Provider);
     });
 
     it('should use config in login', () => {
-      let config= {
+      let config = {
         method: AuthMethods.Anonymous
       };
       let auth = new FirebaseAuth(backend, config);
@@ -170,7 +173,7 @@ describe('FirebaseAuth', () => {
       };
       let auth = new FirebaseAuth(backend, config);
       auth.login();
-      expect(ref.authAnonymously).toHaveBeenCalledWith(jasmine.any(Function), {remember: 'default'});
+      expect(ref.authAnonymously).toHaveBeenCalledWith(jasmine.any(Function), { remember: 'default' });
     });
 
     it('should be overridden by login\'s arguments', () => {
@@ -201,21 +204,44 @@ describe('FirebaseAuth', () => {
     });
   });
 
-  describe ('login', () => {
+  describe('createUser', () => {
     let auth: FirebaseAuth = null;
+    let credentials = { email: 'myname', password: 'password' };
 
     beforeEach(() => {
       ref = jasmine.createSpyObj('ref',
-        ['authWithCustomToken','authAnonymously','authWithPassword',
-          'authWithOAuthPopup','authWithOAuthRedirect','authWithOAuthToken',
-          'unauth','getAuth', 'onAuth', 'offAuth',
-          'createUser','changePassword','changeEmail','removeUser','resetPassword'
+        ['authWithCustomToken', 'authAnonymously', 'authWithPassword',
+          'authWithOAuthPopup', 'authWithOAuthRedirect', 'authWithOAuthToken',
+          'unauth', 'getAuth', 'onAuth', 'offAuth',
+          'createUser', 'changePassword', 'changeEmail', 'removeUser', 'resetPassword'
         ]);
       backend = new FirebaseSdkAuthBackend(ref);
       auth = new FirebaseAuth(backend);
     });
 
-    it('should reject if password is used without credentials', (done:any) => {
+    it('should call createUser on a db reference', () => {
+      auth.createUser(credentials);
+      expect(ref.createUser)
+        .toHaveBeenCalledWith(credentials, jasmine.any(Function));
+    });
+
+  });
+
+  describe('login', () => {
+    let auth: FirebaseAuth = null;
+
+    beforeEach(() => {
+      ref = jasmine.createSpyObj('ref',
+        ['authWithCustomToken', 'authAnonymously', 'authWithPassword',
+          'authWithOAuthPopup', 'authWithOAuthRedirect', 'authWithOAuthToken',
+          'unauth', 'getAuth', 'onAuth', 'offAuth',
+          'createUser', 'changePassword', 'changeEmail', 'removeUser', 'resetPassword'
+        ]);
+      backend = new FirebaseSdkAuthBackend(ref);
+      auth = new FirebaseAuth(backend);
+    });
+
+    it('should reject if password is used without credentials', (done: any) => {
       let config = {
         method: AuthMethods.Password
       };
@@ -223,7 +249,7 @@ describe('FirebaseAuth', () => {
       auth.login().then(done.fail, done);
     });
 
-    it('should reject if custom token is used without credentials', (done:any) => {
+    it('should reject if custom token is used without credentials', (done: any) => {
       let config = {
         method: AuthMethods.CustomToken
       };
@@ -231,7 +257,7 @@ describe('FirebaseAuth', () => {
       auth.login().then(done.fail, done);;
     });
 
-    it('should reject if oauth token is used without credentials', (done:any) => {
+    it('should reject if oauth token is used without credentials', (done: any) => {
       let config = {
         method: AuthMethods.OAuthToken
       };
@@ -239,7 +265,7 @@ describe('FirebaseAuth', () => {
       auth.login().then(done.fail, done);
     });
 
-    it('should reject if popup is used without a provider', (done:any) => {
+    it('should reject if popup is used without a provider', (done: any) => {
       let config = {
         method: AuthMethods.Popup
       };
@@ -247,7 +273,7 @@ describe('FirebaseAuth', () => {
       auth.login().then(done.fail, done);
     });
 
-    it('should reject if redirect is used without a provider', (done:any) => {
+    it('should reject if redirect is used without a provider', (done: any) => {
       let config = {
         method: AuthMethods.Redirect
       };
@@ -267,15 +293,15 @@ describe('FirebaseAuth', () => {
       it('passes custom token to underlying method', () => {
         auth.login(credentials, options);
         expect(ref.authWithCustomToken)
-        .toHaveBeenCalledWith('myToken', jasmine.any(Function), {remember: 'default'});
+          .toHaveBeenCalledWith('myToken', jasmine.any(Function), { remember: 'default' });
       });
 
-      it('will reject the promise if authentication fails', (done:any) => {
+      it('will reject the promise if authentication fails', (done: any) => {
         auth.login(credentials, options).then(done.fail, done);
         callback('authWithCustomToken')('myError');
       });
 
-      it('will resolve the promise upon authentication', (done:any) => {
+      it('will resolve the promise upon authentication', (done: any) => {
         auth.login(credentials, options).then(result => {
           expect(result).toEqual(AngularFireAuthState);
           done();
@@ -291,15 +317,15 @@ describe('FirebaseAuth', () => {
       };
       it('passes options object to underlying method', () => {
         auth.login(options);
-        expect(ref.authAnonymously).toHaveBeenCalledWith(jasmine.any(Function), {remember: 'default'});
+        expect(ref.authAnonymously).toHaveBeenCalledWith(jasmine.any(Function), { remember: 'default' });
       });
 
-      it('will reject the promise if authentication fails', (done:any) => {
+      it('will reject the promise if authentication fails', (done: any) => {
         auth.login(options).then(done.fail, done);
         callback('authAnonymously')('myError');
       });
 
-      it('will resolve the promise upon authentication', (done:any) => {
+      it('will resolve the promise upon authentication', (done: any) => {
         auth.login(options).then(result => {
           expect(result).toEqual(AngularFireAuthState);
           done();
@@ -309,24 +335,40 @@ describe('FirebaseAuth', () => {
     });
 
     describe('authWithPassword', () => {
-      let options = {remember: 'default', method: AuthMethods.Password};
-      let credentials = {email:'myname', password:'password'};
+      let options = { remember: 'default', method: AuthMethods.Password };
+      let credentials = { email: 'myname', password: 'password' };
+
+      it('should login with password credentials', () => {
+        let config = {
+          method: AuthMethods.Password,
+          provider: AuthProviders.Password
+        };
+        const credentials = {
+          email: 'david@fire.com',
+          password: 'supersecretpassword'
+        };
+        let auth = new FirebaseAuth(backend, config);
+        auth.login(credentials);
+        expect(ref.authWithPassword).toHaveBeenCalledWith(credentials,
+          jasmine.any(Function),
+          { provider: config.provider });
+      });
 
       it('passes options and credentials object to underlying method', () => {
         auth.login(credentials, options);
         expect(ref.authWithPassword).toHaveBeenCalledWith(
           credentials,
           jasmine.any(Function),
-          {remember: options.remember}
+          { remember: options.remember }
         );
       });
 
-      it('will revoke the promise if authentication fails', (done:any) => {
+      it('will revoke the promise if authentication fails', (done: any) => {
         auth.login(credentials, options).then(done.fail, done);
         callback('authWithPassword')('myError');
       });
 
-      it('will resolve the promise upon authentication', (done:any) => {
+      it('will resolve the promise upon authentication', (done: any) => {
         auth.login(credentials, options).then(result => {
           expect(result).toEqual(AngularFireAuthState);
           done();
@@ -335,28 +377,28 @@ describe('FirebaseAuth', () => {
       });
     });
 
-    describe('authWithOAuthPopup',function(){
+    describe('authWithOAuthPopup', function() {
       let options = {
         method: AuthMethods.Popup,
         provider: AuthProviders.Github
       };
       it('passes provider and options object to underlying method', () => {
-        let customOptions = Object.assign ({}, options);
+        let customOptions = Object.assign({}, options);
         customOptions.scope = ['email'];
         auth.login(customOptions);
         expect(ref.authWithOAuthPopup).toHaveBeenCalledWith(
           'github',
           jasmine.any(Function),
-          {scope: ['email']}
+          { scope: ['email'] }
         );
       });
 
-      it('will reject the promise if authentication fails', (done:any) => {
+      it('will reject the promise if authentication fails', (done: any) => {
         auth.login(options).then(done.fail, done);
         callback('authWithOAuthPopup')('myError');
       });
 
-      it('will resolve the promise upon authentication',  (done:any) => {
+      it('will resolve the promise upon authentication', (done: any) => {
         auth.login(options).then(result => {
           expect(result).toEqual(AngularFireAuthState);
           done();
@@ -371,27 +413,27 @@ describe('FirebaseAuth', () => {
         provider: AuthProviders.Github
       };
       it('passes provider and options object to underlying method', () => {
-        let customOptions = Object.assign({} , options);
+        let customOptions = Object.assign({}, options);
         customOptions.scope = ['email'];
         auth.login(customOptions);
         expect(ref.authWithOAuthRedirect).toHaveBeenCalledWith(
           'github',
           jasmine.any(Function),
-          {scope: ['email']}
+          { scope: ['email'] }
         );
       });
 
-      it('will reject the promise if authentication fails', (done:any) => {
+      it('will reject the promise if authentication fails', (done: any) => {
         auth.login(options).then(done.fail, done);
         callback('authWithOAuthRedirect')('myError');
       });
 
-      it('will resolve the promise upon authentication', (done:any) => {
+      it('will resolve the promise upon authentication', (done: any) => {
         auth.login(options).then(result => {
           expect(result).toEqual(AngularFireAuthState);
           done();
         }, done.fail);
-        callback('authWithOAuthRedirect')(null,authState);
+        callback('authWithOAuthRedirect')(null, authState);
       });
     });
 
@@ -411,12 +453,12 @@ describe('FirebaseAuth', () => {
           'github',
           token,
           jasmine.any(Function),
-          {scope: ['email']}
+          { scope: ['email'] }
         );
       });
 
       it('passes provider, OAuth credentials, and options object to underlying method', () => {
-        let customOptions = Object.assign ({}, options);
+        let customOptions = Object.assign({}, options);
         customOptions.provider = AuthProviders.Twitter;
         let twitterCredentials = {
           "user_id": "<USER-ID>",
@@ -428,11 +470,11 @@ describe('FirebaseAuth', () => {
           'twitter',
           twitterCredentials,
           jasmine.any(Function),
-          {scope: ['email']}
+          { scope: ['email'] }
         );
       });
 
-      it('will reject the promise if authentication fails', (done:any) => {
+      it('will reject the promise if authentication fails', (done: any) => {
         let creds = {
           token: ''
         };
@@ -440,7 +482,7 @@ describe('FirebaseAuth', () => {
         callback('authWithOAuthToken')('myError');
       });
 
-      it('will resolve the promise upon authentication', (done:any) => {
+      it('will resolve the promise upon authentication', (done: any) => {
         auth.login(credentials, options).then(result => {
           expect(result).toEqual(AngularFireAuthState);
           done();
@@ -450,14 +492,14 @@ describe('FirebaseAuth', () => {
     });
 
 
-    describe('unauth()',() => {
+    describe('unauth()', () => {
       it('will call unauth() on the backing ref if logged in', () => {
-        (<any> ref).getAuth.and.returnValue({provider: 'twitter'}); auth.logout();
+        (<any>ref).getAuth.and.returnValue({ provider: 'twitter' }); auth.logout();
         expect(ref.unauth).toHaveBeenCalled();
       });
 
       it('will NOT call unauth() on the backing ref if NOT logged in', () => {
-        (<any> ref).getAuth.and.returnValue(null);
+        (<any>ref).getAuth.and.returnValue(null);
         auth.logout();
         expect(ref.unauth).not.toHaveBeenCalled();
       });

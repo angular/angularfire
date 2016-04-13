@@ -58,6 +58,18 @@ export class WebWorkerFirebaseAuth extends AuthBackend {
   getAuth(): FirebaseAuthData {
     return this._fbRef.getAuth();
   }
+  
+  createUser(creds: FirebaseCredentials): Promise<FirebaseAuthData> {
+    return new Promise<FirebaseAuthData>((resolve, reject) => {
+      this._fbRef.createUser(creds, (err, authData) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(authData);
+        }
+      });
+    });
+  }
 
   authAnonymously(options?: any): Promise<FirebaseAuthState> {
     let args = new UiArguments('authAnonymously', [new FnArg(options, PRIMITIVE)]);

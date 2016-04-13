@@ -2,6 +2,7 @@ import {Provider, Inject, provide, Injectable, Optional} from 'angular2/core';
 import {ReplaySubject} from 'rxjs/subject/ReplaySubject';
 import {FirebaseRef, FirebaseAuthConfig} from '../tokens';
 import {isPresent} from '../utils/utils';
+import * as utils from '../utils/utils';
 import {
   AuthBackend,
   AuthProviders,
@@ -26,14 +27,15 @@ export const firebaseAuthConfig = (config: AuthConfiguration): Provider => {
 
 @Injectable()
 export class FirebaseAuth extends ReplaySubject<FirebaseAuthState> {
-  constructor (private _authBackend: AuthBackend,
-               @Optional() @Inject(FirebaseAuthConfig) private _config?: AuthConfiguration) {
-    super (kBufferSize);
+  constructor(private _authBackend: AuthBackend,
+    @Optional() @Inject(FirebaseAuthConfig) private _config?: AuthConfiguration) {
+    super(kBufferSize);
 
     this._authBackend.onAuth((authData) => this._emitAuthData(authData));
   }
 
   public login(config?: AuthConfiguration): Promise<FirebaseAuthState>;
+  public login(credentials?: FirebaseCredentials): Promise<FirebaseAuthState>;
   public login(credentials: AuthCredentials, config?: AuthConfiguration): Promise<FirebaseAuthState>;
   public login(obj1?: any, obj2?: AuthConfiguration): Promise<FirebaseAuthState> {
     let config: AuthConfiguration = null;
@@ -44,7 +46,13 @@ export class FirebaseAuth extends ReplaySubject<FirebaseAuthState> {
       credentials = obj1;
       config = obj2;
     } else if (arguments.length == 1) {
-      config = obj1;
+      // Check if obj1 is password credentials
+      if (obj1.password && obj1.email) {
+        credentials = obj1;
+        config = {};
+      } else {
+        config = obj1;
+      }
     }
     config = this._mergeConfigs(config);
 
@@ -52,13 +60,13 @@ export class FirebaseAuth extends ReplaySubject<FirebaseAuthState> {
       return this._reject('You must provide a login method');
     }
     let providerMethods = [AuthMethods.Popup, AuthMethods.Redirect, AuthMethods.OAuthToken];
-    if (providerMethods.indexOf(config.method) != -1){
-        if (!isPresent(config.provider)) {
-          return this._reject('You must include a provider to use this auth method.');
-        }
+    if (providerMethods.indexOf(config.method) != -1) {
+      if (!isPresent(config.provider)) {
+        return this._reject('You must include a provider to use this auth method.');
+      }
     }
     let credentialsMethods = [AuthMethods.Password, AuthMethods.OAuthToken, AuthMethods.CustomToken];
-    if (credentialsMethods.indexOf(config.method) != -1){
+    if (credentialsMethods.indexOf(config.method) != -1) {
       if (!credentials) {
         return this._reject('You must include credentials to use this auth method.');
       }
@@ -72,13 +80,13 @@ export class FirebaseAuth extends ReplaySubject<FirebaseAuthState> {
       case AuthMethods.Anonymous:
         return this._authBackend.authAnonymously(this._scrubConfig(config));
       case AuthMethods.Password:
-        return this._authBackend.authWithPassword(<FirebaseCredentials> credentials, this._scrubConfig(config, false));
+        return this._authBackend.authWithPassword(<FirebaseCredentials>credentials, this._scrubConfig(config, false));
       case AuthMethods.OAuthToken:
-        return this._authBackend.authWithOAuthToken(config.provider, <OAuthCredentials> credentials,
-                                         this._scrubConfig(config));
+        return this._authBackend.authWithOAuthToken(config.provider, <OAuthCredentials>credentials,
+          this._scrubConfig(config));
       case AuthMethods.CustomToken:
-        return this._authBackend.authWithCustomToken((<OAuth2Credentials> credentials).token,
-                                         this._scrubConfig(config, false));
+        return this._authBackend.authWithCustomToken((<OAuth2Credentials>credentials).token,
+          this._scrubConfig(config, false));
     }
   }
 
@@ -86,6 +94,14 @@ export class FirebaseAuth extends ReplaySubject<FirebaseAuthState> {
     if (this._authBackend.getAuth() !== null) {
       this._authBackend.unauth();
     }
+  }
+
+  public getAuth(): FirebaseAuthData {
+    return this._authBackend.getAuth();
+  }
+
+  public createUser(credentials: FirebaseCredentials): Promise<FirebaseAuthData> {
+    return this._authBackend.createUser(credentials);
   }
 
   /**
@@ -101,12 +117,12 @@ export class FirebaseAuth extends ReplaySubject<FirebaseAuthState> {
 
   private _reject(msg: string): Promise<FirebaseAuthState> {
     return new Promise((res, rej) => {
-      return rej (msg);
+      return rej(msg);
     });
   }
 
-  private _scrubConfig (config: AuthConfiguration, scrubProvider = true): any {
-    let scrubbed = Object.assign ({}, config);
+  private _scrubConfig(config: AuthConfiguration, scrubProvider = true): any {
+    let scrubbed = Object.assign({}, config);
     if (scrubProvider) {
       delete scrubbed.provider;
     }
