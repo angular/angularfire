@@ -2,6 +2,7 @@ import {Observable} from 'rxjs/Observable';
 import {Operator} from 'rxjs/Operator';
 import {Subscriber} from 'rxjs/Subscriber';
 import {Subscription} from 'rxjs/Subscription';
+import * as utils from './utils';
 
 export type FirebaseOperation = string | Firebase | FirebaseDataSnapshot | AFUnwrappedDataSnapshot
 
@@ -57,15 +58,15 @@ export class FirebaseListObservable<T> extends Observable<T> {
   }
   
   _checkOperationCases(item: FirebaseOperation, cases: FirebaseOperationCases) : Promise<void> {
-    if (typeof item === 'string') {
+    if (utils.isString(item)) {
       return cases.stringCase();
-    } else if (item instanceof Firebase) {
+    } else if (utils.isFirebaseRef(item)) {
       // Firebase ref
       return cases.firebaseCase();
-    } else if (typeof (<any>item).key === 'function') {
+    } else if (utils.isFirebaseDataSnapshot(item)) {
       // Snapshot
       return cases.snapshotCase();
-    } else if (typeof (<any>item).$key === 'string') {
+    } else if (utils.isAFUnwrappedSnapshot(item)) {
       // Unwrapped snapshot
       return cases.unwrappedSnapshotCase()
     }
