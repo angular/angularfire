@@ -1,6 +1,6 @@
 /// <reference path="../../manual_typings/manual_typings.d.ts" />
 
-import {expect, describe,it,beforeEach} from 'angular2/testing';
+import {expect, describe,it,iit,beforeEach} from 'angular2/testing';
 import {Injector, provide, Provider} from 'angular2/core';
 import {Observable} from 'rxjs/Observable'
 import {
@@ -172,6 +172,22 @@ describe('FirebaseAuth', () => {
       auth.login();
       expect(ref.authAnonymously).toHaveBeenCalledWith(jasmine.any(Function), {remember: 'default'});
     });
+    
+    it('should login with password credentials', () => {
+      let config = {
+        method: AuthMethods.Password,
+        provider: AuthProviders.Password
+      };
+      const credentials = {
+        email: 'david@fire.com',
+        password: 'supersecretpassword'
+      };
+      let auth = new FirebaseAuth(backend, config);
+      auth.login(credentials);
+      expect(ref.authWithPassword).toHaveBeenCalledWith(credentials, 
+        jasmine.any(Function), 
+        { provider: config.provider});
+    });    
 
     it('should be overridden by login\'s arguments', () => {
       let config = {

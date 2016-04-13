@@ -44,7 +44,13 @@ export class FirebaseAuth extends ReplaySubject<FirebaseAuthState> {
       credentials = obj1;
       config = obj2;
     } else if (arguments.length == 1) {
-      config = obj1;
+      // Check if obj1 is password credentials
+      if (obj1.password && obj1.email) {
+        credentials = obj1;
+        config = {};
+      } else {
+        config = obj1; 
+      }
     }
     config = this._mergeConfigs(config);
 
@@ -86,6 +92,10 @@ export class FirebaseAuth extends ReplaySubject<FirebaseAuthState> {
     if (this._authBackend.getAuth() !== null) {
       this._authBackend.unauth();
     }
+  }
+  
+  public getAuth(): FirebaseAuthData {
+     return this._authBackend.getAuth();
   }
 
   /**
