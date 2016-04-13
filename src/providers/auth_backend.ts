@@ -78,8 +78,7 @@ export interface FirebaseAuthState {
 
 export function authDataToAuthState(authData: FirebaseAuthDataAllProviders): FirebaseAuthState {
   let {auth, uid, provider, github, twitter, facebook, google, password, anonymous} = authData;
-  let authState: FirebaseAuthState = { auth, uid, provider: null };
-  authState.expires = authData.expires;
+  let authState: FirebaseAuthState = { auth, uid, expires: authData.expires, provider: null };
   switch (provider) {
     case 'github':
       authState.github = github;
