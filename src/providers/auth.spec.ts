@@ -29,7 +29,8 @@ describe('FirebaseAuth', () => {
     accessToken: 'accessToken',
     displayName: 'github User',
     username: 'githubUsername',
-    id: '12345'
+    id: '12345',
+    expires: 0
   }
 
   const authObj = {
@@ -40,14 +41,16 @@ describe('FirebaseAuth', () => {
     provider: 'github',
     uid: 'github:12345',
     github: providerMetadata,
-    auth: authObj
+    auth: authObj,
+    expires: 0
   };
 
   const AngularFireAuthState = {
     provider: AuthProviders.Github,
     uid: 'github:12345',
     github: providerMetadata,
-    auth: authObj
+    auth: authObj,
+    expires: 0
   }
 
   beforeEach (() => {
@@ -55,7 +58,7 @@ describe('FirebaseAuth', () => {
     authCb = null;
     injector = Injector.resolveAndCreate([
       provide(FirebaseUrl, {
-        useValue: 'https://angularfire2.firebaseio-demo.com/'
+        useValue: 'https://angularfire2-auth.firebaseio-demo.com/'
       }),
       FIREBASE_PROVIDERS
     ]);
