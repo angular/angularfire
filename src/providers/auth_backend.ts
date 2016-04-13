@@ -5,10 +5,11 @@ export abstract class AuthBackend {
   abstract authWithOAuthPopup(provider: AuthProviders, options?: any): Promise<FirebaseAuthState>;
   abstract authWithOAuthRedirect(provider: AuthProviders, options?: any): Promise<FirebaseAuthState>;
   abstract authWithOAuthToken(provider: AuthProviders, credentialsObj: OAuthCredentials, options?: any)
-  : Promise<FirebaseAuthState>;
+    : Promise<FirebaseAuthState>;
   abstract onAuth(onComplete: (authData: FirebaseAuthData) => void): void;
   abstract getAuth(): FirebaseAuthData;
   abstract unauth(): void;
+  abstract createUser(credentials: FirebaseCredentials): Promise<FirebaseAuthData>;
 }
 
 // Firebase only provides typings for google
@@ -65,10 +66,10 @@ export type AuthCredentials = FirebaseCredentials | OAuthCredentials;
 export interface FirebaseAuthState {
   uid: string;
   provider: AuthProviders;
-	auth: Object;
+  auth: Object;
   expires?: number;
   github?: any;
-	google?: any;
+  google?: any;
   twitter?: any;
   facebook?: any;
   password?: any;
@@ -77,7 +78,7 @@ export interface FirebaseAuthState {
 
 export function authDataToAuthState(authData: FirebaseAuthDataAllProviders): FirebaseAuthState {
   let {auth, uid, provider, github, twitter, facebook, google, password, anonymous} = authData;
-  let authState: FirebaseAuthState = {auth, uid, provider: null};
+  let authState: FirebaseAuthState = { auth, uid, provider: null };
   authState.expires = authData.expires;
   switch (provider) {
     case 'github':

@@ -13,10 +13,22 @@ import {isPresent} from '../utils/utils';
 import * as Firebase from 'firebase';
 
 @Injectable()
-export class FirebaseSdkAuthBackend extends AuthBackend{
-  constructor (@Inject(FirebaseRef) private _fbRef: Firebase,
-              private _webWorkerMode = false) {
+export class FirebaseSdkAuthBackend extends AuthBackend {
+  constructor( @Inject(FirebaseRef) private _fbRef: Firebase,
+    private _webWorkerMode = false) {
     super();
+  }
+
+  createUser(creds: FirebaseCredentials): Promise<FirebaseAuthData> {
+    return new Promise<FirebaseAuthData>((resolve, reject) => {
+      this._fbRef.createUser(creds, (err, authData) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(authData);
+        }
+      });
+    });
   }
 
   onAuth(onComplete: (authData: FirebaseAuthData) => void): void {
@@ -59,7 +71,7 @@ export class FirebaseSdkAuthBackend extends AuthBackend{
   authWithOAuthPopup(provider: AuthProviders, options?: any): Promise<FirebaseAuthState> {
     let p = new Promise((res, rej) => {
       this._fbRef.authWithOAuthPopup(this._providerToString(provider),
-                                     this._handleFirebaseCb(res, rej, options), options);
+        this._handleFirebaseCb(res, rej, options), options);
     });
 
     return p;
@@ -73,20 +85,20 @@ export class FirebaseSdkAuthBackend extends AuthBackend{
   authWithOAuthRedirect(provider: AuthProviders, options?: any): Promise<FirebaseAuthState> {
     let p = new Promise((res, rej) => {
       this._fbRef.authWithOAuthRedirect(this._providerToString(provider),
-                                        this._handleFirebaseCb(res, rej, options), options);
+        this._handleFirebaseCb(res, rej, options), options);
     });
 
     return p;
   }
 
   authWithOAuthToken(provider: AuthProviders, credentialsObj: OAuthCredentials, options?: any)
-  : Promise<FirebaseAuthState> {
+    : Promise<FirebaseAuthState> {
     let p = new Promise((res, rej) => {
       let credentials = isPresent((<OAuth2Credentials>credentialsObj).token)
-                        ? (<OAuth2Credentials> credentialsObj).token 
-                        : credentialsObj;
+        ? (<OAuth2Credentials>credentialsObj).token
+        : credentialsObj;
       this._fbRef.authWithOAuthToken(this._providerToString(provider), credentials,
-                                     this._handleFirebaseCb(res, rej, options), options);
+        this._handleFirebaseCb(res, rej, options), options);
     });
 
     return p;
@@ -95,15 +107,15 @@ export class FirebaseSdkAuthBackend extends AuthBackend{
   private _handleFirebaseCb(res: Function, rej: Function, options: any): (err: any, auth?: FirebaseAuthData) => void {
     return (err, auth?) => {
       if (err) {
-        return rej (err);
+        return rej(err);
       } else {
         if (!this._webWorkerMode)
-          return res (authDataToAuthState(auth));
+          return res(authDataToAuthState(auth));
         else {
           if (isPresent(options) && isPresent(options.remember)) {
             // Add remember value in WebWorker mode so that the worker
             // can auth with the same value
-            (<any> auth).remember = options.remember;
+            (<any>auth).remember = options.remember;
           }
           return res(auth);
         }
@@ -121,7 +133,7 @@ export class FirebaseSdkAuthBackend extends AuthBackend{
         return 'facebook';
       case AuthProviders.Google:
         return 'google';
-      default: 
+      default:
         throw new Error(`Unsupported firebase auth provider ${provider}`);
     }
   }
