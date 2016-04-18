@@ -9,7 +9,7 @@ import * as utils from '../utils/utils'
 @Injectable()
 export class FirebaseDatabase {
   constructor(@Inject(FirebaseUrl) private fbUrl:string) {}
-  list (urlOrRef:string | Firebase, opts?:FirebaseListFactoryOpts):FirebaseListObservable<any[]> {
+  list (urlOrRef:string | Firebase | FirebaseQuery, opts?:FirebaseListFactoryOpts):FirebaseListObservable<any[]> {
     return utils.checkForUrlOrFirebaseRef(urlOrRef, {
       isUrl: () => FirebaseListFactory(getAbsUrl(this.fbUrl, <string>urlOrRef), opts),
       isRef: () => FirebaseListFactory(<Firebase>urlOrRef)
