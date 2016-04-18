@@ -3,7 +3,7 @@ import {Observer} from 'rxjs/Observer';
 import * as Firebase from 'firebase';
 import * as utils from './utils';
 
-export function FirebaseObjectFactory (absoluteUrlOrDbRef:string | Firebase, {preserveSnapshot}:FirebaseObjectFactoryOpts = {}): FirebaseObjectObservable<any> {
+export function FirebaseObjectFactory (absoluteUrlOrDbRef:string | Firebase | FirebaseQuery, {preserveSnapshot}:FirebaseObjectFactoryOpts = {}): FirebaseObjectObservable<any> {
   let ref: Firebase;
   utils.checkForUrlOrFirebaseRef(absoluteUrlOrDbRef, {
     isUrl: () => ref = new Firebase(<string>absoluteUrlOrDbRef),

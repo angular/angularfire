@@ -15,7 +15,7 @@ export class FirebaseDatabase {
       isRef: () => FirebaseListFactory(<Firebase>urlOrRef)
     });
   }
-  object(urlOrRef: string | Firebase, opts?:FirebaseObjectFactoryOpts):FirebaseObjectObservable<any> {
+  object(urlOrRef: string | Firebase | FirebaseQuery, opts?:FirebaseObjectFactoryOpts):FirebaseObjectObservable<any> {
     return utils.checkForUrlOrFirebaseRef(urlOrRef, {
       isUrl: () => FirebaseObjectFactory(getAbsUrl(this.fbUrl, <string>urlOrRef), opts),
       isRef: () => FirebaseObjectFactory(urlOrRef)
