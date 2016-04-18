@@ -6,7 +6,10 @@ export function isString(value: any): boolean {
   return typeof value === 'string';
 }
 
-export function isFirebaseRef(value: any): boolean {
+export function isFirebaseRef(value: any): boolean {  
+  if (value.ref && typeof value.ref === 'function' && value.ref() instanceof Firebase) {
+   return true;
+  }  
   return value instanceof Firebase;
 }
 
