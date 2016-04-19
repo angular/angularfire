@@ -94,7 +94,9 @@ export function onChildChanged(arr:any[], child:any, prevKey:string): any[] {
   return arr.reduce((accumulator:any[], val:any, i:number) => {
     if (!prevKey && i==0) {
       accumulator.push(child);
-      accumulator.push(val);
+      if (val.key() !== child.key()) {
+        accumulator.push(val);
+      }
     } else if(val.key() === prevKey) {
       accumulator.push(val);
       accumulator.push(child);

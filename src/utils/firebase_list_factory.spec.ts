@@ -169,6 +169,11 @@ describe('FirebaseListFactory', () => {
         ).toEqual([val2, val1, val3]);
       });
 
+      it('should not duplicate the first item if it is the one that changed', () => {
+        expect(
+          onChildChanged([val1, val2, val3], val1, null)
+        ).not.toEqual([val1, val1, val2, val3]);
+      });
 
       it('should not mutate the input array', () => {
         var inputArr = [val1, val2];
