@@ -5,11 +5,13 @@
  */
 var fs = require('fs');
 var srcPackage = require('../package.json');
+var [MAIN, JSNEXT_MAIN] = ['main', 'jsnext:main'].map(k => srcPackage[k].replace('/dist/', '/'));
 var outPackage = Object.assign({}, srcPackage, {
   peerDependencies: srcPackage.dependencies,
-  main: "angularfire2.js",
-  typings: "angularfire2.d.ts"
+  main: MAIN,
+  typings: "angularfire2.d.ts",
+  "jsnext:main": JSNEXT_MAIN,
+  dependencies: undefined
 });
-delete outPackage.dependencies;
 
 fs.writeFileSync('./dist/package.json', JSON.stringify(outPackage, null, 2));
