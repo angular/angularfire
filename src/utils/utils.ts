@@ -7,10 +7,11 @@ export function isString(value: any): boolean {
 }
 
 export function isFirebaseRef(value: any): boolean {  
-  if (value.ref && typeof value.ref === 'function' && value.ref() instanceof Firebase) {
-   return true;
-  }  
   return value instanceof Firebase;
+}
+
+export function isFirebaseQuery(value: any): boolean {
+  return typeof value.orderByChild === 'function';
 }
 
 export function isFirebaseDataSnapshot(value: any): boolean {
@@ -31,6 +32,9 @@ export function checkForUrlOrFirebaseRef(urlOrRef: string | Firebase | FirebaseQ
     return cases.isUrl();
   }
   if (isFirebaseRef(urlOrRef)) {
+    return cases.isRef();
+  }
+  if (isFirebaseQuery(urlOrRef)) {
     return cases.isRef();
   }
   throw new Error('Provide a url or a Firebase database reference');  

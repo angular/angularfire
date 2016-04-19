@@ -23,6 +23,11 @@ describe('FirebaseObjectFactory', () => {
       const object = FirebaseObjectFactory(new Firebase(`${rootFirebase}/questions`));
       expect(object).toBeAnInstanceOf(FirebaseObjectObservable);
     });
+    
+    it('should accept a Firebase db query in the constructor', () => {
+      const object = FirebaseObjectFactory(new Firebase(`${rootFirebase}/questions`).orderByChild('unwrapped'));
+      expect(object).toBeAnInstanceOf(FirebaseObjectObservable);
+    });
 
   });
 
