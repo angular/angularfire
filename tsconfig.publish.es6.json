@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "target": "es6",
+    "noImplicitAny": true,
+    "outDir": "dist/es6",
+    "rootDir": "src",
+    "sourceMap": true,
+    "declaration": true,
+    "removeComments": true,
+    "moduleResolution": "node"
+  },
+  "files": [
+    "src/angularfire2.ts",
+    "src/angularfire2_worker_app.ts",
+    "src/angularfire2_worker_render.ts",
+    "src/utils/absolute_path_resolver.ts",
+    "src/utils/firebase_object_factory.ts",
+    "typings/main/ambient/firebase/firebase.d.ts",
+    "typings/main/ambient/jasmine/jasmine.d.ts"
+  ]
+}
