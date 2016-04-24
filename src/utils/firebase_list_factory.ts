@@ -2,8 +2,10 @@ import {FirebaseListObservable, AFUnwrappedDataSnapshot} from './firebase_list_o
 import {Observer} from 'rxjs/Observer';
 import * as Firebase from 'firebase';
 import * as utils from './utils';
+import {Query, observeQuery} from './query_observable';
+import 'rxjs/add/operator/mergeMap';
 
-export function FirebaseListFactory (absoluteUrlOrDbRef:string | Firebase, {preserveSnapshot}:FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
+export function FirebaseListFactory (absoluteUrlOrDbRef:string | Firebase, {preserveSnapshot, query = {}}:FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
   let ref: Firebase;
   
   utils.checkForUrlOrFirebaseRef(absoluteUrlOrDbRef, {
@@ -11,14 +13,26 @@ export function FirebaseListFactory (absoluteUrlOrDbRef:string | Firebase, {pres
     isRef: () => ref = <Firebase>absoluteUrlOrDbRef
   });
   
-  // if (utils.isString(absoluteUrlOrDbRef)) {  
-  //   ref = new Firebase(<string>absoluteUrlOrDbRef);
-  // } else {
-  //   ref = <Firebase>absoluteUrlOrDbRef;
-  // }
+  const queryObs = observeQuery(query);
   
-  return new FirebaseListObservable((obs:Observer<any[]>) => {
-    let arr:any[] = [];
+  return <FirebaseListObservable<{}>>queryObs
+    .map(qo => {
+      let queried: any = ref;
+      console.log('qo', qo);
+      // Only apply the populated keys
+      // apply ordering and available querying options
+      // eg: ref.orderByChild('height').startAt(3)      
+      Object.keys(qo).forEach(key => queried = queried[key](qo[key]));
+      return queried;
+    })
+    .mergeMap((queryRef: Firebase, ix: number) => {
+      return firebaseListObservable(queryRef, { preserveSnapshot }); 
+    });
+}
+
+function firebaseListObservable(ref: Firebase, {preserveSnapshot}: FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
+  return new FirebaseListObservable((obs: Observer<any[]>) => {
+    let arr: any[] = [];
     let hasInitialLoad = false;
 
     // The list should only emit after the initial load
@@ -31,7 +45,7 @@ export function FirebaseListFactory (absoluteUrlOrDbRef:string | Firebase, {pres
       obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
     });
 
-    ref.on('child_added', (child:any, prevKey:string) => {
+    ref.on('child_added', (child: any, prevKey: string) => {
       arr = onChildAdded(arr, child, prevKey);
       // only emit the array after the initial load
       if (hasInitialLoad) {
@@ -39,14 +53,14 @@ export function FirebaseListFactory (absoluteUrlOrDbRef:string | Firebase, {pres
       }
     });
 
-    ref.on('child_removed', (child:any) => {
+    ref.on('child_removed', (child: any) => {
       arr = onChildRemoved(arr, child)
       if (hasInitialLoad) {
         obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
       }
     });
 
-    ref.on('child_changed', (child:any, prevKey: string) => {
+    ref.on('child_changed', (child: any, prevKey: string) => {
       arr = onChildChanged(arr, child, prevKey)
       if (hasInitialLoad) {
         // This also manages when the only change is prevKey change
@@ -60,6 +74,7 @@ export function FirebaseListFactory (absoluteUrlOrDbRef:string | Firebase, {pres
 
 export interface FirebaseListFactoryOpts {
   preserveSnapshot?: boolean;
+  query?: Query;
 }
 
 export function unwrapMapFn (snapshot:FirebaseDataSnapshot): AFUnwrappedDataSnapshot {

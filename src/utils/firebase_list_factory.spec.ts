@@ -16,7 +16,7 @@ import {
   describe,
   expect
 } from 'angular2/testing';
-import {Subscription} from 'rxjs';
+import {Subscription, Observable} from 'rxjs';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/skip';
 import 'rxjs/add/operator/take';
@@ -44,6 +44,27 @@ describe('FirebaseListFactory', () => {
       const list = FirebaseListFactory(new Firebase(`${rootFirebase}/questions`));
       expect(list).toBeAnInstanceOf(FirebaseListObservable);
     });    
+    
+  });
+
+  describe('query', () => {
+
+    iit('should test this query', (done: any) => {
+      
+      const startAtObs = Observable.of(3);
+      const url = 'https://angularfire2-object-factory.firebaseio-demo.com/dinosaurs';
+      const observable = FirebaseListFactory(url, { 
+        query: {
+          orderByChild: 'height',
+          startAt: 3
+        }  
+      });
+      
+      observable.subscribe(val => {
+        console.log('spec', val);
+        done();
+      });
+    });
     
   });
 
