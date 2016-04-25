@@ -7,25 +7,26 @@ import 'rxjs/add/operator/mergeMap';
 
 export function FirebaseListFactory (absoluteUrlOrDbRef:string | Firebase, {preserveSnapshot, query = {}}:FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
   let ref: Firebase;
-  
+
   utils.checkForUrlOrFirebaseRef(absoluteUrlOrDbRef, {
     isUrl: () => ref = new Firebase(<string>absoluteUrlOrDbRef),
     isRef: () => ref = <Firebase>absoluteUrlOrDbRef
   });
-  
+
   const queryObs = observeQuery(query);
-  
+
   return <FirebaseListObservable<{}>>queryObs
     .map(qo => {
       let queried: any = ref;
       // Only apply the populated keys
       // apply ordering and available querying options
-      // eg: ref.orderByChild('height').startAt(3)      
+      // eg: ref.orderByChild('height').startAt(3)
+      console.log('query', qo);
       Object.keys(qo).forEach(key => queried = queried[key](qo[key]));
       return queried;
     })
     .mergeMap((queryRef: Firebase, ix: number) => {
-      return firebaseListObservable(queryRef, { preserveSnapshot }); 
+      return firebaseListObservable(queryRef, { preserveSnapshot });
     });
 }
 
@@ -40,6 +41,7 @@ function firebaseListObservable(ref: Firebase, {preserveSnapshot}: FirebaseListF
     // This way a complete array is emitted which leads
     // to better rendering performance
     ref.once('value', (snap) => {
+      console.log('value', snap.val())
       hasInitialLoad = true;
       obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
     });

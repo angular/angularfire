@@ -34,75 +34,105 @@ export interface OrderBySelection {
   value: boolean | string;
 }
 
+export interface StartAtSelection {
+  key: number | string | boolean;
+}
+
 export function observeQuery (query: Query): Observable<Query> {
-  
+  console.log('observeQuery', query);
   if (!isPresent(query)) {
     return new ScalarObservable(null);
   }
 
-  if (!hasObservableProperties(query)) {
-    return new ScalarObservable(query);
-  }
+  // if (!hasObservableProperties(query)) {
+  //   return new ScalarObservable(query);
+  // }
 
   return Observable.create((observer: Observer<Query>) => {
     var serializedOrder:Query = {};
-    
-    getOrderObservables(query).subscribe((v:OrderBySelection) => {
-      console.log('v', v);
-      if (!isPresent(v.value)) {
-        serializedOrder = {};
-      } else {
-        switch (v.key) {
-          case OrderByOptions.Key:
-            serializedOrder = {orderByKey: <boolean>v.value};
-            break;
-          case OrderByOptions.Priority:
-            serializedOrder = {orderByPriority: <boolean>v.value};
-            break;
-          case OrderByOptions.Value:
-            serializedOrder = {orderByValue: <boolean>v.value};
-            break;
-          case OrderByOptions.Child:
-            serializedOrder = {orderByChild: <string>v.value};
-            break;
-        }
-        switch (v.key) {
-          case QueryOptions.EqualTo: {
-            serializedOrder.equalTo = v.value;
-            break;
-          }
-          case QueryOptions.StartAt: {
-            serializedOrder.startAt = v.value;
-            break;
-          }
-          case QueryOptions.EndAt: {
-            serializedOrder.endAt = v.value;
-            break;
-          }
-        }
-      }
 
-      // TODO: this should combine with other parts of the query
-      observer.next(serializedOrder);
-    });
+    console.log('getOrderObservables', getOrderObservables(query));
+
+    getOrderObservables(query)
+      .combineLatest(getStartAtObservable(query))
+      .subscribe(([orderBy, startAt]:[OrderBySelection,StartAtSelection]) => {
+        console.log('v', orderBy, startAt);
+        if (!isPresent(orderBy) || !isPresent(orderBy.value)) {
+          serializedOrder = {};
+        } else {
+          switch (orderBy.key) {
+            case OrderByOptions.Key:
+              serializedOrder = {orderByKey: <boolean>orderBy.value};
+              break;
+            case OrderByOptions.Priority:
+              serializedOrder = {orderByPriority: <boolean>orderBy.value};
+              break;
+            case OrderByOptions.Value:
+              serializedOrder = {orderByValue: <boolean>orderBy.value};
+              break;
+            case OrderByOptions.Child:
+              serializedOrder = {orderByChild: <string>orderBy.value};
+              break;
+          }
+        }
+        console.log('serializedOrder.startAt', startAt);
+        serializedOrder.startAt = startAt;
+
+        // TODO: this should combine with other parts of the query
+        observer.next(serializedOrder);
+      });
   });
 }
 
 export function getOrderObservables(query: Query): Observable<OrderBySelection> {
-  return merge.apply(null, ['orderByChild', 'orderByKey', 'orderByValue', 'orderByPriority', 'startAt', 'endAt', 'equalTo']
-    .map((key:string, option:OrderByOptions) => ({ key, option }))
-    .filter(({key, option}:{key: string, option: OrderByOptions}) => {
-      return query[key] instanceof Observable;
+  console.log('query in getOrderObservables', query);
+  var observables = ['orderByChild', 'orderByKey', 'orderByValue', 'orderByPriority']
+    .map((key:string, option:OrderByOptions) => {
+      console.log('mapping', key);
+      return ({ key, option })
     })
-    .map(({key, option}) => mapToOrderBySelection(<any>query[key], option)));
+    .filter(({key, option}:{key: string, option: OrderByOptions}) => {
+      return isPresent(query[key]);
+    })
+    .map(({key, option}) => mapToOrderBySelection(<any>query[key], option));
+
+    if (observables.length === 1) {
+      return observables[0];
+    } else if (observables.length > 1) {
+      return observables[0].merge(observables.slice(1));
+    } else {
+
+    }
+
+    return Observable.of(null);
 }
 
-function mapToOrderBySelection (obs:Observable<boolean|string>, key:OrderByOptions): Observable<OrderBySelection> {
-  return map
-    .call(obs, (value: boolean):OrderBySelection => {
-      console.log({ value, key});
-      return ({ value, key});
-    });
+export function getStartAtObservable(query: Query): Observable<StartAtSelection> {
+  console.log('startAt', query.startAt)
+  if (query.startAt instanceof Observable) {
+    console.log('instanceof observable');
+    return query.startAt;
+  } else if (typeof query.startAt !== 'undefined') {
+    console.log('observable.of');
+    return Observable.of(query.startAt);
+  } else {
+    console.log('empty');
+    return Observable.of(null);
+  }
+}
+
+function mapToOrderBySelection (value:Observable<boolean|string> | boolean | string, key:OrderByOptions): Observable<OrderBySelection> {
+  if (value instanceof Observable) {
+    return map
+      .call(value, (value: boolean):OrderBySelection => {
+        console.log({ value, key});
+        return ({ value, key});
+      });
+  } else {
+    console.log('returning scalar', key, value);
+    return Observable.of({key, value});
+  }
+
 }
 
 function hasObservableProperties(query: Query): boolean {

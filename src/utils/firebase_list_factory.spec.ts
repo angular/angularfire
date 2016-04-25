@@ -34,38 +34,38 @@ describe('FirebaseListFactory', () => {
   var val3: any;
 
   describe('constructor', () => {
-    
+
     it('should accept a Firebase db url in the constructor', () => {
       const list = FirebaseListFactory(`${rootFirebase}/questions`);
       expect(list).toBeAnInstanceOf(FirebaseListObservable);
     });
-    
+
     it('should accept a Firebase db ref in the constructor', () => {
       const list = FirebaseListFactory(new Firebase(`${rootFirebase}/questions`));
       expect(list).toBeAnInstanceOf(FirebaseListObservable);
-    });    
-    
+    });
+
   });
 
   describe('query', () => {
 
     iit('should test this query', (done: any) => {
-      
+
       const startAtObs = Observable.of(3);
       const url = 'https://angularfire2-object-factory.firebaseio-demo.com/dinosaurs';
-      const observable = FirebaseListFactory(url, { 
+      const observable = FirebaseListFactory(url, {
         query: {
           orderByChild: 'height',
-          startAt: 3
-        }  
+          startAt: startAtObs
+        }
       });
-      
+
       observable.subscribe(val => {
         console.log('spec', val);
         done();
       });
     });
-    
+
   });
 
   describe('methods', () => {
