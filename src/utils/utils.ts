@@ -18,6 +18,10 @@ export function isAFUnwrappedSnapshot(value: any): boolean {
   return typeof value.$key === 'string';
 }
 
+export function isFirebaseQuery(value: any): boolean {
+  return typeof value.orderByChild === 'function';
+}
+
 export interface CheckUrlRef {
   isUrl: () => any;
   isRef: () => any;
@@ -28,6 +32,9 @@ export function checkForUrlOrFirebaseRef(urlOrRef: string | Firebase, cases: Che
     return cases.isUrl();
   }
   if (isFirebaseRef(urlOrRef)) {
+    return cases.isRef();
+  }
+  if (isFirebaseQuery(urlOrRef)) {
     return cases.isRef();
   }
   throw new Error('Provide a url or a Firebase database reference');  

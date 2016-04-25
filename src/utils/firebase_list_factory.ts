@@ -18,7 +18,6 @@ export function FirebaseListFactory (absoluteUrlOrDbRef:string | Firebase, {pres
   return <FirebaseListObservable<{}>>queryObs
     .map(qo => {
       let queried: any = ref;
-      console.log('qo', qo);
       // Only apply the populated keys
       // apply ordering and available querying options
       // eg: ref.orderByChild('height').startAt(3)      

@@ -14,6 +14,7 @@ export interface FirebaseOperationCases {
 }
 
 export class FirebaseListObservable<T> extends Observable<T> {
+  public ref: Firebase;
   constructor(subscribe?: <R>(subscriber: Subscriber<R>) => Subscription | Function | void, private _ref?:Firebase) {
     super(subscribe);
   }
@@ -22,6 +23,7 @@ export class FirebaseListObservable<T> extends Observable<T> {
     observable.source = this;
     observable.operator = operator;
     observable._ref = this._ref;
+    observable.ref = this._ref;
     return observable;
   }
 
