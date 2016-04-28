@@ -8,6 +8,7 @@ import {
   unwrapMapFn
 } from './firebase_list_factory';
 import {FirebaseListObservable} from './firebase_list_observable';
+import {FirebaseObjectFactory} from './firebase_object_factory';
 import {
   beforeEach,
   it,
@@ -16,7 +17,7 @@ import {
   describe,
   expect
 } from 'angular2/testing';
-import {Subscription, Observable} from 'rxjs';
+import {Subscription, Observable, Subject} from 'rxjs';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/skip';
 import 'rxjs/add/operator/take';
@@ -47,26 +48,44 @@ describe('FirebaseListFactory', () => {
 
   });
 
-  describe('query', () => {
+  // describe('query', () => {
 
-    iit('should test this query', (done: any) => {
+  //   /*
+  //     Query combinations
+  //     ----------------------
+  //     orderByChild("").equalTo()
+  //     orderByChild("").startAt()
+  //     orderByChild("").startAt().endAt();
+  //     orderByChild("").endAt();
+  //   */
 
-      const startAtObs = Observable.of(3);
-      const url = 'https://angularfire2-object-factory.firebaseio-demo.com/dinosaurs';
-      const observable = FirebaseListFactory(url, {
-        query: {
-          orderByChild: 'height',
-          startAt: startAtObs
-        }
-      });
 
-      observable.subscribe(val => {
-        console.log('spec', val);
-        done();
-      });
-    });
-
-  });
+  //   it('should test this query', (done: any) => {
+      
+  //     const url = 'https://angularfire2-object-factory.firebaseio-demo.com/';
+  //     const subject = new Subject();
+  //     const observable = FirebaseListFactory(url, {
+  //       query: {
+  //         orderByChild: 'height',
+  //         startAt: subject
+  //       }
+  //     });
+      
+  //     let nexted = false;
+      
+  //     observable
+  //     .take(2)
+  //     .subscribe(val => {
+  //       console.log('spec', val);
+  //       if(!nexted) {
+  //         subject.next(1); 
+  //       }
+  //       nexted = true;
+  //     }, null, done);
+      
+  //     subject.next(3);
+  //   });
+  // });
 
   describe('methods', () => {
 
@@ -90,9 +109,7 @@ describe('FirebaseListFactory', () => {
 
 
     it('should emit only when the initial data set has been loaded', (done: any) => {
-      // TODO: Fix Firebase server event order. srsly
-      // Use set to populate and erase previous values
-      // Populate with mutliple values to see the initial data load
+      
       (<any>questions)._ref.set([{ initial1: true }, { initial2: true }, { initial3: true }, { initial4: true }])
         .then(() => questions.take(1).toPromise())
         .then((val: any[]) => {

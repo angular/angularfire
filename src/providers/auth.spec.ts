@@ -93,7 +93,7 @@ describe('FirebaseAuth', () => {
       updateAuthState(authState);
       let nextSpy = jasmine.createSpy('nextSpy');
       let auth = injector.get(FirebaseAuth);
-
+      
       auth.subscribe(nextSpy);
       expect(nextSpy).toHaveBeenCalledWith(AngularFireAuthState);
     });

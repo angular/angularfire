@@ -25,9 +25,10 @@ export function isFirebaseQuery(value: any): boolean {
 export interface CheckUrlRef {
   isUrl: () => any;
   isRef: () => any;
+  isQuery?: () => any;
 }
 
-export function checkForUrlOrFirebaseRef(urlOrRef: string | Firebase, cases: CheckUrlRef): any {
+export function checkForUrlOrFirebaseRef(urlOrRef: string | Firebase | FirebaseQuery, cases: CheckUrlRef): any {
   if (isString(urlOrRef)) {
     return cases.isUrl();
   }
@@ -35,7 +36,7 @@ export function checkForUrlOrFirebaseRef(urlOrRef: string | Firebase, cases: Che
     return cases.isRef();
   }
   if (isFirebaseQuery(urlOrRef)) {
-    return cases.isRef();
+    return cases.isQuery();
   }
   throw new Error('Provide a url or a Firebase database reference');  
 }

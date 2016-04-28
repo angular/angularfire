@@ -56,7 +56,7 @@ describe('angularfire', () => {
 
 
     it('should accept an absolute url', () => {
-      expect((<any>af.list(localServerUrl))._ref.toString()).toBe(localServerUrl);
+      expect((<any>af.list(localServerUrl))._ref.toString()).toEqual(localServerUrl);
     });
 
 

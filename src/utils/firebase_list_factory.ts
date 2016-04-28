@@ -5,33 +5,87 @@ import * as utils from './utils';
 import {Query, observeQuery} from './query_observable';
 import 'rxjs/add/operator/mergeMap';
 
-export function FirebaseListFactory (absoluteUrlOrDbRef:string | Firebase, {preserveSnapshot, query = {}}:FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
-  let ref: Firebase;
+export function FirebaseListFactory (absoluteUrlOrDbRef:string | Firebase | FirebaseQuery, {preserveSnapshot, query = {}}:FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
+  let ref: Firebase | FirebaseQuery;
 
   utils.checkForUrlOrFirebaseRef(absoluteUrlOrDbRef, {
     isUrl: () => ref = new Firebase(<string>absoluteUrlOrDbRef),
-    isRef: () => ref = <Firebase>absoluteUrlOrDbRef
+    isRef: () => ref = <Firebase>absoluteUrlOrDbRef,
+    isQuery: () => ref = <FirebaseQuery>absoluteUrlOrDbRef,
   });
-
+  
+  if (utils.isFirebaseRef(absoluteUrlOrDbRef) || utils.isString(absoluteUrlOrDbRef)) {
+    return firebaseListObservable(ref, { preserveSnapshot });
+  }
+  
   const queryObs = observeQuery(query);
-
-  return <FirebaseListObservable<{}>>queryObs
-    .map(qo => {
-      let queried: any = ref;
+  const listObs = <FirebaseListObservable<{}>>queryObs
+    .map(queryOrder => {
+      let queried: FirebaseQuery = ref;
       // Only apply the populated keys
       // apply ordering and available querying options
       // eg: ref.orderByChild('height').startAt(3)
-      console.log('query', qo);
-      Object.keys(qo).forEach(key => queried = queried[key](qo[key]));
+      // 1. apply orderBy
+      // 2. check for equalTo 
+      // 3. check for starAt 
+      // 4. check for endAt
+      // 5. check for limitTo
+      // Check orderBy
+      if (queryOrder.orderByChild) {
+        queried = queried.orderByChild(queryOrder.orderByChild);
+      } else if (queryOrder.orderByKey) {
+        queried = queried.orderByKey();
+      } else if (queryOrder.orderByPriority) {
+        queried = queried.orderByPriority();
+      } else if (queryOrder.orderByValue) {
+        queried = queried.orderByValue();
+      }
+      
+      // check equalTo
+      if (utils.isPresent(queryOrder.equalTo)) {
+          queried = queried.equalTo(queryOrder.equalTo);
+        
+        // apply limitTos
+        if (utils.isPresent(queryOrder.limitToFirst)) {
+          queried = queried.limitToFirst(queryOrder.limitToFirst);
+        }
+        
+        if (utils.isPresent(queryOrder.limitToLast)) {
+          queried = queried.limitToLast(queryOrder.limitToLast);
+        }
+        
+        return queried;
+      }
+      
+      // check startAt
+      if (utils.isPresent(queryOrder.startAt)) {
+          queried = queried.startAt(queryOrder.startAt);
+      }
+      
+      if (utils.isPresent(queryOrder.endAt)) {
+          queried = queried.endAt(queryOrder.endAt);
+      }
+      
+      // apply limitTos
+      if (utils.isPresent(queryOrder.limitToFirst)) {
+          queried = queried.limitToFirst(queryOrder.limitToFirst);
+      }
+      
+      if (utils.isPresent(queryOrder.limitToLast)) {
+          queried = queried.limitToLast(queryOrder.limitToLast);
+      }
+      
       return queried;
     })
     .mergeMap((queryRef: Firebase, ix: number) => {
       return firebaseListObservable(queryRef, { preserveSnapshot });
     });
+    return listObs;
 }
 
-function firebaseListObservable(ref: Firebase, {preserveSnapshot}: FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
-  return new FirebaseListObservable((obs: Observer<any[]>) => {
+function firebaseListObservable(ref: Firebase | FirebaseQuery, {preserveSnapshot}: FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
+  
+  const listObs = new FirebaseListObservable((obs: Observer<any[]>) => {
     let arr: any[] = [];
     let hasInitialLoad = false;
 
@@ -41,7 +95,6 @@ function firebaseListObservable(ref: Firebase, {preserveSnapshot}: FirebaseListF
     // This way a complete array is emitted which leads
     // to better rendering performance
     ref.once('value', (snap) => {
-      console.log('value', snap.val())
       hasInitialLoad = true;
       obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
     });
@@ -71,6 +124,7 @@ function firebaseListObservable(ref: Firebase, {preserveSnapshot}: FirebaseListF
 
     return () => ref.off();
   }, ref);
+  return listObs;
 }
 
 export interface FirebaseListFactoryOpts {

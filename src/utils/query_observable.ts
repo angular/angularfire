@@ -4,9 +4,11 @@ import {Operator} from 'rxjs/Operator';
 import {Observer} from 'rxjs/Observer';
 import {merge} from 'rxjs/operator/merge';
 import {map} from 'rxjs/operator/map';
+import 'rxjs/add/operator/combineLatest';
+import 'rxjs/add/observable/of';
 
 export interface Query {
-  [key:string]: any;
+  [key: string]: any;
   orderByKey?: boolean | Observable<boolean>;
   orderByPriority?: boolean | Observable<boolean>;
   orderByChild?: string | Observable<string>;
@@ -14,6 +16,21 @@ export interface Query {
   equalTo?: any | Observable<any>;
   startAt?: any | Observable<any>;
   endAt?: any | Observable<any>;
+  limitToFirst?: number | Observable<number>;
+  limitToLast?: number | Observable<number>;
+}
+
+export interface ScalarQuery {
+  [key: string]: any;
+  orderByKey?: boolean;
+  orderByPriority?: boolean;
+  orderByChild?: string;
+  orderByValue?: boolean;
+  equalTo?: any;
+  startAt?: any;
+  endAt?: any;
+  limitToFirst?: number;
+  limitToLast?: number;  
 }
 
 export enum OrderByOptions {
@@ -23,6 +40,11 @@ export enum OrderByOptions {
   Priority
 }
 
+export enum LimitToOptions {
+  First,
+  Last
+}
+
 export enum QueryOptions {
   EqualTo,
   StartAt,
@@ -30,16 +52,19 @@ export enum QueryOptions {
 }
 
 export interface OrderBySelection {
-  key: OrderByOptions | QueryOptions;
+  key: OrderByOptions;
   value: boolean | string;
 }
 
-export interface StartAtSelection {
-  key: number | string | boolean;
+export interface LimitToSelection {
+  key: LimitToOptions;
+  value: number;
 }
 
-export function observeQuery (query: Query): Observable<Query> {
-  console.log('observeQuery', query);
+export type Primitive = number | string | boolean;
+
+
+export function observeQuery(query: Query): Observable<ScalarQuery> {
   if (!isPresent(query)) {
     return new ScalarObservable(null);
   }
@@ -48,91 +73,145 @@ export function observeQuery (query: Query): Observable<Query> {
   //   return new ScalarObservable(query);
   // }
 
-  return Observable.create((observer: Observer<Query>) => {
-    var serializedOrder:Query = {};
-
-    console.log('getOrderObservables', getOrderObservables(query));
-
+  return Observable.create((observer: Observer<ScalarQuery>) => {
     getOrderObservables(query)
-      .combineLatest(getStartAtObservable(query))
-      .subscribe(([orderBy, startAt]:[OrderBySelection,StartAtSelection]) => {
-        console.log('v', orderBy, startAt);
-        if (!isPresent(orderBy) || !isPresent(orderBy.value)) {
-          serializedOrder = {};
-        } else {
+      .combineLatest(
+      getStartAtObservable(query),
+      getEndAtObservable(query),
+      getEqualToObservable(query),
+      getLimitToObservables(query)
+      )
+      .subscribe(([orderBy, startAt, endAt, equalTo, limitTo]
+        : [OrderBySelection, Primitive, Primitive, Primitive, LimitToSelection]) => {
+
+        var serializedOrder: any = {};
+
+        if (isPresent(orderBy) && isPresent(orderBy.value)) {
           switch (orderBy.key) {
             case OrderByOptions.Key:
-              serializedOrder = {orderByKey: <boolean>orderBy.value};
+              serializedOrder = { orderByKey: <boolean>orderBy.value };
               break;
             case OrderByOptions.Priority:
-              serializedOrder = {orderByPriority: <boolean>orderBy.value};
+              serializedOrder = { orderByPriority: <boolean>orderBy.value };
               break;
             case OrderByOptions.Value:
-              serializedOrder = {orderByValue: <boolean>orderBy.value};
+              serializedOrder = { orderByValue: <boolean>orderBy.value };
               break;
             case OrderByOptions.Child:
-              serializedOrder = {orderByChild: <string>orderBy.value};
+              serializedOrder = { orderByChild: <string>orderBy.value };
               break;
           }
         }
-        console.log('serializedOrder.startAt', startAt);
-        serializedOrder.startAt = startAt;
 
-        // TODO: this should combine with other parts of the query
+        if (isPresent(limitTo) && isPresent(limitTo.value)) {
+          switch (limitTo.key) {
+            case LimitToOptions.First:
+              serializedOrder.limitToFirst = limitTo.value;
+              break;
+            case LimitToOptions.Last: {
+              serializedOrder.limitToLast = limitTo.value;
+              break;
+            }
+          }
+        }
+
+        serializedOrder.startAt = startAt;
+        serializedOrder.endAt = endAt;
+        serializedOrder.equalTo = equalTo;
+        
         observer.next(serializedOrder);
       });
   });
 }
 
 export function getOrderObservables(query: Query): Observable<OrderBySelection> {
-  console.log('query in getOrderObservables', query);
   var observables = ['orderByChild', 'orderByKey', 'orderByValue', 'orderByPriority']
-    .map((key:string, option:OrderByOptions) => {
-      console.log('mapping', key);
+    .map((key: string, option: OrderByOptions) => {
       return ({ key, option })
     })
-    .filter(({key, option}:{key: string, option: OrderByOptions}) => {
+    .filter(({key, option}: { key: string, option: OrderByOptions }) => {
       return isPresent(query[key]);
     })
     .map(({key, option}) => mapToOrderBySelection(<any>query[key], option));
 
-    if (observables.length === 1) {
-      return observables[0];
-    } else if (observables.length > 1) {
-      return observables[0].merge(observables.slice(1));
-    } else {
+  if (observables.length === 1) {
+    return observables[0];
+  } else if (observables.length > 1) {
+    return observables[0].merge(observables.slice(1));
+  } else {
 
-    }
+  }
 
-    return Observable.of(null);
+  return Observable.of(null);
 }
 
-export function getStartAtObservable(query: Query): Observable<StartAtSelection> {
-  console.log('startAt', query.startAt)
+export function getLimitToObservables(query: Query): Observable<LimitToSelection> {
+  var observables = ['limitToFirst', 'limitToLast']
+    .map((key: string, option: LimitToOptions) => ({ key, option }))
+    .filter(({key, option}: { key: string, option: LimitToOptions }) => isPresent(query[key]))
+    .map(({key, option}) => mapToLimitToSelection(<any>query[key], option));
+
+  if (observables.length === 1) {
+    return observables[0];
+  } else if (observables.length > 1) {
+    return observables[0].merge(observables.slice(1));
+  } else {
+
+  }
+  return Observable.of(null);
+}
+
+export function getStartAtObservable(query: Query): Observable<Primitive> {
   if (query.startAt instanceof Observable) {
-    console.log('instanceof observable');
     return query.startAt;
   } else if (typeof query.startAt !== 'undefined') {
-    console.log('observable.of');
     return Observable.of(query.startAt);
   } else {
-    console.log('empty');
     return Observable.of(null);
   }
 }
 
-function mapToOrderBySelection (value:Observable<boolean|string> | boolean | string, key:OrderByOptions): Observable<OrderBySelection> {
+export function getEndAtObservable(query: Query): Observable<Primitive> {
+  if (query.endAt instanceof Observable) {
+    return query.endAt;
+  } else if (typeof query.endAt !== 'undefined') {
+    return Observable.of(query.endAt);
+  } else {
+    return Observable.of(null);
+  }
+}
+
+export function getEqualToObservable(query: Query): Observable<Primitive> {
+  if (query.equalTo instanceof Observable) {
+    return query.equalTo;
+  } else if (typeof query.equalTo !== 'undefined') {
+    return Observable.of(query.equalTo);
+  } else {
+    return Observable.of(null);
+  }
+}
+
+
+function mapToOrderBySelection(value: Observable<boolean | string> | boolean | string, key: OrderByOptions): Observable<OrderBySelection> {
   if (value instanceof Observable) {
     return map
-      .call(value, (value: boolean):OrderBySelection => {
-        console.log({ value, key});
-        return ({ value, key});
+      .call(value, (value: boolean): OrderBySelection => {
+        console.log({ value, key });
+        return ({ value, key });
       });
   } else {
-    console.log('returning scalar', key, value);
-    return Observable.of({key, value});
+    return Observable.of({ key, value });
   }
 
+}
+
+function mapToLimitToSelection(value: Observable<number> | number, key: LimitToOptions): Observable<LimitToSelection> {
+  if (value instanceof Observable) {
+    return map
+      .call(value, (value: number): LimitToSelection => ({ value, key }));
+  } else {
+    return Observable.of({ key, value });
+  }
 }
 
 function hasObservableProperties(query: Query): boolean {
