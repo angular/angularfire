@@ -1,9 +1,31 @@
-import {describe, expect, it} from 'angular2/testing';
+import {describe, expect, it, iit} from 'angular2/testing';
 import {Observable} from 'rxjs/Observable';
 import {Observer} from 'rxjs/Observer';
 import {Subject} from 'rxjs/Subject';
 
-import {getOrderObservables, observeQuery} from './query_observable';
+import {getOrderObservables, observeQuery, Query} from './query_observable';
+
+function scalarQueryTest(query: Query, done: any) {
+  const queryObservable = observeQuery(query);
+  queryObservable.subscribe(result => {
+    expect(result).toEqual(query);
+    done();
+  });
+}
+
+function observableQueryTest(query: Query, nextProp: any, done: any) {
+  const nextSpy = jasmine.createSpy('next');
+  const queryObservable = observeQuery(query);
+  const toMerge: any = {};
+  queryObservable.subscribe(nextSpy);
+  Object.keys(nextProp).forEach(prop => {
+    query[prop].next(nextProp[prop]);
+    toMerge[prop] = nextProp[prop];
+  })  
+  const merged = Object.assign(query, toMerge);
+  expect(nextSpy).toHaveBeenCalledWith(merged);
+  done();
+}
 
 describe('observeQuery', () => {
   const resultQuery = { orderByKey: true, startAt: <any>null, endAt: <any>null, equalTo: <any>null };
@@ -15,11 +37,13 @@ describe('observeQuery', () => {
   it('should immediately emit a query object if passed a plain JS object with only scalar values', () => {
     var nextSpy = jasmine.createSpy('next');
     var completeSpy = jasmine.createSpy('complete');
-    var query = { orderByKey: true, startAt: <any>null, endAt: <any>null, equalTo: <any>null };
+    var query = { orderByChild: 'height', equalTo: 10 };
     var obs = observeQuery(query);
     obs.subscribe(nextSpy, null, completeSpy);
-    expect(nextSpy).toHaveBeenCalledWith(query);
-    expect(completeSpy).toHaveBeenCalled();
+    expect(nextSpy).toHaveBeenCalledWith({
+      orderByChild: 'height', 
+      equalTo: 10
+    });
   });
 
 
@@ -41,10 +65,10 @@ describe('observeQuery', () => {
       orderByKey: new Subject()
     };
     var obs = observeQuery(query);
-    var noOrderyQuery = { orderByKey: false, startAt: <any>null, endAt: <any>null, equalTo: <any>null };
+    var noOrderyQuery = { orderByKey: false };
     obs.subscribe(nextSpy, null, completeSpy);
     query.orderByKey.next(true);
-    expect(nextSpy).toHaveBeenCalledWith(resultQuery);
+    expect(nextSpy).toHaveBeenCalledWith({ orderByKey: true});
     nextSpy.calls.reset();
     expect(completeSpy).not.toHaveBeenCalled();
     query.orderByKey.next(false);
@@ -61,17 +85,16 @@ describe('observeQuery', () => {
     var obs = observeQuery(query);
     obs.subscribe(nextSpy, null, completeSpy);
     query.orderByKey.next(true);
-    expect(nextSpy).toHaveBeenCalledWith(resultQuery);
+    expect(nextSpy).toHaveBeenCalledWith({ orderByKey: true });
     nextSpy.calls.reset();
     query.orderByKey.next(null);
-    delete resultQuery.orderByKey;
-    expect(nextSpy).toHaveBeenCalledWith(resultQuery);
+    expect(nextSpy).toHaveBeenCalledWith({});
   });
 
 
   it('should omit only the orderBy type of the last emitted orderBy observable', () => {
+    // TODO: Should we allow re-emitting of the orderBy method?
     var nextSpy = jasmine.createSpy('next');
-    var completeSpy = jasmine.createSpy('complete');
     var query = {
       orderByKey: new Subject(),
       orderByPriority: new Subject(),
@@ -80,15 +103,17 @@ describe('observeQuery', () => {
     };
     var obs = observeQuery(query);
     obs.subscribe(nextSpy);
+    query.orderByChild.next('height');
+    expect(nextSpy).toHaveBeenCalledWith({
+      orderByChild: 'height'
+    });
+    nextSpy.calls.reset();
     query.orderByKey.next(true);
-    expect(nextSpy).toHaveBeenCalledWith(resultQuery);
-    nextSpy.calls.reset();
-    query.orderByPriority.next(true);
-    expect(nextSpy).toHaveBeenCalledWith({orderByPriority: true});
-    nextSpy.calls.reset();
-    query.orderByValue.next(true);
-    expect(nextSpy).toHaveBeenCalledWith({orderByValue: true});
-    nextSpy.calls.reset();
+    expect(nextSpy).not.toHaveBeenCalled();
+    // nextSpy.calls.reset();
+    // query.orderByValue.next(true);
+    // expect(nextSpy).toHaveBeenCalledWith({orderByValue: true});
+    // nextSpy.calls.reset();
     query.orderByChild.next('foo');
     expect(nextSpy).toHaveBeenCalledWith({orderByChild: 'foo'});
   });
@@ -101,4 +126,300 @@ describe('getOrderObservables', () => {
       getOrderObservables({}).subscribe();
     }).not.toThrow();
   });
+});
+
+describe('query combinations', () => {
+  
+    describe('orderByChild', () => {
+      /*
+        orderByChild combinations
+        ----------------------
+        orderByChild("").equalTo()
+        orderByChild("").startAt()
+        orderByChild("").startAt().endAt();
+        orderByChild("").endAt();
+      */  
+      it('should build an equalTo query with scalar values', (done: any) => {
+        scalarQueryTest({
+          orderByChild: 'height',
+          equalTo: 94
+        }, done);
+      });      
+      
+      it('should build an equalTo query with an observable', (done: any) => {
+        const query = {
+          orderByChild: 'height',
+          equalTo: new Subject()
+        };
+        observableQueryTest(query, { equalTo: 92 }, done);
+      }); 
+      
+      it('should build a startAt query with scalar values', (done: any) => {
+        scalarQueryTest({
+          orderByChild: 'height',
+          startAt: 94
+        }, done);
+      });      
+      
+      it('should build a startAt query with an observable', (done: any) => {
+        const query = {
+          orderByChild: 'height',
+          startAt: new Subject()
+        };
+        observableQueryTest(query, { startAt: 92 }, done);
+      });
+      
+      it('should build a endAt query with scalar values', (done: any) => {
+        scalarQueryTest({
+          orderByChild: 'height',
+          endAt: 94
+        }, done);
+      });      
+      
+      it('should build a endAt query with an observable', (done: any) => {
+        const query = {
+          orderByChild: 'height',
+          endAt: new Subject()
+        };
+        observableQueryTest(query, { endAt: 92 }, done);
+      });
+      
+      it('should build a startAt().endAt() query with scalar values', (done: any) => {
+        scalarQueryTest({
+          orderByChild: 'height',
+          startAt: 32,
+          endAt: 94
+        }, done);
+      });      
+      
+      it('should build a startAt().endAt() query with an observable', (done: any) => {
+        const query = {
+          orderByChild: 'height',
+          endAt: new Subject(),
+          startAt: new Subject()
+        };
+        observableQueryTest(query, { startAt: 32, endAt: 92 }, done);
+      });            
+                        
+    })
+    
+    describe('orderByKey', () => {
+      /*
+        orderByKey combinations
+        ----------------------
+        orderByKey("").equalTo()
+        orderByKey("").startAt()
+        orderByKey("").startAt().endAt();
+        orderByKey("").endAt();
+      */  
+      it('should build an equalTo query with scalar values', (done: any) => {
+        scalarQueryTest({
+          orderByKey: true,
+          equalTo: 94
+        }, done);
+      });      
+      
+      it('should build an equalTo query with an observable', (done: any) => {
+        const query = {
+          orderByKey: true,
+          equalTo: new Subject()
+        };
+        observableQueryTest(query, { equalTo: 92 }, done);
+      }); 
+      
+      it('should build a startAt query with scalar values', (done: any) => {
+        scalarQueryTest({
+          orderByKey: true,
+          startAt: 94
+        }, done);
+      });      
+      
+      it('should build a startAt query with an observable', (done: any) => {
+        const query = {
+          orderByKey: true,
+          startAt: new Subject()
+        };
+        observableQueryTest(query, { startAt: 92 }, done);
+      });
+      
+      it('should build a endAt query with scalar values', (done: any) => {
+        scalarQueryTest({
+          orderByKey: true,
+          endAt: 94
+        }, done);
+      });      
+      
+      it('should build a endAt query with an observable', (done: any) => {
+        const query = {
+          orderByKey: true,
+          endAt: new Subject()
+        };
+        observableQueryTest(query, { endAt: 92 }, done);
+      });
+      
+      it('should build a startAt().endAt() query with scalar values', (done: any) => {
+        scalarQueryTest({
+          orderByKey: true,
+          startAt: 32,
+          endAt: 94
+        }, done);
+      });      
+      
+      it('should build a startAt().endAt() query with an observable', (done: any) => {
+        const query = {
+          orderByKey: true,
+          endAt: new Subject(),
+          startAt: new Subject()
+        };
+        observableQueryTest(query, { startAt: 32, endAt: 92 }, done);
+      });            
+                        
+    });
+    
+    describe('orderByValue', () => {
+      /*
+        orderByValue combinations
+        ----------------------
+        orderByValue("").equalTo()
+        orderByValue("").startAt()
+        orderByValue("").startAt().endAt();
+        orderByValue("").endAt();
+      */  
+      it('should build an equalTo query with scalar values', (done: any) => {
+        scalarQueryTest({
+          orderByValue: true,
+          equalTo: 21
+        }, done);
+      });      
+      
+      it('should build an equalTo query with an observable', (done: any) => {
+        const query = {
+          orderByValue: true,
+          equalTo: new Subject()
+        };
+        observableQueryTest(query, { equalTo: 43 }, done);
+      }); 
+      
+      it('should build a startAt query with scalar values', (done: any) => {
+        scalarQueryTest({
+          orderByValue: true,
+          startAt: 25
+        }, done);
+      });      
+      
+      it('should build a startAt query with an observable', (done: any) => {
+        const query = {
+          orderByValue: true,
+          startAt: new Subject()
+        };
+        observableQueryTest(query, { startAt: 11 }, done);
+      });
+      
+      it('should build a endAt query with scalar values', (done: any) => {
+        scalarQueryTest({
+          orderByValue: true,
+          endAt: 94
+        }, done);
+      });      
+      
+      it('should build a endAt query with an observable', (done: any) => {
+        const query = {
+          orderByValue: true,
+          endAt: new Subject()
+        };
+        observableQueryTest(query, { endAt: 43 }, done);
+      });
+      
+      it('should build a startAt().endAt() query with scalar values', (done: any) => {
+        scalarQueryTest({
+          orderByValue: true,
+          startAt: 32,
+          endAt: 94
+        }, done);
+      });      
+      
+      it('should build a startAt().endAt() query with an observable', (done: any) => {
+        const query = {
+          orderByValue: true,
+          endAt: new Subject(),
+          startAt: new Subject()
+        };
+        observableQueryTest(query, { startAt: 7, endAt: 12 }, done);
+      });            
+                        
+    });
+   
+    describe('orderByPriority', () => {
+      /*
+        orderByPriority combinations
+        ----------------------
+        orderByPriority("").equalTo()
+        orderByPriority("").startAt()
+        orderByPriority("").startAt().endAt();
+        orderByPriority("").endAt();
+      */  
+      it('should build an equalTo query with scalar values', (done: any) => {
+        scalarQueryTest({
+          orderByPriority: true,
+          equalTo: 21
+        }, done);
+      });      
+      
+      it('should build an equalTo query with an observable', (done: any) => {
+        const query = {
+          orderByPriority: true,
+          equalTo: new Subject()
+        };
+        observableQueryTest(query, { equalTo: 43 }, done);
+      }); 
+      
+      it('should build a startAt query with scalar values', (done: any) => {
+        scalarQueryTest({
+          orderByPriority: true,
+          startAt: 25
+        }, done);
+      });      
+      
+      it('should build a startAt query with an observable', (done: any) => {
+        const query = {
+          orderByPriority: true,
+          startAt: new Subject()
+        };
+        observableQueryTest(query, { startAt: 11 }, done);
+      });
+      
+      it('should build a endAt query with scalar values', (done: any) => {
+        scalarQueryTest({
+          orderByPriority: true,
+          endAt: 94
+        }, done);
+      });      
+      
+      it('should build a endAt query with an observable', (done: any) => {
+        const query = {
+          orderByPriority: true,
+          endAt: new Subject()
+        };
+        observableQueryTest(query, { endAt: 43 }, done);
+      });
+      
+      it('should build a startAt().endAt() query with scalar values', (done: any) => {
+        scalarQueryTest({
+          orderByPriority: true,
+          startAt: 32,
+          endAt: 94
+        }, done);
+      });      
+      
+      it('should build a startAt().endAt() query with an observable', (done: any) => {
+        const query = {
+          orderByPriority: true,
+          endAt: new Subject(),
+          startAt: new Subject()
+        };
+        observableQueryTest(query, { startAt: 7, endAt: 12 }, done);
+      });            
+                        
+    });
+       
 });

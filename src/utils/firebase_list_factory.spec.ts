@@ -17,12 +17,31 @@ import {
   describe,
   expect
 } from 'angular2/testing';
+import {Query} from './query_observable';
 import {Subscription, Observable, Subject} from 'rxjs';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/skip';
 import 'rxjs/add/operator/take';
 
 const rootFirebase = 'https://angularfire2-list-factory.firebaseio-demo.com/';
+
+function queryTest(observable: Observable<any>, subject: Subject<any>, done: any) {
+  let nexted = false;
+  observable
+    .take(2)
+    .subscribe(val => {
+      if (!nexted) {
+        subject.next('2');
+      }
+      if (nexted) {
+        expect(nexted).toBe(true);
+        done();
+      }
+      nexted = true;
+    });
+
+  subject.next('20');
+}
 
 describe('FirebaseListFactory', () => {
   var subscription: Subscription;
@@ -48,44 +67,207 @@ describe('FirebaseListFactory', () => {
 
   });
 
-  // describe('query', () => {
+  describe('query', () => {
+    
+    describe('orderByChild', () => {
+      /*
+        orderByChild combinations
+        ----------------------
+        orderByChild("").equalTo()
+        orderByChild("").startAt()
+        orderByChild("").startAt().endAt();
+        orderByChild("").endAt();
+      */
+      it('equalTo - should re-run a query when the observable value has emitted', (done: any) => {
+        
+        const subject = new Subject();
+        const observable = FirebaseListFactory(rootFirebase, {
+          query: {
+            orderByChild: 'height',
+            equalTo: subject
+          }
+        });
+        
+        queryTest(observable, subject, done);
+      });
+                         
+      it('startAt - should re-run a query when the observable value has emitted', (done: any) => {
+        
+        const subject = new Subject();
+        const observable = FirebaseListFactory(rootFirebase, {
+          query: {
+            orderByChild: 'height',
+            startAt: subject
+          }
+        });
+        
+        queryTest(observable, subject, done);
+      });      
 
-  //   /*
-  //     Query combinations
-  //     ----------------------
-  //     orderByChild("").equalTo()
-  //     orderByChild("").startAt()
-  //     orderByChild("").startAt().endAt();
-  //     orderByChild("").endAt();
-  //   */
+      it('endAt - should re-run a query when the observable value has emitted', (done: any) => {
+        
+        const subject = new Subject();
+        const observable = FirebaseListFactory(rootFirebase, {
+          query: {
+            orderByChild: 'height',
+            endAt: subject
+          }
+        });
+        
+        queryTest(observable, subject, done);
+      });  
+      
+    });
+    
+    describe('orderByValue', () => {
+      /*
+        orderByValue combinations
+        ----------------------
+        orderByValue("").equalTo()
+        orderByValue("").startAt()
+        orderByValue("").startAt().endAt();
+        orderByValue("").endAt();
+      */
+      it('equalTo - should re-run a query when the observable value has emitted', (done: any) => {
+        
+        const subject = new Subject();
+        const observable = FirebaseListFactory(rootFirebase, {
+          query: {
+            orderByValue: true,
+            equalTo: subject
+          }
+        });
+        
+        queryTest(observable, subject, done);
+      });
+                         
+      it('startAt - should re-run a query when the observable value has emitted', (done: any) => {
+        
+        const subject = new Subject();
+        const observable = FirebaseListFactory(rootFirebase, {
+          query: {
+            orderByValue: true,
+            startAt: subject
+          }
+        });
+        
+        queryTest(observable, subject, done);
+      });      
 
+      it('endAt - should re-run a query when the observable value has emitted', (done: any) => {
+        
+        const subject = new Subject();
+        const observable = FirebaseListFactory(rootFirebase, {
+          query: {
+            orderByValue: true,
+            endAt: subject
+          }
+        });
+        
+        queryTest(observable, subject, done);
+      });  
+      
+    });
+    
+    describe('orderByKey', () => {
+      /*
+        orderByKey combinations
+        ----------------------
+        orderByKey("").equalTo()
+        orderByKey("").startAt()
+        orderByKey("").startAt().endAt();
+        orderByKey("").endAt();
+      */
+      it('equalTo - should re-run a query when the observable value has emitted', (done: any) => {
+        
+        const subject = new Subject();
+        const observable = FirebaseListFactory(rootFirebase, {
+          query: {
+            orderByKey: true,
+            equalTo: subject
+          }
+        });
+        
+        queryTest(observable, subject, done);
+      });
+                         
+      it('startAt - should re-run a query when the observable value has emitted', (done: any) => {
+        
+        const subject = new Subject();
+        const observable = FirebaseListFactory(rootFirebase, {
+          query: {
+            orderByKey: true,
+            startAt: subject
+          }
+        });
+        
+        queryTest(observable, subject, done);
+      });      
 
-  //   it('should test this query', (done: any) => {
-      
-  //     const url = 'https://angularfire2-object-factory.firebaseio-demo.com/';
-  //     const subject = new Subject();
-  //     const observable = FirebaseListFactory(url, {
-  //       query: {
-  //         orderByChild: 'height',
-  //         startAt: subject
-  //       }
-  //     });
-      
-  //     let nexted = false;
-      
-  //     observable
-  //     .take(2)
-  //     .subscribe(val => {
-  //       console.log('spec', val);
-  //       if(!nexted) {
-  //         subject.next(1); 
-  //       }
-  //       nexted = true;
-  //     }, null, done);
-      
-  //     subject.next(3);
-  //   });
-  // });
+      it('endAt - should re-run a query when the observable value has emitted', (done: any) => {
+        
+        const subject = new Subject();
+        const observable = FirebaseListFactory(rootFirebase, {
+          query: {
+            orderByKey: true,
+            endAt: subject
+          }
+        });
+        
+        queryTest(observable, subject, done);
+      });             
+    });
+    
+    describe('orderByPriority', () => {
+      /*
+        orderByPriority combinations
+        ----------------------
+        orderByPriority("").equalTo()
+        orderByPriority("").startAt()
+        orderByPriority("").startAt().endAt();
+        orderByPriority("").endAt();
+      */
+      it('equalTo - should re-run a query when the observable value has emitted', (done: any) => {
+        
+        const subject = new Subject();
+        const observable = FirebaseListFactory(rootFirebase, {
+          query: {
+            orderByKey: true,
+            equalTo: subject
+          }
+        });
+        
+        queryTest(observable, subject, done);
+      });
+                         
+      it('startAt - should re-run a query when the observable value has emitted', (done: any) => {
+        
+        const subject = new Subject();
+        const observable = FirebaseListFactory(rootFirebase, {
+          query: {
+            orderByKey: true,
+            startAt: subject
+          }
+        });
+        
+        queryTest(observable, subject, done);
+      });      
+
+      it('endAt - should re-run a query when the observable value has emitted', (done: any) => {
+        
+        const subject = new Subject();
+        const observable = FirebaseListFactory(rootFirebase, {
+          query: {
+            orderByKey: true,
+            endAt: subject
+          }
+        });
+        
+        queryTest(observable, subject, done);
+      });             
+    });    
+    
+  });
 
   describe('methods', () => {
 

@@ -4,6 +4,7 @@ import {Operator} from 'rxjs/Operator';
 import {Observer} from 'rxjs/Observer';
 import {merge} from 'rxjs/operator/merge';
 import {map} from 'rxjs/operator/map';
+import 'rxjs/add/operator/merge';
 import 'rxjs/add/operator/combineLatest';
 import 'rxjs/add/observable/of';
 
@@ -30,7 +31,7 @@ export interface ScalarQuery {
   startAt?: any;
   endAt?: any;
   limitToFirst?: number;
-  limitToLast?: number;  
+  limitToLast?: number;
 }
 
 export enum OrderByOptions {
@@ -69,10 +70,6 @@ export function observeQuery(query: Query): Observable<ScalarQuery> {
     return new ScalarObservable(null);
   }
 
-  // if (!hasObservableProperties(query)) {
-  //   return new ScalarObservable(query);
-  // }
-
   return Observable.create((observer: Observer<ScalarQuery>) => {
     getOrderObservables(query)
       .combineLatest(
@@ -85,7 +82,6 @@ export function observeQuery(query: Query): Observable<ScalarQuery> {
         : [OrderBySelection, Primitive, Primitive, Primitive, LimitToSelection]) => {
 
         var serializedOrder: any = {};
-
         if (isPresent(orderBy) && isPresent(orderBy.value)) {
           switch (orderBy.key) {
             case OrderByOptions.Key:
@@ -115,10 +111,18 @@ export function observeQuery(query: Query): Observable<ScalarQuery> {
           }
         }
 
-        serializedOrder.startAt = startAt;
-        serializedOrder.endAt = endAt;
-        serializedOrder.equalTo = equalTo;
-        
+        if (isPresent(startAt)) {
+          serializedOrder.startAt = startAt;
+        }
+
+        if (isPresent(endAt)) {
+          serializedOrder.endAt = endAt;
+        }
+
+        if (isPresent(equalTo)) {
+          serializedOrder.equalTo = equalTo;
+        }
+
         observer.next(serializedOrder);
       });
   });
@@ -196,7 +200,6 @@ function mapToOrderBySelection(value: Observable<boolean | string> | boolean | s
   if (value instanceof Observable) {
     return map
       .call(value, (value: boolean): OrderBySelection => {
-        console.log({ value, key });
         return ({ value, key });
       });
   } else {

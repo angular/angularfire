@@ -22,6 +22,11 @@ export function isFirebaseQuery(value: any): boolean {
   return typeof value.orderByChild === 'function';
 }
 
+export function isEmptyObject(obj: Object): boolean {
+  if (!isPresent(obj)) { return false; }
+  return Object.keys(obj).length === 0 && JSON.stringify(obj) === JSON.stringify({});
+}
+
 export interface CheckUrlRef {
   isUrl: () => any;
   isRef: () => any;

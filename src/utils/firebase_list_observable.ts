@@ -14,16 +14,16 @@ export interface FirebaseOperationCases {
 }
 
 export class FirebaseListObservable<T> extends Observable<T> {
-  constructor(subscribe?: <R>(subscriber: Subscriber<R>) => Subscription | Function | void, private _ref?:Firebase | FirebaseQuery) {
+  constructor(public _ref: Firebase | FirebaseQuery, subscribe?: <R>(subscriber: Subscriber<R>) => Subscription | Function | void) {
     super(subscribe);
   }
   lift<T, R>(operator: Operator<T, R>): Observable<R> {
-    const observable = new FirebaseListObservable<R>();
+    const observable = new FirebaseListObservable<R>(this._ref);
     observable.source = this;
     observable.operator = operator;
     observable._ref = this._ref;
     return observable;
-  }
+  } 
 
   push(val:any):FirebaseWithPromise<void> {
     if(!this._ref) {
