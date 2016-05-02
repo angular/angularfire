@@ -13,27 +13,6 @@ export function FirebaseObjectFactory(absoluteUrlOrDbRef: string | Firebase, {pr
     isRef: () => ref = <Firebase>absoluteUrlOrDbRef
   });
   
-  // const queryObs = observeQuery(query);
-  
-  // queryObs
-  //   .map(qo => {
-  //     return ref;
-  //   })
-  //   .mergeMap((queryRef: Firebase, ix: number) => {
-  //     console.log('mergeMap', queryRef);
-  //     return new FirebaseObjectObservable((obs: Observer<any[]>) => {
-  //       queryRef.on('value', (snapshot) => {
-  //         obs.next(preserveSnapshot ? snapshot : snapshot.val())
-  //       });
-
-  //       return () => queryRef.off();
-  //     }, queryRef); 
-  //   })
-  //   .do(a => console.log('do', a))
-  //   .subscribe(qo => {
-  //     console.log('subscribe', qo);
-  //   });
-
   return new FirebaseObjectObservable((obs: Observer<any[]>) => {
     ref.on('value', (snapshot) => {
       obs.next(preserveSnapshot ? snapshot : snapshot.val())
