@@ -4,7 +4,7 @@
     "emitDecoratorMetadata": true,
     "module": "commonjs",
     "target": "es5",
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "outDir": "dist",
     "rootDir": "src",
     "sourceMap": true,

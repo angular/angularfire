@@ -6,7 +6,6 @@ import {merge} from 'rxjs/operator/merge';
 import {map} from 'rxjs/operator/map';
 import 'rxjs/add/operator/merge';
 import 'rxjs/add/operator/combineLatest';
-import 'rxjs/add/observable/of';
 
 export interface Query {
   [key: string]: any;
@@ -145,8 +144,9 @@ export function getOrderObservables(query: Query): Observable<OrderBySelection> 
   } else {
 
   }
-
-  return Observable.of(null);
+  return new Observable(subscriber => {
+    subscriber.next(null);
+  });
 }
 
 export function getLimitToObservables(query: Query): Observable<LimitToSelection> {
@@ -162,16 +162,22 @@ export function getLimitToObservables(query: Query): Observable<LimitToSelection
   } else {
 
   }
-  return Observable.of(null);
+  return new Observable(subscriber => {
+    subscriber.next(null);
+  });
 }
 
 export function getStartAtObservable(query: Query): Observable<Primitive> {
   if (query.startAt instanceof Observable) {
     return query.startAt;
   } else if (typeof query.startAt !== 'undefined') {
-    return Observable.of(query.startAt);
+    return new Observable(subscriber => {
+      subscriber.next(query.startAt);
+    });
   } else {
-    return Observable.of(null);
+    return new Observable(subscriber => {
+      subscriber.next(null);
+    });
   }
 }
 
@@ -179,9 +185,13 @@ export function getEndAtObservable(query: Query): Observable<Primitive> {
   if (query.endAt instanceof Observable) {
     return query.endAt;
   } else if (typeof query.endAt !== 'undefined') {
-    return Observable.of(query.endAt);
+    return new Observable(subscriber => {
+      subscriber.next(query.endAt);
+    });
   } else {
-    return Observable.of(null);
+    return new Observable(subscriber => {
+      subscriber.next(null);
+    });
   }
 }
 
@@ -189,9 +199,13 @@ export function getEqualToObservable(query: Query): Observable<Primitive> {
   if (query.equalTo instanceof Observable) {
     return query.equalTo;
   } else if (typeof query.equalTo !== 'undefined') {
-    return Observable.of(query.equalTo);
+    return new Observable(subscriber => {
+      subscriber.next(query.equalTo);
+    });
   } else {
-    return Observable.of(null);
+    return new Observable(subscriber => {
+      subscriber.next(null);
+    });
   }
 }
 
@@ -203,7 +217,9 @@ function mapToOrderBySelection(value: Observable<boolean | string> | boolean | s
         return ({ value, key });
       });
   } else {
-    return Observable.of({ key, value });
+    return new Observable(subscriber => {
+      subscriber.next({ key, value });
+    });
   }
 
 }
@@ -213,7 +229,9 @@ function mapToLimitToSelection(value: Observable<number> | number, key: LimitToO
     return map
       .call(value, (value: number): LimitToSelection => ({ value, key }));
   } else {
-    return Observable.of({ key, value });
+    return new Observable(subscriber => {
+      subscriber.next({ key, value });
+    });
   }
 }
 

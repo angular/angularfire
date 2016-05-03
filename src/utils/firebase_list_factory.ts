@@ -4,6 +4,7 @@ import * as Firebase from 'firebase';
 import * as utils from './utils';
 import {Query, observeQuery} from './query_observable';
 import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/map';
 
 export function FirebaseListFactory (absoluteUrlOrDbRef:string | Firebase | FirebaseQuery, {preserveSnapshot, query = {}}:FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
   let ref: Firebase | FirebaseQuery;
