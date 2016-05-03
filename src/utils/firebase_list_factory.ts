@@ -24,54 +24,62 @@ export function FirebaseListFactory (absoluteUrlOrDbRef:string | Firebase | Fire
   
   const queryObs = observeQuery(query);
   const listObs = <FirebaseListObservable<{}>>queryObs
-    .map(queryOrder => {
+    .map(query => {
       let queried: FirebaseQuery = ref;
       // Only apply the populated keys
       // apply ordering and available querying options
       // eg: ref.orderByChild('height').startAt(3)
       // Check orderBy
-      if (queryOrder.orderByChild) {
-        queried = queried.orderByChild(queryOrder.orderByChild);
-      } else if (queryOrder.orderByKey) {
+      if (query.orderByChild) {
+        queried = queried.orderByChild(query.orderByChild);
+      } else if (query.orderByKey) {
         queried = queried.orderByKey();
-      } else if (queryOrder.orderByPriority) {
+      } else if (query.orderByPriority) {
         queried = queried.orderByPriority();
-      } else if (queryOrder.orderByValue) {
+      } else if (query.orderByValue) {
         queried = queried.orderByValue();
       }
       
       // check equalTo
-      if (utils.isPresent(queryOrder.equalTo)) {
-          queried = queried.equalTo(queryOrder.equalTo);
+      if (utils.isPresent(query.equalTo)) {
+          queried = queried.equalTo(query.equalTo);
+          
+        if (utils.isPresent(query.startAt) || query.endAt) {
+          throw new Error('Query Error: Cannot use startAt with endAt.');
+        }          
         
         // apply limitTos
-        if (utils.isPresent(queryOrder.limitToFirst)) {
-          queried = queried.limitToFirst(queryOrder.limitToFirst);
+        if (utils.isPresent(query.limitToFirst)) {
+          queried = queried.limitToFirst(query.limitToFirst);
         }
         
-        if (utils.isPresent(queryOrder.limitToLast)) {
-          queried = queried.limitToLast(queryOrder.limitToLast);
+        if (utils.isPresent(query.limitToLast)) {
+          queried = queried.limitToLast(query.limitToLast);
         }
         
         return queried;
       }
       
       // check startAt
-      if (utils.isPresent(queryOrder.startAt)) {
-          queried = queried.startAt(queryOrder.startAt);
+      if (utils.isPresent(query.startAt)) {
+          queried = queried.startAt(query.startAt);
       }
       
-      if (utils.isPresent(queryOrder.endAt)) {
-          queried = queried.endAt(queryOrder.endAt);
+      if (utils.isPresent(query.endAt)) {
+          queried = queried.endAt(query.endAt);
+      }
+      
+      if (utils.isPresent(query.limitToFirst) && query.limitToLast) {
+        throw new Error('Query Error: Cannot use limitToFirst with limitToLast.');
       }
       
       // apply limitTos
-      if (utils.isPresent(queryOrder.limitToFirst)) {
-          queried = queried.limitToFirst(queryOrder.limitToFirst);
+      if (utils.isPresent(query.limitToFirst)) {
+          queried = queried.limitToFirst(query.limitToFirst);
       }
       
-      if (utils.isPresent(queryOrder.limitToLast)) {
-          queried = queried.limitToLast(queryOrder.limitToLast);
+      if (utils.isPresent(query.limitToLast)) {
+          queried = queried.limitToLast(query.limitToLast);
       }
       
       return queried;

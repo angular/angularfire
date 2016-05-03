@@ -117,6 +117,55 @@ describe('FirebaseListFactory', () => {
         queryTest(observable, subject, done);
       });  
       
+      it('should throw an error if limitToLast and limitToFirst are chained', () => {
+        
+        const observable = FirebaseListFactory(rootFirebase, {
+          query: {
+            orderByChild: 'height',
+            limitToFirst: 10,
+            limitToLast: 100
+          }
+        });
+        expect(observable.subscribe).toThrowError();
+      });
+      
+      it('should throw an error if startAt is used with equalTo', () => {
+        
+        const observable = FirebaseListFactory(rootFirebase, {
+          query: {
+            orderByChild: 'height',
+            equalTo: 10,
+            startAt: 100
+          }
+        });
+        expect(observable.subscribe).toThrowError();
+      });
+      
+      it('should throw an error if endAt is used with equalTo', () => {
+        
+        const observable = FirebaseListFactory(rootFirebase, {
+          query: {
+            orderByChild: 'height',
+            equalTo: 10,
+            endAt: 100
+          }
+        });
+        expect(observable.subscribe).toThrowError();
+      });
+      
+      it('should throw an error if startAt and endAt is used with equalTo', () => {
+        
+        const observable = FirebaseListFactory(rootFirebase, {
+          query: {
+            orderByChild: 'height',
+            equalTo: 10,
+            endAt: 100,
+            startAt: 103
+          }
+        });
+        expect(observable.subscribe).toThrowError();
+      });                  
+      
     });
     
     describe('orderByValue', () => {
