@@ -95,6 +95,8 @@ function firebaseListObservable(ref: Firebase | FirebaseQuery, {preserveSnapshot
     ref.once('value', (snap) => {
       hasInitialLoad = true;
       obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
+    }, err => {
+      if (err) { obs.error(err); obs.complete(); }
     });
 
     ref.on('child_added', (child: any, prevKey: string) => {
@@ -103,6 +105,8 @@ function firebaseListObservable(ref: Firebase | FirebaseQuery, {preserveSnapshot
       if (hasInitialLoad) {
         obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
       }
+    }, err => {
+      if (err) { obs.error(err); obs.complete(); }
     });
 
     ref.on('child_removed', (child: any) => {
@@ -110,6 +114,8 @@ function firebaseListObservable(ref: Firebase | FirebaseQuery, {preserveSnapshot
       if (hasInitialLoad) {
         obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
       }
+    }, err => {
+      if (err) { obs.error(err); obs.complete(); }
     });
 
     ref.on('child_changed', (child: any, prevKey: string) => {
@@ -118,6 +124,8 @@ function firebaseListObservable(ref: Firebase | FirebaseQuery, {preserveSnapshot
         // This also manages when the only change is prevKey change
         obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
       }
+    }, err => {
+      if (err) { obs.error(err); obs.complete(); }
     });
 
     return () => ref.off();
