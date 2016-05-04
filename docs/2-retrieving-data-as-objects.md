@@ -182,3 +182,5 @@ this.item.subscribe(snapshot => console.log(snapshot.key()));
 ## Querying?
 The `FirebaseObjectObservable` synchronizes objects from the realtime database. There is no querying available for objects because 
 objects are simply JSON, and JSON order is specified by the browser.
+
+###[Next Step: Retrieving data as lists](docs/3-retrieving-data-as-lists.md)

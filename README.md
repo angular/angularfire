@@ -48,10 +48,10 @@ If you want to get started quickly on building with AngularFire2, check out our
 5 step developer guide that will teach you everything you need to know to be 
 dangerous with AngularFire2.
 
-1. [Installation & Setup](/docs/1-installation-and-setup.md)
-2. [Retreiving data as objects - FirebaseObjectObservable](/docs/2-retrieving-data-as-objects.md)
-3. [Retreiving data as lists - FirebaseListObservable](/docs/3-retrieving-data-as-lists.md)
-4. [Querying lists](/docs/4-querying-lists.md)
+1. [Installation & Setup](docs/1-install-and-setup.md)
+2. [Retreiving data as objects - FirebaseObjectObservable](docs/2-retrieving-data-as-objects.md)
+3. [Retreiving data as lists - FirebaseListObservable](docs/3-retrieving-data-as-lists.md)
+4. [Querying lists](docs/4-querying-lists.md)
 5. [User Authentication - FirebaseAuthentication](docs/5-user-authentication.md)
 
-## [API Reference](/docs/api-reference.md)
+## [API Reference](docs/api-reference.md)

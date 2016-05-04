@@ -165,4 +165,4 @@ Run the serve command and go to `localhost:4200` in your browser.
 
 And that's it! If it totally borke, file an issue and let us know.
 
-###[Next Step: Retreiving data](/docs/2-retreiving-data-as-objects.md)
+###[Next Step: Retrieving data as objects](docs/2-retrieving-data-as-objects.md)
