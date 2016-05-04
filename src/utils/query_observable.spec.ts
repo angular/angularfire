@@ -1,4 +1,4 @@
-import {describe, expect, it, iit} from 'angular2/testing';
+import {describe, expect, it, iit} from '@angular/core/testing';
 import {Observable} from 'rxjs/Observable';
 import {Observer} from 'rxjs/Observer';
 import {Subject} from 'rxjs/Subject';

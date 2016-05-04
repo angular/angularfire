@@ -1,7 +1,7 @@
 /// <reference path="../../manual_typings/manual_typings.d.ts" />
 
-import {expect, describe, it, iit, beforeEach} from 'angular2/testing';
-import {Injector, provide, Provider} from 'angular2/core';
+import {expect, describe, it, iit, beforeEach} from '@angular/core/testing';
+import {ReflectiveInjector, provide, Provider} from '@angular/core';
 import {Observable} from 'rxjs/Observable'
 import {
   FIREBASE_PROVIDERS,
@@ -19,7 +19,7 @@ import * as Firebase from 'firebase';
 import * as mockPromises from 'mock-promises';
 
 describe('FirebaseAuth', () => {
-  let injector: Injector = null;
+  let injector: ReflectiveInjector = null;
   let ref: Firebase = null;
   let authData: any = null;
   let authCb: any = null;
@@ -56,7 +56,7 @@ describe('FirebaseAuth', () => {
   beforeEach(() => {
     authData = null;
     authCb = null;
-    injector = Injector.resolveAndCreate([
+    injector = ReflectiveInjector.resolveAndCreate([
       provide(FirebaseUrl, {
         useValue: 'https://angularfire2-auth.firebaseio-demo.com/'
       }),

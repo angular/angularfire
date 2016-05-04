@@ -1,4 +1,4 @@
-import {Inject, Injectable} from 'angular2/core';
+import {Inject, Injectable} from '@angular/core';
 import {FirebaseUrl} from '../tokens';
 import {FirebaseListObservable} from '../utils/firebase_list_observable';
 import {FirebaseObjectObservable} from '../utils/firebase_object_observable';

@@ -1,4 +1,4 @@
-import {describe,it,beforeEach} from 'angular2/testing';
+import {describe,it,beforeEach} from '@angular/core/testing';
 import {FirebaseObjectObservable} from './firebase_object_observable';
 import {Observer} from 'rxjs/Observer';
 import 'rxjs/add/operator/map';

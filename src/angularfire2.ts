@@ -1,4 +1,4 @@
-import {APP_INITIALIZER, Inject, Injectable, OpaqueToken, provide, Provider} from 'angular2/core';
+import {APP_INITIALIZER, Inject, Injectable, OpaqueToken, provide, Provider} from '@angular/core';
 import {FirebaseAuth, firebaseAuthConfig} from './providers/auth';
 import * as Firebase from 'firebase';
 import {FirebaseListObservable} from './utils/firebase_list_observable';

@@ -1,7 +1,6 @@
-import {Component, enableProdMode, Inject, provide} from 'angular2/core';
-import {bootstrap} from 'angular2/platform/browser';
+import {Component, enableProdMode, Inject, provide} from '@angular/core';
+import {bootstrap} from '@angular/platform-browser-dynamic';
 import {defaultFirebase, AngularFire, FIREBASE_PROVIDERS, FirebaseListObservable} from 'angularfire2';
-
 import * as Firebase from 'firebase';
 
 enableProdMode();

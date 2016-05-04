@@ -1,4 +1,4 @@
-import {provide} from 'angular2/core';
+import {provide} from '@angular/core';
 import {COMMON_PROVIDERS} from './angularfire2';
 import {AuthBackend} from './providers/auth_backend';
 import {WebWorkerFirebaseAuth} from './providers/web_workers/worker/auth';

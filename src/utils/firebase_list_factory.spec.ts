@@ -16,7 +16,7 @@ import {
   ddescribe,
   describe,
   expect
-} from 'angular2/testing';
+} from '@angular/core/testing';
 import {Query} from './query_observable';
 import {Subscription, Observable, Subject} from 'rxjs';
 import 'rxjs/add/operator/do';

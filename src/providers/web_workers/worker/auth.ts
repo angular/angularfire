@@ -1,4 +1,4 @@
-import {Injectable, Inject} from 'angular2/core';
+import {Injectable, Inject} from '@angular/core';
 
 // Import these from src/ until we have a specific import path for them
 // https://github.com/angular/angular/issues/7419
