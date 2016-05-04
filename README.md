@@ -1,5 +1,5 @@
 <p align="center">
-  <p style="font-size: 32px" align="center">AngularFire2</h1>
+  <h1 align="center">AngularFire2</h1>
   <p align="center">The official library for Firebase and Angular 2</p>
 </p>
 
@@ -22,9 +22,8 @@ npm install angularfire2 firebase --save
 ## Example use:
 
 ```ts
-import {Component} from 'angular2/core';
-import {Observable} from 'rxjs/Observable';
-import {AngularFire} from 'angularfire2';
+import {Component} from '@angular/core';
+import {AngularFire, FirebaseListObservable} from 'angularfire2';
 
 @Component({
   selector: 'project-name-app',
@@ -37,7 +36,7 @@ import {AngularFire} from 'angularfire2';
   `
 })
 export class MyApp {
-  items: Observable<any[]>;
+  items: FirebaseListObservable<any[]>;
   constructor(af: AngularFire) {
     this.items = af.database.list('/items');
   }
@@ -55,4 +54,4 @@ dangerous with AngularFire2.
 4. [Querying lists](/docs/4-querying-lists.md)
 5. [User Authentication - FirebaseAuthentication](docs/5-user-authentication.md)
 
-[## API](/docs/api.md)
+## [API Reference](/docs/api-reference.md)
