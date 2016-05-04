@@ -46,9 +46,9 @@ export class MyApp {
 
 ## Developer Guide
 1. [Installation & Setup](/docs/1-installation-and-setup.md)
-2. [Retreiving data as objects - FirebaseObjectObservable](/docs/2-retreiving-data-as-objects.md)
-3. [Retreiving data as lists - FirebaseListObservable](/docs/3-retreiving-data-as-lists.md)
-4. Querying lists
+2. [Retreiving data as objects - FirebaseObjectObservable](/docs/2-retrieving-data-as-objects.md)
+3. [Retreiving data as lists - FirebaseListObservable](/docs/3-retrieving-data-as-lists.md)
+4. [Querying lists](/docs/4-querying-lists.md)
 4. User Authentication - FirebaseAuthentication
 5. Deploying your app - Firebase Hosting
 6. When to use AngularFire2, and when to use the regular Firebase SDK
