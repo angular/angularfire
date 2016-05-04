@@ -29,7 +29,7 @@ import {AngularFire, FirebaseListObservable} from 'angularfire2';
   selector: 'project-name-app',
   template: `
   <ul>
-    <li *ngFor="#item in items | async">
+    <li *ngFor="let item of items | async">
       {{ item.name }}
     </li>
   </ul>
