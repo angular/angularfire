@@ -108,30 +108,8 @@ promise
 Use the `push()` method to add new items on the list.
 
 ```ts
-import {Component} from 'angular2/core';
-import {AngularFire, FirebaseListObservable} from 'angularfire2';
-
-@Component({
-  selector: 'app',
-  templateUrl: `
-  <ul>
-    <li *ngFor="var item in items | async">
-      {{ item.name }}
-    </li>
-  </ul>
-  <input type="text" #newitem />
-  <button (click)="add(newitem.value)">Add</button>
-  `,
-})
-class AppComponent {
-  items: FirebaseListObservable<any>;
-  constructor(af: AngularFire) {
-    this.items = af.database.list('/items');
-  }
-  add(newName: string) {
-    this.items.push({ name: newName });
-  }
-}
+const items = af.database.list('/items');
+items.push({ name: newName });
 ```
 
 ### Updating items in the list
@@ -139,74 +117,18 @@ class AppComponent {
 Use the `update()` method to update existing items.
 
 ```ts
-import {Component} from 'angular2/core';
-import {AngularFire, FirebaseListObservable} from 'angularfire2';
-
-@Component({
-  selector: 'app',
-  templateUrl: `
-  <ul>
-    <li *ngFor="var item in items | async">
-      {{ item.name }}
-      <input type="text" #updatesize />
-      <button (click)="update(updatesize.value, item.$key)">Update</button>
-    </li>
-  </ul>
-  <input type="text" #newitem />
-  <button (click)="add(newitem.value)">Add</button>
-  `,
-})
-class AppComponent {
-  items: FirebaseListObservable<any>;
-  constructor(af: AngularFire) {
-    this.items = af.database.list('/items');
-  }
-  add(newName: string) {
-    this.items.push({ name: newName });
-  }
-  update(newSize: string, key: string) {
-    this.update(key, { size: newSize });
-  }
-}
+const items = af.database.list('/items');
+// to get a key, check the Example app below
+items.update('key-of-some-data', { size: newSize });
 ```
 
 ### Removing items from the list
 Use the `remove()` method to remove data at the list item's location.
 
 ```ts
-import {Component} from 'angular2/core';
-import {AngularFire, FirebaseListObservable} from 'angularfire2';
-
-@Component({
-  selector: 'app',
-  templateUrl: `
-  <ul>
-    <li *ngFor="var item in items | async">
-      {{ item.name }}
-      <input type="text" #updatesize />
-      <button (click)="update(updatesize.value, item.$key)">Update</button>
-      <button (click)="deleteItem(item.$key)>Delete</button>
-    </li>
-  </ul>
-  <input type="text" #newitem />
-  <button (click)="add(newitem.value)">Add</button>
-  `,
-})
-class AppComponent {
-  items: FirebaseListObservable<any>;
-  constructor(af: AngularFire) {
-    this.items = af.database.list('/items');
-  }
-  add(newName: string) {
-    this.items.push({ name: newName })
-  }
-  update(newSize: string, key: string) {
-    this.items.update(key, { size: newSize });
-  }
-  deleteItem(key: string) { 
-    this.items.remove(key);    
-  }
-}
+const items = af.database.list('/items');
+// to get a key, check the Example app below
+items.remove('key-of-some-data');
 ```
 
 ## Deleting the entire list
@@ -214,18 +136,25 @@ class AppComponent {
 If you omit the `key` parameter from `.remove()` it deletes the entire list.
 
 ```ts
-import {Component} from 'angular2/core';
-import {AngularFire, FirebaseListObservable} from 'angularfire2';
+const items = af.database.list('/items');
+items.remove();
+```
+
+**Example app**
+
+```ts
+import { Component } from '@angular/core';
+import { AngularFire, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2';
 
 @Component({
+  moduleId: module.id,
   selector: 'app',
-  templateUrl: `
+  template: `
   <ul>
-    <li *ngFor="var item in items | async">
-      {{ item.name }}
-      <input type="text" #updatesize />
+    <li *ngFor="let item of items | async">
+      <input type="text" #updatesize [value]="item.text" />
       <button (click)="update(updatesize.value, item.$key)">Update</button>
-      <button (click)="deleteItem(item.$key)>Delete</button>
+      <button (click)="deleteItem(item.$key)">Delete</button>
     </li>
   </ul>
   <input type="text" #newitem />
@@ -233,13 +162,13 @@ import {AngularFire, FirebaseListObservable} from 'angularfire2';
   <button (click)="deleteEverything()">Delete All</button>
   `,
 })
-class AppComponent {
+export class RcTestAppComponent {
   items: FirebaseListObservable<any>;
   constructor(af: AngularFire) {
-    this.items = af.database.list('/items');
+    this.items = af.database.list('/messages');
   }
   add(newName: string) {
-    this.items.push({ name: newName });
+    this.items.push({ text: newName });
   }
   update(newSize: string, key: string) {
     this.items.update(key, { size: newSize });
@@ -260,10 +189,6 @@ Data retreived from the object binding contains special properties retreived fro
 | ---------|--------------------| 
 | $key     | The key for each record. This is equivalent to each record's path in our database as it would be returned by `ref.key()`.|
 | $value   | If the data for this child node is a primitive (number, string, or boolean), then the record itself will still be an object. The primitive value will be stored under `$value` and can be changed and saved like any other field.|
-
-```ts
-// TODO: Code example
-```
 
 ## Retreiving the snapshot
 AngularFire2 unwraps the Firebase DataSnapshot by default, but you can get the data as the original snapshot by specifying the `preserveSnapshot` option. 

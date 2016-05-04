@@ -42,14 +42,22 @@ Include AngularFire2 and Firebase in the `vendorNpmFiles` array:
 var Angular2App = require('angular-cli/lib/broccoli/angular2-app');
 
 module.exports = function(defaults) {
-  var app = new Angular2App(defaults, {
+  return new Angular2App(defaults, {
     vendorNpmFiles: [
+      'systemjs/dist/system-polyfills.js',
+      'systemjs/dist/system.src.js',
+      'zone.js/dist/*.js',
+      'es6-shim/es6-shim.js',
+      'reflect-metadata/*.js',
+      'rxjs/**/*.js',
+      '@angular/**/*.js',
+      // above are the existing entries
+      // below are the AngularFire entries
       'angularfire2/**/*.js',
-      'firebase/lib/*.js'
+      'firebase/lib/*.js'      
     ]
   });
-  return app.toTree();
-}
+};
 ```
 
 ### 5. Build
@@ -62,106 +70,82 @@ Run a build and check the `/dist/vendor` folder for the `angularfire2` and `fire
 
 ### 6. System.js
 
-Open `/src/index.html`. Modify the `System.config` like below:
+Open `/src/system-config.ts`. Modify the file like below:
 
 ```js
-System.config({
-  map: {
-    firebase: 'vendor/firebase/lib/firebase-web.js',
-    angularfire2: 'vendor/angularfire2'
-  },
-  packages: {
-    app: {
-      format: 'register',
-      defaultExtension: 'js'
-    },
-    angularfire2: {
-      defaultExtension: 'js',
-      main: 'angularfire2.js'
-    }
-  }
-});
+// TODO: Find the actual way to do this
 ```
 
 AngularFire 2 and Firebase need to be mapped with System.js for module loading.
 
 ### 7. Bootstrap
 
-Open `/src/app.ts`:
+Open `/src/app.ts`, inject the Firebase providers, and specify your default Firebase:
 
 ```ts
-import {bootstrap} from 'angular2/platform/browser';
-import {MyAppClass} from './app/<my-app-class>';
-import {ROUTER_PROVIDERS} from 'angular2/router';
+import { bootstrap } from '@angular/platform-browser-dynamic';
+import { enableProdMode } from '@angular/core';
+import { <MyApp>, environment } from './app/';
 import {FIREBASE_PROVIDERS, defaultFirebase, AngularFire} from 'angularfire2';
 
-bootstrap(<MyAppClass>, [
+if (environment.production) {
+  enableProdMode();
+}
+
+bootstrap(<MyApp>, [
   FIREBASE_PROVIDERS,
-  defaultFirebase('https://<your-firebase>.firebaseio.com'),
-  ROUTER_PROVIDERS
+  defaultFirebase('https://<your-firebase-app>.firebaseio.com')
 ]);
 ```
 
 ### 8. Inject AngularFire
 
-Open `/src/app/project-name.ts`:
+Open `/src/app/<project-name>.component.ts`:
 
 ```ts
-import {Component} from 'angular2/core';
-import {RouteConfig, ROUTER_DIRECTIVES} from 'angular2/router';
-import {AngularFire} from 'angularfire2';
-import {Observable} from 'rxjs/Observable';
+import { Component } from '@angular/core';
+import { AngularFire, FirebaseListObservable } from 'angularfire2';
 
 @Component({
-  selector: 'project-name-app',
-  providers: [],
-  templateUrl: 'app/project-name-app.html',
-  directives: [ROUTER_DIRECTIVES],
-  pipes: []
+  moduleId: module.id,
+  selector: '<my-app>-app',
+  templateUrl: '<my-app>.component.html',
+  styleUrls: ['<my-app>.component.css']
 })
-@RouteConfig([
-
-])
-export class ProjectNameApp {
+export class <MyApp>Component {
   constructor(af: AngularFire) {
-
+    
   }
 }
+
 ```
 
 ### 9. Bind to a list
 
-In `/src/app/project-name.ts`:
+In `/src/app/project-name.component.ts`:
 
 ```ts
-import {Component} from 'angular2/core';
-import {RouteConfig, ROUTER_DIRECTIVES} from 'angular2/router';
-import {AngularFire} from 'angularfire2';
-import {Observable} from 'rxjs/Observable';
+import { Component } from '@angular/core';
+import { AngularFire, FirebaseListObservable } from 'angularfire2';
 
 @Component({
-  selector: 'project-name-app',
-  providers: [],
-  templateUrl: 'app/project-name-app.html',
-  directives: [ROUTER_DIRECTIVES],
-  pipes: []
+  moduleId: module.id,
+  selector: '<my-app>-app',
+  templateUrl: '<my-app>.component.html',
+  styleUrls: ['<my-app>.component.css']
 })
-@RouteConfig([
-
-])
-export class ProjectNameApp {
-  items: Observable<any[]>;
+export class RcTestAppComponent {
+  items: FirebaseListObservable<any[]>;
   constructor(af: AngularFire) {
-    // create a list at /items
     this.items = af.database.list('/items');
   }
 }
 ```
 
-Open `/src/app/project-name.html`:
+Open `/src/app/<my-app>.component.html`:
 
 ```html
-<ul *ngFor="#item of items | async">
+<ul *ngFor="let items of items | async">
   <li class="text">
     {{item}}
   </li>
