@@ -202,4 +202,4 @@ this.items
   .subscribe(snapshots => console.log(snapshots.length));
 ```
 
-###[Next Step: Querying lists](docs/4-querying-lists.md)
+###[Next Step: Querying lists](4-querying-lists.md)
