@@ -1,5 +1,5 @@
 import {Provider, Inject, provide, Injectable, Optional} from '@angular/core';
-import {ReplaySubject} from 'rxjs/subject/ReplaySubject';
+import {ReplaySubject} from 'rxjs/ReplaySubject';
 import {FirebaseRef, FirebaseAuthConfig} from '../tokens';
 import {isPresent} from '../utils/utils';
 import * as utils from '../utils/utils';

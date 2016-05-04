@@ -45,7 +45,7 @@ export function FirebaseListFactory (absoluteUrlOrDbRef:string | Firebase | Fire
           queried = queried.equalTo(query.equalTo);
           
         if (utils.isPresent(query.startAt) || query.endAt) {
-          throw new Error('Query Error: Cannot use startAt with endAt.');
+          throw new Error('Query Error: Cannot use startAt or endAt with equalTo.');
         }          
         
         // apply limitTos
