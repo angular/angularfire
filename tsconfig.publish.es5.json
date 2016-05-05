@@ -14,8 +14,6 @@
   },
   "files": [
     "src/angularfire2.ts",
-    "src/utils/absolute_path_resolver.ts",
-    "src/utils/firebase_object_factory.ts",
     "typings/main.d.ts"
   ]
 }

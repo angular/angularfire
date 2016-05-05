@@ -15,7 +15,6 @@
   "files": [
     "src/angularfire2.ts",
     "src/angularfire2.spec.ts",
-    "src/utils/absolute_path_resolver.ts",
     "src/utils/firebase_list_factory.spec.ts",
     "src/utils/firebase_object_factory.ts",
     "src/utils/firebase_object_factory.spec.ts",
