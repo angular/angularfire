@@ -24,8 +24,7 @@ describe('FirebaseObjectObservable', () => {
   });
   
   it('should return an instance of FirebaseObservable when calling operators', () => {
-    var O:FirebaseObjectObservable<number> = new FirebaseObjectObservable((observer:Observer<number>) => {
-    });
+    var O = new FirebaseObjectObservable((observer:Observer<any>) => {});
     expect(O.map(noop) instanceof FirebaseObjectObservable).toBe(true);
   });
   

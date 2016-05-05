@@ -127,7 +127,7 @@ export function observeQuery(query: Query): Observable<ScalarQuery> {
   });
 }
 
-export function getOrderObservables(query: Query): Observable<OrderBySelection> {
+export function getOrderObservables(query: Query): Observable<OrderBySelection> | Observable<OrderBySelection | Observable<OrderBySelection>> {
   var observables = ['orderByChild', 'orderByKey', 'orderByValue', 'orderByPriority']
     .map((key: string, option: OrderByOptions) => {
       return ({ key, option })
@@ -148,7 +148,7 @@ export function getOrderObservables(query: Query): Observable<OrderBySelection> 
   }
 }
 
-export function getLimitToObservables(query: Query): Observable<LimitToSelection> {
+export function getLimitToObservables(query: Query): Observable<LimitToSelection> | Observable<LimitToSelection | Observable<LimitToSelection>> {
   var observables = ['limitToFirst', 'limitToLast']
     .map((key: string, option: LimitToOptions) => ({ key, option }))
     .filter(({key, option}: { key: string, option: LimitToOptions }) => isPresent(query[key]))
