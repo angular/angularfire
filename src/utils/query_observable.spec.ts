@@ -423,4 +423,7 @@ describe('query combinations', () => {
     });
        
 });
+<<<<<<< HEAD
 
+=======
+>>>>>>> upstream/master
