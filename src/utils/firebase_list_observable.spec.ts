@@ -1,4 +1,4 @@
-import {describe,it,iit,beforeEach} from 'angular2/testing';
+import {describe,it,iit,beforeEach} from '@angular/core/testing';
 import {FirebaseListObservable} from './firebase_list_observable';
 import {Observer} from 'rxjs/Observer';
 import 'rxjs/add/operator/map';
@@ -24,7 +24,7 @@ describe('FirebaseObservable', () => {
 
 
   it('should return an instance of FirebaseObservable when calling operators', () => {
-    var O:FirebaseListObservable<number> = new FirebaseListObservable(ref, (observer:Observer<number>) => {
+    O = new FirebaseListObservable(ref, (observer:Observer<any>) => {
     });
     expect(O.map(noop) instanceof FirebaseListObservable).toBe(true);
   });
@@ -38,17 +38,6 @@ describe('FirebaseObservable', () => {
         O.push('foo');
       }).toThrowError('No ref specified for this Observable!')
     });
-
-    // it('should call push on the underlying ref', (done: any) => {
-    //   var O:FirebaseListObservable<number[]> = new FirebaseListObservable(ref.child('things'), (observer:Observer<number>) => {
-    //   });
-    //   O.push(1);
-    // });
-
-    // it('should accept any type of value without compilation error', () => {
-    //   O.push('foo');
-    // });
-
 
     it('should resolve returned thenable when successful', (done:any) => {
       O.push('foo').then(done, done.fail);

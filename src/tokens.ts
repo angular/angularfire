@@ -1,4 +1,4 @@
-import {OpaqueToken} from 'angular2/core';
+import {OpaqueToken} from '@angular/core';
 
 export const FirebaseUrl = new OpaqueToken('FirebaseUrl');
 export const FirebaseRef = new OpaqueToken('FirebaseRef')

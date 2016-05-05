@@ -1,4 +1,4 @@
-import {describe, expect, it, iit} from 'angular2/testing';
+import {describe, expect, it, iit} from '@angular/core/testing';
 import {Observable} from 'rxjs/Observable';
 import {Observer} from 'rxjs/Observer';
 import {Subject} from 'rxjs/Subject';
@@ -62,7 +62,7 @@ describe('observeQuery', () => {
     var nextSpy = jasmine.createSpy('next');
     var completeSpy = jasmine.createSpy('complete');
     var query = {
-      orderByKey: new Subject()
+      orderByKey: new Subject<boolean>()
     };
     var obs = observeQuery(query);
     var noOrderyQuery = { orderByKey: false };
@@ -80,7 +80,7 @@ describe('observeQuery', () => {
     var nextSpy = jasmine.createSpy('next');
     var completeSpy = jasmine.createSpy('complete');
     var query = {
-      orderByKey: new Subject()
+      orderByKey: new Subject<boolean>()
     };
     var obs = observeQuery(query);
     obs.subscribe(nextSpy, null, completeSpy);
@@ -96,10 +96,10 @@ describe('observeQuery', () => {
     // TODO: Should we allow re-emitting of the orderBy method?
     var nextSpy = jasmine.createSpy('next');
     var query = {
-      orderByKey: new Subject(),
-      orderByPriority: new Subject(),
-      orderByValue: new Subject(),
-      orderByChild: new Subject()
+      orderByKey: new Subject<boolean>(),
+      orderByPriority: new Subject<boolean>(),
+      orderByValue: new Subject<boolean>(),
+      orderByChild: new Subject<string>()
     };
     var obs = observeQuery(query);
     obs.subscribe(nextSpy);

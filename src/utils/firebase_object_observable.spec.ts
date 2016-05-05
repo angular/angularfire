@@ -1,4 +1,4 @@
-import {describe,it,beforeEach} from 'angular2/testing';
+import {describe,it,beforeEach} from '@angular/core/testing';
 import {FirebaseObjectObservable} from './firebase_object_observable';
 import {Observer} from 'rxjs/Observer';
 import 'rxjs/add/operator/map';
@@ -24,8 +24,7 @@ describe('FirebaseObjectObservable', () => {
   });
   
   it('should return an instance of FirebaseObservable when calling operators', () => {
-    var O:FirebaseObjectObservable<number> = new FirebaseObjectObservable((observer:Observer<number>) => {
-    });
+    var O = new FirebaseObjectObservable((observer:Observer<any>) => {});
     expect(O.map(noop) instanceof FirebaseObjectObservable).toBe(true);
   });
   

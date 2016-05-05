@@ -7,9 +7,10 @@ import {
   beforeEachProviders,
   expect,
   inject,
-  injectAsync
-} from 'angular2/testing';
-import {Injector, provide, Provider} from 'angular2/core';
+  injectAsync,
+  async
+} from '@angular/core/testing';
+import {ReflectiveInjector, provide, Provider} from '@angular/core';
 import {
   AngularFire,
   FirebaseObjectObservable,
@@ -43,7 +44,7 @@ describe('angularfire', () => {
 
 
   it('should be injectable via FIREBASE_PROVIDERS', () => {
-    var injector = Injector.resolveAndCreate([FIREBASE_PROVIDERS, defaultFirebase(localServerUrl)]);
+    var injector = ReflectiveInjector.resolveAndCreate([FIREBASE_PROVIDERS, defaultFirebase(localServerUrl)]);
     expect(injector.get(AngularFire)).toBeAnInstanceOf(AngularFire);
   });
 
@@ -104,23 +105,25 @@ describe('angularfire', () => {
     });
 
 
-    it('should return an observable of the path', injectAsync([AngularFire], (af:AngularFire) => {
+    it('should return an observable of the path', (done: any) => {
       return (<any>observable)._ref.set({title: 'how to firebase?'})
         .then(() => observable.take(1).toPromise())
         .then((data:any) => {
           expect(data).toEqual({title: 'how to firebase?'});
+          done();
         });
-    }));
+    });
 
 
-    it('should preserve snapshot if preserveSnapshot option specified', injectAsync([AngularFire], (af:AngularFire) => {
+    it('should preserve snapshot if preserveSnapshot option specified', (done: any) => {
       observable = af.object(`list-of-questions/`, {preserveSnapshot: true});
       return (<any>observable)._ref.set({title: 'how to firebase?'})
         .then(() => observable.take(1).toPromise())
         .then((data:any) => {
           expect(data.val()).toEqual({title: 'how to firebase?'});
+          done();
         });
-    }));
+    });
   });
 
 
@@ -135,7 +138,7 @@ describe('angularfire', () => {
 
   describe('FIREBASE_REF', () => {
     it('should provide a FirebaseRef for the FIREBASE_REF binding', () => {
-      var injector = Injector.resolveAndCreate([
+      var injector = ReflectiveInjector.resolveAndCreate([
         provide(FirebaseUrl, {
           useValue: localServerUrl
         }),
@@ -153,7 +156,7 @@ describe('angularfire', () => {
 
 
     it('should inject a FIR reference', () => {
-      const injector = Injector.resolveAndCreate([defaultFirebase(localServerUrl), FIREBASE_PROVIDERS]);
+      const injector = ReflectiveInjector.resolveAndCreate([defaultFirebase(localServerUrl), FIREBASE_PROVIDERS]);
       expect(injector.get(FirebaseRef).toString()).toBe(localServerUrl);
     });
   });
