@@ -40,7 +40,7 @@ module.exports = function(config) {
       {pattern: 'dist/**/*.js.map', included: false, watched: false}
     ],
     
-    reporters: ['progress'],
+    reporters: ['mocha'],
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
