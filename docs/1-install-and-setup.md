@@ -73,7 +73,19 @@ Run a build and check the `/dist/vendor` folder for the `angularfire2` and `fire
 Open `/src/system-config.ts`. Modify the file like below:
 
 ```js
-// TODO: Find the actual way to do this
+/** Map relative paths to URLs. */
+const map: any = {
+  'firebase': 'vendor/firebase/lib/firebase-web.js',
+  'angularfire2': 'vendor/angularfire2'
+};
+
+/** User packages configuration. */
+const packages: any = {
+  angularfire2: {
+    defaultExtension: 'js',
+    main: 'angularfire2.js'
+  }
+};
 ```
 
 AngularFire 2 and Firebase need to be mapped with System.js for module loading.
@@ -86,7 +98,7 @@ Open `/src/app.ts`, inject the Firebase providers, and specify your default Fire
 import { bootstrap } from '@angular/platform-browser-dynamic';
 import { enableProdMode } from '@angular/core';
 import { <MyApp>, environment } from './app/';
-import {FIREBASE_PROVIDERS, defaultFirebase, AngularFire} from 'angularfire2';
+import { FIREBASE_PROVIDERS, defaultFirebase } from 'angularfire2';
 
 if (environment.production) {
   enableProdMode();
