@@ -1,6 +1,6 @@
 import {FirebaseObjectFactory} from '../utils/firebase_object_factory';
 import {FirebaseObjectObservable} from '../utils/firebase_object_observable';
-import {beforeEach, it, describe, expect} from 'angular2/testing';
+import {beforeEach, it, iit, describe, expect} from 'angular2/testing';
 import {Subscription} from 'rxjs';
 
 const rootFirebase = 'https://angularfire2-object-factory.firebaseio-demo.com';

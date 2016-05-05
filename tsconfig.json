@@ -4,7 +4,7 @@
     "emitDecoratorMetadata": true,
     "module": "commonjs",
     "target": "es5",
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "outDir": "dist",
     "rootDir": "src",
     "sourceMap": true,
@@ -22,6 +22,7 @@
     "src/utils/firebase_object_factory.spec.ts",
     "src/utils/firebase_list_observable.spec.ts",
     "src/utils/firebase_object_observable.spec.ts",
+    "src/utils/query_observable.spec.ts",
     "src/providers/auth.spec.ts",
     "typings/main.d.ts"
   ]

@@ -2,25 +2,99 @@ import {FirebaseListObservable, AFUnwrappedDataSnapshot} from './firebase_list_o
 import {Observer} from 'rxjs/Observer';
 import * as Firebase from 'firebase';
 import * as utils from './utils';
+import {Query, observeQuery} from './query_observable';
+import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/map';
 
-export function FirebaseListFactory (absoluteUrlOrDbRef:string | Firebase, {preserveSnapshot}:FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
-  let ref: Firebase;
+export function FirebaseListFactory (absoluteUrlOrDbRef:string | Firebase | FirebaseQuery, {preserveSnapshot, query = {}}:FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
+  let ref: Firebase | FirebaseQuery;
   
   utils.checkForUrlOrFirebaseRef(absoluteUrlOrDbRef, {
     isUrl: () => ref = new Firebase(<string>absoluteUrlOrDbRef),
-    isRef: () => ref = <Firebase>absoluteUrlOrDbRef
+    isRef: () => ref = <Firebase>absoluteUrlOrDbRef,
+    isQuery: () => ref = <FirebaseQuery>absoluteUrlOrDbRef,
   });
   
-  // if (utils.isString(absoluteUrlOrDbRef)) {  
-  //   ref = new Firebase(<string>absoluteUrlOrDbRef);
-  // } else {
-  //   ref = <Firebase>absoluteUrlOrDbRef;
-  // }
+  // if it's just a reference or string, create a regular list observable
+  if ((utils.isFirebaseRef(absoluteUrlOrDbRef) || 
+       utils.isString(absoluteUrlOrDbRef)) && 
+       utils.isEmptyObject(query)) {
+    return firebaseListObservable(ref, { preserveSnapshot });
+  }
   
-  return new FirebaseListObservable((obs:Observer<any[]>) => {
-    let arr:any[] = [];
-    let hasInitialLoad = false;
+  const queryObs = observeQuery(query);
+  const listObs = <FirebaseListObservable<{}>>queryObs
+    .map(query => {
+      let queried: FirebaseQuery = ref;
+      // Only apply the populated keys
+      // apply ordering and available querying options
+      // eg: ref.orderByChild('height').startAt(3)
+      // Check orderBy
+      if (query.orderByChild) {
+        queried = queried.orderByChild(query.orderByChild);
+      } else if (query.orderByKey) {
+        queried = queried.orderByKey();
+      } else if (query.orderByPriority) {
+        queried = queried.orderByPriority();
+      } else if (query.orderByValue) {
+        queried = queried.orderByValue();
+      }
+      
+      // check equalTo
+      if (utils.isPresent(query.equalTo)) {
+          queried = queried.equalTo(query.equalTo);
+          
+        if (utils.isPresent(query.startAt) || query.endAt) {
+          throw new Error('Query Error: Cannot use startAt with endAt.');
+        }          
+        
+        // apply limitTos
+        if (utils.isPresent(query.limitToFirst)) {
+          queried = queried.limitToFirst(query.limitToFirst);
+        }
+        
+        if (utils.isPresent(query.limitToLast)) {
+          queried = queried.limitToLast(query.limitToLast);
+        }
+        
+        return queried;
+      }
+      
+      // check startAt
+      if (utils.isPresent(query.startAt)) {
+          queried = queried.startAt(query.startAt);
+      }
+      
+      if (utils.isPresent(query.endAt)) {
+          queried = queried.endAt(query.endAt);
+      }
+      
+      if (utils.isPresent(query.limitToFirst) && query.limitToLast) {
+        throw new Error('Query Error: Cannot use limitToFirst with limitToLast.');
+      }
+      
+      // apply limitTos
+      if (utils.isPresent(query.limitToFirst)) {
+          queried = queried.limitToFirst(query.limitToFirst);
+      }
+      
+      if (utils.isPresent(query.limitToLast)) {
+          queried = queried.limitToLast(query.limitToLast);
+      }
+      
+      return queried;
+    })
+    .mergeMap((queryRef: Firebase, ix: number) => {
+      return firebaseListObservable(queryRef, { preserveSnapshot });
+    });
+    return listObs;
+}
 
+function firebaseListObservable(ref: Firebase | FirebaseQuery, {preserveSnapshot}: FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
+  
+  const listObs = new FirebaseListObservable(ref, (obs: Observer<any[]>) => {
+    let arr: any[] = [];
+    let hasInitialLoad = false;
     // The list should only emit after the initial load
     // comes down from the Firebase database, (e.g.) all
     // the initial child_added events have fired.
@@ -29,37 +103,47 @@ export function FirebaseListFactory (absoluteUrlOrDbRef:string | Firebase, {pres
     ref.once('value', (snap) => {
       hasInitialLoad = true;
       obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
+    }, err => {
+      if (err) { obs.error(err); obs.complete(); }
     });
 
-    ref.on('child_added', (child:any, prevKey:string) => {
+    ref.on('child_added', (child: any, prevKey: string) => {
       arr = onChildAdded(arr, child, prevKey);
       // only emit the array after the initial load
       if (hasInitialLoad) {
         obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
       }
+    }, err => {
+      if (err) { obs.error(err); obs.complete(); }
     });
 
-    ref.on('child_removed', (child:any) => {
+    ref.on('child_removed', (child: any) => {
       arr = onChildRemoved(arr, child)
       if (hasInitialLoad) {
         obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
       }
+    }, err => {
+      if (err) { obs.error(err); obs.complete(); }
     });
 
-    ref.on('child_changed', (child:any, prevKey: string) => {
+    ref.on('child_changed', (child: any, prevKey: string) => {
       arr = onChildChanged(arr, child, prevKey)
       if (hasInitialLoad) {
         // This also manages when the only change is prevKey change
         obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
       }
+    }, err => {
+      if (err) { obs.error(err); obs.complete(); }
     });
 
     return () => ref.off();
-  }, ref);
+  });
+  return listObs;
 }
 
 export interface FirebaseListFactoryOpts {
   preserveSnapshot?: boolean;
+  query?: Query;
 }
 
 export function unwrapMapFn (snapshot:FirebaseDataSnapshot): AFUnwrappedDataSnapshot {

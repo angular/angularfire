@@ -1,18 +1,23 @@
 import {FirebaseObjectObservable} from './firebase_object_observable';
 import {Observer} from 'rxjs/Observer';
+import 'rxjs/add/operator/mergeMap';
 import * as Firebase from 'firebase';
 import * as utils from './utils';
+import {Query, observeQuery} from './query_observable';
 
-export function FirebaseObjectFactory (absoluteUrlOrDbRef:string | Firebase, {preserveSnapshot}:FirebaseObjectFactoryOpts = {}): FirebaseObjectObservable<any> {
+export function FirebaseObjectFactory(absoluteUrlOrDbRef: string | Firebase, {preserveSnapshot, query}: FirebaseObjectFactoryOpts = {}): FirebaseObjectObservable<any> {
   let ref: Firebase;
+
   utils.checkForUrlOrFirebaseRef(absoluteUrlOrDbRef, {
     isUrl: () => ref = new Firebase(<string>absoluteUrlOrDbRef),
     isRef: () => ref = <Firebase>absoluteUrlOrDbRef
   });
   
-  return new FirebaseObjectObservable((obs:Observer<any[]>) => {
+  return new FirebaseObjectObservable((obs: Observer<any[]>) => {
     ref.on('value', (snapshot) => {
       obs.next(preserveSnapshot ? snapshot : snapshot.val())
+    }, err => {
+      if (err) { obs.error(err); obs.complete(); }
     });
 
     return () => ref.off();
@@ -21,4 +26,5 @@ export function FirebaseObjectFactory (absoluteUrlOrDbRef:string | Firebase, {pr
 
 export interface FirebaseObjectFactoryOpts {
   preserveSnapshot?: boolean;
+  query?: Query
 }
