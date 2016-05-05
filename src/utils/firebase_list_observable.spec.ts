@@ -3,7 +3,7 @@ import {FirebaseListObservable} from './firebase_list_observable';
 import {Observer} from 'rxjs/Observer';
 import 'rxjs/add/operator/map';
 import * as Firebase from 'firebase';
-import {unwrapMapFn} from './firebase_list_factory';
+import {unwrapMapFn} from './utils';
 
 const rootUrl = 'https://angularfire2-list-obs.firebaseio-demo.com/';
 

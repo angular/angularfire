@@ -1,3 +1,5 @@
+import { AFUnwrappedDataSnapshot} from './firebase_list_observable';
+
 export function isPresent(obj: any): boolean {
   return obj !== undefined && obj !== null;
 }
@@ -31,6 +33,17 @@ export interface CheckUrlRef {
   isUrl: () => any;
   isRef: () => any;
   isQuery?: () => any;
+}
+
+export function unwrapMapFn (snapshot:FirebaseDataSnapshot): AFUnwrappedDataSnapshot {
+  var unwrapped = isPresent(snapshot.val()) ? snapshot.val() : { $value: null };
+  if ((/string|number|boolean/).test(typeof unwrapped)) {
+    unwrapped = {
+      $value: unwrapped
+    };
+  }
+  unwrapped.$key = snapshot.key();
+  return unwrapped;
 }
 
 export function checkForUrlOrFirebaseRef(urlOrRef: string | Firebase | FirebaseQuery, cases: CheckUrlRef): any {

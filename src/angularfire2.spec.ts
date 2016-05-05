@@ -106,10 +106,10 @@ describe('angularfire', () => {
 
 
     it('should return an observable of the path', (done: any) => {
-      return (<any>observable)._ref.set({title: 'how to firebase?'})
+      return (<any>observable)._ref.set({title: 'how to firebae?'})
         .then(() => observable.take(1).toPromise())
         .then((data:any) => {
-          expect(data).toEqual({title: 'how to firebase?'});
+          expect(data).toEqual({title: 'how to firebae?', $key: (<any>observable)._ref.key() });
           done();
         });
     });
