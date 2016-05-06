@@ -1,6 +1,7 @@
 import {describe,it,iit,beforeEach} from '@angular/core/testing';
-import {FirebaseListObservable} from './firebase_list_observable';
+import {FirebaseListObservable, asFirebaseListObservable} from './firebase_list_observable';
 import {Observer} from 'rxjs/Observer';
+import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import * as Firebase from 'firebase';
 import {unwrapMapFn} from './utils';
@@ -28,6 +29,12 @@ describe('FirebaseObservable', () => {
     });
     expect(O.map(noop) instanceof FirebaseListObservable).toBe(true);
   });
+  
+  it('should cast a base Observable to a FirebaseListObservable', () => {
+    const obs = new Observable<any>();
+    const listObs = asFirebaseListObservable(obs, ref);
+    expect(listObs.push).not.toBeUndefined()
+  })
 
 
   describe('push', () => {

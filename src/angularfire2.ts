@@ -25,10 +25,7 @@ export class AngularFire {
   constructor(
     @Inject(FirebaseUrl) private fbUrl:string,
     public auth:FirebaseAuth,
-    public database: FirebaseDatabase) {
-      this.list = database.list.bind(database);
-      this.object = database.object.bind(database);
-  }
+    public database: FirebaseDatabase) {}
 
 }
 
