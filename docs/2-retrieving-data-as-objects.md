@@ -47,7 +47,7 @@ const dbRef = new Firebase('https://<your-app>.firebaseio.com/item');
 const relative = af.database.object(dbRef);
 ```
 
-### Retreive data
+### Retrieve data
 
 To get the object in realtime, create an object binding as a property of your component or service.
 Then in your template, you can use the `async` pipe to unwrap the binding.
@@ -74,7 +74,7 @@ export class AppComponent {
 
 ### API Summary
 
-The table below highlights some of the common methods on the `FirebaseObjectObservale`.
+The table below highlights some of the common methods on the `FirebaseObjectObservable`.
 
 | method   |                    | 
 | ---------|--------------------| 
