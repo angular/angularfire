@@ -92,7 +92,7 @@ AngularFire 2 and Firebase need to be mapped with System.js for module loading.
 
 ### 7. Bootstrap
 
-Open `/src/app.ts`, inject the Firebase providers, and specify your default Firebase:
+Open `/src/main.ts`, inject the Firebase providers, and specify your default Firebase:
 
 ```ts
 import { bootstrap } from '@angular/platform-browser-dynamic';
