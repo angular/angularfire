@@ -157,7 +157,7 @@ export class RcTestAppComponent {
 Open `/src/app/<my-app>.component.html`:
 
 ```html
-<ul *ngFor="let items of items | async">
+<ul *ngFor="let item of items | async">
   <li class="text">
     {{item}}
   </li>
