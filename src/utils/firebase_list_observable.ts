@@ -75,12 +75,6 @@ export class FirebaseListObservable<T> extends Observable<T> {
   
 }
 
-export function asFirebaseListObservable(observable: Observable<any>, ref: Firebase | FirebaseQuery): FirebaseListObservable<any> {
-  let pseduoListObs = Object.assign(observable, FirebaseListObservable.prototype);
-  pseduoListObs._ref = ref;
-  return pseduoListObs;
-}
-
 export interface AFUnwrappedDataSnapshot {
   $key: string;
   $value?: string | number | boolean;

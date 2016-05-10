@@ -1,5 +1,5 @@
 import {describe,it,iit,beforeEach} from '@angular/core/testing';
-import {FirebaseListObservable, asFirebaseListObservable} from './firebase_list_observable';
+import {FirebaseListObservable} from './firebase_list_observable';
 import {Observer} from 'rxjs/Observer';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/map';

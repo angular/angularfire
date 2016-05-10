@@ -1,4 +1,4 @@
-import {FirebaseListObservable, AFUnwrappedDataSnapshot, asFirebaseListObservable} from './firebase_list_observable';
+import {FirebaseListObservable, AFUnwrappedDataSnapshot} from './firebase_list_observable';
 import {Observer} from 'rxjs/Observer';
 import * as Firebase from 'firebase';
 import * as utils from './utils';
@@ -23,7 +23,7 @@ export function FirebaseListFactory (absoluteUrlOrDbRef:string | Firebase | Fire
   }
   
   const queryObs = observeQuery(query);
-  const listObs = queryObs
+  const listObs = <FirebaseListObservable<{}>>queryObs
     .map(query => {
       let queried: FirebaseQuery = ref;
       // Only apply the populated keys
@@ -87,7 +87,7 @@ export function FirebaseListFactory (absoluteUrlOrDbRef:string | Firebase | Fire
     .mergeMap((queryRef: Firebase, ix: number) => {
       return firebaseListObservable(queryRef, { preserveSnapshot });
     });
-    return asFirebaseListObservable(listObs, ref);
+    return listObs;
 }
 
 function firebaseListObservable(ref: Firebase | FirebaseQuery, {preserveSnapshot}: FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
