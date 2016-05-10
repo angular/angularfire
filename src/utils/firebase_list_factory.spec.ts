@@ -5,7 +5,6 @@ import {
   onChildChanged,
   onChildRemoved,
   onChildUpdated,
-  unwrapMapFn
 } from './firebase_list_factory';
 import {FirebaseListObservable} from './firebase_list_observable';
 import {FirebaseObjectFactory} from './firebase_object_factory';
@@ -17,6 +16,7 @@ import {
   describe,
   expect
 } from '@angular/core/testing';
+import * as utils from './utils';
 import {Query} from './query_observable';
 import {Subscription, Observable, Subject} from 'rxjs';
 import 'rxjs/add/operator/do';
@@ -480,7 +480,7 @@ describe('FirebaseListFactory', () => {
     });
 
 
-    describe('unwrapMapFn', () => {
+    describe('utils.unwrapMapFn', () => {
       var val = { unwrapped: true };
       var snapshot = {
         key: () => 'key',
@@ -488,7 +488,7 @@ describe('FirebaseListFactory', () => {
       };
 
       it('should return an object value with a $key property', () => {
-        expect(unwrapMapFn(snapshot as FirebaseDataSnapshot)).toEqual({
+        expect(utils.unwrapMapFn(snapshot as FirebaseDataSnapshot)).toEqual({
           $key: 'key',
           unwrapped: true
         });
@@ -496,15 +496,15 @@ describe('FirebaseListFactory', () => {
 
 
       it('should return an object value with a $value property if value is scalar', () => {
-        expect(unwrapMapFn(Object.assign(snapshot, { val: () => 5 }) as FirebaseDataSnapshot)).toEqual({
+        expect(utils.unwrapMapFn(Object.assign(snapshot, { val: () => 5 }) as FirebaseDataSnapshot)).toEqual({
           $key: 'key',
           $value: 5
         });
-        expect(unwrapMapFn(Object.assign(snapshot, { val: () => false }) as FirebaseDataSnapshot)).toEqual({
+        expect(utils.unwrapMapFn(Object.assign(snapshot, { val: () => false }) as FirebaseDataSnapshot)).toEqual({
           $key: 'key',
           $value: false
         });
-        expect(unwrapMapFn(Object.assign(snapshot, { val: () => 'lol' }) as FirebaseDataSnapshot)).toEqual({
+        expect(utils.unwrapMapFn(Object.assign(snapshot, { val: () => 'lol' }) as FirebaseDataSnapshot)).toEqual({
           $key: 'key',
           $value: 'lol'
         });

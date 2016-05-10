@@ -1,4 +1,4 @@
-import {FirebaseListObservable, AFUnwrappedDataSnapshot} from './firebase_list_observable';
+import {FirebaseListObservable, AFUnwrappedDataSnapshot, asFirebaseListObservable} from './firebase_list_observable';
 import {Observer} from 'rxjs/Observer';
 import * as Firebase from 'firebase';
 import * as utils from './utils';
@@ -23,7 +23,7 @@ export function FirebaseListFactory (absoluteUrlOrDbRef:string | Firebase | Fire
   }
   
   const queryObs = observeQuery(query);
-  const listObs = <FirebaseListObservable<{}>>queryObs
+  const listObs = queryObs
     .map(query => {
       let queried: FirebaseQuery = ref;
       // Only apply the populated keys
@@ -87,7 +87,7 @@ export function FirebaseListFactory (absoluteUrlOrDbRef:string | Firebase | Fire
     .mergeMap((queryRef: Firebase, ix: number) => {
       return firebaseListObservable(queryRef, { preserveSnapshot });
     });
-    return listObs;
+    return asFirebaseListObservable(listObs, ref);
 }
 
 function firebaseListObservable(ref: Firebase | FirebaseQuery, {preserveSnapshot}: FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
@@ -102,7 +102,7 @@ function firebaseListObservable(ref: Firebase | FirebaseQuery, {preserveSnapshot
     // to better rendering performance
     ref.once('value', (snap) => {
       hasInitialLoad = true;
-      obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
+      obs.next(preserveSnapshot ? arr : arr.map(utils.unwrapMapFn));
     }, err => {
       if (err) { obs.error(err); obs.complete(); }
     });
@@ -111,7 +111,7 @@ function firebaseListObservable(ref: Firebase | FirebaseQuery, {preserveSnapshot
       arr = onChildAdded(arr, child, prevKey);
       // only emit the array after the initial load
       if (hasInitialLoad) {
-        obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
+        obs.next(preserveSnapshot ? arr : arr.map(utils.unwrapMapFn));
       }
     }, err => {
       if (err) { obs.error(err); obs.complete(); }
@@ -120,7 +120,7 @@ function firebaseListObservable(ref: Firebase | FirebaseQuery, {preserveSnapshot
     ref.on('child_removed', (child: any) => {
       arr = onChildRemoved(arr, child)
       if (hasInitialLoad) {
-        obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
+        obs.next(preserveSnapshot ? arr : arr.map(utils.unwrapMapFn));
       }
     }, err => {
       if (err) { obs.error(err); obs.complete(); }
@@ -130,7 +130,7 @@ function firebaseListObservable(ref: Firebase | FirebaseQuery, {preserveSnapshot
       arr = onChildChanged(arr, child, prevKey)
       if (hasInitialLoad) {
         // This also manages when the only change is prevKey change
-        obs.next(preserveSnapshot ? arr : arr.map(unwrapMapFn));
+        obs.next(preserveSnapshot ? arr : arr.map(utils.unwrapMapFn));
       }
     }, err => {
       if (err) { obs.error(err); obs.complete(); }
@@ -144,17 +144,6 @@ function firebaseListObservable(ref: Firebase | FirebaseQuery, {preserveSnapshot
 export interface FirebaseListFactoryOpts {
   preserveSnapshot?: boolean;
   query?: Query;
-}
-
-export function unwrapMapFn (snapshot:FirebaseDataSnapshot): AFUnwrappedDataSnapshot {
-  var unwrapped = snapshot.val();
-  if ((/string|number|boolean/).test(typeof unwrapped)) {
-    unwrapped = {
-      $value: unwrapped
-    };
-  }
-  unwrapped.$key = snapshot.key();
-  return unwrapped;
 }
 
 export function onChildAdded(arr:any[], child:any, prevKey:string): any[] {

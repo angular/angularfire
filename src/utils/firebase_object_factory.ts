@@ -13,9 +13,9 @@ export function FirebaseObjectFactory(absoluteUrlOrDbRef: string | Firebase, {pr
     isRef: () => ref = <Firebase>absoluteUrlOrDbRef
   });
   
-  return new FirebaseObjectObservable((obs: Observer<any[]>) => {
-    ref.on('value', (snapshot) => {
-      obs.next(preserveSnapshot ? snapshot : snapshot.val())
+  return new FirebaseObjectObservable((obs: Observer<any>) => {
+    ref.on('value', (snapshot: FirebaseDataSnapshot) => {
+      obs.next(preserveSnapshot ? snapshot : utils.unwrapMapFn(snapshot))
     }, err => {
       if (err) { obs.error(err); obs.complete(); }
     });
