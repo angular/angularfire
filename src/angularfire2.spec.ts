@@ -18,7 +18,8 @@ import {
   FirebaseAuth,
   FirebaseUrl,
   FirebaseRef,
-  defaultFirebase
+  defaultFirebase,
+  FirebaseDatabase
 } from './angularfire2';
 import {Subscription} from 'rxjs';
 import 'rxjs/add/operator/toPromise';
@@ -48,85 +49,6 @@ describe('angularfire', () => {
     expect(injector.get(AngularFire)).toBeAnInstanceOf(AngularFire);
   });
 
-  describe('.list()', () => {
-    var af:AngularFire;
-    beforeEachProviders(() => [FIREBASE_PROVIDERS, defaultFirebase(localServerUrl)]);
-    beforeEach(inject([AngularFire], (_af:AngularFire) => {
-      af = _af;
-    }));
-
-
-    it('should accept an absolute url', () => {
-      expect(af.list(localServerUrl)._ref.toString()).toEqual(localServerUrl);
-    });
-
-
-    it('should return an observable of the path', (done:any) => {
-      var questions = af.list(`/questions`);
-      questionsRef.push({pathObservable:true}, () => {
-        subscription = questions
-          .take(1)
-          .do((data:any) => {
-            expect(data.length).toBe(1);
-            expect(data[0].pathObservable).toBe(true);
-          })
-          .subscribe(done, done.fail);
-      });
-    });
-
-
-    it('should preserve snapshots in the list if preserveSnapshot option specified', (done:any) => {
-      var questions = af.list(`list-of-questions`, {preserveSnapshot: true});
-      listOfQuestionsRef.push('hello', () => {
-        subscription = questions
-          .take(1)
-          .do((data:any) => {
-            expect(data[0].val()).toEqual('hello');
-          })
-          .subscribe(done, done.fail);
-      });
-    });
-  });
-
-
-  describe('.object()', () => {
-    var observable:FirebaseObjectObservable<any>;
-    var af:AngularFire;
-
-    beforeEachProviders(() => [FIREBASE_PROVIDERS, defaultFirebase(localServerUrl)]);
-    beforeEach(inject([AngularFire], (_af:AngularFire) => {
-      observable = _af.object(`/list-of-questions/1`)
-      af = _af;
-    }));
-
-
-    it('should accept an absolute url', () => {
-      expect((<any>af.object(localServerUrl))._ref.toString()).toBe(localServerUrl);
-    });
-
-
-    it('should return an observable of the path', (done: any) => {
-      return (<any>observable)._ref.set({title: 'how to firebae?'})
-        .then(() => observable.take(1).toPromise())
-        .then((data:any) => {
-          expect(data).toEqual({title: 'how to firebae?', $key: (<any>observable)._ref.key() });
-          done();
-        });
-    });
-
-
-    it('should preserve snapshot if preserveSnapshot option specified', (done: any) => {
-      observable = af.object(`list-of-questions/`, {preserveSnapshot: true});
-      return (<any>observable)._ref.set({title: 'how to firebase?'})
-        .then(() => observable.take(1).toPromise())
-        .then((data:any) => {
-          expect(data.val()).toEqual({title: 'how to firebase?'});
-          done();
-        });
-    });
-  });
-
-
   describe('.auth', () => {
     beforeEachProviders(() => [FIREBASE_PROVIDERS, defaultFirebase(localServerUrl)]);
 
@@ -134,7 +56,15 @@ describe('angularfire', () => {
       expect(af.auth).toBeAnInstanceOf(FirebaseAuth);
     }));
   });
+  
+  
+  describe('.database', () => {
+    beforeEachProviders(() => [FIREBASE_PROVIDERS, defaultFirebase(localServerUrl)]);
 
+    it('should be an instance of AuthService', inject([AngularFire], (af:AngularFire) => {
+      expect(af.database).toBeAnInstanceOf(FirebaseDatabase);
+    }));
+  });
 
   describe('FIREBASE_REF', () => {
     it('should provide a FirebaseRef for the FIREBASE_REF binding', () => {
