@@ -16,4 +16,4 @@ Queried lists do not have their operators attached. [See issue 162 for details.]
 
 ### Features
 
-* **documentation:** Adds documentation on how to use system-config.ts. ([0239ceb](https://github.com/angular/angularfire2/pull/163/commits/0239ceb5722ea118d0c34c584714f8ca5690a48f))
+* **docs:** Adds documentation on how to use system-config.ts. ([0239ceb](https://github.com/angular/angularfire2/pull/163/commits/0239ceb5722ea118d0c34c584714f8ca5690a48f))
