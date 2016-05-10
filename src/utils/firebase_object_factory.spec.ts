@@ -40,12 +40,12 @@ describe('FirebaseObjectFactory', () => {
       if (subscription && !subscription.isUnsubscribed) {
         subscription.unsubscribe();
       }
-    })
+    });
 
 
     it('should emit a null value if no value is present when subscribed', (done: any) => {
       subscription = observable.subscribe(val => {
-        expect(val).toBe(null);
+        expect(val).toEqual({ $key: (<any>observable)._ref.key(), $value: null });
         done();
       });
     });
@@ -54,12 +54,22 @@ describe('FirebaseObjectFactory', () => {
     it('should emit unwrapped data by default', (done: any) => {
       ref.set({ unwrapped: 'bar' }, () => {
         subscription = observable.subscribe(val => {
-          if (!val) return
-          expect(val).toEqual({ unwrapped: 'bar' });
+          if (!val) return;
+          expect(val).toEqual({ $key: ref.key(), unwrapped: 'bar' });
           done();
         });
       });
     });
+    
+   it('should emit unwrapped data with a $value property for primitive values', (done: any) => {
+      ref.set('fiiiireeee', () => {
+        subscription = observable.subscribe(val => {
+          if (!val) return;
+          expect(val).toEqual({ $key: ref.key(), $value: 'fiiiireeee' });
+          done();
+        });
+      });
+    });    
 
 
     it('should emit snapshots if preserveSnapshot option is true', (done: any) => {

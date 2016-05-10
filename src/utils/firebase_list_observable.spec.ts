@@ -1,9 +1,10 @@
 import {describe,it,iit,beforeEach} from '@angular/core/testing';
 import {FirebaseListObservable} from './firebase_list_observable';
 import {Observer} from 'rxjs/Observer';
+import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import * as Firebase from 'firebase';
-import {unwrapMapFn} from './firebase_list_factory';
+import {unwrapMapFn} from './utils';
 
 const rootUrl = 'https://angularfire2-list-obs.firebaseio-demo.com/';
 
@@ -28,8 +29,7 @@ describe('FirebaseObservable', () => {
     });
     expect(O.map(noop) instanceof FirebaseListObservable).toBe(true);
   });
-
-
+  
   describe('push', () => {
     it('should throw an exception if pushed when not subscribed', () => {
       O = new FirebaseListObservable(null, (observer:Observer<any>) => {});
