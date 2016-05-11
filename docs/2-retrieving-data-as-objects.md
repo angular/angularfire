@@ -20,7 +20,7 @@ import { AngularFire } from 'angularfire2';
   template: 'app.component.html',
   styleUrls: ['app.component.css']
 })
-export export class AppComponent {
+export class AppComponent {
   constructor(af: AngularFire) {
     
   }
