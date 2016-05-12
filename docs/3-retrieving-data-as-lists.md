@@ -38,14 +38,14 @@ There are three ways to create an object binding:
 
 ```ts
 // relative URL, uses the database url provided in bootstrap
-const relative = af.database.list('/item');
+const relative = af.database.list('/items');
 // absolute URL
-const absolute = af.database.list('https://<your-app>.firebaseio.com/item');
+const absolute = af.database.list('https://<your-app>.firebaseio.com/items');
 // database reference
-const dbRef = new Firebase('https://<your-app>.firebaseio.com/item');
+const dbRef = new Firebase('https://<your-app>.firebaseio.com/items');
 const relative = af.database.list(dbRef);
 // query 
-const dbQuery = new Firebase('https://<your-app>.firebaseio.com/item').limitToLast(10);
+const dbQuery = new Firebase('https://<your-app>.firebaseio.com/items').limitToLast(10);
 const queryList = af.database.list(dbQuery);
 ```
 
