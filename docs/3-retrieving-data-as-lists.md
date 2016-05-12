@@ -153,7 +153,7 @@ import { AngularFire, FirebaseListObservable, FirebaseObjectObservable } from 'a
   <ul>
     <li *ngFor="let item of items | async">
       <input type="text" #updatesize [value]="item.text" />
-      <button (click)="update(updatesize.value, item.$key)">Update</button>
+      <button (click)="update(item.$key, updatesize.value)">Update</button>
       <button (click)="deleteItem(item.$key)">Delete</button>
     </li>
   </ul>
@@ -170,7 +170,7 @@ export class RcTestAppComponent {
   add(newName: string) {
     this.items.push({ text: newName });
   }
-  update(newSize: string, key: string) {
+  update(key: string, newSize: string) {
     this.items.update(key, { size: newSize });
   }
   deleteItem(key: string) {    
