@@ -54,7 +54,7 @@ module.exports = function(defaults) {
       // above are the existing entries
       // below are the AngularFire entries
       'angularfire2/**/*.js',
-      'firebase/lib/*.js'      
+      'firebase/*.js'      
     ]
   });
 };
@@ -75,7 +75,7 @@ Open `/src/system-config.ts`. Modify the file like below:
 ```js
 /** Map relative paths to URLs. */
 const map: any = {
-  'firebase': 'vendor/firebase/lib/firebase-web.js',
+  'firebase': 'vendor/firebase',
   'angularfire2': 'vendor/angularfire2'
 };
 
@@ -84,6 +84,10 @@ const packages: any = {
   angularfire2: {
     defaultExtension: 'js',
     main: 'angularfire2.js'
+  },
+  firebase: {
+    defaultExtension: 'js',
+    main: 'firebase.js'
   }
 };
 ```
