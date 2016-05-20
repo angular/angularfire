@@ -3,6 +3,8 @@
   <p align="center">The official library for Firebase and Angular 2</p>
 </p>
 
+### AngularFire2 is currently not on new Firebase 3.0 SDK, but there is an update in progress.
+
 [![Build Status](https://travis-ci.org/angular/angularfire2.svg?branch=master)](https://travis-ci.org/angular/angularfire2) [![Join the chat at https://gitter.im/angular/angularfire2](https://badges.gitter.im/angular/angularfire2.svg)](https://gitter.im/angular/angularfire2?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Status: Beta
