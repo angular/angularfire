@@ -11,7 +11,7 @@ The guide below demonstrates how to retrieve, save, and remove data as lists.
 AngularFire is an injectable service, which is injected through the constructor of your Angular component or `@Injectable()` service.
 
 ```ts
-import {Component} from 'angular2/core';
+import {Component} from '@angular/core';
 import {AngularFire} from 'angularfire2';
 
 @Component({
@@ -55,14 +55,14 @@ To get the list in realtime, create a list binding as a property of your compone
 Then in your template, you can use the `async` pipe to unwrap the binding.
 
 ```ts
-import {Component} from 'angular2/core';
+import {Component} from '@angular/core';
 import {AngularFire, FirebaseListObservable} from 'angularfire2';
 
 @Component({
   selector: 'app',
   templateUrl: `
   <ul>
-    <li *ngFor="var item in items | async">
+    <li *ngFor="let item in items | async">
       {{ item.name }}
     </li>
   </ul>
@@ -100,7 +100,7 @@ from security rules denials, or for debugging.
 const promise = af.database.list('/items').remove();
 promise
   .then(_ => console.log('success'))
-  .catch(err => console.log(err, 'You dont have access!'));
+  .catch(err => console.log(err, 'You do not have access!'));
 ```
 
 ### Adding new items
