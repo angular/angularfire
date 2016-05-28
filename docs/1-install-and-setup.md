@@ -53,8 +53,8 @@ module.exports = function(defaults) {
       '@angular/**/*.js',
       // above are the existing entries
       // below are the AngularFire entries
-      'angularfire2/**/*.js',
-      'firebase/lib/*.js'      
+      'angularfire2/**/*.+(js|js.map)',
+      'firebase/lib/*.+(js|js.map)'      
     ]
   });
 };
@@ -126,7 +126,7 @@ import { AngularFire, FirebaseListObservable } from 'angularfire2';
 })
 export class <MyApp>Component {
   constructor(af: AngularFire) {
-    
+
   }
 }
 
