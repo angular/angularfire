@@ -45,7 +45,7 @@ export class FirebaseSdkAuthBackend extends AuthBackend {
 
   authWithCustomToken(token: string, options?: any): Promise<FirebaseAuthState> {
     let p = new Promise((res, rej) => {
-      this._fbRef.authWithCustomToken(token, this._handleFirebaseCb(res, rej, options), options);
+      this._fbRef.authWithCustomToken(token, this._handleFirebaseAuthCb(res, rej, options), options);
     });
 
     return p;
@@ -53,7 +53,7 @@ export class FirebaseSdkAuthBackend extends AuthBackend {
 
   authAnonymously(options?: any): Promise<FirebaseAuthState> {
     let p = new Promise((res, rej) => {
-      this._fbRef.authAnonymously(this._handleFirebaseCb(res, rej, options), options);
+      this._fbRef.authAnonymously(this._handleFirebaseAuthCb(res, rej, options), options);
     });
 
     return p;
@@ -62,7 +62,7 @@ export class FirebaseSdkAuthBackend extends AuthBackend {
   authWithPassword(credentials: FirebaseCredentials, options?: any)
     : Promise<FirebaseAuthState> {
     let p = new Promise((res, rej) => {
-      this._fbRef.authWithPassword(credentials, this._handleFirebaseCb(res, rej, options), options);
+      this._fbRef.authWithPassword(credentials, this._handleFirebaseAuthCb(res, rej, options), options);
     });
 
     return p;
@@ -71,7 +71,7 @@ export class FirebaseSdkAuthBackend extends AuthBackend {
   authWithOAuthPopup(provider: AuthProviders, options?: any): Promise<FirebaseAuthState> {
     let p = new Promise((res, rej) => {
       this._fbRef.authWithOAuthPopup(this._providerToString(provider),
-        this._handleFirebaseCb(res, rej, options), options);
+        this._handleFirebaseAuthCb(res, rej, options), options);
     });
 
     return p;
@@ -85,7 +85,7 @@ export class FirebaseSdkAuthBackend extends AuthBackend {
   authWithOAuthRedirect(provider: AuthProviders, options?: any): Promise<FirebaseAuthState> {
     let p = new Promise((res, rej) => {
       this._fbRef.authWithOAuthRedirect(this._providerToString(provider),
-        this._handleFirebaseCb(res, rej, options), options);
+        this._handleFirebaseAuthCb(res, rej, options), options);
     });
 
     return p;
@@ -98,13 +98,45 @@ export class FirebaseSdkAuthBackend extends AuthBackend {
         ? (<OAuth2Credentials>credentialsObj).token
         : credentialsObj;
       this._fbRef.authWithOAuthToken(this._providerToString(provider), credentials,
-        this._handleFirebaseCb(res, rej, options), options);
+        this._handleFirebaseAuthCb(res, rej, options), options);
     });
 
     return p;
   }
 
-  private _handleFirebaseCb(res: Function, rej: Function, options: any): (err: any, auth?: FirebaseAuthData) => void {
+  resetPassword(credentials: FirebaseResetPasswordCredentials): Promise<void> {
+    const p = new Promise<void>((res, rej) => {
+      this._fbRef.resetPassword(credentials, this._handleFirebaseCb(res, rej));
+    });
+    return p;
+  }
+
+  changePassword(credentials: FirebaseChangePasswordCredentials): Promise<void> {
+    const p = new Promise<void>((res, rej) => {
+      this._fbRef.changePassword(credentials, this._handleFirebaseCb(res, rej));
+    });
+    return p;
+  }
+
+  changeEmail(credentials: FirebaseChangeEmailCredentials): Promise<void> {
+    const p = new Promise<void>((res, rej) => {
+      this._fbRef.changeEmail(credentials, this._handleFirebaseCb(res, rej));
+    });
+    return p;
+  }
+
+  private _handleFirebaseCb(res: Function, rej: Function): (err: any) => void {
+    return function (err) {
+      if (err) {
+        return rej(err);
+      } else {
+        const args = Array.prototype.slice.call(arguments, 1);
+        return res.apply(null, args);
+      }
+    };
+  }
+
+  private _handleFirebaseAuthCb(res: Function, rej: Function, options: any): (err: any, auth?: FirebaseAuthData) => void {
     return (err, auth?) => {
       if (err) {
         return rej(err);

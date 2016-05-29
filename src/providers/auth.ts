@@ -104,6 +104,18 @@ export class FirebaseAuth extends ReplaySubject<FirebaseAuthState> {
     return this._authBackend.createUser(credentials);
   }
 
+  public resetPassword(credentials: FirebaseResetPasswordCredentials): Promise<void> {
+    return this._authBackend.resetPassword(credentials);
+  }
+
+  public changePassword(credentials: FirebaseChangePasswordCredentials): Promise<void> {
+    return this._authBackend.changePassword(credentials);
+  }
+
+  public changeEmail(credentials: FirebaseChangeEmailCredentials): Promise<void> {
+    return this._authBackend.changeEmail(credentials);
+  }
+
   /**
    * Merges the config object that is passed in with the configuration
    * provided through DI. Giving precendence to the one that was passed.

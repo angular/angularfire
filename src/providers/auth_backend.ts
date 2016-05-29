@@ -10,6 +10,9 @@ export abstract class AuthBackend {
   abstract getAuth(): FirebaseAuthData;
   abstract unauth(): void;
   abstract createUser(credentials: FirebaseCredentials): Promise<FirebaseAuthData>;
+  abstract resetPassword(credentials: FirebaseResetPasswordCredentials): Promise<void>;
+  abstract changePassword(credentials: FirebaseChangePasswordCredentials): Promise<void>;
+  abstract changeEmail(credentials: FirebaseChangeEmailCredentials): Promise<void>;
 }
 
 // Firebase only provides typings for google
