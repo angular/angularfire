@@ -59,7 +59,7 @@ import {AngularFire, FirebaseObjectObservable} from 'angularfire2';
 @Component({
   selector: 'app',
   template: `
-  <h1>{{ item.name | async }}</h1>
+  <h1>{{ (item | async)?.name }}</h1>
   `,
 })
 export class AppComponent {
