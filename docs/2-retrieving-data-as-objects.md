@@ -63,7 +63,7 @@ import {AngularFire, FirebaseObjectObservable} from 'angularfire2';
   `,
 })
 export class AppComponent {
-  item: Observable<any>;
+  item: FirebaseObjectObservable<any>;
   constructor(af: AngularFire) {
     this.item = af.database.object('/item');
   }

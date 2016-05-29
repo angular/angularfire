@@ -112,7 +112,7 @@ bootstrap(<MyApp>, [
 
 ### 8. Inject AngularFire
 
-Open `/src/app/<project-name>.component.ts`:
+Open `/src/app/<my-app>.component.ts`:
 
 ```ts
 import { Component } from '@angular/core';
@@ -134,7 +134,7 @@ export class <MyApp>Component {
 
 ### 9. Bind to a list
 
-In `/src/app/project-name.component.ts`:
+In `/src/app/<my-app>.component.ts`:
 
 ```ts
 import { Component } from '@angular/core';
@@ -146,7 +146,7 @@ import { AngularFire, FirebaseListObservable } from 'angularfire2';
   templateUrl: '<my-app>.component.html',
   styleUrls: ['<my-app>.component.css']
 })
-export class RcTestAppComponent {
+export class <MyApp>Component {
   items: FirebaseListObservable<any[]>;
   constructor(af: AngularFire) {
     this.items = af.database.list('/items');
@@ -165,7 +165,19 @@ Open `/src/app/<my-app>.component.html`:
 ```
 
 The `async` pipe unwraps the each item in the people
-observable as they arrive.
+observable as they arrive. Also the array that is received through the `items` observable contains objects that have a `$value` property. A structure like this:
+```
+[
+  {
+    $value: 'something',
+    (...)
+  },
+  {
+    $value: 'something else',
+    (...)
+  },
+]
+```
 
 ### 10. Serve
 
