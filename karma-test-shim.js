@@ -33,7 +33,7 @@ System.config(
   map: {
     'rxjs': 'node_modules/rxjs',
     '@angular': 'node_modules/@angular',
-    firebase: 'node_modules/firebase/lib/firebase-web.js',
+    firebase: 'node_modules/firebase/firebase.js',
     'app': 'dist'
   },
   packages: {
