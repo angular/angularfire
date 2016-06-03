@@ -38,21 +38,32 @@ function getAbsUrl (root:string, url:string) {
 }
 
 export const COMMON_PROVIDERS: any[] = [
-  provide(FirebaseRef, {
-    useFactory: (url:string) => new Firebase(url),
-    deps: [FirebaseUrl]}),
+  {
+    provide: FirebaseRef,
+    useFactory: _getFirebase,
+    deps: [FirebaseUrl]
+  },
   FirebaseAuth,
   AngularFire,
   FirebaseDatabase
 ];
 
+function _getFirebase(url:string): Firebase {
+  return new Firebase(url);
+}
+
 export const FIREBASE_PROVIDERS:any[] = [
   COMMON_PROVIDERS,
-  provide(AuthBackend, {
-    useFactory: (ref: Firebase) => new FirebaseSdkAuthBackend(ref, false),
+  {
+    provide: AuthBackend,
+    useFactory: _getAuthBackend,
     deps: [FirebaseRef]
-  })
+  }
 ];
+
+function _getAuthBackend(ref: Firebase): FirebaseSdkAuthBackend {
+  return new FirebaseSdkAuthBackend(ref, false);
+}
 
 /**
  * Used to define the default Firebase root location to be
