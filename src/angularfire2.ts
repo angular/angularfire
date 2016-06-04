@@ -31,31 +31,36 @@ export class AngularFire {
 }
 
 export const COMMON_PROVIDERS: any[] = [
-  provide(FirebaseApp, {
-    useFactory: (config: FirebaseAppConfig) => {
-      return initializeApp(config);
-    },
-    deps: [FirebaseConfig]}),
   // TODO: Deprecate
   provide(FirebaseAuth, {
     useExisting: AngularFireAuth
   }),
+  {
+    provide: FirebaseApp,
+    useFactory: _getFirebase,
+    deps: [FirebaseConfig]
+  },
   AngularFireAuth,
   AngularFire,
-  FirebaseDatabase,
+  FirebaseDatabase
 ];
 
-function _getFirebase(url:string): Firebase {
-  return new Firebase(url);
+function _getFirebase(config: FirebaseAppConfig): firebase.app.App {
+  return initializeApp(config);
 }
 
 export const FIREBASE_PROVIDERS:any[] = [
   COMMON_PROVIDERS,
-  provide(AuthBackend, {
-    useFactory: (app: firebase.app.App) => new FirebaseSdkAuthBackend(app, false),
+  {
+    provide: AuthBackend,
+    useFactory: _getAuthBackend,
     deps: [FirebaseApp]
-  })
+  }
 ];
+
+function _getAuthBackend(app: firebase.app.App): FirebaseSdkAuthBackend {
+  return new FirebaseSdkAuthBackend(app, false);
+}
 
 /**
  * Used to define the default Firebase root location to be
