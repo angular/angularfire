@@ -27,7 +27,10 @@ Now that you have a new project setup, install AngularFire 2 and Firebase from n
 npm install typings -g
 typings install --save --ambient firebase
 ```
-
+ 
+ If you are getting an error `typings ERR! message Unable to find "firebase" ("npm") in the registry` it probably means that you are running typings 1.0+, which introduced some breaking changes.  
+ Please run `typings install dt~firebase --global --save` instead.
+ 
 AngularFire 2 is written in Typescript and depends on typings for the Firebase SDK. To get a clean build, install typings and download the Firebase typings.
 
 ### 4. Include AngularFire 2 and Firebase in the vendor files
