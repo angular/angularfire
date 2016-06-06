@@ -36,7 +36,7 @@ describe('FirebaseObservable', () => {
       
       expect(() => {
         O.push('foo');
-      }).toThrowError('No ref specified for this Observable!')
+      }).toThrowError('No ref specified for this Observable!');
     });
 
     it('should resolve returned thenable when successful', (done:any) => {
@@ -124,7 +124,7 @@ describe('FirebaseObservable', () => {
     it('should throw an exception if input is not supported', () => {
       var input = (<any>{lol:true});
       expect(() => O.remove(input)).toThrowError(`FirebaseListObservable.remove requires a key, snapshot, reference, or unwrapped snapshot. Got: ${typeof input}`);
-    })
+    });
   });
   
   describe('update', () => {
@@ -154,7 +154,7 @@ describe('FirebaseObservable', () => {
     
     it('should update the item from the Firebase db when given the reference', (done:any) => {
       var childChangedSpy = jasmine.createSpy('childChanged');
-      const orphanChange = { changed: true }
+      const orphanChange = { changed: true };
       ref.on('child_changed', childChangedSpy);
       O.update(child.ref(), orphanChange)
         .then(() => (<any>ref).once('value'))
@@ -171,7 +171,7 @@ describe('FirebaseObservable', () => {
 
     it('should update the item from the Firebase db when given the snapshot', (done:any) => {
       var childChangedSpy = jasmine.createSpy('childChanged');
-      const orphanChange = { changed: true }
+      const orphanChange = { changed: true };
       ref.on('child_changed', childChangedSpy);
       O.update(child, orphanChange)
         .then(() => (<any>ref).once('value'))
@@ -187,7 +187,7 @@ describe('FirebaseObservable', () => {
     });
 
     it('should update the item from the Firebase db when given the unwrapped snapshot', (done:any) => {
-      const orphanChange = { changed: true }
+      const orphanChange = { changed: true };
       ref.on('child_added', (data:FirebaseDataSnapshot) => {
         expect(data.val()).toEqual(orphan);
         O.update(unwrapMapFn(data), orphanChange)

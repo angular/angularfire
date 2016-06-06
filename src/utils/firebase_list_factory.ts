@@ -8,20 +8,20 @@ import 'rxjs/add/operator/map';
 
 export function FirebaseListFactory (absoluteUrlOrDbRef:string | Firebase | FirebaseQuery, {preserveSnapshot, query = {}}:FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
   let ref: Firebase | FirebaseQuery;
-  
+
   utils.checkForUrlOrFirebaseRef(absoluteUrlOrDbRef, {
     isUrl: () => ref = new Firebase(<string>absoluteUrlOrDbRef),
     isRef: () => ref = <Firebase>absoluteUrlOrDbRef,
     isQuery: () => ref = <FirebaseQuery>absoluteUrlOrDbRef,
   });
-  
+
   // if it's just a reference or string, create a regular list observable
-  if ((utils.isFirebaseRef(absoluteUrlOrDbRef) || 
-       utils.isString(absoluteUrlOrDbRef)) && 
+  if ((utils.isFirebaseRef(absoluteUrlOrDbRef) ||
+       utils.isString(absoluteUrlOrDbRef)) &&
        utils.isEmptyObject(query)) {
     return firebaseListObservable(ref, { preserveSnapshot });
   }
-  
+
   const queryObs = observeQuery(query);
   const listObs = <FirebaseListObservable<{}>>queryObs
     .map(query => {
@@ -39,49 +39,49 @@ export function FirebaseListFactory (absoluteUrlOrDbRef:string | Firebase | Fire
       } else if (query.orderByValue) {
         queried = queried.orderByValue();
       }
-      
+
       // check equalTo
       if (utils.isPresent(query.equalTo)) {
           queried = queried.equalTo(query.equalTo);
-          
+
         if (utils.isPresent(query.startAt) || query.endAt) {
           throw new Error('Query Error: Cannot use startAt or endAt with equalTo.');
-        }          
-        
+        }
+
         // apply limitTos
         if (utils.isPresent(query.limitToFirst)) {
           queried = queried.limitToFirst(query.limitToFirst);
         }
-        
+
         if (utils.isPresent(query.limitToLast)) {
           queried = queried.limitToLast(query.limitToLast);
         }
-        
+
         return queried;
       }
-      
+
       // check startAt
       if (utils.isPresent(query.startAt)) {
           queried = queried.startAt(query.startAt);
       }
-      
+
       if (utils.isPresent(query.endAt)) {
           queried = queried.endAt(query.endAt);
       }
-      
+
       if (utils.isPresent(query.limitToFirst) && query.limitToLast) {
         throw new Error('Query Error: Cannot use limitToFirst with limitToLast.');
       }
-      
+
       // apply limitTos
       if (utils.isPresent(query.limitToFirst)) {
           queried = queried.limitToFirst(query.limitToFirst);
       }
-      
+
       if (utils.isPresent(query.limitToLast)) {
           queried = queried.limitToLast(query.limitToLast);
       }
-      
+
       return queried;
     })
     .mergeMap((queryRef: Firebase, ix: number) => {
@@ -91,7 +91,7 @@ export function FirebaseListFactory (absoluteUrlOrDbRef:string | Firebase | Fire
 }
 
 function firebaseListObservable(ref: Firebase | FirebaseQuery, {preserveSnapshot}: FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
-  
+
   const listObs = new FirebaseListObservable(ref, (obs: Observer<any[]>) => {
     let arr: any[] = [];
     let hasInitialLoad = false;
@@ -118,7 +118,7 @@ function firebaseListObservable(ref: Firebase | FirebaseQuery, {preserveSnapshot
     });
 
     ref.on('child_removed', (child: any) => {
-      arr = onChildRemoved(arr, child)
+      arr = onChildRemoved(arr, child);
       if (hasInitialLoad) {
         obs.next(preserveSnapshot ? arr : arr.map(utils.unwrapMapFn));
       }
@@ -127,7 +127,7 @@ function firebaseListObservable(ref: Firebase | FirebaseQuery, {preserveSnapshot
     });
 
     ref.on('child_changed', (child: any, prevKey: string) => {
-      arr = onChildChanged(arr, child, prevKey)
+      arr = onChildChanged(arr, child, prevKey);
       if (hasInitialLoad) {
         // This also manages when the only change is prevKey change
         obs.next(preserveSnapshot ? arr : arr.map(utils.unwrapMapFn));

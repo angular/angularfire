@@ -130,7 +130,7 @@ export function observeQuery(query: Query): Observable<ScalarQuery> {
 export function getOrderObservables(query: Query): Observable<OrderBySelection> | Observable<OrderBySelection | Observable<OrderBySelection>> {
   var observables = ['orderByChild', 'orderByKey', 'orderByValue', 'orderByPriority']
     .map((key: string, option: OrderByOptions) => {
-      return ({ key, option })
+      return ({ key, option });
     })
     .filter(({key, option}: { key: string, option: OrderByOptions }) => {
       return isPresent(query[key]);
@@ -144,7 +144,7 @@ export function getOrderObservables(query: Query): Observable<OrderBySelection> 
   } else {
     return new Observable<OrderBySelection>(subscriber => {
       subscriber.next(null);
-    });    
+    });
   }
 }
 
@@ -157,8 +157,7 @@ export function getLimitToObservables(query: Query): Observable<LimitToSelection
   if (observables.length === 1) {
     return observables[0];
   } else if (observables.length > 1) {
-    const mergedObs = observables[0].merge(observables.slice(1));
-    return mergedObs;
+    return observables[0].merge(observables.slice(1));
   } else {
     return new Observable<LimitToSelection>(subscriber => {
       subscriber.next(null);
@@ -235,8 +234,7 @@ function mapToLimitToSelection(value: Observable<number> | number, key: LimitToO
 }
 
 function hasObservableProperties(query: Query): boolean {
-  if (query.orderByKey instanceof Observable) return true;
-  return false;
+  return query.orderByKey instanceof Observable;
 }
 
 function isPresent(val: any): boolean {

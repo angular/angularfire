@@ -68,7 +68,7 @@ export class FirebaseListObservable<T> extends Observable<T> {
       return cases.snapshotCase();
     } else if (utils.isAFUnwrappedSnapshot(item)) {
       // Unwrapped snapshot
-      return cases.unwrappedSnapshotCase()
+      return cases.unwrappedSnapshotCase();
     }
     throw new Error(`FirebaseListObservable.remove requires a key, snapshot, reference, or unwrapped snapshot. Got: ${typeof item}`);
   }
