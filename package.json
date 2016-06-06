@@ -12,7 +12,9 @@
     "postbuild_npm": "cp package.json README.md .npmignore dist/ && npm run rewrite_npm_package",
     "postinstall": "typings install",
     "rewrite_npm_package": "node --harmony_destructuring tools/rewrite-published-package.js",
-    "build_bundle": "cp -r src angularfire2 && tsc typings/main.d.ts angularfire2.ts --rootDir . --module system -t es5 --outFile dist/bundles/angularfire2.js  --moduleResolution node --emitDecoratorMetadata --experimentalDecorators"
+    "build_bundle": "cp -r src angularfire2 && tsc typings/main.d.ts angularfire2.ts --rootDir . --module system -t es5 --outFile dist/bundles/angularfire2.js  --moduleResolution node --emitDecoratorMetadata --experimentalDecorators",
+    "lint": "tslint \"src/**/*.ts\"",
+    "format": "clang-format -style=file -i --glob=src/**/*.ts"
   },
   "keywords": [
     "angular2",
@@ -65,7 +67,10 @@
     "typedoc": "github:jeffbcross/typedoc",
     "typescript": "1.8.9",
     "typings": "^0.6.2",
-    "zone.js": "^0.6.6"
+    "zone.js": "^0.6.6",
+    "clang-format": "^1.0.35",
+    "tslint": "^3.6.0",
+    "codelyzer": "0.0.14"
   },
   "typings": "dist/angularfire2.d.ts"
 }
