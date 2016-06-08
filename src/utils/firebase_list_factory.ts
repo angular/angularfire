@@ -138,7 +138,12 @@ function firebaseListObservable(ref: Firebase | FirebaseQuery, {preserveSnapshot
     ref.on('child_removed', child_removed, err);
     ref.on('child_changed', child_changed, err);
 
-    return () => ref.off();
+    return () => {
+      ref.off('value', value);
+      ref.off('child_added', child_added);
+      ref.off('child_removed', child_removed);
+      ref.off('child_changed', child_changed);
+    }
   });
   return listObs;
 }
