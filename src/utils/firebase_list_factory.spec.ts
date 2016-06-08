@@ -7,7 +7,6 @@ import {
   onChildUpdated,
 } from './firebase_list_factory';
 import {FirebaseListObservable} from './firebase_list_observable';
-import {FirebaseObjectFactory} from './firebase_object_factory';
 import {
   beforeEach,
   it,
@@ -68,7 +67,7 @@ describe('FirebaseListFactory', () => {
   });
 
   describe('query', () => {
-    
+
     describe('orderByChild', () => {
       /*
         orderByChild combinations
@@ -79,7 +78,7 @@ describe('FirebaseListFactory', () => {
         orderByChild("").endAt();
       */
       it('equalTo - should re-run a query when the observable value has emitted', (done: any) => {
-        
+
         const subject = new Subject();
         const observable = FirebaseListFactory(rootFirebase, {
           query: {
@@ -87,12 +86,12 @@ describe('FirebaseListFactory', () => {
             equalTo: subject
           }
         });
-        
+
         queryTest(observable, subject, done);
       });
-                         
+
       it('startAt - should re-run a query when the observable value has emitted', (done: any) => {
-        
+
         const subject = new Subject();
         const observable = FirebaseListFactory(rootFirebase, {
           query: {
@@ -100,12 +99,12 @@ describe('FirebaseListFactory', () => {
             startAt: subject
           }
         });
-        
+
         queryTest(observable, subject, done);
-      });      
+      });
 
       it('endAt - should re-run a query when the observable value has emitted', (done: any) => {
-        
+
         const subject = new Subject();
         const observable = FirebaseListFactory(rootFirebase, {
           query: {
@@ -113,12 +112,12 @@ describe('FirebaseListFactory', () => {
             endAt: subject
           }
         });
-        
+
         queryTest(observable, subject, done);
-      });  
-      
+      });
+
       it('should throw an error if limitToLast and limitToFirst are chained', () => {
-        
+
         const observable = FirebaseListFactory(rootFirebase, {
           query: {
             orderByChild: 'height',
@@ -128,9 +127,9 @@ describe('FirebaseListFactory', () => {
         });
         expect(observable.subscribe).toThrowError();
       });
-      
+
       it('should throw an error if startAt is used with equalTo', () => {
-        
+
         const observable = FirebaseListFactory(rootFirebase, {
           query: {
             orderByChild: 'height',
@@ -140,9 +139,9 @@ describe('FirebaseListFactory', () => {
         });
         expect(observable.subscribe).toThrowError();
       });
-      
+
       it('should throw an error if endAt is used with equalTo', () => {
-        
+
         const observable = FirebaseListFactory(rootFirebase, {
           query: {
             orderByChild: 'height',
@@ -152,9 +151,9 @@ describe('FirebaseListFactory', () => {
         });
         expect(observable.subscribe).toThrowError();
       });
-      
+
       it('should throw an error if startAt and endAt is used with equalTo', () => {
-        
+
         const observable = FirebaseListFactory(rootFirebase, {
           query: {
             orderByChild: 'height',
@@ -164,10 +163,10 @@ describe('FirebaseListFactory', () => {
           }
         });
         expect(observable.subscribe).toThrowError();
-      });                  
-      
+      });
+
     });
-    
+
     describe('orderByValue', () => {
       /*
         orderByValue combinations
@@ -178,7 +177,7 @@ describe('FirebaseListFactory', () => {
         orderByValue("").endAt();
       */
       it('equalTo - should re-run a query when the observable value has emitted', (done: any) => {
-        
+
         const subject = new Subject();
         const observable = FirebaseListFactory(rootFirebase, {
           query: {
@@ -186,12 +185,12 @@ describe('FirebaseListFactory', () => {
             equalTo: subject
           }
         });
-        
+
         queryTest(observable, subject, done);
       });
-                         
+
       it('startAt - should re-run a query when the observable value has emitted', (done: any) => {
-        
+
         const subject = new Subject();
         const observable = FirebaseListFactory(rootFirebase, {
           query: {
@@ -199,12 +198,12 @@ describe('FirebaseListFactory', () => {
             startAt: subject
           }
         });
-        
+
         queryTest(observable, subject, done);
-      });      
+      });
 
       it('endAt - should re-run a query when the observable value has emitted', (done: any) => {
-        
+
         const subject = new Subject();
         const observable = FirebaseListFactory(rootFirebase, {
           query: {
@@ -212,12 +211,12 @@ describe('FirebaseListFactory', () => {
             endAt: subject
           }
         });
-        
+
         queryTest(observable, subject, done);
-      });  
-      
+      });
+
     });
-    
+
     describe('orderByKey', () => {
       /*
         orderByKey combinations
@@ -228,7 +227,7 @@ describe('FirebaseListFactory', () => {
         orderByKey("").endAt();
       */
       it('equalTo - should re-run a query when the observable value has emitted', (done: any) => {
-        
+
         const subject = new Subject();
         const observable = FirebaseListFactory(rootFirebase, {
           query: {
@@ -236,12 +235,12 @@ describe('FirebaseListFactory', () => {
             equalTo: subject
           }
         });
-        
+
         queryTest(observable, subject, done);
       });
-                         
+
       it('startAt - should re-run a query when the observable value has emitted', (done: any) => {
-        
+
         const subject = new Subject();
         const observable = FirebaseListFactory(rootFirebase, {
           query: {
@@ -249,12 +248,12 @@ describe('FirebaseListFactory', () => {
             startAt: subject
           }
         });
-        
+
         queryTest(observable, subject, done);
-      });      
+      });
 
       it('endAt - should re-run a query when the observable value has emitted', (done: any) => {
-        
+
         const subject = new Subject();
         const observable = FirebaseListFactory(rootFirebase, {
           query: {
@@ -262,11 +261,11 @@ describe('FirebaseListFactory', () => {
             endAt: subject
           }
         });
-        
+
         queryTest(observable, subject, done);
-      });             
+      });
     });
-    
+
     describe('orderByPriority', () => {
       /*
         orderByPriority combinations
@@ -277,7 +276,7 @@ describe('FirebaseListFactory', () => {
         orderByPriority("").endAt();
       */
       it('equalTo - should re-run a query when the observable value has emitted', (done: any) => {
-        
+
         const subject = new Subject();
         const observable = FirebaseListFactory(rootFirebase, {
           query: {
@@ -285,12 +284,12 @@ describe('FirebaseListFactory', () => {
             equalTo: subject
           }
         });
-        
+
         queryTest(observable, subject, done);
       });
-                         
+
       it('startAt - should re-run a query when the observable value has emitted', (done: any) => {
-        
+
         const subject = new Subject();
         const observable = FirebaseListFactory(rootFirebase, {
           query: {
@@ -298,12 +297,12 @@ describe('FirebaseListFactory', () => {
             startAt: subject
           }
         });
-        
+
         queryTest(observable, subject, done);
-      });      
+      });
 
       it('endAt - should re-run a query when the observable value has emitted', (done: any) => {
-        
+
         const subject = new Subject();
         const observable = FirebaseListFactory(rootFirebase, {
           query: {
@@ -311,11 +310,11 @@ describe('FirebaseListFactory', () => {
             endAt: subject
           }
         });
-        
+
         queryTest(observable, subject, done);
-      });             
-    });    
-    
+      });
+    });
+
   });
 
   describe('methods', () => {
@@ -340,7 +339,7 @@ describe('FirebaseListFactory', () => {
 
 
     it('should emit only when the initial data set has been loaded', (done: any) => {
-      
+
       (<any>questions)._ref.set([{ initial1: true }, { initial2: true }, { initial3: true }, { initial4: true }])
         .then(() => questions.take(1).toPromise())
         .then((val: any[]) => {

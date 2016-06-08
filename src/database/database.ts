@@ -4,7 +4,7 @@ import {FirebaseListObservable} from '../utils/firebase_list_observable';
 import {FirebaseObjectObservable} from '../utils/firebase_object_observable';
 import {FirebaseListFactory, FirebaseListFactoryOpts} from '../utils/firebase_list_factory';
 import {FirebaseObjectFactoryOpts, FirebaseObjectFactory} from '../utils/firebase_object_factory';
-import * as utils from '../utils/utils'
+import * as utils from '../utils/utils';
 
 @Injectable()
 export class FirebaseDatabase {

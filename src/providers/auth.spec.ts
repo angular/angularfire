@@ -1,7 +1,7 @@
 /// <reference path="../../manual_typings/manual_typings.d.ts" />
 
 import {expect, describe, it, iit, beforeEach} from '@angular/core/testing';
-import {ReflectiveInjector, provide, Provider} from '@angular/core';
+import {ReflectiveInjector} from '@angular/core';
 import {Observable} from 'rxjs/Observable'
 import {
   FIREBASE_PROVIDERS,
@@ -16,7 +16,6 @@ import {
 import {AuthBackend} from './auth_backend';
 import {FirebaseSdkAuthBackend} from './firebase_sdk_auth_backend';
 import * as Firebase from 'firebase';
-import * as mockPromises from 'mock-promises';
 
 describe('FirebaseAuth', () => {
   let injector: ReflectiveInjector = null;
@@ -31,11 +30,11 @@ describe('FirebaseAuth', () => {
     username: 'githubUsername',
     id: '12345',
     expires: 0
-  }
+  };
 
   const authObj = {
     token: 'key'
-  }
+  };
 
   const authState = {
     provider: 'github',
@@ -51,15 +50,13 @@ describe('FirebaseAuth', () => {
     github: providerMetadata,
     auth: authObj,
     expires: 0
-  }
+  };
 
   beforeEach(() => {
     authData = null;
     authCb = null;
     injector = ReflectiveInjector.resolveAndCreate([
-      provide(FirebaseUrl, {
-        useValue: 'https://angularfire2-auth.firebaseio-demo.com/'
-      }),
+      {provide: FirebaseUrl, useValue: 'https://angularfire2-auth.firebaseio-demo.com/'},
       FIREBASE_PROVIDERS
     ]);
 
@@ -68,7 +65,7 @@ describe('FirebaseAuth', () => {
 
   it('should be an observable', () => {
     expect(injector.get(FirebaseAuth)).toBeAnInstanceOf(Observable);
-  })
+  });
 
   describe('AuthState', () => {
 
@@ -93,7 +90,7 @@ describe('FirebaseAuth', () => {
       updateAuthState(authState);
       let nextSpy = jasmine.createSpy('nextSpy');
       let auth = injector.get(FirebaseAuth);
-      
+
       auth.subscribe(nextSpy);
       expect(nextSpy).toHaveBeenCalledWith(AngularFireAuthState);
     });
@@ -151,10 +148,6 @@ describe('FirebaseAuth', () => {
           'createUser', 'changePassword', 'changeEmail', 'removeUser', 'resetPassword'
         ]);
       backend = new FirebaseSdkAuthBackend(ref);
-    });
-
-    it('should return a provider', () => {
-      expect(firebaseAuthConfig({ method: AuthMethods.Password })).toBeAnInstanceOf(Provider);
     });
 
     it('should use config in login', () => {

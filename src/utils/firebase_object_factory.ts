@@ -3,7 +3,7 @@ import {Observer} from 'rxjs/Observer';
 import 'rxjs/add/operator/mergeMap';
 import * as Firebase from 'firebase';
 import * as utils from './utils';
-import {Query, observeQuery} from './query_observable';
+import {Query} from './query_observable';
 
 export function FirebaseObjectFactory(absoluteUrlOrDbRef: string | Firebase, {preserveSnapshot, query}: FirebaseObjectFactoryOpts = {}): FirebaseObjectObservable<any> {
   let ref: Firebase;
@@ -12,10 +12,10 @@ export function FirebaseObjectFactory(absoluteUrlOrDbRef: string | Firebase, {pr
     isUrl: () => ref = new Firebase(<string>absoluteUrlOrDbRef),
     isRef: () => ref = <Firebase>absoluteUrlOrDbRef
   });
-  
+
   return new FirebaseObjectObservable((obs: Observer<any>) => {
     ref.on('value', (snapshot: FirebaseDataSnapshot) => {
-      obs.next(preserveSnapshot ? snapshot : utils.unwrapMapFn(snapshot))
+      obs.next(preserveSnapshot ? snapshot : utils.unwrapMapFn(snapshot));
     }, err => {
       if (err) { obs.error(err); obs.complete(); }
     });
@@ -26,5 +26,5 @@ export function FirebaseObjectFactory(absoluteUrlOrDbRef: string | Firebase, {pr
 
 export interface FirebaseObjectFactoryOpts {
   preserveSnapshot?: boolean;
-  query?: Query
+  query?: Query;
 }

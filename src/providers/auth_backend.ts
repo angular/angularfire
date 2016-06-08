@@ -30,7 +30,7 @@ export enum AuthProviders {
   Password,
   Anonymous,
   Custom
-};
+}
 
 export enum AuthMethods {
   Popup,
@@ -39,7 +39,7 @@ export enum AuthMethods {
   Password,
   OAuthToken,
   CustomToken
-};
+}
 
 
 export interface AuthConfiguration {

@@ -11,15 +11,13 @@ import {
 import {MessageBus} from 'angular2/src/web_workers/shared/message_bus';
 import {PRIMITIVE} from 'angular2/src/web_workers/shared/serializer';
 
-import {AUTH_CHANNEL, INITIAL_AUTH_CHANNEL} from '../shared/channels';
+import {AUTH_CHANNEL} from '../shared/channels';
 import {FirebaseRef} from '../../../tokens';
 import {
   AuthBackend,
   FirebaseAuthState,
   AuthProviders,
-  AuthMethods,
   authDataToAuthState,
-  OAuth2Credentials,
   OAuthCredentials
 } from '../../auth_backend';
 import {isPresent} from '../../../utils/utils';
@@ -58,7 +56,7 @@ export class WebWorkerFirebaseAuth extends AuthBackend {
   getAuth(): FirebaseAuthData {
     return this._fbRef.getAuth();
   }
-  
+
   createUser(creds: FirebaseCredentials): Promise<FirebaseAuthData> {
     return new Promise<FirebaseAuthData>((resolve, reject) => {
       this._fbRef.createUser(creds, (err, authData) => {
@@ -108,7 +106,7 @@ export class WebWorkerFirebaseAuth extends AuthBackend {
   authWithOAuthToken(provider: AuthProviders, credentialsObj: OAuthCredentials, options?: any)
   : Promise<FirebaseAuthState> {
     let args = new UiArguments('authWithOAuthToken',
-                               [new FnArg(provider, PRIMITIVE), 
+                               [new FnArg(provider, PRIMITIVE),
                                 new FnArg(credentialsObj, PRIMITIVE),
                                 new FnArg(options, PRIMITIVE)]);
     let uiAuthPromise = this._messageBroker.runOnService(args, PRIMITIVE);
@@ -135,7 +133,7 @@ export class WebWorkerFirebaseAuth extends AuthBackend {
       this._fbRef.authWithCustomToken(authData.token, (err, _) => {
         if (err)
           return rej (err);
-        else 
+        else
           return res(authDataToAuthState(authData));
       }, {remember: authData.remember});
     });

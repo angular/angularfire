@@ -1,14 +1,11 @@
-import {Provider, Inject, provide, Injectable, Optional} from '@angular/core';
+import {Inject, Injectable, Optional} from '@angular/core';
 import {ReplaySubject} from 'rxjs/ReplaySubject';
-import {FirebaseRef, FirebaseAuthConfig} from '../tokens';
+import {FirebaseAuthConfig} from '../tokens';
 import {isPresent} from '../utils/utils';
-import * as utils from '../utils/utils';
 import {
   AuthBackend,
-  AuthProviders,
   AuthMethods,
   OAuthCredentials,
-  OAuth1Credentials,
   OAuth2Credentials,
   AuthCredentials,
   FirebaseAuthState,
@@ -19,10 +16,8 @@ import {
 
 const kBufferSize = 1;
 
-export const firebaseAuthConfig = (config: AuthConfiguration): Provider => {
-  return provide(FirebaseAuthConfig, {
-    useValue: config
-  });
+export const firebaseAuthConfig = (config: AuthConfiguration): any => {
+  return {FirebaseAuthConfig, useValue: config};
 };
 
 @Injectable()

@@ -10,7 +10,7 @@ import {
   injectAsync,
   async
 } from '@angular/core/testing';
-import {ReflectiveInjector, provide, Provider} from '@angular/core';
+import {ReflectiveInjector} from '@angular/core';
 import {
   AngularFire,
   FirebaseObjectObservable,
@@ -31,11 +31,11 @@ import 'rxjs/add/operator/delay';
 const localServerUrl = 'https://angularfire2.firebaseio-demo.com/';
 
 describe('angularfire', () => {
-  var subscription:Subscription;
+  var subscription: Subscription;
   const questionsRef = new Firebase(localServerUrl).child('questions');
   const listOfQuestionsRef = new Firebase(localServerUrl).child('list-of-questions');
 
-  afterEach((done:any) => {
+  afterEach((done: any) => {
     // Clear out the Firebase to prevent leaks between tests
     (new Firebase(localServerUrl)).remove(done);
     if(subscription && !subscription.isUnsubscribed) {
@@ -56,8 +56,8 @@ describe('angularfire', () => {
       expect(af.auth).toBeAnInstanceOf(FirebaseAuth);
     }));
   });
-  
-  
+
+
   describe('.database', () => {
     beforeEachProviders(() => [FIREBASE_PROVIDERS, defaultFirebase(localServerUrl)]);
 
@@ -69,22 +69,14 @@ describe('angularfire', () => {
   describe('FIREBASE_REF', () => {
     it('should provide a FirebaseRef for the FIREBASE_REF binding', () => {
       var injector = ReflectiveInjector.resolveAndCreate([
-        provide(FirebaseUrl, {
-          useValue: localServerUrl
-        }),
+        {provide: FirebaseUrl, useValue: localServerUrl},
         FIREBASE_PROVIDERS
       ]);
       expect(typeof injector.get(FirebaseRef).on).toBe('function');
-    })
+    });
   });
 
   describe('defaultFirebase', () => {
-    it('should create a provider', () => {
-      const provider = defaultFirebase(localServerUrl);
-      expect(provider).toBeAnInstanceOf(Provider);
-    });
-
-
     it('should inject a FIR reference', () => {
       const injector = ReflectiveInjector.resolveAndCreate([defaultFirebase(localServerUrl), FIREBASE_PROVIDERS]);
       expect(injector.get(FirebaseRef).toString()).toBe(localServerUrl);

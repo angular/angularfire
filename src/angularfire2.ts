@@ -1,4 +1,4 @@
-import {APP_INITIALIZER, Inject, Injectable, OpaqueToken, provide, Provider} from '@angular/core';
+import {Inject, Injectable} from '@angular/core';
 import {FirebaseAuth, firebaseAuthConfig} from './providers/auth';
 import * as Firebase from 'firebase';
 import {FirebaseListObservable} from './utils/firebase_list_observable';
@@ -26,53 +26,33 @@ export class AngularFire {
     @Inject(FirebaseUrl) private fbUrl:string,
     public auth:FirebaseAuth,
     public database: FirebaseDatabase) {}
-
-}
-
-function getAbsUrl (root:string, url:string) {
-  if (!(/^[a-z]+:\/\/.*/.test(url))) {
-    // Provided url is relative.
-    url = root + url;
-  }
-  return url;
 }
 
 export const COMMON_PROVIDERS: any[] = [
-  {
-    provide: FirebaseRef,
-    useFactory: _getFirebase,
-    deps: [FirebaseUrl]
-  },
+  { provide: FirebaseRef, useFactory: firebaseFactory, deps: [FirebaseUrl] },
   FirebaseAuth,
   AngularFire,
   FirebaseDatabase
 ];
 
-function _getFirebase(url:string): Firebase {
+export function firebaseFactory(url: string): Firebase {
   return new Firebase(url);
 }
 
-export const FIREBASE_PROVIDERS:any[] = [
+export const FIREBASE_PROVIDERS: any[] = [
   COMMON_PROVIDERS,
-  {
-    provide: AuthBackend,
-    useFactory: _getAuthBackend,
-    deps: [FirebaseRef]
-  }
+  { provide: AuthBackend, useFactory: authBackendFactory, deps: [FirebaseRef] }
 ];
 
-function _getAuthBackend(ref: Firebase): FirebaseSdkAuthBackend {
+export function authBackendFactory(ref: Firebase): FirebaseSdkAuthBackend {
   return new FirebaseSdkAuthBackend(ref, false);
 }
 
 /**
- * Used to define the default Firebase root location to be
- * used throughout an application.
+ * Used to define the default Firebase root location to be used throughout an application.
  */
-export const defaultFirebase = (url: string): Provider => {
-  return provide(FirebaseUrl, {
-    useValue: url
-  });
+export const defaultFirebase = (url: string): any => {
+  return {provide: FirebaseUrl, useValue: url};
 };
 
 export {
@@ -93,5 +73,5 @@ export {FirebaseUrl, FirebaseRef, FirebaseAuthConfig} from './tokens';
 // Helps Angular-CLI automatically add providers
 export default {
   providers: FIREBASE_PROVIDERS
-}
+};
 
