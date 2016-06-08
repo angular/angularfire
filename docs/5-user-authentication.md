@@ -23,7 +23,7 @@ bootstrap(<MyApp>Component, [
 ]);
 ```
 
-**Example boostrap**
+**Example bootstrap**
 ```ts
 import { bootstrap } from '@angular/platform-browser-dynamic';
 import { enableProdMode } from '@angular/core';
