@@ -25,7 +25,7 @@ Now that you have a new project setup, install AngularFire 2 and Firebase from n
 
 ```bash
 npm install typings -g
-typings install --save --ambient firebase
+typings install dt~firebase --global --save
 ```
 
 AngularFire 2 is written in Typescript and depends on typings for the Firebase SDK. To get a clean build, install typings and download the Firebase typings.
