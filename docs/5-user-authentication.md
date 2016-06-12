@@ -124,7 +124,7 @@ import { AngularFire, AuthProviders, AuthMethods } from 'angularfire2';
   moduleId: module.id,
   selector: 'app',
   template: `
-  <div> {{ (af.auth | async).uid }} </div>
+  <div> {{ (af.auth | async)?.uid }} </div>
   <button (click)="login()">Login With Twitter</button>
   <button (click)="overrideLogin()">Login Anonymously</button>
   `,
