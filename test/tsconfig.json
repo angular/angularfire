@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "module": "commonjs",
+    "target": "es5",
+    "noImplicitAny": true,
+    "sourceMap": true,
+    "declaration": true,
+    "removeComments": true,
+    "baseUrl": ".",
+    "outDir": "../dist-test",
+    "paths": {
+      "angularfire2": [
+        "../dist/*",
+        "../dist/angularfire2.d.ts"
+      ],
+      "test/config": [
+        "./config.ts"
+      ]
+    }
+  }
+}
