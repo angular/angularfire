@@ -15,11 +15,12 @@ import {
   AngularFire,
   FirebaseObjectObservable,
   FIREBASE_PROVIDERS,
-  FirebaseAuth,
-  FirebaseUrl,
-  FirebaseRef,
+  AngularFireAuth,
+  FirebaseConfig,
+  FirebaseApp,
   defaultFirebase,
-  FirebaseDatabase
+  FirebaseDatabase,
+  FirebaseAppConfig
 } from './angularfire2';
 import {Subscription} from 'rxjs';
 import 'rxjs/add/operator/toPromise';
@@ -27,68 +28,70 @@ import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/delay';
 
-// Only use this URL for angularfire2.spec.ts
-const localServerUrl = 'https://angularfire2.firebaseio-demo.com/';
+export const firebaseConfig: FirebaseAppConfig  = {
+  apiKey: "AIzaSyBVSy3YpkVGiKXbbxeK0qBnu3-MNZ9UIjA",
+  authDomain: "angularfire2-test.firebaseapp.com",
+  databaseURL: "https://angularfire2-test.firebaseio.com",
+  storageBucket: "angularfire2-test.appspot.com",
+};
 
 describe('angularfire', () => {
   var subscription:Subscription;
-  const questionsRef = new Firebase(localServerUrl).child('questions');
-  const listOfQuestionsRef = new Firebase(localServerUrl).child('list-of-questions');
+  var app: firebase.app.App;
+  var rootRef: firebase.database.Reference;
+  var questionsRef: firebase.database.Reference;
+  var listOfQuestionsRef: firebase.database.Reference;
+  var angularFire2: AngularFire;
 
-  afterEach((done:any) => {
-    // Clear out the Firebase to prevent leaks between tests
-    (new Firebase(localServerUrl)).remove(done);
+  beforeEachProviders(() => [FIREBASE_PROVIDERS, defaultFirebase(firebaseConfig)]);
+
+  describe('things', () => {
+
+  })
+  beforeEach(inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
+    angularFire2 = _af;
+    app = firebaseApp;
+    rootRef = app.database().ref();
+    questionsRef = rootRef.child('questions');
+    listOfQuestionsRef = rootRef.child('list-of-questions');
+  }));
+
+  afterEach((done) => {
+    rootRef.remove()
     if(subscription && !subscription.isUnsubscribed) {
       subscription.unsubscribe();
     }
+    app.delete().then(done, done.fail);
   });
 
 
   it('should be injectable via FIREBASE_PROVIDERS', () => {
-    var injector = ReflectiveInjector.resolveAndCreate([FIREBASE_PROVIDERS, defaultFirebase(localServerUrl)]);
-    expect(injector.get(AngularFire)).toBeAnInstanceOf(AngularFire);
+    expect(angularFire2).toBeAnInstanceOf(AngularFire);
   });
 
   describe('.auth', () => {
-    beforeEachProviders(() => [FIREBASE_PROVIDERS, defaultFirebase(localServerUrl)]);
-
     it('should be an instance of AuthService', inject([AngularFire], (af:AngularFire) => {
-      expect(af.auth).toBeAnInstanceOf(FirebaseAuth);
+      expect(af.auth).toBeAnInstanceOf(AngularFireAuth);
     }));
   });
-  
-  
-  describe('.database', () => {
-    beforeEachProviders(() => [FIREBASE_PROVIDERS, defaultFirebase(localServerUrl)]);
 
-    it('should be an instance of AuthService', inject([AngularFire], (af:AngularFire) => {
+
+  describe('.database', () => {
+    it('should be an instance of Database', inject([AngularFire], (af:AngularFire) => {
       expect(af.database).toBeAnInstanceOf(FirebaseDatabase);
     }));
   });
 
-  describe('FIREBASE_REF', () => {
-    it('should provide a FirebaseRef for the FIREBASE_REF binding', () => {
-      var injector = ReflectiveInjector.resolveAndCreate([
-        provide(FirebaseUrl, {
-          useValue: localServerUrl
-        }),
-        FIREBASE_PROVIDERS
-      ]);
-      expect(typeof injector.get(FirebaseRef).on).toBe('function');
+  describe('FirebaseApp', () => {
+    it('should provide a FirebaseApp for the FirebaseApp binding', () => {
+      expect(typeof app.delete).toBe('function');
     })
   });
 
   describe('defaultFirebase', () => {
     it('should create a provider', () => {
-      const provider = defaultFirebase(localServerUrl);
+      const provider = defaultFirebase(firebaseConfig);
       expect(provider).toBeAnInstanceOf(Provider);
     });
-
-
-    it('should inject a FIR reference', () => {
-      const injector = ReflectiveInjector.resolveAndCreate([defaultFirebase(localServerUrl), FIREBASE_PROVIDERS]);
-      expect(injector.get(FirebaseRef).toString()).toBe(localServerUrl);
-    });
   });
-
 });
