@@ -1,16 +1,49 @@
 import {FirebaseObjectFactory} from '../utils/firebase_object_factory';
 import {FirebaseObjectObservable} from '../utils/firebase_object_observable';
-import {beforeEach, it, iit, describe, expect} from '@angular/core/testing';
+import {
+  beforeEach,
+  it,
+  iit,
+  ddescribe,
+  describe,
+  expect,
+  beforeEachProviders,
+  inject
+} from '@angular/core/testing';
+import {
+  FIREBASE_PROVIDERS,
+  defaultFirebase,
+  FirebaseApp,
+  FirebaseAppConfig,
+  AngularFire
+} from '../angularfire2';
 import {Subscription} from 'rxjs';
 
-const rootFirebase = 'https://angularfire2-object-factory.firebaseio-demo.com';
+export const firebaseConfig: FirebaseAppConfig = {
+  apiKey: "AIzaSyBVSy3YpkVGiKXbbxeK0qBnu3-MNZ9UIjA",
+  authDomain: "angularfire2-test.firebaseapp.com",
+  databaseURL: "https://angularfire2-test.firebaseio.com",
+  storageBucket: "angularfire2-test.appspot.com",
+};
+const rootFirebase = firebaseConfig.databaseURL;
 
 describe('FirebaseObjectFactory', () => {
   var i = 0;
-  var ref: Firebase;
+  var ref: firebase.database.Reference;
   var observable: FirebaseObjectObservable<any>;
   var subscription: Subscription;
   var nextSpy: jasmine.Spy;
+  var app: firebase.app.App;
+
+  beforeEachProviders(() => [FIREBASE_PROVIDERS, defaultFirebase(firebaseConfig)]);
+
+  beforeEach(inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
+    app = firebaseApp;
+  }));
+
+  afterEach(done => {
+    app.delete().then(done, done.fail);
+  });
 
   describe('constructor', () => {
 
@@ -20,7 +53,7 @@ describe('FirebaseObjectFactory', () => {
     });
 
     it('should accept a Firebase db ref in the constructor', () => {
-      const object = FirebaseObjectFactory(new Firebase(`${rootFirebase}/questions`));
+      const object = FirebaseObjectFactory(firebase.database().ref().child(`questions`));
       expect(object).toBeAnInstanceOf(FirebaseObjectObservable);
     });
 
@@ -30,7 +63,7 @@ describe('FirebaseObjectFactory', () => {
 
     beforeEach((done: any) => {
       i = Date.now();
-      ref = new Firebase(`${rootFirebase}/questions/${i}`);
+      ref = firebase.database().ref().child(`questions/${i}`);
       nextSpy = nextSpy = jasmine.createSpy('next');
       observable = FirebaseObjectFactory(`${rootFirebase}/questions/${i}`);
       ref.remove(done);
@@ -45,7 +78,7 @@ describe('FirebaseObjectFactory', () => {
 
     it('should emit a null value if no value is present when subscribed', (done: any) => {
       subscription = observable.subscribe(val => {
-        expect(val).toEqual({ $key: (<any>observable)._ref.key(), $value: null });
+        expect(val).toEqual({ $key: (<any>observable)._ref.key, $value: null });
         done();
       });
     });
@@ -55,21 +88,21 @@ describe('FirebaseObjectFactory', () => {
       ref.set({ unwrapped: 'bar' }, () => {
         subscription = observable.subscribe(val => {
           if (!val) return;
-          expect(val).toEqual({ $key: ref.key(), unwrapped: 'bar' });
+          expect(val).toEqual({ $key: ref.key, unwrapped: 'bar' });
           done();
         });
       });
     });
-    
+
    it('should emit unwrapped data with a $value property for primitive values', (done: any) => {
       ref.set('fiiiireeee', () => {
         subscription = observable.subscribe(val => {
           if (!val) return;
-          expect(val).toEqual({ $key: ref.key(), $value: 'fiiiireeee' });
+          expect(val).toEqual({ $key: ref.key, $value: 'fiiiireeee' });
           done();
         });
       });
-    });    
+    });
 
 
     it('should emit snapshots if preserveSnapshot option is true', (done: any) => {
@@ -86,8 +119,9 @@ describe('FirebaseObjectFactory', () => {
 
 
     it('should call off on all events when disposed', () => {
-      var firebaseSpy = spyOn(Firebase.prototype, 'off');
-      subscription = FirebaseObjectFactory(rootFirebase).subscribe();
+      const dbRef = firebase.database().ref();
+      var firebaseSpy = spyOn(dbRef, 'off');
+      subscription = FirebaseObjectFactory(dbRef).subscribe();
       expect(firebaseSpy).not.toHaveBeenCalled();
       subscription.unsubscribe();
       expect(firebaseSpy).toHaveBeenCalled();
