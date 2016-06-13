@@ -9,11 +9,11 @@ export function isString(value: any): boolean {
 }
 
 export function isFirebaseRef(value: any): boolean {
-  return value instanceof Firebase;
+  return typeof value.set === 'function';
 }
 
 export function isFirebaseDataSnapshot(value: any): boolean {
-  return typeof value.key === 'function';
+  return typeof value.exportVal === 'function';
 }
 
 export function isAFUnwrappedSnapshot(value: any): boolean {
@@ -35,18 +35,18 @@ export interface CheckUrlRef {
   isQuery?: () => any;
 }
 
-export function unwrapMapFn (snapshot:FirebaseDataSnapshot): AFUnwrappedDataSnapshot {
+export function unwrapMapFn (snapshot:firebase.database.DataSnapshot): AFUnwrappedDataSnapshot {
   var unwrapped = isPresent(snapshot.val()) ? snapshot.val() : { $value: null };
   if ((/string|number|boolean/).test(typeof unwrapped)) {
     unwrapped = {
       $value: unwrapped
     };
   }
-  unwrapped.$key = snapshot.key();
+  unwrapped.$key = snapshot.ref.key;
   return unwrapped;
 }
 
-export function checkForUrlOrFirebaseRef(urlOrRef: string | Firebase | FirebaseQuery, cases: CheckUrlRef): any {
+export function checkForUrlOrFirebaseRef(urlOrRef: string | firebase.database.Reference | firebase.database.Query, cases: CheckUrlRef): any {
   if (isString(urlOrRef)) {
     return cases.isUrl();
   }
@@ -56,5 +56,23 @@ export function checkForUrlOrFirebaseRef(urlOrRef: string | Firebase | FirebaseQ
   if (isFirebaseQuery(urlOrRef)) {
     return cases.isQuery();
   }
-  throw new Error('Provide a url or a Firebase database reference');  
+  throw new Error('Provide a url or a Firebase database reference');
+}
+
+export function stripTrailingSlash(value: string): string {
+  // Is the last char a /
+  if (value.substring(value.length - 1, value.length) === '/') {
+    return value.substring(0, value.length - 1);
+  } else {
+    return value;
+  }
+}
+
+export function stripLeadingSlash(value: string): string {
+  // Is the last char a /
+  if (value.substring(0, 1) === '/') {
+    return value.substring(1, value.length);
+  } else {
+    return value;
+  }
 }
