@@ -4,7 +4,9 @@
   },
   "devDependencies": {},
   "ambientDependencies": {
+    "angular-protractor": "github:DefinitelyTyped/DefinitelyTyped/angular-protractor/angular-protractor.d.ts#f9c44651705f574f6d4258fe5e1c335462bdcc19",
     "es6-shim": "github:DefinitelyTyped/DefinitelyTyped/es6-shim/es6-shim.d.ts#6697d6f7dadbf5773cb40ecda35a76027e0783b2",
-    "jasmine": "github:DefinitelyTyped/DefinitelyTyped/jasmine/jasmine.d.ts#64b25f63f0ec821040a5d3e049a976865062ed9d"
+    "jasmine": "github:DefinitelyTyped/DefinitelyTyped/jasmine/jasmine.d.ts#64b25f63f0ec821040a5d3e049a976865062ed9d",
+    "selenium-webdriver": "github:DefinitelyTyped/DefinitelyTyped/selenium-webdriver/selenium-webdriver.d.ts#7de6c3dd94feaeb21f20054b9f30d5dabc5efabd"
   }
 }

@@ -1,12 +1,8 @@
 node_modules/
 dist/
+dist-test/
 docs/api/
 typings/
 npm-debug.log
 .idea/
-test/e2e/firebase_list/firebase_list_example.js
-test/e2e/firebase_list/firebase_list_example.js.map
-test/e2e/firebase_list/firebase_list_example.d.ts
-test/e2e/firebase_object/firebase_object_example.js
-test/e2e/firebase_object/firebase_object_example.js.map
-test/e2e/firebase_object/firebase_object_example.d.ts
+.vscode/settings.json

@@ -1,7 +1,7 @@
 var httpServer = require('http-server');
 // An example configuration file.
 exports.config = {
-  baseUrl: 'http://localhost:8080/test/e2e/',
+  baseUrl: 'http://localhost:8080/dist-test/e2e/',
 
   directConnect: true,
   // seleniumAddress: 'http://localhost:4444/wd/hub',
@@ -16,7 +16,7 @@ exports.config = {
 
   // Spec patterns are relative to the current working directly when
   // protractor is called.
-  specs: ['test/e2e/**/*.spec.js'],
+  specs: ['dist-test/**/*.spec.js'],
   allScriptsTimeout: 110000,
 
   onPrepare: function() {
@@ -26,7 +26,6 @@ exports.config = {
     httpServer.createServer({
       showDir: false
     }).listen('8080', 'localhost');
-    require('./tools/test-server');
   },
   // Options to be passed to Jasmine.
   jasmineNodeOpts: {
