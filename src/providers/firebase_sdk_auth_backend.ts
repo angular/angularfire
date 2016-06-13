@@ -1,80 +1,82 @@
-import {Injectable, Inject} from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import { Observer } from 'rxjs/Observer';
 import {
+  authDataToAuthState,
   AuthBackend,
-  FirebaseAuthState,
   AuthProviders,
   AuthMethods,
-  authDataToAuthState,
-  OAuth2Credentials,
-  OAuthCredentials
+  FirebaseAuthState,
+  EmailPasswordCredentials
 } from './auth_backend';
-import {FirebaseRef} from '../tokens';
+import {FirebaseApp} from '../tokens';
 import {isPresent} from '../utils/utils';
-import * as Firebase from 'firebase';
+import { auth } from 'firebase';
+
+const {
+  FacebookAuthProvider,
+  GithubAuthProvider,
+  GoogleAuthProvider,
+  TwitterAuthProvider
+} = auth;
+
+import 'rxjs/add/operator/map';
+import 'rxjs/add/observable/fromPromise';
 
 @Injectable()
 export class FirebaseSdkAuthBackend extends AuthBackend {
-  constructor( @Inject(FirebaseRef) private _fbRef: Firebase,
+  _fbAuth: firebase.auth.Auth;
+  constructor( @Inject(FirebaseApp) _fbApp: firebase.app.App,
     private _webWorkerMode = false) {
     super();
+    this._fbAuth = _fbApp.auth();
   }
 
-  createUser(creds: FirebaseCredentials): Promise<FirebaseAuthData> {
-    return new Promise<FirebaseAuthData>((resolve, reject) => {
-      this._fbRef.createUser(creds, (err, authData) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(authData);
-        }
-      });
+  createUser(creds: EmailPasswordCredentials): Promise<FirebaseAuthState> {
+    return <Promise<FirebaseAuthState>>this._fbAuth.createUserWithEmailAndPassword(creds.email, creds.password)
+      .then((user: firebase.User) => authDataToAuthState(user));
+  }
+
+  getAuth(): FirebaseAuthState {
+    return authDataToAuthState(this._fbAuth.currentUser);
+  }
+
+  onAuth(): Observable<FirebaseAuthState> {
+    // TODO: assumes this will accept an RxJS observer
+    return Observable.create((observer: Observer<FirebaseAuthState>) => {
+      return this._fbAuth.onAuthStateChanged(observer);
+    })
+    .map((user: firebase.User) => {
+      if (!user) return null;
+      return authDataToAuthState(user);
     });
-  }
-
-  onAuth(onComplete: (authData: FirebaseAuthData) => void): void {
-    this._fbRef.onAuth(onComplete);
-  }
-
-  getAuth(): FirebaseAuthData {
-    return this._fbRef.getAuth();
   }
 
   unauth(): void {
-    this._fbRef.unauth();
+    this._fbAuth.signOut();
   }
 
-  authWithCustomToken(token: string, options?: any): Promise<FirebaseAuthState> {
-    let p = new Promise((res, rej) => {
-      this._fbRef.authWithCustomToken(token, this._handleFirebaseCb(res, rej, options), options);
-    });
-
-    return p;
+  authWithCustomToken(token: string): Promise<FirebaseAuthState> {
+    return <Promise<FirebaseAuthState>>this._fbAuth.signInWithCustomToken(token)
+      .then((user: firebase.User) => authDataToAuthState(user));
   }
 
-  authAnonymously(options?: any): Promise<FirebaseAuthState> {
-    let p = new Promise((res, rej) => {
-      this._fbRef.authAnonymously(this._handleFirebaseCb(res, rej, options), options);
-    });
-
-    return p;
+  authAnonymously(): Promise<FirebaseAuthState> {
+    return <Promise<FirebaseAuthState>>this._fbAuth.signInAnonymously()
+      .then((user: firebase.User) => authDataToAuthState(user));
   }
 
-  authWithPassword(credentials: FirebaseCredentials, options?: any)
-    : Promise<FirebaseAuthState> {
-    let p = new Promise((res, rej) => {
-      this._fbRef.authWithPassword(credentials, this._handleFirebaseCb(res, rej, options), options);
-    });
-
-    return p;
+  authWithPassword(creds: EmailPasswordCredentials): Promise<FirebaseAuthState> {
+    return <Promise<FirebaseAuthState>>this._fbAuth.signInWithEmailAndPassword(creds.email, creds.password)
+      .then((user: firebase.User) => authDataToAuthState(user));
   }
 
-  authWithOAuthPopup(provider: AuthProviders, options?: any): Promise<FirebaseAuthState> {
-    let p = new Promise((res, rej) => {
-      this._fbRef.authWithOAuthPopup(this._providerToString(provider),
-        this._handleFirebaseCb(res, rej, options), options);
-    });
-
-    return p;
+  authWithOAuthPopup(provider: AuthProviders, options?: any): Promise<firebase.auth.UserCredential> {
+    var providerFromFirebase = <FirebaseOAuthProvider>this._enumToAuthProvider(provider);
+    if (options.scope) {
+      options.scope.forEach(scope => providerFromFirebase.addScope(scope));
+    }
+    return <Promise<firebase.auth.UserCredential>>this._fbAuth.signInWithPopup(providerFromFirebase);
   }
 
   /**
@@ -82,59 +84,31 @@ export class FirebaseSdkAuthBackend extends AuthBackend {
    * NOTE: This promise will not be resolved if authentication is successful since the browser redirected.
    * You should subscribe to the FirebaseAuth object to listen succesful login
    */
-  authWithOAuthRedirect(provider: AuthProviders, options?: any): Promise<FirebaseAuthState> {
-    let p = new Promise((res, rej) => {
-      this._fbRef.authWithOAuthRedirect(this._providerToString(provider),
-        this._handleFirebaseCb(res, rej, options), options);
-    });
-
-    return p;
+  authWithOAuthRedirect(provider: AuthProviders, options?: any): Promise<void> {
+    return <Promise<void>>this._fbAuth.signInWithRedirect(this._enumToAuthProvider(provider));
   }
 
-  authWithOAuthToken(provider: AuthProviders, credentialsObj: OAuthCredentials, options?: any)
-    : Promise<FirebaseAuthState> {
-    let p = new Promise((res, rej) => {
-      let credentials = isPresent((<OAuth2Credentials>credentialsObj).token)
-        ? (<OAuth2Credentials>credentialsObj).token
-        : credentialsObj;
-      this._fbRef.authWithOAuthToken(this._providerToString(provider), credentials,
-        this._handleFirebaseCb(res, rej, options), options);
-    });
-
-    return p;
+  authWithOAuthToken(credential: firebase.auth.AuthCredential): Promise<FirebaseAuthState> {
+    return <Promise<FirebaseAuthState>>this._fbAuth.signInWithCredential(credential)
+      .then((user: firebase.User) => authDataToAuthState(user));
   }
 
-  private _handleFirebaseCb(res: Function, rej: Function, options: any): (err: any, auth?: FirebaseAuthData) => void {
-    return (err, auth?) => {
-      if (err) {
-        return rej(err);
-      } else {
-        if (!this._webWorkerMode)
-          return res(authDataToAuthState(auth));
-        else {
-          if (isPresent(options) && isPresent(options.remember)) {
-            // Add remember value in WebWorker mode so that the worker
-            // can auth with the same value
-            (<any>auth).remember = options.remember;
-          }
-          return res(auth);
-        }
-      }
-    };
+  getRedirectResult(): Observable<firebase.auth.UserCredential> {
+    return Observable.fromPromise(this._fbAuth.getRedirectResult());
   }
 
-  private _providerToString(provider: AuthProviders): string {
-    switch (provider) {
+  private _enumToAuthProvider(providerId: AuthProviders): firebase.auth.AuthProvider | FirebaseOAuthProvider {
+    switch (providerId) {
       case AuthProviders.Github:
-        return 'github';
+        return new GithubAuthProvider();
       case AuthProviders.Twitter:
-        return 'twitter';
+        return new TwitterAuthProvider();
       case AuthProviders.Facebook:
-        return 'facebook';
+        return new FacebookAuthProvider();
       case AuthProviders.Google:
-        return 'google';
+        return new GoogleAuthProvider();
       default:
-        throw new Error(`Unsupported firebase auth provider ${provider}`);
+        throw new Error(`Unsupported firebase auth provider ${providerId}`);
     }
   }
 }

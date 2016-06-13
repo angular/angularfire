@@ -87,7 +87,7 @@ class App {
   user: any;
   questions: FirebaseListObservable<any>;
   constructor(public af: AngularFire) {
-    af.auth.onAuth()
+    af.auth
       .subscribe(user => {
         console.log('onAuth', user);
         this.user = user

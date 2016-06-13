@@ -12,7 +12,7 @@ import {MessageBus} from 'angular2/src/web_workers/shared/message_bus';
 import {PRIMITIVE} from 'angular2/src/web_workers/shared/serializer';
 
 import {AUTH_CHANNEL, INITIAL_AUTH_CHANNEL} from '../shared/channels';
-import {FirebaseRef} from '../../../tokens';
+import {FirebaseApp} from '../../../tokens';
 import {
   AuthBackend,
   FirebaseAuthState,
@@ -23,7 +23,7 @@ import {
   OAuthCredentials
 } from '../../auth_backend';
 import {isPresent} from '../../../utils/utils';
-import * as Firebase from 'firebase';
+import * as firebase from 'firebase';
 
 @Injectable()
 export class WebWorkerFirebaseAuth extends AuthBackend {
@@ -32,7 +32,7 @@ export class WebWorkerFirebaseAuth extends AuthBackend {
   private _authCbs: Array<(authData: FirebaseAuthData) => void> = [];
   private _gotAuth = false;
 
-  constructor (@Inject(FirebaseRef) private _fbRef: Firebase, brokerFactory: ClientMessageBrokerFactory,
+  constructor (@Inject(FirebaseApp) private _fbApp: FirebaseApplication, brokerFactory: ClientMessageBrokerFactory,
               bus: MessageBus) {
     super();
     this._messageBroker = brokerFactory.createMessageBroker(AUTH_CHANNEL);
@@ -46,7 +46,7 @@ export class WebWorkerFirebaseAuth extends AuthBackend {
   }
 
   onAuth (onComplete: (authData: FirebaseAuthData) => void): void {
-    this._fbRef.onAuth((authData) => {
+    this._fbApp.onAuth((authData) => {
       if (!this._gotAuth) return false;
       if (isPresent(authData) && isPresent(this._authMetadata[authData.token])) {
         authData = this._authMetadata[authData.token];
@@ -56,12 +56,12 @@ export class WebWorkerFirebaseAuth extends AuthBackend {
   }
 
   getAuth(): FirebaseAuthData {
-    return this._fbRef.getAuth();
+    return this._fbApp.getAuth();
   }
-  
+
   createUser(creds: FirebaseCredentials): Promise<FirebaseAuthData> {
     return new Promise<FirebaseAuthData>((resolve, reject) => {
-      this._fbRef.createUser(creds, (err, authData) => {
+      this._fbApp.createUser(creds, (err, authData) => {
         if (err) {
           reject(err);
         } else {
@@ -79,7 +79,7 @@ export class WebWorkerFirebaseAuth extends AuthBackend {
 
   authWithCustomToken(token: string, options?: any): Promise<FirebaseAuthState> {
     return new Promise((res, rej) => {
-      this._fbRef.authWithCustomToken(token, (err, authData) => {
+      this._fbApp.authWithCustomToken(token, (err, authData) => {
         if (err)
           return rej(err);
         else
@@ -108,7 +108,7 @@ export class WebWorkerFirebaseAuth extends AuthBackend {
   authWithOAuthToken(provider: AuthProviders, credentialsObj: OAuthCredentials, options?: any)
   : Promise<FirebaseAuthState> {
     let args = new UiArguments('authWithOAuthToken',
-                               [new FnArg(provider, PRIMITIVE), 
+                               [new FnArg(provider, PRIMITIVE),
                                 new FnArg(credentialsObj, PRIMITIVE),
                                 new FnArg(options, PRIMITIVE)]);
     let uiAuthPromise = this._messageBroker.runOnService(args, PRIMITIVE);
@@ -118,7 +118,7 @@ export class WebWorkerFirebaseAuth extends AuthBackend {
   unauth(): void {
     let args = new UiArguments('unauth');
     this._messageBroker.runOnService(args, null);
-    this._fbRef.unauth();
+    this._fbApp.unauth();
   }
 
   /**
@@ -132,10 +132,10 @@ export class WebWorkerFirebaseAuth extends AuthBackend {
   private _handleAuthPromise(authData: FirebaseAuthDataWithRemember): Promise<FirebaseAuthState> {
     this._authMetadata[authData.token] = authData;
     return new Promise((res, rej) => {
-      this._fbRef.authWithCustomToken(authData.token, (err, _) => {
+      this._fbApp.authWithCustomToken(authData.token, (err, _) => {
         if (err)
           return rej (err);
-        else 
+        else
           return res(authDataToAuthState(authData));
       }, {remember: authData.remember});
     });
