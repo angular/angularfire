@@ -1,7 +1,6 @@
 import {Injectable, Inject} from '@angular/core';
 import {ServiceMessageBrokerFactory, PRIMITIVE} from '@angular/platform-browser/src/worker_render';
 import {AUTH_CHANNEL, INITIAL_AUTH_CHANNEL} from '../shared/channels';
-import {FirebaseRef} from '../../../tokens';
 import {FirebaseAuthState} from '../../auth_backend';
 import {FirebaseSdkAuthBackend} from '../../firebase_sdk_auth_backend';
 

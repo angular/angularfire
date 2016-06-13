@@ -8,7 +8,7 @@
     "outDir": "dist",
     "rootDir": "src",
     "sourceMap": true,
-    "sourceRoot": "./",
+    "inlineSources": true,
     "declaration": true,
     "removeComments": true
   },
@@ -22,6 +22,7 @@
     "src/utils/firebase_object_observable.spec.ts",
     "src/utils/query_observable.spec.ts",
     "src/providers/auth.spec.ts",
+    "src/providers/auth_backend.spec.ts",
     "typings/main.d.ts",
     "manual_typings/firebase3/firebase3.d.ts"
   ]
