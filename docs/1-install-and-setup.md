@@ -23,11 +23,11 @@ Now that you have a new project setup, install AngularFire 2 and Firebase from n
 
 ### 3. Include Firebase SDK typings
 
+In your `tsconfig.json` file include the following line in your `"files"` array:
+
 ```json
 "files": [
-  // exiting files above
-  // Firebase typings below
-  "node_modules/angularfire2/firebase3.d.ts":
+  "node_modules/angularfire2/firebase3.d.ts"
 ]
 ```
 
