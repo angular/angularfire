@@ -15,7 +15,12 @@ The `firebaseAuthConfig` services takes in an `AuthProvider` and an `AuthMethod`
 ```ts
 bootstrap(<MyApp>Component, [
   FIREBASE_PROVIDERS,
-  defaultFirebase('https://<your-firebase-app>.firebaseio.com'),
+  defaultFirebase({
+    apiKey: "<your-key>",
+    authDomain: "<your-project-authdomain>",
+    databaseURL: "<your-database-URL>",
+    storageBucket: "<your-storage-bucket>",
+  }),
   firebaseAuthConfig({
     provider: AuthProviders.Google,
     method: AuthMethods.Redirect
@@ -41,7 +46,9 @@ if (environment.production) {
 
 bootstrap(<MyApp>Component, [
   FIREBASE_PROVIDERS,
-  defaultFirebase('https://<your-firebase-app>.firebaseio.com'),
+  defaultFirebase({
+   // config object 
+  }),
   firebaseAuthConfig({
     provider: AuthProviders.Twitter,
     method: AuthMethods.Redirect

@@ -1,5 +1,5 @@
 import {APP_INITIALIZER, Inject, Injectable, OpaqueToken, provide, Provider} from '@angular/core';
-import {AngularFireAuth, firebaseAuthConfig} from './providers/auth';
+import {AngularFireAuth, firebaseAuthConfig, FirebaseAuth} from './providers/auth';
 import { initializeApp } from 'firebase';
 import {FirebaseListObservable} from './utils/firebase_list_observable';
 import {FirebaseObjectObservable} from './utils/firebase_object_observable';
@@ -36,9 +36,13 @@ export const COMMON_PROVIDERS: any[] = [
       return initializeApp(config);
     },
     deps: [FirebaseConfig]}),
+  // TODO: Deprecate
+  provide(FirebaseAuth, {
+    useExisting: AngularFireAuth
+  }),
   AngularFireAuth,
   AngularFire,
-  FirebaseDatabase
+  FirebaseDatabase,
 ];
 
 export const FIREBASE_PROVIDERS:any[] = [
@@ -63,6 +67,8 @@ export const defaultFirebase = (config: FirebaseAppConfig): Provider => {
 
 export {
   AngularFireAuth,
+  // TODO: Deprecate
+  FirebaseAuth,
   FirebaseDatabase,
   FirebaseListObservable,
   FirebaseObjectObservable,
@@ -74,7 +80,7 @@ export {
   AuthProviders
 }
 
-export { FirebaseConfig, FirebaseApp, FirebaseAuthConfig } from './tokens';
+export { FirebaseConfig, FirebaseApp, FirebaseAuthConfig, FirebaseRef, FirebaseUrl } from './tokens';
 export { FirebaseAppConfig } from './interfaces';
 
 // Helps Angular-CLI automatically add providers
