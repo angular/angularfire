@@ -16,19 +16,22 @@ The Angular CLI's `new` command will set up the latest Angular build in a new pr
 ### 2. Install AngularFire 2 and Firebase
 
 ```bash
-npm install angularfire2 firebase@2.4.2 --save
+npm install angularfire2 --save
 ```
 
 Now that you have a new project setup, install AngularFire 2 and Firebase from npm.
 
-### 3. Install typings
+### 3. Include Firebase SDK typings
 
-```bash
-npm install typings -g
-typings install --save --ambient firebase
+```json
+"files": [
+  // exiting files above
+  // Firebase typings below
+  "node_modules/angularfire2/firebase3.d.ts":
+]
 ```
 
-AngularFire 2 is written in Typescript and depends on typings for the Firebase SDK. To get a clean build, install typings and download the Firebase typings.
+This is a temporary step until the Firebase typings are published to npm.
 
 ### 4. Include AngularFire 2 and Firebase in the vendor files
 
@@ -54,7 +57,7 @@ module.exports = function(defaults) {
       // above are the existing entries
       // below are the AngularFire entries
       'angularfire2/**/*.js',
-      'firebase/lib/*.js'      
+      'firebase/*.js'      
     ]
   });
 };
@@ -75,7 +78,7 @@ Open `/src/system-config.ts`. Modify the file like below:
 ```js
 /** Map relative paths to URLs. */
 const map: any = {
-  'firebase': 'vendor/firebase/lib/firebase-web.js',
+  'firebase': 'vendor/firebase/firebase.js',
   'angularfire2': 'vendor/angularfire2'
 };
 
@@ -92,7 +95,8 @@ AngularFire 2 and Firebase need to be mapped with System.js for module loading.
 
 ### 7. Bootstrap
 
-Open `/src/main.ts`, inject the Firebase providers, and specify your default Firebase:
+Open `/src/main.ts`, inject the Firebase providers, and specify your Firebase configuration. 
+This can be found in your project at [the Firebase Console](https://console.firebase.google.com):
 
 ```ts
 import { bootstrap } from '@angular/platform-browser-dynamic';
@@ -106,7 +110,13 @@ if (environment.production) {
 
 bootstrap(<MyApp>, [
   FIREBASE_PROVIDERS,
-  defaultFirebase('https://<your-firebase-app>.firebaseio.com')
+  // Initialize Firebase app  
+  defaultFirebase({
+    apiKey: "<your-key>",
+    authDomain: "<your-project-authdomain>",
+    databaseURL: "<your-database-URL>",
+    storageBucket: "<your-storage-bucket>",
+  })
 ]);
 ```
 
@@ -149,7 +159,7 @@ import { AngularFire, FirebaseListObservable } from 'angularfire2';
 export class <MyApp>Component {
   items: FirebaseListObservable<any[]>;
   constructor(af: AngularFire) {
-    this.items = af.database.list('/items');
+    this.items = af.database.list('items');
   }
 }
 ```

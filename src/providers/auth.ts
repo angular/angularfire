@@ -184,3 +184,5 @@ function attachCredentialToAuthState (authState: FirebaseAuthState, credential, 
   authState[stripProviderId(providerId)] = credential;
   return authState;
 }
+// TODO: Deprecate
+export class FirebaseAuth extends AngularFireAuth {}
