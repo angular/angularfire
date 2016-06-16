@@ -1,3 +1,13 @@
+# AngularFire2 2.0.0-beta.1
+
+This release updates AngularFire to the Firebase 3 SDK. There are a few breaking changes, most notably in how
+apps are configured, and how third-party oauth tokens are handled.
+
+## Breaking Changes:
+ * [Upgrade to the Firebase 3.0+ SDK](https://firebase.google.com/docs/web/setup), versions less than 3.0 are not supported. [abe11a2](https://github.com/angular/angularfire2/pull/200/commits/abe11a2fd8f5a3f554056625b751e9308e56b906)
+ * `defaultFirebase` takes in a configuration object rather than a database url string. [See docs for more info.](https://github.com/angular/angularfire2/blob/master/docs/1-install-and-setup.md)
+ * Access tokens for third party auth (github, google, facebook, twitter) are not persisted after refresh. 
+
 # AngularFire2 2.0.0-beta.0
 
 ## Features
