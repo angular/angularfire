@@ -80,7 +80,7 @@ class AppComponent {
 
 ### API Summary
 
-The table below highlights some of the common methods on the `FirebaseObjectObservale`.
+The table below highlights some of the common methods on the `FirebaseObjectObservable`.
 
 | method   |                    | 
 | ---------|--------------------| 
