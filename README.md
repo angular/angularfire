@@ -16,7 +16,7 @@ Status: Beta
 ## Install
 
 ```bash
-npm install angularfire2 firebase --save
+npm install firebase angularfire2 --save
 ```
 
 ## Example use:
