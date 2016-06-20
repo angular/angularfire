@@ -25,7 +25,7 @@ import { COMMON_CONFIG } from '../../../src/test-config';
       <p>
         Is Anonymous?
         <span id="is-anonymous">
-          {{ user?.isAnonymous }}
+          {{ user?.anonymous }}
         </span>
       </p>
     </blockquote>
