@@ -13,7 +13,7 @@
     "rewrite_npm_package": "node --harmony_destructuring tools/rewrite-published-package.js",
     "build_bundle": "cp -r src angularfire2 && tsc typings/main.d.ts angularfire2.ts --rootDir . --module system -t es5 --outFile dist/bundles/angularfire2.js  --moduleResolution node --emitDecoratorMetadata --experimentalDecorators",
     "e2e_test": "webdriver-manager update && npm run build_e2e && protractor",
-    "build_e2e": "npm run build && tsc -p test/ && cp test/e2e/firebase_object/index.html dist-test/e2e/firebase_object/ && cp test/e2e/firebase_list/index.html dist-test/e2e/firebase_list/ && cp test/e2e/auth/index.html dist-test/e2e/auth/"
+    "build_e2e": "rm -rf dist-test && npm run build && tsc -p test/ && cp test/e2e/firebase_object/index.html dist-test/e2e/firebase_object/ && cp test/e2e/firebase_list/index.html dist-test/e2e/firebase_list/ && cp test/e2e/auth/index.html dist-test/e2e/auth/"
   },
   "keywords": [
     "angular2",

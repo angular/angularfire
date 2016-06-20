@@ -9,14 +9,12 @@
     "declaration": true,
     "removeComments": true,
     "baseUrl": ".",
+    "rootDir": ".",
     "outDir": "../dist-test",
     "paths": {
       "angularfire2": [
         "../dist/*",
         "../dist/angularfire2.d.ts"
-      ],
-      "test/config": [
-        "./config.ts"
       ]
     }
   }
