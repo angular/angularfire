@@ -4,6 +4,13 @@
 
 **The setups below use the [Angular CLI](https://github.com/angular/angular-cli).**
 
+### 0. Prerequisites
+
+```bash
+npm install -g angular-cli
+npm install -g typings 
+```
+
 ### 1. Create a new project
 
 ```bash
