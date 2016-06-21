@@ -528,6 +528,20 @@ describe('FirebaseAuth', () => {
         expect(app.auth().signOut).toHaveBeenCalled();
       });
     });
+
+
+    describe('getAuth()', () => {
+      it('should return null when no user is logged in', () => {
+        authSpy['currentUser'] = null;
+        expect(afAuth.getAuth()).toBe(null);
+      });
+
+
+      it('should return authState if user is logged in', () => {
+        authSpy['currentUser'] = firebaseUser;
+        expect(afAuth.getAuth().uid).toEqual(AngularFireAuthState.uid);
+      })
+    });
   });
 });
 
