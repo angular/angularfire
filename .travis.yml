@@ -10,8 +10,6 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
-  hosts:
-    - localhost.firebaseio.test
 
 cache:
   directories:
@@ -23,6 +21,7 @@ env:
 
 install:
   - npm install
+  - ./node_modules/.bin/typings install
 
 before_script:
   - export DISPLAY=:99.0
