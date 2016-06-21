@@ -64,7 +64,7 @@
     "traceur": "0.0.96",
     "tsd": "^0.6.5",
     "typedoc": "github:jeffbcross/typedoc",
-    "typescript": "^1.9.0-dev.20160608-1.0",
+    "typescript": "^1.8.10",
     "typings": "^0.6.2",
     "zone.js": "^0.6.6"
   },

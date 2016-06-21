@@ -6,7 +6,7 @@ import {
   FIREBASE_PROVIDERS,
   FirebaseObjectObservable,
   FirebaseApp
-} from 'angularfire2';
+} from '../../../dist/angularfire2';
 
 // TODO fix imports and tsconfig
 // import { COMMON_CONFIG } from '../../../src/test-config';

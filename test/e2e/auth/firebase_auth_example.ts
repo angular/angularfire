@@ -9,7 +9,7 @@ import {
   FirebaseListObservable,
   FirebaseAuthState,
   FirebaseApp
-} from 'angularfire2';
+} from '../../../dist/angularfire2';
 
 enableProdMode();
 
