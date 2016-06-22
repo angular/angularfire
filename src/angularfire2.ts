@@ -22,8 +22,6 @@ import {FirebaseDatabase} from './database/database';
 
 @Injectable()
 export class AngularFire {
-  list: (url:string, opts?:FirebaseListFactoryOpts) => FirebaseListObservable<any[]>;
-  object: (url: string, opts?:FirebaseObjectFactoryOpts) => FirebaseObjectObservable<any>;
   constructor(
     @Inject(FirebaseConfig) private fbUrl:string,
     public auth: AngularFireAuth,
