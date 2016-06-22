@@ -1,9 +1,12 @@
-import {Observable} from 'rxjs/Observable';
-import {Operator} from 'rxjs/Operator';
-import {Subscriber} from 'rxjs/Subscriber';
-import {Subscription} from 'rxjs/Subscription';
+import { Observable } from 'rxjs/Observable';
+import { Operator } from 'rxjs/Operator';
+import { Subscriber } from 'rxjs/Subscriber';
+import { Subscription } from 'rxjs/Subscription';
 import * as utils from '../utils/utils';
-import {AFUnwrappedDataSnapshot, FirebaseOperationCases} from '../interfaces';
+import { 
+  AFUnwrappedDataSnapshot, 
+  FirebaseOperationCases 
+} from '../interfaces';
 
 export type FirebaseOperation = string | firebase.database.Reference | firebase.database.DataSnapshot | AFUnwrappedDataSnapshot;
 

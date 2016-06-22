@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs/observable';
+import { Observable } from 'rxjs/Observable';
 
 export interface FirebaseAppConfig {
   apiKey: string;
