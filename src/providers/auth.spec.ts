@@ -24,7 +24,8 @@ import {
   AngularFireAuth,
   AuthMethods,
   firebaseAuthConfig,
-  AuthProviders
+  AuthProviders,
+  WindowLocation
 } from '../angularfire2';
 import { COMMON_CONFIG } from '../test-config';
 
@@ -99,20 +100,37 @@ describe('FirebaseAuth', () => {
   let backend: AuthBackend;
   let afAuth: AngularFireAuth;
   let authSpy: jasmine.Spy;
-  var fbAuthObserver: Observer<firebase.User>;
+  let fbAuthObserver: Observer<firebase.User>;
+  let windowLocation: any;
 
-  beforeEachProviders(() => [
-    FIREBASE_PROVIDERS,
-    defaultFirebase(COMMON_CONFIG),
-    provide(FirebaseApp, {
-      useFactory: (config: FirebaseAppConfig) => {
-        var app = initializeApp(config);
-        (<any>app).auth = () => authSpy;
-        return app;
-      },
-      deps: [FirebaseConfig]
-    })
-  ]);
+  beforeEachProviders(() => {
+    windowLocation = {
+      hash: '',
+      search: '',
+      pathname:'/',
+      port: '',
+      hostname:'localhost',
+      host:'localhost',
+      protocol:'https:',
+      origin:'localhost',
+      href:'https://localhost/'
+    };
+    return [
+      FIREBASE_PROVIDERS,
+      defaultFirebase(COMMON_CONFIG),
+      provide(FirebaseApp, {
+        useFactory: (config: FirebaseAppConfig) => {
+          var app = initializeApp(config);
+          (<any>app).auth = () => authSpy;
+          return app;
+        },
+        deps: [FirebaseConfig]
+      }),
+      provide(WindowLocation, {
+        useValue: windowLocation
+      })
+    ]
+  });
 
   beforeEach(() => {
     authSpy = jasmine.createSpyObj('auth', authMethods);
@@ -202,7 +220,7 @@ describe('FirebaseAuth', () => {
       let config = {
         method: AuthMethods.Anonymous
       };
-      afAuth = new AngularFireAuth(backend, config);
+      afAuth = new AngularFireAuth(backend, windowLocation, config);
       afAuth.login();
       expect(app.auth().signInAnonymously).toHaveBeenCalled();
     });
@@ -211,7 +229,7 @@ describe('FirebaseAuth', () => {
       let config = {
         method: AuthMethods.Anonymous
       };
-      afAuth = new AngularFireAuth(backend, config);
+      afAuth = new AngularFireAuth(backend, windowLocation, config);
       afAuth.login({
         method: AuthMethods.Popup,
         provider: AuthProviders.Google
@@ -227,7 +245,7 @@ describe('FirebaseAuth', () => {
         provider: AuthProviders.Google,
         scope: ['email']
       };
-      afAuth = new AngularFireAuth(backend, config);
+      afAuth = new AngularFireAuth(backend, windowLocation, config);
       afAuth.login({
         provider: AuthProviders.Github
       });
@@ -252,7 +270,7 @@ describe('FirebaseAuth', () => {
       let config = {
         method: AuthMethods.Password
       };
-      let afAuth = new AngularFireAuth(backend, config);
+      let afAuth = new AngularFireAuth(backend, windowLocation, config);
       afAuth.login()
         .then(done.fail, done);
     });
@@ -261,7 +279,7 @@ describe('FirebaseAuth', () => {
       let config = {
         method: AuthMethods.CustomToken
       };
-      let afAuth = new AngularFireAuth(backend, config);
+      let afAuth = new AngularFireAuth(backend, windowLocation, config);
       afAuth.login()
         .then(done.fail, done);
     });
@@ -270,7 +288,7 @@ describe('FirebaseAuth', () => {
       let config = {
         method: AuthMethods.OAuthToken
       };
-      let afAuth = new AngularFireAuth(backend, config);
+      let afAuth = new AngularFireAuth(backend, windowLocation, config);
       afAuth.login()
         .then(done.fail, done);
     });
@@ -279,7 +297,7 @@ describe('FirebaseAuth', () => {
       let config = {
         method: AuthMethods.Popup
       };
-      let afAuth = new AngularFireAuth(backend, config);
+      let afAuth = new AngularFireAuth(backend, windowLocation, config);
       afAuth.login()
         .then(done.fail, done);
     });
@@ -288,7 +306,7 @@ describe('FirebaseAuth', () => {
       let config = {
         method: AuthMethods.Redirect
       };
-      let afAuth = new AngularFireAuth(backend, config);
+      let afAuth = new AngularFireAuth(backend, windowLocation, config);
       afAuth.login()
         .then(done.fail, done);
     });
@@ -359,7 +377,7 @@ describe('FirebaseAuth', () => {
           email: 'david@fire.com',
           password: 'supersecretpassword'
         };
-        let afAuth = new AngularFireAuth(backend, config);
+        let afAuth = new AngularFireAuth(backend, windowLocation, config);
         afAuth.login(credentials);
         expect(app.auth().signInWithEmailAndPassword).toHaveBeenCalledWith(credentials.email, credentials.password);
       });
@@ -433,6 +451,18 @@ describe('FirebaseAuth', () => {
             fbAuthObserver.next(firebaseUser);
           });
       }, 10);
+
+
+      it('should not call getRedirectResult() if location.protocol is not http or https', (done) => {
+        windowLocation.protocol = 'file:';
+        afAuth
+          .take(1)
+          .do(() => {
+            expect(authSpy['getRedirectResult']).not.toHaveBeenCalled();
+          })
+          .subscribe(done, done.fail);
+        fbAuthObserver.next(firebaseUser);
+      });
     });
 
     describe('authWithOAuthRedirect', () => {
