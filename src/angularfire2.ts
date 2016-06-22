@@ -9,7 +9,7 @@ import {
   FirebaseObjectFactory
 } from './utils/firebase_object_factory';
 import * as utils from './utils/utils';
-import {FirebaseConfig, FirebaseApp} from './tokens';
+import { FirebaseConfig, FirebaseApp, WindowLocation } from './tokens';
 import { FirebaseAppConfig } from './interfaces';
 import {
   AuthBackend,
@@ -53,7 +53,11 @@ export const FIREBASE_PROVIDERS:any[] = [
     provide: AuthBackend,
     useFactory: _getAuthBackend,
     deps: [FirebaseApp]
-  }
+  },
+  {
+    provide: WindowLocation,
+    useValue: window.location
+  },
 ];
 
 function _getAuthBackend(app: firebase.app.App): FirebaseSdkAuthBackend {
@@ -84,7 +88,8 @@ export {
   firebaseAuthConfig,
   FirebaseAuthState,
   AuthMethods,
-  AuthProviders
+  AuthProviders,
+  WindowLocation
 }
 
 export { FirebaseConfig, FirebaseApp, FirebaseAuthConfig, FirebaseRef, FirebaseUrl } from './tokens';
