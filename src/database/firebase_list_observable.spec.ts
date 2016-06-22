@@ -1,5 +1,9 @@
-import {describe,ddescribe,it,iit,beforeEach,beforeEachProviders,inject} from '@angular/core/testing';
-import {FirebaseListObservable} from './firebase_list_observable';
+import { FirebaseListObservable } from './index';
+import { Observer } from 'rxjs/Observer';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
+import { database } from 'firebase';
+import { unwrapMapFn } from '../utils/utils';
 import {
   FIREBASE_PROVIDERS,
   defaultFirebase,
@@ -7,11 +11,15 @@ import {
   FirebaseAppConfig,
   AngularFire
 } from '../angularfire2';
-import {Observer} from 'rxjs/Observer';
-import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/operator/map';
-import { database } from 'firebase';
-import {unwrapMapFn} from './utils';
+import { 
+  describe,
+  ddescribe,
+  it,
+  iit,
+  beforeEach,
+  beforeEachProviders,
+  inject
+} from '@angular/core/testing';
 
 export const firebaseConfig: FirebaseAppConfig = {
   apiKey: "AIzaSyBVSy3YpkVGiKXbbxeK0qBnu3-MNZ9UIjA",

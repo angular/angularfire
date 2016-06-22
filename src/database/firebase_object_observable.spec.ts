@@ -15,8 +15,8 @@ import {
   FirebaseAppConfig,
   AngularFire
 } from '../angularfire2';
-import {FirebaseObjectObservable} from './firebase_object_observable';
-import {Observer} from 'rxjs/Observer';
+import { FirebaseObjectObservable } from './index';
+import { Observer } from 'rxjs/Observer';
 import 'rxjs/add/operator/map';
 import { database } from 'firebase';
 

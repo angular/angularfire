@@ -1,9 +1,9 @@
-import {describe, expect, it, iit} from '@angular/core/testing';
-import {Observable} from 'rxjs/Observable';
-import {Observer} from 'rxjs/Observer';
-import {Subject} from 'rxjs/Subject';
-
-import {getOrderObservables, observeQuery, Query} from './query_observable';
+import { describe, expect, it, iit } from '@angular/core/testing';
+import { Observable } from 'rxjs/Observable';
+import { Observer } from 'rxjs/Observer';
+import { Subject } from 'rxjs/Subject';
+import { Query } from '../interfaces';
+import { getOrderObservables, observeQuery } from './index';
 
 function scalarQueryTest(query: Query, done: any) {
   const queryObservable = observeQuery(query);
