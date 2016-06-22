@@ -2,7 +2,7 @@
 
 > AngularFire2 synchronizes data as objects using the `FirebaseObjectObservable`. 
 The `FirebaseObjectObservable` is not created by itself, but through the `AngularFire.database` service. 
-The guide below demonstrates how to retreive, save, and remove data as objects.
+The guide below demonstrates how to retrieve, save, and remove data as objects.
 
 ## Injecting the AngularFire service
 
@@ -29,7 +29,7 @@ export class AppComponent {
 
 ## Create an object binding
 
-Data is retreived through the `af.database` service.
+Data is retrieved through the `af.database` service.
 
 There are three ways to create an object binding:
 
@@ -163,7 +163,7 @@ export class RcTestAppComponent {
 ```
 
 ## Meta-fields on the object
-Data retreived from the object binding contains special properties retreived from the unwrapped Firebase DataSnapshot.
+Data retrieved from the object binding contains special properties retrieved from the unwrapped Firebase DataSnapshot.
 
 | property |                    | 
 | ---------|--------------------| 
@@ -171,7 +171,7 @@ Data retreived from the object binding contains special properties retreived fro
 | $value   | If the data for this child node is a primitive (number, string, or boolean), then the record itself will still be an object. The primitive value will be stored under `$value` and can be changed and saved like any other field.|
 
 
-## Retreiving the snapshot
+## Retrieving the snapshot
 AngularFire2 unwraps the Firebase DataSnapshot by default, but you can get the data as the original snapshot by specifying the `preserveSnapshot` option. 
 
 ```ts
