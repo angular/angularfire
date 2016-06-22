@@ -9,7 +9,7 @@ import 'rxjs/add/operator/concat';
 import 'rxjs/add/operator/skip';
 import 'rxjs/add/observable/of';
 
-import {FirebaseApp, FirebaseAuthConfig} from '../tokens';
+import { FirebaseApp, FirebaseAuthConfig, WindowLocation } from '../tokens';
 import {isPresent} from '../utils/utils';
 import * as utils from '../utils/utils';
 import {
@@ -36,23 +36,27 @@ export const firebaseAuthConfig = (config: AuthConfiguration): Provider => {
 export class AngularFireAuth extends ReplaySubject<FirebaseAuthState> {
   private _credentialCache: {[key:string]: OAuthCredential} = {};
   constructor(private _authBackend: AuthBackend,
+    @Inject(WindowLocation) loc: Location,
     @Optional() @Inject(FirebaseAuthConfig) private _config?: AuthConfiguration) {
     super(kBufferSize);
 
     let firstPass = true;
     this._authBackend.onAuth()
       .mergeMap((authState: FirebaseAuthState) => {
-        // TODO: get rid of side effect
         if (firstPass) {
           firstPass = false;
-          return this._authBackend.getRedirectResult()
-            .map((userCredential: firebase.auth.UserCredential) => {
-              if (userCredential && userCredential.credential) {
-                authState = attachCredentialToAuthState(authState, userCredential.credential, userCredential.credential.provider);
-                this._credentialCache[userCredential.credential.provider] = <OAuthCredential>userCredential.credential;
-              }
-              return authState;
-            })
+          if(['http:', 'https:'].indexOf(loc.protocol) > -1) {
+            // Only call getRedirectResult() in a browser
+            return this._authBackend.getRedirectResult()
+              .map((userCredential: firebase.auth.UserCredential) => {
+                if (userCredential && userCredential.credential) {
+                  authState = attachCredentialToAuthState(authState, userCredential.credential, userCredential.credential.provider);
+                  this._credentialCache[userCredential.credential.provider] = <OAuthCredential>userCredential.credential;
+                }
+                return authState;
+              });
+          }
+
         }
         return Observable.of(authState);
       })
