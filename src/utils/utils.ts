@@ -1,4 +1,4 @@
-import { AFUnwrappedDataSnapshot} from './firebase_list_observable';
+import { AFUnwrappedDataSnapshot} from '../interfaces';
 
 export function isPresent(obj: any): boolean {
   return obj !== undefined && obj !== null;

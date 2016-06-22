@@ -1,11 +1,14 @@
-import {Inject, Injectable} from '@angular/core';
-import {FirebaseConfig} from '../tokens';
-import {FirebaseAppConfig} from '../angularfire2';
-import {FirebaseListObservable} from '../utils/firebase_list_observable';
-import {FirebaseObjectObservable} from '../utils/firebase_object_observable';
-import {FirebaseListFactory, FirebaseListFactoryOpts} from '../utils/firebase_list_factory';
-import {FirebaseObjectFactoryOpts, FirebaseObjectFactory} from '../utils/firebase_object_factory';
-import * as utils from '../utils/utils'
+import { Inject, Injectable } from '@angular/core';
+import { FirebaseConfig } from '../tokens';
+import { FirebaseAppConfig } from '../angularfire2';
+import { FirebaseListFactory } from './index';
+import { FirebaseListFactoryOpts, FirebaseObjectFactoryOpts } from '../interfaces';
+import * as utils from '../utils/utils';
+import { 
+  FirebaseListObservable,
+  FirebaseObjectObservable,
+  FirebaseObjectFactory
+} from './index';
 
 @Injectable()
 export class FirebaseDatabase {
