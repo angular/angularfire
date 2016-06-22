@@ -58,7 +58,7 @@ export const COMMON_PROVIDERS: any[] = [
   },
   AngularFireAuth,
   AngularFire,
-  FirebaseDatabase
+  FirebaseDatabase,
 ];
 
 function _getFirebase(config: FirebaseAppConfig): firebase.app.App {
