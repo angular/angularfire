@@ -1,6 +1,6 @@
 {
   "name": "angularfire2",
-  "version": "2.0.0-beta.1",
+  "version": "2.0.0-beta.2",
   "description": "",
   "main": "./dist/angularfire2.js",
   "jsnext:main": "./dist/es6/angularfire2.js",
@@ -13,7 +13,8 @@
     "rewrite_npm_package": "node --harmony_destructuring tools/rewrite-published-package.js",
     "build_bundle": "cp -r src angularfire2 && tsc typings/main.d.ts angularfire2.ts --rootDir . --module system -t es5 --outFile dist/bundles/angularfire2.js  --moduleResolution node --emitDecoratorMetadata --experimentalDecorators",
     "e2e_test": "webdriver-manager update && npm run build_e2e && protractor",
-    "build_e2e": "rm -rf dist-test && npm run build && tsc -p test/ && cp test/e2e/firebase_object/index.html dist-test/e2e/firebase_object/ && cp test/e2e/firebase_list/index.html dist-test/e2e/firebase_list/ && cp test/e2e/auth/index.html dist-test/e2e/auth/"
+    "build_e2e": "rm -rf dist-test && npm run build && tsc -p test/ && cp test/e2e/firebase_object/index.html dist-test/e2e/firebase_object/ && cp test/e2e/firebase_list/index.html dist-test/e2e/firebase_list/ && cp test/e2e/auth/index.html dist-test/e2e/auth/",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 1"
   },
   "keywords": [
     "angular2",
@@ -22,14 +23,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/angular/indy.git"
+    "url": "git+https://github.com/angular/angularfire2.git"
   },
   "author": "jeffbcross",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/angular/indy/issues"
+    "url": "https://github.com/angular/angularfire2/issues"
   },
-  "homepage": "https://github.com/angular/indy#readme",
+  "homepage": "https://github.com/angular/angularfire2#readme",
   "dependencies": {
     "@angular/core": "2.0.0-rc.2",
     "@angular/platform-browser": "2.0.0-rc.2",
@@ -40,6 +41,7 @@
     "rxjs": "5.0.0-beta.6"
   },
   "devDependencies": {
+    "conventional-changelog-cli": "^1.2.0",
     "es6-module-loader": "^0.17.10",
     "es6-shim": "^0.35.0",
     "firebase-server": "^0.5.2",
