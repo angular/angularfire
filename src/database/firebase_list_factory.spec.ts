@@ -1,13 +1,13 @@
 declare var require: any;
 import {
   FirebaseListFactory,
+  FirebaseListObservable,
+  FirebaseObjectFactory,
   onChildAdded,
   onChildChanged,
   onChildRemoved,
   onChildUpdated,
-} from './firebase_list_factory';
-import {FirebaseListObservable} from './firebase_list_observable';
-import {FirebaseObjectFactory} from './firebase_object_factory';
+} from './index';
 import {
   FIREBASE_PROVIDERS,
   defaultFirebase,
@@ -25,8 +25,8 @@ import {
   beforeEachProviders,
   inject
 } from '@angular/core/testing';
-import * as utils from './utils';
-import {Query} from './query_observable';
+import * as utils from '../utils/utils';
+import {Query} from '../interfaces';
 import {Subscription, Observable, Subject} from 'rxjs';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/skip';

@@ -1,5 +1,5 @@
-import {FirebaseObjectFactory} from '../utils/firebase_object_factory';
-import {FirebaseObjectObservable} from '../utils/firebase_object_observable';
+import { Subscription } from 'rxjs';
+import { FirebaseObjectFactory, FirebaseObjectObservable } from './index';
 import {
   beforeEach,
   it,
@@ -17,7 +17,6 @@ import {
   FirebaseAppConfig,
   AngularFire
 } from '../angularfire2';
-import {Subscription} from 'rxjs';
 
 export const firebaseConfig: FirebaseAppConfig = {
   apiKey: "AIzaSyBVSy3YpkVGiKXbbxeK0qBnu3-MNZ9UIjA",

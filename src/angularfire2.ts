@@ -1,24 +1,42 @@
-import {APP_INITIALIZER, Inject, Injectable, OpaqueToken, provide, Provider} from '@angular/core';
-import {AngularFireAuth, firebaseAuthConfig, FirebaseAuth} from './providers/auth';
 import { initializeApp } from 'firebase';
-import {FirebaseListObservable} from './utils/firebase_list_observable';
-import {FirebaseObjectObservable} from './utils/firebase_object_observable';
-import {FirebaseListFactory, FirebaseListFactoryOpts} from './utils/firebase_list_factory';
-import {
-  FirebaseObjectFactoryOpts,
-  FirebaseObjectFactory
-} from './utils/firebase_object_factory';
 import * as utils from './utils/utils';
-import { FirebaseConfig, FirebaseApp, WindowLocation } from './tokens';
 import { FirebaseAppConfig } from './interfaces';
+import { FirebaseSdkAuthBackend } from './providers/firebase_sdk_auth_backend';
+import { 
+  FirebaseListFactoryOpts, 
+  FirebaseObjectFactoryOpts,
+} from './interfaces';
+import {
+  FirebaseConfig,
+  FirebaseApp,
+  WindowLocation
+} from './tokens';
+import { 
+  APP_INITIALIZER, 
+  Inject, 
+  Injectable, 
+  OpaqueToken, 
+  provide, 
+  Provider 
+} from '@angular/core';
+import { 
+  AngularFireAuth, 
+  firebaseAuthConfig, 
+  FirebaseAuth 
+} from './providers/auth';
+import {
+  FirebaseListObservable,
+  FirebaseObjectObservable,
+  FirebaseListFactory,
+  FirebaseObjectFactory,
+  FirebaseDatabase
+} from './database/index';
 import {
   AuthBackend,
   AuthMethods,
   AuthProviders,
   FirebaseAuthState
 } from './providers/auth_backend';
-import {FirebaseSdkAuthBackend} from './providers/firebase_sdk_auth_backend';
-import {FirebaseDatabase} from './database/database';
 
 @Injectable()
 export class AngularFire {
