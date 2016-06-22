@@ -7,12 +7,23 @@ import {
   AngularFire,
   FIREBASE_PROVIDERS,
   FirebaseListObservable,
+  FirebaseAuthState,
   FirebaseApp
 } from '../../../dist/angularfire2';
 
 enableProdMode();
 
-import { COMMON_CONFIG } from '../../../src/test-config';
+// TODO fix imports and tsconfig
+// import { COMMON_CONFIG } from 'angularfire2/test-config';
+
+import 'rxjs/add/operator/do';
+
+const COMMON_CONFIG = {
+  apiKey: "AIzaSyBVSy3YpkVGiKXbbxeK0qBnu3-MNZ9UIjA",
+  authDomain: "angularfire2-test.firebaseapp.com",
+  databaseURL: "https://angularfire2-test.firebaseio.com",
+  storageBucket: "angularfire2-test.appspot.com"
+};
 
 @Component({
   template: `
@@ -25,7 +36,7 @@ import { COMMON_CONFIG } from '../../../src/test-config';
       <p>
         Is Anonymous?
         <span id="is-anonymous">
-          {{ user?.isAnonymous }}
+          {{ user?.anonymous }}
         </span>
       </p>
     </blockquote>
@@ -80,18 +91,27 @@ import { COMMON_CONFIG } from '../../../src/test-config';
       {{ user?.providerData && user.providerData[0] | json }}
       <span *ngIf="!user || !user.providerData">Not Logged In</span>
     </blockquote>
+
+    <blockquote>
+      <h2>User</h2>
+      (Empty object is equivalent to null).
+      {{ user || {} | json }}
+    </blockquote>
   `,
   selector: 'app'
 })
 class App {
-  user: any;
+  user: FirebaseAuthState;
   questions: FirebaseListObservable<any>;
   constructor(public af: AngularFire) {
     af.auth
-      .subscribe(user => {
-        console.log('onAuth', user);
-        this.user = user
-      });
+      .do(v => console.log('onAuth', v))
+      .map(u => {
+        return Object.assign({}, u, {
+          auth: null // makes easier to convert to json
+        })
+      })
+      .subscribe(user => this.user = user);
   }
 
   signInAnonymously() {

@@ -22,6 +22,12 @@ const baseFBUser = {
   providerData: [{}]
 };
 
+const anonymouseFirebaseUser = <firebase.User> {
+  uid: 'fCjhqFLSmLRI1YOfFwy7MDmjBpC9',
+  isAnonymous: true,
+  providerData: []
+};
+
 const baseAuthState: FirebaseAuthState = {
   uid: baseFBUser.uid,
   provider: AuthProviders.Anonymous,
@@ -102,5 +108,20 @@ describe('auth_backend', () => {
 
     let actualAuthState = authDataToAuthState(facebookUser, baseFacebookCredential);
     expect(actualAuthState.facebook.accessToken).toEqual(baseFacebookCredential.accessToken);
+  });
+
+
+  it('Anonymous: should return a FirebaseAuthState object', () => {
+    let anonymouseFirebaseUser = Object.assign({}, baseFBUser, {
+      providerData: [],
+      isAnonymous: true
+    });
+    let expectedAuthState = Object.assign({}, baseAuthState, {
+      facebook: baseFacebookCredential,
+      auth: anonymouseFirebaseUser
+    });
+
+    let actualAuthState = authDataToAuthState(anonymouseFirebaseUser);
+    expect(actualAuthState.anonymous).toEqual(true);
   });
 });

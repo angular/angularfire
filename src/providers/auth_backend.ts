@@ -50,6 +50,7 @@ export interface FirebaseAuthState {
   google?: GoogleCredential;
   twitter?: TwitterCredential;
   facebook?: CommonOAuthCredential;
+  anonymous?: boolean;
 }
 
 export interface CommonOAuthCredential {
@@ -69,8 +70,19 @@ export interface TwitterCredential extends CommonOAuthCredential {
 export type OAuthCredential = CommonOAuthCredential | GoogleCredential | TwitterCredential;
 
 export function authDataToAuthState(authData: firebase.User, providerData?: OAuthCredential): FirebaseAuthState {
-  let { uid, providerData: [{providerId}] } = authData;
+  if (!authData) return null;
+  let providerId;
+  let { uid } = authData;
   let authState: FirebaseAuthState = { auth: authData, uid, provider: null };
+  if (authData.isAnonymous) {
+    providerId = 'anonymous';
+    authState.provider = AuthProviders.Anonymous;
+    authState.anonymous = true;
+    return authState;
+  } else {
+    providerId = authData.providerData[0].providerId;
+  }
+
   switch (providerId) {
     case 'github.com':
       authState.github = <CommonOAuthCredential>providerData;
@@ -90,9 +102,6 @@ export function authDataToAuthState(authData: firebase.User, providerData?: OAut
       break;
     case 'password':
       authState.provider = AuthProviders.Password;
-      break;
-    case 'anonymous':
-      authState.provider = AuthProviders.Anonymous;
       break;
     case 'custom':
       authState.provider = AuthProviders.Custom;

@@ -7,6 +7,7 @@ import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/concat';
 import 'rxjs/add/operator/skip';
+import 'rxjs/add/observable/of';
 
 import {FirebaseApp, FirebaseAuthConfig} from '../tokens';
 import {isPresent} from '../utils/utils';
@@ -126,6 +127,10 @@ export class AngularFireAuth extends ReplaySubject<FirebaseAuthState> {
   }
 
   public getAuth(): FirebaseAuthState {
+    console.warn(`WARNING: the getAuth() API has changed behavior since adding support for Firebase 3.
+    This will return null for the initial value when the page loads, even if the user is actually logged in.
+    Please observe the actual authState asynchronously by subscribing to the auth service: af.auth.subscribe().
+    The getAuth method will be removed in future releases`);
     return this._authBackend.getAuth()
   }
 

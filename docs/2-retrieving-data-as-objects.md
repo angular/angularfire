@@ -63,7 +63,7 @@ import {AngularFire, FirebaseObjectObservable} from 'angularfire2';
   `,
 })
 export class AppComponent {
-  item: Observable<any>;
+  item: FirebaseObjectObservable<any>;
   constructor(af: AngularFire) {
     this.item = af.database.object('/item');
   }
@@ -116,7 +116,7 @@ itemObservable.update({ age: newAge });
 ```
 
 **Only objects are allowed for updates, not primitives**. This is because
-using an update with a primitive is the exact same as doing a `.set()` with a primtivie.
+using an update with a primitive is the exact same as doing a `.set()` with a primitive.
 
 ### Deleting data
 Use the `remove()` method to remove data at the object's location.

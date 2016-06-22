@@ -63,6 +63,12 @@ const firebaseUser = <firebase.User> {
   }]
 };
 
+const anonymouseFirebaseUser = <firebase.User> {
+  uid: '12345',
+  isAnonymous: true,
+  providerData: []
+}
+
 const githubCredential = {
   credential: {
     accessToken: 'ACCESS_TOKEN',
@@ -114,7 +120,7 @@ describe('FirebaseAuth', () => {
     authSpy['signInWithPopup'].and.returnValue(Promise.resolve(googleCredential));
     authSpy['signInWithRedirect'].and.returnValue(Promise.resolve(AngularFireAuthState));
     authSpy['signInWithCredential'].and.returnValue(Promise.resolve(firebaseUser));
-    authSpy['signInAnonymously'].and.returnValue(Promise.resolve(firebaseUser));
+    authSpy['signInAnonymously'].and.returnValue(Promise.resolve(anonymouseFirebaseUser));
     authSpy['signInWithCustomToken'].and.returnValue(Promise.resolve(firebaseUser));
     authSpy['signInWithEmailAndPassword'].and.returnValue(Promise.resolve(firebaseUser));
     authSpy['onAuthStateChanged']
@@ -333,7 +339,7 @@ describe('FirebaseAuth', () => {
       it('will resolve the promise upon authentication', (done: any) => {
         afAuth.login(options)
           .then(result => {
-            expect(result.auth).toEqual(AngularFireAuthState.auth);
+            expect(result.auth).toEqual(anonymouseFirebaseUser);
           })
           .then(done, done.fail);
 
@@ -521,6 +527,20 @@ describe('FirebaseAuth', () => {
         afAuth.logout();
         expect(app.auth().signOut).toHaveBeenCalled();
       });
+    });
+
+
+    describe('getAuth()', () => {
+      it('should return null when no user is logged in', () => {
+        authSpy['currentUser'] = null;
+        expect(afAuth.getAuth()).toBe(null);
+      });
+
+
+      it('should return authState if user is logged in', () => {
+        authSpy['currentUser'] = firebaseUser;
+        expect(afAuth.getAuth().uid).toEqual(AngularFireAuthState.uid);
+      })
     });
   });
 });

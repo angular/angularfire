@@ -1,3 +1,8 @@
+## Contributing Process
+1. Create an issue to open the line of communication. **Please create an issue before sending a PR :)**
+2. Discussion on the issue.
+3. PR sent based on discussion.
+
 ## Initial Setup
 
 ```
