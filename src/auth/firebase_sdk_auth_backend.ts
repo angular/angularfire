@@ -1,6 +1,9 @@
 import { Injectable, Inject } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
+import { FirebaseApp } from '../tokens';
+import { isPresent } from '../utils/utils';
+import { auth } from 'firebase';
 import {
   authDataToAuthState,
   AuthBackend,
@@ -9,9 +12,6 @@ import {
   FirebaseAuthState,
   EmailPasswordCredentials
 } from './auth_backend';
-import {FirebaseApp} from '../tokens';
-import {isPresent} from '../utils/utils';
-import { auth } from 'firebase';
 
 const {
   FacebookAuthProvider,
