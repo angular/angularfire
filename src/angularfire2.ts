@@ -1,7 +1,6 @@
 import { initializeApp } from 'firebase';
 import * as utils from './utils/utils';
 import { FirebaseAppConfig } from './interfaces';
-import { FirebaseSdkAuthBackend } from './providers/firebase_sdk_auth_backend';
 import { 
   FirebaseListFactoryOpts, 
   FirebaseObjectFactoryOpts,
@@ -20,10 +19,15 @@ import {
   Provider 
 } from '@angular/core';
 import { 
+  FirebaseSdkAuthBackend,
   AngularFireAuth, 
   firebaseAuthConfig, 
-  FirebaseAuth 
-} from './providers/auth';
+  FirebaseAuth,
+  AuthBackend,
+  AuthMethods,
+  AuthProviders,
+  FirebaseAuthState    
+} from './auth/index';
 import {
   FirebaseListObservable,
   FirebaseObjectObservable,
@@ -31,12 +35,6 @@ import {
   FirebaseObjectFactory,
   FirebaseDatabase
 } from './database/index';
-import {
-  AuthBackend,
-  AuthMethods,
-  AuthProviders,
-  FirebaseAuthState
-} from './providers/auth_backend';
 
 @Injectable()
 export class AngularFire {

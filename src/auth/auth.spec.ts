@@ -1,4 +1,7 @@
 import { auth, initializeApp } from 'firebase';
+import {ReflectiveInjector, provide, Provider} from '@angular/core';
+import { Observable } from 'rxjs/Observable'
+import { Observer } from 'rxjs/Observer';
 import {
   beforeEachProviders,
   expect,
@@ -9,9 +12,6 @@ import {
   iit,
   beforeEach
 } from '@angular/core/testing';
-import {ReflectiveInjector, provide, Provider} from '@angular/core';
-import { Observable } from 'rxjs/Observable'
-import { Observer } from 'rxjs/Observer';
 import 'rxjs/add/operator/do';
 
 import {
