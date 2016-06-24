@@ -1,8 +1,8 @@
 import { initializeApp } from 'firebase';
-import * as utils from './utils/utils';
+import * as utils from './utils';
 import { FirebaseAppConfig } from './interfaces';
-import { 
-  FirebaseListFactoryOpts, 
+import {
+  FirebaseListFactoryOpts,
   FirebaseObjectFactoryOpts,
 } from './interfaces';
 import {
@@ -10,29 +10,30 @@ import {
   FirebaseApp,
   WindowLocation
 } from './tokens';
-import { 
-  APP_INITIALIZER, 
-  Inject, 
-  Injectable, 
-  OpaqueToken, 
-  provide, 
-  Provider 
+import {
+  APP_INITIALIZER,
+  Inject,
+  Injectable,
+  OpaqueToken,
+  provide,
+  Provider
 } from '@angular/core';
-import { 
+import {
   FirebaseSdkAuthBackend,
-  AngularFireAuth, 
-  firebaseAuthConfig, 
+  AngularFireAuth,
+  firebaseAuthConfig,
   FirebaseAuth,
   AuthBackend,
   AuthMethods,
   AuthProviders,
-  FirebaseAuthState    
+  FirebaseAuthState
 } from './auth/index';
 import {
   FirebaseListObservable,
   FirebaseObjectObservable,
   FirebaseListFactory,
   FirebaseObjectFactory,
+  AngularFireDatabase,
   FirebaseDatabase
 } from './database/index';
 
@@ -41,7 +42,7 @@ export class AngularFire {
   constructor(
     @Inject(FirebaseConfig) private fbUrl:string,
     public auth: AngularFireAuth,
-    public database: FirebaseDatabase) {}
+    public database: AngularFireDatabase) {}
 }
 
 export const COMMON_PROVIDERS: any[] = [
@@ -56,7 +57,7 @@ export const COMMON_PROVIDERS: any[] = [
   },
   AngularFireAuth,
   AngularFire,
-  FirebaseDatabase
+  AngularFireDatabase,
 ];
 
 function _getFirebase(config: FirebaseAppConfig): firebase.app.App {
@@ -94,8 +95,10 @@ export const defaultFirebase = (config: FirebaseAppConfig): Provider => {
 
 export {
   AngularFireAuth,
+  AngularFireDatabase,
   // TODO: Deprecate
   FirebaseAuth,
+  // TODO: Deprecate
   FirebaseDatabase,
   FirebaseListObservable,
   FirebaseObjectObservable,

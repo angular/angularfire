@@ -19,7 +19,7 @@ import {
   FirebaseConfig,
   FirebaseApp,
   defaultFirebase,
-  FirebaseDatabase,
+  AngularFireDatabase,
   FirebaseAppConfig
 } from './angularfire2';
 import {Subscription} from 'rxjs';
@@ -78,7 +78,7 @@ describe('angularfire', () => {
 
   describe('.database', () => {
     it('should be an instance of Database', inject([AngularFire], (af:AngularFire) => {
-      expect(af.database).toBeAnInstanceOf(FirebaseDatabase);
+      expect(af.database).toBeAnInstanceOf(AngularFireDatabase);
     }));
   });
 

@@ -4,7 +4,7 @@ import { Observer } from 'rxjs/Observer';
 import { database } from 'firebase';
 import { observeQuery } from './query_observable';
 import { Query, FirebaseListFactoryOpts } from '../interfaces';
-import * as utils from '../utils/utils';
+import * as utils from '../utils';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/map';
 

@@ -3,7 +3,7 @@ import { Observer } from 'rxjs/Observer';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import { database } from 'firebase';
-import { unwrapMapFn } from '../utils/utils';
+import { unwrapMapFn } from '../utils';
 import {
   FIREBASE_PROVIDERS,
   defaultFirebase,
