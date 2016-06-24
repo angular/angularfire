@@ -1,4 +1,4 @@
-import { AFUnwrappedDataSnapshot} from '../interfaces';
+import { AFUnwrappedDataSnapshot} from './interfaces';
 
 export function isPresent(obj: any): boolean {
   return obj !== undefined && obj !== null;

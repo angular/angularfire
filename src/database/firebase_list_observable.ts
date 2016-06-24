@@ -2,7 +2,7 @@ import { Observable } from 'rxjs/Observable';
 import { Operator } from 'rxjs/Operator';
 import { Subscriber } from 'rxjs/Subscriber';
 import { Subscription } from 'rxjs/Subscription';
-import * as utils from '../utils/utils';
+import * as utils from '../utils';
 import { 
   AFUnwrappedDataSnapshot, 
   FirebaseOperationCases 

@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import { FirebaseApp } from '../tokens';
-import { isPresent } from '../utils/utils';
+import { isPresent } from '../utils';
 import { auth } from 'firebase';
 import {
   authDataToAuthState,

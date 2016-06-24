@@ -25,7 +25,7 @@ import {
   beforeEachProviders,
   inject
 } from '@angular/core/testing';
-import * as utils from '../utils/utils';
+import * as utils from '../utils';
 import {Query} from '../interfaces';
 import {Subscription, Observable, Subject} from 'rxjs';
 import 'rxjs/add/operator/do';

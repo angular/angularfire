@@ -3,7 +3,7 @@ import { FirebaseConfig } from '../tokens';
 import { FirebaseAppConfig } from '../angularfire2';
 import { FirebaseListFactory } from './index';
 import { FirebaseListFactoryOpts, FirebaseObjectFactoryOpts } from '../interfaces';
-import * as utils from '../utils/utils';
+import * as utils from '../utils';
 import { 
   FirebaseListObservable,
   FirebaseObjectObservable,
@@ -11,7 +11,7 @@ import {
 } from './index';
 
 @Injectable()
-export class FirebaseDatabase {
+export class AngularFireDatabase {
   constructor(@Inject(FirebaseConfig) private fbConfig:FirebaseAppConfig) {}
   list (urlOrRef:string | firebase.database.Reference, opts?:FirebaseListFactoryOpts):FirebaseListObservable<any[]> {
     return utils.checkForUrlOrFirebaseRef(urlOrRef, {
@@ -26,6 +26,9 @@ export class FirebaseDatabase {
     });
   }
 }
+
+// TODO: Deprecate
+export class FirebaseDatabase extends AngularFireDatabase {}
 
 function getAbsUrl (root:FirebaseAppConfig, url:string) {
   if (!(/^[a-z]+:\/\/.*/.test(url))) {

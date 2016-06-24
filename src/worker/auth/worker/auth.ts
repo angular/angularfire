@@ -22,7 +22,7 @@ import {
   OAuth2Credentials,
   OAuthCredentials
 } from '../../auth_backend';
-import {isPresent} from '../../../utils/utils';
+import {isPresent} from '../../../utils';
 import * as firebase from 'firebase';
 
 @Injectable()
