@@ -1,68 +1,20 @@
-import {Observable} from 'rxjs/Observable';
-import {ScalarObservable} from 'rxjs/observable/ScalarObservable';
-import {Operator} from 'rxjs/Operator';
-import {Observer} from 'rxjs/Observer';
-import {merge} from 'rxjs/operator/merge';
-import {map} from 'rxjs/operator/map';
+import { Observable } from 'rxjs/Observable';
+import { ScalarObservable } from 'rxjs/observable/ScalarObservable';
+import { Operator } from 'rxjs/Operator';
+import { Observer } from 'rxjs/Observer';
+import { merge } from 'rxjs/operator/merge';
+import { map } from 'rxjs/operator/map';
+import { 
+  Query, 
+  ScalarQuery, 
+  OrderByOptions, 
+  OrderBySelection, 
+  LimitToOptions, 
+  LimitToSelection, 
+  Primitive 
+} from '../interfaces';
 import 'rxjs/add/operator/merge';
 import 'rxjs/add/operator/combineLatest';
-
-export interface Query {
-  [key: string]: any;
-  orderByKey?: boolean | Observable<boolean>;
-  orderByPriority?: boolean | Observable<boolean>;
-  orderByChild?: string | Observable<string>;
-  orderByValue?: boolean | Observable<boolean>;
-  equalTo?: any | Observable<any>;
-  startAt?: any | Observable<any>;
-  endAt?: any | Observable<any>;
-  limitToFirst?: number | Observable<number>;
-  limitToLast?: number | Observable<number>;
-}
-
-export interface ScalarQuery {
-  [key: string]: any;
-  orderByKey?: boolean;
-  orderByPriority?: boolean;
-  orderByChild?: string;
-  orderByValue?: boolean;
-  equalTo?: any;
-  startAt?: any;
-  endAt?: any;
-  limitToFirst?: number;
-  limitToLast?: number;
-}
-
-export enum OrderByOptions {
-  Child,
-  Key,
-  Value,
-  Priority
-}
-
-export enum LimitToOptions {
-  First,
-  Last
-}
-
-export enum QueryOptions {
-  EqualTo,
-  StartAt,
-  EndAt
-}
-
-export interface OrderBySelection {
-  key: OrderByOptions;
-  value: boolean | string;
-}
-
-export interface LimitToSelection {
-  key: LimitToOptions;
-  value: number;
-}
-
-export type Primitive = number | string | boolean;
-
 
 export function observeQuery(query: Query): Observable<ScalarQuery> {
   if (!isPresent(query)) {

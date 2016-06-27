@@ -1,12 +1,19 @@
-import {FirebaseListObservable, AFUnwrappedDataSnapshot} from './firebase_list_observable';
-import {Observer} from 'rxjs/Observer';
+import { AFUnwrappedDataSnapshot } from '../interfaces';
+import { FirebaseListObservable } from './firebase_list_observable';
+import { Observer } from 'rxjs/Observer';
 import { database } from 'firebase';
-import * as utils from './utils';
-import {Query, observeQuery} from './query_observable';
+import { observeQuery } from './query_observable';
+import { Query, FirebaseListFactoryOpts } from '../interfaces';
+import * as utils from '../utils';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/map';
 
-export function FirebaseListFactory (absoluteUrlOrDbRef:string | firebase.database.Reference | firebase.database.Query, {preserveSnapshot, query = {}}:FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
+export function FirebaseListFactory (
+  absoluteUrlOrDbRef:string | 
+  firebase.database.Reference | 
+  firebase.database.Query, 
+  {preserveSnapshot, query = {}}:FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
+  
   let ref: firebase.database.Reference | firebase.database.Query;
 
   utils.checkForUrlOrFirebaseRef(absoluteUrlOrDbRef, {
@@ -140,11 +147,6 @@ function firebaseListObservable(ref: firebase.database.Reference | firebase.data
     return () => ref.off();
   });
   return listObs;
-}
-
-export interface FirebaseListFactoryOpts {
-  preserveSnapshot?: boolean;
-  query?: Query;
 }
 
 export function onChildAdded(arr:any[], child:any, prevKey:string): any[] {

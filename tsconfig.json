@@ -15,14 +15,15 @@
   "files": [
     "src/angularfire2.ts",
     "src/angularfire2.spec.ts",
-    "src/utils/firebase_list_factory.spec.ts",
-    "src/utils/firebase_object_factory.ts",
-    "src/utils/firebase_object_factory.spec.ts",
-    "src/utils/firebase_list_observable.spec.ts",
-    "src/utils/firebase_object_observable.spec.ts",
-    "src/utils/query_observable.spec.ts",
-    "src/providers/auth.spec.ts",
-    "src/providers/auth_backend.spec.ts",
+    "src/database/index.ts",
+    "src/database/firebase_list_factory.spec.ts",
+    "src/database/firebase_object_factory.spec.ts",
+    "src/database/firebase_list_observable.spec.ts",
+    "src/database/firebase_object_observable.spec.ts",
+    "src/database/query_observable.spec.ts",
+    "src/auth/auth.ts",
+    "src/auth/auth.spec.ts",
+    "src/auth/auth_backend.spec.ts",
     "typings/main.d.ts",
     "manual_typings/firebase3/firebase3.d.ts"
   ]

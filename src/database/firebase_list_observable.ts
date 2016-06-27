@@ -1,20 +1,12 @@
-import {Observable} from 'rxjs/Observable';
-import {Operator} from 'rxjs/Operator';
-import {Subscriber} from 'rxjs/Subscriber';
-import {Subscription} from 'rxjs/Subscription';
-import * as utils from './utils';
-
-export interface FirebaseOperationCases {
-  stringCase: () => firebase.Promise<void>;
-  firebaseCase?: () => firebase.Promise<void>;
-  snapshotCase?: () => firebase.Promise<void>;
-  unwrappedSnapshotCase?: () => firebase.Promise<void>;
-}
-
-export interface AFUnwrappedDataSnapshot {
-  $key: string;
-  $value?: string | number | boolean;
-}
+import { Observable } from 'rxjs/Observable';
+import { Operator } from 'rxjs/Operator';
+import { Subscriber } from 'rxjs/Subscriber';
+import { Subscription } from 'rxjs/Subscription';
+import * as utils from '../utils';
+import { 
+  AFUnwrappedDataSnapshot, 
+  FirebaseOperationCases 
+} from '../interfaces';
 
 export type FirebaseOperation = string | firebase.database.Reference | firebase.database.DataSnapshot | AFUnwrappedDataSnapshot;
 

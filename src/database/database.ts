@@ -1,14 +1,17 @@
-import {Inject, Injectable} from '@angular/core';
-import {FirebaseConfig} from '../tokens';
-import {FirebaseAppConfig} from '../angularfire2';
-import {FirebaseListObservable} from '../utils/firebase_list_observable';
-import {FirebaseObjectObservable} from '../utils/firebase_object_observable';
-import {FirebaseListFactory, FirebaseListFactoryOpts} from '../utils/firebase_list_factory';
-import {FirebaseObjectFactoryOpts, FirebaseObjectFactory} from '../utils/firebase_object_factory';
-import * as utils from '../utils/utils'
+import { Inject, Injectable } from '@angular/core';
+import { FirebaseConfig } from '../tokens';
+import { FirebaseAppConfig } from '../angularfire2';
+import { FirebaseListFactory } from './index';
+import { FirebaseListFactoryOpts, FirebaseObjectFactoryOpts } from '../interfaces';
+import * as utils from '../utils';
+import { 
+  FirebaseListObservable,
+  FirebaseObjectObservable,
+  FirebaseObjectFactory
+} from './index';
 
 @Injectable()
-export class FirebaseDatabase {
+export class AngularFireDatabase {
   constructor(@Inject(FirebaseConfig) private fbConfig:FirebaseAppConfig) {}
   list (urlOrRef:string | firebase.database.Reference, opts?:FirebaseListFactoryOpts):FirebaseListObservable<any[]> {
     return utils.checkForUrlOrFirebaseRef(urlOrRef, {
@@ -23,6 +26,9 @@ export class FirebaseDatabase {
     });
   }
 }
+
+// TODO: Deprecate
+export class FirebaseDatabase extends AngularFireDatabase {}
 
 function getAbsUrl (root:FirebaseAppConfig, url:string) {
   if (!(/^[a-z]+:\/\/.*/.test(url))) {

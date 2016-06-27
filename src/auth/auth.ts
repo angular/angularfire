@@ -1,17 +1,9 @@
-import {Provider, Inject, provide, Injectable, Optional} from '@angular/core';
+import { Provider, Inject, provide, Injectable, Optional } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
-import {ReplaySubject} from 'rxjs/ReplaySubject';
-
-import 'rxjs/add/operator/mergeMap';
-import 'rxjs/add/operator/take';
-import 'rxjs/add/operator/concat';
-import 'rxjs/add/operator/skip';
-import 'rxjs/add/observable/of';
-
+import { ReplaySubject } from 'rxjs/ReplaySubject';
 import { FirebaseApp, FirebaseAuthConfig, WindowLocation } from '../tokens';
-import {isPresent} from '../utils/utils';
-import * as utils from '../utils/utils';
+import * as utils from '../utils';
 import {
   authDataToAuthState,
   AuthBackend,
@@ -23,6 +15,11 @@ import {
   FirebaseAuthState,
   stripProviderId
 } from './auth_backend';
+import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/take';
+import 'rxjs/add/operator/concat';
+import 'rxjs/add/operator/skip';
+import 'rxjs/add/observable/of';
 
 const kBufferSize = 1;
 
@@ -86,12 +83,12 @@ export class AngularFireAuth extends ReplaySubject<FirebaseAuthState> {
     }
     config = this._mergeConfigs(config);
 
-    if (!isPresent(config.method)) {
+    if (!utils.isPresent(config.method)) {
       return this._reject('You must provide a login method');
     }
     let providerMethods = [AuthMethods.Popup, AuthMethods.Redirect, AuthMethods.OAuthToken];
     if (providerMethods.indexOf(config.method) != -1) {
-      if (!isPresent(config.provider)) {
+      if (!utils.isPresent(config.provider)) {
         return this._reject('You must include a provider to use this auth method.');
       }
     }
