@@ -58,7 +58,7 @@ bootstrap(<MyApp>Component, [
 
 ## Login users
 
-If you have setup authentication in boostrap like above, then all you need to do
+If you have setup authentication in bootstrap like above, then all you need to do
 is call login on `af.auth.login()`
 
 The long exception is if you're using username and password, then you'll have
