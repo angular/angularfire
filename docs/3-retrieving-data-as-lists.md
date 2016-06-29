@@ -85,7 +85,7 @@ The table below highlights some of the common methods on the `FirebaseObjectObse
 | method   |                    | 
 | ---------|--------------------| 
 | push(value: any) | Creates a new record on the list, using the Realtime Database's push-ids. | 
-| update(keyRefOrSnap: string | Firebase | AFUnwrappedSnapshot, value: Object) | Updates an existing item in the array. Accepts a key, database reference, or an unwrapped snapshot. |
+| update(keyRefOrSnap: string) | Firebase | AFUnwrappedSnapshot, value: Object) | Updates an existing item in the array. Accepts a key, database reference, or an unwrapped snapshot. |
 | remove(key: string?) | Deletes the item by key. If no parameter is provided, the entire list will be deleted. |
 
 ## Returning promises
