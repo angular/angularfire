@@ -80,7 +80,13 @@ export function authDataToAuthState(authData: firebase.User, providerData?: OAut
     authState.anonymous = true;
     return authState;
   } else {
-    providerId = authData.providerData[0].providerId;
+    // when we do custom authentication there is no
+    // providerData that is returned
+    if (authData.providerData && authData.providerData.length > 0) {
+      providerId = authData.providerData[0].providerId;
+    } else {
+      providerId = 'custom';
+    }
   }
 
   switch (providerId) {
@@ -113,7 +119,7 @@ export function authDataToAuthState(authData: firebase.User, providerData?: OAut
   return authState;
 }
 
-export function stripProviderId (providerId: string): string {
+export function stripProviderId(providerId: string): string {
   let providerStripped = /(.*)\.com$/.exec(providerId);
   if (providerStripped && providerStripped.length === 2) {
     return providerStripped[1];

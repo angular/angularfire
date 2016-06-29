@@ -1,29 +1,29 @@
 {
-  "compilerOptions": {
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "module": "commonjs",
-    "target": "es5",
-    "noImplicitAny": false,
-    "outDir": "dist",
-    "rootDir": "src",
-    "sourceMap": true,
-    "inlineSources": true,
-    "declaration": true,
-    "removeComments": true
-  },
-  "files": [
-    "src/angularfire2.ts",
-    "src/angularfire2.spec.ts",
-    "src/utils/firebase_list_factory.spec.ts",
-    "src/utils/firebase_object_factory.ts",
-    "src/utils/firebase_object_factory.spec.ts",
-    "src/utils/firebase_list_observable.spec.ts",
-    "src/utils/firebase_object_observable.spec.ts",
-    "src/utils/query_observable.spec.ts",
-    "src/providers/auth.spec.ts",
-    "src/providers/auth_backend.spec.ts",
-    "typings/main.d.ts",
-    "manual_typings/firebase3/firebase3.d.ts"
-  ]
+    "compilerOptions": {
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "module": "commonjs",
+        "target": "es5",
+        "noImplicitAny": false,
+        "outDir": "dist",
+        "rootDir": "src",
+        "sourceMap": true,
+        "inlineSources": true,
+        "declaration": true,
+        "removeComments": true
+    },
+    "files": [
+        "src/angularfire2.ts",
+        "src/angularfire2.spec.ts",
+        "src/utils/firebase_list_factory.spec.ts",
+        "src/utils/firebase_object_factory.ts",
+        "src/utils/firebase_object_factory.spec.ts",
+        "src/utils/firebase_list_observable.spec.ts",
+        "src/utils/firebase_object_observable.spec.ts",
+        "src/utils/query_observable.spec.ts",
+        "src/providers/auth.spec.ts",
+        "src/providers/auth_backend.spec.ts",
+        "typings/index.d.ts",
+        "manual_typings/firebase3/firebase3.d.ts"
+    ]
 }
