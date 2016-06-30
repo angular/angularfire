@@ -4,7 +4,7 @@
     "emitDecoratorMetadata": true,
     "target": "es6",
     "noImplicitAny": false,
-    "outDir": "dist/esm",
+    "outDir": "dist/es6",
     "rootDir": "src",
     "sourceMap": true,
     "sourceRoot": "./",
