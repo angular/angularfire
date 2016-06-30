@@ -7,7 +7,7 @@
     "outDir": "dist/esm",
     "rootDir": "src",
     "sourceMap": true,
-    "sourceRoot": "./",
+    "inlineSources": true,
     "declaration": true,
     "removeComments": true,
     "moduleResolution": "node"

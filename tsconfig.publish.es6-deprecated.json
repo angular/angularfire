@@ -7,7 +7,7 @@
     "outDir": "dist/es6",
     "rootDir": "src",
     "sourceMap": true,
-    "sourceRoot": "./",
+    "inlineSources": true,
     "declaration": true,
     "removeComments": true,
     "moduleResolution": "node"
