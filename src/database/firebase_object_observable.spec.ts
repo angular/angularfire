@@ -1,11 +1,5 @@
 import {
-  beforeEach,
-  it,
-  iit,
-  ddescribe,
-  describe,
-  expect,
-  beforeEachProviders,
+  addProviders,
   inject
 } from '@angular/core/testing';
 import {
@@ -34,14 +28,15 @@ describe('FirebaseObjectObservable', () => {
   var ref: firebase.database.Reference;
   var app: firebase.app.App;
 
-  beforeEachProviders(() => [FIREBASE_PROVIDERS, defaultFirebase(firebaseConfig)]);
-
-  beforeEach(inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
-    app = firebaseApp;
-    ref = database().ref()
-    O = new FirebaseObjectObservable((observer:Observer<any>) => {
-    }, ref);
-  }));
+  beforeEach(() => {
+    addProviders([FIREBASE_PROVIDERS, defaultFirebase(firebaseConfig)]);
+    inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
+      app = firebaseApp;
+      ref = database().ref()
+      O = new FirebaseObjectObservable((observer:Observer<any>) => {
+      }, ref);
+    })();
+  });
 
   afterEach(done => {
     ref.off();

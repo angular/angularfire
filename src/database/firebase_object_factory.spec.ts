@@ -1,13 +1,7 @@
 import { Subscription } from 'rxjs';
 import { FirebaseObjectFactory, FirebaseObjectObservable } from './index';
 import {
-  beforeEach,
-  it,
-  iit,
-  ddescribe,
-  describe,
-  expect,
-  beforeEachProviders,
+  addProviders,
   inject
 } from '@angular/core/testing';
 import {
@@ -34,11 +28,12 @@ describe('FirebaseObjectFactory', () => {
   var nextSpy: jasmine.Spy;
   var app: firebase.app.App;
 
-  beforeEachProviders(() => [FIREBASE_PROVIDERS, defaultFirebase(firebaseConfig)]);
-
-  beforeEach(inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
-    app = firebaseApp;
-  }));
+  beforeEach(() => {
+    addProviders([FIREBASE_PROVIDERS, defaultFirebase(firebaseConfig)]);
+    inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
+      app = firebaseApp;
+    })();
+  });
 
   afterEach(done => {
     app.delete().then(done, done.fail);
@@ -48,12 +43,12 @@ describe('FirebaseObjectFactory', () => {
 
     it('should accept a Firebase db url in the constructor', () => {
       const object = FirebaseObjectFactory(`${rootFirebase}/questions`);
-      expect(object).toBeAnInstanceOf(FirebaseObjectObservable);
+      expect(object instanceof FirebaseObjectObservable).toBe(true);
     });
 
     it('should accept a Firebase db ref in the constructor', () => {
       const object = FirebaseObjectFactory(firebase.database().ref().child(`questions`));
-      expect(object).toBeAnInstanceOf(FirebaseObjectObservable);
+      expect(object instanceof FirebaseObjectObservable).toBe(true);
     });
 
   });

@@ -16,13 +16,7 @@ import {
   AngularFire
 } from '../angularfire2';
 import {
-  beforeEach,
-  it,
-  iit,
-  ddescribe,
-  describe,
-  expect,
-  beforeEachProviders,
+  addProviders,
   inject
 } from '@angular/core/testing';
 import * as utils from '../utils';
@@ -69,11 +63,12 @@ describe('FirebaseListFactory', () => {
   var val3: any;
   var app: firebase.app.App;
 
-  beforeEachProviders(() => [FIREBASE_PROVIDERS, defaultFirebase(firebaseConfig)]);
-
-  beforeEach(inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
-    app = firebaseApp;
-  }));
+  beforeEach(() => {
+    addProviders([FIREBASE_PROVIDERS, defaultFirebase(firebaseConfig)]);
+    inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
+      app = firebaseApp;
+    })();
+  });
 
   afterEach(done => {
     app.delete().then(done, done.fail);
@@ -83,12 +78,12 @@ describe('FirebaseListFactory', () => {
 
     it('should accept a Firebase db url in the constructor', () => {
       const list = FirebaseListFactory(`${rootFirebase}/questions`);
-      expect(list).toBeAnInstanceOf(FirebaseListObservable);
+      expect(list instanceof FirebaseListObservable).toBe(true);
     });
 
     it('should accept a Firebase db ref in the constructor', () => {
       const list = FirebaseListFactory(firebase.database().refFromURL(`${rootFirebase}/questions`));
-      expect(list).toBeAnInstanceOf(FirebaseListObservable);
+      expect(list instanceof FirebaseListObservable).toBe(true);
     });
 
   });

@@ -3,14 +3,8 @@ import {ReflectiveInjector, provide, Provider} from '@angular/core';
 import { Observable } from 'rxjs/Observable'
 import { Observer } from 'rxjs/Observer';
 import {
-  beforeEachProviders,
-  expect,
-  ddescribe,
-  describe,
-  inject,
-  it,
-  iit,
-  beforeEach
+  addProviders,
+  inject
 } from '@angular/core/testing';
 import 'rxjs/add/operator/do';
 
@@ -103,7 +97,7 @@ describe('FirebaseAuth', () => {
   let fbAuthObserver: Observer<firebase.User>;
   let windowLocation: any;
 
-  beforeEachProviders(() => {
+  beforeEach(() => {
     windowLocation = {
       hash: '',
       search: '',
@@ -115,7 +109,7 @@ describe('FirebaseAuth', () => {
       origin:'localhost',
       href:'https://localhost/'
     };
-    return [
+    addProviders([
       FIREBASE_PROVIDERS,
       defaultFirebase(COMMON_CONFIG),
       provide(FirebaseApp, {
@@ -129,10 +123,8 @@ describe('FirebaseAuth', () => {
       provide(WindowLocation, {
         useValue: windowLocation
       })
-    ]
-  });
+    ]);
 
-  beforeEach(() => {
     authSpy = jasmine.createSpyObj('auth', authMethods);
     authSpy['createUserWithEmailAndPassword'].and.returnValue(Promise.resolve(firebaseUser));
     authSpy['signInWithPopup'].and.returnValue(Promise.resolve(googleCredential));
@@ -162,7 +154,7 @@ describe('FirebaseAuth', () => {
 
 
   it('should be an observable', () => {
-    expect(afAuth).toBeAnInstanceOf(Observable);
+    expect(afAuth instanceof Observable).toBe(true);
   });
 
 
@@ -213,7 +205,7 @@ describe('FirebaseAuth', () => {
 
   describe('firebaseAuthConfig', () => {
     it('should return a provider', () => {
-      expect(firebaseAuthConfig({ method: AuthMethods.Password })).toBeAnInstanceOf(Provider);
+      expect(firebaseAuthConfig({ method: AuthMethods.Password }) instanceof Provider).toBe(true);
     });
 
     it('should use config in login', () => {
