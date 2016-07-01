@@ -1,13 +1,4 @@
 import {
-  expect,
-  ddescribe,
-  describe,
-  it,
-  iit,
-  beforeEach
-} from '@angular/core/testing';
-
-import {
   authDataToAuthState,
   AuthProviders,
   FirebaseAuthState,

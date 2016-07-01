@@ -40,6 +40,24 @@ In your `tsconfig.json` file include the following line in your `"files"` array:
 
 This is a temporary step until the Firebase typings are published to npm.
 
+Unless you're targeting ES6 output in tsconfig.json, you'll also need to install
+typings for the global Promise constructor. Run this command:
+
+`$ typings install --save --global es6-promise`
+
+If you're using Angular CLI, the typings will automatically be added to your
+tsconfig since there is already a reference to `"typings.d.ts"` which transitively
+includes `es6-promise`. If you're using a different seed project, or managing your
+build yourself, just add the reference to your tsconfig files array:
+
+```json
+"files": [
+  "node_modules/angularfire2/firebase3.d.ts",
+  "typings/main.d.ts"
+]
+```
+
+
 ### 4. Include AngularFire 2 and Firebase in the vendor files
 
 Open `angular-cli-build.js`.

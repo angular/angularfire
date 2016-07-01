@@ -11,13 +11,8 @@ import {
   FirebaseAppConfig,
   AngularFire
 } from '../angularfire2';
-import { 
-  describe,
-  ddescribe,
-  it,
-  iit,
-  beforeEach,
-  beforeEachProviders,
+import {
+  addProviders,
   inject
 } from '@angular/core/testing';
 
@@ -34,14 +29,15 @@ describe('FirebaseObservable', () => {
   var ref:firebase.database.Reference;
   var app: firebase.app.App;
 
-  beforeEachProviders(() => [FIREBASE_PROVIDERS, defaultFirebase(firebaseConfig)]);
-
-  beforeEach(inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
-    app = firebaseApp;
-    ref = database().ref();
-    O = new FirebaseListObservable(ref, (observer:Observer<any>) => {
-    });
-  }));
+  beforeEach(() => {
+    addProviders([FIREBASE_PROVIDERS, defaultFirebase(firebaseConfig)]);
+    inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
+      app = firebaseApp;
+      ref = database().ref();
+      O = new FirebaseListObservable(ref, (observer:Observer<any>) => {
+      });
+    })();
+  });
 
   afterEach(done => {
     app.delete().then(done, done.fail);

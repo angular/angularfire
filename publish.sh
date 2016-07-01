@@ -1,2 +1,1 @@
-npm run build_npm
-npm publish dist
+npm run build_npm && npm publish dist

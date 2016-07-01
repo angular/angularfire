@@ -1,14 +1,6 @@
 import {
-  describe,
-  ddescribe,
-  it,
-  iit,
-  beforeEach,
-  beforeEachProviders,
-  expect,
-  inject,
-  injectAsync,
-  async
+  addProviders,
+  inject
 } from '@angular/core/testing';
 import {ReflectiveInjector, provide, Provider} from '@angular/core';
 import {
@@ -43,18 +35,16 @@ describe('angularfire', () => {
   var listOfQuestionsRef: firebase.database.Reference;
   var angularFire2: AngularFire;
 
-  beforeEachProviders(() => [FIREBASE_PROVIDERS, defaultFirebase(firebaseConfig)]);
-
-  describe('things', () => {
-
-  })
-  beforeEach(inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
-    angularFire2 = _af;
-    app = firebaseApp;
-    rootRef = app.database().ref();
-    questionsRef = rootRef.child('questions');
-    listOfQuestionsRef = rootRef.child('list-of-questions');
-  }));
+  beforeEach(() => {
+    addProviders([FIREBASE_PROVIDERS, defaultFirebase(firebaseConfig)]);
+    inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
+      angularFire2 = _af;
+      app = firebaseApp;
+      rootRef = app.database().ref();
+      questionsRef = rootRef.child('questions');
+      listOfQuestionsRef = rootRef.child('list-of-questions');
+    })();
+  });
 
   afterEach((done) => {
     rootRef.remove()
@@ -66,19 +56,19 @@ describe('angularfire', () => {
 
 
   it('should be injectable via FIREBASE_PROVIDERS', () => {
-    expect(angularFire2).toBeAnInstanceOf(AngularFire);
+    expect(angularFire2 instanceof AngularFire).toBe(true);
   });
 
   describe('.auth', () => {
     it('should be an instance of AuthService', inject([AngularFire], (af:AngularFire) => {
-      expect(af.auth).toBeAnInstanceOf(AngularFireAuth);
+      expect(af.auth instanceof AngularFireAuth).toBe(true);
     }));
   });
 
 
   describe('.database', () => {
     it('should be an instance of Database', inject([AngularFire], (af:AngularFire) => {
-      expect(af.database).toBeAnInstanceOf(AngularFireDatabase);
+      expect(af.database instanceof AngularFireDatabase).toBe(true);
     }));
   });
 
@@ -91,7 +81,7 @@ describe('angularfire', () => {
   describe('defaultFirebase', () => {
     it('should create a provider', () => {
       const provider = defaultFirebase(firebaseConfig);
-      expect(provider).toBeAnInstanceOf(Provider);
+      expect(provider instanceof Provider).toBe(true);
     });
   });
 });

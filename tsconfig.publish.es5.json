@@ -8,7 +8,7 @@
     "outDir": "dist",
     "rootDir": "src",
     "sourceMap": true,
-    "sourceRoot": "./",
+    "inlineSources": true,
     "declaration": true,
     "removeComments": true
   },
