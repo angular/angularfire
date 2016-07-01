@@ -30,8 +30,8 @@ export function FirebaseListFactory (
   }
 
   const queryObs = observeQuery(query);
-  const listObs = <FirebaseListObservable<{}>>queryObs
-    .map(query => {
+  return new FirebaseListObservable(ref, subscriber => {
+    let sub = queryObs.map(query => {
       let queried: firebase.database.Query = ref;
       // Only apply the populated keys
       // apply ordering and available querying options
@@ -93,8 +93,11 @@ export function FirebaseListFactory (
     })
     .mergeMap((queryRef: firebase.database.Reference, ix: number) => {
       return firebaseListObservable(queryRef, { preserveSnapshot });
-    });
-    return listObs;
+    })
+    .subscribe(subscriber);
+    
+    return () => sub.unsubscribe();
+  });
 }
 
 function firebaseListObservable(ref: firebase.database.Reference | firebase.database.Query, {preserveSnapshot}: FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
