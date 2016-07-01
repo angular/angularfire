@@ -36,6 +36,8 @@ typings install file:node_modules/angularfire2/firebase3.d.ts --save --global &&
 
 This saves the typings reference into `typings.json` and installs it.
 
+Note: for typings < 1, use the `--ambient` flag instead of `--global`.
+
 ### 4. Include AngularFire 2 and Firebase in the vendor files
 
 Open `angular-cli-build.js`.
