@@ -69,9 +69,9 @@ import {AngularFire, FirebaseListObservable} from 'angularfire2';
   `,
 })
 class AppComponent {
-  item: Observable<any>;
+  items: Observable<any>;
   constructor(af: AngularFire) {
-    this.item = af.database.list('/items');
+    this.items = af.database.list('/items');
   }
 }
 ```
