@@ -196,10 +196,12 @@ AngularFire2 unwraps the Firebase DataSnapshot by default, but you can get the d
 ```ts
 this.items = af.database.list('/items', { preserveSnapshot: true });
 this.items
-  .do(snapshots => {
-    snapshots.forEach(snapshot => console.log(snapshot.key()));
+  .subscribe(snapshots => {
+    snapshots.forEach(snapshot => {
+      console.log(snapshot.key)
+      console.log(snapshot.val())
+    });
   })
-  .subscribe(snapshots => console.log(snapshots.length));
 ```
 
 ###[Next Step: Querying lists](4-querying-lists.md)
