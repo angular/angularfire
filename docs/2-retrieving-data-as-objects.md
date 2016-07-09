@@ -31,20 +31,16 @@ export class AppComponent {
 
 Data is retrieved through the `af.database` service.
 
-There are three ways to create an object binding:
+There are two ways to create an object binding:
 
 1. Relative URL
-2. Absolute URL
-3. Reference
+1. Absolute URL
 
 ```ts
 // relative URL, uses the database url provided in bootstrap
 const relative = af.database.object('/item');
 // absolute URL
 const absolute = af.database.object('https://<your-app>.firebaseio.com/item');
-// database reference
-const dbRef = new Firebase('https://<your-app>.firebaseio.com/item');
-const relative = af.database.object(dbRef);
 ```
 
 ### Retrieve data

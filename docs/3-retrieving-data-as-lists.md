@@ -32,21 +32,21 @@ Data is retrieved through the `af.database` service.
 There are four ways to create an object binding:
 
 1. Relative URL
-2. Absolute URL
-3. Reference
-4. Query
+1. Absolute URL
+1. Query
 
 ```ts
 // relative URL, uses the database url provided in bootstrap
 const relative = af.database.list('/items');
 // absolute URL
 const absolute = af.database.list('https://<your-app>.firebaseio.com/items');
-// database reference
-const dbRef = new Firebase('https://<your-app>.firebaseio.com/items');
-const relative = af.database.list(dbRef);
 // query 
-const dbQuery = new Firebase('https://<your-app>.firebaseio.com/items').limitToLast(10);
-const queryList = af.database.list(dbQuery);
+const queryList = af.database.list('/items', {
+  query: {
+    limitToLast: 10,
+    orderByKey: true
+  }
+});
 ```
 
 ### Retrieve data
