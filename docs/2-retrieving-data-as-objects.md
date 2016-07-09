@@ -35,7 +35,7 @@ There are three ways to create an object binding:
 
 1. Relative URL
 2. Absolute URL
-3. Reference or Query
+3. Reference
 
 ```ts
 // relative URL, uses the database url provided in bootstrap
