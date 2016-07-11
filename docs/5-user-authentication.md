@@ -154,3 +154,30 @@ export class RcTestAppComponent {
   }
 }
 ```
+
+## Cordova case
+
+Firebase authentication wasn't entirely compatible with cordova. You need to add some specific operations.
+
+**Example:**
+
+Login with Facebook.
+
+1- Install cordova plugin
+
+```cordova plugin add cordova-plugin-facebook4 --save --variable APP_ID="123456789" --variable APP_NAME="myApplication"```
+
+2- Use signInWithCredential login method
+
+```ts
+  console.log("Facebook success: " + JSON.stringify(result));
+  var provider = firebase.auth.FacebookAuthProvider.credential(result.authResponse.accessToken);
+
+   firebase.auth().signInWithCredential(provider)
+    .then((success) => {
+      console.log("Firebase success: " + JSON.stringify(success));
+    })
+    .catch((error) => {
+      console.log("Firebase failure: " + JSON.stringify(error));
+    });
+```
