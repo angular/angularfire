@@ -199,15 +199,32 @@ import {FirebaseAuth} from 'angularfire2';
 @Component({
   selector: 'auth-status',
   template: `
-    <div *ng-if="auth | async">You are logged in</div>
-    <div *ng-if="!(auth | async)">Please log in</div>
+    <div *ngIf="auth | async">You are logged in</div>
+    <div *ngIf="!(auth | async)">Please log in</div>
   `
 })
 class App {
   constructor (@Inject(FirebaseAuth) public auth: FirebaseAuth) {}
 }
 ```
+Alternatively, if you wish to extend an existing AngularFire component to monitor authentication status:
+```
+ts
+import {AngularFire, FirebaseAuth} from 'angularfire2';
+@Component({
+  selector: 'auth-status',
+  template: `
+    <div *ngIf="af.auth | async">You are logged in</div>
+    <div *ngIf="!(af.auth | async)">Please log in</div>
+  `
+})
+class App {
+  constructor(public af: AngularFire) {
+    this.af.auth.subscribe(auth => console.log(auth));
+  }
+}
 
+```
 ### FirebaseListObservable
 
 Subclass of rxjs `Observable` which also has methods for updating
