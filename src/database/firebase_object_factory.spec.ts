@@ -42,12 +42,12 @@ describe('FirebaseObjectFactory', () => {
   describe('constructor', () => {
 
     it('should accept a Firebase db url in the constructor', () => {
-      const object = FirebaseObjectFactory(app, `${rootFirebase}/questions`);
+      const object = FirebaseObjectFactory(`${rootFirebase}/questions`);
       expect(object instanceof FirebaseObjectObservable).toBe(true);
     });
 
     it('should accept a Firebase db ref in the constructor', () => {
-      const object = FirebaseObjectFactory(app, firebase.database().ref().child(`questions`));
+      const object = FirebaseObjectFactory(firebase.database().ref().child(`questions`));
       expect(object instanceof FirebaseObjectObservable).toBe(true);
     });
 
@@ -59,7 +59,7 @@ describe('FirebaseObjectFactory', () => {
       i = Date.now();
       ref = firebase.database().ref().child(`questions/${i}`);
       nextSpy = nextSpy = jasmine.createSpy('next');
-      observable = FirebaseObjectFactory(app, `${rootFirebase}/questions/${i}`);
+      observable = FirebaseObjectFactory(`${rootFirebase}/questions/${i}`);
       ref.remove(done);
     });
 
@@ -100,7 +100,7 @@ describe('FirebaseObjectFactory', () => {
 
 
     it('should emit snapshots if preserveSnapshot option is true', (done: any) => {
-      observable = FirebaseObjectFactory(app, `${rootFirebase}/questions/${i}`, { preserveSnapshot: true });
+      observable = FirebaseObjectFactory(`${rootFirebase}/questions/${i}`, { preserveSnapshot: true });
       ref.remove(() => {
         ref.set('preserved snapshot!', () => {
           subscription = observable.subscribe(data => {
@@ -115,7 +115,7 @@ describe('FirebaseObjectFactory', () => {
     it('should call off on all events when disposed', () => {
       const dbRef = firebase.database().ref();
       var firebaseSpy = spyOn(dbRef, 'off');
-      subscription = FirebaseObjectFactory(app, dbRef).subscribe();
+      subscription = FirebaseObjectFactory(dbRef).subscribe();
       expect(firebaseSpy).not.toHaveBeenCalled();
       subscription.unsubscribe();
       expect(firebaseSpy).toHaveBeenCalled();
