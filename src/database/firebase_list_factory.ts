@@ -1,7 +1,6 @@
 import { AFUnwrappedDataSnapshot } from '../interfaces';
 import { FirebaseListObservable } from './firebase_list_observable';
 import { Observer } from 'rxjs/Observer';
-import { database } from 'firebase';
 import { observeQuery } from './query_observable';
 import { Query, FirebaseListFactoryOpts } from '../interfaces';
 import * as utils from '../utils';
@@ -9,6 +8,7 @@ import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/map';
 
 export function FirebaseListFactory (
+  fbApp:firebase.app.App,
   absoluteUrlOrDbRef:string | 
   firebase.database.Reference | 
   firebase.database.Query, 
@@ -17,7 +17,7 @@ export function FirebaseListFactory (
   let ref: firebase.database.Reference | firebase.database.Query;
 
   utils.checkForUrlOrFirebaseRef(absoluteUrlOrDbRef, {
-    isUrl: () => ref = database().refFromURL(<string>absoluteUrlOrDbRef),
+    isUrl: () => ref = fbApp.database().refFromURL(<string>absoluteUrlOrDbRef),
     isRef: () => ref = <firebase.database.Reference>absoluteUrlOrDbRef,
     isQuery: () => ref = <firebase.database.Query>absoluteUrlOrDbRef,
   });
