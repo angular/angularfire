@@ -145,7 +145,7 @@ bootstrap(<MyApp>, [
 
 ### 8. Inject AngularFire
 
-Open `/src/app/<my-app>.component.ts`:
+Open `/src/app/<my-app>.component.ts`, and make sure to modify/delete any tests to get the sample working (tests are still important, you know):
 
 ```ts
 import { Component } from '@angular/core';
