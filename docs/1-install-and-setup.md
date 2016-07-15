@@ -138,7 +138,7 @@ bootstrap(<MyApp>, [
     apiKey: "<your-key>",
     authDomain: "<your-project-authdomain>",
     databaseURL: "<your-database-URL>",
-    storageBucket: "<your-storage-bucket>",
+    storageBucket: "<your-storage-bucket>"
   })
 ]);
 ```
