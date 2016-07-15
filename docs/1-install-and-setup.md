@@ -30,15 +30,13 @@ Now that you have a new project setup, install AngularFire 2 and Firebase from n
 
 ### 3. Include Firebase SDK typings
 
-In your `tsconfig.json` file include the following line in your `"files"` array:
-
-```json
-"files": [
-  "node_modules/angularfire2/firebase3.d.ts"
-]
+```bash
+typings install file:node_modules/angularfire2/firebase3.d.ts --save --global && typings install
 ```
 
-This is a temporary step until the Firebase typings are published to npm.
+This saves the typings reference into `typings.json` and installs it.
+
+Note: for typings < 1, use the `--ambient` flag instead of `--global`.
 
 Unless you're targeting ES6 output in tsconfig.json, you'll also need to install
 typings for the global Promise constructor. Run this command:
