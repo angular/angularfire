@@ -190,8 +190,8 @@ export class <MyApp>Component {
 Open `/src/app/<my-app>.component.html`:
 
 ```html
-<ul *ngFor="let item of items | async">
-  <li class="text">
+<ul>
+  <li class="text" *ngFor="let item of items | async">
     {{item.$value}}
   </li>
 </ul>
