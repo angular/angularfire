@@ -29,7 +29,7 @@ class AppComponent {
 
 Data is retrieved through the `af.database` service.
 
-There are three ways to create an object binding:
+There are four ways to create an object binding:
 
 1. Relative URL
 2. Absolute URL
