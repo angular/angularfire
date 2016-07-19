@@ -16,13 +16,13 @@ export class AngularFireDatabase {
     @Inject(FirebaseApp) private fbApp:firebase.app.App) {}
   list (urlOrRef:string | firebase.database.Reference, opts?:FirebaseListFactoryOpts):FirebaseListObservable<any[]> {
     return utils.checkForUrlOrFirebaseRef(urlOrRef, {
-      isUrl: () => FirebaseListFactory(this.fbApp.database().ref(getAbsUrl(this.fbConfig, <string>urlOrRef)), opts),
+      isUrl: () => FirebaseListFactory(this.fbApp.database().refFromURL(getAbsUrl(this.fbConfig, <string>urlOrRef)), opts),
       isRef: () => FirebaseListFactory(<firebase.database.Reference>urlOrRef)
     });
   }
   object(urlOrRef: string | firebase.database.Reference, opts?:FirebaseObjectFactoryOpts):FirebaseObjectObservable<any> {
     return utils.checkForUrlOrFirebaseRef(urlOrRef, {
-      isUrl: () => FirebaseObjectFactory(this.fbApp.database().ref(getAbsUrl(this.fbConfig, <string>urlOrRef)), opts),
+      isUrl: () => FirebaseObjectFactory(this.fbApp.database().refFromURL(getAbsUrl(this.fbConfig, <string>urlOrRef)), opts),
       isRef: () => FirebaseObjectFactory(urlOrRef)
     });
   }
