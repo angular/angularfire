@@ -69,7 +69,7 @@ import {AngularFire, FirebaseListObservable} from 'angularfire2';
   `,
 })
 class AppComponent {
-  items: Observable<any>;
+  items: FirebaseListObservable<any>;
   constructor(af: AngularFire) {
     this.items = af.database.list('/items');
   }
@@ -80,7 +80,7 @@ class AppComponent {
 
 ### API Summary
 
-The table below highlights some of the common methods on the `FirebaseObjectObservable`.
+The table below highlights some of the common methods on the `FirebaseListObservable`.
 
 | method   |                    | 
 | ---------|--------------------| 
