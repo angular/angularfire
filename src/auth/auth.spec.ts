@@ -87,6 +87,29 @@ const AngularFireAuthState = <FirebaseAuthState>{
   }
 };
 
+describe('Zones', () => {
+  it('should call operators and subscriber in the same zone as when service was initialized', (done) => {
+    // Initialize the app outside of the zone, to mimick real life behavior.
+    var app = initializeApp(COMMON_CONFIG, 'zoneapp');
+
+    let ngZone = Zone.current.fork({
+      name: 'ngZone'
+    });
+    ngZone.run(() => {
+      var afAuth = new AngularFireAuth(new FirebaseSdkAuthBackend(app), window.location);
+      afAuth
+        .take(1)
+        .do(_ => {
+          expect(Zone.current.name).toBe('ngZone');
+        })
+        .subscribe(() => {
+          expect(Zone.current.name).toBe('ngZone');
+          done()
+        }, done.fail);
+    });
+  });
+});
+
 describe('FirebaseAuth', () => {
   let app: firebase.app.App;
   let authData: any;

@@ -11,6 +11,8 @@ import {
   FirebaseApp
 } from '../../../dist/angularfire2';
 
+declare var Zone: any;
+
 enableProdMode();
 
 // TODO fix imports and tsconfig
@@ -111,7 +113,10 @@ class App {
           auth: null // makes easier to convert to json
         })
       })
-      .subscribe(user => this.user = user);
+      .subscribe(user => {
+        console.log('zone', Zone.current.name);
+        this.user = user
+      });
   }
 
   signInAnonymously() {
