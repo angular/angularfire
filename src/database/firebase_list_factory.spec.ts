@@ -17,7 +17,8 @@ import {
 } from '../angularfire2';
 import {
   addProviders,
-  inject
+  inject,
+  iit
 } from '@angular/core/testing';
 import * as utils from '../utils';
 import {Query} from '../interfaces';
@@ -336,6 +337,24 @@ describe('FirebaseListFactory', () => {
         queryTest(observable, subject, done);
       });
     });
+
+  });
+
+  describe('shape', () => {
+
+    it('should have a a FirebaseListObservable shape when queried', () => {
+        const observable = FirebaseListFactory(rootFirebase, {
+          query: {
+            orderByChild: 'height',
+            equalTo: '1'
+          }
+        });
+
+        expect(observable.push instanceof Function).toBe(true);
+        expect(observable.update instanceof Function).toBe(true);
+        expect(observable.remove instanceof Function).toBe(true);
+    });
+       
 
   });
 
