@@ -342,7 +342,7 @@ describe('FirebaseListFactory', () => {
 
   describe('shape', () => {
 
-    iit('should have a a FirebaseListObservable shape when queried', () => {
+    it('should have a a FirebaseListObservable shape when queried', () => {
         const observable = FirebaseListFactory(rootFirebase, {
           query: {
             orderByChild: 'height',
