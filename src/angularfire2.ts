@@ -113,8 +113,3 @@ export {
 
 export { FirebaseConfig, FirebaseApp, FirebaseAuthConfig, FirebaseRef, FirebaseUrl } from './tokens';
 export { FirebaseAppConfig } from './interfaces';
-
-// Helps Angular-CLI automatically add providers
-export default {
-  providers: FIREBASE_PROVIDERS
-}
