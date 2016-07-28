@@ -14,7 +14,7 @@
   },
   "files": [
     "src/angularfire2.ts",
-    "typings/main.d.ts",
+    "typings/index.d.ts",
     "manual_typings/firebase3/firebase3.d.ts"
   ]
 }
