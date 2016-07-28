@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import { FirebaseApp } from '../tokens';
-import { isPresent } from '../utils';
+import { isPresent, ZoneScheduler } from '../utils';
 import { auth } from 'firebase';
 import {
   authDataToAuthState,
@@ -22,6 +22,7 @@ const {
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/fromPromise';
+import 'rxjs/add/operator/observeOn';
 
 @Injectable()
 export class FirebaseSdkAuthBackend extends AuthBackend {
@@ -42,14 +43,20 @@ export class FirebaseSdkAuthBackend extends AuthBackend {
   }
 
   onAuth(): Observable<FirebaseAuthState> {
-    // TODO: assumes this will accept an RxJS observer
     return Observable.create((observer: Observer<FirebaseAuthState>) => {
       return this._fbAuth.onAuthStateChanged(observer);
     })
     .map((user: firebase.User) => {
       if (!user) return null;
       return authDataToAuthState(user);
-    });
+    })
+    /**
+     * TODO: since the auth service automatically subscribes to this before
+     * any user, it will run in the Angular zone, instead of the subscription
+     * zone. The auth service should be refactored to capture the subscription
+     * zone and not use a ReplaySubject.
+    **/
+    .observeOn(new ZoneScheduler(Zone.current));
   }
 
   unauth(): void {
