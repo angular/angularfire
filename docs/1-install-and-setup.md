@@ -31,7 +31,7 @@ Now that you have a new project setup, install AngularFire 2 and Firebase from n
 ### 3. Include Firebase SDK typings
 
 ```bash
-typings install file:node_modules/angularfire2/firebase3.d.ts --save --global && typings install
+typings install file:node_modules/angularfire2/manual_typings/firebase3/firebase3.d.ts --save --global && typings install
 ```
 
 This saves the typings reference into `typings.json` and installs it.
