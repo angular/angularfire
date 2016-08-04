@@ -17,8 +17,7 @@ import {
 } from '../angularfire2';
 import {
   addProviders,
-  inject,
-  iit
+  inject
 } from '@angular/core/testing';
 import * as utils from '../utils';
 import {Query} from '../interfaces';
@@ -354,7 +353,7 @@ describe('FirebaseListFactory', () => {
         expect(observable.update instanceof Function).toBe(true);
         expect(observable.remove instanceof Function).toBe(true);
     });
-       
+
 
   });
 

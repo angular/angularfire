@@ -2,18 +2,30 @@
   "compilerOptions": {
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "target": "es6",
+    "module": "es2015",
+    "target": "es5",
     "noImplicitAny": false,
-    "outDir": "dist/esm",
+    "outDir": "dist/es6",
     "rootDir": "src",
     "sourceMap": true,
     "inlineSources": true,
     "declaration": true,
     "removeComments": true,
+    "lib": [
+      "es2015",
+      "dom"
+    ],
     "moduleResolution": "node"
   },
   "files": [
     "src/angularfire2.ts",
-    "manual_typings/firebase3/firebase3.d.ts"
-  ]
+    "src/database/index.ts",
+    "src/auth/auth.ts",
+    "typings/index.d.ts",
+    "manual_typings/firebase3/firebase3.d.ts",
+    "node_modules/zone.js/dist/zone.js.d.ts"
+  ],
+  "angularCompilerOptions": {
+    "skipTemplateCodegen": true
+  }
 }

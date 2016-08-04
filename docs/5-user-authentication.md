@@ -13,19 +13,28 @@ with the `firebaseAuthConfig` service.
 The `firebaseAuthConfig` services takes in an `AuthProvider` and an `AuthMethod`.
 
 ```ts
-bootstrap(<MyApp>Component, [
-  FIREBASE_PROVIDERS,
-  defaultFirebase({
-    apiKey: "<your-key>",
-    authDomain: "<your-project-authdomain>",
-    databaseURL: "<your-database-URL>",
-    storageBucket: "<your-storage-bucket>",
-  }),
-  firebaseAuthConfig({
-    provider: AuthProviders.Google,
-    method: AuthMethods.Redirect
-  })
-]);
+
+const myFirebaseConfig = {
+  apiKey: "<your-key>",
+  authDomain: "<your-project-authdomain>",
+  databaseURL: "<your-database-URL>",
+  storageBucket: "<your-storage-bucket>",
+}
+
+const myFirebaseAuthConfig = {
+  provider: AuthProviders.Google,
+  method: AuthMethods.Redirect
+}
+
+@NgModule({
+  imports: [
+    BrowserModule,
+    AngularFireModule.initializeApp(myFirebaseConfig, myFirebaseAuthConfig)
+  ],
+  declarations: [ MyComponent ],
+  boostrap: [ MyComponent ]
+})
+export class MyAppModule {}
 ```
 
 **Example bootstrap**

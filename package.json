@@ -9,9 +9,9 @@
     "test:watch": "karma start",
     "build": "rm -rf dist; tsc",
     "build:watch": "rm -rf dist && tsc -w",
-    "build_npm": "rm -rf dist && tsc -p tsconfig.publish.es5.json && tsc -p tsconfig.publish.es6.json && tsc -p tsconfig.publish.es6-deprecated.json",
+    "build_npm": "rm -rf dist && ngc -p tsconfig.publish.es5.json && ngc -p tsconfig.publish.es6.json",
     "postbuild_npm": "cp manual_typings/firebase3/firebase3.d.ts package.json README.md .npmignore dist/ && npm run rewrite_npm_package",
-    "rewrite_npm_package": "node --harmony_destructuring tools/rewrite-published-package.js",
+    "rewrite_npm_package": "node tools/rewrite-published-package.js",
     "e2e_test": "webdriver-manager update && npm run build_e2e && protractor",
     "build_e2e": "rm -rf dist-test && npm run build && tsc -p test/ && cp test/e2e/firebase_object/index.html dist-test/e2e/firebase_object/ && cp test/e2e/firebase_list/index.html dist-test/e2e/firebase_list/ && cp test/e2e/auth/index.html dist-test/e2e/auth/",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 1"
@@ -32,15 +32,17 @@
   },
   "homepage": "https://github.com/angular/angularfire2#readme",
   "dependencies": {
-    "@angular/core": "^2.0.0-rc.2",
-    "@angular/platform-browser": "^2.0.0-rc.2",
-    "@angular/common": "^2.0.0-rc.2",
-    "@angular/compiler": "^2.0.0-rc.2",
-    "@angular/platform-browser-dynamic": "^2.0.0-rc.2",
+    "@angular/common": "^2.0.0-rc.5",
+    "@angular/compiler": "^2.0.0-rc.5",
+    "@angular/core": "^2.0.0-rc.5",
+    "@angular/platform-browser": "^2.0.0-rc.5",
+    "@angular/platform-browser-dynamic": "^2.0.0-rc.5",
     "firebase": "^3.0.3",
     "rxjs": "5.0.0-beta.6"
   },
   "devDependencies": {
+    "@angular/compiler-cli": "^0.5.0",
+    "@angular/platform-server": "^2.0.0-rc.5",
     "conventional-changelog-cli": "^1.2.0",
     "es6-module-loader": "^0.17.10",
     "es6-shim": "^0.35.0",
@@ -66,7 +68,7 @@
     "traceur": "0.0.96",
     "tsd": "^0.6.5",
     "typedoc": "github:jeffbcross/typedoc",
-    "typescript": "^1.8.10",
+    "typescript": "next",
     "typings": "^1.3.2",
     "zone.js": "^0.6.6"
   },

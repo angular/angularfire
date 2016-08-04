@@ -14,6 +14,7 @@
   },
   "files": [
     "src/angularfire2.ts",
-    "manual_typings/firebase3/firebase3.d.ts"
+    "manual_typings/firebase3/firebase3.d.ts",
+    "node_modules/zone.js/dist/zone.js.d.ts"
   ]
 }
