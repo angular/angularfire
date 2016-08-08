@@ -46,30 +46,14 @@ export interface FirebaseAuthState {
   provider: AuthProviders;
   auth: firebase.User;
   expires?: number;
-  github?: CommonOAuthCredential;
-  google?: GoogleCredential;
-  twitter?: TwitterCredential;
-  facebook?: CommonOAuthCredential;
+  github?: firebase.UserInfo;
+  google?: firebase.UserInfo;
+  twitter?: firebase.UserInfo;
+  facebook?: firebase.UserInfo;
   anonymous?: boolean;
 }
 
-export interface CommonOAuthCredential {
-  accessToken: string;
-  provider: 'github.com' | 'google.com' | 'twitter.com' | 'facebook.com';
-}
-
-export interface GoogleCredential {
-  idToken: string;
-  provider: 'google.com';
-}
-
-export interface TwitterCredential extends CommonOAuthCredential {
-  secret: string;
-}
-
-export type OAuthCredential = CommonOAuthCredential | GoogleCredential | TwitterCredential;
-
-export function authDataToAuthState(authData: firebase.User, providerData?: OAuthCredential): FirebaseAuthState {
+export function authDataToAuthState(authData: firebase.User, providerData?: firebase.UserInfo): FirebaseAuthState {
   if (!authData) return null;
   let providerId;
   let { uid } = authData;
@@ -79,25 +63,30 @@ export function authDataToAuthState(authData: firebase.User, providerData?: OAut
     authState.provider = AuthProviders.Anonymous;
     authState.anonymous = true;
     return authState;
+  } else if (authData.providerData[0] === undefined || authData.providerData[0] === null) {
+    // There is no provider data, user is likely custom
+    providerId = 'custom';
+    authState.provider = AuthProviders.Custom;
+    return authState;
   } else {
     providerId = authData.providerData[0].providerId;
   }
 
   switch (providerId) {
     case 'github.com':
-      authState.github = <CommonOAuthCredential>providerData;
+      authState.github = providerData;
       authState.provider = AuthProviders.Github;
       break;
     case 'twitter.com':
-      authState.twitter = <TwitterCredential>providerData;
+      authState.twitter = providerData;
       authState.provider = AuthProviders.Twitter;
       break;
     case 'facebook.com':
-      authState.facebook = <CommonOAuthCredential>providerData;
+      authState.facebook = providerData;
       authState.provider = AuthProviders.Facebook;
       break;
     case 'google.com':
-      authState.google = <GoogleCredential>providerData;
+      authState.google = providerData;
       authState.provider = AuthProviders.Google;
       break;
     case 'password':

@@ -48,7 +48,7 @@ export class FirebaseSdkAuthBackend extends AuthBackend {
     })
     .map((user: firebase.User) => {
       if (!user) return null;
-      return authDataToAuthState(user);
+      return authDataToAuthState(user, user.providerData[0]);
     })
     /**
      * TODO: since the auth service automatically subscribes to this before
