@@ -151,7 +151,7 @@ export class AngularFireAuth extends ReplaySubject<FirebaseAuthState> {
 
   private _reject(msg: string): firebase.Promise<FirebaseAuthState> {
     return (<Promise<FirebaseAuthState>>new Promise((res, rej) => {
-      return rej(msg);
+      return rej(new Error(msg));
     }));
   }
 
