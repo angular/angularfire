@@ -2,10 +2,12 @@ import {
   authDataToAuthState,
   AuthProviders,
   FirebaseAuthState,
-  CommonOAuthCredential,
-  GoogleCredential,
-  TwitterCredential
 } from './auth_backend';
+import {
+  addProviders,
+  inject,
+  iit
+} from '@angular/core/testing';
 
 const baseFBUser = {
   uid: '12345',
@@ -25,26 +27,25 @@ const baseAuthState: FirebaseAuthState = {
   auth: <firebase.User>baseFBUser
 };
 
-const baseGithubCredential: CommonOAuthCredential = {
-  accessToken: 'GH_ACCESS_TOKEN',
-  provider: 'github.com'
-};
+const baseGithubCredential = {
+  providerId: 'github.com',
+  displayName: 'GithubAlice'
+} as firebase.UserInfo;
 
-const baseFacebookCredential: CommonOAuthCredential = {
-  accessToken: 'FB_ACCESS_TOKEN',
-  provider: 'facebook.com'
-};
+const baseFacebookCredential = {
+  displayName: 'FacebookFranny',
+  providerId: 'facebook.com'
+} as firebase.UserInfo;
 
-const baseGoogleCredential: GoogleCredential = {
-  idToken: 'GOOGLE_ID_TOKEN',
-  provider: 'google.com'
-};
+const baseGoogleCredential = {
+  displayName: 'GoogleGerry',
+  providerId: 'google.com'
+} as firebase.UserInfo;
 
-const baseTwitterCredential: TwitterCredential = {
-  accessToken: 'TWITTER_ACCESS_TOKEN',
-  provider: 'twitter.com',
-  secret: 'TWITTER_SECRET'
-};
+const baseTwitterCredential = {
+  displayName: 'TwitterTiffany',
+  providerId: 'twitter.com',
+} as firebase.UserInfo;
 
 describe('auth_backend', () => {
   describe('authDataToAuthState', () => {
@@ -58,7 +59,7 @@ describe('auth_backend', () => {
       });
 
       let actualAuthState = authDataToAuthState(githubUser, baseGithubCredential);
-      expect(actualAuthState.github.accessToken).toEqual(baseGithubCredential.accessToken);
+      expect(actualAuthState.github.displayName).toEqual(baseGithubCredential.displayName);
     });
   });
 
@@ -72,7 +73,7 @@ describe('auth_backend', () => {
     });
 
     let actualAuthState = authDataToAuthState(googleUser, baseGoogleCredential);
-    expect(actualAuthState.google.idToken).toEqual(baseGoogleCredential.idToken);
+    expect(actualAuthState.google.displayName).toEqual(baseGoogleCredential.displayName);
   });
 
   it('Twitter: should return a FirebaseAuthState object with full provider data', () => {
@@ -85,7 +86,7 @@ describe('auth_backend', () => {
     });
 
     let actualAuthState = authDataToAuthState(twitterUser, baseTwitterCredential);
-    expect(actualAuthState.twitter.secret).toEqual(baseTwitterCredential.secret);
+    expect(actualAuthState.twitter.displayName).toEqual(baseTwitterCredential.displayName);
   });
 
   it('Facebook: should return a FirebaseAuthState object with full provider data', () => {
@@ -98,7 +99,7 @@ describe('auth_backend', () => {
     });
 
     let actualAuthState = authDataToAuthState(facebookUser, baseFacebookCredential);
-    expect(actualAuthState.facebook.accessToken).toEqual(baseFacebookCredential.accessToken);
+    expect(actualAuthState.facebook.displayName).toEqual(baseFacebookCredential.displayName);
   });
 
 

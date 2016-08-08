@@ -1,5 +1,5 @@
 import { auth, initializeApp } from 'firebase';
-import {ReflectiveInjector, provide, Provider} from '@angular/core';
+import { ReflectiveInjector, provide, Provider } from '@angular/core';
 import { Observable } from 'rxjs/Observable'
 import { Observer } from 'rxjs/Observer';
 import {
@@ -23,8 +23,8 @@ import {
 } from '../angularfire2';
 import { COMMON_CONFIG } from '../test-config';
 
-import {AuthBackend} from './auth_backend';
-import {FirebaseSdkAuthBackend} from './firebase_sdk_auth_backend';
+import { AuthBackend } from './auth_backend';
+import { FirebaseSdkAuthBackend } from './firebase_sdk_auth_backend';
 
 // Set providers from firebase so no firebase.auth.GoogleProvider() necessary
 const {
@@ -82,9 +82,9 @@ const AngularFireAuthState = <FirebaseAuthState>{
   auth: firebaseUser,
   uid: '12345',
   github: {
-    accessToken: 'GH_ACCESS_TOKEN',
-    provider: 'github.com'
-  }
+    displayName: 'GithubAlice',
+    providerId: 'github.com'
+  } as firebase.UserInfo
 };
 
 describe('FirebaseAuth', () => {
@@ -564,6 +564,7 @@ describe('FirebaseAuth', () => {
         expect(afAuth.getAuth().uid).toEqual(AngularFireAuthState.uid);
       })
     });
+
   });
 });
 
