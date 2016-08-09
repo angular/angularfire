@@ -78,7 +78,7 @@ import { AngularFire } from 'angularfire2';
   moduleId: module.id,
   selector: 'app',
   template: `
-  <div> {{ (af.auth | async).uid }} </div>
+  <div> {{ (af.auth | async)?.uid }} </div>
   <button (click)="login()">Login</button>
   `,
 })
