@@ -22,17 +22,15 @@ import 'rxjs/add/observable/of';
 
 const kBufferSize = 1;
 
-export const firebaseAuthConfig = (config: AuthConfiguration): Provider => {
-  return provide(FirebaseAuthConfig, {
-    useValue: config
-  });
+export const firebaseAuthConfig = (config: AuthConfiguration): any => {
+  return { provide: FirebaseAuthConfig, useValue: config }
 };
 
 @Injectable()
 export class AngularFireAuth extends ReplaySubject<FirebaseAuthState> {
   private _credentialCache: {[key:string]: any} = {};
   constructor(private _authBackend: AuthBackend,
-    @Inject(WindowLocation) loc: Location,
+    @Inject(WindowLocation) loc: any,
     @Optional() @Inject(FirebaseAuthConfig) private _config?: AuthConfiguration) {
     super(kBufferSize);
 

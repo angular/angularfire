@@ -122,25 +122,28 @@ Open `/src/main.ts`, inject the Firebase providers, and specify your Firebase co
 This can be found in your project at [the Firebase Console](https://console.firebase.google.com):
 
 ```ts
-import { bootstrap } from '@angular/platform-browser-dynamic';
-import { enableProdMode } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { enableProdMode, NgModule } from '@angular/core';
 import { <MyApp>, environment } from './app/';
-import { FIREBASE_PROVIDERS, defaultFirebase } from 'angularfire2';
+import { AngularFireModule } from 'angularfire2';
 
-if (environment.production) {
-  enableProdMode();
+const firebaseConfig = {
+  apiKey: "<your-key>",
+  authDomain: "<your-project-authdomain>",
+  databaseURL: "<your-database-URL>",
+  storageBucket: "<your-storage-bucket>"
 }
 
-bootstrap(<MyApp>, [
-  FIREBASE_PROVIDERS,
-  // Initialize Firebase app  
-  defaultFirebase({
-    apiKey: "<your-key>",
-    authDomain: "<your-project-authdomain>",
-    databaseURL: "<your-database-URL>",
-    storageBucket: "<your-storage-bucket>"
-  })
-]);
+@NgModule({
+  imports: [
+    BrowserModule,
+    AngularFireModule.initializeApp(firebaseConfig)
+  ],
+  declarations: [ MyComponent ],
+  Bootstrap: [ MyComponent ]
+})
+export class MyAppModule {}
+
 ```
 
 ### 8. Inject AngularFire

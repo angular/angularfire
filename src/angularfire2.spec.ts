@@ -2,7 +2,7 @@ import {
   addProviders,
   inject
 } from '@angular/core/testing';
-import {ReflectiveInjector, provide, Provider} from '@angular/core';
+import { ReflectiveInjector, provide, Provider } from '@angular/core';
 import {
   AngularFire,
   FirebaseObjectObservable,
@@ -14,7 +14,7 @@ import {
   AngularFireDatabase,
   FirebaseAppConfig
 } from './angularfire2';
-import {Subscription} from 'rxjs';
+import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/do';
@@ -79,9 +79,9 @@ describe('angularfire', () => {
   });
 
   describe('defaultFirebase', () => {
-    it('should create a provider', () => {
-      const provider = defaultFirebase(firebaseConfig);
-      expect(provider instanceof Provider).toBe(true);
+    it('should create an array of providers', () => {
+      const providers = defaultFirebase(firebaseConfig);
+      expect(providers.length).toBe(2);
     });
   });
 });

@@ -1,11 +1,7 @@
 {
   "name": "angularfire2",
-  "dependencies": {
-    "es6-promise": "github:typed-typings/npm-es6-promise#fb04188767acfec1defd054fc8024fafa5cd4de7"
-  },
   "globalDependencies": {
     "angular-protractor": "registry:dt/angular-protractor#1.5.0+20160425143459",
-    "es6-shim": "registry:dt/es6-shim#0.31.2+20160602141504",
     "jasmine": "registry:dt/jasmine#2.2.0+20160621224255",
     "selenium-webdriver": "registry:dt/selenium-webdriver#2.44.0+20160317120654"
   }

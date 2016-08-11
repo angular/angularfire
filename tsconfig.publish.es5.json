@@ -10,11 +10,21 @@
     "sourceMap": true,
     "inlineSources": true,
     "declaration": true,
-    "removeComments": true
+    "removeComments": true,
+    "lib": [
+      "es2015",
+      "dom"
+    ]
   },
   "files": [
     "src/angularfire2.ts",
+    "src/database/index.ts",
+    "src/auth/auth.ts",
     "typings/index.d.ts",
-    "manual_typings/firebase3/firebase3.d.ts"
-  ]
+    "manual_typings/firebase3/firebase3.d.ts",
+    "node_modules/zone.js/dist/zone.js.d.ts"
+  ],
+  "angularCompilerOptions": {
+    "skipTemplateCodegen": true
+  }
 }

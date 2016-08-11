@@ -79,7 +79,7 @@ export class FirebaseSdkAuthBackend extends AuthBackend {
   }
 
   authWithOAuthPopup(provider: AuthProviders, options?: any): Promise<firebase.auth.UserCredential> {
-    var providerFromFirebase = <FirebaseOAuthProvider>this._enumToAuthProvider(provider);
+    var providerFromFirebase:any = this._enumToAuthProvider(provider);
     if (options.scope) {
       options.scope.forEach(scope => providerFromFirebase.addScope(scope));
     }
@@ -104,7 +104,7 @@ export class FirebaseSdkAuthBackend extends AuthBackend {
     return Observable.fromPromise(Promise.resolve(this._fbAuth.getRedirectResult()));
   }
 
-  private _enumToAuthProvider(providerId: AuthProviders): firebase.auth.AuthProvider | FirebaseOAuthProvider {
+  private _enumToAuthProvider(providerId: AuthProviders): any {
     switch (providerId) {
       case AuthProviders.Github:
         return new GithubAuthProvider();
