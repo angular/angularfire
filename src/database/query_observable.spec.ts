@@ -119,13 +119,13 @@ describe('observeQuery', () => {
 });
 
 
-describe('getOrderObservables', () => {
-  it('should be subscribable event if no observables found for orderby', () => {
-    expect(() => {
-      getOrderObservables({}).subscribe();
-    }).not.toThrow();
-  });
-});
+// describe('getOrderObservables', () => {
+//   it('should be subscribable event if no observables found for orderby', () => {
+//     expect(() => {
+//       getOrderObservables((<Query>{})).subscribe();
+//     }).not.toThrow();
+//   });
+// });
 
 describe('query combinations', () => {
 

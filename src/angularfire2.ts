@@ -8,7 +8,8 @@ import {
 import {
   FirebaseConfig,
   FirebaseApp,
-  WindowLocation
+  WindowLocation,
+  FirebaseUserConfig
 } from './tokens';
 import {
   APP_INITIALIZER,
@@ -16,7 +17,8 @@ import {
   Injectable,
   OpaqueToken,
   provide,
-  Provider
+  NgModule,
+  ModuleWithProviders
 } from '@angular/core';
 import {
   FirebaseSdkAuthBackend,
@@ -45,11 +47,29 @@ export class AngularFire {
     public database: AngularFireDatabase) {}
 }
 
+export function _getFirebase(config: FirebaseAppConfig): firebase.app.App {
+  return initializeApp(config);
+}
+
+export function _getWindowLocation(){
+  return window.location;
+}
+
+export function _getAuthBackend(app: firebase.app.App): FirebaseSdkAuthBackend {
+  return new FirebaseSdkAuthBackend(app, false);
+}
+
+export function _getDefaultFirebase(config){
+  // remove a trailing slash from the Database URL if it exists
+  config.databaseURL = utils.stripTrailingSlash(config.databaseURL);
+  return config;
+}
+
 export const COMMON_PROVIDERS: any[] = [
   // TODO: Deprecate
-  provide(FirebaseAuth, {
+  { provide: FirebaseAuth,
     useExisting: AngularFireAuth
-  }),
+  },
   {
     provide: FirebaseApp,
     useFactory: _getFirebase,
@@ -57,12 +77,8 @@ export const COMMON_PROVIDERS: any[] = [
   },
   AngularFireAuth,
   AngularFire,
-  AngularFireDatabase,
+  AngularFireDatabase
 ];
-
-function _getFirebase(config: FirebaseAppConfig): firebase.app.App {
-  return initializeApp(config);
-}
 
 export const FIREBASE_PROVIDERS:any[] = [
   COMMON_PROVIDERS,
@@ -73,25 +89,36 @@ export const FIREBASE_PROVIDERS:any[] = [
   },
   {
     provide: WindowLocation,
-    useValue: window.location
+    useFactory: _getWindowLocation
   },
 ];
-
-function _getAuthBackend(app: firebase.app.App): FirebaseSdkAuthBackend {
-  return new FirebaseSdkAuthBackend(app, false);
-}
 
 /**
  * Used to define the default Firebase root location to be
  * used throughout an application.
  */
-export const defaultFirebase = (config: FirebaseAppConfig): Provider => {
-  // remove a trailing slash from the Database URL if it exists
-  config.databaseURL = utils.stripTrailingSlash(config.databaseURL);
-  return provide(FirebaseConfig, {
-    useValue: config
-  });
+export const defaultFirebase = (config: FirebaseAppConfig): any => {
+  return [
+    { provide: FirebaseUserConfig, useValue: config },
+	{ provide: FirebaseConfig, useFactory: _getDefaultFirebase, deps: [FirebaseUserConfig] }
+  ]
 };
+
+@NgModule({
+	providers: FIREBASE_PROVIDERS
+})
+export class AngularFireModule {
+  static initializeApp(config: FirebaseAppConfig, authConfig?:FirebaseAppConfig): ModuleWithProviders {
+    return {
+		ngModule: AngularFireModule,
+		providers: [
+		  { provide: FirebaseUserConfig, useValue: config },
+		  { provide: FirebaseConfig, useFactory: _getDefaultFirebase, deps: [FirebaseUserConfig] },
+      firebaseAuthConfig(authConfig)
+		]
+	}
+  }
+}
 
 export {
   AngularFireAuth,
@@ -111,5 +138,5 @@ export {
   WindowLocation
 }
 
-export { FirebaseConfig, FirebaseApp, FirebaseAuthConfig, FirebaseRef, FirebaseUrl } from './tokens';
+export { FirebaseConfig, FirebaseApp, FirebaseAuthConfig, FirebaseRef, FirebaseUrl, FirebaseUserConfig } from './tokens';
 export { FirebaseAppConfig } from './interfaces';

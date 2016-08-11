@@ -69,7 +69,7 @@ export interface TwitterCredential extends CommonOAuthCredential {
 
 export type OAuthCredential = CommonOAuthCredential | GoogleCredential | TwitterCredential;
 
-export function authDataToAuthState(authData: firebase.User, providerData?: OAuthCredential): FirebaseAuthState {
+export function authDataToAuthState(authData: any, providerData?: OAuthCredential): FirebaseAuthState {
   if (!authData) return null;
   let providerId;
   let { uid } = authData;
