@@ -47,7 +47,7 @@ describe('auth_backend', () => {
     it('Github: should return a FirebaseAuthState object with full provider data', () => {
       let githubUser = Object.assign({}, baseFBUser, {
         providerData: [{providerId: 'github.com'}]
-      });
+      }) as firebase.User;
       let expectedAuthState = Object.assign({}, baseAuthState, {
         github: baseGithubCredential,
         auth: githubUser
@@ -61,7 +61,7 @@ describe('auth_backend', () => {
   it('Google: should return a FirebaseAuthState object with full provider data', () => {
     let googleUser = Object.assign({}, baseFBUser, {
       providerData: [{providerId: 'google.com'}]
-    });
+    }) as firebase.User;
     let expectedAuthState = Object.assign({}, baseAuthState, {
       google: baseGoogleCredential,
       auth: googleUser
@@ -74,7 +74,7 @@ describe('auth_backend', () => {
   it('Twitter: should return a FirebaseAuthState object with full provider data', () => {
     let twitterUser = Object.assign({}, baseFBUser, {
       providerData: [{providerId: 'twitter.com'}]
-    });
+    }) as firebase.User;
     let expectedAuthState = Object.assign({}, baseAuthState, {
       twitter: baseTwitterCredential,
       auth: twitterUser
@@ -87,7 +87,7 @@ describe('auth_backend', () => {
   it('Facebook: should return a FirebaseAuthState object with full provider data', () => {
     let facebookUser = Object.assign({}, baseFBUser, {
       providerData: [{providerId: 'facebook.com'}]
-    });
+    }) as firebase.User;
     let expectedAuthState = Object.assign({}, baseAuthState, {
       facebook: baseFacebookCredential,
       auth: facebookUser
@@ -99,16 +99,16 @@ describe('auth_backend', () => {
 
 
   it('Anonymous: should return a FirebaseAuthState object', () => {
-    let anonymouseFirebaseUser = Object.assign({}, baseFBUser, {
+    let anonymousFirebaseUser = Object.assign({}, baseFBUser, {
       providerData: [],
       isAnonymous: true
-    });
+    }) as firebase.User;
     let expectedAuthState = Object.assign({}, baseAuthState, {
       facebook: baseFacebookCredential,
-      auth: anonymouseFirebaseUser
+      auth: anonymousFirebaseUser
     });
 
-    let actualAuthState = authDataToAuthState(anonymouseFirebaseUser);
+    let actualAuthState = authDataToAuthState(anonymousFirebaseUser);
     expect(actualAuthState.anonymous).toEqual(true);
   });
 });
