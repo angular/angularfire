@@ -1,6 +1,6 @@
 {
   "name": "angularfire2",
-  "version": "2.0.0-beta.2",
+  "version": "2.0.0-beta.3-pre",
   "description": "",
   "main": "./dist/angularfire2.js",
   "jsnext:main": "./dist/esm/angularfire2.js",
@@ -9,8 +9,8 @@
     "test:watch": "karma start",
     "build": "rm -rf dist; tsc",
     "build:watch": "rm -rf dist && tsc -w",
-    "build_npm": "rm -rf dist && ngc -p tsconfig.publish.es5.json && ngc -p tsconfig.publish.es6.json",
-    "postbuild_npm": "cp manual_typings/firebase3/firebase3.d.ts package.json README.md .npmignore dist/ && npm run rewrite_npm_package",
+    "build_npm": "rm -rf dist && ngc -p tsconfig.publish.es5.json && ngc -p tsconfig.publish.es6.json && npm run postbuild_npm",
+    "postbuild_npm": "cp package.json README.md .npmignore dist/ && npm run rewrite_npm_package",
     "rewrite_npm_package": "node --harmony_destructuring tools/rewrite-published-package.js",
     "e2e_test": "webdriver-manager update && npm run build_e2e && protractor",
     "build_e2e": "rm -rf dist-test && npm run build && tsc -p test/ && cp test/e2e/firebase_object/index.html dist-test/e2e/firebase_object/ && cp test/e2e/firebase_list/index.html dist-test/e2e/firebase_list/ && cp test/e2e/auth/index.html dist-test/e2e/auth/",
