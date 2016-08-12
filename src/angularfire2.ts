@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase';
 import * as utils from './utils';
 import { FirebaseAppConfig } from './interfaces';
+import { AuthConfiguration } from './auth';
 import {
   FirebaseListFactoryOpts,
   FirebaseObjectFactoryOpts,
@@ -109,7 +110,7 @@ export const defaultFirebase = (config: FirebaseAppConfig): any => {
 	providers: FIREBASE_PROVIDERS
 })
 export class AngularFireModule {
-  static initializeApp(config: FirebaseAppConfig, authConfig?:FirebaseAppConfig): ModuleWithProviders {
+  static initializeApp(config: FirebaseAppConfig, authConfig?:AuthConfiguration): ModuleWithProviders {
     return {
 		ngModule: AngularFireModule,
 		providers: [
