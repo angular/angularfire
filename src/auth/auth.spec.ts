@@ -1,5 +1,5 @@
 import { auth, initializeApp } from 'firebase';
-import {ReflectiveInjector, provide, Provider} from '@angular/core';
+import { ReflectiveInjector, provide, Provider } from '@angular/core';
 import { Observable } from 'rxjs/Observable'
 import { Observer } from 'rxjs/Observer';
 import {
@@ -23,8 +23,8 @@ import {
 } from '../angularfire2';
 import { COMMON_CONFIG } from '../test-config';
 
-import {AuthBackend} from './auth_backend';
-import {FirebaseSdkAuthBackend} from './firebase_sdk_auth_backend';
+import { AuthBackend } from './auth_backend';
+import { FirebaseSdkAuthBackend } from './firebase_sdk_auth_backend';
 
 // Set providers from firebase so no firebase.auth.GoogleProvider() necessary
 const {
@@ -66,7 +66,6 @@ const anonymouseFirebaseUser = <firebase.User> {
 
 const githubCredential = {
   credential: {
-    accessToken: 'ACCESS_TOKEN',
     provider: 'github.com'
   },
   user: firebaseUser
@@ -77,15 +76,15 @@ const googleCredential = {
   user: firebaseUser
 }
 
-const AngularFireAuthState = <FirebaseAuthState>{
+const AngularFireAuthState = {
   provider: 0,
   auth: firebaseUser,
   uid: '12345',
   github: {
-    accessToken: 'GH_ACCESS_TOKEN',
-    provider: 'github.com'
-  }
-};
+    displayName: 'FirebaseUser',
+    providerId: 'github.com'
+  } as firebase.UserInfo
+} as FirebaseAuthState;
 
 describe('Zones', () => {
   it('should call operators and subscriber in the same zone as when service was initialized', (done) => {

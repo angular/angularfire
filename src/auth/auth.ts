@@ -10,7 +10,6 @@ import {
   AuthProviders,
   AuthMethods,
   EmailPasswordCredentials,
-  OAuthCredential,
   AuthConfiguration,
   FirebaseAuthState,
   stripProviderId
@@ -29,7 +28,7 @@ export const firebaseAuthConfig = (config: AuthConfiguration): any => {
 
 @Injectable()
 export class AngularFireAuth extends ReplaySubject<FirebaseAuthState> {
-  private _credentialCache: {[key:string]: OAuthCredential} = {};
+  private _credentialCache: {[key:string]: any} = {};
   constructor(private _authBackend: AuthBackend,
     @Inject(WindowLocation) loc: any,
     @Optional() @Inject(FirebaseAuthConfig) private _config?: AuthConfiguration) {
@@ -46,7 +45,7 @@ export class AngularFireAuth extends ReplaySubject<FirebaseAuthState> {
               .map((userCredential: firebase.auth.UserCredential) => {
                 if (userCredential && userCredential.credential) {
                   authState = attachCredentialToAuthState(authState, userCredential.credential, userCredential.credential.provider);
-                  this._credentialCache[userCredential.credential.provider] = <OAuthCredential>userCredential.credential;
+                  this._credentialCache[userCredential.credential.provider] = userCredential.credential;
                 }
                 return authState;
               });
@@ -102,8 +101,8 @@ export class AngularFireAuth extends ReplaySubject<FirebaseAuthState> {
         return this._authBackend.authWithOAuthPopup(config.provider, this._scrubConfig(config))
           .then((userCredential: firebase.auth.UserCredential) => {
             // Incorrect type information
-            this._credentialCache[userCredential.credential.provider] = <OAuthCredential>userCredential.credential;
-            return authDataToAuthState(userCredential.user, <OAuthCredential>(<any>userCredential).credential);
+            this._credentialCache[userCredential.credential.provider] = userCredential.credential;
+            return authDataToAuthState(userCredential.user, (<any>userCredential).credential);
           });
       case AuthMethods.Redirect:
         // Gets around typings issue since this method doesn't resolve with a user.

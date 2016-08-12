@@ -1,10 +1,7 @@
 import {
   authDataToAuthState,
   AuthProviders,
-  FirebaseAuthState,
-  CommonOAuthCredential,
-  GoogleCredential,
-  TwitterCredential
+  FirebaseAuthState
 } from './auth_backend';
 
 const baseFBUser = {
@@ -25,94 +22,93 @@ const baseAuthState: FirebaseAuthState = {
   auth: <firebase.User>baseFBUser
 };
 
-const baseGithubCredential: CommonOAuthCredential = {
-  accessToken: 'GH_ACCESS_TOKEN',
-  provider: 'github.com'
-};
+const baseGithubCredential = {
+  providerId: 'github.com',
+  displayName: 'GithubAlice'
+} as firebase.UserInfo;
 
-const baseFacebookCredential: CommonOAuthCredential = {
-  accessToken: 'FB_ACCESS_TOKEN',
-  provider: 'facebook.com'
-};
+const baseFacebookCredential = {
+  displayName: 'FacebookFranny',
+  providerId: 'facebook.com'
+} as firebase.UserInfo;
 
-const baseGoogleCredential: GoogleCredential = {
-  idToken: 'GOOGLE_ID_TOKEN',
-  provider: 'google.com'
-};
+const baseGoogleCredential = {
+  displayName: 'GoogleGerry',
+  providerId: 'google.com'
+} as firebase.UserInfo;
 
-const baseTwitterCredential: TwitterCredential = {
-  accessToken: 'TWITTER_ACCESS_TOKEN',
-  provider: 'twitter.com',
-  secret: 'TWITTER_SECRET'
-};
+const baseTwitterCredential = {
+  displayName: 'TwitterTiffany',
+  providerId: 'twitter.com',
+} as firebase.UserInfo;
 
 describe('auth_backend', () => {
   describe('authDataToAuthState', () => {
     it('Github: should return a FirebaseAuthState object with full provider data', () => {
       let githubUser = Object.assign({}, baseFBUser, {
         providerData: [{providerId: 'github.com'}]
-      });
+      }) as firebase.User;
       let expectedAuthState = Object.assign({}, baseAuthState, {
         github: baseGithubCredential,
         auth: githubUser
       });
 
       let actualAuthState = authDataToAuthState(githubUser, baseGithubCredential);
-      expect(actualAuthState.github.accessToken).toEqual(baseGithubCredential.accessToken);
+      expect(actualAuthState.github.displayName).toEqual(baseGithubCredential.displayName);
     });
   });
 
   it('Google: should return a FirebaseAuthState object with full provider data', () => {
     let googleUser = Object.assign({}, baseFBUser, {
       providerData: [{providerId: 'google.com'}]
-    });
+    }) as firebase.User;
     let expectedAuthState = Object.assign({}, baseAuthState, {
       google: baseGoogleCredential,
       auth: googleUser
     });
 
     let actualAuthState = authDataToAuthState(googleUser, baseGoogleCredential);
-    expect(actualAuthState.google.idToken).toEqual(baseGoogleCredential.idToken);
+    expect(actualAuthState.google.displayName).toEqual(baseGoogleCredential.displayName);
   });
 
   it('Twitter: should return a FirebaseAuthState object with full provider data', () => {
     let twitterUser = Object.assign({}, baseFBUser, {
       providerData: [{providerId: 'twitter.com'}]
-    });
+    }) as firebase.User;
     let expectedAuthState = Object.assign({}, baseAuthState, {
       twitter: baseTwitterCredential,
       auth: twitterUser
     });
 
     let actualAuthState = authDataToAuthState(twitterUser, baseTwitterCredential);
-    expect(actualAuthState.twitter.secret).toEqual(baseTwitterCredential.secret);
+    expect(actualAuthState.twitter.displayName).toEqual(baseTwitterCredential.displayName);
   });
 
   it('Facebook: should return a FirebaseAuthState object with full provider data', () => {
     let facebookUser = Object.assign({}, baseFBUser, {
       providerData: [{providerId: 'facebook.com'}]
-    });
+    }) as firebase.User;
     let expectedAuthState = Object.assign({}, baseAuthState, {
       facebook: baseFacebookCredential,
       auth: facebookUser
     });
 
     let actualAuthState = authDataToAuthState(facebookUser, baseFacebookCredential);
-    expect(actualAuthState.facebook.accessToken).toEqual(baseFacebookCredential.accessToken);
+    expect(actualAuthState.facebook.displayName).toEqual(baseFacebookCredential.displayName);
   });
 
 
   it('Anonymous: should return a FirebaseAuthState object', () => {
-    let anonymouseFirebaseUser = Object.assign({}, baseFBUser, {
+    let anonymousFirebaseUser = Object.assign({}, baseFBUser, {
       providerData: [],
       isAnonymous: true
-    });
+    }) as firebase.User;
     let expectedAuthState = Object.assign({}, baseAuthState, {
       facebook: baseFacebookCredential,
-      auth: anonymouseFirebaseUser
+      auth: anonymousFirebaseUser
     });
 
-    let actualAuthState = authDataToAuthState(anonymouseFirebaseUser);
+    let actualAuthState = authDataToAuthState(anonymousFirebaseUser);
     expect(actualAuthState.anonymous).toEqual(true);
   });
 });
