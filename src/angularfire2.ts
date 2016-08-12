@@ -9,7 +9,8 @@ import {
   FirebaseConfig,
   FirebaseApp,
   WindowLocation,
-  FirebaseUserConfig
+  FirebaseUserConfig,
+  FirebaseAuthConfig
 } from './tokens';
 import {
   APP_INITIALIZER,
@@ -114,7 +115,7 @@ export class AngularFireModule {
 		providers: [
 		  { provide: FirebaseUserConfig, useValue: config },
 		  { provide: FirebaseConfig, useFactory: _getDefaultFirebase, deps: [FirebaseUserConfig] },
-      firebaseAuthConfig(authConfig)
+      { provide: FirebaseAuthConfig, useValue: authConfig }
 		]
 	}
   }

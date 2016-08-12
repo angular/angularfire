@@ -4,7 +4,7 @@ import { FirebaseAppConfig } from '../angularfire2';
 import { FirebaseListFactory } from './index';
 import { FirebaseListFactoryOpts, FirebaseObjectFactoryOpts } from '../interfaces';
 import * as utils from '../utils';
-import { 
+import {
   FirebaseListObservable,
   FirebaseObjectObservable,
   FirebaseObjectFactory
@@ -13,7 +13,7 @@ import {
 @Injectable()
 export class AngularFireDatabase {
   constructor(@Inject(FirebaseConfig) private fbConfig:FirebaseAppConfig,
-    @Inject(FirebaseApp) private fbApp:firebase.app.App) {}
+    @Inject(FirebaseApp) private fbApp:any) {}
   list (urlOrRef:string | firebase.database.Reference, opts?:FirebaseListFactoryOpts):FirebaseListObservable<any[]> {
     return utils.checkForUrlOrFirebaseRef(urlOrRef, {
       isUrl: () => FirebaseListFactory(this.fbApp.database().refFromURL(getAbsUrl(this.fbConfig, <string>urlOrRef)), opts),
