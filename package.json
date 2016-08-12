@@ -1,6 +1,6 @@
 {
   "name": "angularfire2",
-  "version": "2.0.0-beta.3-pre",
+  "version": "2.0.0-beta.2",
   "description": "",
   "main": "./dist/angularfire2.js",
   "jsnext:main": "./dist/esm/angularfire2.js",
