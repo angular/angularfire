@@ -225,13 +225,72 @@ class App {
 }
 
 ```
+
 ### FirebaseListObservable
 
 Subclass of rxjs `Observable` which also has methods for updating
 list-like Firebase data.
 
-type: `class`
+Type: `class`
 
-additional methods:
+Properties:
 
-`add:(val) => void`: Add an element to the Firebase ref.
+`$ref:(firebase.database.Reference)`: The reference used to sync this
+collection to the Firebase database. See
+[firebase.database.Reference](https://firebase.google.com/docs/reference/js/firebase.database.Reference)
+
+Methods:
+
+`push:(val) => Promise`: Add an element to the Firebase Database. 
+This is the equivalent of the Firebase SDK's  
+[set() method](https://firebase.google.com/docs/reference/js/firebase.database.Reference#set).
+See [Saving Data](https://firebase.google.com/docs/database/web/save-data) 
+for info about restricted characters in object keys and more details about
+saving data in the Database.
+
+`update:(item:Object) => void`: Replace any child keys provided in `val`
+with the values provided, but do not touch any other keys in the element.
+This is the equivalent of the Firebase SDK's 
+[update() method](https://firebase.google.com/docs/reference/js/firebase.database.Reference#update).
+
+`remove:([item]) => void`: Remove an element from the Firebase Database.
+If no `item` argument is provided, it removes all elements from the list.
+ This is the equivalent of the Firebase SDK's
+ [remove() method](https://firebase.google.com/docs/reference/js/firebase.database.Reference#remove).
+
+### FirebaseObjectObservable
+
+Subclass of rxjs `Observable` which also has methods for syncing and
+updating object-like Firebase data. {For collections and lists, see
+FirebaseListObservable.)
+
+Type: `class`
+
+Properties:
+
+`$ref:(firebase.database.Reference)`: The reference used to sync
+this collection to the Firebase database. See 
+[firebase.database.Reference](https://firebase.google.com/docs/reference/js/firebase.database.Reference)
+
+Methods:
+
+`set:(val:any) => Promise`: Replaces any data at this path in the Database
+ with the value provided here (or adds the data if it doesn't exist). 
+ This is the equivalent of the Firebase SDK's  
+[set() method](https://firebase.google.com/docs/reference/js/firebase.database.Reference#set).
+See [Saving Data](https://firebase.google.com/docs/database/web/save-data) 
+for info about restricted characters in object keys and more details about
+saving data in the Database.
+
+`update:(val:Object) => void`: Replace any child keys provided in `val`
+with the values provided here. The primary difference between this method
+and `set()` above, is that `update()` modifies only the keys provided,
+leaving any other data untouched, where `set()` essentially replaces
+all data at the given path.
+This is the equivalent of the Firebase SDK's 
+[update() method](https://firebase.google.com/docs/reference/js/firebase.database.Reference#update).
+
+`remove:() => void`: Remove an element from the Firebase Database.
+If no `item` argument is provided, it removes all elements from the list.
+ This is the equivalent of the Firebase SDK's
+ [remove() method](https://firebase.google.com/docs/reference/js/firebase.database.Reference#remove).

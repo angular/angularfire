@@ -366,8 +366,8 @@ describe('FirebaseListFactory', () => {
       firebase.database().ref().remove(done);
       questions = FirebaseListFactory(`${rootFirebase}/questions`);
       questionsSnapshotted = FirebaseListFactory(`${rootFirebase}/questionssnapshot`, { preserveSnapshot: true });
-      ref = (<any>questions)._ref;
-      refSnapshotted = (<any>questionsSnapshotted)._ref;
+      ref = (<any>questions).$ref;
+      refSnapshotted = (<any>questionsSnapshotted).$ref;
     });
 
     afterEach((done: any) => {
@@ -379,7 +379,7 @@ describe('FirebaseListFactory', () => {
 
 
     it('should emit only when the initial data set has been loaded', (done: any) => {
-      (<any>questions)._ref.set([{ initial1: true }, { initial2: true }, { initial3: true }, { initial4: true }])
+      (<any>questions).$ref.set([{ initial1: true }, { initial2: true }, { initial3: true }, { initial4: true }])
         .then(() => questions.take(1).toPromise())
         .then((val: any[]) => {
           expect(val.length).toBe(4);

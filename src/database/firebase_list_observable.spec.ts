@@ -1,6 +1,5 @@
 import { FirebaseListObservable } from './index';
 import { Observer } from 'rxjs/Observer';
-import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import { database } from 'firebase';
 import { unwrapMapFn } from '../utils';
@@ -22,7 +21,6 @@ export const firebaseConfig: FirebaseAppConfig = {
   databaseURL: "https://angularfire2-test.firebaseio.com",
   storageBucket: "angularfire2-test.appspot.com",
 };
-const rootUrl = firebaseConfig.databaseURL;
 
 describe('FirebaseObservable', () => {
   var O:FirebaseListObservable<any>;
@@ -31,7 +29,7 @@ describe('FirebaseObservable', () => {
 
   beforeEach(() => {
     addProviders([FIREBASE_PROVIDERS, defaultFirebase(firebaseConfig)]);
-    inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
+    inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App) => {
       app = firebaseApp;
       ref = database().ref();
       O = new FirebaseListObservable(ref, (observer:Observer<any>) => {
@@ -49,6 +47,16 @@ describe('FirebaseObservable', () => {
     O = new FirebaseListObservable(ref, (observer:Observer<any>) => {
     });
     expect(O.map(noop) instanceof FirebaseListObservable).toBe(true);
+  });
+
+  describe('$ref', () => {
+    it('should be a firebase.database.Reference', () => {
+      expect(O.$ref instanceof database.Reference).toBe(true);
+    });
+
+    it('should match the database path passed in the constructor', () => {
+      expect(O.$ref.toString()).toEqual(ref.toString());
+    });
   });
 
   describe('push', () => {
