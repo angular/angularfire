@@ -39,10 +39,10 @@ export class FirebaseListObservable<T> extends Observable<T> {
     });
   }
 
-  remove(item:FirebaseOperation = null): firebase.Promise<void> {
+  remove(item?:FirebaseOperation): firebase.Promise<void> {
     // TODO: remove override when typings are updated to include
     // remove() returning a promise.
-
+    
     // if no item parameter is provided, remove the whole list
     if (!item) {
       return this._ref.ref.remove();
@@ -68,7 +68,7 @@ export class FirebaseListObservable<T> extends Observable<T> {
       // Unwrapped snapshot
       return cases.unwrappedSnapshotCase()
     }
-    throw new Error(`FirebaseListObservable.remove requires a key, snapshot, reference, or unwrapped snapshot. Got: ${typeof item}`);
+    throw new Error(`Method requires a key, snapshot, reference, or unwrapped snapshot. Got: ${typeof item}`);
   }
 
 }

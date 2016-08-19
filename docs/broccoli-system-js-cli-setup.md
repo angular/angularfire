@@ -5,17 +5,14 @@ We have yet to release the RC5 version to the main package because we are still 
 
 > Getting started with AngularFire2 is easy with the [Angular CLI](https://github.com/angular/angular-cli). Follow the 10 steps below to get started. Don't worry, we're always working to make this shorter.
 
-**The setups below use the Webpack branch of the [Angular CLI](https://github.com/angular/angular-cli).**
+**The setups below use the [Angular CLI](https://github.com/angular/angular-cli).**
 
-**For the Broccoli/System.js branch [see this set up guide](broccoli-system-js-cli-setup.md)**
+**We recommend using the Webpack branch, [which you can see the guide here.](1-install-and-setup.md)**
 
 ### 0. Prerequisites
 
 ```bash
-npm install -g angular-cli@webpack 
-# or install locally
-npm install angular-cli@webpack --save-dev
-# make sure you have typings installed
+npm install -g angular-cli
 npm install -g typings 
 ```
 
@@ -36,7 +33,67 @@ npm install angularfire2 firebase --save
 
 Now that you have a new project setup, install AngularFire 2 and Firebase from npm.
 
-### 3. Setup @NgModule
+### 3. Include AngularFire 2 and Firebase in the vendor files
+
+Open `angular-cli-build.js`.
+
+Include AngularFire2 and Firebase in the `vendorNpmFiles` array:
+
+```js
+/* global require, module */
+
+var Angular2App = require('angular-cli/lib/broccoli/angular2-app');
+
+module.exports = function(defaults) {
+  return new Angular2App(defaults, {
+    vendorNpmFiles: [
+      'systemjs/dist/system-polyfills.js',
+      'systemjs/dist/system.src.js',
+      'zone.js/dist/**/*.+(js|js.map)',
+      'es6-shim/es6-shim.js',
+      'reflect-metadata/**/*.+(js|js.map)',
+      'rxjs/**/*.+(js|js.map)',
+      '@angular/**/*.+(js|js.map)',
+      // above are the existing entries
+      // below are the AngularFire entries
+      'angularfire2/**/*.js',
+      'firebase/*.js'      
+    ]
+  });
+};
+```
+
+### 4. Build
+
+```bash
+ng build
+```
+
+Run a build and check the `/dist/vendor` folder for the `angularfire2` and `firebase` folders.
+
+### 5. System.js
+
+Open `/src/system-config.ts`. Modify the file like below:
+
+```js
+/** Map relative paths to URLs. */
+const map: any = {
+  'firebase': 'vendor/firebase/firebase.js',
+  'angularfire2': 'vendor/angularfire2'
+};
+
+/** User packages configuration. */
+const packages: any = {
+  angularfire2: {
+    defaultExtension: 'js',
+    main: 'angularfire2.js'
+  }
+};
+```
+
+AngularFire 2 and Firebase need to be mapped with System.js for module loading.
+
+### 6. Set up @NgModule
 
 Open `/src/main.ts`, inject the Firebase providers, and specify your Firebase configuration. 
 This can be found in your project at [the Firebase Console](https://console.firebase.google.com):
@@ -68,7 +125,7 @@ export class MyAppModule {}
 
 ```
 
-### 4. Inject AngularFire
+### 7. Inject AngularFire
 
 Open `/src/app/<my-app>.component.ts`, and make sure to modify/delete any tests to get the sample working (tests are still important, you know):
 
@@ -90,7 +147,7 @@ export class <MyApp>Component {
 
 ```
 
-### 5. Bind to a list
+### 8. Bind to a list
 
 In `/src/app/<my-app>.component.ts`:
 
@@ -122,22 +179,22 @@ Open `/src/app/<my-app>.component.html`:
 </ul>
 ```
 
-The `async` pipe unwraps the each item in the people
-observable as they arrive. Also the array that is received through the `items` observable contains objects that have a `$value` property. A structure like this:
-```
+The `async` pipe unwraps the each item in the people observable as they arrive. The observable emits an array of items that automatically unwraps  A structure like this:
+
+```json
 [
   {
-    $value: 'something',
-    (...)
+    "$value": 'something',
+    "$key": '<the-key>'
   },
   {
-    $value: 'something else',
+    "$value": 'something else',
     (...)
   },
 ]
 ```
 
-### 6. Serve
+### 9. Serve
 
 ```bash
 ng serve
