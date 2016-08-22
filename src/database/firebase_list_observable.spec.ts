@@ -142,7 +142,7 @@ describe('FirebaseObservable', () => {
     });
 
 
-    fit('should throw an exception if input is not supported', () => {
+    it('should throw an exception if input is not supported', () => {
       var input = (<any>{lol:true});
       expect(() => O.remove(input)).toThrowError(`Method requires a key, snapshot, reference, or unwrapped snapshot. Got: ${typeof input}`);
     })
