@@ -1,3 +1,40 @@
+<a name="2.0.0-beta.3"></a>
+# [2.0.0-beta.3](https://github.com/angular/angularfire2/compare/2.0.0-beta.2...v2.0.0-beta.3) (2016-08-22)
+
+
+* a handful of package and publish chores (#312) ([ac8c6be](https://github.com/angular/angularfire2/commit/ac8c6be)), closes [#272](https://github.com/angular/angularfire2/issues/272) [#311](https://github.com/angular/angularfire2/issues/311) [#310](https://github.com/angular/angularfire2/issues/310) [#293](https://github.com/angular/angularfire2/issues/293) [#246](https://github.com/angular/angularfire2/issues/246)
+
+
+### Bug Fixes
+
+* **auth:** add scheduler to schedule onAuth events through Angular zone ([#368](https://github.com/angular/angularfire2/issues/368)) ([3615318](https://github.com/angular/angularfire2/commit/3615318)), closes [#354](https://github.com/angular/angularfire2/issues/354)
+* **auth:** Auth config for initializeApp ([#428](https://github.com/angular/angularfire2/issues/428)) ([a2ee25d](https://github.com/angular/angularfire2/commit/a2ee25d))
+* **auth:** check protocol before calling getRedirectResult ([#271](https://github.com/angular/angularfire2/issues/271)) ([f38e9d7](https://github.com/angular/angularfire2/commit/f38e9d7)), closes [#243](https://github.com/angular/angularfire2/issues/243)
+* **auth:** make statically analyzable x2 ([#427](https://github.com/angular/angularfire2/issues/427)) ([ab80954](https://github.com/angular/angularfire2/commit/ab80954))
+* **auth:** providerData issue ([#420](https://github.com/angular/angularfire2/issues/420)) ([1ebb726](https://github.com/angular/angularfire2/commit/1ebb726))
+* **list:** FirebaseListObservable shape ([#321](https://github.com/angular/angularfire2/issues/321)) ([35e8583](https://github.com/angular/angularfire2/commit/35e8583))
+* **providers:** make AoT compile friendly ([#410](https://github.com/angular/angularfire2/issues/410)) ([6219ac1](https://github.com/angular/angularfire2/commit/6219ac1))
+
+
+### Features
+
+* **docs:** Docs for RC5 ([9870a7f](https://github.com/angular/angularfire2/commit/9870a7f))
+
+
+### BREAKING CHANGES
+
+* Previously, es modules were published to the es6/ directory inside the npm
+package. This change publishes them to the esm directory to be consistent
+with other angular packages. Currently, the es6 directory is still published
+in the npm package, but will be removed in a future release.
+* auth: The AngularFireAuth class has changed the order of its constructor arguments.
+Since this is usually instantiated automatically via dependency injection,
+it shouldn't affect common usage of the library. However, if manually
+instantiating AngularFireAuth in tests or in an application, the order of
+arguments is now: `(AuthBackend, WindowLocation[, AuthConfiguration])`.
+
+
+
 <a name="2.0.0-beta.2"></a>
 # [2.0.0-beta.2](https://github.com/angular/angularfire2/compare/2.0.0-beta.1...v2.0.0-beta.2) (2016-06-22)
 
