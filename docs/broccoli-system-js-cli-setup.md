@@ -1,6 +1,3 @@
-# These instructions are for the @next RC5 setup
-We have yet to release the RC5 version to the main package because we are still testing it out. We recommend you try it by following the steps below. However, if you are still on RC4, you can refer to the older docs here: https://github.com/angular/angularfire2/blob/5720ebc48fddb2d1e75cd905fb534c4ed2e5c286/docs/1-install-and-setup.md
-
 # 1. Installation and Setup
 
 > Getting started with AngularFire2 is easy with the [Angular CLI](https://github.com/angular/angular-cli). Follow the 10 steps below to get started. Don't worry, we're always working to make this shorter.
