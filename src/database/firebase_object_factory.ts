@@ -8,9 +8,9 @@ import { FirebaseObjectFactoryOpts } from '../interfaces';
 import 'rxjs/add/operator/mergeMap';
 
 export function FirebaseObjectFactory (
-  absoluteUrlOrDbRef: string | firebase.database.Reference, 
+  absoluteUrlOrDbRef: string | firebase.database.Reference,
   { preserveSnapshot, query }: FirebaseObjectFactoryOpts = {}): FirebaseObjectObservable<any> {
-  
+
   let ref: firebase.database.Reference;
 
   utils.checkForUrlOrFirebaseRef(absoluteUrlOrDbRef, {
@@ -19,12 +19,12 @@ export function FirebaseObjectFactory (
   });
 
   return new FirebaseObjectObservable((obs: Observer<any>) => {
-    ref.on('value', (snapshot: firebase.database.DataSnapshot) => {
+    let fn = ref.on('value', (snapshot: firebase.database.DataSnapshot) => {
       obs.next(preserveSnapshot ? snapshot : utils.unwrapMapFn(snapshot))
     }, err => {
       if (err) { obs.error(err); obs.complete(); }
     });
 
-    return () => ref.off();
+    return () => ref.off('value', fn);
   }, ref);
 }
