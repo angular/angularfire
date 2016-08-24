@@ -71,33 +71,50 @@ describe('FirebaseObjectFactory', () => {
 
 
     it('should emit a null value if no value is present when subscribed', (done: any) => {
-      subscription = observable.subscribe(val => {
-        expect(val).toEqual({ $key: (<any>observable)._ref.key, $value: null });
+      subscription = observable.subscribe(unwrapped => {
+        const expectedObject = { $key: (<any>observable)._ref.key, $value: null };
+        expect(unwrapped.$key).toEqual(expectedObject.$key);
+        expect(unwrapped.$value).toEqual(expectedObject.$value);
+        expect(unwrapped.$exists()).toEqual(false);
         done();
       });
     });
 
 
     it('should emit unwrapped data by default', (done: any) => {
-      ref.set({ unwrapped: 'bar' }, () => {
-        subscription = observable.subscribe(val => {
-          if (!val) return;
-          expect(val).toEqual({ $key: ref.key, unwrapped: 'bar' });
+      ref.set({ data: 'bar' }, () => {
+        subscription = observable.subscribe(unwrapped => {
+          if (!unwrapped) return;
+          const expectedObject = { $key: ref.key, data: 'bar' };
+          expect(unwrapped.$key).toEqual(expectedObject.$key);
+          expect(unwrapped.data).toEqual(expectedObject.data);
+          expect(unwrapped.$exists()).toEqual(true);
           done();
         });
       });
     });
 
-   it('should emit unwrapped data with a $value property for primitive values', (done: any) => {
+   it('should emit unwrapped data with $ properties for primitive values', (done: any) => {
       ref.set('fiiiireeee', () => {
         subscription = observable.subscribe(val => {
           if (!val) return;
-          expect(val).toEqual({ $key: ref.key, $value: 'fiiiireeee' });
+          expect(val.$key).toEqual(ref.key);
+          expect(val.$value).toEqual('fiiiireeee');
+          expect(val.$exists()).toEqual(true);
           done();
         });
       });
     });
 
+   it('should emit null for $ properties for primitive values', (done: any) => {
+     subscription = observable.subscribe(val => {
+       if (!val) return;
+       expect(val.$key).toEqual(ref.key);
+       expect(val.$value).toEqual(null);
+       expect(val.$exists()).toEqual(false);
+       done();
+     });
+    });
 
     it('should emit snapshots if preserveSnapshot option is true', (done: any) => {
       observable = FirebaseObjectFactory(`${rootFirebase}/questions/${i}`, { preserveSnapshot: true });

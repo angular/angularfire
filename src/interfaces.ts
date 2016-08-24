@@ -17,6 +17,7 @@ export interface FirebaseOperationCases {
 export interface AFUnwrappedDataSnapshot {
   $key: string;
   $value?: string | number | boolean;
+  $exists: () => boolean;
 }
 
 export interface Query {
