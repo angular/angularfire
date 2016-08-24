@@ -39,11 +39,7 @@ export interface CheckUrlRef {
 }
 
 /**
- * Unwraps the data returned in the DataSnapshot. Exposes the DataSnapshot key
- * and exists methods through the $key and $exists properties respectively.
- * If the value is primitive, it is unwrapped using a $value property. The $ 
- * properies mean they cannot be saved in the Database as those characters 
- * are invalid. 
+ * Unwraps the data returned in the DataSnapshot. Exposes the DataSnapshot key and exists methods through the $key and $exists properties respectively. If the value is primitive, it is unwrapped using a $value property. The $ properies mean they cannot be saved in the Database as those characters are invalid. 
  * @param {DataSnapshot} snapshot - The snapshot to unwrap
  * @return AFUnwrappedDataSnapshot
  * @example

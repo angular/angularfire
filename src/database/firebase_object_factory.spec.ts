@@ -71,18 +71,24 @@ describe('FirebaseObjectFactory', () => {
 
 
     it('should emit a null value if no value is present when subscribed', (done: any) => {
-      subscription = observable.subscribe(val => {
-        expect(val).toEqual({ $key: (<any>observable)._ref.key, $value: null });
+      subscription = observable.subscribe(unwrapped => {
+        const expectedObject = { $key: (<any>observable)._ref.key, $value: null };
+        expect(unwrapped.$key).toEqual(expectedObject.$key);
+        expect(unwrapped.$value).toEqual(expectedObject.$value);
+        expect(unwrapped.$exists()).toEqual(false);
         done();
       });
     });
 
 
     it('should emit unwrapped data by default', (done: any) => {
-      ref.set({ unwrapped: 'bar' }, () => {
-        subscription = observable.subscribe(val => {
-          if (!val) return;
-          expect(val).toEqual({ $key: ref.key, unwrapped: 'bar' });
+      ref.set({ data: 'bar' }, () => {
+        subscription = observable.subscribe(unwrapped => {
+          if (!unwrapped) return;
+          const expectedObject = { $key: ref.key, data: 'bar' };
+          expect(unwrapped.$key).toEqual(expectedObject.$key);
+          expect(unwrapped.data).toEqual(expectedObject.data);
+          expect(unwrapped.$exists()).toEqual(true);
           done();
         });
       });

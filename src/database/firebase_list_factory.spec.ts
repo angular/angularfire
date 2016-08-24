@@ -13,15 +13,15 @@ import {
   defaultFirebase,
   FirebaseApp,
   FirebaseAppConfig,
-  AngularFire
+  AngularFire,
 } from '../angularfire2';
 import {
   addProviders,
   inject
 } from '@angular/core/testing';
 import * as utils from '../utils';
-import {Query} from '../interfaces';
-import {Subscription, Observable, Subject} from 'rxjs';
+import { Query, AFUnwrappedDataSnapshot } from '../interfaces';
+import { Subscription, Observable, Subject } from 'rxjs';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/skip';
 import 'rxjs/add/operator/take';
@@ -524,14 +524,10 @@ describe('FirebaseListFactory', () => {
         val: () => val
       };
 
-      it('should return an object value with a $key property', () => {
+      fit('should return an object value with a $key property', () => {
         const unwrapped = utils.unwrapMapFn(snapshot as firebase.database.DataSnapshot);
-        expect(unwrapped).toEqual({
-          $key: 'key',
-          unwrapped: true
-        });
+        expect(unwrapped.$key).toEqual(snapshot.ref.key);
       });
-
 
       it('should return an object value with a $value property if value is scalar', () => {
         const existsFn = () => { return true; }
