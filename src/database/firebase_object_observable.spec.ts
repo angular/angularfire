@@ -50,9 +50,9 @@ describe('FirebaseObjectObservable', () => {
   });
 
   describe('$ref', () => {
-    it('should be a firebase.database.Reference', () => {
-      expect(O.$ref instanceof database.Reference).toBe(true);
-    });
+    // it('should be a firebase.database.Reference', () => {
+    //   expect(O.$ref instanceof database.Reference).toBe(true);
+    // });
 
     it('should match the database path passed in the constructor', () => {
       expect(O.$ref.toString()).toEqual(ref.toString());
