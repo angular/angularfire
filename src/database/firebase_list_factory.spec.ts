@@ -524,7 +524,7 @@ describe('FirebaseListFactory', () => {
         val: () => val
       };
 
-      fit('should return an object value with a $key property', () => {
+      it('should return an object value with a $key property', () => {
         const unwrapped = utils.unwrapMapFn(snapshot as firebase.database.DataSnapshot);
         expect(unwrapped.$key).toEqual(snapshot.ref.key);
       });
