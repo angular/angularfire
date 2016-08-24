@@ -9,11 +9,11 @@ import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/map';
 
 export function FirebaseListFactory (
-  absoluteUrlOrDbRef:string | 
-  firebase.database.Reference | 
-  firebase.database.Query, 
+  absoluteUrlOrDbRef:string |
+  firebase.database.Reference |
+  firebase.database.Query,
   {preserveSnapshot, query = {}}:FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
-  
+
   let ref: firebase.database.Reference | firebase.database.Query;
 
   utils.checkForUrlOrFirebaseRef(absoluteUrlOrDbRef, {
@@ -95,7 +95,7 @@ export function FirebaseListFactory (
       return firebaseListObservable(queryRef, { preserveSnapshot });
     })
     .subscribe(subscriber);
-    
+
     return () => sub.unsubscribe();
   });
 }
@@ -118,7 +118,7 @@ function firebaseListObservable(ref: firebase.database.Reference | firebase.data
       obs.complete()
     });
 
-    ref.on('child_added', (child: any, prevKey: string) => {
+    let addFn = ref.on('child_added', (child: any, prevKey: string) => {
       arr = onChildAdded(arr, child, prevKey);
       // only emit the array after the initial load
       if (hasInitialLoad) {
@@ -128,7 +128,7 @@ function firebaseListObservable(ref: firebase.database.Reference | firebase.data
       if (err) { obs.error(err); obs.complete(); }
     });
 
-    ref.on('child_removed', (child: any) => {
+    let remFn = ref.on('child_removed', (child: any) => {
       arr = onChildRemoved(arr, child)
       if (hasInitialLoad) {
         obs.next(preserveSnapshot ? arr : arr.map(utils.unwrapMapFn));
@@ -137,7 +137,7 @@ function firebaseListObservable(ref: firebase.database.Reference | firebase.data
       if (err) { obs.error(err); obs.complete(); }
     });
 
-    ref.on('child_changed', (child: any, prevKey: string) => {
+    let chgFn = ref.on('child_changed', (child: any, prevKey: string) => {
       arr = onChildChanged(arr, child, prevKey)
       if (hasInitialLoad) {
         // This also manages when the only change is prevKey change
@@ -147,7 +147,11 @@ function firebaseListObservable(ref: firebase.database.Reference | firebase.data
       if (err) { obs.error(err); obs.complete(); }
     });
 
-    return () => ref.off();
+    return () => {
+      ref.off('child_added', addFn);
+      ref.off('child_removed', remFn);
+      ref.off('child_changed', chgFn);
+    }
   });
   return listObs;
 }
