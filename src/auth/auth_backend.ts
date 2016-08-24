@@ -37,6 +37,7 @@ export enum AuthMethods {
 export interface AuthConfiguration {
   method?: AuthMethods;
   provider?: AuthProviders;
+  scope?: string[];
 }
 
 export interface FirebaseAuthState {

@@ -534,18 +534,22 @@ describe('FirebaseListFactory', () => {
 
 
       it('should return an object value with a $value property if value is scalar', () => {
-        expect(utils.unwrapMapFn(Object.assign(snapshot, { val: () => 5 }) as firebase.database.DataSnapshot)).toEqual({
-          $key: 'key',
-          $value: 5
-        });
-        expect(utils.unwrapMapFn(Object.assign(snapshot, { val: () => false }) as firebase.database.DataSnapshot)).toEqual({
-          $key: 'key',
-          $value: false
-        });
-        expect(utils.unwrapMapFn(Object.assign(snapshot, { val: () => 'lol' }) as firebase.database.DataSnapshot)).toEqual({
-          $key: 'key',
-          $value: 'lol'
-        });
+        const existsFn = () => { return true; }
+        const unwrappedValue5 = utils.unwrapMapFn(Object.assign(snapshot, { val: () => 5, exists: existsFn }) as firebase.database.DataSnapshot);
+        const unwrappedValueFalse = utils.unwrapMapFn(Object.assign(snapshot, { val: () => false, exists: existsFn }) as firebase.database.DataSnapshot);
+        const unwrappedValueLol = utils.unwrapMapFn(Object.assign(snapshot, { val: () => 'lol', exists: existsFn }) as firebase.database.DataSnapshot);
+
+        expect(unwrappedValue5.$key).toEqual('key');
+        expect(unwrappedValue5.$value).toEqual(5);
+        expect(unwrappedValue5.$exists()).toEqual(true);
+
+        expect(unwrappedValueFalse.$key).toEqual('key');
+        expect(unwrappedValueFalse.$value).toEqual(false);
+        expect(unwrappedValueFalse.$exists()).toEqual(true);
+
+        expect(unwrappedValueLol.$key).toEqual('key');
+        expect(unwrappedValueLol.$value).toEqual('lol');
+        expect(unwrappedValueLol.$exists()).toEqual(true);        
       });
     });
 
