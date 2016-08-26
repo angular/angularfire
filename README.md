@@ -17,8 +17,6 @@ Status: Beta
 
 ```bash
 npm install firebase angularfire2 --save
-# Or install the pre-release for RC5
-npm install firebase angularfire2@next --save
 ```
 
 ## Example use:
