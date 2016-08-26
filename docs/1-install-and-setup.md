@@ -35,7 +35,7 @@ Now that you have a new project setup, install AngularFire 2 and Firebase from n
 
 ### 3. Setup @NgModule
 
-Open `/src/main.ts`, inject the Firebase providers, and specify your Firebase configuration. 
+Open `/src/app/app.module.ts`, inject the Firebase providers, and specify your Firebase configuration. 
 This can be found in your project at [the Firebase Console](https://console.firebase.google.com):
 
 ```ts
