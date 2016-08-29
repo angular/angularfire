@@ -8,12 +8,15 @@
 
 ### 0. Prerequisites
 
+You need the Angular CLI, typings, and TypeScript 2.0. TypeScript 2.0 is required for AngularFire2.
+
 ```bash
 npm install -g angular-cli@webpack 
 # or install locally
 npm install angular-cli@webpack --save-dev
 # make sure you have typings installed
 npm install -g typings 
+npm install -g typescript@2.0
 ```
 
 ### 1. Create a new project
@@ -117,21 +120,6 @@ Open `/src/app/<my-app>.component.html`:
     {{item.$value}}
   </li>
 </ul>
-```
-
-The `async` pipe unwraps the each item in the people
-observable as they arrive. Also the array that is received through the `items` observable contains objects that have a `$value` property. A structure like this:
-```
-[
-  {
-    $value: 'something',
-    (...)
-  },
-  {
-    $value: 'something else',
-    (...)
-  },
-]
 ```
 
 ### 6. Serve
