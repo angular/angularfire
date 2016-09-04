@@ -113,6 +113,10 @@ af.auth.login({
 
 // Email and password
 af.auth.login({
+  email: 'email@example.com',
+  password: 'password',
+},
+{
   provider: AuthProviders.Password,
   method: AuthMethods.Password,
 })
