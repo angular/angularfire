@@ -1,5 +1,7 @@
 import { Subscription } from 'rxjs/Subscription';
 import { QueueScheduler } from 'rxjs/scheduler/QueueScheduler';
+import { AsyncAction } from 'rxjs/scheduler/AsyncAction';
+import { QueueAction } from 'rxjs/scheduler/QueueAction';
 import { Scheduler } from 'rxjs/Scheduler';
 import { AFUnwrappedDataSnapshot} from './interfaces';
 
@@ -96,7 +98,7 @@ export function stripLeadingSlash(value: string): string {
  */
 export class ZoneScheduler extends QueueScheduler {
   constructor(public zone: Zone) {
-    super();
+    super(QueueAction);
   }
 
   schedule(...args): Subscription {

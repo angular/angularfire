@@ -22,7 +22,7 @@ import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/delay';
 
-fdescribe('angularfire', () => {
+describe('angularfire', () => {
   var subscription:Subscription;
   var app: firebase.app.App;
   var rootRef: firebase.database.Reference;
