@@ -37,7 +37,6 @@
     "@angular/core": "^2.0.0-rc.7",
     "@angular/platform-browser": "^2.0.0-rc.7",
     "@angular/platform-browser-dynamic": "^2.0.0-rc.7",
-    "@types/bluebird": "^3.0.32",
     "@types/request": "0.0.30",
     "firebase": "^3.4.0",
     "rxjs": "5.0.0-beta.12"

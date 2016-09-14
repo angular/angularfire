@@ -30,7 +30,6 @@ module.exports = function(config) {
 
 
       { pattern: 'karma-test-shim.js', included: true, watched: true },
-      //{ pattern: 'dist/test/matchers.js', included: true, watched: true },
 
       // paths loaded via module imports
       // Angular itself
