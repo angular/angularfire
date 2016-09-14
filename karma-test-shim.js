@@ -59,6 +59,7 @@ System.config(
     },
     '@angular/platform-browser-dynamic': {
       main: 'index.js',
+      main: 'angularfire2.js',
       defaultExtension: 'js'
     },
     'rxjs': {

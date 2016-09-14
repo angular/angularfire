@@ -18,7 +18,6 @@ import {
   Inject,
   Injectable,
   OpaqueToken,
-  provide,
   NgModule,
   ModuleWithProviders
 } from '@angular/core';
