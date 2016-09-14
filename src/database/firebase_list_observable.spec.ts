@@ -9,20 +9,16 @@ import {
   defaultFirebase,
   FirebaseApp,
   FirebaseAppConfig,
-  AngularFire
+  AngularFire,
+  AngularFireModule
 } from '../angularfire2';
 import {
-  addProviders,
+  TestBed,
   inject
 } from '@angular/core/testing';
+import { COMMON_CONFIG, ANON_AUTH_CONFIG } from '../test-config';
 
-export const firebaseConfig: FirebaseAppConfig = {
-  apiKey: "AIzaSyBVSy3YpkVGiKXbbxeK0qBnu3-MNZ9UIjA",
-  authDomain: "angularfire2-test.firebaseapp.com",
-  databaseURL: "https://angularfire2-test.firebaseio.com",
-  storageBucket: "angularfire2-test.appspot.com",
-};
-const rootUrl = firebaseConfig.databaseURL;
+const rootUrl = COMMON_CONFIG.databaseURL;
 
 describe('FirebaseObservable', () => {
   var O:FirebaseListObservable<any>;
@@ -30,7 +26,9 @@ describe('FirebaseObservable', () => {
   var app: firebase.app.App;
 
   beforeEach(() => {
-    addProviders([FIREBASE_PROVIDERS, defaultFirebase(firebaseConfig)]);
+    TestBed.configureTestingModule({
+      imports: [AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG)]
+    });
     inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
       app = firebaseApp;
       ref = database().ref();

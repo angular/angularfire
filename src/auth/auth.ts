@@ -1,4 +1,4 @@
-import { Provider, Inject, provide, Injectable, Optional } from '@angular/core';
+import { Provider, Inject, Injectable, Optional } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import { ReplaySubject } from 'rxjs/ReplaySubject';

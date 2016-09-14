@@ -22,17 +22,18 @@ export function observeQuery(query: Query): Observable<ScalarQuery> {
   }
 
   return Observable.create((observer: Observer<ScalarQuery>) => {
-    getOrderObservables(query)
-      .combineLatest(
-      getStartAtObservable(query),
-      getEndAtObservable(query),
-      getEqualToObservable(query),
-      getLimitToObservables(query)
+
+    let obs = getOrderObservables(query) as Observable<OrderBySelection>;
+    obs.combineLatest(
+        getStartAtObservable(query),
+        getEndAtObservable(query),
+        getEqualToObservable(query),
+        getLimitToObservables(query)
       )
       .subscribe(([orderBy, startAt, endAt, equalTo, limitTo]
         : [OrderBySelection, Primitive, Primitive, Primitive, LimitToSelection]) => {
 
-        var serializedOrder: any = {};
+        let serializedOrder: any = {};
         if (isPresent(orderBy) && isPresent(orderBy.value)) {
           switch (orderBy.key) {
             case OrderByOptions.Key:

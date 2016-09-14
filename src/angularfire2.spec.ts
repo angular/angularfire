@@ -12,7 +12,8 @@ import {
   FirebaseApp,
   defaultFirebase,
   AngularFireDatabase,
-  FirebaseAppConfig
+  FirebaseAppConfig,
+  AngularFireModule
 } from './angularfire2';
 import { Subscription } from 'rxjs/Subscription';
 import { COMMON_CONFIG, ANON_AUTH_CONFIG } from './test-config';
@@ -21,23 +22,13 @@ import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/delay';
 
-describe('angularfire', () => {
+fdescribe('angularfire', () => {
   var subscription:Subscription;
   var app: firebase.app.App;
   var rootRef: firebase.database.Reference;
   var questionsRef: firebase.database.Reference;
   var listOfQuestionsRef: firebase.database.Reference;
   var angularFire2: AngularFire;
-
-fdescribe('angularfire', () => {
-  let subscription:Subscription;
-  let app: firebase.app.App;
-  let rootRef: firebase.database.Reference;
-  let questionsRef: firebase.database.Reference;
-  let listOfQuestionsRef: firebase.database.Reference;
-  let angularFire2: AngularFire;
-  let providers;
-  let defaultBase;
 
   beforeEach(() => {
 
@@ -56,7 +47,7 @@ fdescribe('angularfire', () => {
 
   afterEach((done) => {
     rootRef.remove()
-    if(subscription && !subscription.isUnsubscribed) {
+    if(subscription && !subscription.closed) {
       subscription.unsubscribe();
     }
     app.delete().then(done, done.fail);
