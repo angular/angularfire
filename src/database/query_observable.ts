@@ -1,24 +1,24 @@
 import { Observable } from 'rxjs/Observable';
-import { ScalarObservable } from 'rxjs/observable/ScalarObservable';
+import 'rxjs/add/observable/of';
 import { Operator } from 'rxjs/Operator';
 import { Observer } from 'rxjs/Observer';
 import { merge } from 'rxjs/operator/merge';
 import { map } from 'rxjs/operator/map';
-import { 
-  Query, 
-  ScalarQuery, 
-  OrderByOptions, 
-  OrderBySelection, 
-  LimitToOptions, 
-  LimitToSelection, 
-  Primitive 
+import {
+  Query,
+  ScalarQuery,
+  OrderByOptions,
+  OrderBySelection,
+  LimitToOptions,
+  LimitToSelection,
+  Primitive
 } from '../interfaces';
 import 'rxjs/add/operator/merge';
 import 'rxjs/add/operator/combineLatest';
 
 export function observeQuery(query: Query): Observable<ScalarQuery> {
   if (!isPresent(query)) {
-    return new ScalarObservable(null);
+    return Observable.of(null);
   }
 
   return Observable.create((observer: Observer<ScalarQuery>) => {
@@ -97,7 +97,7 @@ export function getOrderObservables(query: Query): Observable<OrderBySelection> 
   } else {
     return new Observable<OrderBySelection>(subscriber => {
       subscriber.next(null);
-    });    
+    });
   }
 }
 
