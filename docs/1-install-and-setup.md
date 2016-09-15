@@ -6,18 +6,10 @@
 
 ### 0. Prerequisites
 
-You need the Angular CLI, typings, and TypeScript 2.0. TypeScript 2.0 is required for AngularFire2.
+Before you start installing AngularFire2, make sure you have correct version of angular-cli installed. 
+To verify run the command `ng -v` and ensure you see `angular-cli: 1.x.x-beta.x-webpack.x`.
 
-```bash
-npm install -g angular-cli@webpack 
-# or install locally
-npm install angular-cli@webpack --save-dev
-# make sure you have typings installed
-npm install -g typings 
-npm install -g typescript@2.0.2
-```
-
-Verify you have the correct version installed by running `ng -v` and ensuring that you see `angular-cli: 1.x.x-beta.x-webpack.x`. If not, you may need to do the following:
+If not, you may need to do the following:
 
 ```bash
 # if you have the wrong cli version only
@@ -27,6 +19,16 @@ npm uninstall -g angular-cli
 npm install -g angular-cli@webpack 
 ```
 
+You need the Angular CLI (you already got above), typings, and TypeScript 2.0. TypeScript 2.0 is required for AngularFire2.
+
+```bash
+npm install -g angular-cli@webpack  
+# or install locally
+npm install angular-cli@webpack --save-dev
+# make sure you have typings installed
+npm install -g typings 
+npm install -g typescript@2.0.2
+```
 
 ### 1. Create a new project
 
@@ -153,7 +155,7 @@ And that's it! If it totally borke, file an issue and let us know.
 
 ### Troubleshooting
 
-#### Cannot find namespace 'firebase'.
+#### 1. Cannot find namespace 'firebase'.
 
 If you run into this error while trying to invoke `ng serve`, open `src/tsconfig.json` and add the "types" array as follows:
 
@@ -171,4 +173,13 @@ If you run into this error while trying to invoke `ng serve`, open `src/tsconfig
     ]
   }
 }
+```
+
+#### 2. Cannot find name 'require'.
+
+If you run into this error while trying to invoke `ng serve`, open `src/typings.d.ts` and add the following two entries as follows:
+
+```bash
+declare var require: any;
+declare var module: any;
 ```
