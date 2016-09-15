@@ -19,7 +19,7 @@ npm uninstall -g angular-cli
 npm install -g angular-cli@webpack 
 ```
 
-You need the Angular CLI (you already got above), typings, and TypeScript 2.0. TypeScript 2.0 is required for AngularFire2.
+You need the Angular CLI, typings, and TypeScript 2.0. TypeScript 2.0 is required for AngularFire2.
 
 ```bash
 npm install -g angular-cli@webpack  
@@ -175,7 +175,7 @@ If you run into this error while trying to invoke `ng serve`, open `src/tsconfig
 }
 ```
 
-#### 2. Cannot find name 'require'.
+#### 2. Cannot find name 'require' (This is just a temporary workaround for the Angular CLI).
 
 If you run into this error while trying to invoke `ng serve`, open `src/typings.d.ts` and add the following two entries as follows:
 
