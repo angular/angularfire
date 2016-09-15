@@ -1,3 +1,24 @@
+<a name="2.0.0-beta.5"></a>
+# [2.0.0-beta.5](https://github.com/angular/angularfire2/compare/2.0.0-beta.4...v2.0.0-beta.5) (2016-09-15)
+
+
+### Bug Fixes
+
+* **docs:** Remove [@next](https://github.com/next) install ([5984a99](https://github.com/angular/angularfire2/commit/5984a99))
+* **docs:** typos ([197026a](https://github.com/angular/angularfire2/commit/197026a))
+* **docs:** Update for beta.4 ([f2d5ba5](https://github.com/angular/angularfire2/commit/f2d5ba5))
+* **docs:** Update for beta.4 ([b347e16](https://github.com/angular/angularfire2/commit/b347e16))
+* **firebase_*_factory.js:** Fix calls to off() which inadvertently cancel all listeners on the path ([#469](https://github.com/angular/angularfire2/issues/469)) ([b4fb281](https://github.com/angular/angularfire2/commit/b4fb281)), closes [#443](https://github.com/angular/angularfire2/issues/443)
+* **package:** Version number ([986685a](https://github.com/angular/angularfire2/commit/986685a))
+
+
+### Features
+
+* **utils:** Add $exists method to AFUnwrappedSnapshot ([#471](https://github.com/angular/angularfire2/issues/471)) ([f67aab1](https://github.com/angular/angularfire2/commit/f67aab1))
+* upgrade to RC7 ([#505](https://github.com/angular/angularfire2/issues/505)) ([2410b2d](https://github.com/angular/angularfire2/commit/2410b2d))
+
+
+
 <a name="2.0.0-beta.4"></a>
 # [2.0.0-beta.4](https://github.com/angular/angularfire2/compare/2.0.0-beta.2...v2.0.0-beta.3) (2016-08-22)
 
