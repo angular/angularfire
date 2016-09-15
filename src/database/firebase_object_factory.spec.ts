@@ -1,7 +1,7 @@
 import { Subscription } from 'rxjs';
 import { FirebaseObjectFactory, FirebaseObjectObservable } from './index';
 import {
-  addProviders,
+  TestBed,
   inject
 } from '@angular/core/testing';
 import {
@@ -9,16 +9,12 @@ import {
   defaultFirebase,
   FirebaseApp,
   FirebaseAppConfig,
-  AngularFire
+  AngularFire,
+  AngularFireModule
 } from '../angularfire2';
+import { COMMON_CONFIG, ANON_AUTH_CONFIG } from '../test-config';
 
-export const firebaseConfig: FirebaseAppConfig = {
-  apiKey: "AIzaSyBVSy3YpkVGiKXbbxeK0qBnu3-MNZ9UIjA",
-  authDomain: "angularfire2-test.firebaseapp.com",
-  databaseURL: "https://angularfire2-test.firebaseio.com",
-  storageBucket: "angularfire2-test.appspot.com",
-};
-const rootFirebase = firebaseConfig.databaseURL;
+const rootDatabaseUrl = COMMON_CONFIG.databaseURL;
 
 describe('FirebaseObjectFactory', () => {
   var i = 0;
@@ -29,7 +25,9 @@ describe('FirebaseObjectFactory', () => {
   var app: firebase.app.App;
 
   beforeEach(() => {
-    addProviders([FIREBASE_PROVIDERS, defaultFirebase(firebaseConfig)]);
+    TestBed.configureTestingModule({
+      imports: [AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG)]
+    });
     inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
       app = firebaseApp;
     })();
@@ -42,7 +40,7 @@ describe('FirebaseObjectFactory', () => {
   describe('constructor', () => {
 
     it('should accept a Firebase db url in the constructor', () => {
-      const object = FirebaseObjectFactory(`${rootFirebase}/questions`);
+      const object = FirebaseObjectFactory(`${rootDatabaseUrl}/questions`);
       expect(object instanceof FirebaseObjectObservable).toBe(true);
     });
 
@@ -59,12 +57,12 @@ describe('FirebaseObjectFactory', () => {
       i = Date.now();
       ref = firebase.database().ref().child(`questions/${i}`);
       nextSpy = nextSpy = jasmine.createSpy('next');
-      observable = FirebaseObjectFactory(`${rootFirebase}/questions/${i}`);
+      observable = FirebaseObjectFactory(`${rootDatabaseUrl}/questions/${i}`);
       ref.remove(done);
     });
 
     afterEach(() => {
-      if (subscription && !subscription.isUnsubscribed) {
+      if (subscription && !subscription.closed) {
         subscription.unsubscribe();
       }
     });
@@ -117,7 +115,7 @@ describe('FirebaseObjectFactory', () => {
     });
 
     it('should emit snapshots if preserveSnapshot option is true', (done: any) => {
-      observable = FirebaseObjectFactory(`${rootFirebase}/questions/${i}`, { preserveSnapshot: true });
+      observable = FirebaseObjectFactory(`${rootDatabaseUrl}/questions/${i}`, { preserveSnapshot: true });
       ref.remove(() => {
         ref.set('preserved snapshot!', () => {
           subscription = observable.subscribe(data => {

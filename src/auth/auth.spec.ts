@@ -1,9 +1,9 @@
 import { auth, initializeApp } from 'firebase';
-import { ReflectiveInjector, provide, Provider } from '@angular/core';
+import { ReflectiveInjector, Provider } from '@angular/core';
 import { Observable } from 'rxjs/Observable'
 import { Observer } from 'rxjs/Observer';
 import {
-  addProviders,
+  TestBed,
   inject
 } from '@angular/core/testing';
 import 'rxjs/add/operator/do';
@@ -19,9 +19,10 @@ import {
   AuthMethods,
   firebaseAuthConfig,
   AuthProviders,
-  WindowLocation
+  WindowLocation,
+  AngularFireModule
 } from '../angularfire2';
-import { COMMON_CONFIG } from '../test-config';
+import { COMMON_CONFIG, ANON_AUTH_CONFIG } from '../test-config';
 
 import { AuthBackend } from './auth_backend';
 import { FirebaseSdkAuthBackend } from './firebase_sdk_auth_backend';
@@ -131,19 +132,25 @@ describe('FirebaseAuth', () => {
       origin:'localhost',
       href:'https://localhost/'
     };
-    addProviders([
-      FIREBASE_PROVIDERS,
-      defaultFirebase(COMMON_CONFIG),
-      { provide: FirebaseApp,
-        useFactory: (config: FirebaseAppConfig) => {
-          var app = initializeApp(config);
-          (<any>app).auth = () => authSpy;
-          return app;
+
+    TestBed.configureTestingModule({
+      imports: [AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG)],
+      providers: [
+        {
+          provide: FirebaseApp,
+          useFactory: (config: FirebaseAppConfig) => {
+            var app = initializeApp(config);
+            (<any>app).auth = () => authSpy;
+            return app;
+          },
+          deps: [FirebaseConfig]
         },
-        deps: [FirebaseConfig]
-      },
-      { provide: WindowLocation, useValue: windowLocation }
-    ]);
+        {
+          provide: WindowLocation,
+          useValue: windowLocation
+        }
+      ]
+    });
 
     authSpy = jasmine.createSpyObj('auth', authMethods);
     authSpy['createUserWithEmailAndPassword'].and.returnValue(Promise.resolve(firebaseUser));

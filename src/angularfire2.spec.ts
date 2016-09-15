@@ -1,8 +1,8 @@
 import {
-  addProviders,
+  TestBed,
   inject
 } from '@angular/core/testing';
-import { ReflectiveInjector, provide, Provider } from '@angular/core';
+import { ReflectiveInjector, Provider } from '@angular/core';
 import {
   AngularFire,
   FirebaseObjectObservable,
@@ -12,20 +12,15 @@ import {
   FirebaseApp,
   defaultFirebase,
   AngularFireDatabase,
-  FirebaseAppConfig
+  FirebaseAppConfig,
+  AngularFireModule
 } from './angularfire2';
 import { Subscription } from 'rxjs/Subscription';
+import { COMMON_CONFIG, ANON_AUTH_CONFIG } from './test-config';
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/delay';
-
-export const firebaseConfig: FirebaseAppConfig  = {
-  apiKey: "AIzaSyBVSy3YpkVGiKXbbxeK0qBnu3-MNZ9UIjA",
-  authDomain: "angularfire2-test.firebaseapp.com",
-  databaseURL: "https://angularfire2-test.firebaseio.com",
-  storageBucket: "angularfire2-test.appspot.com",
-};
 
 describe('angularfire', () => {
   var subscription:Subscription;
@@ -36,7 +31,11 @@ describe('angularfire', () => {
   var angularFire2: AngularFire;
 
   beforeEach(() => {
-    addProviders([FIREBASE_PROVIDERS, defaultFirebase(firebaseConfig)]);
+
+    TestBed.configureTestingModule({
+      imports: [AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG)]
+    });
+
     inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
       angularFire2 = _af;
       app = firebaseApp;
@@ -48,7 +47,7 @@ describe('angularfire', () => {
 
   afterEach((done) => {
     rootRef.remove()
-    if(subscription && !subscription.isUnsubscribed) {
+    if(subscription && !subscription.closed) {
       subscription.unsubscribe();
     }
     app.delete().then(done, done.fail);
@@ -80,7 +79,7 @@ describe('angularfire', () => {
 
   describe('defaultFirebase', () => {
     it('should create an array of providers', () => {
-      const providers = defaultFirebase(firebaseConfig);
+      const providers = defaultFirebase(COMMON_CONFIG);
       expect(providers.length).toBe(2);
     });
   });
