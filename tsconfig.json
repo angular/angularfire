@@ -2,7 +2,7 @@
   "compilerOptions": {
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "module": "commonjs",
+    "module": "es2015",
     "target": "es5",
     "noImplicitAny": false,
     "outDir": "dist",
@@ -15,20 +15,11 @@
       "es2015",
       "dom"
     ],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "moduleResolution": "node"
   },
   "files": [
-    "src/angularfire2.ts",
-    "src/angularfire2.spec.ts",
-    "src/database/index.ts",
-    "src/database/firebase_list_factory.spec.ts",
-    "src/database/firebase_object_factory.spec.ts",
-    "src/database/firebase_list_observable.spec.ts",
-    "src/database/firebase_object_observable.spec.ts",
-    "src/database/query_observable.spec.ts",
-    "src/auth/auth.ts",
-    "src/auth/auth.spec.ts",
-    "src/auth/auth_backend.spec.ts",
+    "src/test-root.ts",
     "typings/index.d.ts",
     "node_modules/zone.js/dist/zone.js.d.ts"
   ],
