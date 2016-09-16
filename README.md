@@ -13,6 +13,11 @@ Status: Beta
 - **Realtime bindings** - Synchronize database collections as objects or lists.
 - **Authentication** - Monitor authentication state in realtime.
 
+#### Quick links
+[Contributing](https://github.com/angular/angularfire2/blob/master/CONTRIBUTOR.md)
+
+[Plunker Template](http://plnkr.co/edit/4IbB5IvfkBYcj2iVAIM1?p=preview) - Requires to set your Firebase credentials in `app.module.ts`.
+
 ## Install
 
 ```bash
