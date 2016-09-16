@@ -9,11 +9,11 @@
 You need the Angular CLI, typings, and TypeScript 2.0. TypeScript 2.0 is required for AngularFire2.
 
 ```bash
-npm install -g angular-cli@webpack 
+npm install -g angular-cli
 # or install locally
-npm install angular-cli@webpack --save-dev
+npm install angular-cli --save-dev
 # make sure you have typings installed
-npm install -g typings 
+npm install -g typings
 npm install -g typescript@2.0.2
 ```
 
@@ -24,7 +24,7 @@ Verify you have the correct version installed by running `ng -v` and ensuring th
 npm uninstall -g angular-cli
 
 # reinstall clean version
-npm install -g angular-cli@webpack 
+npm install -g angular-cli
 ```
 
 
