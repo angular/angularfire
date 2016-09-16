@@ -1,30 +1,30 @@
 import { Observable } from 'rxjs/Observable';
-import { ScalarObservable } from 'rxjs/observable/ScalarObservable';
+import { of as observableOf } from  'rxjs/observable/of';
 import { Operator } from 'rxjs/Operator';
 import { Observer } from 'rxjs/Observer';
+import { combineLatest } from 'rxjs/operator/combineLatest';
 import { merge } from 'rxjs/operator/merge';
 import { map } from 'rxjs/operator/map';
-import { 
-  Query, 
-  ScalarQuery, 
-  OrderByOptions, 
-  OrderBySelection, 
-  LimitToOptions, 
-  LimitToSelection, 
-  Primitive 
+import {
+  Query,
+  ScalarQuery,
+  OrderByOptions,
+  OrderBySelection,
+  LimitToOptions,
+  LimitToSelection,
+  Primitive
 } from '../interfaces';
-import 'rxjs/add/operator/merge';
-import 'rxjs/add/operator/combineLatest';
+
 
 export function observeQuery(query: Query): Observable<ScalarQuery> {
   if (!isPresent(query)) {
-    return new ScalarObservable(null);
+    return observableOf(null);
   }
 
   return Observable.create((observer: Observer<ScalarQuery>) => {
 
     let obs = getOrderObservables(query) as Observable<OrderBySelection>;
-    obs.combineLatest(
+    combineLatest.call(obs,
         getStartAtObservable(query),
         getEndAtObservable(query),
         getEqualToObservable(query),
@@ -93,11 +93,11 @@ export function getOrderObservables(query: Query): Observable<OrderBySelection> 
   if (observables.length === 1) {
     return observables[0];
   } else if (observables.length > 1) {
-    return observables[0].merge(observables.slice(1));
+    return merge.call(observables[0], observables.slice(1));
   } else {
     return new Observable<OrderBySelection>(subscriber => {
       subscriber.next(null);
-    });    
+    });
   }
 }
 
@@ -110,7 +110,7 @@ export function getLimitToObservables(query: Query): Observable<LimitToSelection
   if (observables.length === 1) {
     return observables[0];
   } else if (observables.length > 1) {
-    const mergedObs = observables[0].merge(observables.slice(1));
+    const mergedObs = merge.call(observables[0], observables.slice(1));
     return mergedObs;
   } else {
     return new Observable<LimitToSelection>(subscriber => {

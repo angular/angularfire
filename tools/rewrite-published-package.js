@@ -5,16 +5,15 @@
  */
 var fs = require('fs');
 var srcPackage = require('../package.json');
-var [MAIN, JSNEXT_MAIN] = ['main', 'jsnext:main'].map(k => srcPackage[k].replace('/dist/', '/'));
+
+delete srcPackage.scripts;
 
 var peerDependencies = Object.assign({}, srcPackage.dependencies);
 // See note about including firebase as dependency
 delete peerDependencies.firebase;
+
 var outPackage = Object.assign({}, srcPackage, {
   peerDependencies,
-  main: MAIN,
-  typings: "angularfire2.d.ts",
-  "jsnext:main": JSNEXT_MAIN,
   dependencies: {
     /**
      * Firebase SDK should be a dependency since it's not required that

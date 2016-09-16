@@ -20,9 +20,9 @@ const {
   TwitterAuthProvider
 } = auth;
 
-import 'rxjs/add/operator/map';
-import 'rxjs/add/observable/fromPromise';
-import 'rxjs/add/operator/observeOn';
+import { map } from 'rxjs/operator/map';
+import { fromPromise } from 'rxjs/observable/fromPromise';
+import { observeOn } from 'rxjs/operator/observeOn';
 
 @Injectable()
 export class FirebaseSdkAuthBackend extends AuthBackend {
@@ -34,7 +34,7 @@ export class FirebaseSdkAuthBackend extends AuthBackend {
   }
 
   createUser(creds: EmailPasswordCredentials): Promise<FirebaseAuthState> {
-    return Promise.resolve(this._fbAuth.createUserWithEmailAndPassword(creds.email, creds.password))
+    return castPromise<firebase.User>(this._fbAuth.createUserWithEmailAndPassword(creds.email, creds.password))
       .then((user: firebase.User) => authDataToAuthState(user));
   }
 
@@ -43,20 +43,21 @@ export class FirebaseSdkAuthBackend extends AuthBackend {
   }
 
   onAuth(): Observable<FirebaseAuthState> {
-    return Observable.create((observer: Observer<FirebaseAuthState>) => {
+    let stateChange = Observable.create((observer: Observer<FirebaseAuthState>) => {
       return this._fbAuth.onAuthStateChanged(observer);
-    })
-    .map((user: firebase.User) => {
+    });
+    let authState = map.call(stateChange, (user: firebase.User) => {
       if (!user) return null;
       return authDataToAuthState(user, user.providerData[0]);
-    })
+    });
+
     /**
      * TODO: since the auth service automatically subscribes to this before
      * any user, it will run in the Angular zone, instead of the subscription
      * zone. The auth service should be refactored to capture the subscription
      * zone and not use a ReplaySubject.
     **/
-    .observeOn(new ZoneScheduler(Zone.current));
+    return observeOn.call(authState, new ZoneScheduler(Zone.current));
   }
 
   unauth(): void {
@@ -64,17 +65,17 @@ export class FirebaseSdkAuthBackend extends AuthBackend {
   }
 
   authWithCustomToken(token: string): Promise<FirebaseAuthState> {
-    return Promise.resolve(this._fbAuth.signInWithCustomToken(token))
+    return castPromise<firebase.User>((this._fbAuth.signInWithCustomToken(token)))
       .then((user: firebase.User) => authDataToAuthState(user));
   }
 
   authAnonymously(): Promise<FirebaseAuthState> {
-    return Promise.resolve(this._fbAuth.signInAnonymously())
+    return castPromise<firebase.User>(this._fbAuth.signInAnonymously())
       .then((user: firebase.User) => authDataToAuthState(user));
   }
 
   authWithPassword(creds: EmailPasswordCredentials): Promise<FirebaseAuthState> {
-    return Promise.resolve(this._fbAuth.signInWithEmailAndPassword(creds.email, creds.password))
+    return castPromise<firebase.User>(this._fbAuth.signInWithEmailAndPassword(creds.email, creds.password))
       .then((user: firebase.User) => authDataToAuthState(user));
   }
 
@@ -83,7 +84,7 @@ export class FirebaseSdkAuthBackend extends AuthBackend {
     if (options.scope) {
       options.scope.forEach(scope => providerFromFirebase.addScope(scope));
     }
-    return Promise.resolve(this._fbAuth.signInWithPopup(providerFromFirebase));
+    return castPromise<firebase.auth.UserCredential>(this._fbAuth.signInWithPopup(providerFromFirebase));
   }
 
   /**
@@ -92,16 +93,16 @@ export class FirebaseSdkAuthBackend extends AuthBackend {
    * You should subscribe to the FirebaseAuth object to listen succesful login
    */
   authWithOAuthRedirect(provider: AuthProviders, options?: any): Promise<void> {
-    return Promise.resolve(this._fbAuth.signInWithRedirect(this._enumToAuthProvider(provider)));
+    return castPromise<void>(this._fbAuth.signInWithRedirect(this._enumToAuthProvider(provider)));
   }
 
   authWithOAuthToken(credential: firebase.auth.AuthCredential): Promise<FirebaseAuthState> {
-    return Promise.resolve(this._fbAuth.signInWithCredential(credential))
+    return castPromise<firebase.User>(this._fbAuth.signInWithCredential(credential))
       .then((user: firebase.User) => authDataToAuthState(user));
   }
 
   getRedirectResult(): Observable<firebase.auth.UserCredential> {
-    return Observable.fromPromise(Promise.resolve(this._fbAuth.getRedirectResult()));
+    return fromPromise(castPromise<firebase.auth.UserCredential>(this._fbAuth.getRedirectResult()));
   }
 
   private _enumToAuthProvider(providerId: AuthProviders): any {
@@ -118,4 +119,9 @@ export class FirebaseSdkAuthBackend extends AuthBackend {
         throw new Error(`Unsupported firebase auth provider ${providerId}`);
     }
   }
+}
+
+// Cast Firebase promises as Zone-patched Promises
+function castPromise<T>(promiseLike: PromiseLike<T>): Promise<T> {
+  return Promise.resolve(promiseLike) as Promise<T>;
 }

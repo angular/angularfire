@@ -1,7 +1,6 @@
 import { Subscription } from 'rxjs/Subscription';
-import { QueueScheduler } from 'rxjs/scheduler/QueueScheduler';
-import { QueueAction } from 'rxjs/scheduler/QueueAction';
 import { Scheduler } from 'rxjs/Scheduler';
+import { queue } from 'rxjs/scheduler/queue';
 import { AFUnwrappedDataSnapshot} from './interfaces';
 
 export function isPresent(obj: any): boolean {
@@ -40,7 +39,7 @@ export interface CheckUrlRef {
 }
 
 /**
- * Unwraps the data returned in the DataSnapshot. Exposes the DataSnapshot key and exists methods through the $key and $exists properties respectively. If the value is primitive, it is unwrapped using a $value property. The $ properies mean they cannot be saved in the Database as those characters are invalid. 
+ * Unwraps the data returned in the DataSnapshot. Exposes the DataSnapshot key and exists methods through the $key and $exists properties respectively. If the value is primitive, it is unwrapped using a $value property. The $ properies mean they cannot be saved in the Database as those characters are invalid.
  * @param {DataSnapshot} snapshot - The snapshot to unwrap
  * @return AFUnwrappedDataSnapshot
  * @example
@@ -95,12 +94,10 @@ export function stripLeadingSlash(value: string): string {
  * TODO: remove this scheduler once Rx has a more robust story for working
  * with zones.
  */
-export class ZoneScheduler extends QueueScheduler {
-  constructor(public zone: Zone) {
-    super(QueueAction);
-  }
+export class ZoneScheduler {
+  constructor(public zone: Zone) {}
 
   schedule(...args): Subscription {
-    return <Subscription>this.zone.run(() => super.schedule.apply(this, args));
+    return <Subscription>this.zone.run(() => queue.schedule.apply(queue, args));
   }
 }

@@ -5,8 +5,8 @@ import { database } from 'firebase';
 import { observeQuery } from './query_observable';
 import { Query, FirebaseListFactoryOpts } from '../interfaces';
 import * as utils from '../utils';
-import 'rxjs/add/operator/mergeMap';
-import 'rxjs/add/operator/map';
+import { mergeMap } from 'rxjs/operator/mergeMap';
+import { map } from 'rxjs/operator/map';
 
 export function FirebaseListFactory (
   absoluteUrlOrDbRef:string |
@@ -31,7 +31,7 @@ export function FirebaseListFactory (
 
   const queryObs = observeQuery(query);
   return new FirebaseListObservable(ref, subscriber => {
-    let sub = queryObs.map(query => {
+    let sub = mergeMap.call(map.call(queryObs, query => {
       let queried: firebase.database.Query = ref;
       // Only apply the populated keys
       // apply ordering and available querying options
@@ -90,8 +90,7 @@ export function FirebaseListFactory (
       }
 
       return queried;
-    })
-    .mergeMap((queryRef: firebase.database.Reference, ix: number) => {
+    }), (queryRef: firebase.database.Reference, ix: number) => {
       return firebaseListObservable(queryRef, { preserveSnapshot });
     })
     .subscribe(subscriber);
