@@ -1,7 +1,7 @@
 import { FirebaseListObservable } from './index';
 import { Observer } from 'rxjs/Observer';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/map';
+import { map } from 'rxjs/operator/map';
 import { database } from 'firebase';
 import { unwrapMapFn } from '../utils';
 import {
@@ -46,7 +46,7 @@ describe('FirebaseObservable', () => {
   it('should return an instance of FirebaseObservable when calling operators', () => {
     O = new FirebaseListObservable(ref, (observer:Observer<any>) => {
     });
-    expect(O.map(noop) instanceof FirebaseListObservable).toBe(true);
+    expect(map.call(O, noop) instanceof FirebaseListObservable).toBe(true);
   });
 
   describe('push', () => {

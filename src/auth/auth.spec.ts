@@ -6,7 +6,7 @@ import {
   TestBed,
   inject
 } from '@angular/core/testing';
-import 'rxjs/add/operator/do';
+import { _do } from 'rxjs/operator/do';
 
 import {
   defaultFirebase,
@@ -97,9 +97,9 @@ describe('Zones', () => {
     });
     ngZone.run(() => {
       var afAuth = new AngularFireAuth(new FirebaseSdkAuthBackend(app), window.location);
-      afAuth
-        .take(1)
-        .do(_ => {
+      var authObs = afAuth.take(1);
+
+      _do.call(authObs, _ => {
           expect(Zone.current.name).toBe('ngZone');
         })
         .subscribe(() => {
