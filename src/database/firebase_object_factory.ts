@@ -5,7 +5,6 @@ import * as utils from '../utils';
 import { Query } from '../interfaces';
 import { observeQuery } from './query_observable';
 import { FirebaseObjectFactoryOpts } from '../interfaces';
-import 'rxjs/add/operator/mergeMap';
 
 export function FirebaseObjectFactory (
   absoluteUrlOrDbRef: string | firebase.database.Reference,

@@ -20,9 +20,9 @@ const {
   TwitterAuthProvider
 } = auth;
 
-import 'rxjs/add/operator/map';
-import 'rxjs/add/observable/fromPromise';
-import 'rxjs/add/operator/observeOn';
+import { map } from 'rxjs/operator/map';
+import { fromPromise } from 'rxjs/observable/fromPromise';
+import { observeOn } from 'rxjs/operator/observeOn';
 
 @Injectable()
 export class FirebaseSdkAuthBackend extends AuthBackend {
@@ -43,20 +43,21 @@ export class FirebaseSdkAuthBackend extends AuthBackend {
   }
 
   onAuth(): Observable<FirebaseAuthState> {
-    return Observable.create((observer: Observer<FirebaseAuthState>) => {
+    let stateChange = Observable.create((observer: Observer<FirebaseAuthState>) => {
       return this._fbAuth.onAuthStateChanged(observer);
-    })
-    .map((user: firebase.User) => {
+    });
+    let authState = map.call(stateChange, (user: firebase.User) => {
       if (!user) return null;
       return authDataToAuthState(user, user.providerData[0]);
-    })
+    });
+
     /**
      * TODO: since the auth service automatically subscribes to this before
      * any user, it will run in the Angular zone, instead of the subscription
      * zone. The auth service should be refactored to capture the subscription
      * zone and not use a ReplaySubject.
     **/
-    .observeOn(new ZoneScheduler(Zone.current));
+    return observeOn.call(authState, new ZoneScheduler(Zone.current));
   }
 
   unauth(): void {
@@ -101,7 +102,7 @@ export class FirebaseSdkAuthBackend extends AuthBackend {
   }
 
   getRedirectResult(): Observable<firebase.auth.UserCredential> {
-    return Observable.fromPromise(castPromise<firebase.auth.UserCredential>(this._fbAuth.getRedirectResult()));
+    return fromPromise(castPromise<firebase.auth.UserCredential>(this._fbAuth.getRedirectResult()));
   }
 
   private _enumToAuthProvider(providerId: AuthProviders): any {

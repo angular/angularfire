@@ -17,10 +17,6 @@ import {
 } from './angularfire2';
 import { Subscription } from 'rxjs/Subscription';
 import { COMMON_CONFIG, ANON_AUTH_CONFIG } from './test-config';
-import 'rxjs/add/operator/toPromise';
-import 'rxjs/add/operator/take';
-import 'rxjs/add/operator/do';
-import 'rxjs/add/operator/delay';
 
 describe('angularfire', () => {
   var subscription:Subscription;

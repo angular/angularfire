@@ -13,7 +13,7 @@ import {
 import { COMMON_CONFIG, ANON_AUTH_CONFIG } from '../test-config';
 import { FirebaseObjectObservable } from './index';
 import { Observer } from 'rxjs/Observer';
-import 'rxjs/add/operator/map';
+import { map } from 'rxjs/operator/map';
 import { database } from 'firebase';
 
 const rootDatabaseUrl = COMMON_CONFIG.databaseURL;
@@ -44,7 +44,7 @@ describe('FirebaseObjectObservable', () => {
 
   it('should return an instance of FirebaseObservable when calling operators', () => {
     var O = new FirebaseObjectObservable((observer:Observer<any>) => {});
-    expect(O.map(noop) instanceof FirebaseObjectObservable).toBe(true);
+    expect(map.call(O, noop) instanceof FirebaseObjectObservable).toBe(true);
   });
 
   describe('set', () => {

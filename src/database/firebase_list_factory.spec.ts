@@ -24,16 +24,16 @@ import * as utils from '../utils';
 import { Query, AFUnwrappedDataSnapshot } from '../interfaces';
 import { Subscription, Observable, Subject } from 'rxjs';
 import { COMMON_CONFIG, ANON_AUTH_CONFIG } from '../test-config';
-import 'rxjs/add/operator/do';
-import 'rxjs/add/operator/skip';
-import 'rxjs/add/operator/take';
+import { _do } from 'rxjs/operator/do';
+import { skip } from 'rxjs/operator/skip';
+import { take } from 'rxjs/operator/take';
+import { toPromise } from 'rxjs/operator/toPromise';
 
 const rootDatabaseUrl = COMMON_CONFIG.databaseURL;
 
 function queryTest(observable: Observable<any>, subject: Subject<any>, done: any) {
   let nexted = false;
-  observable
-    .take(2)
+  skipAndTake(observable, 2)
     .subscribe(val => {
       if (!nexted) {
         subject.next('2');
@@ -378,7 +378,7 @@ describe('FirebaseListFactory', () => {
 
     it('should emit only when the initial data set has been loaded', (done: any) => {
       (<any>questions)._ref.set([{ initial1: true }, { initial2: true }, { initial3: true }, { initial4: true }])
-        .then(() => questions.take(1).toPromise())
+        .then(() => toPromise.call(skipAndTake(questions, 1)))
         .then((val: any[]) => {
           expect(val.length).toBe(4);
         })
@@ -389,10 +389,8 @@ describe('FirebaseListFactory', () => {
 
 
     it('should emit a new value when a child moves', (done: any) => {
-      subscription = questions
-        .skip(2)
-        .take(1)
-        .do((data: any) => {
+       let question = skipAndTake(questions, 1, 2)
+       subscription = _do.call(question, (data: any) => {
           expect(data.length).toBe(2);
           expect(data[0].push2).toBe(true);
           expect(data[1].push1).toBe(true);
@@ -412,15 +410,13 @@ describe('FirebaseListFactory', () => {
     it('should emit unwrapped data by default', (done: any) => {
       ref.remove(() => {
         ref.push({ unwrapped: true }, () => {
-          subscription = questions
-            .take(1)
-            .do((data: any) => {
-              expect(data.length).toBe(1);
-              expect(data[0].unwrapped).toBe(true);
-            })
-            .subscribe(() => {
-              done();
-            }, done.fail);
+          subscription = _do.call(skipAndTake(questions, 1), (data: any) => {
+            expect(data.length).toBe(1);
+            expect(data[0].unwrapped).toBe(true);
+          })
+          .subscribe(() => {
+            done();
+          }, done.fail);
         });
       });
     });
@@ -428,14 +424,12 @@ describe('FirebaseListFactory', () => {
 
     it('should emit snapshots if preserveSnapshot option is true', (done: any) => {
       refSnapshotted.push('hello snapshot!', () => {
-        subscription = questionsSnapshotted
-          .take(1)
-          .do((data: any) => {
-            expect(data[0].val()).toEqual('hello snapshot!');
-          })
-          .subscribe(() => {
-            done();
-          }, done.fail);
+        subscription = _do.call(skipAndTake(questionsSnapshotted, 1),(data: any) => {
+          expect(data[0].val()).toEqual('hello snapshot!');
+        })
+        .subscribe(() => {
+          done();
+        }, done.fail);
       });
     });
 
@@ -543,9 +537,13 @@ describe('FirebaseListFactory', () => {
 
         expect(unwrappedValueLol.$key).toEqual('key');
         expect(unwrappedValueLol.$value).toEqual('lol');
-        expect(unwrappedValueLol.$exists()).toEqual(true);        
+        expect(unwrappedValueLol.$exists()).toEqual(true);
       });
     });
 
   });
 });
+
+function skipAndTake<T>(obs: Observable<T>, takeCount: number = 1, skipCount: number = 0) {
+  return take.call(skip.call(obs, skipCount), takeCount);
+}
