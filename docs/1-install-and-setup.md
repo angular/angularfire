@@ -83,7 +83,7 @@ export const firebaseConfig = {
   declarations: [ AppComponent ],
   bootstrap: [ AppComponent ]
 })
-export class MyAppModule {}
+export class AppModule {}
 
 ```
 
