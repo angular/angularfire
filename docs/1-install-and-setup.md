@@ -2,12 +2,10 @@
 
 > Getting started with AngularFire2 is easy with the [Angular CLI](https://github.com/angular/angular-cli). Follow the 10 steps below to get started. Don't worry, we're always working to make this shorter.
 
-**The setups below use the Webpack branch of the [Angular CLI](https://github.com/angular/angular-cli).**
-
 ### 0. Prerequisites
 
-Before you start installing AngularFire2, make sure you have correct version of angular-cli installed. 
-To verify run the command `ng -v` and ensure you see `angular-cli: 1.x.x-beta.x-webpack.x`.
+Before you start installing AngularFire2, make sure you have latest version of angular-cli installed. 
+To verify run the command `ng -v` and ensure you see `angular-cli: 1.x.x-beta.14`.
 
 If not, you may need to do the following:
 
@@ -16,15 +14,15 @@ If not, you may need to do the following:
 npm uninstall -g angular-cli
 
 # reinstall clean version
-npm install -g angular-cli@webpack 
+npm install -g angular-cli 
 ```
 
 You need the Angular CLI, typings, and TypeScript 2.0. TypeScript 2.0 is required for AngularFire2.
 
 ```bash
-npm install -g angular-cli@webpack  
+npm install -g angular-cli  
 # or install locally
-npm install angular-cli@webpack --save-dev
+npm install angular-cli --save-dev
 # make sure you have typings installed
 npm install -g typings 
 npm install -g typescript@2.0.2
