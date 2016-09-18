@@ -10,22 +10,26 @@ The guide below demonstrates how to retrieve, save, and remove data as objects.
 
 AngularFire is an injectable service, which is injected through the constructor of your Angular component or `@Injectable()` service.
 
+If you've followed the earlier step "Installation and Setup"  your `/src/app/app.component.ts` should look like below. 
+
 ```ts
 import { Component } from '@angular/core';
-import { AngularFire } from 'angularfire2';
+import { AngularFire, FirebaseListObservable } from 'angularfire2';
 
 @Component({
-  moduleId: module.id,
-  selector: 'app',
-  template: 'app.component.html',
+  selector: 'app-root',
+  templateUrl: 'app.component.html',
   styleUrls: ['app.component.css']
 })
 export class AppComponent {
+  items: FirebaseListObservable<any[]>;
   constructor(af: AngularFire) {
-    
+    this.items = af.database.list('items');
   }
 }
 ```
+
+In this section, we're going to modify the `/src/app/app.component.ts`  to retreive data as object.
 
 ## Create an object binding
 
@@ -46,14 +50,17 @@ const absolute = af.database.object('https://<your-app>.firebaseio.com/item');
 ### Retrieve data
 
 To get the object in realtime, create an object binding as a property of your component or service.
-Then in your template, you can use the `async` pipe to unwrap the binding.
+Then in your template, you can use the `async` pipe to unwrap the binding. 
+
+Replace the FirebaseListObservable to FirebaseObjectObservable in your `/src/app/app.component.ts` as below.
+Also notice the templateUrl changed to inline template below:
 
 ```ts
-import {Component} from 'angular2/core';
+import {Component} from '@angular/core';
 import {AngularFire, FirebaseObjectObservable} from 'angularfire2';
 
 @Component({
-  selector: 'app',
+  selector: 'app-root',
   template: `
   <h1>{{ (item | async)?.name }}</h1>
   `,
@@ -129,8 +136,7 @@ import { Component } from '@angular/core';
 import { AngularFire, FirebaseObjectObservable } from 'angularfire2';
 
 @Component({
-  moduleId: module.id,
-  selector: 'app',
+  selector: 'app-root',
   template: `
   <h1>{{ item | async | json }}</h1>
   <input type="text" #newname placeholder="Name" />
@@ -141,7 +147,7 @@ import { AngularFire, FirebaseObjectObservable } from 'angularfire2';
   <button (click)="delete()">Delete</button>
   `,
 })
-export class RcTestAppComponent {
+export class AppComponent {
   item: FirebaseObjectObservable<any>;
   constructor(af: AngularFire) {
     this.item = af.database.object('/item');
