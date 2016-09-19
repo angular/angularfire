@@ -70,7 +70,7 @@ describe('FirebaseObjectFactory', () => {
 
     it('should emit a null value if no value is present when subscribed', (done: any) => {
       subscription = observable.subscribe(unwrapped => {
-        const expectedObject = { $key: (<any>observable)._ref.key, $value: null };
+        const expectedObject = { $key: (<any>observable).$ref.key, $value: null };
         expect(unwrapped.$key).toEqual(expectedObject.$key);
         expect(unwrapped.$value).toEqual(expectedObject.$value);
         expect(unwrapped.$exists()).toEqual(false);

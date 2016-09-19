@@ -47,6 +47,16 @@ describe('FirebaseObjectObservable', () => {
     expect(map.call(O, noop) instanceof FirebaseObjectObservable).toBe(true);
   });
 
+  describe('$ref', () => {
+    // it('should be a firebase.database.Reference', () => {
+    //   expect(O.$ref instanceof database.Reference).toBe(true);
+    // });
+
+    it('should match the database path passed in the constructor', () => {
+      expect(O.$ref.toString()).toEqual(ref.toString());
+    });
+  });
+
   describe('set', () => {
 
     it('should call set on the underlying ref', (done:any) => {

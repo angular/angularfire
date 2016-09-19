@@ -1,6 +1,5 @@
 import { FirebaseListObservable } from './index';
 import { Observer } from 'rxjs/Observer';
-import { Observable } from 'rxjs/Observable';
 import { map } from 'rxjs/operator/map';
 import { database } from 'firebase';
 import { unwrapMapFn } from '../utils';
@@ -47,6 +46,16 @@ describe('FirebaseObservable', () => {
     O = new FirebaseListObservable(ref, (observer:Observer<any>) => {
     });
     expect(map.call(O, noop) instanceof FirebaseListObservable).toBe(true);
+  });
+
+  describe('$ref', () => {
+    // it('should be a firebase.database.Reference', () => {
+    //   expect(O.$ref instanceof database.Reference).toBe(true);
+    // });
+
+    it('should match the database path passed in the constructor', () => {
+      expect(O.$ref.toString()).toEqual(ref.toString());
+    });
   });
 
   describe('push', () => {
