@@ -1,6 +1,6 @@
 import { Subscription } from 'rxjs/Subscription';
-import { QueueScheduler } from 'rxjs/scheduler/QueueScheduler';
 import { Scheduler } from 'rxjs/Scheduler';
+import { queue } from 'rxjs/scheduler/queue';
 import { AFUnwrappedDataSnapshot} from './interfaces';
 
 export function isPresent(obj: any): boolean {
@@ -38,6 +38,13 @@ export interface CheckUrlRef {
   isQuery?: () => any;
 }
 
+/**
+ * Unwraps the data returned in the DataSnapshot. Exposes the DataSnapshot key and exists methods through the $key and $exists properties respectively. If the value is primitive, it is unwrapped using a $value property. The $ properies mean they cannot be saved in the Database as those characters are invalid.
+ * @param {DataSnapshot} snapshot - The snapshot to unwrap
+ * @return AFUnwrappedDataSnapshot
+ * @example
+ * unwrapMapFn(snapshot) => { name: 'David', $key: 'david', $exists: Function }
+ */
 export function unwrapMapFn (snapshot:firebase.database.DataSnapshot): AFUnwrappedDataSnapshot {
   var unwrapped = isPresent(snapshot.val()) ? snapshot.val() : { $value: null };
   if ((/string|number|boolean/).test(typeof unwrapped)) {
@@ -46,6 +53,9 @@ export function unwrapMapFn (snapshot:firebase.database.DataSnapshot): AFUnwrapp
     };
   }
   unwrapped.$key = snapshot.ref.key;
+  unwrapped.$exists = () => {
+    return snapshot.exists();
+  };
   return unwrapped;
 }
 
@@ -84,12 +94,10 @@ export function stripLeadingSlash(value: string): string {
  * TODO: remove this scheduler once Rx has a more robust story for working
  * with zones.
  */
-export class ZoneScheduler extends QueueScheduler {
-  constructor(public zone: Zone) {
-    super();
-  }
+export class ZoneScheduler {
+  constructor(public zone: Zone) {}
 
   schedule(...args): Subscription {
-    return <Subscription>this.zone.run(() => super.schedule.apply(this, args));
+    return <Subscription>this.zone.run(() => queue.schedule.apply(queue, args));
   }
 }

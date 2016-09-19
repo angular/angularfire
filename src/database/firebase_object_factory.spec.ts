@@ -1,7 +1,7 @@
 import { Subscription } from 'rxjs';
 import { FirebaseObjectFactory, FirebaseObjectObservable } from './index';
 import {
-  addProviders,
+  TestBed,
   inject
 } from '@angular/core/testing';
 import {
@@ -9,16 +9,12 @@ import {
   defaultFirebase,
   FirebaseApp,
   FirebaseAppConfig,
-  AngularFire
+  AngularFire,
+  AngularFireModule
 } from '../angularfire2';
+import { COMMON_CONFIG, ANON_AUTH_CONFIG } from '../test-config';
 
-export const firebaseConfig: FirebaseAppConfig = {
-  apiKey: "AIzaSyBVSy3YpkVGiKXbbxeK0qBnu3-MNZ9UIjA",
-  authDomain: "angularfire2-test.firebaseapp.com",
-  databaseURL: "https://angularfire2-test.firebaseio.com",
-  storageBucket: "angularfire2-test.appspot.com",
-};
-const rootFirebase = firebaseConfig.databaseURL;
+const rootDatabaseUrl = COMMON_CONFIG.databaseURL;
 
 describe('FirebaseObjectFactory', () => {
   var i = 0;
@@ -29,7 +25,9 @@ describe('FirebaseObjectFactory', () => {
   var app: firebase.app.App;
 
   beforeEach(() => {
-    addProviders([FIREBASE_PROVIDERS, defaultFirebase(firebaseConfig)]);
+    TestBed.configureTestingModule({
+      imports: [AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG)]
+    });
     inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
       app = firebaseApp;
     })();
@@ -42,7 +40,7 @@ describe('FirebaseObjectFactory', () => {
   describe('constructor', () => {
 
     it('should accept a Firebase db url in the constructor', () => {
-      const object = FirebaseObjectFactory(`${rootFirebase}/questions`);
+      const object = FirebaseObjectFactory(`${rootDatabaseUrl}/questions`);
       expect(object instanceof FirebaseObjectObservable).toBe(true);
     });
 
@@ -59,48 +57,65 @@ describe('FirebaseObjectFactory', () => {
       i = Date.now();
       ref = firebase.database().ref().child(`questions/${i}`);
       nextSpy = nextSpy = jasmine.createSpy('next');
-      observable = FirebaseObjectFactory(`${rootFirebase}/questions/${i}`);
+      observable = FirebaseObjectFactory(`${rootDatabaseUrl}/questions/${i}`);
       ref.remove(done);
     });
 
     afterEach(() => {
-      if (subscription && !subscription.isUnsubscribed) {
+      if (subscription && !subscription.closed) {
         subscription.unsubscribe();
       }
     });
 
 
     it('should emit a null value if no value is present when subscribed', (done: any) => {
-      subscription = observable.subscribe(val => {
-        expect(val).toEqual({ $key: (<any>observable).$ref.key, $value: null });
+      subscription = observable.subscribe(unwrapped => {
+        const expectedObject = { $key: (<any>observable).$ref.key, $value: null };
+        expect(unwrapped.$key).toEqual(expectedObject.$key);
+        expect(unwrapped.$value).toEqual(expectedObject.$value);
+        expect(unwrapped.$exists()).toEqual(false);
         done();
       });
     });
 
 
     it('should emit unwrapped data by default', (done: any) => {
-      ref.set({ unwrapped: 'bar' }, () => {
-        subscription = observable.subscribe(val => {
-          if (!val) return;
-          expect(val).toEqual({ $key: ref.key, unwrapped: 'bar' });
+      ref.set({ data: 'bar' }, () => {
+        subscription = observable.subscribe(unwrapped => {
+          if (!unwrapped) return;
+          const expectedObject = { $key: ref.key, data: 'bar' };
+          expect(unwrapped.$key).toEqual(expectedObject.$key);
+          expect(unwrapped.data).toEqual(expectedObject.data);
+          expect(unwrapped.$exists()).toEqual(true);
           done();
         });
       });
     });
 
-   it('should emit unwrapped data with a $value property for primitive values', (done: any) => {
+   it('should emit unwrapped data with $ properties for primitive values', (done: any) => {
       ref.set('fiiiireeee', () => {
         subscription = observable.subscribe(val => {
           if (!val) return;
-          expect(val).toEqual({ $key: ref.key, $value: 'fiiiireeee' });
+          expect(val.$key).toEqual(ref.key);
+          expect(val.$value).toEqual('fiiiireeee');
+          expect(val.$exists()).toEqual(true);
           done();
         });
       });
     });
 
+   it('should emit null for $ properties for primitive values', (done: any) => {
+     subscription = observable.subscribe(val => {
+       if (!val) return;
+       expect(val.$key).toEqual(ref.key);
+       expect(val.$value).toEqual(null);
+       expect(val.$exists()).toEqual(false);
+       done();
+     });
+    });
 
     it('should emit snapshots if preserveSnapshot option is true', (done: any) => {
-      observable = FirebaseObjectFactory(`${rootFirebase}/questions/${i}`, { preserveSnapshot: true });
+      observable = FirebaseObjectFactory(`${rootDatabaseUrl}/questions/${i}`, { preserveSnapshot: true });
       ref.remove(() => {
         ref.set('preserved snapshot!', () => {
           subscription = observable.subscribe(data => {

@@ -5,15 +5,15 @@ import { database } from 'firebase';
 import { observeQuery } from './query_observable';
 import { Query, FirebaseListFactoryOpts } from '../interfaces';
 import * as utils from '../utils';
-import 'rxjs/add/operator/mergeMap';
-import 'rxjs/add/operator/map';
+import { mergeMap } from 'rxjs/operator/mergeMap';
+import { map } from 'rxjs/operator/map';
 
 export function FirebaseListFactory (
-  absoluteUrlOrDbRef:string | 
-  firebase.database.Reference | 
-  firebase.database.Query, 
+  absoluteUrlOrDbRef:string |
+  firebase.database.Reference |
+  firebase.database.Query,
   {preserveSnapshot, query = {}}:FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
-  
+
   let ref: firebase.database.Reference | firebase.database.Query;
 
   utils.checkForUrlOrFirebaseRef(absoluteUrlOrDbRef, {
@@ -31,7 +31,7 @@ export function FirebaseListFactory (
 
   const queryObs = observeQuery(query);
   return new FirebaseListObservable(ref, subscriber => {
-    let sub = queryObs.map(query => {
+    let sub = mergeMap.call(map.call(queryObs, query => {
       let queried: firebase.database.Query = ref;
       // Only apply the populated keys
       // apply ordering and available querying options
@@ -90,12 +90,11 @@ export function FirebaseListFactory (
       }
 
       return queried;
-    })
-    .mergeMap((queryRef: firebase.database.Reference, ix: number) => {
+    }), (queryRef: firebase.database.Reference, ix: number) => {
       return firebaseListObservable(queryRef, { preserveSnapshot });
     })
     .subscribe(subscriber);
-    
+
     return () => sub.unsubscribe();
   });
 }
@@ -118,7 +117,7 @@ function firebaseListObservable(ref: firebase.database.Reference | firebase.data
       obs.complete()
     });
 
-    ref.on('child_added', (child: any, prevKey: string) => {
+    let addFn = ref.on('child_added', (child: any, prevKey: string) => {
       arr = onChildAdded(arr, child, prevKey);
       // only emit the array after the initial load
       if (hasInitialLoad) {
@@ -128,7 +127,7 @@ function firebaseListObservable(ref: firebase.database.Reference | firebase.data
       if (err) { obs.error(err); obs.complete(); }
     });
 
-    ref.on('child_removed', (child: any) => {
+    let remFn = ref.on('child_removed', (child: any) => {
       arr = onChildRemoved(arr, child)
       if (hasInitialLoad) {
         obs.next(preserveSnapshot ? arr : arr.map(utils.unwrapMapFn));
@@ -137,7 +136,7 @@ function firebaseListObservable(ref: firebase.database.Reference | firebase.data
       if (err) { obs.error(err); obs.complete(); }
     });
 
-    ref.on('child_changed', (child: any, prevKey: string) => {
+    let chgFn = ref.on('child_changed', (child: any, prevKey: string) => {
       arr = onChildChanged(arr, child, prevKey)
       if (hasInitialLoad) {
         // This also manages when the only change is prevKey change
@@ -147,7 +146,11 @@ function firebaseListObservable(ref: firebase.database.Reference | firebase.data
       if (err) { obs.error(err); obs.complete(); }
     });
 
-    return () => ref.off();
+    return () => {
+      ref.off('child_added', addFn);
+      ref.off('child_removed', remFn);
+      ref.off('child_changed', chgFn);
+    }
   });
   return listObs;
 }

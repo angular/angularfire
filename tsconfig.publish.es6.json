@@ -5,7 +5,7 @@
     "module": "es2015",
     "target": "es5",
     "noImplicitAny": false,
-    "outDir": "dist/es6",
+    "outDir": "dist",
     "rootDir": "src",
     "sourceMap": true,
     "inlineSources": true,
@@ -15,16 +15,16 @@
       "es2015",
       "dom"
     ],
+    "skipLibCheck": true,
     "moduleResolution": "node"
   },
   "files": [
-    "src/angularfire2.ts",
-    "src/database/index.ts",
-    "src/auth/auth.ts",
+    "src/index.ts",
     "typings/index.d.ts",
     "node_modules/zone.js/dist/zone.js.d.ts"
   ],
   "angularCompilerOptions": {
-    "skipTemplateCodegen": true
+    "skipTemplateCodegen": true,
+    "strictMetadataEmit": true
   }
 }

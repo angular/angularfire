@@ -1,6 +1,6 @@
 import { FirebaseListObservable } from './index';
 import { Observer } from 'rxjs/Observer';
-import 'rxjs/add/operator/map';
+import { map } from 'rxjs/operator/map';
 import { database } from 'firebase';
 import { unwrapMapFn } from '../utils';
 import {
@@ -8,19 +8,16 @@ import {
   defaultFirebase,
   FirebaseApp,
   FirebaseAppConfig,
-  AngularFire
+  AngularFire,
+  AngularFireModule
 } from '../angularfire2';
 import {
-  addProviders,
+  TestBed,
   inject
 } from '@angular/core/testing';
+import { COMMON_CONFIG, ANON_AUTH_CONFIG } from '../test-config';
 
-export const firebaseConfig: FirebaseAppConfig = {
-  apiKey: "AIzaSyBVSy3YpkVGiKXbbxeK0qBnu3-MNZ9UIjA",
-  authDomain: "angularfire2-test.firebaseapp.com",
-  databaseURL: "https://angularfire2-test.firebaseio.com",
-  storageBucket: "angularfire2-test.appspot.com",
-};
+const rootUrl = COMMON_CONFIG.databaseURL;
 
 describe('FirebaseObservable', () => {
   var O:FirebaseListObservable<any>;
@@ -28,8 +25,10 @@ describe('FirebaseObservable', () => {
   var app: firebase.app.App;
 
   beforeEach(() => {
-    addProviders([FIREBASE_PROVIDERS, defaultFirebase(firebaseConfig)]);
-    inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App) => {
+    TestBed.configureTestingModule({
+      imports: [AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG)]
+    });
+    inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
       app = firebaseApp;
       ref = database().ref();
       O = new FirebaseListObservable(ref, (observer:Observer<any>) => {
@@ -46,7 +45,7 @@ describe('FirebaseObservable', () => {
   it('should return an instance of FirebaseObservable when calling operators', () => {
     O = new FirebaseListObservable(ref, (observer:Observer<any>) => {
     });
-    expect(O.map(noop) instanceof FirebaseListObservable).toBe(true);
+    expect(map.call(O, noop) instanceof FirebaseListObservable).toBe(true);
   });
 
   describe('$ref', () => {
@@ -152,7 +151,7 @@ describe('FirebaseObservable', () => {
 
     it('should throw an exception if input is not supported', () => {
       var input = (<any>{lol:true});
-      expect(() => O.remove(input)).toThrowError(`FirebaseListObservable.remove requires a key, snapshot, reference, or unwrapped snapshot. Got: ${typeof input}`);
+      expect(() => O.remove(input)).toThrowError(`Method requires a key, snapshot, reference, or unwrapped snapshot. Got: ${typeof input}`);
     })
   });
 

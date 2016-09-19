@@ -1,4 +1,4 @@
-import { Provider, Inject, provide, Injectable, Optional } from '@angular/core';
+import { Provider, Inject, Injectable, Optional } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
@@ -14,11 +14,9 @@ import {
   FirebaseAuthState,
   stripProviderId
 } from './auth_backend';
-import 'rxjs/add/operator/mergeMap';
-import 'rxjs/add/operator/take';
-import 'rxjs/add/operator/concat';
-import 'rxjs/add/operator/skip';
-import 'rxjs/add/observable/of';
+import { mergeMap } from 'rxjs/operator/mergeMap';
+import { of as observableOf } from 'rxjs/observable/of';
+import { map } from 'rxjs/operator/map';
 
 const kBufferSize = 1;
 
@@ -35,26 +33,26 @@ export class AngularFireAuth extends ReplaySubject<FirebaseAuthState> {
     super(kBufferSize);
 
     let firstPass = true;
-    this._authBackend.onAuth()
-      .mergeMap((authState: FirebaseAuthState) => {
-        if (firstPass) {
-          firstPass = false;
-          if(['http:', 'https:'].indexOf(loc.protocol) > -1) {
-            // Only call getRedirectResult() in a browser
-            return this._authBackend.getRedirectResult()
-              .map((userCredential: firebase.auth.UserCredential) => {
-                if (userCredential && userCredential.credential) {
-                  authState = attachCredentialToAuthState(authState, userCredential.credential, userCredential.credential.provider);
-                  this._credentialCache[userCredential.credential.provider] = userCredential.credential;
-                }
-                return authState;
-              });
-          }
+    let onAuth = this._authBackend.onAuth();
 
+    mergeMap.call(onAuth, (authState: FirebaseAuthState) => {
+      if (firstPass) {
+        firstPass = false;
+        if(['http:', 'https:'].indexOf(loc.protocol) > -1) {
+          // Only call getRedirectResult() in a browser
+          return map.call(this._authBackend.getRedirectResult(), (userCredential: firebase.auth.UserCredential) => {
+              if (userCredential && userCredential.credential) {
+                authState = attachCredentialToAuthState(authState, userCredential.credential, userCredential.credential.provider);
+                this._credentialCache[userCredential.credential.provider] = userCredential.credential;
+              }
+              return authState;
+            });
         }
-        return Observable.of(authState);
-      })
-      .subscribe((authData: FirebaseAuthState) => this._emitAuthData(authData));
+
+      }
+      return observableOf(authState);
+    })
+    .subscribe((authData: FirebaseAuthState) => this._emitAuthData(authData));
   }
 
   public login(config?: AuthConfiguration): firebase.Promise<FirebaseAuthState>;

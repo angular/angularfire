@@ -10,22 +10,26 @@ The guide below demonstrates how to retrieve, save, and remove data as objects.
 
 AngularFire is an injectable service, which is injected through the constructor of your Angular component or `@Injectable()` service.
 
+If you've followed the earlier step "Installation and Setup"  your `/src/app/app.component.ts` should look like below. 
+
 ```ts
 import { Component } from '@angular/core';
-import { AngularFire } from 'angularfire2';
+import { AngularFire, FirebaseListObservable } from 'angularfire2';
 
 @Component({
-  moduleId: module.id,
-  selector: 'app',
-  template: 'app.component.html',
+  selector: 'app-root',
+  templateUrl: 'app.component.html',
   styleUrls: ['app.component.css']
 })
 export class AppComponent {
+  items: FirebaseListObservable<any[]>;
   constructor(af: AngularFire) {
-    
+    this.items = af.database.list('items');
   }
 }
 ```
+
+In this section, we're going to modify the `/src/app/app.component.ts`  to retreive data as object.
 
 ## Create an object binding
 
@@ -48,12 +52,15 @@ const absolute = af.database.object('https://<your-app>.firebaseio.com/item');
 To get the object in realtime, create an object binding as a property of your component or service.
 Then in your template, you can use the `async` pipe to unwrap the binding.
 
+Replace the FirebaseListObservable to FirebaseObjectObservable in your `/src/app/app.component.ts` as below.
+Also notice the templateUrl changed to inline template below:
+
 ```ts
-import {Component} from 'angular2/core';
+import {Component} from '@angular/core';
 import {AngularFire, FirebaseObjectObservable} from 'angularfire2';
 
 @Component({
-  selector: 'app',
+  selector: 'app-root',
   template: `
   <h1>{{ (item | async)?.name }}</h1>
   `,
@@ -129,8 +136,7 @@ import { Component } from '@angular/core';
 import { AngularFire, FirebaseObjectObservable } from 'angularfire2';
 
 @Component({
-  moduleId: module.id,
-  selector: 'app',
+  selector: 'app-root',
   template: `
   <h1>{{ item | async | json }}</h1>
   <input type="text" #newname placeholder="Name" />
@@ -141,7 +147,7 @@ import { AngularFire, FirebaseObjectObservable } from 'angularfire2';
   <button (click)="delete()">Delete</button>
   `,
 })
-export class RcTestAppComponent {
+export class AppComponent {
   item: FirebaseObjectObservable<any>;
   constructor(af: AngularFire) {
     this.item = af.database.object('/item');
@@ -179,7 +185,9 @@ this.item.subscribe(snapshot => {
 ```
 
 ## Querying?
-The `FirebaseObjectObservable` synchronizes objects from the realtime database. There is no querying available for objects because 
-objects are simply JSON, and JSON order is specified by the browser.
+
+Because `FirebaseObjectObservable` synchronizes objects from the realtime database, sorting will have no effect for queries that are not also limited by a range. For example, when paginating you would provide a query with a sort and filter. Both the sort operation and the filter operation affect which subset of the data is returned by the query; however, because the resulting object is simply json, the sort order will not be preseved locally. Hence, for operations that require sorting, you are probably looking for a [list](3-retrieving-data-as-lists.md)
+
+For filtering response data see [](4-querying-lists.md) and repeat 'Object' to yourself everytime you read the word 'List'. 
 
 ###[Next Step: Retrieving data as lists](3-retrieving-data-as-lists.md)

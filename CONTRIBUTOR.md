@@ -34,3 +34,8 @@ $ npm run docs
 $ cd docs
 $ firebase deploy
 ```
+
+## Error TS6053: File '...index.d.ts' not found.
+
+You may need to run `typings install`
+

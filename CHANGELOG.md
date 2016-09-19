@@ -1,3 +1,81 @@
+<a name="2.0.0-beta.5"></a>
+# [2.0.0-beta.5](https://github.com/angular/angularfire2/compare/2.0.0-beta.4...v2.0.0-beta.5) (2016-09-15)
+
+
+### Bug Fixes
+
+* **docs:** Remove [@next](https://github.com/next) install ([5984a99](https://github.com/angular/angularfire2/commit/5984a99))
+* **docs:** typos ([197026a](https://github.com/angular/angularfire2/commit/197026a))
+* **docs:** Update for beta.4 ([f2d5ba5](https://github.com/angular/angularfire2/commit/f2d5ba5))
+* **docs:** Update for beta.4 ([b347e16](https://github.com/angular/angularfire2/commit/b347e16))
+* **firebase_*_factory.js:** Fix calls to off() which inadvertently cancel all listeners on the path ([#469](https://github.com/angular/angularfire2/issues/469)) ([b4fb281](https://github.com/angular/angularfire2/commit/b4fb281)), closes [#443](https://github.com/angular/angularfire2/issues/443)
+* **package:** Version number ([986685a](https://github.com/angular/angularfire2/commit/986685a))
+
+
+### Features
+
+* **utils:** Add $exists method to AFUnwrappedSnapshot ([#471](https://github.com/angular/angularfire2/issues/471)) ([f67aab1](https://github.com/angular/angularfire2/commit/f67aab1))
+* upgrade to RC7 ([#505](https://github.com/angular/angularfire2/issues/505)) ([2410b2d](https://github.com/angular/angularfire2/commit/2410b2d))
+
+### BREAKING CHANGES
+
+The way this project is packaged has changed to be consistent with other Angular packages.
+Previously:
+
+ * The project just consisted of CommonJS modules, with `angularfire2.js` as the main entry point.
+ * The project provided an `es6` directory which contained es2015 modules and es2015 JS
+ * Package.json included `main` and `jsnext:main` fields, pointing to `angularfire2.js` and `es6/angularfire2.js`, respectively.
+
+Now:
+
+ * The project ships ES2015 modules with ES5 JS at the root, as well as an ES5 UMD bundle at `bundles/angulafire2.umd.js`
+ * The `main` field of `package.json` points to `bundles/angularfire2.umd.js`.
+ * Instead of `jsnext:main`, we're using the `module` field of package.json to point to `index.js`.
+ * Instead of `angularfire2.js` being the main entry point, an `index.js` has been added (though angulafire2.js hasn't changed significantly).
+
+If you're using Rollup or Webpack, they should _just work_ with this new setup (please open issues if not). If using SystemJS, you should be able to
+add `format: 'esm'` inside of the packages configuration, and it should load and parse the es2015 modules correctly.
+
+The addition of the umd bundle will also make it possible to use AngularFire2 in a `<script>` tag, such as in a plunker or JSBin. The library is
+exported on a global called `angularFire2`.
+
+<a name="2.0.0-beta.4"></a>
+# [2.0.0-beta.4](https://github.com/angular/angularfire2/compare/2.0.0-beta.2...v2.0.0-beta.3) (2016-08-22)
+
+
+* a handful of package and publish chores (#312) ([ac8c6be](https://github.com/angular/angularfire2/commit/ac8c6be)), closes [#272](https://github.com/angular/angularfire2/issues/272) [#311](https://github.com/angular/angularfire2/issues/311) [#310](https://github.com/angular/angularfire2/issues/310) [#293](https://github.com/angular/angularfire2/issues/293) [#246](https://github.com/angular/angularfire2/issues/246)
+
+
+### Bug Fixes
+
+* **auth:** add scheduler to schedule onAuth events through Angular zone ([#368](https://github.com/angular/angularfire2/issues/368)) ([3615318](https://github.com/angular/angularfire2/commit/3615318)), closes [#354](https://github.com/angular/angularfire2/issues/354)
+* **auth:** Auth config for initializeApp ([#428](https://github.com/angular/angularfire2/issues/428)) ([a2ee25d](https://github.com/angular/angularfire2/commit/a2ee25d))
+* **auth:** check protocol before calling getRedirectResult ([#271](https://github.com/angular/angularfire2/issues/271)) ([f38e9d7](https://github.com/angular/angularfire2/commit/f38e9d7)), closes [#243](https://github.com/angular/angularfire2/issues/243)
+* **auth:** make statically analyzable x2 ([#427](https://github.com/angular/angularfire2/issues/427)) ([ab80954](https://github.com/angular/angularfire2/commit/ab80954))
+* **auth:** providerData issue ([#420](https://github.com/angular/angularfire2/issues/420)) ([1ebb726](https://github.com/angular/angularfire2/commit/1ebb726))
+* **list:** FirebaseListObservable shape ([#321](https://github.com/angular/angularfire2/issues/321)) ([35e8583](https://github.com/angular/angularfire2/commit/35e8583))
+* **providers:** make AoT compile friendly ([#410](https://github.com/angular/angularfire2/issues/410)) ([6219ac1](https://github.com/angular/angularfire2/commit/6219ac1))
+
+
+### Features
+
+* **docs:** Docs for RC5 ([9870a7f](https://github.com/angular/angularfire2/commit/9870a7f))
+
+
+### BREAKING CHANGES
+
+* Previously, es modules were published to the es6/ directory inside the npm
+package. This change publishes them to the esm directory to be consistent
+with other angular packages. Currently, the es6 directory is still published
+in the npm package, but will be removed in a future release.
+* auth: The AngularFireAuth class has changed the order of its constructor arguments.
+Since this is usually instantiated automatically via dependency injection,
+it shouldn't affect common usage of the library. However, if manually
+instantiating AngularFireAuth in tests or in an application, the order of
+arguments is now: `(AuthBackend, WindowLocation[, AuthConfiguration])`.
+
+
+
 <a name="2.0.0-beta.2"></a>
 # [2.0.0-beta.2](https://github.com/angular/angularfire2/compare/2.0.0-beta.1...v2.0.0-beta.2) (2016-06-22)
 
@@ -19,7 +97,7 @@ apps are configured, and how third-party oauth tokens are handled.
 ## Breaking Changes:
  * [Upgrade to the Firebase 3.0+ SDK](https://firebase.google.com/docs/web/setup), versions less than 3.0 are not supported. [abe11a2](https://github.com/angular/angularfire2/pull/200/commits/abe11a2fd8f5a3f554056625b751e9308e56b906)
  * `defaultFirebase` takes in a configuration object rather than a database url string. [See docs for more info.](https://github.com/angular/angularfire2/blob/master/docs/1-install-and-setup.md)
- * Access tokens for third party auth (github, google, facebook, twitter) are not persisted after refresh. 
+ * Access tokens for third party auth (github, google, facebook, twitter) are not persisted after refresh.
 
 # AngularFire2 2.0.0-beta.0
 

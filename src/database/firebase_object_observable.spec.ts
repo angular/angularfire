@@ -1,5 +1,5 @@
 import {
-  addProviders,
+  TestBed,
   inject
 } from '@angular/core/testing';
 import {
@@ -7,20 +7,16 @@ import {
   defaultFirebase,
   FirebaseApp,
   FirebaseAppConfig,
-  AngularFire
+  AngularFire,
+  AngularFireModule
 } from '../angularfire2';
+import { COMMON_CONFIG, ANON_AUTH_CONFIG } from '../test-config';
 import { FirebaseObjectObservable } from './index';
 import { Observer } from 'rxjs/Observer';
-import 'rxjs/add/operator/map';
+import { map } from 'rxjs/operator/map';
 import { database } from 'firebase';
 
-export const firebaseConfig: FirebaseAppConfig = {
-  apiKey: "AIzaSyBVSy3YpkVGiKXbbxeK0qBnu3-MNZ9UIjA",
-  authDomain: "angularfire2-test.firebaseapp.com",
-  databaseURL: "https://angularfire2-test.firebaseio.com",
-  storageBucket: "angularfire2-test.appspot.com",
-};
-const rootUrl = firebaseConfig.databaseURL;
+const rootDatabaseUrl = COMMON_CONFIG.databaseURL;
 
 describe('FirebaseObjectObservable', () => {
 
@@ -29,7 +25,9 @@ describe('FirebaseObjectObservable', () => {
   var app: firebase.app.App;
 
   beforeEach(() => {
-    addProviders([FIREBASE_PROVIDERS, defaultFirebase(firebaseConfig)]);
+    TestBed.configureTestingModule({
+      imports: [AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG)]
+    });
     inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
       app = firebaseApp;
       ref = database().ref()
@@ -46,7 +44,7 @@ describe('FirebaseObjectObservable', () => {
 
   it('should return an instance of FirebaseObservable when calling operators', () => {
     var O = new FirebaseObjectObservable((observer:Observer<any>) => {});
-    expect(O.map(noop) instanceof FirebaseObjectObservable).toBe(true);
+    expect(map.call(O, noop) instanceof FirebaseObjectObservable).toBe(true);
   });
 
   describe('$ref', () => {
