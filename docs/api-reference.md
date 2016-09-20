@@ -294,3 +294,129 @@ This is the equivalent of the Firebase SDK's
 If no `item` argument is provided, it removes all elements from the list.
  This is the equivalent of the Firebase SDK's
  [remove() method](https://firebase.google.com/docs/reference/js/firebase.database.Reference#remove).
+
+
+### AngularFireAuth
+
+AngularFire2 provides AngularFireAuth Object which extends [`ReplaySubject`](http://reactivex.io/documentation/subject.html) and provides following methods for creating and authenticating users.
+
+Type: `class`
+
+Methods:
+
+`createUser(credentials: EmailPasswordCredentials): firebase.Promise<FirebaseAuthState>` :
+
+Method used to create User. The credentials object passed as an arugment is an object with two properties (email and password), both are of type string. On `FirebaseAuth` object, you can call createUser(credentials) method, to create a new user. 
+
+Usage:
+
+```ts
+....
+  createUserWithEmail(): void {        
+	     this.auth$.createUser({
+		 email: 'your-name@gmail.com',
+		 password: 'MyPassword',
+	     })
+    }
+....
+```
+
+
+`getAuth(): FirebaseAuthState` :
+
+Determines the state of a user. Call the `getAuth()` method on the `FirebaseAuth` object. This returns a FirebaseAuthState object, which can return null, if a user is not logged in.
+
+Usage:
+
+```ts
+....
+    constructor(public auth$: FirebaseAuth) {
+      this.authState = auth$.getAuth();
+      auth$.subscribe((state: FirebaseAuthState) => {
+ 	this.authState = state;          
+      });        
+    }
+    
+    get isUserAuthenticated(): boolean {        
+        return this.authState !== null;
+    }
+....
+```
+
+
+AngularFire2 provides multiple variants of login
+
+`login(credentials?: EmailPasswordCredentials | firebase.auth.AuthCredential | string): firebase.Promise<FirebaseAuthState>` :
+
+Takes one of the three arguments as input. The `EmailPasswordCredentials` object is same, as mentioned above in createUser method. The login method can also take a [firebase.auth.AuthCredential](https://firebase.google.com/docs/reference/js/firebase.auth.AuthCredential) object as mentioned here.
+
+Usage:
+
+```ts
+....
+    signInWithEmail(): Promise<FirebaseAuthState> {
+            return this.auth$.login({
+                email: "your-name@gmail.com",
+                password: 'xxxx@@xx'
+        });
+....
+```
+
+`login(config?: AuthConfiguration): firebase.Promise<FirebaseAuthState>` :
+
+The AuthConfiguration Object has the following signature
+
+```ts
+export interface AuthConfiguration {
+		method?: AuthMethods;
+		provider?: AuthProviders;
+		remember?: string;
+		scope?: string[];
+  }
+```
+
+* The AuthMethods and AuthProviders are enums, defining values for Methods and Providers respectively.  
+
+
+Usage:
+
+```ts
+....
+signInWithFacebook(): Promise<FirebaseAuthState> {
+	     return this.auth$.login({
+		 provider: AuthProviders.Facebook,
+		 method: AuthMethods.Popup,
+	     });
+    }
+....
+```
+
+This is similar to how firebase provides authentication
+   [Facebook-Login](https://firebase.google.com/docs/auth/web/facebook-login)  
+   
+```ts
+....
+signInWithGoogle(): Promise<FirebaseAuthState> {
+    	     return this.auth$.login({
+    		 provider: AuthProviders.Google,
+    		 method: AuthMethods.Redirect,
+    	     });
+....
+```
+
+This is similar to how firebase provides authentication [Google-Signin](https://firebase.google.com/docs/auth/web/google-signin)     
+
+
+`logout()` : Ends Current session for a User.
+       
+ Call logout on FirebaseAuth object to logout of the current session.
+
+Usage:
+       
+```ts
+....
+   signOut(): void {
+           this.auth$.logout();
+   }
+....
+```
