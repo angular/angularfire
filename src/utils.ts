@@ -52,10 +52,13 @@ export function unwrapMapFn (snapshot:firebase.database.DataSnapshot): AFUnwrapp
       $value: unwrapped
     };
   }
-  unwrapped.$key = snapshot.ref.key;
-  unwrapped.$exists = () => {
-    return snapshot.exists();
-  };
+  Object.defineProperty(unwrapped, '$key', {value: snapshot.ref.key, enumerable: false});
+  Object.defineProperty(unwrapped, '$exists' {
+    value: () => {
+      return snapshot.exists();
+    }, 
+    enumerable: false
+  });
   return unwrapped;
 }
 
