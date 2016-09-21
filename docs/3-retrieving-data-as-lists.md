@@ -10,26 +10,34 @@ The guide below demonstrates how to retrieve, save, and remove data as lists.
 
 AngularFire is an injectable service, which is injected through the constructor of your Angular component or `@Injectable()` service.
 
+In the previous step, we modified the `/src/app/app.component.ts` to retrieve data as object. In this step, let's start with a clean slate.
+ 
+ Replace your  `/src/app/app.component.ts` from previous step to look like below. 
+
 ```ts
 import {Component} from '@angular/core';
 import {AngularFire} from 'angularfire2';
 
 @Component({
-  selector: 'app',
-  templateUrl: 'app/app.html',
+  selector: 'app-root',
+  templateUrl: 'app.component.html',
+  styleUrls: ['app.component.css']
 })
-class AppComponent {
+export class AppComponent {
   constructor(af: AngularFire) {
          
   }
 }
 ```
 
+In this section, we're going to modify the `/src/app/app.component.ts`  to retreive data as list, but before that let's look at ways around how to bind to a list.
+
+
 ## Create a list binding
 
 Data is retrieved through the `af.database` service.
 
-There are four ways to create an object binding:
+There are three ways to create a list binding:
 
 1. Relative URL
 1. Absolute URL
@@ -54,13 +62,16 @@ const queryList = af.database.list('/items', {
 To get the list in realtime, create a list binding as a property of your component or service.
 Then in your template, you can use the `async` pipe to unwrap the binding.
 
+Update `/src/app/app.component.ts` to import `FirebaseListObservable` from angularfire2 and iterate thru the list once data is retrieved. Also note the change in attribute `templateUrl` to inline `template` below.
+
+
 ```ts
 import {Component} from '@angular/core';
 import {AngularFire, FirebaseListObservable} from 'angularfire2';
 
 @Component({
-  selector: 'app',
-  templateUrl: `
+  selector: 'app-root',
+  template: `
   <ul>
     <li *ngFor="let item of items | async">
       {{ item.name }}
@@ -68,7 +79,7 @@ import {AngularFire, FirebaseListObservable} from 'angularfire2';
   </ul>
   `,
 })
-class AppComponent {
+export class AppComponent {
   items: FirebaseListObservable<any>;
   constructor(af: AngularFire) {
     this.items = af.database.list('/items');
@@ -147,8 +158,7 @@ import { Component } from '@angular/core';
 import { AngularFire, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2';
 
 @Component({
-  moduleId: module.id,
-  selector: 'app',
+  selector: 'app-root',
   template: `
   <ul>
     <li *ngFor="let item of items | async">
@@ -162,7 +172,7 @@ import { AngularFire, FirebaseListObservable, FirebaseObjectObservable } from 'a
   <button (click)="deleteEverything()">Delete All</button>
   `,
 })
-export class RcTestAppComponent {
+export class AppComponent {
   items: FirebaseListObservable<any>;
   constructor(af: AngularFire) {
     this.items = af.database.list('/messages');
