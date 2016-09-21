@@ -1,6 +1,6 @@
 import { FirebaseObjectObservable } from './index';
 import { Observer } from 'rxjs/Observer';
-import { database } from 'firebase';
+import * as firebase from 'firebase';
 import * as utils from '../utils';
 import { Query } from '../interfaces';
 import { observeQuery } from './query_observable';
@@ -13,7 +13,7 @@ export function FirebaseObjectFactory (
   let ref: firebase.database.Reference;
 
   utils.checkForUrlOrFirebaseRef(absoluteUrlOrDbRef, {
-    isUrl: () => ref = database().refFromURL(<string>absoluteUrlOrDbRef),
+    isUrl: () => ref = firebase.database().refFromURL(<string>absoluteUrlOrDbRef),
     isRef: () => ref = <firebase.database.Reference>absoluteUrlOrDbRef
   });
 

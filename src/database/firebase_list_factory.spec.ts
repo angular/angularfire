@@ -1,4 +1,4 @@
-declare var require: any;
+import * as firebase from 'firebase';
 import {
   FirebaseListFactory,
   FirebaseListObservable,

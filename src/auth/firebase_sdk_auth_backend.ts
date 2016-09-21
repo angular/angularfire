@@ -1,9 +1,9 @@
+import * as firebase from 'firebase';
 import { Injectable, Inject } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import { FirebaseApp } from '../tokens';
 import { isPresent, ZoneScheduler } from '../utils';
-import { auth } from 'firebase';
 import {
   authDataToAuthState,
   AuthBackend,
@@ -18,7 +18,7 @@ const {
   GithubAuthProvider,
   GoogleAuthProvider,
   TwitterAuthProvider
-} = auth;
+} = firebase.auth;
 
 import { map } from 'rxjs/operator/map';
 import { fromPromise } from 'rxjs/observable/fromPromise';
