@@ -1,3 +1,4 @@
+import * as firebase from 'firebase';
 import { Subscription } from 'rxjs';
 import { FirebaseObjectFactory, FirebaseObjectObservable } from './index';
 import {

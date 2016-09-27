@@ -1,7 +1,7 @@
 import { FirebaseListObservable } from './index';
 import { Observer } from 'rxjs/Observer';
 import { map } from 'rxjs/operator/map';
-import { database } from 'firebase';
+import * as firebase from 'firebase';
 import { unwrapMapFn } from '../utils';
 import {
   FIREBASE_PROVIDERS,
@@ -30,7 +30,7 @@ describe('FirebaseObservable', () => {
     });
     inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
       app = firebaseApp;
-      ref = database().ref();
+      ref = firebase.database().ref();
       O = new FirebaseListObservable(ref, (observer:Observer<any>) => {
       });
     })();
