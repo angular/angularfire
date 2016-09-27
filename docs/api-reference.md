@@ -206,7 +206,7 @@ The AuthConfiguration Object has the following signature
  ```
  
  * The AuthMethods and AuthProviders are enums, defining values for Methods and Providers respectively.  
- 
+  See [Facebook-Login](https://firebase.google.com/docs/auth/web/facebook-login) and [Google-Signin](https://firebase.google.com/docs/auth/web/google-signin) for more information.
  
  Usage:
  
@@ -221,8 +221,6 @@ The AuthConfiguration Object has the following signature
  ....
  ```
  
- This is similar to how firebase provides authentication
-    [Facebook-Login](https://firebase.google.com/docs/auth/web/facebook-login)  
 
 ```ts
  ....
@@ -234,7 +232,6 @@ The AuthConfiguration Object has the following signature
  ....
  ```
  
- This is similar to how firebase provides authentication [Google-Signin](https://firebase.google.com/docs/auth/web/google-signin)     
 
 `login(credentials?: EmailPasswordCredentials | firebase.auth.AuthCredential | string): firebase.Promise<FirebaseAuthState>` :
  
@@ -290,7 +287,21 @@ class App {
 ```
 
 
-`getAuth(): FirebaseAuthState` : Returns the client's current Authentication State.
+`getAuth(): FirebaseAuthState` : Returns the client's current Authentication State. The FirebaseAuthState is an interface with following  signature 
+
+```ts
+export interface FirebaseAuthState {
+  uid: string;
+  provider: AuthProviders;
+  auth: firebase.User;
+  expires?: number;
+  github?: firebase.UserInfo;
+  google?: firebase.UserInfo;
+  twitter?: firebase.UserInfo;
+  facebook?: firebase.UserInfo;
+  anonymous?: boolean;
+}
+```
 
 Sample Usage:
 
@@ -307,7 +318,9 @@ constructor(public auth: FirebaseAuth) {
     }
 ```
 
-`logout(): void`: Deletes the authentication token issued by Firebase and signs user out. See [Auth.signOut()](https://firebase.google.com/docs/reference/js/firebase.auth.Auth#signOut) in the Firebase API reference.
+`logout(): void`: Deletes the authentication token issued by Firebase and signs user out. See [Auth.signOut()](https://firebase.google.com/docs/reference/js/firebase.auth.Auth#signOut) for more information.
+
+*It is worth noting that logout() is an asynchronous operation. There is an open bug against the Firebase SDK to make this return a promise.*
 
 Sample Usage:
 
@@ -319,10 +332,10 @@ Sample Usage:
 
 `createUser(credentials: EmailPasswordCredentials): firebase.Promise<FirebaseAuthState>` : Creates a new user with email/password provided. Returns a promise filled with FirebaseAuthState, which contains the uid of the created user.
 
-The credentials object is an object containing email and password of the user to be created. Similar to [createUserWithEmailAndPassword](https://firebase.google.com/docs/reference/js/firebase.auth.Auth#createUserWithEmailAndPassword)
+The credentials object is an object containing email and password of the user to be created. See [createUserWithEmailAndPassword](https://firebase.google.com/docs/reference/js/firebase.auth.Auth#createUserWithEmailAndPassword) for more information.
 
 ```ts
-  createNewUser(): Promise<FirebaseAuthState> {
+  createNewUser(properties:Object): Promise<FirebaseAuthState> {
         return this.auth.createUser({
             email: 'uniqueName@gmail.com',
             password: 'uniquePassword'
