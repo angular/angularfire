@@ -17,7 +17,7 @@ npm uninstall -g angular-cli
 npm install -g angular-cli 
 ```
 
-You need the Angular CLI, typings, and TypeScript 2.0. TypeScript 2.0 is required for AngularFire2.
+You need the Angular CLI, typings, and TypeScript.
 
 ```bash
 npm install -g angular-cli  
@@ -25,7 +25,7 @@ npm install -g angular-cli
 npm install angular-cli --save-dev
 # make sure you have typings installed
 npm install -g typings 
-npm install -g typescript@2.0.2
+npm install -g typescript
 ```
 
 ### 1. Create a new project
