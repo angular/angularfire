@@ -71,7 +71,7 @@ import {AngularFire, FirebaseListObservable} from 'angularfire2';
   template: `
   <ul>
     <li *ngFor="let item of items | async">
-       {{ item.$value }}
+       {{ item | json }}
     </li>
   </ul>
   `,
