@@ -99,6 +99,18 @@ export class RcTestAppComponent {
 }
 ```
 
+## Logout users
+
+Deletes the authentication token issued by Firebase and signs user out. See [Auth.signOut()](https://firebase.google.com/docs/reference/js/firebase.auth.Auth#signOut) in the Firebase API reference.
+
+Sample Usage:
+
+```ts
+	signOut(): {
+		this.af.auth.logout();
+	}
+```
+
 ## Override configuration / No config
 
 Authentication works without configuration, and even if you have setup 
