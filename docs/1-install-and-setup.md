@@ -139,7 +139,7 @@ Open `/src/app/app.component.html`:
 </ul>
 ```
 
-### 6. Run your app
+### 7. Run your app
 
 ```bash
 ng serve
@@ -147,7 +147,7 @@ ng serve
 
 Run the serve command and go to `localhost:4200` in your browser.
 
-And that's it! If it totally borke, file an issue and let us know.
+And that's it! If it's totally *borked*, file an issue and let us know.
 
 ###[Next Step: Retrieving data as objects](2-retrieving-data-as-objects.md)
 
