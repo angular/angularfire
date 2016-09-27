@@ -147,7 +147,7 @@ ng serve
 
 Run the serve command and go to `localhost:4200` in your browser.
 
-And that's it! If it totally broke, file an issue and let us know.
+And that's it! If it's totally *borked*, file an issue and let us know.
 
 ###[Next Step: Retrieving data as objects](2-retrieving-data-as-objects.md)
 
