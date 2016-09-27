@@ -7,12 +7,14 @@ today! As a contributor, here are the guidelines we would like you to follow:
  - [Question or Problem?](#question)
  - [Issues and Bugs](#issue)
  - [Feature Requests](#feature)
+ - [Initial Setup](#setup)
  - [Submission Guidelines](#submit)
  - [Coding Rules][rules]
  - [Commit Message Guidelines][commit]
  - [Signing the CLA](#cla)
 
 ## <a name="coc"></a> Code of Conduct
+
 Help us keep the Angular and Firebase communities open and inclusive. Please read and follow the Angular [Code of Conduct][coc].
 
 ## <a name="question"></a> Got a Question or Problem?
@@ -23,11 +25,13 @@ Please note that the Angular team's capacity to answer usage questions is limite
 Members of the Firebase team can be reached on [Slack][slack] and via the [Firebase Google Group][firebase-group].
 
 ## <a name="issue"></a> Found an Issue?
+
 If you find a bug in the source code, you can help us by
 [submitting an issue](#submit-issue) to our [GitHub Repository][github]. Even better, you can
 [submit a Pull Request](#submit-pr) with a fix.
 
 ## <a name="feature"></a> Want a Feature?
+
 You can *request* a new feature by [submitting an issue](#submit-issue) to our [GitHub
 Repository][github]. If you would like to *implement* a new feature, please submit an issue with
 a proposal for your work first, to be sure that we can use it.
@@ -37,6 +41,25 @@ Please consider what kind of change it is:
 discussed. This will also allow us to better coordinate our efforts, prevent duplication of work,
 and help you to craft the change so that it is successfully accepted into the project.
 * **Small Features** can be crafted and directly [submitted as a Pull Request](#submit-pr).
+
+## <a name="setup"></a> Initial Setup
+
+1. Create a fork of AngularFire2 (See [Forking a Project][github-fork])
+
+2. CD into your clone and install dependencies
+
+```shell
+$ git clone 
+$ npm install
+$ npm run build
+$ npm test
+```
+
+3. Make your changes in a new git branch:
+
+```shell
+git checkout -b my-fix-branch master
+```
 
 ## <a name="submit"></a> Submission Guidelines
 
@@ -60,7 +83,7 @@ You can file new issues by providing the above information [here](https://github
 
 ### <a name="submit-pr"></a> Submitting a Pull Request (PR)
 
-Before you submit your Pull Request (PR) consider the following guidelines:
+#### Before you submit:
 
 * Ensure proposed changes or problem have already been clearly defined and
   discussed in the issue tracker. We don't want you to burn time on code
@@ -69,11 +92,8 @@ Before you submit your Pull Request (PR) consider the following guidelines:
   that relates to your submission. You don't want to duplicate effort.
 * Please sign our [Contributor License Agreement (CLA)](#cla) before sending PRs.
   We cannot accept code without this.
-* Make your changes in a new git branch:
 
-     ```shell
-     git checkout -b my-fix-branch master
-     ```
+#### How to submit:
 
 * Create your patch, **including appropriate test cases**.
 * Follow the [Angular Coding Rules](rules).
@@ -107,6 +127,24 @@ Before you submit your Pull Request (PR) consider the following guidelines:
 
 That's it! Thank you for your contribution!
 
+#### Deploying Docs
+
+1. Build the docs
+
+`$ npm run docs`
+
+2. Deploy Docs to Firebase Hosting
+
+(Ask @jeffbcross to add you as a collaborator or deploy on your behalf)
+
+```
+$ npm install -g firebase-tools
+$ firebase login
+$ npm run docs
+$ cd docs
+$ firebase deploy
+```
+
 ## <a name="cla"></a> Signing the CLA
 
 Please sign our Contributor License Agreement (CLA) before sending pull requests. For any code
@@ -132,3 +170,4 @@ changes to be accepted, the CLA must be signed. It's a quick process, we promise
 [commit]: https://github.com/angular/angular/blob/master/CONTRIBUTING.md#-commit-message-guidelines
 [angular-group]:  https://groups.google.com/forum/#!forum/angular
 [firebase-group]: https://groups.google.com/forum/#!forum/firebase-talk
+[github-fork]: https://help.github.com/articles/fork-a-repo/
