@@ -9,8 +9,8 @@ today! As a contributor, here are the guidelines we would like you to follow:
  - [Feature Requests](#feature)
  - [Initial Setup](#setup)
  - [Submission Guidelines](#submit)
- - [Coding Rules][rules]
- - [Commit Message Guidelines][commit]
+ - [Coding Rules][rules] (external link)
+ - [Commit Message Guidelines][commit] (external link)
  - [Signing the CLA](#cla)
 
 ## <a name="coc"></a> Code of Conduct
@@ -20,7 +20,7 @@ Help us keep the Angular and Firebase communities open and inclusive. Please rea
 ## <a name="question"></a> Got a Question or Problem?
 
 If you have questions about how to *use* AngularFire, please direct them to the [Angular Google Group][angular-group]
-discussion list or [StackOverflow][stackoverflow] (include the firebase and angular tags in your posts!). 
+discussion list or [StackOverflow][stackoverflow] (include the `firebase` and `angular` tags!). 
 Please note that the Angular team's capacity to answer usage questions is limited.
 Members of the Firebase team can be reached on [Slack][slack] and via the [Firebase Google Group][firebase-group].
 
@@ -44,9 +44,9 @@ and help you to craft the change so that it is successfully accepted into the pr
 
 ## <a name="setup"></a> Initial Setup
 
-1. Create a fork of AngularFire2 (See [Forking a Project][github-fork])
+1) Create a fork of AngularFire2 (See [Forking a Project][github-fork])
 
-2. CD into your clone and install dependencies
+2) CD into your clone and install dependencies
 
 ```shell
 $ git clone 
@@ -55,7 +55,7 @@ $ npm run build
 $ npm test
 ```
 
-3. Make your changes in a new git branch:
+3) Make your changes in a new git branch:
 
 ```shell
 git checkout -b my-fix-branch master
@@ -96,11 +96,11 @@ You can file new issues by providing the above information [here](https://github
 #### How to submit:
 
 * Create your patch, **including appropriate test cases**.
-* Follow the [Angular Coding Rules](rules).
+* Follow the [Angular Coding Rules][rules].
 * Run the full test suite, as described in the [developer documentation][dev-doc],
   and ensure that all tests pass.
 * Commit your changes using a descriptive commit message that follows the
-  [Angular commit message conventions](commit). Adherence to these conventions
+  [Angular commit message conventions][commit]. Adherence to these conventions
   is necessary because release notes are automatically generated from these messages.
 
      ```shell
@@ -129,11 +129,11 @@ That's it! Thank you for your contribution!
 
 #### Deploying Docs
 
-1. Build the docs
+1) Build the docs
 
 `$ npm run docs`
 
-2. Deploy Docs to Firebase Hosting
+2) Deploy Docs to Firebase Hosting
 
 (Ask @jeffbcross to add you as a collaborator or deploy on your behalf)
 
