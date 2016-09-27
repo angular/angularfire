@@ -101,9 +101,7 @@ export class RcTestAppComponent {
 
 ## Logout users
 
-`logout()` : Removes the Firebase refernece, similar to [firebase-signout](https://firebase.google.com/docs/reference/js/firebase.auth.Auth#signOut)
-
-All you need to do is call logout on `af.auth.logout()`
+Deletes the authentication token issued by Firebase and signs user out. See [Auth.signOut()](https://firebase.google.com/docs/reference/js/firebase.auth.Auth#signOut) in the Firebase API reference.
 
 Sample Usage:
 
@@ -112,7 +110,6 @@ Sample Usage:
 		this.af.auth.logout();
 	}
 ```
-
 
 ## Override configuration / No config
 
