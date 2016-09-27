@@ -307,14 +307,14 @@ constructor(public auth: FirebaseAuth) {
     }
 ```
 
-`logout(): void` : Removes the Firebase refernece, similar to [firebase-signout](https://firebase.google.com/docs/reference/js/firebase.auth.Auth#signOut)
+`logout(): void`: Deletes the authentication token issued by Firebase and signs user out. See [Auth.signOut()](https://firebase.google.com/docs/reference/js/firebase.auth.Auth#signOut) in the Firebase API reference.
 
 Sample Usage:
 
 ```ts
-    signOut(): void {
-        this.auth$.logout();
-    }
+	signOut(): {
+		this.af.auth.logout();
+	}
 ```
 
 `createUser(credentials: EmailPasswordCredentials): firebase.Promise<FirebaseAuthState>` : Creates a new user with email/password provided. Returns a promise filled with FirebaseAuthState, which contains the uid of the created user.
