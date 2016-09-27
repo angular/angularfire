@@ -41,7 +41,7 @@ export class MyAppModule {}
 ```ts
 import { bootstrap } from '@angular/platform-browser-dynamic';
 import { enableProdMode } from '@angular/core';
-import { <MyApp>Component, environment } from './app/';
+import { AppComponent, environment } from './app/';
 import {FIREBASE_PROVIDERS, 
   defaultFirebase, 
   AngularFire, 
@@ -83,18 +83,23 @@ af.auth.login({ email: 'email', password: 'pass' });
 import { Component } from '@angular/core';
 import { AngularFire } from 'angularfire2';
 
-@Component({
-  moduleId: module.id,
-  selector: 'app',
+@Component({ 
+  selector: 'app-root',
   template: `
   <div> {{ (af.auth | async)?.uid }} </div>
   <button (click)="login()">Login</button>
+  <button (click)="logout()">Logout</button>
   `,
 })
-export class RcTestAppComponent {
+export class AppComponent {
   constructor(public af: AngularFire) {}
-  login() {
+ 
+ login() {
     this.af.auth.login();
+  }
+  
+  logout() {
+     this.af.auth.logout();
   }
 }
 ```
@@ -148,20 +153,21 @@ af.auth.login({
 
 **Example app:**
 
+*Before running the below example, make sure you've correctly enabled the appropriate sign-in providers in your Firebase console under Auth tab to avoid any exceptions.*
+
 ```ts
 import { Component } from '@angular/core';
 import { AngularFire, AuthProviders, AuthMethods } from 'angularfire2';
 
 @Component({
-  moduleId: module.id,
-  selector: 'app',
+  selector: 'app-root',
   template: `
   <div> {{ (af.auth | async)?.uid }} </div>
   <button (click)="login()">Login With Twitter</button>
   <button (click)="overrideLogin()">Login Anonymously</button>
   `,
 })
-export class RcTestAppComponent {
+export class AppComponent {
   constructor(public af: AngularFire) {
     this.af.auth.subscribe(auth => console.log(auth));
   }
