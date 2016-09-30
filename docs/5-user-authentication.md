@@ -7,18 +7,16 @@ of authentication, you can specify that ahead of time so you only need to call
 
 ## Configure application in bootstrap
 
-To specify your authentication ahead of time, you provide the `bootstrap` array 
-with the `firebaseAuthConfig` service. 
-
-The `firebaseAuthConfig` services takes in an `AuthProvider` and an `AuthMethod`.
+To specify your authentication ahead of time, you provide the `AngularFireModule.initializeApp` function 
+with an `AuthProvider` and an `AuthMethod`.
 
 ```ts
 
 const myFirebaseConfig = {
-  apiKey: "<your-key>",
-  authDomain: "<your-project-authdomain>",
-  databaseURL: "<your-database-URL>",
-  storageBucket: "<your-storage-bucket>",
+  apiKey: '<your-key>',
+  authDomain: '<your-project-authdomain>',
+  databaseURL: '<your-database-URL>',
+  storageBucket: '<your-storage-bucket>',
 }
 
 const myFirebaseAuthConfig = {
@@ -37,33 +35,6 @@ const myFirebaseAuthConfig = {
 export class MyAppModule {}
 ```
 
-**Example bootstrap**
-```ts
-import { bootstrap } from '@angular/platform-browser-dynamic';
-import { enableProdMode } from '@angular/core';
-import { AppComponent, environment } from './app/';
-import {FIREBASE_PROVIDERS, 
-  defaultFirebase, 
-  AngularFire, 
-  AuthMethods, 
-  AuthProviders, 
-  firebaseAuthConfig} from 'angularfire2';
-
-if (environment.production) {
-  enableProdMode();
-}
-
-bootstrap(<MyApp>Component, [
-  FIREBASE_PROVIDERS,
-  defaultFirebase({
-   // config object 
-  }),
-  firebaseAuthConfig({
-    provider: AuthProviders.Twitter,
-    method: AuthMethods.Redirect
-  })
-]);
-```
 
 ## Login users
 
