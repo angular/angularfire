@@ -49,7 +49,12 @@ export class AngularFire {
 }
 
 export function _getFirebase(config: FirebaseAppConfig): firebase.app.App {
-  return firebase.initializeApp(config);
+  try {
+    return firebase.initializeApp(config);
+  }
+  catch (e) {
+    return firebase.app(null);
+  }
 }
 
 export function _getWindowLocation(){
