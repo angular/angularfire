@@ -5,7 +5,7 @@
   "main": "bundles/angularfire2.umd.js",
   "module": "index.js",
   "scripts": {
-    "test": "npm run build; karma start --single-run",
+    "test": "npm run build && karma start --single-run",
     "test:watch": "concurrently 'npm run build:watch' 'npm run delayed_karma'",
     "delayed_karma": "sleep 10 && karma start",
     "delayed_rollup": "sleep 5 && rollup --watch -c rollup.test.config.js",
