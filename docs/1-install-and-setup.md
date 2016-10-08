@@ -99,7 +99,7 @@ import { AngularFire, FirebaseListObservable } from 'angularfire2';
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.css']
 })
-export class <MyApp>Component {
+export class AppComponent {
   constructor(af: AngularFire) {
     
   }
