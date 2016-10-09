@@ -39,13 +39,17 @@ export class FirebaseListObservable<T> extends Observable<T> {
     });
   }
 
-  remove(item?:FirebaseOperation): firebase.Promise<void> {
-    // TODO: remove override when typings are updated to include
-    // remove() returning a promise.
+  remove(onComplete?: (a: Object) => any): firebase.Promise<void>
+  remove(item?: FirebaseOperation, onComplete?: (a: Object) => any): firebase.Promise<void>
+  remove(item?: any, onComplete?: (a: Object) => any): firebase.Promise<void> {
+    if (typeof item === 'function') {
+      onComplete = item;
+      item = undefined;
+    }
     
     // if no item parameter is provided, remove the whole list
     if (!item) {
-      return this.$ref.ref.remove();
+      return this.$ref.ref.remove(onComplete);
     }
     return this._checkOperationCases(item, {
       stringCase: () => this.$ref.ref.child(<string>item).remove(),

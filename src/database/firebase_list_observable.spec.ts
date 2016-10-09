@@ -157,6 +157,22 @@ describe('FirebaseObservable', () => {
       var input = (<any>{lol:true});
       expect(() => O.remove(input)).toThrowError(`Method requires a key, snapshot, reference, or unwrapped snapshot. Got: ${typeof input}`);
     })
+
+    it('should resolve returned thenable when successful', (done:any) => {
+      O.remove().then(done, done.fail);
+    });
+
+    it('should call callback when successful', (done:any) => {
+      O.remove(done);
+    });
+
+    it('should resolve returned thenable when successful with specified child', (done:any) => {
+      O.remove(child.key).then(done, done.fail);
+    });
+
+    it('should call callback when successful with specified child', (done:any) => {
+      O.remove(child.key, done);
+    });
   });
 
   describe('update', () => {
