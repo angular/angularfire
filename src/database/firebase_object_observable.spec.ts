@@ -98,7 +98,7 @@ describe('FirebaseObjectObservable', () => {
 
       O.subscribe();
       O.update(updateObject);
-      expect(updateSpy).toHaveBeenCalledWith(updateObject);
+      expect(updateSpy).toHaveBeenCalledWith(updateObject, undefined);
     });
 
     it('should throw an exception if updated when not subscribed', () => {
@@ -115,6 +115,10 @@ describe('FirebaseObjectObservable', () => {
 
     it('should resolve returned thenable when successful', (done:any) => {
       O.update(updateObject).then(done, done.fail);
+    });
+
+    it('should call callback when successful', (done:any) => {
+       O.update(updateObject, done);
     });
 
   });
