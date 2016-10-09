@@ -52,10 +52,12 @@ export class FirebaseListObservable<T> extends Observable<T> {
       return this.$ref.ref.remove(onComplete);
     }
     return this._checkOperationCases(item, {
-      stringCase: () => this.$ref.ref.child(<string>item).remove(),
-      firebaseCase: () => (<firebase.database.Reference>item).remove(),
-      snapshotCase: () => (<firebase.database.DataSnapshot>item).ref.remove(),
-      unwrappedSnapshotCase: () => this.$ref.ref.child((<AFUnwrappedDataSnapshot>item).$key).remove()
+      stringCase: () => this.$ref.ref.child(<string>item).remove(onComplete),
+      firebaseCase: () => (<firebase.database.Reference>item).remove(onComplete),
+      snapshotCase: () => (<firebase.database.DataSnapshot>item).ref.remove(onComplete),
+      unwrappedSnapshotCase: () => this.$ref.ref.child((<AFUnwrappedDataSnapshot>item).$key).remove(onComplete)
+    });
+  }
     });
   }
 
