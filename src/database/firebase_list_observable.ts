@@ -30,12 +30,12 @@ export class FirebaseListObservable<T> extends Observable<T> {
     return this.$ref.ref.push(value, onComplete);
   }
 
-  update(item: FirebaseOperation, value: Object): firebase.Promise<void> {
+  update(item: FirebaseOperation, value: Object, onComplete?: (a: Object) => any): firebase.Promise<void> {
     return this._checkOperationCases(item, {
-      stringCase: () => this.$ref.ref.child(<string>item).update(value),
-      firebaseCase: () => (<firebase.database.Reference>item).update(value),
-      snapshotCase: () => (<firebase.database.DataSnapshot>item).ref.update(value),
-      unwrappedSnapshotCase: () => this.$ref.ref.child((<AFUnwrappedDataSnapshot>item).$key).update(value)
+      stringCase: () => this.$ref.ref.child(<string>item).update(value, onComplete),
+      firebaseCase: () => (<firebase.database.Reference>item).update(value, onComplete),
+      snapshotCase: () => (<firebase.database.DataSnapshot>item).ref.update(value, onComplete),
+      unwrappedSnapshotCase: () => this.$ref.ref.child((<AFUnwrappedDataSnapshot>item).$key).update(value, onComplete)
     });
   }
 
