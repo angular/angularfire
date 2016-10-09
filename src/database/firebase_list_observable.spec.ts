@@ -70,6 +70,10 @@ describe('FirebaseObservable', () => {
     it('should resolve returned thenable when successful', (done:any) => {
       O.push('foo').then(done, done.fail);
     });
+
+    it('should call callback when successful', (done:any) => {
+      O.push('foo', done);
+    });
   });
 
 

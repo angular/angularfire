@@ -23,11 +23,11 @@ export class FirebaseListObservable<T> extends Observable<T> {
     return observable;
   }
 
-  push(val:any):firebase.database.ThenableReference {
-    if(!this.$ref) {
+  push(value: any, onComplete?: (a: Object) => any): firebase.database.ThenableReference {
+    if (!this.$ref) {
       throw new Error('No ref specified for this Observable!');
     }
-    return this.$ref.ref.push(val);
+    return this.$ref.ref.push(value, onComplete);
   }
 
   update(item: FirebaseOperation, value: Object): firebase.Promise<void> {
