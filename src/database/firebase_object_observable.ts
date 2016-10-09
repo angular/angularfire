@@ -15,7 +15,13 @@ export class FirebaseObjectObservable<T> extends Observable<T> {
     observable.$ref = this.$ref;
     return observable;
   }
-  set(value: any): firebase.Promise<void> {
+
+  set(value: any, onComplete?: (a: Object) => any): firebase.Promise<void> {
+    if(!this.$ref) {
+      throw new Error('No ref specified for this Observable!');
+    }
+    return this.$ref.set(value, onComplete);
+  }
     if(!this.$ref) {
       throw new Error('No ref specified for this Observable!');
     }

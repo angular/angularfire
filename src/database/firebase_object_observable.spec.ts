@@ -64,7 +64,7 @@ describe('FirebaseObjectObservable', () => {
 
       O.subscribe();
       O.set(1);
-      expect(setSpy).toHaveBeenCalledWith(1);
+      expect(setSpy).toHaveBeenCalledWith(1, undefined);
       done();
     });
 
@@ -83,6 +83,10 @@ describe('FirebaseObjectObservable', () => {
 
     it('should resolve returned thenable when successful', (done:any) => {
       O.set('foo').then(done, done.fail);
+    });
+
+    it('should call callback when successful', (done:any) => {
+      O.set('foo', done);
     });
 
   });
