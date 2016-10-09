@@ -34,10 +34,11 @@ export class FirebaseObjectObservable<T> extends Observable<T> {
     }
     return this.$ref.update(value, onComplete);
   }
-  remove(): firebase.Promise<void> {
+
+  remove(onComplete?: (a: Object) => any): firebase.Promise<void> {
     if(!this.$ref) {
       throw new Error('No ref specified for this Observable!');
     }
-    return this.$ref.remove();
+    return this.$ref.remove(onComplete);
   }
 }

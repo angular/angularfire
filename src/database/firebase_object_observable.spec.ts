@@ -130,7 +130,7 @@ describe('FirebaseObjectObservable', () => {
 
       O.subscribe();
       O.remove();
-      expect(removeSpy).toHaveBeenCalledWith();
+      expect(removeSpy).toHaveBeenCalledWith(undefined);
     });
 
     it('should throw an exception if removed when not subscribed', () => {
@@ -143,6 +143,10 @@ describe('FirebaseObjectObservable', () => {
 
     it('should resolve returned thenable when successful', (done:any) => {
       O.remove().then(done, done.fail);
+    });
+
+    it('should call callback when successful', (done:any) => {
+      O.remove(done);
     });
 
   });
