@@ -263,6 +263,94 @@ describe('FirebaseObservable', () => {
 
   });
 
+  describe('transaction', () => {
+    var orphan = { orphan: true };
+    var child:firebase.database.Reference;
+
+    beforeEach(() => {
+      child = ref.push(orphan);
+    });
+
+    it('should update the item from the Firebase db when given the key', (done:any) => {
+      var childChangedSpy = jasmine.createSpy('childChanged');
+      const orphanChange = data => Object.assign({ changed: true }, data);
+      ref.on('child_changed', childChangedSpy);
+      O.transaction(child.key, orphanChange)
+        .then(() => (<any>ref).once('value'))
+        .then((data:firebase.database.DataSnapshot) => {
+          expect(childChangedSpy.calls.argsFor(0)[0].val()).toEqual({
+            orphan: true,
+            changed: true
+          });
+
+          ref.off();
+        })
+        .then(done, done.fail);
+    });
+
+    it('should update the item from the Firebase db when given the reference', (done:any) => {
+      var childChangedSpy = jasmine.createSpy('childChanged');
+      const orphanChange = data => Object.assign({ changed: true }, data);
+      ref.on('child_changed', childChangedSpy);
+      O.transaction(child.ref, orphanChange)
+        .then(() => (<any>ref).once('value'))
+        .then((data:firebase.database.DataSnapshot) => {
+          expect(childChangedSpy.calls.argsFor(0)[0].val()).toEqual({
+            orphan: true,
+            changed: true
+          });
+
+          ref.off();
+        })
+        .then(done, done.fail);
+    });
+
+    it('should update the item from the Firebase db when given the snapshot', (done:any) => {
+      var childChangedSpy = jasmine.createSpy('childChanged');
+      const orphanChange = data => Object.assign({ changed: true }, data);
+      ref.on('child_changed', childChangedSpy);
+      O.transaction(child, orphanChange)
+        .then(() => (<any>ref).once('value'))
+        .then((data:firebase.database.DataSnapshot) => {
+          expect(childChangedSpy.calls.argsFor(0)[0].val()).toEqual({
+            orphan: true,
+            changed: true
+          });
+
+          ref.off();
+        })
+        .then(done, done.fail);
+    });
+
+    it('should update the item from the Firebase db when given the unwrapped snapshot', (done:any) => {
+      const orphanChange = data => Object.assign({ changed: true }, data);
+      ref.on('child_added', (data:firebase.database.DataSnapshot) => {
+        expect(data.val()).toEqual(orphan);
+        O.transaction(unwrapMapFn(data), orphanChange)
+          .then(() => (<any>child).once('value'))
+          .then((data:firebase.database.DataSnapshot) => {
+            expect(data.val()).toEqual({
+              orphan: true,
+              changed: true
+            });
+            ref.off();
+          })
+          .then(done, done.fail);
+      });
+    });
+
+    it('should resolve returned thenable when successful', (done:any) => {
+      const orphanChange = data => Object.assign({ changed: true }, data);
+      O.transaction(child, orphanChange).then(done, done.fail);
+    });
+
+    it('should call callback when successful', (done:any) => {
+      const orphanChange = data => Object.assign({ changed: true }, data);
+      O.transaction(child, orphanChange, done);
+    });
+
+  });
+
 });
 
 function noop() {}

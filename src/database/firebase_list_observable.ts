@@ -30,6 +30,15 @@ export class FirebaseListObservable<T> extends Observable<T> {
     return this.$ref.ref.push(value, onComplete);
   }
 
+  transaction(item: FirebaseOperation, transactionUpdate: (a: any) => any, onComplete?: (a: Object, b: boolean, c: firebase.database.DataSnapshot) => any, applyLocally?: boolean): firebase.Promise<any> {
+    return this._checkOperationCases(item, {
+      stringCase: () => this.$ref.ref.child(<string>item).transaction(transactionUpdate, onComplete, applyLocally),
+      firebaseCase: () => (<firebase.database.Reference>item).transaction(transactionUpdate, onComplete, applyLocally),
+      snapshotCase: () => (<firebase.database.DataSnapshot>item).ref.transaction(transactionUpdate, onComplete, applyLocally),
+      unwrappedSnapshotCase: () => this.$ref.ref.child((<AFUnwrappedDataSnapshot>item).$key).transaction(transactionUpdate, onComplete, applyLocally)
+    });
+  }
+
   update(item: FirebaseOperation, value: Object, onComplete?: (a: Object) => any): firebase.Promise<void> {
     return this._checkOperationCases(item, {
       stringCase: () => this.$ref.ref.child(<string>item).update(value, onComplete),
