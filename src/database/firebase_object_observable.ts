@@ -22,9 +22,12 @@ export class FirebaseObjectObservable<T> extends Observable<T> {
     }
     return this.$ref.set(value, onComplete);
   }
+
+  transaction(transactionUpdate: (a: any) => any, onComplete?: (a: Object, b: boolean, c: firebase.database.DataSnapshot) => any, applyLocally?: boolean): firebase.Promise<{ committed: boolean, snapshot: firebase.database.DataSnapshot }> {
     if(!this.$ref) {
       throw new Error('No ref specified for this Observable!');
     }
+    return this.$ref.transaction(transactionUpdate, onComplete, applyLocally);
   }
 
   update(value: Object, onComplete?: (a: Object) => any): firebase.Promise<void> {

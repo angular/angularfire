@@ -123,6 +123,38 @@ describe('FirebaseObjectObservable', () => {
 
   });
 
+  describe('transaction', () => {
+    const transactionFn = (data) => data;
+    it('should call update on the underlying ref', () => {
+      var transactionSpy = spyOn(ref, 'transaction');
+
+      O.subscribe();
+      O.transaction(transactionFn);
+      expect(transactionSpy).toHaveBeenCalledWith(transactionFn, undefined, undefined);
+    });
+
+    it('should throw an exception if updated when not subscribed', () => {
+      O = new FirebaseObjectObservable((observer:Observer<any>) => {});
+
+      expect(() => {
+        O.transaction(transactionFn);
+      }).toThrowError('No ref specified for this Observable!')
+    });
+
+    it('should accept any type of value without compilation error', () => {
+      O.transaction(transactionFn);
+    });
+
+    it('should resolve returned thenable when successful', (done:any) => {
+      O.transaction(transactionFn).then(done, done.fail);
+    });
+
+    it('should call callback when successful', (done:any) => {
+       O.update(transactionFn, done);
+    });
+
+  });
+
   describe('remove', () => {
 
     it('should call remove on the underlying ref', () => {
