@@ -67,8 +67,6 @@ export class FirebaseListObservable<T> extends Observable<T> {
       unwrappedSnapshotCase: () => this.$ref.ref.child((<AFUnwrappedDataSnapshot>item).$key).remove(onComplete)
     });
   }
-    });
-  }
 
   _checkOperationCases(item: FirebaseOperation, cases: FirebaseOperationCases) : firebase.Promise<void> {
     if (utils.isString(item)) {
