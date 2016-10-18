@@ -1,5 +1,7 @@
 <!--
 
+IMPORTANT! YOU MUST FOLLOW THESE INSTRUCTIONS OR YOUR ISSUE WILL BE CLOSED.
+
 Thank you for contributing to the Firebase community!
 
 Have a usage question?
@@ -24,10 +26,9 @@ Think you found a bug?
 Yeah, we're definitely not perfect! Please use the bug report template below and include a minimal
 repro when opening the issue.
 
-
 Have a feature request?
 ========================
-Great, we love hearing how we can improve our products! Just remove the template below and
+Great, we love hearing how we can improve our products! Remove the template below and
 provide an explanation of your feature request. Provide code samples if applicable. Try to
 think about what it will allow you to do that you can't do today? How will it make current
 workarounds straightforward? What potential bugs and edge cases does it help to avoid?
@@ -46,13 +47,25 @@ be fixed in the latest versions. -->
 
 **AngularFire:**
 
-**Other (e.g. Node, browser, operating system) (if applicable):**
+**Other (e.g. Ionic/Cordova, Node, browser, operating system):**
 
-### Test case
+### How to reproduce these conditions
 
-<!-- Provide a failing test unit, or create a minimal, complete, and 
+**Failing test unit, Plunkr, or JSFiddle demonstrating the problem**
+
+<!-- 
+Provide a failing test unit, or create a minimal, complete, and 
 verifiable example (http://stackoverflow.com/help/mcve) using either 
-Plunker (http://plnkr.co/) or JSFiddle (https://jsfiddle.net/). -->
+Plunker (http://plnkr.co/) or JSFiddle (https://jsfiddle.net/).
+-->
+
+**Steps to set up and reproduce**
+
+<!-- detailed instructions to run your minimal repro or to recreate the environment -->
+
+**Sample data and security rules**
+
+<-- include/attach/link to some json sample data (or provide credentials to a sanitized, test Firebase project) -->
 
 ### Debug output
 
@@ -62,15 +75,9 @@ Plunker (http://plnkr.co/) or JSFiddle (https://jsfiddle.net/). -->
 
 ** Screenshots **
 
-### Steps to reproduce
-
-<!-- Provide the steps needed to reproduce the issue given the above test case. -->
-
-
 ### Expected behavior
 
 <!-- What is the expected behavior? -->
-
 
 ### Actual behavior
 
