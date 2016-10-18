@@ -46,13 +46,25 @@ be fixed in the latest versions. -->
 
 **AngularFire:**
 
-**Other (e.g. Node, browser, operating system) (if applicable):**
+**Other (e.g. Ionic/Cordova, Node, browser, operating system):**
 
-### Test case
+### How to reproduce these conditions
 
-<!-- Provide a failing test unit, or create a minimal, complete, and 
+**Failing test unit, Plunkr, or JSFiddle demonstrating the problem**
+
+<!-- 
+Provide a failing test unit, or create a minimal, complete, and 
 verifiable example (http://stackoverflow.com/help/mcve) using either 
-Plunker (http://plnkr.co/) or JSFiddle (https://jsfiddle.net/). -->
+Plunker (http://plnkr.co/) or JSFiddle (https://jsfiddle.net/).
+-->
+
+**Steps to set up and reproduce**
+
+<!-- detailed instructions to run your minimal repro or to recreate the environment -->
+
+**Sample data and security rules**
+
+<-- include/attach/link to some json sample data (or provide credentials to a sanitized, test Firebase project) -->
 
 ### Debug output
 
@@ -62,15 +74,9 @@ Plunker (http://plnkr.co/) or JSFiddle (https://jsfiddle.net/). -->
 
 ** Screenshots **
 
-### Steps to reproduce
-
-<!-- Provide the steps needed to reproduce the issue given the above test case. -->
-
-
 ### Expected behavior
 
 <!-- What is the expected behavior? -->
-
 
 ### Actual behavior
 
