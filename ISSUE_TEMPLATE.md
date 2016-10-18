@@ -1,5 +1,7 @@
 <!--
 
+IMPORTANT! YOU MUST FOLLOW THESE INSTRUCTIONS OR YOUR ISSUE WILL BE CLOSED.
+
 Thank you for contributing to the Firebase community!
 
 Have a usage question?
@@ -24,10 +26,9 @@ Think you found a bug?
 Yeah, we're definitely not perfect! Please use the bug report template below and include a minimal
 repro when opening the issue.
 
-
 Have a feature request?
 ========================
-Great, we love hearing how we can improve our products! Just remove the template below and
+Great, we love hearing how we can improve our products! Remove the template below and
 provide an explanation of your feature request. Provide code samples if applicable. Try to
 think about what it will allow you to do that you can't do today? How will it make current
 workarounds straightforward? What potential bugs and edge cases does it help to avoid?
