@@ -9,9 +9,15 @@ today! As a contributor, here are the guidelines we would like you to follow:
  - [Feature Requests](#feature)
  - [Initial Setup](#setup)
  - [Submission Guidelines](#submit)
- - [Coding Rules][rules] (external link)
- - [Commit Message Guidelines][commit] (external link)
- - [Signing the CLA](#cla)
+   - [Submitting an Issue](#submit-issue)
+   - [Submitting a Pull Request](#submit-pr)
+      - [Before you submit](#submit-before)
+      - [How to submit](#submit-how)
+      - [Deploying docs](#submit-docs)
+ - Appendix
+   - [Coding Rules][rules] (external link)
+   - [Commit Message Guidelines][commit] (external link)
+   - [Signing the CLA](#cla)
 
 ## <a name="coc"></a> Code of Conduct
 
@@ -83,7 +89,7 @@ You can file new issues by providing the above information [here](https://github
 
 ### <a name="submit-pr"></a> Submitting a Pull Request (PR)
 
-#### Before you submit:
+#### <a name="submit-before"></a> Before you submit:
 
 * Ensure proposed changes or problem have already been clearly defined and
   discussed in the issue tracker. We don't want you to burn time on code
@@ -92,8 +98,10 @@ You can file new issues by providing the above information [here](https://github
   that relates to your submission. You don't want to duplicate effort.
 * Please sign our [Contributor License Agreement (CLA)](#cla) before sending PRs.
   We cannot accept code without this.
+* Review our [Coding Rules][rules] (external link)
+* Review our [Commit Message Guidelines][commit] (external link)  
 
-#### How to submit:
+#### <a name="submit-how"></a> How to submit:
 
 * Create your patch, **including appropriate test cases**.
 * Follow the [Angular Coding Rules][rules].
@@ -127,7 +135,7 @@ You can file new issues by providing the above information [here](https://github
 
 That's it! Thank you for your contribution!
 
-#### Deploying Docs
+#### <a name="submit-docs"></a> Deploying Docs
 
 1) Build the docs
 
