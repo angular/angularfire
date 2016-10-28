@@ -136,5 +136,22 @@ describe('FirebaseObjectFactory', () => {
       subscription.unsubscribe();
       expect(firebaseSpy).toHaveBeenCalled();
     });
+
+    it('should emit values in the correct zone', (done: any) => {
+      Zone.current.fork({
+        name: 'newZone'
+      })
+      .run(() => {
+        observable = FirebaseObjectFactory(`${rootDatabaseUrl}/questions/${i}`);
+        ref.remove(() => {
+          ref.set('data!', () => {
+            subscription = observable.subscribe(data => {
+              expect(Zone.current.name).toBe('newZone');
+              done();
+            });
+          });
+        });
+      });
+    });
   });
 });

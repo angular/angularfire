@@ -541,6 +541,22 @@ describe('FirebaseListFactory', () => {
       });
     });
 
+    it('should emit values in the correct zone', (done: any) => {
+      Zone.current.fork({
+        name: 'newZone'
+      })
+      .run(() => {
+        let observable = FirebaseListFactory(`${rootDatabaseUrl}/questions`);
+        ref.remove(() => {
+          ref.push('data', () => {
+            subscription = observable.subscribe(data => {
+              expect(Zone.current.name).toBe('newZone');
+              done();
+            });
+          });
+        });
+      });
+    })
   });
 });
 

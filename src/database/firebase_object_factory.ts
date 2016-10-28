@@ -1,5 +1,6 @@
 import { FirebaseObjectObservable } from './index';
 import { Observer } from 'rxjs/Observer';
+import { observeOn } from 'rxjs/operator/observeOn';
 import * as firebase from 'firebase';
 import * as utils from '../utils';
 import { Query } from '../interfaces';
@@ -17,7 +18,7 @@ export function FirebaseObjectFactory (
     isRef: () => ref = <firebase.database.Reference>absoluteUrlOrDbRef
   });
 
-  return new FirebaseObjectObservable((obs: Observer<any>) => {
+  return observeOn.call(new FirebaseObjectObservable((obs: Observer<any>) => {
     let fn = ref.on('value', (snapshot: firebase.database.DataSnapshot) => {
       obs.next(preserveSnapshot ? snapshot : utils.unwrapMapFn(snapshot))
     }, err => {
@@ -25,5 +26,5 @@ export function FirebaseObjectFactory (
     });
 
     return () => ref.off('value', fn);
-  }, ref);
+  }, ref), new utils.ZoneScheduler(Zone.current));
 }
