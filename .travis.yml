@@ -14,14 +14,12 @@ addons:
 cache:
   directories:
     - node_modules
-    - typings
 
 env:
   - CXX=g++-4.8
 
 install:
   - npm install
-  - ./node_modules/.bin/typings install
 
 before_script:
   - export DISPLAY=:99.0

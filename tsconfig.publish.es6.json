@@ -20,7 +20,6 @@
   },
   "files": [
     "src/index.ts",
-    "typings/index.d.ts",
     "node_modules/zone.js/dist/zone.js.d.ts"
   ],
   "angularCompilerOptions": {
