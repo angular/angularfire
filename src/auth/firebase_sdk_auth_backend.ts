@@ -27,7 +27,14 @@ import { observeOn } from 'rxjs/operator/observeOn';
 @Injectable()
 export class FirebaseSdkAuthBackend extends AuthBackend {
   _fbAuth: firebase.auth.Auth;
-  constructor( @Inject(FirebaseApp) _fbApp: firebase.app.App,
+  /**
+   * TODO(jeffbcross): change _fbApp type back to firebase.app.App
+   * An issue with AoT compiler does not allow interface types on
+   * constructor parameters, even when used in conjunction with @Inject.
+   * https://github.com/angular/angular/issues/12631
+   * https://github.com/angular/angularfire2/issues/653
+   **/
+  constructor( @Inject(FirebaseApp) _fbApp: any,
     private _webWorkerMode = false) {
     super();
     this._fbAuth = _fbApp.auth();
