@@ -18,7 +18,7 @@ export function FirebaseObjectFactory (
     isRef: () => ref = <firebase.database.Reference>absoluteUrlOrDbRef
   });
 
-  return observeOn.call(new FirebaseObjectObservable((obs: Observer<any>) => {
+  const objectObservable = new FirebaseObjectObservable((obs: Observer<any>) => {
     let fn = ref.on('value', (snapshot: firebase.database.DataSnapshot) => {
       obs.next(preserveSnapshot ? snapshot : utils.unwrapMapFn(snapshot))
     }, err => {
@@ -26,5 +26,7 @@ export function FirebaseObjectFactory (
     });
 
     return () => ref.off('value', fn);
-  }, ref), new utils.ZoneScheduler(Zone.current));
+  }, ref);
+
+  return observeOn.call(objectObservable, new utils.ZoneScheduler(Zone.current));
 }
