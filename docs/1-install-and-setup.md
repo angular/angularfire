@@ -155,22 +155,11 @@ And that's it! If it's totally *borked*, file an issue and let us know.
 
 #### 1. Cannot find namespace 'firebase'.
 
-If you run into this error while trying to invoke `ng serve`, open `src/tsconfig.json` and add the "types" array as follows:
+If you run into this error while trying to invoke `ng serve`, you need to update to the correct types with the following commands (from the root of a new project):
 
-```json
-{
-  "compilerOptions": {
-    ...
-    "typeRoots": [
-      "../node_modules/@types"
-    ],
-    
-    // ADD THIS
-    "types": [
-      "firebase"
-    ]
-  }
-}
+```
+mkdir node_modules/\@types/firebase
+cp node_modules/firebase/firebase.d.ts node_modules/\@types/firebase/index.d.ts
 ```
 
 #### 2. Cannot find name 'require' (This is just a temporary workaround for the Angular CLI).
