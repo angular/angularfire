@@ -548,7 +548,9 @@ describe('FirebaseListFactory', () => {
       .run(() => {
         // Creating a new observable so that the current zone is captured.
         subscription = FirebaseListFactory(`${rootDatabaseUrl}/questions`)
-          .filter(d => d.length)
+          .filter(d => d
+            .map(v => v.$value)
+            .indexOf('in-the-zone') > -1)
           .subscribe(data => {
             expect(Zone.current.name).toBe('newZone');
             done();
@@ -557,7 +559,7 @@ describe('FirebaseListFactory', () => {
 
       expect(Zone.current.name).toBe('ProxyZone');
       ref.remove(() => {
-        ref.push('new-data');
+        ref.push('in-the-zone');
       });
     });
   });
