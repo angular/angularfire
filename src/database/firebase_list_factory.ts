@@ -2,6 +2,7 @@ import * as firebase from 'firebase';
 import { AFUnwrappedDataSnapshot } from '../interfaces';
 import { FirebaseListObservable } from './firebase_list_observable';
 import { Observer } from 'rxjs/Observer';
+import { observeOn } from 'rxjs/operator/observeOn';
 import { observeQuery } from './query_observable';
 import { Query, FirebaseListFactoryOpts } from '../interfaces';
 import * as utils from '../utils';
@@ -152,7 +153,7 @@ function firebaseListObservable(ref: firebase.database.Reference | firebase.data
       ref.off('child_changed', chgFn);
     }
   });
-  return listObs;
+  return observeOn.call(listObs, new utils.ZoneScheduler(Zone.current));
 }
 
 export function onChildAdded(arr:any[], child:any, prevKey:string): any[] {

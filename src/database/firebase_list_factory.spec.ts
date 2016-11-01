@@ -541,6 +541,27 @@ describe('FirebaseListFactory', () => {
       });
     });
 
+    it('should emit values in the observable creation zone', (done: any) => {
+      Zone.current.fork({
+        name: 'newZone'
+      })
+      .run(() => {
+        // Creating a new observable so that the current zone is captured.
+        subscription = FirebaseListFactory(`${rootDatabaseUrl}/questions`)
+          .filter(d => d
+            .map(v => v.$value)
+            .indexOf('in-the-zone') > -1)
+          .subscribe(data => {
+            expect(Zone.current.name).toBe('newZone');
+            done();
+          });
+      });
+
+      expect(Zone.current.name).toBe('ProxyZone');
+      ref.remove(() => {
+        ref.push('in-the-zone');
+      });
+    });
   });
 });
 
