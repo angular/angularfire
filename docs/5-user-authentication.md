@@ -94,7 +94,7 @@ Sample Usage:
 ## Override configuration / No config
 
 Authentication works without configuration, and even if you have setup 
-authentication in the boostrap phase, you can still override the configuration.
+authentication in the bootstrap phase, you can still override the configuration.
 
 ```ts
 // Anonymous
