@@ -67,8 +67,8 @@ export class FirebaseSdkAuthBackend extends AuthBackend {
     return observeOn.call(authState, new ZoneScheduler(Zone.current));
   }
 
-  unauth(): void {
-    Promise.resolve(this._fbAuth.signOut());
+  unauth(): Promise<void> {
+    return <Promise<void>>this._fbAuth.signOut();
   }
 
   authWithCustomToken(token: string): Promise<FirebaseAuthState> {
