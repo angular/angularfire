@@ -69,7 +69,7 @@ import { AngularFire } from 'angularfire2';
 export class AppComponent {
   constructor(public af: AngularFire) {}
  
- login() {
+  login() {
     this.af.auth.login();
   }
   
