@@ -317,15 +317,15 @@ constructor(public auth: FirebaseAuth) {
     }
 ```
 
-`logout(): void`: Deletes the authentication token issued by Firebase and signs user out. See [Auth.signOut()](https://firebase.google.com/docs/reference/js/firebase.auth.Auth#signOut) for more information.
-
-*It is worth noting that logout() is an asynchronous operation. There is an open bug against the Firebase SDK to make this return a promise.*
+`logout(): Promise<void>`: Deletes the authentication token issued by Firebase and signs user out. See [Auth.signOut()](https://firebase.google.com/docs/reference/js/firebase.auth.Auth#signOut) for more information.
 
 Sample Usage:
 
 ```ts
 	signOut(): {
-		this.af.auth.logout();
+		this.af.auth.logout().then(() => {
+			// user logged out
+		});
 	}
 ```
 
