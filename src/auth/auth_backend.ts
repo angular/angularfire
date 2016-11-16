@@ -11,7 +11,7 @@ export abstract class AuthBackend {
     : Promise<FirebaseAuthState>;
   abstract onAuth(): Observable<FirebaseAuthState>;
   abstract getAuth(): FirebaseAuthState;
-  abstract unauth(): void;
+  abstract unauth(): Promise<void>;
   abstract createUser(credentials: EmailPasswordCredentials): Promise<FirebaseAuthState>;
   abstract getRedirectResult(): Observable<firebase.auth.UserCredential>;
 }

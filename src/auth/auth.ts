@@ -119,8 +119,8 @@ export class AngularFireAuth extends ReplaySubject<FirebaseAuthState> {
     }
   }
 
-  public logout(): void {
-    this._authBackend.unauth();
+  public logout(): Promise<void> {
+    return this._authBackend.unauth();
   }
 
   public getAuth(): FirebaseAuthState {
