@@ -56,10 +56,6 @@ describe('FirebaseObservable', () => {
     it('should match the database path passed in the constructor', () => {
       expect(O.$ref.toString()).toEqual(ref.toString());
     });
-
-    it('should not be enumerable', () => {
-      expect(Object.keys(O).indexOf('$ref')).toEqual(-1);
-    });
   });
 
   describe('push', () => {
