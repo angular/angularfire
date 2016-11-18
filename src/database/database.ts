@@ -1,3 +1,4 @@
+import * as firebase from 'firebase';
 import { Inject, Injectable } from '@angular/core';
 import { FirebaseApp, FirebaseConfig } from '../tokens';
 import { FirebaseAppConfig } from '../angularfire2';

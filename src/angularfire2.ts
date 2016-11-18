@@ -1,4 +1,4 @@
-import { initializeApp } from 'firebase';
+import * as firebase from 'firebase';
 import * as utils from './utils';
 import { FirebaseAppConfig } from './interfaces';
 import { AuthConfiguration } from './auth';
@@ -49,7 +49,12 @@ export class AngularFire {
 }
 
 export function _getFirebase(config: FirebaseAppConfig): firebase.app.App {
-  return initializeApp(config);
+  try {
+    return firebase.initializeApp(config);
+  }
+  catch (e) {
+    return firebase.app(null);
+  }
 }
 
 export function _getWindowLocation(){

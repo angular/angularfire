@@ -1,3 +1,4 @@
+import * as firebase from 'firebase';
 import { auth, initializeApp } from 'firebase';
 import { ReflectiveInjector, Provider } from '@angular/core';
 import { Observable } from 'rxjs/Observable'

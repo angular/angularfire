@@ -14,7 +14,7 @@ import { COMMON_CONFIG, ANON_AUTH_CONFIG } from '../test-config';
 import { FirebaseObjectObservable } from './index';
 import { Observer } from 'rxjs/Observer';
 import { map } from 'rxjs/operator/map';
-import { database } from 'firebase';
+import * as firebase from 'firebase';
 
 const rootDatabaseUrl = COMMON_CONFIG.databaseURL;
 
@@ -30,7 +30,7 @@ describe('FirebaseObjectObservable', () => {
     });
     inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
       app = firebaseApp;
-      ref = database().ref()
+      ref = firebase.database().ref()
       O = new FirebaseObjectObservable((observer:Observer<any>) => {
       }, ref);
     })();

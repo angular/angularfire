@@ -1,9 +1,9 @@
+import * as firebase from 'firebase';
 import { Injectable, Inject } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import { FirebaseApp } from '../tokens';
 import { isPresent, ZoneScheduler } from '../utils';
-import { auth } from 'firebase';
 import {
   authDataToAuthState,
   AuthBackend,
@@ -18,7 +18,7 @@ const {
   GithubAuthProvider,
   GoogleAuthProvider,
   TwitterAuthProvider
-} = auth;
+} = firebase.auth;
 
 import { map } from 'rxjs/operator/map';
 import { fromPromise } from 'rxjs/observable/fromPromise';
@@ -27,7 +27,14 @@ import { observeOn } from 'rxjs/operator/observeOn';
 @Injectable()
 export class FirebaseSdkAuthBackend extends AuthBackend {
   _fbAuth: firebase.auth.Auth;
-  constructor( @Inject(FirebaseApp) _fbApp: firebase.app.App,
+  /**
+   * TODO(jeffbcross): change _fbApp type back to firebase.app.App
+   * An issue with AoT compiler does not allow interface types on
+   * constructor parameters, even when used in conjunction with @Inject.
+   * https://github.com/angular/angular/issues/12631
+   * https://github.com/angular/angularfire2/issues/653
+   **/
+  constructor( @Inject(FirebaseApp) _fbApp: any,
     private _webWorkerMode = false) {
     super();
     this._fbAuth = _fbApp.auth();
