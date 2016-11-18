@@ -2,12 +2,10 @@
 
 > Getting started with AngularFire2 is easy with the [Angular CLI](https://github.com/angular/angular-cli). Follow the 10 steps below to get started. Don't worry, we're always working to make this shorter.
 
-**The setups below use the Webpack branch of the [Angular CLI](https://github.com/angular/angular-cli).**
-
 ### 0. Prerequisites
 
-Before you start installing AngularFire2, make sure you have correct version of angular-cli installed. 
-To verify run the command `ng -v` and ensure you see `angular-cli: 1.x.x-beta.x-webpack.x`.
+Before you start installing AngularFire2, make sure you have latest version of angular-cli installed. 
+To verify run the command `ng -v` and ensure you see `angular-cli: 1.x.x-beta.xx`. The lowest compatible version is `1.x.x-beta.14`.
 
 If not, you may need to do the following:
 
@@ -16,18 +14,18 @@ If not, you may need to do the following:
 npm uninstall -g angular-cli
 
 # reinstall clean version
-npm install -g angular-cli@webpack 
+npm install -g angular-cli 
 ```
 
-You need the Angular CLI, typings, and TypeScript 2.0. TypeScript 2.0 is required for AngularFire2.
+You need the Angular CLI, typings, and TypeScript.
 
 ```bash
-npm install -g angular-cli@webpack  
+npm install -g angular-cli  
 # or install locally
-npm install angular-cli@webpack --save-dev
+npm install angular-cli --save-dev
 # make sure you have typings installed
 npm install -g typings 
-npm install -g typescript@2.0.2
+npm install -g typescript
 ```
 
 ### 1. Create a new project
@@ -69,10 +67,10 @@ import { AngularFireModule } from 'angularfire2';
 
 // Must export the config
 export const firebaseConfig = {
-  apiKey: "<your-key>",
-  authDomain: "<your-project-authdomain>",
-  databaseURL: "<your-database-URL>",
-  storageBucket: "<your-storage-bucket>"
+  apiKey: '<your-key>',
+  authDomain: '<your-project-authdomain>',
+  databaseURL: '<your-database-URL>',
+  storageBucket: '<your-storage-bucket>'
 };
 
 @NgModule({
@@ -101,7 +99,7 @@ import { AngularFire, FirebaseListObservable } from 'angularfire2';
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.css']
 })
-export class <MyApp>Component {
+export class AppComponent {
   constructor(af: AngularFire) {
     
   }
@@ -126,7 +124,7 @@ import { AngularFire, FirebaseListObservable } from 'angularfire2';
 export class AppComponent {
   items: FirebaseListObservable<any[]>;
   constructor(af: AngularFire) {
-    this.items = af.database.list('items');
+    this.items = af.database.list('/items');
   }
 }
 ```
@@ -141,7 +139,7 @@ Open `/src/app/app.component.html`:
 </ul>
 ```
 
-### 6. Run your app
+### 7. Run your app
 
 ```bash
 ng serve
@@ -149,7 +147,7 @@ ng serve
 
 Run the serve command and go to `localhost:4200` in your browser.
 
-And that's it! If it totally borke, file an issue and let us know.
+And that's it! If it's totally *borked*, file an issue and let us know.
 
 ###[Next Step: Retrieving data as objects](2-retrieving-data-as-objects.md)
 

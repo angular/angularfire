@@ -1,7 +1,8 @@
+import * as firebase from 'firebase';
 import { AFUnwrappedDataSnapshot } from '../interfaces';
 import { FirebaseListObservable } from './firebase_list_observable';
 import { Observer } from 'rxjs/Observer';
-import { database } from 'firebase';
+import { observeOn } from 'rxjs/operator/observeOn';
 import { observeQuery } from './query_observable';
 import { Query, FirebaseListFactoryOpts } from '../interfaces';
 import * as utils from '../utils';
@@ -17,7 +18,7 @@ export function FirebaseListFactory (
   let ref: firebase.database.Reference | firebase.database.Query;
 
   utils.checkForUrlOrFirebaseRef(absoluteUrlOrDbRef, {
-    isUrl: () => ref = database().refFromURL(<string>absoluteUrlOrDbRef),
+    isUrl: () => ref = firebase.database().refFromURL(<string>absoluteUrlOrDbRef),
     isRef: () => ref = <firebase.database.Reference>absoluteUrlOrDbRef,
     isQuery: () => ref = <firebase.database.Query>absoluteUrlOrDbRef,
   });
@@ -152,7 +153,9 @@ function firebaseListObservable(ref: firebase.database.Reference | firebase.data
       ref.off('child_changed', chgFn);
     }
   });
-  return listObs;
+
+  // TODO: should be in the subscription zone instead
+  return observeOn.call(listObs, new utils.ZoneScheduler(Zone.current));
 }
 
 export function onChildAdded(arr:any[], child:any, prevKey:string): any[] {

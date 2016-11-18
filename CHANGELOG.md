@@ -1,3 +1,29 @@
+<a name="2.0.0-beta.6-preview"></a>
+# [2.0.0-beta.6-preview](https://github.com/angular/angularfire2/compare/2.0.0-beta.5...v2.0.0-beta.6-preview) (2016-11-02)
+
+
+### Bug Fixes
+
+* **Database:** use Zone scheduler for object and list factories ([e18da0e](https://github.com/angular/angularfire2/commit/e18da0e)), closes [#637](https://github.com/angular/angularfire2/issues/637)
+* **AoT:** change constructor param interface type annotation to any ([2c0a57f](https://github.com/angular/angularfire2/commit/2c0a57f))
+* **build:** Fix npm test and test:watch commands for windows ([86b4b24](https://github.com/angular/angularfire2/commit/86b4b24)), closes [#217](https://github.com/angular/angularfire2/issues/217)
+* **database:** Add $ref to observables ([#447](https://github.com/angular/angularfire2/issues/447)) ([a53fac0](https://github.com/angular/angularfire2/commit/a53fac0)), closes [#294](https://github.com/angular/angularfire2/issues/294)
+* **imports:** add firebase imports to all places that reference firebase namespace ([c3a954c](https://github.com/angular/angularfire2/commit/c3a954c)), closes [#525](https://github.com/angular/angularfire2/issues/525)
+
+
+### Features
+
+* **docs:** Add AoT installation and setup ([#546](https://github.com/angular/angularfire2/issues/546)) ([7c20d13](https://github.com/angular/angularfire2/commit/7c20d13))
+* **docs:** update installation guide to latest cli version ([#519](https://github.com/angular/angularfire2/issues/519)) ([648666f](https://github.com/angular/angularfire2/commit/648666f))
+* **hmr:** Add Hot module reloading ([c32a008](https://github.com/angular/angularfire2/commit/c32a008))
+
+### Notes
+
+A TypeScript issue with the previous release has been fixed, where errors about a missing `firebase` namespace were reported. For
+applications that worked around this issue by manually adding the `firebase.d.ts` typings to `tsconfig.json`, those typings
+should now be removed since the firebase namespace should automatically be resolved within AngularFire.
+See [this issue](https://github.com/angular/angularfire2/issues/525) for more context.
+
 <a name="2.0.0-beta.5"></a>
 # [2.0.0-beta.5](https://github.com/angular/angularfire2/compare/2.0.0-beta.4...v2.0.0-beta.5) (2016-09-15)
 

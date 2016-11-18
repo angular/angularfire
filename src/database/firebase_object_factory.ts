@@ -1,6 +1,7 @@
 import { FirebaseObjectObservable } from './index';
 import { Observer } from 'rxjs/Observer';
-import { database } from 'firebase';
+import { observeOn } from 'rxjs/operator/observeOn';
+import * as firebase from 'firebase';
 import * as utils from '../utils';
 import { Query } from '../interfaces';
 import { observeQuery } from './query_observable';
@@ -13,11 +14,11 @@ export function FirebaseObjectFactory (
   let ref: firebase.database.Reference;
 
   utils.checkForUrlOrFirebaseRef(absoluteUrlOrDbRef, {
-    isUrl: () => ref = database().refFromURL(<string>absoluteUrlOrDbRef),
+    isUrl: () => ref = firebase.database().refFromURL(<string>absoluteUrlOrDbRef),
     isRef: () => ref = <firebase.database.Reference>absoluteUrlOrDbRef
   });
 
-  return new FirebaseObjectObservable((obs: Observer<any>) => {
+  const objectObservable = new FirebaseObjectObservable((obs: Observer<any>) => {
     let fn = ref.on('value', (snapshot: firebase.database.DataSnapshot) => {
       obs.next(preserveSnapshot ? snapshot : utils.unwrapMapFn(snapshot))
     }, err => {
@@ -26,4 +27,7 @@ export function FirebaseObjectFactory (
 
     return () => ref.off('value', fn);
   }, ref);
+
+  // TODO: should be in the subscription zone instead
+  return observeOn.call(objectObservable, new utils.ZoneScheduler(Zone.current));
 }
