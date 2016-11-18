@@ -80,12 +80,12 @@ describe('FirebaseObjectFactory', () => {
 
 
     it('should emit unwrapped data by default', (done: any) => {
-      ref.set({ data: 'bar' }, () => {
+      const fixtureData = { data: 'bar' };
+      ref.set(fixtureData, () => {
         subscription = observable.subscribe(unwrapped => {
           if (!unwrapped) return;
-          const expectedObject = { $key: ref.key, data: 'bar' };
-          expect(unwrapped.$key).toEqual(expectedObject.$key);
-          expect(unwrapped.data).toEqual(expectedObject.data);
+          expect(unwrapped.$key).toEqual(ref.key);
+          expect(unwrapped).toEqual(fixtureData);
           expect(unwrapped.$exists()).toEqual(true);
           done();
         });

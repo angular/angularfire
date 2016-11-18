@@ -30,7 +30,7 @@ describe('FirebaseObjectObservable', () => {
     });
     inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
       app = firebaseApp;
-      ref = database().ref()
+      ref = database().ref();
       O = new FirebaseObjectObservable((observer:Observer<any>) => {
       }, ref);
     })();
@@ -54,6 +54,10 @@ describe('FirebaseObjectObservable', () => {
 
     it('should match the database path passed in the constructor', () => {
       expect(O.$ref.toString()).toEqual(ref.toString());
+    });
+
+    it('should not be enumerable', () => {
+      expect(Object.keys(O).indexOf('$ref')).toEqual(-1);
     });
   });
 
