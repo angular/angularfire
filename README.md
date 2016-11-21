@@ -58,3 +58,4 @@ productive with AngularFire2.
 3. [Retreiving data as lists - FirebaseListObservable](docs/3-retrieving-data-as-lists.md)
 4. [Querying lists](docs/4-querying-lists.md)
 5. [User Authentication - FirebaseAuthentication](docs/5-user-authentication.md)
+6. [Ionic2 - Authenticating with AngularFire2](docs/Auth-with-Ionic2.md)
