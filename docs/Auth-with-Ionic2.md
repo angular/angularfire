@@ -1,4 +1,4 @@
-# Ionic2 - Auth using AngularFire2
+#  Using AngularFire2 with Ionic 2
 
 This document provides you a walkthrough of integrating AngularFire2 Authentication with Ionic2.
 The below setup has been tested on Windows 10, but it should be same for Mac/Linux.
