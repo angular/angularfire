@@ -406,3 +406,133 @@ which should open the facebook pop-up.
 Once you authenticate yourself, you should see your Facebook display name in console.
 
 You can try redirecting yourself to another page to grab additional details from Facebook. 
+
+
+***Running our application on mobile phone.***
+
+Ensure you've the platform added to your project. If not add the platform by executing the following command.
+
+```
+
+C:\projects\Ionic_AngularFire2_Project>ionic platform add android 
+
+```
+
+This adds android platform for your project. 
+Replace android with ios, if you're on Mac book or add both. The generic command is ```ionic platform add <platform-name>```
+
+Now, let's try to run the app in browser. Execute the command
+
+```
+
+C:\projects\Ionic_AngularFire2_Project> ionic run android
+
+```
+
+This should run the app on your mobile phone. Now click on the Facebook button and you'll notice the button doesn't work anymore. 
+This is because the code written so far is good for running our application in browsers, but when running the application on mobile phones, we need to have access to ***Native Mobile API's***, which are provided by _Corodova Plugins_. 
+
+**We can access these corodva plugins, using Ionic Native, which are nothing but wrappers for cordova plugins.**
+
+List of all Ionic Native API's for corodova plugins can be found [here](http://ionicframework.com/docs/v2/native/).
+
+Let's look at configuring and installing facebook plugin [here](http://ionicframework.com/docs/v2/native/facebook/).
+_Ensure you follow the steps correctly to configure your app._
+
+ Once you create your app and make a note of your App ID, go to command prompt in your project directory and execute the following command
+ 
+ ```
+ C:\projects\Ionic_AngularFire2_Project>
+ ionic plugin add cordova-plugin-facebook4 --save --variable APP_ID="123456789" --variable APP_NAME="myApp"
+
+ ```
+
+Replace App ID with your app id from portal and provide your app name.
+
+This will install the corodva plugin for facebook.
+
+Add the platform to your facebook portal as mentioned in the document [here](http://ionicframework.com/docs/v2/native/facebook/).
+
+Now import the Platform and Facebook objects in your ```auth-service.ts```
+
+```
+import { Platform } from 'ionic-angular';
+import { Facebook } from 'ionic-native';
+```
+
+and update the signInWithFacebook() method.
+
+your ```auth-service.ts``` code should look like this.
+
+```ts
+
+
+import { Injectable } from '@angular/core';
+import { AuthProviders, FirebaseAuth, FirebaseAuthState, AuthMethods } from 'angularfire2';
+
+import { Platform } from 'ionic-angular';
+import { Facebook } from 'ionic-native';
+
+@Injectable()
+export class AuthService {
+  private authState: FirebaseAuthState;
+
+  constructor(public auth$: FirebaseAuth, private platform: Platform) {
+    this.authState = auth$.getAuth();
+    auth$.subscribe((state: FirebaseAuthState) => {
+      this.authState = state;
+    });
+  }
+
+  get authenticated(): boolean {
+    return this.authState !== null;
+  }
+
+  signInWithFacebook(): firebase.Promise<FirebaseAuthState> {
+    if (this.platform.is('cordova')) {
+      Facebook.login(['email', 'public_profile']).then(res => {
+        const facebookCredential = firebase.auth.FacebookAuthProvider.credential(res.authResponse.accessToken);
+        return firebase.auth().signInWithCredential(facebookCredential);
+      });
+    } else {
+      return this.auth$.login({
+        provider: AuthProviders.Facebook,
+        method: AuthMethods.Popup
+      });
+    }
+
+  }
+
+  signOut(): void {
+    this.auth$.logout();
+  }
+
+  displayName(): string {
+    if (this.authState != null) {
+      return this.authState.facebook.displayName;
+    } else {
+      return '';
+    }
+  }
+}
+
+
+```
+
+Verfiy your app is running in browser by executing the following command 
+
+```
+
+C:\projects\Ionic_AngularFire2_Project>ionic serve
+
+```
+
+Everything should work. Now trying running the app on your android phone
+
+```
+
+C:\projects\Ionic_AngularFire2_Project> ionic run android
+
+```
+
+Once the App launches click on the Facebook login button and it should open up the native facebook app for authentication and once your enter credentials and gets succesfully authenticated, it should redirect you back to the home page.
