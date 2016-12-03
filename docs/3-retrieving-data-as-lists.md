@@ -35,7 +35,7 @@ In this section, we're going to modify the `/src/app/app.component.ts`  to retre
 
 Data is retrieved through the `af.database` service.
 
-There are three ways to create an object binding:
+There are three ways to create a list binding:
 
 1. Relative URL
 1. Absolute URL
