@@ -14,10 +14,10 @@ import {
   LimitToSelection,
   Primitive
 } from '../interfaces';
-
+import { isNil } from '../utils';
 
 export function observeQuery(query: Query): Observable<ScalarQuery> {
-  if (!isPresent(query)) {
+  if (isNil(query)) {
     return observableOf(null);
   }
 
@@ -34,7 +34,7 @@ export function observeQuery(query: Query): Observable<ScalarQuery> {
         : [OrderBySelection, Primitive, Primitive, Primitive, LimitToSelection]) => {
 
         let serializedOrder: any = {};
-        if (isPresent(orderBy) && isPresent(orderBy.value)) {
+        if (!isNil(orderBy) && !isNil(orderBy.value)) {
           switch (orderBy.key) {
             case OrderByOptions.Key:
               serializedOrder = { orderByKey: <boolean>orderBy.value };
@@ -51,7 +51,7 @@ export function observeQuery(query: Query): Observable<ScalarQuery> {
           }
         }
 
-        if (isPresent(limitTo) && isPresent(limitTo.value)) {
+        if (!isNil(limitTo) && !isNil(limitTo.value)) {
           switch (limitTo.key) {
             case LimitToOptions.First:
               serializedOrder.limitToFirst = limitTo.value;
@@ -63,15 +63,15 @@ export function observeQuery(query: Query): Observable<ScalarQuery> {
           }
         }
 
-        if (isPresent(startAt)) {
+        if (!isNil(startAt)) {
           serializedOrder.startAt = startAt;
         }
 
-        if (isPresent(endAt)) {
+        if (!isNil(endAt)) {
           serializedOrder.endAt = endAt;
         }
 
-        if (isPresent(equalTo)) {
+        if (!isNil(equalTo)) {
           serializedOrder.equalTo = equalTo;
         }
 
@@ -86,7 +86,7 @@ export function getOrderObservables(query: Query): Observable<OrderBySelection> 
       return ({ key, option })
     })
     .filter(({key, option}: { key: string, option: OrderByOptions }) => {
-      return isPresent(query[key]);
+      return !isNil(query[key]);
     })
     .map(({key, option}) => mapToOrderBySelection(<any>query[key], option));
 
@@ -104,7 +104,7 @@ export function getOrderObservables(query: Query): Observable<OrderBySelection> 
 export function getLimitToObservables(query: Query): Observable<LimitToSelection> | Observable<LimitToSelection | Observable<LimitToSelection>> {
   var observables = ['limitToFirst', 'limitToLast']
     .map((key: string, option: LimitToOptions) => ({ key, option }))
-    .filter(({key, option}: { key: string, option: LimitToOptions }) => isPresent(query[key]))
+    .filter(({key, option}: { key: string, option: LimitToOptions }) => !isNil(query[key]))
     .map(({key, option}) => mapToLimitToSelection(<any>query[key], option));
 
   if (observables.length === 1) {
@@ -191,8 +191,3 @@ function hasObservableProperties(query: Query): boolean {
   if (query.orderByKey instanceof Observable) return true;
   return false;
 }
-
-function isPresent(val: any): boolean {
-  return val !== undefined && val !== null;
-}
-

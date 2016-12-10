@@ -49,19 +49,19 @@ export function FirebaseListFactory (
       }
 
       // check equalTo
-      if (utils.isPresent(query.equalTo)) {
+      if (!utils.isNil(query.equalTo)) {
           queried = queried.equalTo(query.equalTo);
 
-        if (utils.isPresent(query.startAt) || query.endAt) {
+        if (!utils.isNil(query.startAt) || query.endAt) {
           throw new Error('Query Error: Cannot use startAt or endAt with equalTo.');
         }
 
         // apply limitTos
-        if (utils.isPresent(query.limitToFirst)) {
+        if (!utils.isNil(query.limitToFirst)) {
           queried = queried.limitToFirst(query.limitToFirst);
         }
 
-        if (utils.isPresent(query.limitToLast)) {
+        if (!utils.isNil(query.limitToLast)) {
           queried = queried.limitToLast(query.limitToLast);
         }
 
@@ -69,24 +69,24 @@ export function FirebaseListFactory (
       }
 
       // check startAt
-      if (utils.isPresent(query.startAt)) {
+      if (!utils.isNil(query.startAt)) {
           queried = queried.startAt(query.startAt);
       }
 
-      if (utils.isPresent(query.endAt)) {
+      if (!utils.isNil(query.endAt)) {
           queried = queried.endAt(query.endAt);
       }
 
-      if (utils.isPresent(query.limitToFirst) && query.limitToLast) {
+      if (!utils.isNil(query.limitToFirst) && query.limitToLast) {
         throw new Error('Query Error: Cannot use limitToFirst with limitToLast.');
       }
 
       // apply limitTos
-      if (utils.isPresent(query.limitToFirst)) {
+      if (!utils.isNil(query.limitToFirst)) {
           queried = queried.limitToFirst(query.limitToFirst);
       }
 
-      if (utils.isPresent(query.limitToLast)) {
+      if (!utils.isNil(query.limitToLast)) {
           queried = queried.limitToLast(query.limitToLast);
       }
 

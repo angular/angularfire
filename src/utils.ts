@@ -4,8 +4,8 @@ import { Scheduler } from 'rxjs/Scheduler';
 import { queue } from 'rxjs/scheduler/queue';
 import { AFUnwrappedDataSnapshot} from './interfaces';
 
-export function isPresent(obj: any): boolean {
-  return obj !== undefined && obj !== null;
+export function isNil(obj: any): boolean {
+  return obj === undefined || obj === null;
 }
 
 export function isString(value: any): boolean {
@@ -29,7 +29,7 @@ export function isFirebaseQuery(value: any): boolean {
 }
 
 export function isEmptyObject(obj: Object): boolean {
-  if (!isPresent(obj)) { return false; }
+  if (isNil(obj)) { return false; }
   return Object.keys(obj).length === 0 && JSON.stringify(obj) === JSON.stringify({});
 }
 
@@ -47,7 +47,7 @@ export interface CheckUrlRef {
  * unwrapMapFn(snapshot) => { name: 'David', $key: 'david', $exists: Function }
  */
 export function unwrapMapFn (snapshot:firebase.database.DataSnapshot): AFUnwrappedDataSnapshot {
-  var unwrapped = isPresent(snapshot.val()) ? snapshot.val() : { $value: null };
+  var unwrapped = !isNil(snapshot.val()) ? snapshot.val() : { $value: null };
   if ((/string|number|boolean/).test(typeof unwrapped)) {
     unwrapped = {
       $value: unwrapped
