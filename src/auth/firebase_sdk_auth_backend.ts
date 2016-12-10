@@ -3,7 +3,7 @@ import { Injectable, Inject } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import { FirebaseApp } from '../tokens';
-import { isPresent, ZoneScheduler } from '../utils';
+import { ZoneScheduler } from '../utils';
 import {
   authDataToAuthState,
   AuthBackend,

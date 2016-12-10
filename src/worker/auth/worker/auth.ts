@@ -22,7 +22,7 @@ import {
   OAuth2Credentials,
   OAuthCredentials
 } from '../../auth_backend';
-import {isPresent} from '../../../utils';
+import {isNil} from '../../../utils';
 import * as firebase from 'firebase';
 
 @Injectable()
@@ -48,7 +48,7 @@ export class WebWorkerFirebaseAuth extends AuthBackend {
   onAuth (onComplete: (authData: FirebaseAuthData) => void): void {
     this._fbApp.onAuth((authData) => {
       if (!this._gotAuth) return false;
-      if (isPresent(authData) && isPresent(this._authMetadata[authData.token])) {
+      if (!isNil(authData) && !isNil(this._authMetadata[authData.token])) {
         authData = this._authMetadata[authData.token];
       }
       onComplete(authData);
