@@ -8,6 +8,10 @@ export function isNil(obj: any): boolean {
   return obj === undefined || obj === null;
 }
 
+export function hasKey(obj: Object, key: string): boolean {
+  return obj && obj[key] !== undefined;
+}
+
 export function isString(value: any): boolean {
   return typeof value === 'string';
 }
