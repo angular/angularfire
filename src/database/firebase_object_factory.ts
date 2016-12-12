@@ -3,13 +3,11 @@ import { Observer } from 'rxjs/Observer';
 import { observeOn } from 'rxjs/operator/observeOn';
 import * as firebase from 'firebase';
 import * as utils from '../utils';
-import { Query } from '../interfaces';
-import { observeQuery } from './query_observable';
 import { FirebaseObjectFactoryOpts } from '../interfaces';
 
 export function FirebaseObjectFactory (
   absoluteUrlOrDbRef: string | firebase.database.Reference,
-  { preserveSnapshot, query }: FirebaseObjectFactoryOpts = {}): FirebaseObjectObservable<any> {
+  { preserveSnapshot }: FirebaseObjectFactoryOpts = {}): FirebaseObjectObservable<any> {
 
   let ref: firebase.database.Reference;
 
