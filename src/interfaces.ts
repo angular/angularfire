@@ -65,7 +65,6 @@ export interface FirebaseListFactoryOpts {
 
 export interface FirebaseObjectFactoryOpts {
   preserveSnapshot?: boolean;
-  query?: Query
 }
 
 
