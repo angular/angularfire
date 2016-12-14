@@ -268,8 +268,7 @@ class App {
 }
 ```
 Alternatively, if you wish to extend an existing AngularFire component to monitor authentication status:
-```
-ts
+```ts
 import {AngularFire, FirebaseAuth} from 'angularfire2';
 @Component({
   selector: 'auth-status',
