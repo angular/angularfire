@@ -377,16 +377,16 @@ describe('FirebaseListFactory', () => {
 
 
     it('should emit only when the initial data set has been loaded', (done: any) => {
-      (<any>questions).$ref.set([{ initial1: true }, { initial2: true }, { initial3: true }, { initial4: true }])
+      questions.$ref.ref.set([{ initial1: true }, { initial2: true }, { initial3: true }, { initial4: true }])
         .then(() => toPromise.call(skipAndTake(questions, 1)))
         .then((val: any[]) => {
+          console.log(val);
           expect(val.length).toBe(4);
         })
         .then(() => {
           done();
         }, done.fail);
     });
-
 
     it('should emit a new value when a child moves', (done: any) => {
        let question = skipAndTake(questions, 1, 2)
@@ -433,16 +433,16 @@ describe('FirebaseListFactory', () => {
       });
     });
 
-
-    it('should call off on all events when disposed', () => {
+    it('should call off on all events when disposed', (done: any) => {
       const questionRef = firebase.database().ref().child('questions');
       var firebaseSpy = spyOn(questionRef, 'off').and.callThrough();
-      subscription = FirebaseListFactory(questionRef).subscribe();
-      expect(firebaseSpy).not.toHaveBeenCalled();
-      subscription.unsubscribe();
-      expect(firebaseSpy).toHaveBeenCalled();
+      subscription = FirebaseListFactory(questionRef).subscribe(() => {
+        expect(firebaseSpy).not.toHaveBeenCalled();
+        subscription.unsubscribe();
+        expect(firebaseSpy).toHaveBeenCalled();
+        done();
+      });
     });
-
 
     describe('onChildAdded', () => {
       it('should add the child after the prevKey', () => {
