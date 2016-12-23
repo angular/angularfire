@@ -50,19 +50,19 @@ export function FirebaseListFactory(
       }
 
       // check equalTo
-      if (utils.isPresent(query.equalTo)) {
+      if (utils.hasKey(query, "equalTo")) {
         queried = queried.equalTo(query.equalTo);
 
-        if (utils.isPresent(query.startAt) || query.endAt) {
+        if (utils.hasKey(query, "startAt") || utils.hasKey(query, "endAt")) {
           throw new Error('Query Error: Cannot use startAt or endAt with equalTo.');
         }
 
         // apply limitTos
-        if (utils.isPresent(query.limitToFirst)) {
+        if (!utils.isNil(query.limitToFirst)) {
           queried = queried.limitToFirst(query.limitToFirst);
         }
 
-        if (utils.isPresent(query.limitToLast)) {
+        if (!utils.isNil(query.limitToLast)) {
           queried = queried.limitToLast(query.limitToLast);
         }
 
@@ -70,24 +70,24 @@ export function FirebaseListFactory(
       }
 
       // check startAt
-      if (utils.isPresent(query.startAt)) {
+      if (utils.hasKey(query, "startAt")) {
         queried = queried.startAt(query.startAt);
       }
 
-      if (utils.isPresent(query.endAt)) {
+      if (utils.hasKey(query, "endAt")) {
         queried = queried.endAt(query.endAt);
       }
 
-      if (utils.isPresent(query.limitToFirst) && query.limitToLast) {
+      if (!utils.isNil(query.limitToFirst) && query.limitToLast) {
         throw new Error('Query Error: Cannot use limitToFirst with limitToLast.');
       }
 
       // apply limitTos
-      if (utils.isPresent(query.limitToFirst)) {
+      if (!utils.isNil(query.limitToFirst)) {
         queried = queried.limitToFirst(query.limitToFirst);
       }
 
-      if (utils.isPresent(query.limitToLast)) {
+      if (!utils.isNil(query.limitToLast)) {
         queried = queried.limitToLast(query.limitToLast);
       }
 
@@ -135,8 +135,8 @@ function firebaseListObservable(ref: firebase.database.Reference | firebase.data
           // If the initial load has not been set and the current key is
           // the last key of the initialArray, we know we have hit the
           // initial load
-          if(!isInitiallyEmpty)  {
-            if(child.key === lastKey) {
+          if (!isInitiallyEmpty) {
+            if (child.key === lastKey) {
               hasInitialLoad = true;
               obs.next(preserveSnapshot ? initialArray : initialArray.map(utils.unwrapMapFn));
               return;
