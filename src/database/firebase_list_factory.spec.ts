@@ -364,8 +364,8 @@ describe('FirebaseListFactory', () => {
       firebase.database().ref().remove(done);
       questions = FirebaseListFactory(`${rootDatabaseUrl}/questions`);
       questionsSnapshotted = FirebaseListFactory(`${rootDatabaseUrl}/questionssnapshot`, { preserveSnapshot: true });
-      ref = (<any>questions).$ref;
-      refSnapshotted = (<any>questionsSnapshotted).$ref;
+      ref = questions.$ref;
+      refSnapshotted = questionsSnapshotted.$ref;
     });
 
     afterEach((done: any) => {
@@ -377,7 +377,7 @@ describe('FirebaseListFactory', () => {
 
 
     it('should emit only when the initial data set has been loaded', (done: any) => {
-      (<any>questions).$ref.set([{ initial1: true }, { initial2: true }, { initial3: true }, { initial4: true }])
+      questions.$ref.ref.set([{ initial1: true }, { initial2: true }, { initial3: true }, { initial4: true }])
         .then(() => toPromise.call(skipAndTake(questions, 1)))
         .then((val: any[]) => {
           expect(val.length).toBe(4);
@@ -434,13 +434,15 @@ describe('FirebaseListFactory', () => {
     });
 
 
-    it('should call off on all events when disposed', () => {
+    it('should call off on all events when disposed', (done: any) => {
       const questionRef = firebase.database().ref().child('questions');
       var firebaseSpy = spyOn(questionRef, 'off').and.callThrough();
-      subscription = FirebaseListFactory(questionRef).subscribe();
-      expect(firebaseSpy).not.toHaveBeenCalled();
-      subscription.unsubscribe();
-      expect(firebaseSpy).toHaveBeenCalled();
+      subscription = FirebaseListFactory(questionRef).subscribe(_ => {
+        expect(firebaseSpy).not.toHaveBeenCalled();
+        subscription.unsubscribe();
+        expect(firebaseSpy).toHaveBeenCalled();
+        done();
+      });
     });
 
 
