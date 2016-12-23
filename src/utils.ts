@@ -2,7 +2,7 @@ import * as firebase from 'firebase';
 import { Subscription } from 'rxjs/Subscription';
 import { Scheduler } from 'rxjs/Scheduler';
 import { queue } from 'rxjs/scheduler/queue';
-import { AFUnwrappedDataSnapshot} from './interfaces';
+import { AFUnwrappedDataSnapshot } from './interfaces';
 
 export function isNil(obj: any): boolean {
   return obj === undefined || obj === null;

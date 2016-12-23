@@ -100,58 +100,99 @@ export function FirebaseListFactory (
   });
 }
 
+/**
+ * Creates a FirebaseListObservable from a reference or query. Options can be provided as a second parameter.
+ * This function understands the nuances of the Firebase SDK event ordering and other quirks. This function
+ * takes into account that not all .on() callbacks are guaranteed to be asynchonous. It creates a initial array
+ * from a promise of ref.once('value'), and then starts listening to child events. When the initial array
+ * is loaded, the observable starts emitting values.
+ */
 function firebaseListObservable(ref: firebase.database.Reference | firebase.database.Query, {preserveSnapshot}: FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
-
+  // Keep track of callback handles for calling ref.off(event, handle)
+  const handles = [];
   const listObs = new FirebaseListObservable(ref, (obs: Observer<any[]>) => {
-    let arr: any[] = [];
-    let hasInitialLoad = false;
-    // The list should only emit after the initial load
-    // comes down from the Firebase database, (e.g.) all
-    // the initial child_added events have fired.
-    // This way a complete array is emitted which leads
-    // to better rendering performance
-    ref.once('value', (snap) => {
-      hasInitialLoad = true;
-      obs.next(preserveSnapshot ? arr : arr.map(utils.unwrapMapFn));
-    }).catch(err => {
-      obs.error(err);
-      obs.complete()
-    });
+    ref.once('value')
+      .then((snap) => {
+        let initialArray = [];
+        snap.forEach(child => {
+          initialArray.push(child)
+        });
+        return initialArray;
+      })
+      .then((initialArray) => {
+        const isInitiallyEmpty = initialArray.length === 0;
+        let hasInitialLoad = false;
+        let lastKey;
 
-    let addFn = ref.on('child_added', (child: any, prevKey: string) => {
-      arr = onChildAdded(arr, child, prevKey);
-      // only emit the array after the initial load
-      if (hasInitialLoad) {
-        obs.next(preserveSnapshot ? arr : arr.map(utils.unwrapMapFn));
-      }
-    }, err => {
-      if (err) { obs.error(err); obs.complete(); }
-    });
+        if (!isInitiallyEmpty) {
+          // The last key in the initial array tells us where
+          // to begin listening in realtime
+          lastKey = initialArray[initialArray.length - 1].key;
+        }
 
-    let remFn = ref.on('child_removed', (child: any) => {
-      arr = onChildRemoved(arr, child)
-      if (hasInitialLoad) {
-        obs.next(preserveSnapshot ? arr : arr.map(utils.unwrapMapFn));
-      }
-    }, err => {
-      if (err) { obs.error(err); obs.complete(); }
-    });
+        const addFn = ref.on('child_added', (child: any, prevKey: string) => {
+          // If the initial load has not been set and the current key is
+          // the last key of the initialArray, we know we have hit the
+          // initial load
+          if (!isInitiallyEmpty) {
+            if (child.key === lastKey) {
+              hasInitialLoad = true;
+              obs.next(preserveSnapshot ? initialArray : initialArray.map(utils.unwrapMapFn));
+              return;
+            }
+          }
 
-    let chgFn = ref.on('child_changed', (child: any, prevKey: string) => {
-      arr = onChildChanged(arr, child, prevKey)
-      if (hasInitialLoad) {
-        // This also manages when the only change is prevKey change
-        obs.next(preserveSnapshot ? arr : arr.map(utils.unwrapMapFn));
-      }
-    }, err => {
-      if (err) { obs.error(err); obs.complete(); }
-    });
+          if (hasInitialLoad) {
+            initialArray = onChildAdded(initialArray, child, prevKey);
+          }
+
+          // only emit the array after the initial load
+          if (hasInitialLoad) {
+            obs.next(preserveSnapshot ? initialArray : initialArray.map(utils.unwrapMapFn));
+          }
+        }, err => {
+          if (err) { obs.error(err); obs.complete(); }
+        });
+
+        handles.push({ event: 'child_added', handle: addFn });
+
+        let remFn = ref.on('child_removed', (child: any) => {
+          initialArray = onChildRemoved(initialArray, child)
+          if (hasInitialLoad) {
+            obs.next(preserveSnapshot ? initialArray : initialArray.map(utils.unwrapMapFn));
+          }
+        }, err => {
+          if (err) { obs.error(err); obs.complete(); }
+        });
+        handles.push({ event: 'child_removed', handle: remFn });
+
+        let chgFn = ref.on('child_changed', (child: any, prevKey: string) => {
+          initialArray = onChildChanged(initialArray, child, prevKey)
+          if (hasInitialLoad) {
+            // This also manages when the only change is prevKey change
+            obs.next(preserveSnapshot ? initialArray : initialArray.map(utils.unwrapMapFn));
+          }
+        }, err => {
+          if (err) { obs.error(err); obs.complete(); }
+        });
+        handles.push({ event: 'child_changed', handle: chgFn });
+
+        // If empty emit the array
+        if (isInitiallyEmpty) {
+          obs.next(initialArray);
+          hasInitialLoad = true;
+        }
+      });
 
     return () => {
-      ref.off('child_added', addFn);
-      ref.off('child_removed', remFn);
-      ref.off('child_changed', chgFn);
-    }
+      // Loop through callback handles and dispose of each event with handle
+      // The Firebase SDK requires the reference, event name, and callback to
+      // properly unsubscribe, otherwise it can affect other subscriptions.
+      handles.forEach(item => {
+        ref.off(item.event, item.handle);
+      });
+    };
+
   });
 
   // TODO: should be in the subscription zone instead
