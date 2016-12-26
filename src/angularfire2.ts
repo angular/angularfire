@@ -62,7 +62,7 @@ export function _getWindowLocation(){
 }
 
 export function _getAuthBackend(app: firebase.app.App): FirebaseSdkAuthBackend {
-  return new FirebaseSdkAuthBackend(app, false);
+  return new FirebaseSdkAuthBackend(app);
 }
 
 export function _getDefaultFirebase(config){

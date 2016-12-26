@@ -34,8 +34,7 @@ export class FirebaseSdkAuthBackend extends AuthBackend {
    * https://github.com/angular/angular/issues/12631
    * https://github.com/angular/angularfire2/issues/653
    **/
-  constructor( @Inject(FirebaseApp) _fbApp: any,
-    private _webWorkerMode = false) {
+  constructor(@Inject(FirebaseApp) _fbApp: any) {
     super();
     this._fbAuth = _fbApp.auth();
   }
