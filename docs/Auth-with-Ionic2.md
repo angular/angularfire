@@ -490,7 +490,7 @@ export class AuthService {
 
   signInWithFacebook(): firebase.Promise<FirebaseAuthState> {
     if (this.platform.is('cordova')) {
-      Facebook.login(['email', 'public_profile']).then(res => {
+      return Facebook.login(['email', 'public_profile']).then(res => {
         const facebookCredential = firebase.auth.FacebookAuthProvider.credential(res.authResponse.accessToken);
         return firebase.auth().signInWithCredential(facebookCredential);
       });
