@@ -4,6 +4,8 @@
 
 ### 0. Prerequisites
 
+Make sure that you must have npm version >= 3.
+
 Before you start installing AngularFire2, make sure you have latest version of angular-cli installed. 
 To verify run the command `ng -v` and ensure you see `angular-cli: 1.x.x-beta.xx`. The lowest compatible version is `1.x.x-beta.14`.
 
