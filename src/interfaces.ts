@@ -2,10 +2,11 @@ import * as firebase from 'firebase';
 import { Observable } from 'rxjs/Observable';
 
 export interface FirebaseAppConfig {
-  apiKey: string;
-  authDomain: string;
-  databaseURL: string;
-  storageBucket: string;
+  apiKey?: string;
+  authDomain?: string;
+  databaseURL?: string;
+  storageBucket?: string;
+  messagingSenderId?: string;
 }
 
 export interface FirebaseOperationCases {
