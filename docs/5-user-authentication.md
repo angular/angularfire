@@ -7,7 +7,7 @@ of authentication, you can specify that ahead of time so you only need to call
 
 ## Configure application in bootstrap
 
-To specify your authentication ahead of time, you provide the `AngularFireModule.initializeApp` function 
+To specify your authentication ahead of time, you provide the `AngularFireModule.initializeApp` function
 with an `AuthProvider` and an `AuthMethod`.
 
 ```ts
@@ -21,6 +21,7 @@ const myFirebaseConfig = {
   authDomain: '<your-project-authdomain>',
   databaseURL: '<your-database-URL>',
   storageBucket: '<your-storage-bucket>',
+  messagingSenderId: '<your-messaging-sender-id>'
 }
 
 const myFirebaseAuthConfig = {
@@ -58,7 +59,7 @@ af.auth.login({ email: 'email', password: 'pass' });
 import { Component } from '@angular/core';
 import { AngularFire } from 'angularfire2';
 
-@Component({ 
+@Component({
   selector: 'app-root',
   template: `
   <div> {{ (af.auth | async)?.uid }} </div>
@@ -68,11 +69,11 @@ import { AngularFire } from 'angularfire2';
 })
 export class AppComponent {
   constructor(public af: AngularFire) {}
- 
+
   login() {
     this.af.auth.login();
   }
-  
+
   logout() {
      this.af.auth.logout();
   }
@@ -93,7 +94,7 @@ Sample Usage:
 
 ## Override configuration / No config
 
-Authentication works without configuration, and even if you have setup 
+Authentication works without configuration, and even if you have setup
 authentication in the bootstrap phase, you can still override the configuration.
 
 ```ts
@@ -156,7 +157,7 @@ export class AppComponent {
     this.af.auth.login({
       provider: AuthProviders.Anonymous,
       method: AuthMethods.Anonymous,
-    });    
+    });
   }
 }
 ```
