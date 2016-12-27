@@ -4,7 +4,7 @@
 
 ### 0. Prerequisites
 
-Before you start installing AngularFire2, make sure you have latest version of angular-cli installed. 
+Before you start installing AngularFire2, make sure you have latest version of angular-cli installed.
 To verify run the command `ng -v` and ensure you see `angular-cli: 1.x.x-beta.xx`. The lowest compatible version is `1.x.x-beta.14`.
 
 If not, you may need to do the following:
@@ -14,17 +14,17 @@ If not, you may need to do the following:
 npm uninstall -g angular-cli
 
 # reinstall clean version
-npm install -g angular-cli 
+npm install -g angular-cli
 ```
 
 You need the Angular CLI, typings, and TypeScript.
 
 ```bash
-npm install -g angular-cli  
+npm install -g angular-cli
 # or install locally
 npm install angular-cli --save-dev
 # make sure you have typings installed
-npm install -g typings 
+npm install -g typings
 npm install -g typescript
 ```
 
@@ -56,7 +56,7 @@ Now that you have a new project setup, install AngularFire 2 and Firebase from n
 
 ### 4. Setup @NgModule
 
-Open `/src/app/app.module.ts`, inject the Firebase providers, and specify your Firebase configuration. 
+Open `/src/app/app.module.ts`, inject the Firebase providers, and specify your Firebase configuration.
 This can be found in your project at [the Firebase Console](https://console.firebase.google.com):
 
 ```ts
@@ -70,7 +70,8 @@ export const firebaseConfig = {
   apiKey: '<your-key>',
   authDomain: '<your-project-authdomain>',
   databaseURL: '<your-database-URL>',
-  storageBucket: '<your-storage-bucket>'
+  storageBucket: '<your-storage-bucket>',
+  messagingSenderId: '<your-messaging-sender-id>'
 };
 
 @NgModule({
@@ -94,14 +95,14 @@ import { Component } from '@angular/core';
 import { AngularFire, FirebaseListObservable } from 'angularfire2';
 
 @Component({
- 
+
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.css']
 })
 export class AppComponent {
   constructor(af: AngularFire) {
-    
+
   }
 }
 
@@ -116,7 +117,7 @@ import { Component } from '@angular/core';
 import { AngularFire, FirebaseListObservable } from 'angularfire2';
 
 @Component({
-  
+
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.css']
@@ -164,7 +165,7 @@ If you run into this error while trying to invoke `ng serve`, open `src/tsconfig
     "typeRoots": [
       "../node_modules/@types"
     ],
-    
+
     // ADD THIS
     "types": [
       "firebase"

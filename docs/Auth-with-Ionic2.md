@@ -7,7 +7,7 @@ Ensure that you're executing these commands as **Administrator** on Windows and 
 
 ### Prerequisites
 The first step is to ensure you've latest version of **Node** installed.
-You can get the latest version from [here](https://nodejs.org). 
+You can get the latest version from [here](https://nodejs.org).
 This will install both node and npm.
 
 After installing node, check the version by executing the following command in your prompt window.
@@ -15,11 +15,11 @@ After installing node, check the version by executing the following command in y
 ```bash
 
 C:\projects>node -v
-v6.9.1 
+v6.9.1
 
 ```
 
-As of writting this document, this is the most stable version. If you're not on this version, 
+As of writting this document, this is the most stable version. If you're not on this version,
 please upgrade yourself to latest version by installing node from [here](https://nodejs.org).
 
 Check your npm version by executing the following command.
@@ -84,10 +84,10 @@ C:\projects\Ionic_AngularFire2_Project> ionic serve
 
 ```
 
-If everything is installed correctly, the app should open your browser with the dev server running at following url 
+If everything is installed correctly, the app should open your browser with the dev server running at following url
 **`http://localhost:8100`** and will display default home page.
 
-Stop you server by pressing "ctrl + c", if it is still running from the above step and 
+Stop you server by pressing "ctrl + c", if it is still running from the above step and
 install typings and typescript globally by executing the following commands:
 
 **Note:-** typings is not required for our current application to work, but it will be helpful incase you want to bring in
@@ -95,7 +95,7 @@ external libraries and extend this application.
 
 ```bash
 
-C:\projects\Ionic_AngularFire2_Project>npm install -g typings 
+C:\projects\Ionic_AngularFire2_Project>npm install -g typings
 
 C:\projects\Ionic_AngularFire2_Project>npm install -g typescript
 
@@ -156,6 +156,7 @@ export const firebaseConfig = {
   authDomain: "your-domain-name.firebaseapp.com",
   databaseURL: "https://your-domain-name.firebaseio.com",
   storageBucket: "your-domain-name.appspot.com",
+  messagingSenderId: '<your-messaging-sender-id>'
 };
 
 @NgModule({
@@ -201,7 +202,7 @@ import { AngularFire, FirebaseListObservable } from 'angularfire2';
   templateUrl: 'home.html'
 })
 export class HomePage {
-  
+
   items: FirebaseListObservable<any[]>;
 
   constructor(public navCtrl: NavController,af: AngularFire) {
@@ -246,7 +247,7 @@ C:\projects\Ionic_AngularFire2_Project> ionic serve
 
 ## Configuring AngularFire2 Auth with Ionic2
 
-Continuing with the above example stop your server by pressing `ctrl+c` and go to command prompt and 
+Continuing with the above example stop your server by pressing `ctrl+c` and go to command prompt and
 generate a service by executing the following command
 
 ```bash
@@ -295,7 +296,7 @@ export class AuthService {
     } else {
       return '';
     }
-  }  
+  }
 }
 
 ```
@@ -318,6 +319,7 @@ export const firebaseConfig = {
   authDomain: "your-domain-name.firebaseapp.com",
   databaseURL: "https://your-domain-name.firebaseio.com",
   storageBucket: "your-domain-name.appspot.com",
+  messagingSenderId: '<your-messaging-sender-id>'
 };
 
 @NgModule({
@@ -364,7 +366,7 @@ Update your `home.html` to add a login button. Your `home.html` should look like
 
 ```
 
-and finally, add the corresponding click handlers in `home.ts` as follows. 
+and finally, add the corresponding click handlers in `home.ts` as follows.
 Also, ensure the *AuthService* is injected in the constructor. Your `home.ts` should look like this
 
 ```bash
@@ -380,7 +382,7 @@ import { AngularFire, FirebaseListObservable } from 'angularfire2';
   templateUrl: 'home.html'
 })
 export class HomePage {
-  
+
   items: FirebaseListObservable<any[]>;
 
   constructor(public navCtrl: NavController,af: AngularFire,private _auth: AuthService) {
@@ -392,7 +394,7 @@ export class HomePage {
       .then(() => this.onSignInSuccess());
   }
 
-  private onSignInSuccess(): void {    
+  private onSignInSuccess(): void {
     console.log("Facebook display name ",this._auth.displayName());
   }
 
@@ -400,12 +402,12 @@ export class HomePage {
 
 ```
 
-Now run your app and if everything is configured correctly, you should be able to click on the login button in your app, 
+Now run your app and if everything is configured correctly, you should be able to click on the login button in your app,
 which should open the facebook pop-up.
 
 Once you authenticate yourself, you should see your Facebook display name in console.
 
-You can try redirecting yourself to another page to grab additional details from Facebook. 
+You can try redirecting yourself to another page to grab additional details from Facebook.
 
 
 ***Running our application on mobile phone.***
@@ -414,11 +416,11 @@ Ensure you've the platform added to your project. If not add the platform by exe
 
 ```
 
-C:\projects\Ionic_AngularFire2_Project>ionic platform add android 
+C:\projects\Ionic_AngularFire2_Project>ionic platform add android
 
 ```
 
-This adds android platform for your project. 
+This adds android platform for your project.
 Replace android with ios, if you're on Mac book or add both. The generic command is ```ionic platform add <platform-name>```
 
 Now, let's try to run the app in browser. Execute the command
@@ -429,8 +431,8 @@ C:\projects\Ionic_AngularFire2_Project> ionic run android
 
 ```
 
-This should run the app on your mobile phone. Now click on the Facebook button and you'll notice the button doesn't work anymore. 
-This is because the code written so far is good for running our application in browsers, but when running the application on mobile phones, we need to have access to ***Native Mobile API's***, which are provided by _Corodova Plugins_. 
+This should run the app on your mobile phone. Now click on the Facebook button and you'll notice the button doesn't work anymore.
+This is because the code written so far is good for running our application in browsers, but when running the application on mobile phones, we need to have access to ***Native Mobile API's***, which are provided by _Corodova Plugins_.
 
 **We can access these corodva plugins, using Ionic Native, which are nothing but wrappers for cordova plugins.**
 
@@ -440,7 +442,7 @@ Let's look at configuring and installing facebook plugin [here](http://ionicfram
 _Ensure you follow the steps correctly to configure your app._
 
  Once you create your app and make a note of your App ID, go to command prompt in your project directory and execute the following command
- 
+
  ```
  C:\projects\Ionic_AngularFire2_Project>
  ionic plugin add cordova-plugin-facebook4 --save --variable APP_ID="123456789" --variable APP_NAME="myApp"
@@ -519,7 +521,7 @@ export class AuthService {
 
 ```
 
-Verfiy your app is running in browser by executing the following command 
+Verfiy your app is running in browser by executing the following command
 
 ```
 
