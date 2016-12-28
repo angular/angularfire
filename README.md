@@ -16,7 +16,7 @@ Status: Beta
 #### Quick links
 [Contributing](https://github.com/angular/angularfire2/blob/master/CONTRIBUTING.md)
 
-[Plunker Template](http://plnkr.co/edit/4IbB5IvfkBYcj2iVAIM1?p=preview) - Requires to set your Firebase credentials in `app.module.ts`.
+[Plunker Template](http://plnkr.co/edit/8yY4tH?p=preview) - Requires to set your Firebase credentials in `app.module.ts`.
 
 ## Install
 
