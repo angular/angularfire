@@ -10,7 +10,7 @@
 
 ```bash
 npm install -g angular-cli
-npm install -g typings 
+npm install -g typings
 ```
 
 ### 1. Create a new project
@@ -54,7 +54,7 @@ module.exports = function(defaults) {
       // above are the existing entries
       // below are the AngularFire entries
       'angularfire2/**/*.js',
-      'firebase/*.js'      
+      'firebase/*.js'
     ]
   });
 };
@@ -92,7 +92,7 @@ AngularFire 2 and Firebase need to be mapped with System.js for module loading.
 
 ### 6. Set up @NgModule
 
-Open `/src/main.ts`, inject the Firebase providers, and specify your Firebase configuration. 
+Open `/src/main.ts`, inject the Firebase providers, and specify your Firebase configuration.
 This can be found in your project at [the Firebase Console](https://console.firebase.google.com):
 
 ```ts
@@ -107,7 +107,8 @@ export const firebaseConfig = {
   apiKey: "<your-key>",
   authDomain: "<your-project-authdomain>",
   databaseURL: "<your-database-URL>",
-  storageBucket: "<your-storage-bucket>"
+  storageBucket: "<your-storage-bucket>",
+  messagingSenderId: '<your-messaging-sender-id>'
 };
 
 @NgModule({
@@ -138,7 +139,7 @@ import { AngularFire, FirebaseListObservable } from 'angularfire2';
 })
 export class <MyApp>Component {
   constructor(af: AngularFire) {
-    
+
   }
 }
 
