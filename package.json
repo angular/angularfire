@@ -52,7 +52,6 @@
     "conventional-changelog-cli": "^1.2.0",
     "es6-module-loader": "^0.17.10",
     "es6-shim": "^0.35.0",
-    "firebase-server": "^0.5.2",
     "gulp": "^3.9.0",
     "gulp-jasmine": "^2.2.1",
     "gulp-typescript": "^2.10.0",
@@ -76,10 +75,8 @@
     "systemjs": "^0.19.16",
     "systemjs-builder": "^0.15.7",
     "traceur": "0.0.96",
-    "tsd": "^0.6.5",
     "typedoc": "github:jeffbcross/typedoc",
     "typescript": "^2.0.2",
-    "typings": "^1.3.2",
     "zone.js": "^0.6.26"
   },
   "typings": "index.d.ts"
