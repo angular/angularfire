@@ -1,6 +1,6 @@
 {
   "name": "angularfire2",
-  "version": "2.0.0-beta.7-pre",
+  "version": "2.0.0-beta.7.1-pre",
   "description": "",
   "main": "bundles/angularfire2.umd.js",
   "module": "index.js",
@@ -77,7 +77,7 @@
     "traceur": "0.0.96",
     "typedoc": "github:jeffbcross/typedoc",
     "typescript": "^2.0.2",
-    "zone.js": "^0.6.26"
+    "zone.js": "^0.7.2"
   },
   "typings": "index.d.ts"
 }
