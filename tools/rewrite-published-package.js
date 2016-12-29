@@ -10,6 +10,8 @@ delete srcPackage.scripts;
 
 var peerDependencies = Object.assign({}, srcPackage.dependencies);
 
+delete srcPackage.dependencies;
+
 var outPackage = Object.assign({}, srcPackage, { peerDependencies });
 
 fs.writeFileSync('./dist/package.json', JSON.stringify(outPackage, null, 2));
