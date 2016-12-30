@@ -22,12 +22,12 @@ const myFirebaseConfig = {
   databaseURL: '<your-database-URL>',
   storageBucket: '<your-storage-bucket>',
   messagingSenderId: '<your-messaging-sender-id>'
-}
+};
 
 const myFirebaseAuthConfig = {
   provider: AuthProviders.Google,
   method: AuthMethods.Redirect
-}
+};
 
 @NgModule({
   imports: [
@@ -46,7 +46,7 @@ export class AppModule {}
 If you have setup authentication in bootstrap like above, then all you need to do
 is call login on `af.auth.login()`
 
-The long exception is if you're using username and password, then you'll have
+The lone exception is if you're using username and password, then you'll have
 to call `af.auth.login()` with the user's credentials.
 
 ```ts
@@ -102,7 +102,7 @@ authentication in the bootstrap phase, you can still override the configuration.
 af.auth.login({
   provider: AuthProviders.Anonymous,
   method: AuthMethods.Anonymous,
-})
+});
 
 // Email and password
 af.auth.login({
@@ -112,19 +112,19 @@ af.auth.login({
 {
   provider: AuthProviders.Password,
   method: AuthMethods.Password,
-})
+});
 
 // Social provider redirect
 af.auth.login({
   provider: AuthProviders.Twitter,
   method: AuthMethods.Redirect,
-})
+});
 
 // Social provider popup
 af.auth.login({
   provider: AuthProviders.Github,
   method: AuthMethods.Popup,
-})
+});
 ```
 
 **Example app:**

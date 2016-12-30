@@ -20,17 +20,18 @@ import { Subscription } from 'rxjs/Subscription';
 import { COMMON_CONFIG, ANON_AUTH_CONFIG } from './test-config';
 
 describe('angularfire', () => {
-  var subscription:Subscription;
-  var app: firebase.app.App;
-  var rootRef: firebase.database.Reference;
-  var questionsRef: firebase.database.Reference;
-  var listOfQuestionsRef: firebase.database.Reference;
-  var angularFire2: AngularFire;
+  let subscription:Subscription;
+  let app: firebase.app.App;
+  let rootRef: firebase.database.Reference;
+  let questionsRef: firebase.database.Reference;
+  let listOfQuestionsRef: firebase.database.Reference;
+  let angularFire2: AngularFire;
+  const APP_NAME = 'super-awesome-test-firebase-app-name';
 
   beforeEach(() => {
 
     TestBed.configureTestingModule({
-      imports: [AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG)]
+      imports: [AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG, APP_NAME)]
     });
 
     inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
@@ -71,6 +72,9 @@ describe('angularfire', () => {
   describe('FirebaseApp', () => {
     it('should provide a FirebaseApp for the FirebaseApp binding', () => {
       expect(typeof app.delete).toBe('function');
+    });
+    it('should have the provided name', () => {
+      expect(app.name).toBe(APP_NAME);
     })
   });
 
