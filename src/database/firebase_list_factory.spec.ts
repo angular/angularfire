@@ -61,7 +61,7 @@ describe('FirebaseListFactory', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG)]
+      imports: [AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG, '[DEFAULT]')]
     });
     inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
       app = firebaseApp;
