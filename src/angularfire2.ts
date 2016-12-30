@@ -49,7 +49,7 @@ export class AngularFire {
     public database: AngularFireDatabase) {}
 }
 
-export function _getFirebase(config: FirebaseAppConfig, appName: string): firebase.app.App {
+export function _getFirebase(config: FirebaseAppConfig, appName?: string): firebase.app.App {
   try {
     return firebase.initializeApp(config, appName);
   }
