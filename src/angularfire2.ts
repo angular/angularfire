@@ -51,7 +51,11 @@ export class AngularFire {
 
 export function _getFirebase(config: FirebaseAppConfig, appName?: string): firebase.app.App {
   try {
-    return firebase.initializeApp(config, appName);
+    if (appName) {
+      return firebase.initializeApp(config, appName);
+    } else {
+      return firebase.initializeApp(config);
+    }
   }
   catch (e) {
     return firebase.app(null);
