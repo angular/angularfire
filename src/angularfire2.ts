@@ -11,7 +11,8 @@ import {
   FirebaseApp,
   WindowLocation,
   FirebaseUserConfig,
-  FirebaseAuthConfig
+  FirebaseAuthConfig,
+  FirebaseAppName
 } from './tokens';
 import {
   APP_INITIALIZER,
@@ -43,14 +44,14 @@ import {
 @Injectable()
 export class AngularFire {
   constructor(
-    @Inject(FirebaseConfig) private firebaseConfig:string,
+    @Inject(FirebaseConfig) private firebaseConfig:FirebaseAppConfig,
     public auth: AngularFireAuth,
     public database: AngularFireDatabase) {}
 }
 
-export function _getFirebase(config: FirebaseAppConfig): firebase.app.App {
+export function _getFirebase(config: FirebaseAppConfig, appName: string): firebase.app.App {
   try {
-    return firebase.initializeApp(config);
+    return firebase.initializeApp(config, appName);
   }
   catch (e) {
     return firebase.app(null);
@@ -79,7 +80,7 @@ export const COMMON_PROVIDERS: any[] = [
   {
     provide: FirebaseApp,
     useFactory: _getFirebase,
-    deps: [FirebaseConfig]
+    deps: [FirebaseConfig, FirebaseAppName]
   },
   AngularFireAuth,
   AngularFire,
@@ -106,23 +107,24 @@ export const FIREBASE_PROVIDERS:any[] = [
 export const defaultFirebase = (config: FirebaseAppConfig): any => {
   return [
     { provide: FirebaseUserConfig, useValue: config },
-	{ provide: FirebaseConfig, useFactory: _getDefaultFirebase, deps: [FirebaseUserConfig] }
+    { provide: FirebaseConfig, useFactory: _getDefaultFirebase, deps: [FirebaseUserConfig] }
   ]
 };
 
 @NgModule({
-	providers: FIREBASE_PROVIDERS
+  providers: FIREBASE_PROVIDERS
 })
 export class AngularFireModule {
-  static initializeApp(config: FirebaseAppConfig, authConfig?:AuthConfiguration): ModuleWithProviders {
+  static initializeApp(config: FirebaseAppConfig, authConfig?: AuthConfiguration, appName?: string): ModuleWithProviders {
     return {
-		ngModule: AngularFireModule,
-		providers: [
-		  { provide: FirebaseUserConfig, useValue: config },
-		  { provide: FirebaseConfig, useFactory: _getDefaultFirebase, deps: [FirebaseUserConfig] },
-      { provide: FirebaseAuthConfig, useValue: authConfig }
-		]
-	}
+      ngModule: AngularFireModule,
+      providers: [
+        { provide: FirebaseUserConfig, useValue: config },
+        { provide: FirebaseConfig, useFactory: _getDefaultFirebase, deps: [FirebaseUserConfig] },
+        { provide: FirebaseAuthConfig, useValue: authConfig },
+        { provide: FirebaseAppName, useValue: appName }
+      ]
+    }
   }
 }
 

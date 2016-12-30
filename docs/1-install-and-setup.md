@@ -52,7 +52,7 @@ You should see a message that says *App works!*
 npm install angularfire2 firebase --save
 ```
 
-Now that you have a new project setup, install AngularFire 2 and Firebase from npm.
+Now that you have a new project setup, install AngularFire2 and Firebase from npm.
 
 ### 4. Setup @NgModule
 
@@ -85,6 +85,22 @@ export const firebaseConfig = {
 export class AppModule {}
 
 ```
+
+### Custom FirebaseApp Names
+You can optionally provide a custom FirebaseApp name with `initializeApp`.
+
+```ts
+@NgModule({
+  imports: [
+    BrowserModule,
+    AngularFireModule.initializeApp(firebaseConfig, authConfig, 'my-app-name')
+  ],
+  declarations: [ AppComponent ],
+  bootstrap: [ AppComponent ]
+})
+export class AppModule {}
+```
+
 
 ### 5. Inject AngularFire
 
