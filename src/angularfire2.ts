@@ -26,7 +26,6 @@ import {
   FirebaseSdkAuthBackend,
   AngularFireAuth,
   firebaseAuthConfig,
-  FirebaseAuth,
   AuthBackend,
   AuthMethods,
   AuthProviders,
@@ -37,8 +36,7 @@ import {
   FirebaseObjectObservable,
   FirebaseListFactory,
   FirebaseObjectFactory,
-  AngularFireDatabase,
-  FirebaseDatabase
+  AngularFireDatabase
 } from './database/index';
 
 @Injectable()
@@ -77,10 +75,6 @@ export function _getDefaultFirebase(config){
 }
 
 export const COMMON_PROVIDERS: any[] = [
-  // TODO: Deprecate
-  { provide: FirebaseAuth,
-    useExisting: AngularFireAuth
-  },
   {
     provide: FirebaseApp,
     useFactory: _getFirebase,
@@ -135,10 +129,6 @@ export class AngularFireModule {
 export {
   AngularFireAuth,
   AngularFireDatabase,
-  // TODO: Deprecate
-  FirebaseAuth,
-  // TODO: Deprecate
-  FirebaseDatabase,
   FirebaseListObservable,
   FirebaseObjectObservable,
   FirebaseListFactory,

@@ -29,9 +29,6 @@ export class AngularFireDatabase {
   }
 }
 
-// TODO: Deprecate
-export class FirebaseDatabase extends AngularFireDatabase {}
-
 function getAbsUrl (root:FirebaseAppConfig, url:string) {
   if (!(/^[a-z]+:\/\/.*/.test(url))) {
     // Provided url is relative.
