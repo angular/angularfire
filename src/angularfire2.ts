@@ -68,7 +68,7 @@ export function _getAuthBackend(app: firebase.app.App): FirebaseSdkAuthBackend {
   return new FirebaseSdkAuthBackend(app);
 }
 
-export function _getDefaultFirebase(config: FirebaseUserConfig): FirebaseUserConfig {
+export function _getDefaultFirebase(config: FirebaseUserConfig) {
   // remove a trailing slash from the Database URL if it exists
   config.databaseURL = utils.stripTrailingSlash(config.databaseURL);
   return config;
