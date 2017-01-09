@@ -18,6 +18,7 @@ const queryObservable = af.database.list('/items', {
 ```
 
 **Query Options:**
+
 | method   | purpose            | 
 | ---------|--------------------| 
 | orderByChild | specify a child to order by |
