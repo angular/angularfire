@@ -17,6 +17,20 @@ const queryObservable = af.database.list('/items', {
 });
 ```
 
+**Query Options:**
+| method   | purpose            | 
+| ---------|--------------------| 
+| orderByChild | specify a child to order by |
+| orderByKey | boolean to order by Firebase keys |
+| orderByPriority | boolean to order by Firebase priority |
+| orderByValue | specify a value to order by |
+| equalTo | limit list to items that contain certain value |
+| limitToFirst | limit response to x items starting at the beginning |
+| limitToLast | limit response to x items starting at the end |
+| startAt | key of item to start at |
+| endAt | key of item to end at |
+| shallow | boolean to only return item keys |
+
 ## Invalid query combinations
 
 **Queries can only be ordered by one method.** This means you can only specify
