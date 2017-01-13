@@ -1,3 +1,24 @@
+<a name="2.0.0-beta.7"></a>
+# [2.0.0-beta.7](https://github.com/angular/angularfire2/compare/2.0.0-beta.6...v2.0.0-beta.7) (2017-01-13)
+
+
+### Bug Fixes
+
+* **aot:** Remove AuthBackend param for AOT support ([f875360](https://github.com/angular/angularfire2/commit/f875360))
+* **auth_backend:** Update logout method to return a promise ([169ce64](https://github.com/angular/angularfire2/commit/169ce64)), closes [#583](https://github.com/angular/angularfire2/issues/583)
+* **config:** Add messagingSenderId to FirebaseAppConfig ([9c84869](https://github.com/angular/angularfire2/commit/9c84869))
+* **database:** Allow null values for equalTo, etc. ([70a3e94](https://github.com/angular/angularfire2/commit/70a3e94)), closes [#704](https://github.com/angular/angularfire2/issues/704)
+* **database:** Removed unused query option ([9cbc59b](https://github.com/angular/angularfire2/commit/9cbc59b)), closes [#706](https://github.com/angular/angularfire2/issues/706)
+* **list:** Fix FirebaseListObservable emit as array bug [#574](https://github.com/angular/angularfire2/issues/574) ([ce3de04](https://github.com/angular/angularfire2/commit/ce3de04))
+* **module:** Conditionally pass app name ([8427009](https://github.com/angular/angularfire2/commit/8427009))
+
+
+### Features
+
+* **module:** Add a custom FirebaseApp name ([73a3e26](https://github.com/angular/angularfire2/commit/73a3e26))
+
+
+
 <a name="2.0.0-beta.6-preview"></a>
 # [2.0.0-beta.6-preview](https://github.com/angular/angularfire2/compare/2.0.0-beta.5...v2.0.0-beta.6-preview) (2016-11-02)
 
