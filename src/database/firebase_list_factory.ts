@@ -134,7 +134,7 @@ function firebaseListObservable(ref: firebase.database.Reference | firebase.data
           // If the initial load has not been set and the current key is
           // the last key of the initialArray, we know we have hit the
           // initial load
-          if (!isInitiallyEmpty) {
+          if (!isInitiallyEmpty && !hasInitialLoad) {
             if (child.key === lastKey) {
               hasInitialLoad = true;
               obs.next(preserveSnapshot ? initialArray : initialArray.map(utils.unwrapMapFn));
