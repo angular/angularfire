@@ -563,6 +563,43 @@ describe('FirebaseListFactory', () => {
         ref.push('in-the-zone');
       });
     });
+
+    describe('Removing and replacing a child key', () => {
+      const firstKey = 'index1';
+      const middleKey = 'index2';
+      const lastKey = 'index3';
+      const initialData = {
+        [firstKey]: true,
+        [middleKey]: true,
+        [lastKey]: true,
+      };
+      let keyToRemove: string;
+
+      afterEach((done: any) => {
+        subscription = questions
+          .skip(2)
+          .take(1)
+          .subscribe((items: any[]) => {
+            expect(items.length).toBe(3);
+            done();
+          }, done.fail);
+        questions.$ref.ref.set(initialData)
+          .then(() => ref.child(keyToRemove).remove())
+          .then(() => ref.child(keyToRemove).set(true));
+      });
+
+      it('should work with the first item in the list', () => {
+        keyToRemove = firstKey;
+      });
+
+      it('should work with the middle item in the list', () => {
+        keyToRemove = middleKey;
+      });
+
+      it('should work with the last item in the list', () => {
+        keyToRemove = lastKey;
+      });
+    });
   });
 });
 
