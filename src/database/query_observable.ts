@@ -5,6 +5,7 @@ import { Observer } from 'rxjs/Observer';
 import { combineLatest } from 'rxjs/operator/combineLatest';
 import { merge } from 'rxjs/operator/merge';
 import { map } from 'rxjs/operator/map';
+import { auditTime } from 'rxjs/operator/auditTime';
 import {
   Query,
   ScalarQuery,
@@ -16,20 +17,24 @@ import {
 } from '../interfaces';
 import { isNil } from '../utils';
 
-export function observeQuery(query: Query): Observable<ScalarQuery> {
+export function observeQuery(query: Query, audit: boolean = true): Observable<ScalarQuery> {
   if (isNil(query)) {
     return observableOf(null);
   }
 
   return Observable.create((observer: Observer<ScalarQuery>) => {
 
-    combineLatest.call(
-        getOrderObservables(query),
-        getStartAtObservable(query),
-        getEndAtObservable(query),
-        getEqualToObservable(query),
-        getLimitToObservables(query)
-      )
+    let combined = combineLatest.call(
+      getOrderObservables(query),
+      getStartAtObservable(query),
+      getEndAtObservable(query),
+      getEqualToObservable(query),
+      getLimitToObservables(query)
+    );
+    if (audit) {
+      combined = auditTime.call(combined, 0);
+    }
+    combined
       .subscribe(([orderBy, startAt, endAt, equalTo, limitTo]
         : [OrderBySelection, Primitive, Primitive, Primitive, LimitToSelection]) => {
 
