@@ -124,13 +124,15 @@ describe('observeQuery', () => {
 });
 
 
-// describe('getOrderObservables', () => {
-//   it('should be subscribable event if no observables found for orderby', () => {
-//     expect(() => {
-//       getOrderObservables((<Query>{})).subscribe();
-//     }).not.toThrow();
-//   });
-// });
+describe('getOrderObservables', () => {
+  it('should be subscribable event if no observables found for orderby', () => {
+    var nextSpy = jasmine.createSpy('next');
+    var obs = getOrderObservables({});
+    obs.subscribe(nextSpy);
+    expect(nextSpy).toHaveBeenCalledWith(null);
+  });
+});
+
 
 describe('query combinations', () => {
 
