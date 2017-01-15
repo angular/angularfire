@@ -92,7 +92,6 @@ describe('observeQuery', () => {
 
 
   it('should omit only the orderBy type of the last emitted orderBy observable', () => {
-    // TODO: Should we allow re-emitting of the orderBy method?
     var nextSpy = jasmine.createSpy('next');
     var query = {
       orderByKey: new Subject<boolean>(),
@@ -108,13 +107,19 @@ describe('observeQuery', () => {
     });
     nextSpy.calls.reset();
     query.orderByKey.next(true);
-    expect(nextSpy).not.toHaveBeenCalled();
-    // nextSpy.calls.reset();
-    // query.orderByValue.next(true);
-    // expect(nextSpy).toHaveBeenCalledWith({orderByValue: true});
-    // nextSpy.calls.reset();
+    expect(nextSpy).toHaveBeenCalledWith({
+      orderByKey: true
+    });
+    nextSpy.calls.reset();
+    query.orderByValue.next(true);
+    expect(nextSpy).toHaveBeenCalledWith({
+      orderByValue: true
+    });
+    nextSpy.calls.reset();
     query.orderByChild.next('foo');
-    expect(nextSpy).toHaveBeenCalledWith({orderByChild: 'foo'});
+    expect(nextSpy).toHaveBeenCalledWith({
+      orderByChild: 'foo'
+    });
   });
 });
 
