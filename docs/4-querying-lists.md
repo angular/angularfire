@@ -21,16 +21,15 @@ const queryObservable = af.database.list('/items', {
 
 | method   | purpose            | 
 | ---------|--------------------| 
-| orderByChild | specify a child to order by |
-| orderByKey | boolean to order by Firebase keys |
-| orderByPriority | boolean to order by Firebase priority |
-| orderByValue | specify a value to order by |
-| equalTo | limit list to items that contain certain value |
-| limitToFirst | limit response to x items starting at the beginning |
-| limitToLast | limit response to x items starting at the end |
-| startAt | key of item to start at |
-| endAt | key of item to end at |
-| shallow | boolean to only return item keys |
+| `orderByChild` | Specify a child to order by. |
+| `orderByKey` | Boolean to order by Firebase Database keys. |
+| `orderByPriority` | Boolean to order by Firebase Database priority. |
+| `orderByValue` | Specify a value to order by. |
+| `equalTo` | Limit list to items that contain certain value. |
+| `limitToFirst` | Sets the maximum number of items to return from the beginning of the ordered list of results. |
+| `limitToLast` | Sets the maximum number of items to return from the end of the ordered list of results. |
+| `startAt` | Return items greater than or equal to the specified key or value, depending on the order-by method chosen. |
+| `endAt` | Return items less than or equal to the specified key or value, depending on the order-by method chosen. |
 
 ## Invalid query combinations
 
