@@ -262,13 +262,13 @@ Update the service with the following code.
 ```bash
 
 import { Injectable } from '@angular/core';
-import { AuthProviders, FirebaseAuth, FirebaseAuthState, AuthMethods } from 'angularfire2';
+import { AuthProviders, AngularFireAuth, FirebaseAuthState, AuthMethods } from 'angularfire2';
 
 @Injectable()
 export class AuthService {
   private authState: FirebaseAuthState;
 
-  constructor(public auth$: FirebaseAuth) {
+  constructor(public auth$: AngularFireAuth) {
     this.authState = auth$.getAuth();
     auth$.subscribe((state: FirebaseAuthState) => {
       this.authState = state;
@@ -470,7 +470,7 @@ your ```auth-service.ts``` code should look like this.
 
 
 import { Injectable } from '@angular/core';
-import { AuthProviders, FirebaseAuth, FirebaseAuthState, AuthMethods } from 'angularfire2';
+import { AuthProviders, AngularFireAuth, FirebaseAuthState, AuthMethods } from 'angularfire2';
 
 import { Platform } from 'ionic-angular';
 import { Facebook } from 'ionic-native';
@@ -479,7 +479,7 @@ import { Facebook } from 'ionic-native';
 export class AuthService {
   private authState: FirebaseAuthState;
 
-  constructor(public auth$: FirebaseAuth, private platform: Platform) {
+  constructor(public auth$: AngularFireAuth, private platform: Platform) {
     this.authState = auth$.getAuth();
     auth$.subscribe((state: FirebaseAuthState) => {
       this.authState = state;
