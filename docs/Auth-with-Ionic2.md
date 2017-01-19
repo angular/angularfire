@@ -286,13 +286,24 @@ export class AuthService {
     });
   }
 
+  signInWithGoogle(): firebase.Promise<FirebaseAuthState> {
+    return this.auth$.login({
+      provider: AuthProviders.Google,
+      method: AuthMethods.Popup
+    });
+  }
+
   signOut(): void {
     this.auth$.logout();
   }
 
   displayName(): string {
     if (this.authState != null) {
-      return this.authState.facebook.displayName;
+      if (this.authState.facebook) {
+        return this.authState.facebook.displayName;
+      } else {
+        return this.authState.google.displayName;
+      }        
     } else {
       return '';
     }
@@ -362,6 +373,7 @@ Update your `home.html` to add a login button. Your `home.html` should look like
   </ion-list>
 
   <button ion-button outline (click)="signInWithFacebook()">Facebook</button>
+  <button ion-button outline (click)="signInWithGoogle()">Google</button>
 </ion-content>
 
 ```
@@ -394,18 +406,23 @@ export class HomePage {
       .then(() => this.onSignInSuccess());
   }
 
+  signInWithGoogle(): void {
+    this._auth.signInWithGoogle()
+      .then(() => this.onSignInSuccess());
+  }
+
   private onSignInSuccess(): void {
-    console.log("Facebook display name ",this._auth.displayName());
+    console.log("Facebook or Google display name ",this._auth.displayName());
   }
 
 }
 
 ```
 
-Now run your app and if everything is configured correctly, you should be able to click on the login button in your app,
-which should open the facebook pop-up.
+Now run your app and if everything is configured correctly, you should be able to click on the facebook button in your app,
+which should open the facebook pop-up. The google button should open the google pop-up.
 
-Once you authenticate yourself, you should see your Facebook display name in console.
+Once you authenticate yourself, you should see your Facebook or Google display name in console.
 
 You can try redirecting yourself to another page to grab additional details from Facebook.
 
@@ -431,13 +448,14 @@ C:\projects\Ionic_AngularFire2_Project> ionic run android
 
 ```
 
-This should run the app on your mobile phone. Now click on the Facebook button and you'll notice the button doesn't work anymore.
+This should run the app on your mobile phone. Now click on the Facebook or Google button and you'll notice the button doesn't work anymore.
 This is because the code written so far is good for running our application in browsers, but when running the application on mobile phones, we need to have access to ***Native Mobile API's***, which are provided by _Corodova Plugins_.
 
 **We can access these corodva plugins, using Ionic Native, which are nothing but wrappers for cordova plugins.**
 
 List of all Ionic Native API's for corodova plugins can be found [here](http://ionicframework.com/docs/v2/native/).
 
+***Native Facebook Login***
 Let's look at configuring and installing facebook plugin [here](http://ionicframework.com/docs/v2/native/facebook/).
 _Ensure you follow the steps correctly to configure your app._
 
@@ -455,14 +473,47 @@ This will install the corodva plugin for facebook.
 
 Add the platform to your facebook portal as mentioned in the document [here](http://ionicframework.com/docs/v2/native/facebook/).
 
-Now import the Platform and Facebook objects in your ```auth-service.ts```
+***Native Google Login***
+
+To configure and install the google plugin [here](http://ionicframework.com/docs/v2/native/google-plus/).
+_Ensure you follow the steps correctly to configure your app._
+
+Download the GoogleService-info.plist from your Firebase Dashboard Console. Open the file to extract the REVERSED_CLIENT_ID which will be used below to setup the cordova-plugin-googleplus.
+
+ ```
+ C:\projects\Ionic_AngularFire2_Project>
+ ionic plugin add cordova-plugin-googleplus --variable REVERSED_CLIENT_ID=myreversedclientid
+ 
+ ```
+
+Replace REVERSED_CLIENT_ID with the one in your GoogleService-info.plist.
+
+Open config.xml 
+```
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<widget id="MAKE_THIS_THE_BUNDLE_ID_FROM_GoogleService-info.plist" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+```
+
+and change the "MAKE_THIS_THE_BUNDLE_ID_FROM_GoogleService-info.plist" to be the BUNDLE_ID from your GoogleService-info.plist.
+
+The last value you need from GoogleService-info.plist is the CLIENT_ID which you will pass using
+```
+GooglePlus.login({
+  webClientId: "CLIENT_ID_FROM_GoogleService-info.plist" // necessary for iOS 9+
+}).then(auth => { // steps to connect OAUTH result to angularfire
+```
+***Updating our AuthService***
+
+Now import the Platform, Facebook, GooglePlus and firebase objects in your ```auth-service.ts```
 
 ```
 import { Platform } from 'ionic-angular';
 import { Facebook } from 'ionic-native';
+import { GooglePlus } from "ionic-native";
+import * as firebase from 'firebase';
 ```
 
-and update the signInWithFacebook() method.
+and update the signInWithFacebook() and signInWithGoogle() methods.
 
 your ```auth-service.ts``` code should look like this.
 
@@ -474,6 +525,8 @@ import { AuthProviders, AngularFireAuth, FirebaseAuthState, AuthMethods } from '
 
 import { Platform } from 'ionic-angular';
 import { Facebook } from 'ionic-native';
+import { GooglePlus } from "ionic-native";
+import * as firebase from 'firebase';
 
 @Injectable()
 export class AuthService {
@@ -502,7 +555,22 @@ export class AuthService {
         method: AuthMethods.Popup
       });
     }
+  }
 
+  signInWithGoogle(): firebase.Promise<FirebaseAuthState> {
+    if (this.platform.is('cordova')) {
+      return GooglePlus.login({
+        webClientId: "CLIENT_ID_FROM_GoogleService-info.plist" // necessary for iOS 9+
+      }).then(auth => {
+        let googleCredential = firebase.auth.GoogleAuthProvider.credential(auth.idToken, auth.accessToken);
+        return firebase.auth().signInWithCredential(googleCredential);
+      });
+    } else {
+      return this.auth$.login({
+        provider: AuthProviders.Google,
+        method: AuthMethods.Popup
+      });
+    }
   }
 
   signOut(): void {
@@ -511,7 +579,11 @@ export class AuthService {
 
   displayName(): string {
     if (this.authState != null) {
-      return this.authState.facebook.displayName;
+      if (this.authState.facebook) {
+        return this.authState.facebook.displayName;
+      } else {
+        return this.authState.google.displayName;
+      }        
     } else {
       return '';
     }
@@ -537,4 +609,4 @@ C:\projects\Ionic_AngularFire2_Project> ionic run android
 
 ```
 
-Once the App launches click on the Facebook login button and it should open up the native facebook app for authentication and once your enter credentials and gets succesfully authenticated, it should redirect you back to the home page.
+Once the App launches click on the Facebook or Google login button and it should open up the native facebook app or the Google Web login for authentication and once your enter credentials and gets succesfully authenticated, it should redirect you back to the home page.
