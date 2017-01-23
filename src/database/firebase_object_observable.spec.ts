@@ -30,7 +30,7 @@ describe('FirebaseObjectObservable', () => {
     });
     inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
       app = firebaseApp;
-      ref = firebase.database().ref()
+      ref = firebase.database().ref();
       O = new FirebaseObjectObservable((observer:Observer<any>) => {
       }, ref);
     })();
