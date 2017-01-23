@@ -63,7 +63,7 @@ This can be found in your project at [the Firebase Console](https://console.fire
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
-import { AngularFireModule } from 'angularfire2';
+import { FIREBASE_PROVIDERS, AngularFireModule } from 'angularfire2';
 
 // Must export the config
 export const firebaseConfig = {
@@ -80,6 +80,7 @@ export const firebaseConfig = {
     AngularFireModule.initializeApp(firebaseConfig)
   ],
   declarations: [ AppComponent ],
+  providers: [FIREBASE_PROVIDERS],
   bootstrap: [ AppComponent ]
 })
 export class AppModule {}
@@ -96,6 +97,7 @@ You can optionally provide a custom FirebaseApp name with `initializeApp`.
     AngularFireModule.initializeApp(firebaseConfig, authConfig, 'my-app-name')
   ],
   declarations: [ AppComponent ],
+  providers: [FIREBASE_PROVIDERS],
   bootstrap: [ AppComponent ]
 })
 export class AppModule {}
