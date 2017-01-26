@@ -49,14 +49,7 @@ function queryTest(observable: Observable<any>, subject: Subject<any>, done: any
 }
 
 describe('FirebaseListFactory', () => {
-  var subscription: Subscription;
-  var questions: FirebaseListObservable<any>;
-  var questionsSnapshotted: FirebaseListObservable<any>;
-  var ref: any;
-  var refSnapshotted: any;
-  var val1: any;
-  var val2: any;
-  var val3: any;
+
   var app: firebase.app.App;
 
   beforeEach(() => {
@@ -351,13 +344,22 @@ describe('FirebaseListFactory', () => {
         expect(observable.update instanceof Function).toBe(true);
         expect(observable.remove instanceof Function).toBe(true);
     });
-
-
   });
 
   describe('methods', () => {
 
+    var toKey;
+    var val1: any;
+    var val2: any;
+    var val3: any;
+    var questions: FirebaseListObservable<any>;
+    var questionsSnapshotted: FirebaseListObservable<any>;
+    var ref: any;
+    var refSnapshotted: any;
+    var subscription: Subscription;
+
     beforeEach((done: any) => {
+      toKey = (val) => val.key;
       val1 = { key: 'key1' };
       val2 = { key: 'key2' };
       val3 = { key: 'key3' };
@@ -367,6 +369,7 @@ describe('FirebaseListFactory', () => {
       ref = questions.$ref;
       refSnapshotted = questionsSnapshotted.$ref;
     });
+
 
     afterEach((done: any) => {
       if (subscription && !subscription.closed) {
@@ -434,6 +437,46 @@ describe('FirebaseListFactory', () => {
     });
 
 
+    it('should re-emit identical instances of unchanged children', (done: any) => {
+
+      let prev;
+
+      take.call(questions, 2).subscribe(
+        (list) => {
+          if (prev) {
+            expect(list[0]).toBe(prev[0]);
+            done();
+          } else {
+            prev = list;
+            questions.push({ name: 'bob' });
+          }
+        },
+        done.fail
+      );
+      questions.push({ name: 'alice' });
+    });
+
+
+    it('should re-emit identical instances of unchanged children as snapshots', (done: any) => {
+
+      let prev;
+
+      take.call(questionsSnapshotted, 2).subscribe(
+        (list) => {
+          if (prev) {
+            expect(list[0]).toBe(prev[0]);
+            done();
+          } else {
+            prev = list;
+            questionsSnapshotted.push({ name: 'bob' });
+          }
+        },
+        done.fail
+      );
+      questionsSnapshotted.push({ name: 'alice' });
+    });
+
+
     it('should call off on all events when disposed', (done: any) => {
       const questionRef = firebase.database().ref().child('questions');
       var firebaseSpy = spyOn(questionRef, 'off').and.callThrough();
@@ -447,65 +490,57 @@ describe('FirebaseListFactory', () => {
 
 
     describe('onChildAdded', () => {
+
       it('should add the child after the prevKey', () => {
-        expect(onChildAdded([val1, val2], val3, 'key1')).toEqual([val1, val3, val2]);
+        expect(onChildAdded([val1, val2], val3, toKey, 'key1')).toEqual([val1, val3, val2]);
       });
 
 
       it('should not mutate the input array', () => {
         var inputArr = [val1];
-        expect(onChildAdded(inputArr, val2, 'key1')).not.toEqual(inputArr);
+        expect(onChildAdded(inputArr, val2, toKey, 'key1')).not.toEqual(inputArr);
       });
     });
 
 
     describe('onChildChanged', () => {
+
       it('should move the child after the specified prevKey', () => {
-        expect(onChildChanged([val1, val2], val1, 'key2')).toEqual([val2, val1]);
+        expect(onChildChanged([val1, val2], val1, toKey, 'key2')).toEqual([val2, val1]);
       });
 
 
       it('should move the child to the beginning if prevKey is null', () => {
         expect(
-          onChildChanged([val1, val2, val3], val2, null)
+          onChildChanged([val1, val2, val3], val2, toKey, null)
         ).toEqual([val2, val1, val3]);
       });
 
       it('should not duplicate the first item if it is the one that changed', () => {
         expect(
-          onChildChanged([val1, val2, val3], val1, null)
+          onChildChanged([val1, val2, val3], val1, toKey, null)
         ).not.toEqual([val1, val1, val2, val3]);
       });
 
       it('should not mutate the input array', () => {
         var inputArr = [val1, val2];
-        expect(onChildChanged(inputArr, val1, 'key2')).not.toEqual(inputArr);
+        expect(onChildChanged(inputArr, val1, toKey, 'key2')).not.toEqual(inputArr);
       });
 
 
       it('should update the child', () => {
         expect(
-          onChildUpdated([val1, val2, val3], { key: 'newkey' }, 'key1').map(v => v.key)
+          onChildUpdated([val1, val2, val3], { key: 'newkey' }, toKey, 'key1').map(v => v.key)
         ).toEqual(['key1', 'newkey', 'key3']);
       });
     });
 
 
     describe('onChildRemoved', () => {
-      var val1: any;
-      var val2: any;
-      var val3: any;
-
-      beforeEach(() => {
-        val1 = { key: () => 'key1' };
-        val2 = { key: () => 'key2' };
-        val3 = { key: () => 'key3' };
-      });
-
 
       it('should remove the child', () => {
         expect(
-          onChildRemoved([val1, val2, val3], val2)
+          onChildRemoved([val1, val2, val3], val2, toKey)
         ).toEqual([val1, val3]);
       });
     });

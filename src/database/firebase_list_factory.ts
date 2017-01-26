@@ -108,6 +108,8 @@ export function FirebaseListFactory (
  * is loaded, the observable starts emitting values.
  */
 function firebaseListObservable(ref: firebase.database.Reference | firebase.database.Query, {preserveSnapshot}: FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
+  const toValue = preserveSnapshot ? (snapshot => snapshot) : utils.unwrapMapFn;
+  const toKey = preserveSnapshot ? (value => value.key) : (value => value.$key);
   // Keep track of callback handles for calling ref.off(event, handle)
   const handles = [];
   const listObs = new FirebaseListObservable(ref, (obs: Observer<any[]>) => {
@@ -115,7 +117,7 @@ function firebaseListObservable(ref: firebase.database.Reference | firebase.data
       .then((snap) => {
         let initialArray = [];
         snap.forEach(child => {
-          initialArray.push(child)
+          initialArray.push(toValue(child))
         });
         return initialArray;
       })
@@ -127,7 +129,7 @@ function firebaseListObservable(ref: firebase.database.Reference | firebase.data
         if (!isInitiallyEmpty) {
           // The last key in the initial array tells us where
           // to begin listening in realtime
-          lastKey = initialArray[initialArray.length - 1].key;
+          lastKey = toKey(initialArray[initialArray.length - 1]);
         }
 
         const addFn = ref.on('child_added', (child: any, prevKey: string) => {
@@ -137,18 +139,18 @@ function firebaseListObservable(ref: firebase.database.Reference | firebase.data
           if (!isInitiallyEmpty && !hasInitialLoad) {
             if (child.key === lastKey) {
               hasInitialLoad = true;
-              obs.next(preserveSnapshot ? initialArray : initialArray.map(utils.unwrapMapFn));
+              obs.next(initialArray);
               return;
             }
           }
 
           if (hasInitialLoad) {
-            initialArray = onChildAdded(initialArray, child, prevKey);
+            initialArray = onChildAdded(initialArray, toValue(child), toKey, prevKey);
           }
 
           // only emit the array after the initial load
           if (hasInitialLoad) {
-            obs.next(preserveSnapshot ? initialArray : initialArray.map(utils.unwrapMapFn));
+            obs.next(initialArray);
           }
         }, err => {
           if (err) { obs.error(err); obs.complete(); }
@@ -157,9 +159,9 @@ function firebaseListObservable(ref: firebase.database.Reference | firebase.data
         handles.push({ event: 'child_added', handle: addFn });
 
         let remFn = ref.on('child_removed', (child: any) => {
-          initialArray = onChildRemoved(initialArray, child)
+          initialArray = onChildRemoved(initialArray, toValue(child), toKey);
           if (hasInitialLoad) {
-            obs.next(preserveSnapshot ? initialArray : initialArray.map(utils.unwrapMapFn));
+            obs.next(initialArray);
           }
         }, err => {
           if (err) { obs.error(err); obs.complete(); }
@@ -167,10 +169,10 @@ function firebaseListObservable(ref: firebase.database.Reference | firebase.data
         handles.push({ event: 'child_removed', handle: remFn });
 
         let chgFn = ref.on('child_changed', (child: any, prevKey: string) => {
-          initialArray = onChildChanged(initialArray, child, prevKey)
+          initialArray = onChildChanged(initialArray, toValue(child), toKey, prevKey)
           if (hasInitialLoad) {
             // This also manages when the only change is prevKey change
-            obs.next(preserveSnapshot ? initialArray : initialArray.map(utils.unwrapMapFn));
+            obs.next(initialArray);
           }
         }, err => {
           if (err) { obs.error(err); obs.complete(); }
@@ -199,49 +201,51 @@ function firebaseListObservable(ref: firebase.database.Reference | firebase.data
   return observeOn.call(listObs, new utils.ZoneScheduler(Zone.current));
 }
 
-export function onChildAdded(arr:any[], child:any, prevKey:string): any[] {
+export function onChildAdded(arr:any[], child:any, toKey:(element:any)=>string, prevKey:string): any[] {
   if (!arr.length) {
     return [child];
   }
-
   return arr.reduce((accumulator:firebase.database.DataSnapshot[], curr:firebase.database.DataSnapshot, i:number) => {
     if (!prevKey && i===0) {
       accumulator.push(child);
     }
     accumulator.push(curr);
-    if (prevKey && prevKey === curr.key) {
+    if (prevKey && prevKey === toKey(curr)) {
       accumulator.push(child);
     }
     return accumulator;
   }, []);
 }
 
-export function onChildChanged(arr:any[], child:any, prevKey:string): any[] {
+export function onChildChanged(arr:any[], child:any, toKey:(element:any)=>string, prevKey:string): any[] {
+  const childKey = toKey(child);
   return arr.reduce((accumulator:any[], val:any, i:number) => {
+    const valKey = toKey(val);
     if (!prevKey && i==0) {
       accumulator.push(child);
-      if (val.key !== child.key) {
+      if (valKey !== childKey) {
         accumulator.push(val);
       }
-    } else if(val.key === prevKey) {
+    } else if(valKey === prevKey) {
       accumulator.push(val);
       accumulator.push(child);
-    } else if (val.key !== child.key) {
+    } else if (valKey !== childKey) {
       accumulator.push(val);
     }
     return accumulator;
   }, []);
 }
 
-export function onChildRemoved(arr:any[], child:any): any[] {
-  return arr.filter(c => c.key !== child.key);
+export function onChildRemoved(arr:any[], child:any, toKey:(element:any)=>string): any[] {
+  let childKey = toKey(child);
+  return arr.filter(c => toKey(c) !== childKey);
 }
 
-export function onChildUpdated(arr:any[], child:any, prevKey:string): any[] {
+export function onChildUpdated(arr:any[], child:any, toKey:(element:any)=>string, prevKey:string): any[] {
   return arr.map((v, i, arr) => {
     if(!prevKey && !i) {
       return child;
-    } else if (i > 0 && arr[i-1].key === prevKey) {
+    } else if (i > 0 && toKey(arr[i-1]) === prevKey) {
       return child;
     } else {
       return v;
