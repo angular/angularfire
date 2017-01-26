@@ -2,6 +2,10 @@
 # [2.0.0-beta.7](https://github.com/angular/angularfire2/compare/2.0.0-beta.6...v2.0.0-beta.7) (2017-01-13)
 
 
+### Breaking changes
+
+* **auth:** Remove `FirebaseAuth` in favor of `AngularFireAuth`. ([d422e6])(https://github.com/angular/angularfire2/commit/d422e62b46a80d9fb12c9a9e2cf1cf2f7db04dd3)
+
 ### Bug Fixes
 
 * **aot:** Remove AuthBackend param for AOT support ([f875360](https://github.com/angular/angularfire2/commit/f875360))
@@ -11,7 +15,6 @@
 * **database:** Removed unused query option ([9cbc59b](https://github.com/angular/angularfire2/commit/9cbc59b)), closes [#706](https://github.com/angular/angularfire2/issues/706)
 * **list:** Fix FirebaseListObservable emit as array bug [#574](https://github.com/angular/angularfire2/issues/574) ([ce3de04](https://github.com/angular/angularfire2/commit/ce3de04))
 * **module:** Conditionally pass app name ([8427009](https://github.com/angular/angularfire2/commit/8427009))
-
 
 ### Features
 
