@@ -477,6 +477,63 @@ describe('FirebaseListFactory', () => {
     });
 
 
+    it('should support null for equalTo queries', (done: any) => {
+
+      questions.$ref.ref.set({
+        val1,
+        val2: Object.assign({}, val2, { extra: true }),
+        val3: Object.assign({}, val3, { extra: true }),
+      })
+      .then(() => {
+
+        var query = FirebaseListFactory(questions.$ref.ref, {
+          query: {
+            orderByChild: "extra",
+            equalTo: null
+          }
+        });
+
+        take.call(query, 1).subscribe(
+          (list) => {
+            expect(list.length).toEqual(1);
+            expect(list[0].$key).toEqual("val1");
+            done();
+          },
+          done.fail
+        );
+      });
+    });
+
+
+    it('should support null for startAt/endAt queries', (done: any) => {
+
+      questions.$ref.ref.set({
+        val1,
+        val2: Object.assign({}, val2, { extra: true }),
+        val3: Object.assign({}, val3, { extra: true }),
+      })
+      .then(() => {
+
+        var query = FirebaseListFactory(questions.$ref.ref, {
+          query: {
+            orderByChild: "extra",
+            startAt: null,
+            endAt: null
+          }
+        });
+
+        take.call(query, 1).subscribe(
+          (list) => {
+            expect(list.length).toEqual(1);
+            expect(list[0].$key).toEqual("val1");
+            done();
+          },
+          done.fail
+        );
+      });
+    });
+
+
     it('should call off on all events when disposed', (done: any) => {
       const questionRef = firebase.database().ref().child('questions');
       var firebaseSpy = spyOn(questionRef, 'off').and.callThrough();
