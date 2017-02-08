@@ -263,6 +263,7 @@ Update the service with the following code.
 
 import { Injectable } from '@angular/core';
 import { AuthProviders, AngularFireAuth, FirebaseAuthState, AuthMethods } from 'angularfire2';
+import * as firebase from 'firebase';
 
 @Injectable()
 export class AuthService {
@@ -360,6 +361,8 @@ Update your `home.html` to add a login button. Your `home.html` should look like
     {{item | json}}
   </ion-item>
   </ion-list>
+  
+  <p>{{displayName || 'On Successful Authentication, shows Facebook Display Name'}}</p>
 
   <button ion-button outline (click)="signInWithFacebook()">Facebook</button>
 </ion-content>
@@ -384,6 +387,7 @@ import { AngularFire, FirebaseListObservable } from 'angularfire2';
 export class HomePage {
 
   items: FirebaseListObservable<any[]>;
+  displayName = '';
 
   constructor(public navCtrl: NavController,af: AngularFire,private _auth: AuthService) {
     this.items = af.database.list('/items');
@@ -395,7 +399,8 @@ export class HomePage {
   }
 
   private onSignInSuccess(): void {
-    console.log("Facebook display name ",this._auth.displayName());
+    this.displayName = this._auth.displayName();
+    console.log("Facebook display name ",this.displayName);
   }
 
 }
@@ -538,3 +543,31 @@ C:\projects\Ionic_AngularFire2_Project> ionic run android
 ```
 
 Once the App launches click on the Facebook login button and it should open up the native facebook app for authentication and once your enter credentials and gets succesfully authenticated, it should redirect you back to the home page.
+
+You should see your Facebook display name on Home page. 
+
+***Accessing Console Window while testing app on Mobile Phone.***
+
+Accessing the console window while running the app in browser is quite straighforward, but what if you want to access the console while testing your app on Mobile phone. Now that's pretty easy.
+
+Ensure that your mobile phone is connected to your computer and you've executed the following command (Basically your app is running on your mobile phone)
+```
+ionic run android
+```
+Open a new tab in your chrome browser and in the URL bar, type 
+
+chrome://inspect.
+
+This will open a new window and show you the connected devices on your computer. 
+
+Now click on the inspect link under the device name of your mobile phone  and it will open up a new browser window.
+
+Not only you can interact with your application, but you get your console window as well.
+
+Although the link [here](http://ionicframework.com/docs/v2/native/facebook/) talks about configuring and installing Facebook plugin, double check the below items to avoid any basic issues.
+
+> 1. In your firebase console, under Authetnication section, where you enable Facebook as Sign-In provider, the App ID and App Secret are correctly copied from your Facebook App, which is available [here](https://developers.facebook.com/apps/).
+
+> 2. The firbease console page also provides _OAuth redirect URI_ for Facebook app configuration. You need to copy this URI and go to your Facebook App Dashboard page and then under Products --> Facebook Login --> Settings. You need to paste this copied URI to Valid OAuth redirect URIs input box and click on Save changes to ensure Firebase App and Facebook App can talk to each other. 
+
+> 3. You can find more information [here](https://firebase.google.com/docs/auth/web/facebook-login).
