@@ -184,6 +184,11 @@ function firebaseListObservable(ref: firebase.database.Reference | firebase.data
           obs.next(initialArray);
           hasInitialLoad = true;
         }
+      }, err => {
+        if (err) { 
+          obs.error(err); 
+          obs.complete(); 
+        }
       });
 
     return () => {
