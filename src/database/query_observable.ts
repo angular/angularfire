@@ -5,6 +5,7 @@ import { Observer } from 'rxjs/Observer';
 import { combineLatest } from 'rxjs/operator/combineLatest';
 import { merge } from 'rxjs/operator/merge';
 import { map } from 'rxjs/operator/map';
+import { auditTime } from 'rxjs/operator/auditTime';
 import {
   Query,
   ScalarQuery,
@@ -16,20 +17,24 @@ import {
 } from '../interfaces';
 import { hasKey, isNil } from '../utils';
 
-export function observeQuery(query: Query): Observable<ScalarQuery> {
+export function observeQuery(query: Query, audit: boolean = true): Observable<ScalarQuery> {
   if (isNil(query)) {
     return observableOf(null);
   }
 
   return Observable.create((observer: Observer<ScalarQuery>) => {
 
-    let obs = getOrderObservables(query) as Observable<OrderBySelection>;
-    combineLatest.call(obs,
-        getStartAtObservable(query),
-        getEndAtObservable(query),
-        getEqualToObservable(query),
-        getLimitToObservables(query)
-      )
+    let combined = combineLatest.call(
+      getOrderObservables(query),
+      getStartAtObservable(query),
+      getEndAtObservable(query),
+      getEqualToObservable(query),
+      getLimitToObservables(query)
+    );
+    if (audit) {
+      combined = auditTime.call(combined, 0);
+    }
+    combined
       .subscribe(([orderBy, startAt, endAt, equalTo, limitTo]
         : [OrderBySelection, Primitive, Primitive, Primitive, LimitToSelection]) => {
 
@@ -80,7 +85,7 @@ export function observeQuery(query: Query): Observable<ScalarQuery> {
   });
 }
 
-export function getOrderObservables(query: Query): Observable<OrderBySelection> | Observable<OrderBySelection | Observable<OrderBySelection>> {
+export function getOrderObservables(query: Query): Observable<OrderBySelection> {
   var observables = ['orderByChild', 'orderByKey', 'orderByValue', 'orderByPriority']
     .map((key: string, option: OrderByOptions) => {
       return ({ key, option })
@@ -93,7 +98,7 @@ export function getOrderObservables(query: Query): Observable<OrderBySelection> 
   if (observables.length === 1) {
     return observables[0];
   } else if (observables.length > 1) {
-    return merge.call(observables[0], observables.slice(1));
+    return merge.apply(observables[0], observables.slice(1));
   } else {
     return new Observable<OrderBySelection>(subscriber => {
       subscriber.next(null);
@@ -101,7 +106,7 @@ export function getOrderObservables(query: Query): Observable<OrderBySelection> 
   }
 }
 
-export function getLimitToObservables(query: Query): Observable<LimitToSelection> | Observable<LimitToSelection | Observable<LimitToSelection>> {
+export function getLimitToObservables(query: Query): Observable<LimitToSelection> {
   var observables = ['limitToFirst', 'limitToLast']
     .map((key: string, option: LimitToOptions) => ({ key, option }))
     .filter(({key, option}: { key: string, option: LimitToOptions }) => !isNil(query[key]))
@@ -110,7 +115,7 @@ export function getLimitToObservables(query: Query): Observable<LimitToSelection
   if (observables.length === 1) {
     return observables[0];
   } else if (observables.length > 1) {
-    const mergedObs = merge.call(observables[0], observables.slice(1));
+    const mergedObs = merge.apply(observables[0], observables.slice(1));
     return mergedObs;
   } else {
     return new Observable<LimitToSelection>(subscriber => {
