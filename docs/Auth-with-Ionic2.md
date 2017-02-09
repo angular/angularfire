@@ -400,7 +400,7 @@ export class HomePage {
 
   private onSignInSuccess(): void {
     this.displayName = this._auth.displayName();
-    console.log("Facebook display name ",this.displayName);
+    console.log('Facebook display name ',this.displayName);
   }
 
 }
@@ -546,28 +546,21 @@ Once the App launches click on the Facebook login button and it should open up t
 
 You should see your Facebook display name on Home page. 
 
-***Accessing Console Window while testing app on Mobile Phone.***
-
-Accessing the console window while running the app in browser is quite straighforward, but what if you want to access the console while testing your app on Mobile phone. Now that's pretty easy.
-
-Ensure that your mobile phone is connected to your computer and you've executed the following command (Basically your app is running on your mobile phone)
+Ensure that your mobile phone is connected to your computer. You've executed the following command, and your app is now running on your device.
 ```
 ionic run android
 ```
-Open a new tab in your chrome browser and in the URL bar, type 
+Open a new tab in your chrome browser and in the URL bar type: chrome://inspect. 
 
-chrome://inspect.
+This will open a new window and show your computer's connected devices. 
 
-This will open a new window and show you the connected devices on your computer. 
-
-Now click on the inspect link under the device name of your mobile phone  and it will open up a new browser window.
-
-Not only you can interact with your application, but you get your console window as well.
+Now click on the inspect link under the device name of your mobile phone and it will open up a new browser window.
+You can interact with your application and see your console window.
 
 Although the link [here](http://ionicframework.com/docs/v2/native/facebook/) talks about configuring and installing Facebook plugin, double check the below items to avoid any basic issues.
 
-> 1. In your firebase console, under Authetnication section, where you enable Facebook as Sign-In provider, the App ID and App Secret are correctly copied from your Facebook App, which is available [here](https://developers.facebook.com/apps/).
+> 1. In the Firebase console under the Authentication section, go to where you enable Facebook as a Sign-In provider. The App ID and App Secret are correctly copied from your Facebook App found [here](https://developers.facebook.com/apps/).
 
-> 2. The firbease console page also provides _OAuth redirect URI_ for Facebook app configuration. You need to copy this URI and go to your Facebook App Dashboard page and then under Products --> Facebook Login --> Settings. You need to paste this copied URI to Valid OAuth redirect URIs input box and click on Save changes to ensure Firebase App and Facebook App can talk to each other. 
+> 2. The Firbease console also provides `OAuth redirect URI` for Facebook app configuration. Copy this URL and go to the Facebook App Dashboard. Then under `Product --> Facebook Login --> Settings, paste the copied URI to Valid OAuth redirect URIs. Click Save Changes.
 
 > 3. You can find more information [here](https://firebase.google.com/docs/auth/web/facebook-login).
