@@ -391,6 +391,32 @@ describe('FirebaseListFactory', () => {
     });
 
 
+    it('should be resistant to non-asynchronous child_added quirks', (done: any) => {
+
+      // If push is called (or set or update, too, I guess) immediately after
+      // an on or once listener is added, it appears that the on or once
+      // child_added listeners are invoked immediately - i.e. not
+      // asynchronously - and the list implementation needs to support that.
+
+      questions.$ref.ref.push({ number: 1 })
+        .then(() => {
+          let calls = [];
+          questions.$ref.ref.once('child_added', (snap) => calls.push('child_added:' + snap.val().number));
+          skipAndTake(questions).subscribe(
+            (list) => {
+              expect(calls).toEqual(['child_added:2', 'pushed']);
+              expect(list.map(i => i.number)).toEqual([1, 2]);
+              done();
+            },
+            done.fail
+          );
+          questions.push({ number: 2 });
+          calls.push('pushed');
+        })
+        .catch(done.fail);
+    });
+
+
     it('should emit a new value when a child moves', (done: any) => {
        let question = skipAndTake(questions, 1, 2)
        subscription = _do.call(question, (data: any) => {
