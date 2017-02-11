@@ -70,7 +70,11 @@ export function FirebaseListFactory (
 
       // check startAt
       if (utils.hasKey(query, "startAt")) {
+        if (utils.hasKey(query.startAt, "value")) {
+          queried = queried.startAt(query.startAt.value, query.startAt.key);
+        } else {
           queried = queried.startAt(query.startAt);
+        }
       }
 
       if (utils.hasKey(query, "endAt")) {
@@ -185,9 +189,9 @@ function firebaseListObservable(ref: firebase.database.Reference | firebase.data
           hasInitialLoad = true;
         }
       }, err => {
-        if (err) { 
-          obs.error(err); 
-          obs.complete(); 
+        if (err) {
+          obs.error(err);
+          obs.complete();
         }
       });
 
