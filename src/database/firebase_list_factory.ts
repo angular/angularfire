@@ -112,88 +112,71 @@ export function FirebaseListFactory (
  * is loaded, the observable starts emitting values.
  */
 function firebaseListObservable(ref: firebase.database.Reference | firebase.database.Query, {preserveSnapshot}: FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
+
   const toValue = preserveSnapshot ? (snapshot => snapshot) : utils.unwrapMapFn;
   const toKey = preserveSnapshot ? (value => value.key) : (value => value.$key);
-  // Keep track of callback handles for calling ref.off(event, handle)
-  const handles = [];
+
   const listObs = new FirebaseListObservable(ref, (obs: Observer<any[]>) => {
-    ref.once('value')
-      .then((snap) => {
-        let initialArray = [];
-        snap.forEach(child => {
-          initialArray.push(toValue(child))
-        });
-        return initialArray;
-      })
-      .then((initialArray) => {
-        const isInitiallyEmpty = initialArray.length === 0;
-        let hasInitialLoad = false;
-        let lastKey;
 
-        if (!isInitiallyEmpty) {
-          // The last key in the initial array tells us where
-          // to begin listening in realtime
-          lastKey = toKey(initialArray[initialArray.length - 1]);
+    // Keep track of callback handles for calling ref.off(event, handle)
+    const handles = [];
+    let hasLoaded = false;
+    let lastLoadedKey: string = null;
+    let array = [];
+
+    // The list children are always added to, removed from and changed within
+    // the array using the child_added/removed/changed events. The value event
+    // is only used to determine when the initial load is complete.
+
+    ref.once('value', (snap: any) => {
+      if (snap.exists()) {
+        snap.forEach((child: any) => {
+          lastLoadedKey = child.key;
+        });
+        if (array.find((child: any) => toKey(child) === lastLoadedKey)) {
+          hasLoaded = true;
+          obs.next(array);
         }
+      } else {
+        hasLoaded = true;
+        obs.next(array);
+      }
+    }, err => {
+      if (err) { obs.error(err); obs.complete(); }
+    });
 
-        const addFn = ref.on('child_added', (child: any, prevKey: string) => {
-          // If the initial load has not been set and the current key is
-          // the last key of the initialArray, we know we have hit the
-          // initial load
-          if (!isInitiallyEmpty && !hasInitialLoad) {
-            if (child.key === lastKey) {
-              hasInitialLoad = true;
-              obs.next(initialArray);
-              return;
-            }
-          }
+    const addFn = ref.on('child_added', (child: any, prevKey: string) => {
+      array = onChildAdded(array, toValue(child), toKey, prevKey);
+      if (hasLoaded) {
+        obs.next(array);
+      } else if (child.key === lastLoadedKey) {
+        hasLoaded = true;
+        obs.next(array);
+      }
+    }, err => {
+      if (err) { obs.error(err); obs.complete(); }
+    });
+    handles.push({ event: 'child_added', handle: addFn });
 
-          if (hasInitialLoad) {
-            initialArray = onChildAdded(initialArray, toValue(child), toKey, prevKey);
-          }
+    let remFn = ref.on('child_removed', (child: any) => {
+      array = onChildRemoved(array, toValue(child), toKey);
+      if (hasLoaded) {
+        obs.next(array);
+      }
+    }, err => {
+      if (err) { obs.error(err); obs.complete(); }
+    });
+    handles.push({ event: 'child_removed', handle: remFn });
 
-          // only emit the array after the initial load
-          if (hasInitialLoad) {
-            obs.next(initialArray);
-          }
-        }, err => {
-          if (err) { obs.error(err); obs.complete(); }
-        });
-
-        handles.push({ event: 'child_added', handle: addFn });
-
-        let remFn = ref.on('child_removed', (child: any) => {
-          initialArray = onChildRemoved(initialArray, toValue(child), toKey);
-          if (hasInitialLoad) {
-            obs.next(initialArray);
-          }
-        }, err => {
-          if (err) { obs.error(err); obs.complete(); }
-        });
-        handles.push({ event: 'child_removed', handle: remFn });
-
-        let chgFn = ref.on('child_changed', (child: any, prevKey: string) => {
-          initialArray = onChildChanged(initialArray, toValue(child), toKey, prevKey)
-          if (hasInitialLoad) {
-            // This also manages when the only change is prevKey change
-            obs.next(initialArray);
-          }
-        }, err => {
-          if (err) { obs.error(err); obs.complete(); }
-        });
-        handles.push({ event: 'child_changed', handle: chgFn });
-
-        // If empty emit the array
-        if (isInitiallyEmpty) {
-          obs.next(initialArray);
-          hasInitialLoad = true;
-        }
-      }, err => {
-        if (err) {
-          obs.error(err);
-          obs.complete();
-        }
-      });
+    let chgFn = ref.on('child_changed', (child: any, prevKey: string) => {
+      array = onChildChanged(array, toValue(child), toKey, prevKey);
+      if (hasLoaded) {
+        obs.next(array);
+      }
+    }, err => {
+      if (err) { obs.error(err); obs.complete(); }
+    });
+    handles.push({ event: 'child_changed', handle: chgFn });
 
     return () => {
       // Loop through callback handles and dispose of each event with handle

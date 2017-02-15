@@ -431,6 +431,55 @@ describe('query combinations', () => {
 });
 
 
+describe('null values', () => {
+
+  it('should build an equalTo() query with a null scalar value', (done: any) => {
+    scalarQueryTest({
+      orderByChild: 'height',
+      equalTo: null
+    }, done);
+  });
+
+  it('should build a startAt() query with a null scalar value', (done: any) => {
+    scalarQueryTest({
+      orderByChild: 'height',
+      startAt: null
+    }, done);
+  });
+
+  it('should build an endAt() query with a null scalar value', (done: any) => {
+    scalarQueryTest({
+      orderByChild: 'height',
+      endAt: null
+    }, done);
+  });
+
+  it('should build an equalTo() query with a null observable value', (done: any) => {
+    const query = {
+      orderByChild: 'height',
+      equalTo: new Subject()
+    };
+    observableQueryTest(query, { equalTo: null }, done);
+  });
+
+  it('should build a startAt() query with a null observable value', (done: any) => {
+    const query = {
+      orderByChild: 'height',
+      startAt: new Subject()
+    };
+    observableQueryTest(query, { startAt: null }, done);
+  });
+
+  it('should build an endAt() query with a null observable value', (done: any) => {
+    const query = {
+      orderByChild: 'height',
+      endAt: new Subject()
+    };
+    observableQueryTest(query, { endAt: null }, done);
+  });
+
+});
+
 describe('audited queries', () => {
 
   it('should immediately emit if not audited', () => {

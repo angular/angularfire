@@ -391,6 +391,32 @@ describe('FirebaseListFactory', () => {
     });
 
 
+    it('should be resistant to non-asynchronous child_added quirks', (done: any) => {
+
+      // If push is called (or set or update, too, I guess) immediately after
+      // an on or once listener is added, it appears that the on or once
+      // child_added listeners are invoked immediately - i.e. not
+      // asynchronously - and the list implementation needs to support that.
+
+      questions.$ref.ref.push({ number: 1 })
+        .then(() => {
+          let calls = [];
+          questions.$ref.ref.once('child_added', (snap) => calls.push('child_added:' + snap.val().number));
+          skipAndTake(questions).subscribe(
+            (list) => {
+              expect(calls).toEqual(['child_added:2', 'pushed']);
+              expect(list.map(i => i.number)).toEqual([1, 2]);
+              done();
+            },
+            done.fail
+          );
+          questions.push({ number: 2 });
+          calls.push('pushed');
+        })
+        .catch(done.fail);
+    });
+
+
     it('should emit a new value when a child moves', (done: any) => {
      let question = skipAndTake(questions, 1, 2)
      subscription = _do.call(question, (data: any) => {
@@ -474,6 +500,63 @@ describe('FirebaseListFactory', () => {
         done.fail
       );
       questionsSnapshotted.push({ name: 'alice' });
+    });
+
+
+    it('should support null for equalTo queries', (done: any) => {
+
+      questions.$ref.ref.set({
+        val1,
+        val2: Object.assign({}, val2, { extra: true }),
+        val3: Object.assign({}, val3, { extra: true }),
+      })
+      .then(() => {
+
+        var query = FirebaseListFactory(questions.$ref.ref, {
+          query: {
+            orderByChild: "extra",
+            equalTo: null
+          }
+        });
+
+        take.call(query, 1).subscribe(
+          (list) => {
+            expect(list.length).toEqual(1);
+            expect(list[0].$key).toEqual("val1");
+            done();
+          },
+          done.fail
+        );
+      });
+    });
+
+
+    it('should support null for startAt/endAt queries', (done: any) => {
+
+      questions.$ref.ref.set({
+        val1,
+        val2: Object.assign({}, val2, { extra: true }),
+        val3: Object.assign({}, val3, { extra: true }),
+      })
+      .then(() => {
+
+        var query = FirebaseListFactory(questions.$ref.ref, {
+          query: {
+            orderByChild: "extra",
+            startAt: null,
+            endAt: null
+          }
+        });
+
+        take.call(query, 1).subscribe(
+          (list) => {
+            expect(list.length).toEqual(1);
+            expect(list[0].$key).toEqual("val1");
+            done();
+          },
+          done.fail
+        );
+      });
     });
 
 
