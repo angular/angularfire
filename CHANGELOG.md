@@ -1,3 +1,24 @@
+<a name="2.0.0-beta.8"></a>
+# [2.0.0-beta.8](https://github.com/angular/angularfire2/compare/2.0.0-beta7...v2.0.0-beta.8) (2017-02-16)
+
+
+### Bug Fixes
+
+* **database:** allow null values for equalTo, etc. ([#809](https://github.com/angular/angularfire2/issues/809)) ([561e7b7](https://github.com/angular/angularfire2/commit/561e7b7))
+* **database:** call apply instead of call ([7a85bd2](https://github.com/angular/angularfire2/commit/7a85bd2))
+* **database:** retrieve initial list content once ([#820](https://github.com/angular/angularfire2/issues/820)) ([5c5ff7b](https://github.com/angular/angularfire2/commit/5c5ff7b)), closes [#819](https://github.com/angular/angularfire2/issues/819)
+* **database:** store unwrapped snapshots ([9f3c47b](https://github.com/angular/angularfire2/commit/9f3c47b)), closes [#791](https://github.com/angular/angularfire2/issues/791)
+* **utils:** Make object $key and $exists properties non-enumerable ([253401f](https://github.com/angular/angularfire2/commit/253401f))
+* **utils:** Minor formatting improvement ([fc3774a](https://github.com/angular/angularfire2/commit/fc3774a))
+
+
+### Features
+
+* **database:** adds auditTime for queries ([f9cb5c3](https://github.com/angular/angularfire2/commit/f9cb5c3)), closes [#389](https://github.com/angular/angularfire2/issues/389) [#770](https://github.com/angular/angularfire2/issues/770)
+* **database:** support the optional startAt key ([#821](https://github.com/angular/angularfire2/issues/821)) ([c469b11](https://github.com/angular/angularfire2/commit/c469b11))
+
+
+
 <a name="2.0.0-beta.7"></a>
 # [2.0.0-beta.7](https://github.com/angular/angularfire2/compare/2.0.0-beta.6...v2.0.0-beta.7) (2017-01-13)
 
