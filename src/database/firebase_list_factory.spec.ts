@@ -418,15 +418,15 @@ describe('FirebaseListFactory', () => {
 
 
     it('should emit a new value when a child moves', (done: any) => {
-       let question = skipAndTake(questions, 1, 2)
-       subscription = _do.call(question, (data: any) => {
-          expect(data.length).toBe(2);
-          expect(data[0].push2).toBe(true);
-          expect(data[1].push1).toBe(true);
-        })
-        .subscribe(() => {
-          done();
-        }, done.fail);
+     let question = skipAndTake(questions, 1, 2)
+     subscription = _do.call(question, (data: any) => {
+        expect(data.length).toBe(2);
+        expect(data[0].push2).toBe(true);
+        expect(data[1].push1).toBe(true);
+      })
+      .subscribe(() => {
+        done();
+      }, done.fail);
 
       var child1 = ref.push({ push1: true }, () => {
         ref.push({ push2: true }, () => {
@@ -717,6 +717,46 @@ describe('FirebaseListFactory', () => {
       it('should work with the last item in the list', () => {
         keyToRemove = lastKey;
       });
+    });
+
+    describe('startAt(value, key)', () => {
+
+      it('should support the optional key parameter to startAt', (done) => {
+
+        questions.$ref.ref.set({
+          val1: Object.assign({}, val1, { data: 0 }),
+          val2: Object.assign({}, val2, { data: 0 }),
+          val3: Object.assign({}, val3, { data: 0 })
+        })
+        .then(() => {
+
+          let query1 = FirebaseListFactory(`${rootDatabaseUrl}/questions`, {
+            query: {
+              orderByChild: 'data',
+              startAt: { value: 0 }
+            }
+          });
+          query1 = take.call(query1, 1);
+          query1 = toPromise.call(query1);
+
+          let query2 = FirebaseListFactory(`${rootDatabaseUrl}/questions`, {
+            query: {
+              orderByChild: 'data',
+              startAt: { value: 0, key: 'val2' }
+            }
+          });
+          query2 = take.call(query2, 1);
+          query2 = toPromise.call(query2);
+
+          Promise.all([query1, query2]).then(([list1, list2]) => {
+            expect(list1.map(i => i.$key)).toEqual(['val1', 'val2', 'val3']);
+            expect(list2.map(i => i.$key)).toEqual(['val2', 'val3']);
+            done();
+          });
+        })
+        .catch(done.fail);
+      });
+
     });
   });
 });

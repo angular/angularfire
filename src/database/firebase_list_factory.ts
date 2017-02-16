@@ -70,7 +70,11 @@ export function FirebaseListFactory (
 
       // check startAt
       if (utils.hasKey(query, "startAt")) {
+        if (utils.hasKey(query.startAt, "value")) {
+          queried = queried.startAt(query.startAt.value, query.startAt.key);
+        } else {
           queried = queried.startAt(query.startAt);
+        }
       }
 
       if (utils.hasKey(query, "endAt")) {

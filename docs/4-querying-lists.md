@@ -28,8 +28,10 @@ const queryObservable = af.database.list('/items', {
 | `equalTo` | Limit list to items that contain certain value. |
 | `limitToFirst` | Sets the maximum number of items to return from the beginning of the ordered list of results. |
 | `limitToLast` | Sets the maximum number of items to return from the end of the ordered list of results. |
-| `startAt` | Return items greater than or equal to the specified key or value, depending on the order-by method chosen. |
+| `startAt` <sup>1</sup> | Return items greater than or equal to the specified key or value, depending on the order-by method chosen. |
 | `endAt` | Return items less than or equal to the specified key or value, depending on the order-by method chosen. |
+
+<sup>1</sup> The Firebase SDK supports [an optional `key` parameter](https://firebase.google.com/docs/reference/js/firebase.database.Reference#startAt) when ordering by child, value, or priority. You can specify the `key` parameter using `startAt: { value: 'some-value', key: 'some-key' }`
 
 ## Invalid query combinations
 
