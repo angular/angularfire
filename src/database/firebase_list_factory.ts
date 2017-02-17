@@ -6,7 +6,7 @@ import { observeOn } from 'rxjs/operator/observeOn';
 import { observeQuery } from './query_observable';
 import { Query, FirebaseListFactoryOpts } from '../interfaces';
 import * as utils from '../utils';
-import { mergeMap } from 'rxjs/operator/mergeMap';
+import { switchMap } from 'rxjs/operator/switchMap';
 import { map } from 'rxjs/operator/map';
 
 export function FirebaseListFactory (
@@ -32,7 +32,7 @@ export function FirebaseListFactory (
 
   const queryObs = observeQuery(query);
   return new FirebaseListObservable(ref, subscriber => {
-    let sub = mergeMap.call(map.call(queryObs, query => {
+    let sub = switchMap.call(map.call(queryObs, query => {
       let queried: firebase.database.Query = ref;
       // Only apply the populated keys
       // apply ordering and available querying options
