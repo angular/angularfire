@@ -25,8 +25,10 @@ import { Query, AFUnwrappedDataSnapshot } from '../interfaces';
 import { Subscription, Observable, Subject } from 'rxjs';
 import { COMMON_CONFIG, ANON_AUTH_CONFIG } from '../test-config';
 import { _do } from 'rxjs/operator/do';
+import { map } from 'rxjs/operator/map';
 import { skip } from 'rxjs/operator/skip';
 import { take } from 'rxjs/operator/take';
+import { toArray } from 'rxjs/operator/toArray';
 import { toPromise } from 'rxjs/operator/toPromise';
 
 const rootDatabaseUrl = COMMON_CONFIG.databaseURL;
@@ -758,6 +760,60 @@ describe('FirebaseListFactory', () => {
       });
 
     });
+
+    describe('observable queries (issue #830)', () => {
+
+      it('should not emit the results of previous queries', (done) => {
+
+        questions.$ref.ref.set({
+          key1: { even: false, value: 1 },
+          key2: { even: true, value: 2 }
+        })
+        .then(() => {
+
+          let subject = new Subject<boolean>();
+          let query = FirebaseListFactory(`${rootDatabaseUrl}/questions`, {
+            query: {
+              orderByChild: 'even',
+              equalTo: subject
+            }
+          });
+
+          query = map.call(query, (list, index) => {
+            switch (index) {
+            case 0:
+              subject.next(true);
+              break;
+            case 1:
+              questions.$ref.ref.update({
+                key3: { even: false, value: 3 },
+                key4: { even: true, value: 4 }
+              });
+              break;
+            default:
+              break;
+            }
+            return list;
+          });
+          query = take.call(query, 3);
+          query = toArray.call(query);
+
+          toPromise.call(query).then((emits) => {
+            expect(emits.map(e => e.map(i => i.$key))).toEqual([
+              ['key1'],
+              ['key2'],
+              ['key2', 'key4']
+            ]);
+            done();
+          });
+
+          subject.next(false);
+        })
+        .catch(done.fail);
+      });
+
+    });
+
   });
 });
 
