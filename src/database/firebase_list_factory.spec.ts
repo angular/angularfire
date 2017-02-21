@@ -761,6 +761,86 @@ describe('FirebaseListFactory', () => {
 
     });
 
+    describe('equalTo(value, key)', () => {
+
+      it('should support the optional key parameter to equalTo', (done) => {
+
+        questions.$ref.ref.set({
+          val1: Object.assign({}, val1, { data: 0 }),
+          val2: Object.assign({}, val2, { data: 0 }),
+          val3: Object.assign({}, val3, { data: 0 })
+        })
+        .then(() => {
+
+          let query1 = FirebaseListFactory(`${rootDatabaseUrl}/questions`, {
+            query: {
+              orderByChild: 'data',
+              equalTo: { value: 0 }
+            }
+          });
+          query1 = take.call(query1, 1);
+          query1 = toPromise.call(query1);
+
+          let query2 = FirebaseListFactory(`${rootDatabaseUrl}/questions`, {
+            query: {
+              orderByChild: 'data',
+              equalTo: { value: 0, key: 'val2' }
+            }
+          });
+          query2 = take.call(query2, 1);
+          query2 = toPromise.call(query2);
+
+          Promise.all([query1, query2]).then(([list1, list2]) => {
+            expect(list1.map(i => i.$key)).toEqual(['val1', 'val2', 'val3']);
+            expect(list2.map(i => i.$key)).toEqual(['val2']);
+            done();
+          });
+        })
+        .catch(done.fail);
+      });
+
+    });
+
+    describe('endAt(value, key)', () => {
+
+      it('should support the optional key parameter to endAt', (done) => {
+
+        questions.$ref.ref.set({
+          val1: Object.assign({}, val1, { data: 0 }),
+          val2: Object.assign({}, val2, { data: 0 }),
+          val3: Object.assign({}, val3, { data: 0 })
+        })
+        .then(() => {
+
+          let query1 = FirebaseListFactory(`${rootDatabaseUrl}/questions`, {
+            query: {
+              orderByChild: 'data',
+              endAt: { value: 0 }
+            }
+          });
+          query1 = take.call(query1, 1);
+          query1 = toPromise.call(query1);
+
+          let query2 = FirebaseListFactory(`${rootDatabaseUrl}/questions`, {
+            query: {
+              orderByChild: 'data',
+              endAt: { value: 0, key: 'val2' }
+            }
+          });
+          query2 = take.call(query2, 1);
+          query2 = toPromise.call(query2);
+
+          Promise.all([query1, query2]).then(([list1, list2]) => {
+            expect(list1.map(i => i.$key)).toEqual(['val1', 'val2', 'val3']);
+            expect(list2.map(i => i.$key)).toEqual(['val1', 'val2']);
+            done();
+          });
+        })
+        .catch(done.fail);
+      });
+
+    });
+
     describe('observable queries (issue #830)', () => {
 
       it('should not emit the results of previous queries', (done) => {
