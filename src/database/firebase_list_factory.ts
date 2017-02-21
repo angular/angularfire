@@ -50,7 +50,11 @@ export function FirebaseListFactory (
 
       // check equalTo
       if (utils.hasKey(query, "equalTo")) {
-        queried = queried.equalTo(query.equalTo);
+        if (utils.hasKey(query.equalTo, "value")) {
+          queried = queried.equalTo(query.equalTo.value, query.equalTo.key);
+        } else {
+          queried = queried.equalTo(query.equalTo);
+        }
 
         if (utils.hasKey(query, "startAt") || utils.hasKey(query, "endAt")) {
           throw new Error('Query Error: Cannot use startAt or endAt with equalTo.');
@@ -78,7 +82,11 @@ export function FirebaseListFactory (
       }
 
       if (utils.hasKey(query, "endAt")) {
+        if (utils.hasKey(query.endAt, "value")) {
+          queried = queried.endAt(query.endAt.value, query.endAt.key);
+        } else {
           queried = queried.endAt(query.endAt);
+        }
       }
 
       if (!utils.isNil(query.limitToFirst) && query.limitToLast) {
