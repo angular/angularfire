@@ -92,9 +92,10 @@ The table below highlights some of the common methods on the `FirebaseListObserv
 
 | method   |                    | 
 | ---------|--------------------| 
-| push(value: any) | Creates a new record on the list, using the Realtime Database's push-ids. | 
-| update(keyRefOrSnap: string) | Firebase | AFUnwrappedSnapshot, value: Object) | Updates an existing item in the array. Accepts a key, database reference, or an unwrapped snapshot. |
-| remove(key: string?) | Deletes the item by key. If no parameter is provided, the entire list will be deleted. |
+| `push(value: any, callback?: Function)` | Creates a new record on the list, using the Realtime Database's push-ids. | 
+| `update(keyRefOrSnap: string, value: Object, callback?: Function) | Firebase | AFUnwrappedSnapshot, value: Object)` | Updates an existing item in the array. Accepts a key, database reference, or an unwrapped snapshot. |
+| `transaction(keyRefOrSnap: string, transactionUpdate: Function, callback?: Function) | Firebase | AFUnwrappedSnapshot, transaction: Function)` | Updates with a transaction an existing item in the array. Accepts a key, database reference, or an unwrapped snapshot. |
+| `remove(key?: string, callback?: Function)` | Deletes the item by key. If no parameter is provided, the entire list will be deleted. |
 
 ## Returning promises
 Each data operation method in the table above returns a promise. However,
@@ -130,6 +131,20 @@ const items = af.database.list('/items');
 items.update('key-of-some-data', { size: newSize });
 ```
 
+### Execute a transation on items in the list
+
+Use the `transaction()` method to execute a transaction on existing items.
+
+```ts
+const items = af.database.list('/items');
+// to get a key, check the Example app below
+items.transaction('key-of-some-data', data => {
+  if (!data) data = {views: 0};
+  data.views++;
+  return data;
+});
+```
+
 ### Removing items from the list
 Use the `remove()` method to remove data at the list item's location.
 
@@ -161,6 +176,7 @@ import { AngularFire, FirebaseListObservable, FirebaseObjectObservable } from 'a
     <li *ngFor="let item of items | async">
       <input type="text" #updatetext [value]="item.text" />
       <button (click)="updateItem(item.$key, updatetext.value)">Update</button>
+      <button (click)="prefixItem(item.$key)">Prefix</button>
       <button (click)="deleteItem(item.$key)">Delete</button>
     </li>
   </ul>
@@ -179,6 +195,14 @@ export class AppComponent {
   }
   updateItem(key: string, newText: string) {
     this.items.update(key, { text: newText });
+  }
+  prefixItem(key: string) {
+    const prefix = 'awesome-';
+    this.items.transaction(key, data => {
+      if (!data) return {text: prefix};
+      data.text = prefix + data.text
+      return data;
+    });
   }
   deleteItem(key: string) {    
     this.items.remove(key); 

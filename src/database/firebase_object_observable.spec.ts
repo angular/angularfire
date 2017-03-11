@@ -64,7 +64,7 @@ describe('FirebaseObjectObservable', () => {
 
       O.subscribe();
       O.set(1);
-      expect(setSpy).toHaveBeenCalledWith(1);
+      expect(setSpy).toHaveBeenCalledWith(1, undefined);
       done();
     });
 
@@ -85,6 +85,10 @@ describe('FirebaseObjectObservable', () => {
       O.set('foo').then(done, done.fail);
     });
 
+    it('should call callback when successful', (done:any) => {
+      O.set('foo', done);
+    });
+
   });
 
   describe('update', () => {
@@ -94,7 +98,7 @@ describe('FirebaseObjectObservable', () => {
 
       O.subscribe();
       O.update(updateObject);
-      expect(updateSpy).toHaveBeenCalledWith(updateObject);
+      expect(updateSpy).toHaveBeenCalledWith(updateObject, undefined);
     });
 
     it('should throw an exception if updated when not subscribed', () => {
@@ -113,6 +117,42 @@ describe('FirebaseObjectObservable', () => {
       O.update(updateObject).then(done, done.fail);
     });
 
+    it('should call callback when successful', (done:any) => {
+       O.update(updateObject, done);
+    });
+
+  });
+
+  describe('transaction', () => {
+    const transactionFn = (data) => data;
+    it('should call update on the underlying ref', () => {
+      var transactionSpy = spyOn(ref, 'transaction');
+
+      O.subscribe();
+      O.transaction(transactionFn);
+      expect(transactionSpy).toHaveBeenCalledWith(transactionFn, undefined, undefined);
+    });
+
+    it('should throw an exception if updated when not subscribed', () => {
+      O = new FirebaseObjectObservable((observer:Observer<any>) => {});
+
+      expect(() => {
+        O.transaction(transactionFn);
+      }).toThrowError('No ref specified for this Observable!')
+    });
+
+    it('should accept any type of value without compilation error', () => {
+      O.transaction(transactionFn);
+    });
+
+    it('should resolve returned thenable when successful', (done:any) => {
+      O.transaction(transactionFn).then(done, done.fail);
+    });
+
+    it('should call callback when successful', (done:any) => {
+       O.update(transactionFn, done);
+    });
+
   });
 
   describe('remove', () => {
@@ -122,7 +162,7 @@ describe('FirebaseObjectObservable', () => {
 
       O.subscribe();
       O.remove();
-      expect(removeSpy).toHaveBeenCalledWith();
+      expect(removeSpy).toHaveBeenCalledWith(undefined);
     });
 
     it('should throw an exception if removed when not subscribed', () => {
@@ -135,6 +175,10 @@ describe('FirebaseObjectObservable', () => {
 
     it('should resolve returned thenable when successful', (done:any) => {
       O.remove().then(done, done.fail);
+    });
+
+    it('should call callback when successful', (done:any) => {
+      O.remove(done);
     });
 
   });

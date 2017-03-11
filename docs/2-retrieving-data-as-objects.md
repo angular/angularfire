@@ -81,9 +81,10 @@ The table below highlights some of the common methods on the `FirebaseObjectObse
 
 | method   |                    | 
 | ---------|--------------------| 
-| set(value: any)      | Replaces the current value in the database with the new value specified as the parameter. This is called a **destructive** update, because it deletes everything currently in place and saves the new value. | 
-| update(value: Object)   | Updates the current value with in the database with the new value specified as the parameter. This is called a **non-destructive** update, because it only updates the values specified. |
-| remove()   | Deletes all data present at that location. Same as calling `set(null)`. |
+| `set(value: any, callback?: Function)`      | Replaces the current value in the database with the new value specified as the parameter. This is called a **destructive** update, because it deletes everything currently in place and saves the new value. | 
+| `update(value: Object, callback?: Function)`   | Updates the current value with in the database with the new value specified as the parameter. This is called a **non-destructive** update, because it only updates the values specified. |
+| `remove(callback?: Function)`   | Deletes all data present at that location. Same as calling `set(null)`. |
+| `transaction(transactionUpdate: Function, callback? Function)`| Execute function server side to update data with a transaction. This method permit to deal with concurrency properly. 
 
 ## Returning promises
 Each data operation method in the table above returns a promise. However,
@@ -144,6 +145,7 @@ import { AngularFire, FirebaseObjectObservable } from 'angularfire2';
   <br />
   <button (click)="save(newname.value)">Set Name</button>
   <button (click)="update(newsize.value)">Update Size</button>
+  <button (click)="addOneView()">Add one view</button>
   <button (click)="delete()">Delete</button>
   `,
 })
@@ -157,6 +159,13 @@ export class AppComponent {
   }
   update(newSize: string) {
     this.item.update({ size: newSize });
+  }
+  addOneView() {
+    this.item.transaction(item => {
+      if (!item) item = {views: 0};
+      item.views++;
+      return item;
+    });
   }
   delete() {
     this.item.remove();
