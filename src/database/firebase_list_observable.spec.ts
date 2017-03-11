@@ -1,7 +1,7 @@
 import { FirebaseListObservable } from './index';
 import { Observer } from 'rxjs/Observer';
 import { map } from 'rxjs/operator/map';
-import * as firebase from 'firebase';
+import * as firebase from 'firebase/app';
 import { unwrapMapFn } from '../utils';
 import {
   FIREBASE_PROVIDERS,

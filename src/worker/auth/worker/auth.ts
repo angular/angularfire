@@ -23,7 +23,7 @@ import {
   OAuthCredentials
 } from '../../auth_backend';
 import {isNil} from '../../../utils';
-import * as firebase from 'firebase';
+import * as firebase from 'firebase/app';
 
 @Injectable()
 export class WebWorkerFirebaseAuth extends AuthBackend {

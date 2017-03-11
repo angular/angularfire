@@ -14,7 +14,7 @@ import { COMMON_CONFIG, ANON_AUTH_CONFIG } from '../test-config';
 import { FirebaseObjectObservable } from './index';
 import { Observer } from 'rxjs/Observer';
 import { map } from 'rxjs/operator/map';
-import * as firebase from 'firebase';
+import * as firebase from 'firebase/app';
 
 const rootDatabaseUrl = COMMON_CONFIG.databaseURL;
 
