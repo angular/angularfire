@@ -1,4 +1,5 @@
-import * as firebase from 'firebase';
+import * as firebase from 'firebase/app';
+import 'firebase/database';
 import { AFUnwrappedDataSnapshot } from '../interfaces';
 import { FirebaseListObservable } from './firebase_list_observable';
 import { Observer } from 'rxjs/Observer';

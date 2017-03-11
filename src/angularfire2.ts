@@ -1,4 +1,4 @@
-import * as firebase from 'firebase';
+import * as firebase from 'firebase/app';
 import * as utils from './utils';
 import { FirebaseAppConfig } from './interfaces';
 import { AuthConfiguration } from './auth';
@@ -142,3 +142,4 @@ export {
 
 export { FirebaseConfig, FirebaseApp, FirebaseAuthConfig, FirebaseRef, FirebaseUrl, FirebaseUserConfig } from './tokens';
 export { FirebaseAppConfig } from './interfaces';
+

@@ -1,7 +1,8 @@
 import { FirebaseObjectObservable } from './index';
 import { Observer } from 'rxjs/Observer';
 import { observeOn } from 'rxjs/operator/observeOn';
-import * as firebase from 'firebase';
+import * as firebase from 'firebase/app';
+import 'firebase/database';
 import * as utils from '../utils';
 import { FirebaseObjectFactoryOpts } from '../interfaces';
 
