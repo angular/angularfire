@@ -38,6 +38,12 @@ describe('FirebaseObjectFactory', () => {
       expect(object instanceof FirebaseObjectObservable).toBe(true);
     });
 
+    it('should take an absolute url in the constructor', () => {
+      const absoluteUrl = COMMON_CONFIG.databaseURL + '/questions/one';
+      const list = FirebaseObjectFactory(absoluteUrl);
+      expect(list instanceof FirebaseObjectObservable).toBe(true);
+    });
+
   });
 
   describe('methods', () => {
