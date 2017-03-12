@@ -3,27 +3,13 @@ import { auth, initializeApp } from 'firebase';
 import { ReflectiveInjector, Provider } from '@angular/core';
 import { Observable } from 'rxjs/Observable'
 import { Observer } from 'rxjs/Observer';
-import {
-  TestBed,
-  inject
-} from '@angular/core/testing';
+import { TestBed, inject } from '@angular/core/testing';
 import { _do } from 'rxjs/operator/do';
-
-import {
-  FIREBASE_PROVIDERS,
-  FirebaseApp,
-  FirebaseAppConfig,
-  FirebaseAuthState,
-  FirebaseAppConfigToken,
-  AngularFireAuth,
-  AuthMethods,
-  firebaseAuthConfig,
-  AuthProviders,
-  WindowLocation,
-  AngularFireModule
-} from '../angularfire2';
+import { take } from 'rxjs/operator/take';
+import 'rxjs/operator/take';
+import 'rxjs/operator/do';
+import { FIREBASE_PROVIDERS, FirebaseApp, FirebaseAppConfig, FirebaseAuthState, FirebaseAppConfigToken, AngularFireAuth, AuthMethods, firebaseAuthConfig, AuthProviders, WindowLocation, AngularFireModule } from '../angularfire2';
 import { COMMON_CONFIG, ANON_AUTH_CONFIG } from '../test-config';
-
 import { AuthBackend } from './auth_backend';
 import { FirebaseSdkAuthBackend } from './firebase_sdk_auth_backend';
 
@@ -63,7 +49,7 @@ const anonymouseFirebaseUser = <firebase.User> {
   uid: '12345',
   isAnonymous: true,
   providerData: []
-}
+};
 
 const githubCredential = {
   credential: {
@@ -75,7 +61,7 @@ const githubCredential = {
 const googleCredential = {
   credential: {},
   user: firebaseUser
-}
+};
 
 const AngularFireAuthState = {
   provider: 0,
@@ -98,7 +84,7 @@ describe('Zones', () => {
     ngZone.run(() => {
       var afAuth = new AngularFireAuth(new FirebaseSdkAuthBackend(app), window.location);
       var authObs = afAuth.take(1);
-
+      
       _do.call(authObs, _ => {
           expect(Zone.current.name).toBe('ngZone');
         })
