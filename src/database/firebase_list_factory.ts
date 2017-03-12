@@ -1,30 +1,37 @@
 import * as firebase from 'firebase/app';
+import * as utils from '../utils';
 import 'firebase/database';
 import { AFUnwrappedDataSnapshot } from '../interfaces';
 import { FirebaseListObservable } from './firebase_list_observable';
 import { Observer } from 'rxjs/Observer';
 import { observeOn } from 'rxjs/operator/observeOn';
 import { observeQuery } from './query_observable';
-import { Query, FirebaseListFactoryOpts, PathReference } from '../interfaces';
-import * as utils from '../utils';
+import { Query, FirebaseListFactoryOpts, PathReference, QueryReference, DatabaseQuery, DatabaseReference } from '../interfaces';
 import { switchMap } from 'rxjs/operator/switchMap';
 import { map } from 'rxjs/operator/map';
 
 export function FirebaseListFactory (
-  pathOrReference: PathReference,
+  pathRef: PathReference,
   { preserveSnapshot, query = {} } :FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
 
-  let ref: firebase.database.Reference | firebase.database.Query;
+  let ref: QueryReference;
 
-  utils.checkForUrlOrFirebaseRef(pathOrReference, {
-    isUrl: () => ref = firebase.database().ref(<string>pathOrReference),
-    isRef: () => ref = <firebase.database.Reference>pathOrReference,
-    isQuery: () => ref = <firebase.database.Query>pathOrReference,
+  utils.checkForUrlOrFirebaseRef(pathRef, {
+    isUrl: () => {
+      const path = pathRef as string;
+      if(utils.isAbsoluteUrl(path)) {
+        ref = firebase.database().refFromURL(path)
+      } else {
+        ref = firebase.database().ref(path);
+      } 
+    },
+    isRef: () => ref = <DatabaseReference>pathRef,
+    isQuery: () => ref = <DatabaseQuery>pathRef,
   });
 
   // if it's just a reference or string, create a regular list observable
-  if ((utils.isFirebaseRef(pathOrReference) ||
-       utils.isString(pathOrReference)) &&
+  if ((utils.isFirebaseRef(pathRef) ||
+       utils.isString(pathRef)) &&
        utils.isEmptyObject(query)) {
     return firebaseListObservable(ref, { preserveSnapshot });
   }
@@ -32,7 +39,7 @@ export function FirebaseListFactory (
   const queryObs = observeQuery(query);
   return new FirebaseListObservable(ref, subscriber => {
     let sub = switchMap.call(map.call(queryObs, query => {
-      let queried: firebase.database.Query = ref;
+      let queried: DatabaseQuery = ref;
       // Only apply the populated keys
       // apply ordering and available querying options
       // eg: ref.orderByChild('height').startAt(3)
@@ -112,13 +119,13 @@ export function FirebaseListFactory (
 }
 
 /**
- * Creates a FirebaseListObservable from a reference or query. Options can be provided as a second parameter.
- * This function understands the nuances of the Firebase SDK event ordering and other quirks. This function
- * takes into account that not all .on() callbacks are guaranteed to be asynchonous. It creates a initial array
- * from a promise of ref.once('value'), and then starts listening to child events. When the initial array
- * is loaded, the observable starts emitting values.
+ * Creates a FirebaseListObservable from a reference or query. Options can be provided as a second 
+ * parameter. This function understands the nuances of the Firebase SDK event ordering and other
+ * quirks. This function takes into account that not all .on() callbacks are guaranteed to be
+ * asynchonous. It creates a initial array from a promise of ref.once('value'), and then starts
+ * listening to child events. When the initial array is loaded, the observable starts emitting values.
  */
-function firebaseListObservable(ref: firebase.database.Reference | firebase.database.Query, {preserveSnapshot}: FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
+function firebaseListObservable(ref: firebase.database.Reference | DatabaseQuery, {preserveSnapshot}: FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
 
   const toValue = preserveSnapshot ? (snapshot => snapshot) : utils.unwrapMapFn;
   const toKey = preserveSnapshot ? (value => value.key) : (value => value.$key);
