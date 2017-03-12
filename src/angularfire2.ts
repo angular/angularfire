@@ -1,53 +1,16 @@
 import * as firebase from 'firebase/app';
 import * as utils from './utils';
-import { FirebaseAppConfig } from './interfaces';
-import { AuthConfiguration } from './auth';
-import {
-  FirebaseListFactoryOpts,
-  FirebaseObjectFactoryOpts,
-} from './interfaces';
-import {
-  FirebaseConfig,
-  FirebaseApp,
-  WindowLocation,
-  FirebaseUserConfig,
-  FirebaseAuthConfig,
-  FirebaseAppName
-} from './tokens';
-import {
-  APP_INITIALIZER,
-  Inject,
-  Injectable,
-  OpaqueToken,
-  NgModule,
-  ModuleWithProviders
-} from '@angular/core';
-import {
-  FirebaseSdkAuthBackend,
-  AngularFireAuth,
-  firebaseAuthConfig,
-  AuthBackend,
-  AuthMethods,
-  AuthProviders,
-  FirebaseAuthState
-} from './auth/index';
-import {
-  FirebaseListObservable,
-  FirebaseObjectObservable,
-  FirebaseListFactory,
-  FirebaseObjectFactory,
-  AngularFireDatabase
-} from './database/index';
+import { FirebaseListFactoryOpts, FirebaseObjectFactoryOpts, FirebaseAppConfig } from './interfaces';
+import { FirebaseAppName } from './tokens';
+import { Injectable, OpaqueToken, NgModule, ModuleWithProviders } from '@angular/core';
+import { FirebaseListObservable, FirebaseObjectObservable, FirebaseListFactory, FirebaseObjectFactory, AngularFireDatabase } from './database/index';
 
 @Injectable()
 export class AngularFire {
-  constructor(
-    @Inject(FirebaseConfig) private firebaseConfig:FirebaseAppConfig,
-    public auth: AngularFireAuth,
-    public database: AngularFireDatabase) {}
+  constructor(public database: AngularFireDatabase) {}
 }
 
-export function _getFirebase(config: FirebaseAppConfig, appName?: string): firebase.app.App {
+export function _getFirebase(config: FirebaseAppConfig, appName?: string): FirebaseApp {
   try {
     if (appName) {
       return firebase.initializeApp(config, appName);
@@ -60,86 +23,75 @@ export function _getFirebase(config: FirebaseAppConfig, appName?: string): fireb
   }
 }
 
-export function _getWindowLocation(){
-  return window.location;
+export const FirebaseAppConfigToken = new OpaqueToken('FirebaseAppConfigToken');
+
+@Injectable()
+export class FirebaseApp {
+  name: string;
+  options: {};
+  auth: () => firebase.auth.Auth;
+  database: () => firebase.database.Database;
+  messaging: () => firebase.messaging.Messaging;
+  storage: () => firebase.storage.Storage;
+  delete: () => firebase.Promise<any>;
 }
 
-export function _getAuthBackend(app: firebase.app.App): FirebaseSdkAuthBackend {
-  return new FirebaseSdkAuthBackend(app);
+export function _getAngularFire(db: AngularFireDatabase) {
+  return new AngularFire(db);
 }
 
-export function _getDefaultFirebase(config){
-  // remove a trailing slash from the Database URL if it exists
-  config.databaseURL = utils.stripTrailingSlash(config.databaseURL);
-  return config;
+export function _getAngularFireDatabase(app: FirebaseApp) {
+  return new AngularFireDatabase(app);
 }
 
-export const COMMON_PROVIDERS: any[] = [
-  {
-    provide: FirebaseApp,
-    useFactory: _getFirebase,
-    deps: [FirebaseConfig, FirebaseAppName]
-  },
-  AngularFireAuth,
-  AngularFire,
-  AngularFireDatabase
-];
-
-export const FIREBASE_PROVIDERS:any[] = [
-  COMMON_PROVIDERS,
-  {
-    provide: AuthBackend,
-    useFactory: _getAuthBackend,
-    deps: [FirebaseApp]
-  },
-  {
-    provide: WindowLocation,
-    useFactory: _getWindowLocation
-  },
-];
-
-/**
- * Used to define the default Firebase root location to be
- * used throughout an application.
- */
-export const defaultFirebase = (config: FirebaseAppConfig): any => {
-  return [
-    { provide: FirebaseUserConfig, useValue: config },
-    { provide: FirebaseConfig, useFactory: _getDefaultFirebase, deps: [FirebaseUserConfig] }
-  ]
+export const FirebaseAppProvider = {
+  provide: FirebaseApp,
+  useFactory: _getFirebase,
+  deps: [ FirebaseAppConfigToken, FirebaseAppName ]
 };
 
-@NgModule({
-  providers: FIREBASE_PROVIDERS
-})
-export class AngularFireModule {
-  static initializeApp(config: FirebaseAppConfig, authConfig?: AuthConfiguration, appName?: string): ModuleWithProviders {
-    return {
-      ngModule: AngularFireModule,
-      providers: [
-        { provide: FirebaseUserConfig, useValue: config },
-        { provide: FirebaseConfig, useFactory: _getDefaultFirebase, deps: [FirebaseUserConfig] },
-        { provide: FirebaseAuthConfig, useValue: authConfig },
-        { provide: FirebaseAppName, useValue: appName }
-      ]
-    }
-  }
-}
+export const AngularFireDatabaseProvider = {
+  provide: AngularFireDatabase,
+  useFactory: _getAngularFireDatabase,
+  deps: [ FirebaseApp ]
+};
+
+export const AngularFireProvider = {
+  provide: AngularFire,
+  useFactory: _getAngularFire,
+  deps: [ AngularFireDatabase ]
+};
+
+export const FIREBASE_PROVIDERS:any[] = [
+  FirebaseAppProvider,
+  AngularFireDatabaseProvider,
+  AngularFireProvider
+];
 
 export {
-  AngularFireAuth,
   AngularFireDatabase,
   FirebaseListObservable,
   FirebaseObjectObservable,
   FirebaseListFactory,
-  FirebaseObjectFactory,
-  firebaseAuthConfig,
-  FirebaseAuthState,
-  AuthMethods,
-  AuthProviders,
-  WindowLocation
+  FirebaseObjectFactory
 }
 
-export { FirebaseConfig, FirebaseApp, FirebaseAuthConfig, FirebaseRef, FirebaseUrl, FirebaseUserConfig } from './tokens';
+export { FirebaseConfig, FirebaseAuthConfig, FirebaseRef, FirebaseUrl, FirebaseUserConfig } from './tokens';
 export { FirebaseAppConfig } from './interfaces';
+
+@NgModule({
+  providers: [FIREBASE_PROVIDERS]
+})
+export class AngularFireModule {
+  static initializeApp(config, authConfig?, appName?): ModuleWithProviders {
+    return {
+      ngModule: AngularFireModule,
+      providers: [
+        { provide: FirebaseAppConfigToken, useValue: config },
+        { provide: FirebaseAppName, useValue: appName },
+        FirebaseAppProvider,
+      ]
+    }
+  }
+}
 
