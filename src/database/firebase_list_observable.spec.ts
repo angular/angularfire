@@ -3,25 +3,14 @@ import { Observer } from 'rxjs/Observer';
 import { map } from 'rxjs/operator/map';
 import * as firebase from 'firebase/app';
 import { unwrapMapFn } from '../utils';
-import {
-  FIREBASE_PROVIDERS,
-  FirebaseApp,
-  FirebaseAppConfig,
-  AngularFire,
-  AngularFireModule
-} from '../angularfire2';
-import {
-  TestBed,
-  inject
-} from '@angular/core/testing';
+import { FIREBASE_PROVIDERS, FirebaseApp, FirebaseAppConfig, AngularFire, AngularFireModule} from '../angularfire2';
+import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG, ANON_AUTH_CONFIG } from '../test-config';
 
-const rootUrl = COMMON_CONFIG.databaseURL;
-
-describe('FirebaseObservable', () => {
-  var O:FirebaseListObservable<any>;
-  var ref:firebase.database.Reference;
-  var app: firebase.app.App;
+describe('FirebaseListObservable', () => {
+  let O:FirebaseListObservable<any>;
+  let ref:firebase.database.Reference;
+  let app: firebase.app.App;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -48,10 +37,6 @@ describe('FirebaseObservable', () => {
   });
 
   describe('$ref', () => {
-    // it('should be a firebase.database.Reference', () => {
-    //   expect(O.$ref instanceof database.Reference).toBe(true);
-    // });
-
     it('should match the database path passed in the constructor', () => {
       expect(O.$ref.toString()).toEqual(ref.toString());
     });
@@ -71,18 +56,16 @@ describe('FirebaseObservable', () => {
     });
   });
 
-
   describe('remove', () => {
-    var orphan = { orphan: true };
-    var child:firebase.database.Reference;
+    let orphan = { orphan: true };
+    let child:firebase.database.Reference;
 
     beforeEach(() => {
       child = ref.push(orphan);
     });
 
-
     it('should remove the item from the Firebase db when given the key', (done:any) => {
-      var childAddedSpy = jasmine.createSpy('childAdded');
+      let childAddedSpy = jasmine.createSpy('childAdded');
 
       ref.on('child_added', childAddedSpy);
       O.remove(child.key)
@@ -97,7 +80,7 @@ describe('FirebaseObservable', () => {
 
 
     it('should remove the item from the Firebase db when given the reference', (done:any) => {
-      var childAddedSpy = jasmine.createSpy('childAdded');
+      let childAddedSpy = jasmine.createSpy('childAdded');
 
       ref.on('child_added', childAddedSpy);
 
@@ -149,21 +132,21 @@ describe('FirebaseObservable', () => {
 
 
     it('should throw an exception if input is not supported', () => {
-      var input = (<any>{lol:true});
+      let input = (<any>{lol:true});
       expect(() => O.remove(input)).toThrowError(`Method requires a key, snapshot, reference, or unwrapped snapshot. Got: ${typeof input}`);
     })
   });
 
   describe('update', () => {
-    var orphan = { orphan: true };
-    var child:firebase.database.Reference;
+    let orphan = { orphan: true };
+    let child:firebase.database.Reference;
 
     beforeEach(() => {
       child = ref.push(orphan);
     });
 
     it('should update the item from the Firebase db when given the key', (done:any) => {
-      var childChangedSpy = jasmine.createSpy('childChanged');
+      let childChangedSpy = jasmine.createSpy('childChanged');
       const orphanChange = { changed: true }
       ref.on('child_changed', childChangedSpy);
       O.update(child.key, orphanChange)
@@ -180,7 +163,7 @@ describe('FirebaseObservable', () => {
     });
 
     it('should update the item from the Firebase db when given the reference', (done:any) => {
-      var childChangedSpy = jasmine.createSpy('childChanged');
+      let childChangedSpy = jasmine.createSpy('childChanged');
       const orphanChange = { changed: true }
       ref.on('child_changed', childChangedSpy);
       O.update(child.ref, orphanChange)
@@ -197,7 +180,7 @@ describe('FirebaseObservable', () => {
     });
 
     it('should update the item from the Firebase db when given the snapshot', (done:any) => {
-      var childChangedSpy = jasmine.createSpy('childChanged');
+      let childChangedSpy = jasmine.createSpy('childChanged');
       const orphanChange = { changed: true }
       ref.on('child_changed', childChangedSpy);
       O.update(child, orphanChange)

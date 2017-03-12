@@ -5,28 +5,26 @@ import { FirebaseListObservable } from './firebase_list_observable';
 import { Observer } from 'rxjs/Observer';
 import { observeOn } from 'rxjs/operator/observeOn';
 import { observeQuery } from './query_observable';
-import { Query, FirebaseListFactoryOpts } from '../interfaces';
+import { Query, FirebaseListFactoryOpts, PathReference } from '../interfaces';
 import * as utils from '../utils';
 import { switchMap } from 'rxjs/operator/switchMap';
 import { map } from 'rxjs/operator/map';
 
 export function FirebaseListFactory (
-  absoluteUrlOrDbRef:string |
-  firebase.database.Reference |
-  firebase.database.Query,
-  {preserveSnapshot, query = {}}:FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
+  pathOrReference: PathReference,
+  { preserveSnapshot, query = {} } :FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
 
   let ref: firebase.database.Reference | firebase.database.Query;
 
-  utils.checkForUrlOrFirebaseRef(absoluteUrlOrDbRef, {
-    isUrl: () => ref = firebase.database().refFromURL(<string>absoluteUrlOrDbRef),
-    isRef: () => ref = <firebase.database.Reference>absoluteUrlOrDbRef,
-    isQuery: () => ref = <firebase.database.Query>absoluteUrlOrDbRef,
+  utils.checkForUrlOrFirebaseRef(pathOrReference, {
+    isUrl: () => ref = firebase.database().ref(<string>pathOrReference),
+    isRef: () => ref = <firebase.database.Reference>pathOrReference,
+    isQuery: () => ref = <firebase.database.Query>pathOrReference,
   });
 
   // if it's just a reference or string, create a regular list observable
-  if ((utils.isFirebaseRef(absoluteUrlOrDbRef) ||
-       utils.isString(absoluteUrlOrDbRef)) &&
+  if ((utils.isFirebaseRef(pathOrReference) ||
+       utils.isString(pathOrReference)) &&
        utils.isEmptyObject(query)) {
     return firebaseListObservable(ref, { preserveSnapshot });
   }

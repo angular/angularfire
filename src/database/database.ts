@@ -13,16 +13,16 @@ import {
 
 @Injectable()
 export class AngularFireDatabase {
-  constructor(private fbApp: FirebaseApp) {}
+  constructor(private app: FirebaseApp) {}
   list (urlOrRef:string | firebase.database.Reference, opts?:FirebaseListFactoryOpts):FirebaseListObservable<any[]> {
     return utils.checkForUrlOrFirebaseRef(urlOrRef, {
-      isUrl: () => FirebaseListFactory(this.fbApp.database().ref(<string>urlOrRef), opts),
+      isUrl: () => FirebaseListFactory(this.app.database().ref(<string>urlOrRef), opts),
       isRef: () => FirebaseListFactory(<firebase.database.Reference>urlOrRef)
     });
   }
   object(urlOrRef: string | firebase.database.Reference, opts?:FirebaseObjectFactoryOpts):FirebaseObjectObservable<any> {
     return utils.checkForUrlOrFirebaseRef(urlOrRef, {
-      isUrl: () => FirebaseObjectFactory(this.fbApp.database().ref(<string>urlOrRef), opts),
+      isUrl: () => FirebaseObjectFactory(this.app.database().ref(<string>urlOrRef), opts),
       isRef: () => FirebaseObjectFactory(urlOrRef)
     });
   }

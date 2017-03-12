@@ -6,15 +6,7 @@ import { combineLatest } from 'rxjs/operator/combineLatest';
 import { merge } from 'rxjs/operator/merge';
 import { map } from 'rxjs/operator/map';
 import { auditTime } from 'rxjs/operator/auditTime';
-import {
-  Query,
-  ScalarQuery,
-  OrderByOptions,
-  OrderBySelection,
-  LimitToOptions,
-  LimitToSelection,
-  Primitive
-} from '../interfaces';
+import { Query, ScalarQuery, OrderByOptions, OrderBySelection, LimitToOptions, LimitToSelection, Primitive } from '../interfaces';
 import { hasKey, isNil } from '../utils';
 
 export function observeQuery(query: Query, audit: boolean = true): Observable<ScalarQuery> {

@@ -11,7 +11,8 @@ import {
   FirebaseApp,
   AngularFireDatabase,
   FirebaseAppConfig,
-  AngularFireModule
+  AngularFireModule,
+  AngularFireAuth
 } from './angularfire2';
 import { Subscription } from 'rxjs/Subscription';
 import { COMMON_CONFIG, ANON_AUTH_CONFIG } from './test-config';
@@ -22,20 +23,18 @@ describe('angularfire', () => {
   let rootRef: firebase.database.Reference;
   let questionsRef: firebase.database.Reference;
   let listOfQuestionsRef: firebase.database.Reference;
-  let angularFire2: AngularFire;
+  let angularfire: AngularFire;
   const APP_NAME = 'super-awesome-test-firebase-app-name';
 
   beforeEach(() => {
 
-    const afmod = AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG, APP_NAME);
-
     TestBed.configureTestingModule({
-      imports: [afmod]
+      imports: [AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG, APP_NAME)]
     });
 
-    inject([FirebaseApp, AngularFire], (firebaseApp: FirebaseApp, _af: AngularFire) => {
-      angularFire2 = _af;
-      app = firebaseApp;
+    inject([FirebaseApp, AngularFire], (_app: FirebaseApp, _af: AngularFire) => {
+      angularfire = _af;
+      app = _app;
       rootRef = app.database().ref();
       questionsRef = rootRef.child('questions');
       listOfQuestionsRef = rootRef.child('list-of-questions');
@@ -51,21 +50,16 @@ describe('angularfire', () => {
     app.delete().then(done, done.fail);
   });
 
-  it('should inject a Firebase App',
-    inject([FirebaseApp], (app: FirebaseApp) => {
-      expect(app).toBeDefined();
-  }));
-
   it('should be injectable via FIREBASE_PROVIDERS', () => {
-    expect(angularFire2 instanceof AngularFire).toBe(true);
+    expect(angularfire instanceof AngularFire).toBe(true);
   });
 
-  // describe('.auth', () => {
-  //   it('should be an instance of AuthService', inject([AngularFire], (af:AngularFire) => {
-  //     expect(af.auth instanceof AngularFireAuth).toBe(true);
-  //   }));
-  // });
-
+  describe('.auth', () => {
+    it('should be an instance of AuthService', inject([AngularFire], (af:AngularFire) => {
+      debugger;
+      expect(af.auth instanceof AngularFireAuth).toBe(true);
+    }));
+  });
 
   describe('.database', () => {
     it('should be an instance of Database', inject([AngularFire], (af:AngularFire) => {

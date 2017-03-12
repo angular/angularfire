@@ -34,9 +34,9 @@ export class FirebaseSdkAuthBackend extends AuthBackend {
    * https://github.com/angular/angular/issues/12631
    * https://github.com/angular/angularfire2/issues/653
    **/
-  constructor(private _fbApp: FirebaseApp) {
+  constructor(private app: FirebaseApp) {
     super();
-    this._fbAuth = _fbApp.auth();
+    this._fbAuth = app.auth();
   }
 
   createUser(creds: EmailPasswordCredentials): Promise<FirebaseAuthState> {
@@ -96,7 +96,7 @@ export class FirebaseSdkAuthBackend extends AuthBackend {
   /**
    * Authenticates a Firebase client using a redirect-based OAuth flow
    * NOTE: This promise will not be resolved if authentication is successful since the browser redirected.
-   * You should subscribe to the FirebaseAuth object to listen succesful login
+   * You should subscribe to the AngularFireAuth object to listen succesful login
    */
   authWithOAuthRedirect(provider: AuthProviders, options?: any): Promise<void> {
     return castPromise<void>(this._fbAuth.signInWithRedirect(this._enumToAuthProvider(provider)));
