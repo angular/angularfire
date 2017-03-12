@@ -8,10 +8,7 @@ import {
   AngularFire,
   FirebaseObjectObservable,
   FIREBASE_PROVIDERS,
-  AngularFireAuth,
-  FirebaseConfig,
   FirebaseApp,
-  defaultFirebase,
   AngularFireDatabase,
   FirebaseAppConfig,
   AngularFireModule
@@ -21,7 +18,7 @@ import { COMMON_CONFIG, ANON_AUTH_CONFIG } from './test-config';
 
 describe('angularfire', () => {
   let subscription:Subscription;
-  let app: firebase.app.App;
+  let app: FirebaseApp;
   let rootRef: firebase.database.Reference;
   let questionsRef: firebase.database.Reference;
   let listOfQuestionsRef: firebase.database.Reference;
@@ -30,17 +27,20 @@ describe('angularfire', () => {
 
   beforeEach(() => {
 
+    const afmod = AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG, APP_NAME);
+
     TestBed.configureTestingModule({
-      imports: [AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG, APP_NAME)]
+      imports: [afmod]
     });
 
-    inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
+    inject([FirebaseApp, AngularFire], (firebaseApp: FirebaseApp, _af: AngularFire) => {
       angularFire2 = _af;
       app = firebaseApp;
       rootRef = app.database().ref();
       questionsRef = rootRef.child('questions');
       listOfQuestionsRef = rootRef.child('list-of-questions');
     })();
+
   });
 
   afterEach((done) => {
@@ -51,16 +51,20 @@ describe('angularfire', () => {
     app.delete().then(done, done.fail);
   });
 
+  it('should inject a Firebase App',
+    inject([FirebaseApp], (app: FirebaseApp) => {
+      expect(app).toBeDefined();
+  }));
 
   it('should be injectable via FIREBASE_PROVIDERS', () => {
     expect(angularFire2 instanceof AngularFire).toBe(true);
   });
 
-  describe('.auth', () => {
-    it('should be an instance of AuthService', inject([AngularFire], (af:AngularFire) => {
-      expect(af.auth instanceof AngularFireAuth).toBe(true);
-    }));
-  });
+  // describe('.auth', () => {
+  //   it('should be an instance of AuthService', inject([AngularFire], (af:AngularFire) => {
+  //     expect(af.auth instanceof AngularFireAuth).toBe(true);
+  //   }));
+  // });
 
 
   describe('.database', () => {
@@ -76,12 +80,5 @@ describe('angularfire', () => {
     it('should have the provided name', () => {
       expect(app.name).toBe(APP_NAME);
     })
-  });
-
-  describe('defaultFirebase', () => {
-    it('should create an array of providers', () => {
-      const providers = defaultFirebase(COMMON_CONFIG);
-      expect(providers.length).toBe(2);
-    });
   });
 });

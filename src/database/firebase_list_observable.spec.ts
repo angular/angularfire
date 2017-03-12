@@ -5,7 +5,6 @@ import * as firebase from 'firebase/app';
 import { unwrapMapFn } from '../utils';
 import {
   FIREBASE_PROVIDERS,
-  defaultFirebase,
   FirebaseApp,
   FirebaseAppConfig,
   AngularFire,

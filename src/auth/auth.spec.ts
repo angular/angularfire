@@ -10,12 +10,11 @@ import {
 import { _do } from 'rxjs/operator/do';
 
 import {
-  defaultFirebase,
   FIREBASE_PROVIDERS,
   FirebaseApp,
   FirebaseAppConfig,
   FirebaseAuthState,
-  FirebaseConfig,
+  FirebaseAppConfigToken,
   AngularFireAuth,
   AuthMethods,
   firebaseAuthConfig,
@@ -144,7 +143,7 @@ describe('FirebaseAuth', () => {
             (<any>app).auth = () => authSpy;
             return app;
           },
-          deps: [FirebaseConfig]
+          deps: [FirebaseAppConfigToken]
         },
         {
           provide: WindowLocation,

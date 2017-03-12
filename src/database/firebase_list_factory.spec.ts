@@ -10,7 +10,6 @@ import {
 } from './index';
 import {
   FIREBASE_PROVIDERS,
-  defaultFirebase,
   FirebaseApp,
   FirebaseAppConfig,
   AngularFire,
