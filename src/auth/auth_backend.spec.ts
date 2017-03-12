@@ -1,9 +1,5 @@
 import * as firebase from 'firebase/app';
-import {
-  authDataToAuthState,
-  AuthProviders,
-  FirebaseAuthState
-} from './auth_backend';
+import { authDataToAuthState, AuthProviders, FirebaseAuthState } from './auth_backend';
 
 const baseFBUser = {
   uid: '12345',

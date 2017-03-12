@@ -6,8 +6,7 @@ import { Observer } from 'rxjs/Observer';
 import { TestBed, inject } from '@angular/core/testing';
 import { _do } from 'rxjs/operator/do';
 import { take } from 'rxjs/operator/take';
-import 'rxjs/operator/take';
-import 'rxjs/operator/do';
+import { skip } from 'rxjs/operator/skip';
 import { FIREBASE_PROVIDERS, FirebaseApp, FirebaseAppConfig, FirebaseAuthState, FirebaseAppConfigToken, AngularFireAuth, AuthMethods, firebaseAuthConfig, AuthProviders, WindowLocation, AngularFireModule } from '../angularfire2';
 import { COMMON_CONFIG, ANON_AUTH_CONFIG } from '../test-config';
 import { AuthBackend } from './auth_backend';
@@ -73,6 +72,14 @@ const AngularFireAuthState = {
   } as firebase.UserInfo
 } as FirebaseAuthState;
 
+function authTake(auth: AngularFireAuth | Observable<any>, count: number): Observable<any> {
+  return take.call(auth, 1);
+}
+
+function authSkip(auth: AngularFireAuth, count: number): Observable<any> {
+  return skip.call(auth, 1);
+}
+
 describe('Zones', () => {
   it('should call operators and subscriber in the same zone as when service was initialized', (done) => {
     // Initialize the app outside of the zone, to mimick real life behavior.
@@ -83,7 +90,7 @@ describe('Zones', () => {
     });
     ngZone.run(() => {
       var afAuth = new AngularFireAuth(new FirebaseSdkAuthBackend(app), window.location);
-      var authObs = afAuth.take(1);
+      var authObs = authTake(afAuth, 1);
       
       _do.call(authObs, _ => {
           expect(Zone.current.name).toBe('ngZone');
@@ -176,8 +183,7 @@ describe('FirebaseAuth', () => {
     fbAuthObserver.next(null);
 
     // Check that the first value is null
-    afAuth
-      .take(1)
+    take.call(afAuth, 1)
       .do((authData) => {
         expect(authData).toBe(null);
         setTimeout(() => fbAuthObserver.next(firebaseUser));
@@ -185,9 +191,8 @@ describe('FirebaseAuth', () => {
       .subscribe();
 
     // Check the 2nd value emitted from the observable
-    afAuth
-      .skip(1)
-      .take(1)
+    const skipObs = authSkip(afAuth, 1);
+    take.call(skipObs, 1)
       .do((authData) => {
         expect(authData.auth).toEqual(AngularFireAuthState.auth);
       })
@@ -198,8 +203,7 @@ describe('FirebaseAuth', () => {
   describe('AuthState', () => {
     it('should asynchronously load firebase auth data', (done) => {
       fbAuthObserver.next(firebaseUser);
-      afAuth
-        .take(1)
+      authTake(afAuth, 1)
         .subscribe((data) => {
           expect(data.auth).toEqual(AngularFireAuthState.auth);
         }, done.fail, done);
@@ -207,8 +211,7 @@ describe('FirebaseAuth', () => {
 
     it('should be null if user is not authed', (done) => {
       fbAuthObserver.next(null);
-      afAuth
-        .take(1)
+      authTake(afAuth, 1)
         .subscribe(authData => {
           expect(authData).toBe(null);
         }, done.fail, done);
@@ -443,8 +446,7 @@ describe('FirebaseAuth', () => {
       });
 
       it('should include credentials in onAuth payload after logging in', (done) => {
-        afAuth
-          .take(1)
+        take.call(afAuth, 1)
           .do((user: FirebaseAuthState) => {
             expect(user.github).toBe(githubCredential.credential);
           })
@@ -460,8 +462,7 @@ describe('FirebaseAuth', () => {
 
       xit('should not call getRedirectResult() if location.protocol is not http or https', (done) => {
         windowLocation.protocol = 'file:';
-        afAuth
-          .take(1)
+        take.call(afAuth, 1)
           .do(() => {
             expect(authSpy['getRedirectResult']).not.toHaveBeenCalled();
           })
@@ -500,8 +501,7 @@ describe('FirebaseAuth', () => {
 
       it('should include credentials in onAuth payload after logging in', (done) => {
         authSpy['getRedirectResult'].and.returnValue(Promise.resolve(githubCredential));
-        afAuth
-          .do((user: FirebaseAuthState) => {
+          _do.call(afAuth, (user: FirebaseAuthState) => {
             expect(user.github).toBe(githubCredential.credential);
           })
           .take(2)
