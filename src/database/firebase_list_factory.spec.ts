@@ -1,11 +1,11 @@
 import * as firebase from 'firebase/app';
 import { FirebaseListFactory, FirebaseListObservable, FirebaseObjectFactory, onChildAdded, onChildChanged, onChildRemoved, onChildUpdated, AngularFireDatabase, AngularFireDatabaseModule } from './index';
-import { FIREBASE_PROVIDERS, FirebaseApp, FirebaseAppConfig, AngularFireModule} from '../angularfire2';
+import { FirebaseApp, FirebaseAppConfig, AngularFireModule} from '../angularfire2';
 import { TestBed, inject } from '@angular/core/testing';
 import * as utils from '../utils';
 import { Query, AFUnwrappedDataSnapshot } from '../interfaces';
 import { Subscription, Observable, Subject } from 'rxjs';
-import { COMMON_CONFIG, ANON_AUTH_CONFIG } from '../test-config';
+import { COMMON_CONFIG } from '../test-config';
 import { _do } from 'rxjs/operator/do';
 import { map } from 'rxjs/operator/map';
 import { skip } from 'rxjs/operator/skip';
@@ -39,7 +39,7 @@ describe('AngularFireDatabase', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG, '[DEFAULT]'),
+        AngularFireModule.initializeApp(COMMON_CONFIG, '[DEFAULT]'),
         AngularFireDatabaseModule
       ]
     });
@@ -56,7 +56,6 @@ describe('AngularFireDatabase', () => {
   describe('<constructor>', () => {
 
     it('should accept a Firebase db url in the constructor', () => {
-      debugger;
       expect(db instanceof AngularFireDatabase).toBe(true);
     });
 
@@ -72,7 +71,7 @@ describe('FirebaseListFactory', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG, '[DEFAULT]'),
+        AngularFireModule.initializeApp(COMMON_CONFIG, '[DEFAULT]'),
         AngularFireDatabaseModule
       ]
     });
@@ -85,8 +84,7 @@ describe('FirebaseListFactory', () => {
 
   describe('<constructor>', () => {
 
-    it('should accept a Firebase db url in the constructor', () => {
-      debugger;
+    it('should accept a Firebase db path in the constructor', () => {
       const list = FirebaseListFactory(`questions`);
       expect(list instanceof FirebaseListObservable).toBe(true);
     });

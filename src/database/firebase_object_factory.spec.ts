@@ -2,8 +2,8 @@ import * as firebase from 'firebase/app';
 import { Subscription } from 'rxjs';
 import { FirebaseObjectFactory, FirebaseObjectObservable, AngularFireDatabaseModule, AngularFireDatabase } from './index';
 import { TestBed, inject } from '@angular/core/testing';
-import { FIREBASE_PROVIDERS, FirebaseApp, FirebaseAppConfig, AngularFire, AngularFireModule } from '../angularfire2';
-import { COMMON_CONFIG, ANON_AUTH_CONFIG } from '../test-config';
+import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from '../angularfire2';
+import { COMMON_CONFIG } from '../test-config';
 
 describe('FirebaseObjectFactory', () => {
   let i = 0;
@@ -17,7 +17,7 @@ describe('FirebaseObjectFactory', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG, '[DEFAULT]'),
+        AngularFireModule.initializeApp(COMMON_CONFIG, '[DEFAULT]'),
         AngularFireDatabaseModule
       ]
     });
