@@ -4,7 +4,6 @@ import { FirebaseAppConfigToken, FirebaseApp, _firebaseAppFactory } from './app/
 import { FirebaseListFactoryOpts, FirebaseObjectFactoryOpts, FirebaseAppConfig } from './interfaces';
 import { FirebaseAppName } from './tokens';
 import { Injectable, OpaqueToken, NgModule } from '@angular/core';
-import { FirebaseSdkAuthBackend, AuthBackend, AngularFireAuth, AuthConfiguration } from './auth/index';
 
 export const FirebaseAppProvider = {
   provide: FirebaseApp,

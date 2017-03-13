@@ -3,9 +3,9 @@ import { Observer } from 'rxjs/Observer';
 import { map } from 'rxjs/operator/map';
 import * as firebase from 'firebase/app';
 import { unwrapMapFn } from '../utils';
-import { FIREBASE_PROVIDERS, FirebaseApp, FirebaseAppConfig, AngularFire, AngularFireModule} from '../angularfire2';
+import { FirebaseApp, FirebaseAppConfig, AngularFireModule} from '../angularfire2';
 import { TestBed, inject } from '@angular/core/testing';
-import { COMMON_CONFIG, ANON_AUTH_CONFIG } from '../test-config';
+import { COMMON_CONFIG } from '../test-config';
 
 describe('FirebaseListObservable', () => {
   let O: FirebaseListObservable<any>;
@@ -16,7 +16,7 @@ describe('FirebaseListObservable', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG),
+        AngularFireModule.initializeApp(COMMON_CONFIG),
         AngularFireDatabaseModule
       ]
     });

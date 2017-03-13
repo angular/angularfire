@@ -4,6 +4,7 @@ import 'firebase/auth';
 import { Injectable, NgZone } from '@angular/core';
 import { Auth } from '../interfaces';
 import { Observable } from 'rxjs/Observable';
+import { Observer } from 'rxjs/Observer';
 import { observeOn } from 'rxjs/operator/observeOn';
 import { FirebaseApp } from '../app/index';
 
@@ -22,6 +23,7 @@ export class AngularFireAuth {
 
   constructor(public app: FirebaseApp) {
     this.authState = FirebaseAuthStateObservable(app);
+    this.auth = app.auth();
   }
 
 }
@@ -31,7 +33,13 @@ export class AngularFireAuth {
  * within the current zone.
  * @param app - Firebase App instance
  */
-export function FirebaseAuthStateObservable(app: FirebaseApp) {
-  const authState = Observable.create(firebase.auth().onAuthStateChanged);
+export function FirebaseAuthStateObservable(app: FirebaseApp): Observable<firebase.User> {
+  const authState = Observable.create((observer: Observer<firebase.User>) => {
+    firebase.auth().onAuthStateChanged(
+      (user?: firebase.User) => observer.next(user),
+      (error: firebase.auth.Error) => observer.error(error),
+      () => observer.complete()
+    );
+  });
   return observeOn.call(authState, new utils.ZoneScheduler(Zone.current));
 }

@@ -1,19 +1,9 @@
 import * as firebase from 'firebase/app';
-import {
-  TestBed,
-  inject
-} from '@angular/core/testing';
+import { TestBed, inject } from '@angular/core/testing';
 import { ReflectiveInjector, Provider } from '@angular/core';
-import {
-  AngularFire,
-  FIREBASE_PROVIDERS,
-  FirebaseApp,
-  FirebaseAppConfig,
-  AngularFireModule,
-  AngularFireAuth
-} from './angularfire2';
+import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from './angularfire2';
 import { Subscription } from 'rxjs/Subscription';
-import { COMMON_CONFIG, ANON_AUTH_CONFIG } from './test-config';
+import { COMMON_CONFIG } from './test-config';
 
 describe('angularfire', () => {
   let subscription:Subscription;
@@ -21,17 +11,15 @@ describe('angularfire', () => {
   let rootRef: firebase.database.Reference;
   let questionsRef: firebase.database.Reference;
   let listOfQuestionsRef: firebase.database.Reference;
-  let angularfire: AngularFire;
   const APP_NAME = 'super-awesome-test-firebase-app-name';
 
   beforeEach(() => {
 
     TestBed.configureTestingModule({
-      imports: [AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG, APP_NAME)]
+      imports: [AngularFireModule.initializeApp(COMMON_CONFIG, APP_NAME)]
     });
 
-    inject([FirebaseApp, AngularFire], (_app: FirebaseApp, _af: AngularFire) => {
-      angularfire = _af;
+    inject([FirebaseApp], (_app: FirebaseApp) => {
       app = _app;
       rootRef = app.database().ref();
       questionsRef = rootRef.child('questions');
@@ -46,17 +34,6 @@ describe('angularfire', () => {
       subscription.unsubscribe();
     }
     app.delete().then(done, done.fail);
-  });
-
-  it('should be injectable via FIREBASE_PROVIDERS', () => {
-    expect(angularfire instanceof AngularFire).toBe(true);
-  });
-
-  describe('.auth', () => {
-    it('should be an instance of AuthService', inject([AngularFire], (af:AngularFire) => {
-      debugger;
-      expect(af.auth instanceof AngularFireAuth).toBe(true);
-    }));
   });
 
   describe('FirebaseApp', () => {
