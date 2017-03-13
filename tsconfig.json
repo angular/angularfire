@@ -20,6 +20,8 @@
   },
   "files": [
     "src/test-root.ts",
+    "src/auth/index.ts",
+    "src/database/index.ts",    
     "node_modules/zone.js/dist/zone.js.d.ts"
   ],
   "angularCompilerOptions": {
