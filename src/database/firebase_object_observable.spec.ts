@@ -1,7 +1,7 @@
 import { TestBed, inject } from '@angular/core/testing';
 import { FIREBASE_PROVIDERS, FirebaseApp, FirebaseAppConfig, AngularFire, AngularFireModule } from '../angularfire2';
 import { COMMON_CONFIG, ANON_AUTH_CONFIG } from '../test-config';
-import { FirebaseObjectObservable } from './index';
+import { FirebaseObjectObservable, AngularFireDatabaseModule, AngularFireDatabase } from './index';
 import { Observer } from 'rxjs/Observer';
 import { map } from 'rxjs/operator/map';
 import * as firebase from 'firebase/app';
@@ -11,13 +11,18 @@ describe('FirebaseObjectObservable', () => {
   let O: FirebaseObjectObservable<any>;
   let ref: firebase.database.Reference;
   let app: firebase.app.App;
+  let db: AngularFireDatabase;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG)]
+      imports: [
+        AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG),
+        AngularFireDatabaseModule
+      ]
     });
-    inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
-      app = firebaseApp;
+    inject([FirebaseApp, AngularFireDatabase], (_app: firebase.app.App, _db: AngularFireDatabase) => {
+      app = _app;
+      db = _db;
       ref = firebase.database().ref();
       O = new FirebaseObjectObservable((observer: Observer<any>) => {
       }, ref);

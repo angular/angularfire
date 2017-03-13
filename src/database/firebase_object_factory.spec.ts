@@ -1,6 +1,6 @@
 import * as firebase from 'firebase/app';
 import { Subscription } from 'rxjs';
-import { FirebaseObjectFactory, FirebaseObjectObservable } from './index';
+import { FirebaseObjectFactory, FirebaseObjectObservable, AngularFireDatabaseModule, AngularFireDatabase } from './index';
 import { TestBed, inject } from '@angular/core/testing';
 import { FIREBASE_PROVIDERS, FirebaseApp, FirebaseAppConfig, AngularFire, AngularFireModule } from '../angularfire2';
 import { COMMON_CONFIG, ANON_AUTH_CONFIG } from '../test-config';
@@ -12,13 +12,18 @@ describe('FirebaseObjectFactory', () => {
   let subscription: Subscription;
   let nextSpy: jasmine.Spy;
   let app: firebase.app.App;
+  let db: AngularFireDatabase;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG)]
+      imports: [
+        AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG, '[DEFAULT]'),
+        AngularFireDatabaseModule
+      ]
     });
-    inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
-      app = firebaseApp;
+    inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {
+      app = app_;
+      db = _db;
     })();
   });
 
