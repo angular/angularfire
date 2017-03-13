@@ -4,22 +4,16 @@ import { FirebaseAppConfigToken, FirebaseApp, _firebaseAppFactory } from './app/
 import { FirebaseListFactoryOpts, FirebaseObjectFactoryOpts, FirebaseAppConfig } from './interfaces';
 import { FirebaseAppName, WindowLocation, FirebaseAuthConfig } from './tokens';
 import { Injectable, OpaqueToken, NgModule } from '@angular/core';
-import { FirebaseListObservable, FirebaseObjectObservable, FirebaseListFactory, FirebaseObjectFactory, AngularFireDatabase } from './database/index';
 import { FirebaseSdkAuthBackend, AuthBackend, AngularFireAuth, AuthConfiguration } from './auth/index';
 
 @Injectable()
 export class AngularFire {
   constructor(
-    public auth: AngularFireAuth,
-    public database: AngularFireDatabase) {}
+    public auth: AngularFireAuth) {}
 }
 
-export function _getAngularFire(db: AngularFireDatabase, auth: AngularFireAuth) {
-  return new AngularFire(auth, db);
-}
-
-export function _getAngularFireDatabase(app: FirebaseApp) {
-  return new AngularFireDatabase(app);
+export function _getAngularFire(auth: AngularFireAuth) {
+  return new AngularFire(auth);
 }
 
 export function _getAngularFireAuth(backend: AuthBackend, location: any, config: any) {
@@ -51,12 +45,6 @@ export const FirebaseAppProvider = {
   deps: [ FirebaseAppConfigToken, FirebaseAppName ]
 };
 
-export const AngularFireDatabaseProvider = {
-  provide: AngularFireDatabase,
-  useFactory: _getAngularFireDatabase,
-  deps: [ FirebaseApp ]
-};
-
 export const FirebaseAuthBackendProvider = {
   provide: FirebaseSdkAuthBackend,
   useFactory: _getFirebaseAuthBackend,
@@ -72,7 +60,7 @@ export const AngularFireAuthProvider = {
 export const AngularFireProvider = {
   provide: AngularFire,
   useFactory: _getAngularFire,
-  deps: [ AngularFireDatabase, AngularFireAuth ]
+  deps: [ AngularFireAuth ]
 };
 
 export const FIREBASE_PROVIDERS:any[] = [
@@ -80,7 +68,6 @@ export const FIREBASE_PROVIDERS:any[] = [
   FirebaseAuthBackendProvider,
   AuthBackendProvder,
   WindowLocationProvider,
-  AngularFireDatabaseProvider,
   AngularFireAuthProvider,
   AngularFireProvider
 ];
@@ -88,12 +75,7 @@ export const FIREBASE_PROVIDERS:any[] = [
 export {
   FirebaseApp,
   FirebaseAppConfigToken,
-  AngularFireDatabase,
   AngularFireAuth,
-  FirebaseListObservable,
-  FirebaseObjectObservable,
-  FirebaseListFactory,
-  FirebaseObjectFactory,
   WindowLocation
 }
 

@@ -6,10 +6,8 @@ import {
 import { ReflectiveInjector, Provider } from '@angular/core';
 import {
   AngularFire,
-  FirebaseObjectObservable,
   FIREBASE_PROVIDERS,
   FirebaseApp,
-  AngularFireDatabase,
   FirebaseAppConfig,
   AngularFireModule,
   AngularFireAuth
@@ -58,12 +56,6 @@ describe('angularfire', () => {
     it('should be an instance of AuthService', inject([AngularFire], (af:AngularFire) => {
       debugger;
       expect(af.auth instanceof AngularFireAuth).toBe(true);
-    }));
-  });
-
-  describe('.database', () => {
-    it('should be an instance of Database', inject([AngularFire], (af:AngularFire) => {
-      expect(af.database instanceof AngularFireDatabase).toBe(true);
     }));
   });
 
