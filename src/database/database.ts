@@ -10,7 +10,7 @@ import { FirebaseListObservable, FirebaseObjectObservable, FirebaseObjectFactory
 @Injectable()
 export class AngularFireDatabase {
   
-  constructor(private app: FirebaseApp) {}
+  constructor(public app: FirebaseApp) {}
   
   list(pathOrRef: PathReference, opts?:FirebaseListFactoryOpts):FirebaseListObservable<any[]> {
     const ref = utils.getRef(this.app, pathOrRef);

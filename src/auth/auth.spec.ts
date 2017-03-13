@@ -7,8 +7,8 @@ import { TestBed, inject } from '@angular/core/testing';
 import { _do } from 'rxjs/operator/do';
 import { take } from 'rxjs/operator/take';
 import { skip } from 'rxjs/operator/skip';
-import { FIREBASE_PROVIDERS, FirebaseApp, FirebaseAppConfig, FirebaseAuthState, FirebaseAppConfigToken, AngularFireAuth, AuthMethods, firebaseAuthConfig, AuthProviders, WindowLocation, AngularFireModule } from '../angularfire2';
-import { COMMON_CONFIG, ANON_AUTH_CONFIG } from '../test-config';
+import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from '../angularfire2';
+import { COMMON_CONFIG } from '../test-config';
 import { AuthBackend } from './auth_backend';
 import { FirebaseSdkAuthBackend } from './firebase_sdk_auth_backend';
 
