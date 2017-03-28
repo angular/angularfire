@@ -2,7 +2,7 @@
 
 > Getting started with AngularFire2 is easy with the [Angular CLI](https://github.com/angular/angular-cli). Follow the 10 steps below to get started. Don't worry, we're always working to make this shorter.
 
-### 0. Prerequisites
+### 0. Prerequisites
 
 Before you start installing AngularFire2, make sure you have latest version of angular-cli installed.
 To verify run the command `ng -v` and ensure you see `angular-cli: 1.x.x-beta.xx`. The lowest compatible version is `1.x.x-beta.14`.
@@ -88,7 +88,7 @@ export class AppModule {}
 
 ```
 
-### Custom FirebaseApp Names
+#### Custom FirebaseApp Names
 You can optionally provide a custom FirebaseApp name with `initializeApp`.
 
 ```ts
@@ -168,7 +168,7 @@ Run the serve command and go to `localhost:4200` in your browser.
 
 And that's it! If it's totally *borked*, file an issue and let us know.
 
-###[Next Step: Retrieving data as objects](2-retrieving-data-as-objects.md)
+### [Next Step: Retrieving data as objects](2-retrieving-data-as-objects.md)
 
 ### Troubleshooting
 
