@@ -1,10 +1,10 @@
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import { Subject } from 'rxjs/Subject';
-import { Query } from '../interfaces';
+import { Query, ScalarQuery } from '../interfaces';
 import { getOrderObservables, observeQuery } from './index';
 
-function scalarQueryTest(query: Query, done: any) {
+function scalarQueryTest(query: ScalarQuery, done: any) {
   const queryObservable = observeQuery(query);
   queryObservable.subscribe(result => {
     expect(result).toEqual(query);

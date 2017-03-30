@@ -759,8 +759,7 @@ describe('FirebaseListFactory', () => {
               startAt: { value: 0 }
             }
           });
-          query1 = take.call(query1, 1);
-          query1 = toPromise.call(query1);
+          let promise1 = toPromise.call(take.call(query1, 1));
 
           let query2 = FirebaseListFactory(`questions`, {
             query: {
@@ -768,10 +767,9 @@ describe('FirebaseListFactory', () => {
               startAt: { value: 0, key: 'val2' }
             }
           });
-          query2 = take.call(query2, 1);
-          query2 = toPromise.call(query2);
+          let promise2 = toPromise.call(take.call(query2, 1));
 
-          Promise.all([query1, query2]).then(([list1, list2]) => {
+          Promise.all([promise1, promise2]).then(([list1, list2]) => {
             expect(list1.map(i => i.$key)).toEqual(['val1', 'val2', 'val3']);
             expect(list2.map(i => i.$key)).toEqual(['val2', 'val3']);
             done();
@@ -799,8 +797,7 @@ describe('FirebaseListFactory', () => {
               equalTo: { value: 0 }
             }
           });
-          query1 = take.call(query1, 1);
-          query1 = toPromise.call(query1);
+          let promise1 = toPromise.call(take.call(query1, 1));
 
           let query2 = FirebaseListFactory(`questions`, {
             query: {
@@ -808,10 +805,9 @@ describe('FirebaseListFactory', () => {
               equalTo: { value: 0, key: 'val2' }
             }
           });
-          query2 = take.call(query2, 1);
-          query2 = toPromise.call(query2);
+          let promise2 = toPromise.call(take.call(query2, 1));
 
-          Promise.all([query1, query2]).then(([list1, list2]) => {
+          Promise.all([promise1, promise2]).then(([list1, list2]) => {
             expect(list1.map(i => i.$key)).toEqual(['val1', 'val2', 'val3']);
             expect(list2.map(i => i.$key)).toEqual(['val2']);
             done();
@@ -839,8 +835,7 @@ describe('FirebaseListFactory', () => {
               endAt: { value: 0 }
             }
           });
-          query1 = take.call(query1, 1);
-          query1 = toPromise.call(query1);
+          let promise1 = toPromise.call(take.call(query1, 1));
 
           let query2 = FirebaseListFactory(`questions`, {
             query: {
@@ -848,10 +843,9 @@ describe('FirebaseListFactory', () => {
               endAt: { value: 0, key: 'val2' }
             }
           });
-          query2 = take.call(query2, 1);
-          query2 = toPromise.call(query2);
+          let promise2 = toPromise.call(take.call(query2, 1));
 
-          Promise.all([query1, query2]).then(([list1, list2]) => {
+          Promise.all([promise1, promise2]).then(([list1, list2]) => {
             expect(list1.map(i => i.$key)).toEqual(['val1', 'val2', 'val3']);
             expect(list2.map(i => i.$key)).toEqual(['val1', 'val2']);
             done();
