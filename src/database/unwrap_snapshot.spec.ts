@@ -1,7 +1,79 @@
+import { TestBed, inject } from '@angular/core/testing';
 import * as firebase from 'firebase/app';
+import { AngularFireModule, FirebaseApp, FirebaseAppConfig } from '../angularfire2';
+import { AngularFireDatabaseModule } from './index';
+import { COMMON_CONFIG } from '../test-config';
+import { UnwrapSnapshotSignature } from './interfaces';
+import { UnwrapSnapshotToken } from './tokens';
 import { unwrapSnapshot } from './unwrap_snapshot';
 
+describe('UnwrapSnapshotProvider', () => {
+
+  describe('default', () => {
+
+    let app: FirebaseApp;
+    let injectedUnwrapSnapshot: UnwrapSnapshotSignature;
+
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        imports: [
+          AngularFireModule.initializeApp(COMMON_CONFIG, '[DEFAULT]'),
+          AngularFireDatabaseModule
+        ]
+      });
+      inject([FirebaseApp, UnwrapSnapshotToken], (app_: FirebaseApp, unwrapSnapshot_: UnwrapSnapshotSignature) => {
+        app = app_;
+        injectedUnwrapSnapshot = unwrapSnapshot_;
+      })();
+    });
+
+    afterEach(done => {
+      app.delete().then(done, done.fail);
+    });
+
+    it('should inject the default implementation', () => {
+
+      expect(injectedUnwrapSnapshot).toEqual(unwrapSnapshot);
+    });
+  });
+
+  describe('injected', () => {
+
+    function customUnwrapSnapshot() {}
+
+    let app: FirebaseApp;
+    let injectedUnwrapSnapshot: UnwrapSnapshotSignature;
+
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        imports: [
+          AngularFireModule.initializeApp(COMMON_CONFIG, '[DEFAULT]'),
+          AngularFireDatabaseModule
+        ],
+        providers: [{
+          provide: UnwrapSnapshotToken,
+          useValue: customUnwrapSnapshot
+        }]
+      });
+      inject([FirebaseApp, UnwrapSnapshotToken], (app_: FirebaseApp, unwrapSnapshot_: UnwrapSnapshotSignature) => {
+        app = app_;
+        injectedUnwrapSnapshot = unwrapSnapshot_;
+      })();
+    });
+
+    afterEach(done => {
+      app.delete().then(done, done.fail);
+    });
+
+    it('should support injecting a custom implementation', () => {
+
+      expect(injectedUnwrapSnapshot).toEqual(customUnwrapSnapshot);
+    });
+  });
+});
+
 describe('unwrapSnapshot', () => {
+
   let val = { unwrapped: true };
   let snapshot = {
     ref: { key: 'key' },

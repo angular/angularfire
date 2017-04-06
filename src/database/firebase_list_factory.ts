@@ -1,7 +1,7 @@
 import * as firebase from 'firebase/app';
 import { hasKey, isNil, isAbsoluteUrl, isEmptyObject, isString, ZoneScheduler } from '../utils';
 import { checkForUrlOrFirebaseRef, isFirebaseRef } from './utils';
-import { unwrapSnapshot } from './unwrap_snapshot';
+import { unwrapSnapshot as defaultUnwrapSnapshot } from './unwrap_snapshot';
 import 'firebase/database';
 import { FirebaseListObservable } from './firebase_list_observable';
 import { Observer } from 'rxjs/Observer';
@@ -13,7 +13,14 @@ import { map } from 'rxjs/operator/map';
 
 export function FirebaseListFactory (
   pathRef: PathReference,
-  { preserveSnapshot, query = {} } :FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
+  { preserveSnapshot, query = {}, unwrapSnapshot } :FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
+
+  if (unwrapSnapshot && preserveSnapshot) {
+    throw new Error('Cannot use preserveSnapshot with unwrapSnapshot.');
+  }
+  if (!unwrapSnapshot) {
+    unwrapSnapshot = defaultUnwrapSnapshot;
+  }
 
   let ref: QueryReference;
 
@@ -34,7 +41,7 @@ export function FirebaseListFactory (
   if ((isFirebaseRef(pathRef) ||
        isString(pathRef)) &&
        isEmptyObject(query)) {
-    return firebaseListObservable(ref, { preserveSnapshot });
+    return firebaseListObservable(ref, { preserveSnapshot, unwrapSnapshot });
   }
 
   const queryObs = observeQuery(query);
@@ -111,7 +118,7 @@ export function FirebaseListFactory (
 
       return queried;
     }), (queryRef: firebase.database.Reference, ix: number) => {
-      return firebaseListObservable(queryRef, { preserveSnapshot });
+      return firebaseListObservable(queryRef, { preserveSnapshot, unwrapSnapshot });
     })
     .subscribe(subscriber);
 
@@ -126,7 +133,7 @@ export function FirebaseListFactory (
  * asynchonous. It creates a initial array from a promise of ref.once('value'), and then starts
  * listening to child events. When the initial array is loaded, the observable starts emitting values.
  */
-function firebaseListObservable(ref: firebase.database.Reference | DatabaseQuery, {preserveSnapshot}: FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
+function firebaseListObservable(ref: firebase.database.Reference | DatabaseQuery, { preserveSnapshot, unwrapSnapshot }: FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
 
   const toValue = preserveSnapshot ? (snapshot => snapshot) : unwrapSnapshot;
   const toKey = preserveSnapshot ? (value => value.key) : (value => value.$key);

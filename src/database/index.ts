@@ -6,4 +6,5 @@ export * from './firebase_object_observable';
 export * from './query_observable';
 export * from './database.module';
 export * from './interfaces';
+export * from './tokens';
 export * from './utils';

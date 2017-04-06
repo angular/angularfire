@@ -8,10 +8,13 @@ export interface FirebaseOperationCases {
   unwrappedSnapshotCase?: () => firebase.Promise<void>;
 }
 
-export interface AFUnwrappedDataSnapshot {
+export type UnwrapSnapshotSignature = (snapshot: firebase.database.DataSnapshot) => UnwrappedSnapshot;
+
+export interface UnwrappedSnapshot {
   $key: string;
   $value?: string | number | boolean;
   $exists: () => boolean;
+  [key: string]: any;
 }
 
 export interface Query {
@@ -53,10 +56,12 @@ export interface LimitToSelection {
 export interface FirebaseListFactoryOpts {
   preserveSnapshot?: boolean;
   query?: Query;
+  unwrapSnapshot?: UnwrapSnapshotSignature;
 }
 
 export interface FirebaseObjectFactoryOpts {
   preserveSnapshot?: boolean;
+  unwrapSnapshot?: UnwrapSnapshotSignature;
 }
 
 export enum OrderByOptions {

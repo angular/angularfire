@@ -3,6 +3,7 @@ import { FirebaseListFactory, FirebaseListObservable, FirebaseObjectFactory, onC
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule} from '../angularfire2';
 import { TestBed, inject } from '@angular/core/testing';
 import { Query } from './interfaces';
+import { unwrapSnapshot } from './unwrap_snapshot';
 import { Subscription, Observable, Subject } from 'rxjs';
 import { COMMON_CONFIG } from '../test-config';
 import { _do } from 'rxjs/operator/do';
@@ -877,6 +878,54 @@ describe('FirebaseListFactory', () => {
     });
 
   });
+
+  describe('unwrapSnapshot', () => {
+
+    let ref: firebase.database.Reference;
+    let subscription: Subscription;
+
+    beforeEach((done: any) => {
+
+      ref = firebase.database().ref('test');
+      ref.remove()
+        .then(done)
+        .catch(done.fail);
+    });
+
+    afterEach((done: any) => {
+      if (subscription && !subscription.closed) {
+        subscription.unsubscribe();
+      }
+      ref.remove()
+        .then(done)
+        .catch(done.fail);
+    });
+
+    it('should use the specified unwrapSnapshot implementation', (done: any) => {
+
+      ref.set({ 'key1': 'val1' })
+        .then(() => {
+          let observable = FirebaseListFactory(ref, {
+            unwrapSnapshot: (snapshot) => {
+              const unwrapped = unwrapSnapshot(snapshot);
+              (unwrapped as any).custom = true;
+              return unwrapped;
+            }
+          });
+          return toPromise.call(skipAndTake(observable, 1));
+        })
+        .then((list: any[]) => {
+          expect(list.length).toBe(1);
+          expect(list[0].$key).toBe('key1');
+          expect(list[0].$value).toBe('val1');
+          expect(list[0].custom).toBe(true);
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+
+  });
+
 });
 
 function skipAndTake<T>(obs: Observable<T>, takeCount: number = 1, skipCount: number = 0) {

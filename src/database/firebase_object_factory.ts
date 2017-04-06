@@ -5,12 +5,19 @@ import * as firebase from 'firebase/app';
 import 'firebase/database';
 import { isAbsoluteUrl, ZoneScheduler } from '../utils';
 import { checkForUrlOrFirebaseRef } from './utils';
-import { unwrapSnapshot } from './unwrap_snapshot';
+import { unwrapSnapshot as defaultUnwrapSnapshot } from './unwrap_snapshot';
 import { FirebaseObjectFactoryOpts, PathReference, DatabaseReference } from './interfaces';
 
 export function FirebaseObjectFactory (
   pathRef: PathReference,
-  { preserveSnapshot }: FirebaseObjectFactoryOpts = {}): FirebaseObjectObservable<any> {
+  { preserveSnapshot, unwrapSnapshot }: FirebaseObjectFactoryOpts = {}): FirebaseObjectObservable<any> {
+
+  if (unwrapSnapshot && preserveSnapshot) {
+    throw new Error('Cannot use preserveSnapshot with unwrapSnapshot.');
+  }
+  if (!unwrapSnapshot) {
+    unwrapSnapshot = defaultUnwrapSnapshot;
+  }
 
   let ref: DatabaseReference;
 

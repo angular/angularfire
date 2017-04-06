@@ -1,9 +1,12 @@
 import * as firebase from 'firebase/app';
 import { Subscription } from 'rxjs';
+import { take } from 'rxjs/operator/take';
+import { toPromise } from 'rxjs/operator/toPromise';
 import { FirebaseObjectFactory, FirebaseObjectObservable, AngularFireDatabaseModule, AngularFireDatabase } from './index';
 import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from '../angularfire2';
 import { COMMON_CONFIG } from '../test-config';
+import { unwrapSnapshot } from './unwrap_snapshot';
 
 describe('FirebaseObjectFactory', () => {
   let i = 0;
@@ -155,4 +158,51 @@ describe('FirebaseObjectFactory', () => {
       });
     });
   });
+
+  describe('unwrapSnapshot', () => {
+
+    let ref: firebase.database.Reference;
+    let subscription: Subscription;
+
+    beforeEach((done: any) => {
+
+      ref = firebase.database().ref('test');
+      ref.remove()
+        .then(done)
+        .catch(done.fail);
+    });
+
+    afterEach((done: any) => {
+      if (subscription && !subscription.closed) {
+        subscription.unsubscribe();
+      }
+      ref.remove()
+        .then(done)
+        .catch(done.fail);
+    });
+
+    it('should use the specified unwrapSnapshot implementation', (done: any) => {
+
+      ref.set({ 'key1': 'val1' })
+        .then(() => {
+          let observable = FirebaseObjectFactory(ref, {
+            unwrapSnapshot: (snapshot) => {
+              const unwrapped = unwrapSnapshot(snapshot);
+              (unwrapped as any).custom = true;
+              return unwrapped;
+            }
+          });
+          return toPromise.call(take.call(observable, 1));
+        })
+        .then((obj: any) => {
+          expect(obj.$key).toBe('test');
+          expect(obj.key1).toBe('val1');
+          expect(obj.custom).toBe(true);
+        })
+        .then(done)
+        .catch(done.fail);
+    });
+
+  });
+
 });

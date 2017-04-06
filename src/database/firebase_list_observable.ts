@@ -6,9 +6,9 @@ import * as firebase from 'firebase/app';
 import 'firebase/database';
 import { isString } from '../utils';
 import { isFirebaseRef, isFirebaseDataSnapshot, isAFUnwrappedSnapshot } from './utils';
-import { AFUnwrappedDataSnapshot, FirebaseOperationCases, QueryReference, DatabaseSnapshot, DatabaseReference } from './interfaces';
+import { UnwrappedSnapshot, FirebaseOperationCases, QueryReference, DatabaseSnapshot, DatabaseReference } from './interfaces';
 
-export type FirebaseOperation = string | firebase.database.Reference | firebase.database.DataSnapshot | AFUnwrappedDataSnapshot;
+export type FirebaseOperation = string | firebase.database.Reference | firebase.database.DataSnapshot | UnwrappedSnapshot;
 
 export class FirebaseListObservable<T> extends Observable<T> {
   constructor(public $ref: QueryReference, subscribe?: <R>(subscriber: Subscriber<R>) => Subscription | Function | void) {
@@ -34,7 +34,7 @@ export class FirebaseListObservable<T> extends Observable<T> {
       stringCase: () => this.$ref.ref.child(<string>item).update(value),
       firebaseCase: () => (<firebase.database.Reference>item).update(value),
       snapshotCase: () => (<firebase.database.DataSnapshot>item).ref.update(value),
-      unwrappedSnapshotCase: () => this.$ref.ref.child((<AFUnwrappedDataSnapshot>item).$key).update(value)
+      unwrappedSnapshotCase: () => this.$ref.ref.child((<UnwrappedSnapshot>item).$key).update(value)
     });
   }
 
@@ -47,7 +47,7 @@ export class FirebaseListObservable<T> extends Observable<T> {
       stringCase: () => this.$ref.ref.child(<string>item).remove(),
       firebaseCase: () => (<DatabaseReference>item).remove(),
       snapshotCase: () => (<DatabaseSnapshot>item).ref.remove(),
-      unwrappedSnapshotCase: () => this.$ref.ref.child((<AFUnwrappedDataSnapshot>item).$key).remove()
+      unwrappedSnapshotCase: () => this.$ref.ref.child((<UnwrappedSnapshot>item).$key).remove()
     });
   }
 
