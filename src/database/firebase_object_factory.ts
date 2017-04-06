@@ -4,7 +4,7 @@ import { observeOn } from 'rxjs/operator/observeOn';
 import * as firebase from 'firebase/app';
 import 'firebase/database';
 import { isAbsoluteUrl, ZoneScheduler } from '../utils';
-import { checkForUrlOrFirebaseRef, unwrapMapFn } from './utils';
+import { checkForUrlOrFirebaseRef, unwrapSnapshot } from './utils';
 import { FirebaseObjectFactoryOpts, PathReference, DatabaseReference } from './interfaces';
 
 export function FirebaseObjectFactory (
@@ -27,7 +27,7 @@ export function FirebaseObjectFactory (
 
   const objectObservable = new FirebaseObjectObservable((obs: Observer<any>) => {
     let fn = ref.on('value', (snapshot: firebase.database.DataSnapshot) => {
-      obs.next(preserveSnapshot ? snapshot : unwrapMapFn(snapshot))
+      obs.next(preserveSnapshot ? snapshot : unwrapSnapshot(snapshot))
     }, err => {
       if (err) { obs.error(err); obs.complete(); }
     });

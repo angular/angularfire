@@ -1,6 +1,6 @@
 import * as firebase from 'firebase/app';
 import { hasKey, isNil, isAbsoluteUrl, isEmptyObject, isString, ZoneScheduler } from '../utils';
-import { checkForUrlOrFirebaseRef, isFirebaseRef, unwrapMapFn } from './utils';
+import { checkForUrlOrFirebaseRef, isFirebaseRef, unwrapSnapshot } from './utils';
 import 'firebase/database';
 import { AFUnwrappedDataSnapshot } from './interfaces';
 import { FirebaseListObservable } from './firebase_list_observable';
@@ -128,7 +128,7 @@ export function FirebaseListFactory (
  */
 function firebaseListObservable(ref: firebase.database.Reference | DatabaseQuery, {preserveSnapshot}: FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
 
-  const toValue = preserveSnapshot ? (snapshot => snapshot) : unwrapMapFn;
+  const toValue = preserveSnapshot ? (snapshot => snapshot) : unwrapSnapshot;
   const toKey = preserveSnapshot ? (value => value.key) : (value => value.$key);
 
   const listObs = new FirebaseListObservable(ref, (obs: Observer<any[]>) => {

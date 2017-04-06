@@ -2,7 +2,7 @@ import * as firebase from 'firebase/app';
 import { FirebaseListFactory, FirebaseListObservable, FirebaseObjectFactory, onChildAdded, onChildChanged, onChildRemoved, onChildUpdated, AngularFireDatabase, AngularFireDatabaseModule } from './index';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule} from '../angularfire2';
 import { TestBed, inject } from '@angular/core/testing';
-import { unwrapMapFn } from './utils';
+import { unwrapSnapshot } from './utils';
 import { Query, AFUnwrappedDataSnapshot } from './interfaces';
 import { Subscription, Observable, Subject } from 'rxjs';
 import { COMMON_CONFIG } from '../test-config';
@@ -652,7 +652,7 @@ describe('FirebaseListFactory', () => {
     });
 
 
-    describe('unwrapMapFn', () => {
+    describe('unwrapSnapshot', () => {
       let val = { unwrapped: true };
       let snapshot = {
         ref: { key: 'key' },
@@ -660,15 +660,15 @@ describe('FirebaseListFactory', () => {
       };
 
       it('should return an object value with a $key property', () => {
-        const unwrapped = unwrapMapFn(snapshot as firebase.database.DataSnapshot);
+        const unwrapped = unwrapSnapshot(snapshot as firebase.database.DataSnapshot);
         expect(unwrapped.$key).toEqual(snapshot.ref.key);
       });
 
       it('should return an object value with a $value property if value is scalar', () => {
         const existsFn = () => { return true; }
-        const unwrappedValue5 = unwrapMapFn(Object.assign(snapshot, { val: () => 5, exists: existsFn }) as firebase.database.DataSnapshot);
-        const unwrappedValueFalse = unwrapMapFn(Object.assign(snapshot, { val: () => false, exists: existsFn }) as firebase.database.DataSnapshot);
-        const unwrappedValueLol = unwrapMapFn(Object.assign(snapshot, { val: () => 'lol', exists: existsFn }) as firebase.database.DataSnapshot);
+        const unwrappedValue5 = unwrapSnapshot(Object.assign(snapshot, { val: () => 5, exists: existsFn }) as firebase.database.DataSnapshot);
+        const unwrappedValueFalse = unwrapSnapshot(Object.assign(snapshot, { val: () => false, exists: existsFn }) as firebase.database.DataSnapshot);
+        const unwrappedValueLol = unwrapSnapshot(Object.assign(snapshot, { val: () => 'lol', exists: existsFn }) as firebase.database.DataSnapshot);
 
         expect(unwrappedValue5.$key).toEqual('key');
         expect(unwrappedValue5.$value).toEqual(5);

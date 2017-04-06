@@ -30,9 +30,9 @@ export interface CheckUrlRef {
  * @param {DataSnapshot} snapshot - The snapshot to unwrap
  * @return AFUnwrappedDataSnapshot
  * @example
- * unwrapMapFn(snapshot) => { name: 'David', $key: 'david', $exists: Function }
+ * unwrapSnapshot(snapshot) => { name: 'David', $key: 'david', $exists: Function }
  */
-export function unwrapMapFn (snapshot:firebase.database.DataSnapshot): AFUnwrappedDataSnapshot {
+export function unwrapSnapshot (snapshot:firebase.database.DataSnapshot): AFUnwrappedDataSnapshot {
   var unwrapped = !isNil(snapshot.val()) ? snapshot.val() : { $value: null };
   if ((/string|number|boolean/).test(typeof unwrapped)) {
     unwrapped = {
