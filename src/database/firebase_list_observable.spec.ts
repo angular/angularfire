@@ -2,7 +2,7 @@ import { FirebaseListObservable, AngularFireDatabase, AngularFireDatabaseModule 
 import { Observer } from 'rxjs/Observer';
 import { map } from 'rxjs/operator/map';
 import * as firebase from 'firebase/app';
-import { unwrapSnapshot } from './utils';
+import { unwrapSnapshot } from './unwrap_snapshot';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule} from '../angularfire2';
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../test-config';

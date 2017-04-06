@@ -4,7 +4,8 @@ import { observeOn } from 'rxjs/operator/observeOn';
 import * as firebase from 'firebase/app';
 import 'firebase/database';
 import { isAbsoluteUrl, ZoneScheduler } from '../utils';
-import { checkForUrlOrFirebaseRef, unwrapSnapshot } from './utils';
+import { checkForUrlOrFirebaseRef } from './utils';
+import { unwrapSnapshot } from './unwrap_snapshot';
 import { FirebaseObjectFactoryOpts, PathReference, DatabaseReference } from './interfaces';
 
 export function FirebaseObjectFactory (

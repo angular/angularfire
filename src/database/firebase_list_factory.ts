@@ -1,8 +1,8 @@
 import * as firebase from 'firebase/app';
 import { hasKey, isNil, isAbsoluteUrl, isEmptyObject, isString, ZoneScheduler } from '../utils';
-import { checkForUrlOrFirebaseRef, isFirebaseRef, unwrapSnapshot } from './utils';
+import { checkForUrlOrFirebaseRef, isFirebaseRef } from './utils';
+import { unwrapSnapshot } from './unwrap_snapshot';
 import 'firebase/database';
-import { AFUnwrappedDataSnapshot } from './interfaces';
 import { FirebaseListObservable } from './firebase_list_observable';
 import { Observer } from 'rxjs/Observer';
 import { observeOn } from 'rxjs/operator/observeOn';
