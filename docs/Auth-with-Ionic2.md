@@ -243,7 +243,7 @@ C:\projects\Ionic_AngularFire2_Project> ionic serve
 
 ```
 
-####_This should fetch the data from firebase._
+This should fetch the data from firebase.
 
 ## Configuring AngularFire2 Auth with Ionic2
 
