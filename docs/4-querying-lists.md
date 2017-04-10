@@ -17,6 +17,22 @@ const queryObservable = af.database.list('/items', {
 });
 ```
 
+**Query Options:**
+
+| method   | purpose            | 
+| ---------|--------------------| 
+| `orderByChild` | Specify a child to order by. |
+| `orderByKey` | Boolean to order by Firebase Database keys. |
+| `orderByPriority` | Boolean to order by Firebase Database priority. |
+| `orderByValue` | Specify a value to order by. |
+| `equalTo` <sup>1</sup> | Limit list to items that contain certain value. |
+| `limitToFirst` | Sets the maximum number of items to return from the beginning of the ordered list of results. |
+| `limitToLast` | Sets the maximum number of items to return from the end of the ordered list of results. |
+| `startAt` <sup>1</sup> | Return items greater than or equal to the specified key or value, depending on the order-by method chosen. |
+| `endAt` <sup>1</sup> | Return items less than or equal to the specified key or value, depending on the order-by method chosen. |
+
+<sup>1</sup> The Firebase SDK supports an optional `key` parameter for [`startAt`](https://firebase.google.com/docs/reference/js/firebase.database.Reference#startAt), [`endAt`](https://firebase.google.com/docs/reference/js/firebase.database.Reference#endAt), and [`equalTo`](https://firebase.google.com/docs/reference/js/firebase.database.Reference#equalTo) when ordering by child, value, or priority. You can specify the `key` parameter using an object literal that contains the `value` and the `key`. For example: `startAt: { value: 'some-value', key: 'some-key' }`.
+
 ## Invalid query combinations
 
 **Queries can only be ordered by one method.** This means you can only specify
@@ -52,6 +68,8 @@ re-run queries when the observable emits a new value.
 
 This is the magic of AngularFire2.
 
+An RxJS Subject is imported below. A Subject is like an Observable, but can multicast to many Observers. Subjects are like EventEmitters: they maintain a registry of many listeners. See, [What is a Subject](http://reactivex.io/rxjs/manual/overview.html#subject) for more information.
+
 ```ts
 const subject = new Subject(); // import {Subject} from 'rxjs/Subject';
 const queryObservable = af.database.list('/items', {
@@ -81,8 +99,7 @@ import { AngularFire, FirebaseListObservable, FirebaseObjectObservable } from 'a
 import { Subject } from 'rxjs/Subject';
 
 @Component({
-  moduleId: module.id,
-  selector: 'app',
+  selector: 'app-root',
   template: `
   <ul>
     <li *ngFor="let item of items | async">
@@ -97,7 +114,7 @@ import { Subject } from 'rxjs/Subject';
   </div>
   `,
 })
-export class RcTestAppComponent {
+export class AppComponent {
   items: FirebaseListObservable<any[]>;
   sizeSubject: Subject<any>;
   
@@ -115,5 +132,20 @@ export class RcTestAppComponent {
   }
 }
 ```
+
++**To run the above example as is, you need to have sample data in you firebase database with the following structure:"**
+ 
+ ```ts
+   -|items
+       -|item1
+           -|size: small
+           -|text: sample small text
+       -|item2
+           -|size: medium
+           -|text: sample medium text
+       -|item3
+           -|size: large
+           -|text: sample large text    
+ ```
 
 ###[Next Step: User Authentication](5-user-authentication.md)

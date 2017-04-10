@@ -1,39 +1,29 @@
-import { FirebaseListObservable } from './index';
+import { FirebaseListObservable, AngularFireDatabase, AngularFireDatabaseModule } from './index';
 import { Observer } from 'rxjs/Observer';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/map';
-import { database } from 'firebase';
+import { map } from 'rxjs/operator/map';
+import * as firebase from 'firebase/app';
 import { unwrapMapFn } from '../utils';
-import {
-  FIREBASE_PROVIDERS,
-  defaultFirebase,
-  FirebaseApp,
-  FirebaseAppConfig,
-  AngularFire
-} from '../angularfire2';
-import {
-  addProviders,
-  inject
-} from '@angular/core/testing';
+import { FirebaseApp, FirebaseAppConfig, AngularFireModule} from '../angularfire2';
+import { TestBed, inject } from '@angular/core/testing';
+import { COMMON_CONFIG } from '../test-config';
 
-export const firebaseConfig: FirebaseAppConfig = {
-  apiKey: "AIzaSyBVSy3YpkVGiKXbbxeK0qBnu3-MNZ9UIjA",
-  authDomain: "angularfire2-test.firebaseapp.com",
-  databaseURL: "https://angularfire2-test.firebaseio.com",
-  storageBucket: "angularfire2-test.appspot.com",
-};
-const rootUrl = firebaseConfig.databaseURL;
-
-describe('FirebaseObservable', () => {
-  var O:FirebaseListObservable<any>;
-  var ref:firebase.database.Reference;
-  var app: firebase.app.App;
+describe('FirebaseListObservable', () => {
+  let O: FirebaseListObservable<any>;
+  let ref: firebase.database.Reference;
+  let app: firebase.app.App;
+  let db: AngularFireDatabase;
 
   beforeEach(() => {
-    addProviders([FIREBASE_PROVIDERS, defaultFirebase(firebaseConfig)]);
-    inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
-      app = firebaseApp;
-      ref = database().ref();
+    TestBed.configureTestingModule({
+      imports: [
+        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireDatabaseModule
+      ]
+    });
+    inject([FirebaseApp, AngularFireDatabase], (_app: firebase.app.App, _db: AngularFireDatabase) => {
+      app = _app;
+      db = _db;
+      ref = firebase.database().ref();
       O = new FirebaseListObservable(ref, (observer:Observer<any>) => {
       });
     })();
@@ -48,7 +38,13 @@ describe('FirebaseObservable', () => {
   it('should return an instance of FirebaseObservable when calling operators', () => {
     O = new FirebaseListObservable(ref, (observer:Observer<any>) => {
     });
-    expect(O.map(noop) instanceof FirebaseListObservable).toBe(true);
+    expect(map.call(O, noop) instanceof FirebaseListObservable).toBe(true);
+  });
+
+  describe('$ref', () => {
+    it('should match the database path passed in the constructor', () => {
+      expect(O.$ref.toString()).toEqual(ref.toString());
+    });
   });
 
   describe('push', () => {
@@ -65,18 +61,16 @@ describe('FirebaseObservable', () => {
     });
   });
 
-
   describe('remove', () => {
-    var orphan = { orphan: true };
-    var child:firebase.database.Reference;
+    let orphan = { orphan: true };
+    let child:firebase.database.Reference;
 
     beforeEach(() => {
       child = ref.push(orphan);
     });
 
-
     it('should remove the item from the Firebase db when given the key', (done:any) => {
-      var childAddedSpy = jasmine.createSpy('childAdded');
+      let childAddedSpy = jasmine.createSpy('childAdded');
 
       ref.on('child_added', childAddedSpy);
       O.remove(child.key)
@@ -91,7 +85,7 @@ describe('FirebaseObservable', () => {
 
 
     it('should remove the item from the Firebase db when given the reference', (done:any) => {
-      var childAddedSpy = jasmine.createSpy('childAdded');
+      let childAddedSpy = jasmine.createSpy('childAdded');
 
       ref.on('child_added', childAddedSpy);
 
@@ -143,21 +137,21 @@ describe('FirebaseObservable', () => {
 
 
     it('should throw an exception if input is not supported', () => {
-      var input = (<any>{lol:true});
+      let input = (<any>{lol:true});
       expect(() => O.remove(input)).toThrowError(`Method requires a key, snapshot, reference, or unwrapped snapshot. Got: ${typeof input}`);
     })
   });
 
   describe('update', () => {
-    var orphan = { orphan: true };
-    var child:firebase.database.Reference;
+    let orphan = { orphan: true };
+    let child:firebase.database.Reference;
 
     beforeEach(() => {
       child = ref.push(orphan);
     });
 
     it('should update the item from the Firebase db when given the key', (done:any) => {
-      var childChangedSpy = jasmine.createSpy('childChanged');
+      let childChangedSpy = jasmine.createSpy('childChanged');
       const orphanChange = { changed: true }
       ref.on('child_changed', childChangedSpy);
       O.update(child.key, orphanChange)
@@ -174,7 +168,7 @@ describe('FirebaseObservable', () => {
     });
 
     it('should update the item from the Firebase db when given the reference', (done:any) => {
-      var childChangedSpy = jasmine.createSpy('childChanged');
+      let childChangedSpy = jasmine.createSpy('childChanged');
       const orphanChange = { changed: true }
       ref.on('child_changed', childChangedSpy);
       O.update(child.ref, orphanChange)
@@ -191,7 +185,7 @@ describe('FirebaseObservable', () => {
     });
 
     it('should update the item from the Firebase db when given the snapshot', (done:any) => {
-      var childChangedSpy = jasmine.createSpy('childChanged');
+      let childChangedSpy = jasmine.createSpy('childChanged');
       const orphanChange = { changed: true }
       ref.on('child_changed', childChangedSpy);
       O.update(child, orphanChange)

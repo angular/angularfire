@@ -1,10 +1,10 @@
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import { Subject } from 'rxjs/Subject';
-import { Query } from '../interfaces';
+import { Query, ScalarQuery } from '../interfaces';
 import { getOrderObservables, observeQuery } from './index';
 
-function scalarQueryTest(query: Query, done: any) {
+function scalarQueryTest(query: ScalarQuery, done: any) {
   const queryObservable = observeQuery(query);
   queryObservable.subscribe(result => {
     expect(result).toEqual(query);
@@ -13,17 +13,17 @@ function scalarQueryTest(query: Query, done: any) {
 }
 
 function observableQueryTest(query: Query, nextProp: any, done: any) {
-  const nextSpy = jasmine.createSpy('next');
   const queryObservable = observeQuery(query);
   const toMerge: any = {};
-  queryObservable.subscribe(nextSpy);
+  queryObservable.subscribe(result => {
+    const merged = Object.assign(query, toMerge);
+    expect(result).toEqual(merged);
+    done();
+  });
   Object.keys(nextProp).forEach(prop => {
     query[prop].next(nextProp[prop]);
     toMerge[prop] = nextProp[prop];
-  })
-  const merged = Object.assign(query, toMerge);
-  expect(nextSpy).toHaveBeenCalledWith(merged);
-  done();
+  });
 }
 
 describe('observeQuery', () => {
@@ -33,11 +33,11 @@ describe('observeQuery', () => {
     expect(observeQuery({}) instanceof Observable).toBe(true);
   });
 
-  it('should immediately emit a query object if passed a plain JS object with only scalar values', () => {
-    var nextSpy = jasmine.createSpy('next');
-    var completeSpy = jasmine.createSpy('complete');
-    var query = { orderByChild: 'height', equalTo: 10 };
-    var obs = observeQuery(query);
+  it('should immediately emit a query object if passed a POJO with only scalar values', () => {
+    let nextSpy = jasmine.createSpy('next');
+    let completeSpy = jasmine.createSpy('complete');
+    let query = { orderByChild: 'height', equalTo: 10 };
+    let obs = observeQuery(query, false);
     obs.subscribe(nextSpy, null, completeSpy);
     expect(nextSpy).toHaveBeenCalledWith({
       orderByChild: 'height',
@@ -47,10 +47,10 @@ describe('observeQuery', () => {
 
 
   it('should return null if called with no query', () => {
-    var nextSpy = jasmine.createSpy('next');
-    var completeSpy = jasmine.createSpy('complete');
-    var query:any = null;
-    var obs = observeQuery(query);
+    let nextSpy = jasmine.createSpy('next');
+    let completeSpy = jasmine.createSpy('complete');
+    let query:any = null;
+    let obs = observeQuery(query, false);
     obs.subscribe(nextSpy, null, completeSpy);
     expect(nextSpy).toHaveBeenCalledWith(null);
     expect(completeSpy).toHaveBeenCalled();
@@ -58,13 +58,13 @@ describe('observeQuery', () => {
 
 
   it('should emit an updated query if an attached observable emits new value', () => {
-    var nextSpy = jasmine.createSpy('next');
-    var completeSpy = jasmine.createSpy('complete');
-    var query = {
+    let nextSpy = jasmine.createSpy('next');
+    let completeSpy = jasmine.createSpy('complete');
+    let query = {
       orderByKey: new Subject<boolean>()
     };
-    var obs = observeQuery(query);
-    var noOrderyQuery = { orderByKey: false };
+    let obs = observeQuery(query, false);
+    let noOrderyQuery = { orderByKey: false };
     obs.subscribe(nextSpy, null, completeSpy);
     query.orderByKey.next(true);
     expect(nextSpy).toHaveBeenCalledWith({ orderByKey: true});
@@ -76,12 +76,12 @@ describe('observeQuery', () => {
 
 
   it('should omit a key from the query if its observable emits null', () => {
-    var nextSpy = jasmine.createSpy('next');
-    var completeSpy = jasmine.createSpy('complete');
-    var query = {
+    let nextSpy = jasmine.createSpy('next');
+    let completeSpy = jasmine.createSpy('complete');
+    let query = {
       orderByKey: new Subject<boolean>()
     };
-    var obs = observeQuery(query);
+    let obs = observeQuery(query, false);
     obs.subscribe(nextSpy, null, completeSpy);
     query.orderByKey.next(true);
     expect(nextSpy).toHaveBeenCalledWith({ orderByKey: true });
@@ -92,15 +92,14 @@ describe('observeQuery', () => {
 
 
   it('should omit only the orderBy type of the last emitted orderBy observable', () => {
-    // TODO: Should we allow re-emitting of the orderBy method?
-    var nextSpy = jasmine.createSpy('next');
-    var query = {
+    let nextSpy = jasmine.createSpy('next');
+    let query = {
       orderByKey: new Subject<boolean>(),
       orderByPriority: new Subject<boolean>(),
       orderByValue: new Subject<boolean>(),
       orderByChild: new Subject<string>()
     };
-    var obs = observeQuery(query);
+    let obs = observeQuery(query, false);
     obs.subscribe(nextSpy);
     query.orderByChild.next('height');
     expect(nextSpy).toHaveBeenCalledWith({
@@ -108,24 +107,32 @@ describe('observeQuery', () => {
     });
     nextSpy.calls.reset();
     query.orderByKey.next(true);
-    expect(nextSpy).not.toHaveBeenCalled();
-    // nextSpy.calls.reset();
-    // query.orderByValue.next(true);
-    // expect(nextSpy).toHaveBeenCalledWith({orderByValue: true});
-    // nextSpy.calls.reset();
+    expect(nextSpy).toHaveBeenCalledWith({
+      orderByKey: true
+    });
+    nextSpy.calls.reset();
+    query.orderByValue.next(true);
+    expect(nextSpy).toHaveBeenCalledWith({
+      orderByValue: true
+    });
+    nextSpy.calls.reset();
     query.orderByChild.next('foo');
-    expect(nextSpy).toHaveBeenCalledWith({orderByChild: 'foo'});
+    expect(nextSpy).toHaveBeenCalledWith({
+      orderByChild: 'foo'
+    });
   });
 });
 
 
-// describe('getOrderObservables', () => {
-//   it('should be subscribable event if no observables found for orderby', () => {
-//     expect(() => {
-//       getOrderObservables((<Query>{})).subscribe();
-//     }).not.toThrow();
-//   });
-// });
+describe('getOrderObservables', () => {
+  it('should be subscribable event if no observables found for orderby', () => {
+    let nextSpy = jasmine.createSpy('next');
+    let obs = getOrderObservables({});
+    obs.subscribe(nextSpy);
+    expect(nextSpy).toHaveBeenCalledWith(null);
+  });
+});
+
 
 describe('query combinations', () => {
 
@@ -420,5 +427,115 @@ describe('query combinations', () => {
       });
 
     });
+
+});
+
+
+describe('null values', () => {
+
+  it('should build an equalTo() query with a null scalar value', (done: any) => {
+    scalarQueryTest({
+      orderByChild: 'height',
+      equalTo: null
+    }, done);
+  });
+
+  it('should build a startAt() query with a null scalar value', (done: any) => {
+    scalarQueryTest({
+      orderByChild: 'height',
+      startAt: null
+    }, done);
+  });
+
+  it('should build an endAt() query with a null scalar value', (done: any) => {
+    scalarQueryTest({
+      orderByChild: 'height',
+      endAt: null
+    }, done);
+  });
+
+  it('should build an equalTo() query with a null observable value', (done: any) => {
+    const query = {
+      orderByChild: 'height',
+      equalTo: new Subject()
+    };
+    observableQueryTest(query, { equalTo: null }, done);
+  });
+
+  it('should build a startAt() query with a null observable value', (done: any) => {
+    const query = {
+      orderByChild: 'height',
+      startAt: new Subject()
+    };
+    observableQueryTest(query, { startAt: null }, done);
+  });
+
+  it('should build an endAt() query with a null observable value', (done: any) => {
+    const query = {
+      orderByChild: 'height',
+      endAt: new Subject()
+    };
+    observableQueryTest(query, { endAt: null }, done);
+  });
+
+});
+
+describe('audited queries', () => {
+
+  it('should immediately emit if not audited', () => {
+    let nextSpy = jasmine.createSpy('next');
+    let query = { orderByChild: 'height', startAt: new Subject(), endAt: new Subject() };
+    let obs = observeQuery(query, false);
+    obs.subscribe(nextSpy);
+    query.startAt.next(5);
+    expect(nextSpy).not.toHaveBeenCalled();
+    query.endAt.next(10);
+    expect(nextSpy).toHaveBeenCalledWith({
+      orderByChild: 'height',
+      startAt: 5,
+      endAt: 10
+    });
+    query.startAt.next(10);
+    expect(nextSpy).toHaveBeenCalledWith({
+      orderByChild: 'height',
+      startAt: 10,
+      endAt: 10
+    });
+    query.endAt.next(15);
+    expect(nextSpy).toHaveBeenCalledWith({
+      orderByChild: 'height',
+      startAt: 10,
+      endAt: 15
+    });
+  });
+
+  it('should emit the last query (in the event loop) if audited', (done: any) => {
+    let emits = 0;
+    let query = { orderByChild: 'height', startAt: new Subject(), endAt: new Subject() };
+    let obs = observeQuery(query, true);
+    obs.subscribe(result => {
+      switch (++emits) {
+      case 1:
+        expect(result).toEqual({
+          orderByChild: 'height',
+          startAt: 5,
+          endAt: 10
+        });
+        query.startAt.next(10);
+        query.endAt.next(15);
+        break;
+      case 2:
+        expect(result).toEqual({
+          orderByChild: 'height',
+          startAt: 10,
+          endAt: 15
+        });
+        done();
+        break;
+      }
+    });
+    query.startAt.next(5);
+    query.endAt.next(10);
+  });
 
 });

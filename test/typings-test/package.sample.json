@@ -1,0 +1,17 @@
+{
+  "name": "typings-test",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "angularfire2": "file:{{ANGULARFIRE_VERSION}}",
+    "firebase": "{{FIREBASE_VERSION}}",
+    "@angular/common": "{{ANGULAR_VERSION}}",
+    "@angular/compiler": "{{ANGULAR_VERSION}}",
+    "@angular/core": "{{ANGULAR_VERSION}}",
+    "@angular/platform-browser": "{{ANGULAR_VERSION}}",
+    "@angular/platform-browser-dynamic": "{{ANGULAR_VERSION}}",
+    "zone.js": "{{ZONE_VERSION}}",
+    "rxjs": "{{RXJS_VERSION}}",
+    "typescript": "{{TYPESCRIPT_VERSION}}"
+  }
+}

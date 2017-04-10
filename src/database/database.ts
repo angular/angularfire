@@ -1,41 +1,28 @@
+import * as firebase from 'firebase/app';
+import 'firebase/database';
 import { Inject, Injectable } from '@angular/core';
-import { FirebaseApp, FirebaseConfig } from '../tokens';
-import { FirebaseAppConfig } from '../angularfire2';
+import { FirebaseAppConfigToken, FirebaseAppConfig, FirebaseApp } from '../angularfire2';
 import { FirebaseListFactory } from './index';
-import { FirebaseListFactoryOpts, FirebaseObjectFactoryOpts } from '../interfaces';
+import { FirebaseListFactoryOpts, FirebaseObjectFactoryOpts, PathReference } from '../interfaces';
 import * as utils from '../utils';
-import {
-  FirebaseListObservable,
-  FirebaseObjectObservable,
-  FirebaseObjectFactory
-} from './index';
+import { FirebaseListObservable, FirebaseObjectObservable, FirebaseObjectFactory } from './index';
 
 @Injectable()
 export class AngularFireDatabase {
-  constructor(@Inject(FirebaseConfig) private fbConfig:FirebaseAppConfig,
-    @Inject(FirebaseApp) private fbApp:any) {}
-  list (urlOrRef:string | firebase.database.Reference, opts?:FirebaseListFactoryOpts):FirebaseListObservable<any[]> {
-    return utils.checkForUrlOrFirebaseRef(urlOrRef, {
-      isUrl: () => FirebaseListFactory(this.fbApp.database().refFromURL(getAbsUrl(this.fbConfig, <string>urlOrRef)), opts),
-      isRef: () => FirebaseListFactory(<firebase.database.Reference>urlOrRef)
+  
+  constructor(public app: FirebaseApp) {}
+  
+  list(pathOrRef: PathReference, opts?:FirebaseListFactoryOpts):FirebaseListObservable<any[]> {
+    const ref = utils.getRef(this.app, pathOrRef);
+    return FirebaseListFactory(utils.getRef(this.app, ref), opts);
+  }
+
+  object(pathOrRef: PathReference, opts?:FirebaseObjectFactoryOpts):FirebaseObjectObservable<any> {
+    return utils.checkForUrlOrFirebaseRef(pathOrRef, {
+      isUrl: () => FirebaseObjectFactory(this.app.database().ref(<string>pathOrRef), opts),
+      isRef: () => FirebaseObjectFactory(pathOrRef)
     });
   }
-  object(urlOrRef: string | firebase.database.Reference, opts?:FirebaseObjectFactoryOpts):FirebaseObjectObservable<any> {
-    return utils.checkForUrlOrFirebaseRef(urlOrRef, {
-      isUrl: () => FirebaseObjectFactory(this.fbApp.database().refFromURL(getAbsUrl(this.fbConfig, <string>urlOrRef)), opts),
-      isRef: () => FirebaseObjectFactory(urlOrRef)
-    });
-  }
+
 }
 
-// TODO: Deprecate
-export class FirebaseDatabase extends AngularFireDatabase {}
-
-function getAbsUrl (root:FirebaseAppConfig, url:string) {
-  if (!(/^[a-z]+:\/\/.*/.test(url))) {
-    // Provided url is relative.
-    // Strip any leading slash
-    url = root.databaseURL + '/' + utils.stripLeadingSlash(url);
-  }
-  return url;
-}

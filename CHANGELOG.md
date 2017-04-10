@@ -1,3 +1,115 @@
+<a name="2.0.0-beta.8"></a>
+# [2.0.0-beta.8](https://github.com/angular/angularfire2/compare/2.0.0-beta7...v2.0.0-beta.8) (2017-02-16)
+
+
+### Bug Fixes
+
+* **database:** allow null values for equalTo, etc. ([#809](https://github.com/angular/angularfire2/issues/809)) ([561e7b7](https://github.com/angular/angularfire2/commit/561e7b7))
+* **database:** call apply instead of call ([7a85bd2](https://github.com/angular/angularfire2/commit/7a85bd2))
+* **database:** retrieve initial list content once ([#820](https://github.com/angular/angularfire2/issues/820)) ([5c5ff7b](https://github.com/angular/angularfire2/commit/5c5ff7b)), closes [#819](https://github.com/angular/angularfire2/issues/819)
+* **database:** store unwrapped snapshots ([9f3c47b](https://github.com/angular/angularfire2/commit/9f3c47b)), closes [#791](https://github.com/angular/angularfire2/issues/791)
+* **utils:** Make object $key and $exists properties non-enumerable ([253401f](https://github.com/angular/angularfire2/commit/253401f))
+* **utils:** Minor formatting improvement ([fc3774a](https://github.com/angular/angularfire2/commit/fc3774a))
+
+
+### Features
+
+* **database:** adds auditTime for queries ([f9cb5c3](https://github.com/angular/angularfire2/commit/f9cb5c3)), closes [#389](https://github.com/angular/angularfire2/issues/389) [#770](https://github.com/angular/angularfire2/issues/770)
+* **database:** support the optional startAt key ([#821](https://github.com/angular/angularfire2/issues/821)) ([c469b11](https://github.com/angular/angularfire2/commit/c469b11))
+
+
+
+<a name="2.0.0-beta.7"></a>
+# [2.0.0-beta.7](https://github.com/angular/angularfire2/compare/2.0.0-beta.6...v2.0.0-beta.7) (2017-01-13)
+
+
+### Breaking changes
+
+* **auth:** Remove `FirebaseAuth` in favor of `AngularFireAuth`. ([d422e6])(https://github.com/angular/angularfire2/commit/d422e62b46a80d9fb12c9a9e2cf1cf2f7db04dd3)
+
+### Bug Fixes
+
+* **aot:** Remove AuthBackend param for AOT support ([f875360](https://github.com/angular/angularfire2/commit/f875360))
+* **auth_backend:** Update logout method to return a promise ([169ce64](https://github.com/angular/angularfire2/commit/169ce64)), closes [#583](https://github.com/angular/angularfire2/issues/583)
+* **config:** Add messagingSenderId to FirebaseAppConfig ([9c84869](https://github.com/angular/angularfire2/commit/9c84869))
+* **database:** Allow null values for equalTo, etc. ([70a3e94](https://github.com/angular/angularfire2/commit/70a3e94)), closes [#704](https://github.com/angular/angularfire2/issues/704)
+* **database:** Removed unused query option ([9cbc59b](https://github.com/angular/angularfire2/commit/9cbc59b)), closes [#706](https://github.com/angular/angularfire2/issues/706)
+* **list:** Fix FirebaseListObservable emit as array bug [#574](https://github.com/angular/angularfire2/issues/574) ([ce3de04](https://github.com/angular/angularfire2/commit/ce3de04))
+* **module:** Conditionally pass app name ([8427009](https://github.com/angular/angularfire2/commit/8427009))
+
+### Features
+
+* **module:** Add a custom FirebaseApp name ([73a3e26](https://github.com/angular/angularfire2/commit/73a3e26))
+
+
+
+<a name="2.0.0-beta.6-preview"></a>
+# [2.0.0-beta.6-preview](https://github.com/angular/angularfire2/compare/2.0.0-beta.5...v2.0.0-beta.6-preview) (2016-11-02)
+
+
+### Bug Fixes
+
+* **Database:** use Zone scheduler for object and list factories ([e18da0e](https://github.com/angular/angularfire2/commit/e18da0e)), closes [#637](https://github.com/angular/angularfire2/issues/637)
+* **AoT:** change constructor param interface type annotation to any ([2c0a57f](https://github.com/angular/angularfire2/commit/2c0a57f))
+* **build:** Fix npm test and test:watch commands for windows ([86b4b24](https://github.com/angular/angularfire2/commit/86b4b24)), closes [#217](https://github.com/angular/angularfire2/issues/217)
+* **database:** Add $ref to observables ([#447](https://github.com/angular/angularfire2/issues/447)) ([a53fac0](https://github.com/angular/angularfire2/commit/a53fac0)), closes [#294](https://github.com/angular/angularfire2/issues/294)
+* **imports:** add firebase imports to all places that reference firebase namespace ([c3a954c](https://github.com/angular/angularfire2/commit/c3a954c)), closes [#525](https://github.com/angular/angularfire2/issues/525)
+
+
+### Features
+
+* **docs:** Add AoT installation and setup ([#546](https://github.com/angular/angularfire2/issues/546)) ([7c20d13](https://github.com/angular/angularfire2/commit/7c20d13))
+* **docs:** update installation guide to latest cli version ([#519](https://github.com/angular/angularfire2/issues/519)) ([648666f](https://github.com/angular/angularfire2/commit/648666f))
+* **hmr:** Add Hot module reloading ([c32a008](https://github.com/angular/angularfire2/commit/c32a008))
+
+### Notes
+
+A TypeScript issue with the previous release has been fixed, where errors about a missing `firebase` namespace were reported. For
+applications that worked around this issue by manually adding the `firebase.d.ts` typings to `tsconfig.json`, those typings
+should now be removed since the firebase namespace should automatically be resolved within AngularFire.
+See [this issue](https://github.com/angular/angularfire2/issues/525) for more context.
+
+<a name="2.0.0-beta.5"></a>
+# [2.0.0-beta.5](https://github.com/angular/angularfire2/compare/2.0.0-beta.4...v2.0.0-beta.5) (2016-09-15)
+
+
+### Bug Fixes
+
+* **docs:** Remove [@next](https://github.com/next) install ([5984a99](https://github.com/angular/angularfire2/commit/5984a99))
+* **docs:** typos ([197026a](https://github.com/angular/angularfire2/commit/197026a))
+* **docs:** Update for beta.4 ([f2d5ba5](https://github.com/angular/angularfire2/commit/f2d5ba5))
+* **docs:** Update for beta.4 ([b347e16](https://github.com/angular/angularfire2/commit/b347e16))
+* **firebase_*_factory.js:** Fix calls to off() which inadvertently cancel all listeners on the path ([#469](https://github.com/angular/angularfire2/issues/469)) ([b4fb281](https://github.com/angular/angularfire2/commit/b4fb281)), closes [#443](https://github.com/angular/angularfire2/issues/443)
+* **package:** Version number ([986685a](https://github.com/angular/angularfire2/commit/986685a))
+
+
+### Features
+
+* **utils:** Add $exists method to AFUnwrappedSnapshot ([#471](https://github.com/angular/angularfire2/issues/471)) ([f67aab1](https://github.com/angular/angularfire2/commit/f67aab1))
+* upgrade to RC7 ([#505](https://github.com/angular/angularfire2/issues/505)) ([2410b2d](https://github.com/angular/angularfire2/commit/2410b2d))
+
+### BREAKING CHANGES
+
+The way this project is packaged has changed to be consistent with other Angular packages.
+Previously:
+
+ * The project just consisted of CommonJS modules, with `angularfire2.js` as the main entry point.
+ * The project provided an `es6` directory which contained es2015 modules and es2015 JS
+ * Package.json included `main` and `jsnext:main` fields, pointing to `angularfire2.js` and `es6/angularfire2.js`, respectively.
+
+Now:
+
+ * The project ships ES2015 modules with ES5 JS at the root, as well as an ES5 UMD bundle at `bundles/angulafire2.umd.js`
+ * The `main` field of `package.json` points to `bundles/angularfire2.umd.js`.
+ * Instead of `jsnext:main`, we're using the `module` field of package.json to point to `index.js`.
+ * Instead of `angularfire2.js` being the main entry point, an `index.js` has been added (though angulafire2.js hasn't changed significantly).
+
+If you're using Rollup or Webpack, they should _just work_ with this new setup (please open issues if not). If using SystemJS, you should be able to
+add `format: 'esm'` inside of the packages configuration, and it should load and parse the es2015 modules correctly.
+
+The addition of the umd bundle will also make it possible to use AngularFire2 in a `<script>` tag, such as in a plunker or JSBin. The library is
+exported on a global called `angularFire2`.
+
 <a name="2.0.0-beta.4"></a>
 # [2.0.0-beta.4](https://github.com/angular/angularfire2/compare/2.0.0-beta.2...v2.0.0-beta.3) (2016-08-22)
 
@@ -56,7 +168,7 @@ apps are configured, and how third-party oauth tokens are handled.
 ## Breaking Changes:
  * [Upgrade to the Firebase 3.0+ SDK](https://firebase.google.com/docs/web/setup), versions less than 3.0 are not supported. [abe11a2](https://github.com/angular/angularfire2/pull/200/commits/abe11a2fd8f5a3f554056625b751e9308e56b906)
  * `defaultFirebase` takes in a configuration object rather than a database url string. [See docs for more info.](https://github.com/angular/angularfire2/blob/master/docs/1-install-and-setup.md)
- * Access tokens for third party auth (github, google, facebook, twitter) are not persisted after refresh. 
+ * Access tokens for third party auth (github, google, facebook, twitter) are not persisted after refresh.
 
 # AngularFire2 2.0.0-beta.0
 

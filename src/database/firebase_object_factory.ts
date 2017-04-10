@@ -1,24 +1,30 @@
 import { FirebaseObjectObservable } from './index';
 import { Observer } from 'rxjs/Observer';
-import { database } from 'firebase';
+import { observeOn } from 'rxjs/operator/observeOn';
+import * as firebase from 'firebase/app';
+import 'firebase/database';
 import * as utils from '../utils';
-import { Query } from '../interfaces';
-import { observeQuery } from './query_observable';
-import { FirebaseObjectFactoryOpts } from '../interfaces';
-import 'rxjs/add/operator/mergeMap';
+import { FirebaseObjectFactoryOpts, PathReference, DatabaseReference } from '../interfaces';
 
 export function FirebaseObjectFactory (
-  absoluteUrlOrDbRef: string | firebase.database.Reference,
-  { preserveSnapshot, query }: FirebaseObjectFactoryOpts = {}): FirebaseObjectObservable<any> {
+  pathRef: PathReference,
+  { preserveSnapshot }: FirebaseObjectFactoryOpts = {}): FirebaseObjectObservable<any> {
 
-  let ref: firebase.database.Reference;
+  let ref: DatabaseReference;
 
-  utils.checkForUrlOrFirebaseRef(absoluteUrlOrDbRef, {
-    isUrl: () => ref = database().refFromURL(<string>absoluteUrlOrDbRef),
-    isRef: () => ref = <firebase.database.Reference>absoluteUrlOrDbRef
+  utils.checkForUrlOrFirebaseRef(pathRef, {
+    isUrl: () => {
+      const path = pathRef as string;
+      if(utils.isAbsoluteUrl(path)) {
+        ref = firebase.database().refFromURL(path)
+      } else {
+        ref = firebase.database().ref(path);
+      }      
+    },
+    isRef: () => ref = <DatabaseReference>pathRef
   });
 
-  return new FirebaseObjectObservable((obs: Observer<any>) => {
+  const objectObservable = new FirebaseObjectObservable((obs: Observer<any>) => {
     let fn = ref.on('value', (snapshot: firebase.database.DataSnapshot) => {
       obs.next(preserveSnapshot ? snapshot : utils.unwrapMapFn(snapshot))
     }, err => {
@@ -27,4 +33,7 @@ export function FirebaseObjectFactory (
 
     return () => ref.off('value', fn);
   }, ref);
+
+  // TODO: should be in the subscription zone instead
+  return observeOn.call(objectObservable, new utils.ZoneScheduler(Zone.current));
 }

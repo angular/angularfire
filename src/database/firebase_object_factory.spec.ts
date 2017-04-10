@@ -1,37 +1,29 @@
+import * as firebase from 'firebase/app';
 import { Subscription } from 'rxjs';
-import { FirebaseObjectFactory, FirebaseObjectObservable } from './index';
-import {
-  addProviders,
-  inject
-} from '@angular/core/testing';
-import {
-  FIREBASE_PROVIDERS,
-  defaultFirebase,
-  FirebaseApp,
-  FirebaseAppConfig,
-  AngularFire
-} from '../angularfire2';
-
-export const firebaseConfig: FirebaseAppConfig = {
-  apiKey: "AIzaSyBVSy3YpkVGiKXbbxeK0qBnu3-MNZ9UIjA",
-  authDomain: "angularfire2-test.firebaseapp.com",
-  databaseURL: "https://angularfire2-test.firebaseio.com",
-  storageBucket: "angularfire2-test.appspot.com",
-};
-const rootFirebase = firebaseConfig.databaseURL;
+import { FirebaseObjectFactory, FirebaseObjectObservable, AngularFireDatabaseModule, AngularFireDatabase } from './index';
+import { TestBed, inject } from '@angular/core/testing';
+import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from '../angularfire2';
+import { COMMON_CONFIG } from '../test-config';
 
 describe('FirebaseObjectFactory', () => {
-  var i = 0;
-  var ref: firebase.database.Reference;
-  var observable: FirebaseObjectObservable<any>;
-  var subscription: Subscription;
-  var nextSpy: jasmine.Spy;
-  var app: firebase.app.App;
+  let i = 0;
+  let ref: firebase.database.Reference;
+  let observable: FirebaseObjectObservable<any>;
+  let subscription: Subscription;
+  let nextSpy: jasmine.Spy;
+  let app: firebase.app.App;
+  let db: AngularFireDatabase;
 
   beforeEach(() => {
-    addProviders([FIREBASE_PROVIDERS, defaultFirebase(firebaseConfig)]);
-    inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
-      app = firebaseApp;
+    TestBed.configureTestingModule({
+      imports: [
+        AngularFireModule.initializeApp(COMMON_CONFIG, '[DEFAULT]'),
+        AngularFireDatabaseModule
+      ]
+    });
+    inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {
+      app = app_;
+      db = _db;
     })();
   });
 
@@ -39,16 +31,22 @@ describe('FirebaseObjectFactory', () => {
     app.delete().then(done, done.fail);
   });
 
-  describe('constructor', () => {
+  describe('<constructor>', () => {
 
     it('should accept a Firebase db url in the constructor', () => {
-      const object = FirebaseObjectFactory(`${rootFirebase}/questions`);
+      const object = FirebaseObjectFactory(`questions`);
       expect(object instanceof FirebaseObjectObservable).toBe(true);
     });
 
     it('should accept a Firebase db ref in the constructor', () => {
       const object = FirebaseObjectFactory(firebase.database().ref().child(`questions`));
       expect(object instanceof FirebaseObjectObservable).toBe(true);
+    });
+
+    it('should take an absolute url in the constructor', () => {
+      const absoluteUrl = COMMON_CONFIG.databaseURL + '/questions/one';
+      const list = FirebaseObjectFactory(absoluteUrl);
+      expect(list instanceof FirebaseObjectObservable).toBe(true);
     });
 
   });
@@ -59,12 +57,12 @@ describe('FirebaseObjectFactory', () => {
       i = Date.now();
       ref = firebase.database().ref().child(`questions/${i}`);
       nextSpy = nextSpy = jasmine.createSpy('next');
-      observable = FirebaseObjectFactory(`${rootFirebase}/questions/${i}`);
+      observable = FirebaseObjectFactory(`questions/${i}`);
       ref.remove(done);
     });
 
     afterEach(() => {
-      if (subscription && !subscription.isUnsubscribed) {
+      if (subscription && !subscription.closed) {
         subscription.unsubscribe();
       }
     });
@@ -72,7 +70,7 @@ describe('FirebaseObjectFactory', () => {
 
     it('should emit a null value if no value is present when subscribed', (done: any) => {
       subscription = observable.subscribe(unwrapped => {
-        const expectedObject = { $key: (<any>observable)._ref.key, $value: null };
+        const expectedObject = { $key: (<any>observable).$ref.key, $value: null };
         expect(unwrapped.$key).toEqual(expectedObject.$key);
         expect(unwrapped.$value).toEqual(expectedObject.$value);
         expect(unwrapped.$exists()).toEqual(false);
@@ -82,12 +80,12 @@ describe('FirebaseObjectFactory', () => {
 
 
     it('should emit unwrapped data by default', (done: any) => {
-      ref.set({ data: 'bar' }, () => {
+      const fixtureData = { data: 'bar' };
+      ref.set(fixtureData, () => {
         subscription = observable.subscribe(unwrapped => {
           if (!unwrapped) return;
-          const expectedObject = { $key: ref.key, data: 'bar' };
-          expect(unwrapped.$key).toEqual(expectedObject.$key);
-          expect(unwrapped.data).toEqual(expectedObject.data);
+          expect(unwrapped.$key).toEqual(ref.key);
+          expect(unwrapped).toEqual(fixtureData);
           expect(unwrapped.$exists()).toEqual(true);
           done();
         });
@@ -117,7 +115,7 @@ describe('FirebaseObjectFactory', () => {
     });
 
     it('should emit snapshots if preserveSnapshot option is true', (done: any) => {
-      observable = FirebaseObjectFactory(`${rootFirebase}/questions/${i}`, { preserveSnapshot: true });
+      observable = FirebaseObjectFactory(`questions/${i}`, { preserveSnapshot: true });
       ref.remove(() => {
         ref.set('preserved snapshot!', () => {
           subscription = observable.subscribe(data => {
@@ -131,11 +129,30 @@ describe('FirebaseObjectFactory', () => {
 
     it('should call off on all events when disposed', () => {
       const dbRef = firebase.database().ref();
-      var firebaseSpy = spyOn(dbRef, 'off');
+      let firebaseSpy = spyOn(dbRef, 'off');
       subscription = FirebaseObjectFactory(dbRef).subscribe();
       expect(firebaseSpy).not.toHaveBeenCalled();
       subscription.unsubscribe();
       expect(firebaseSpy).toHaveBeenCalled();
+    });
+
+    it('should emit values in the observable creation zone', (done: any) => {
+      Zone.current.fork({
+        name: 'newZone'
+      })
+      .run(() => {
+        // Creating a new observable so that the current zone is captured.
+        subscription = FirebaseObjectFactory(`questions/${i}`)
+          .filter(d => d.$value === 'in-the-zone')
+          .subscribe(data => {
+            expect(Zone.current.name).toBe('newZone');
+            done();
+          });
+      });
+
+      ref.remove(() => {
+        ref.set('in-the-zone');
+      });
     });
   });
 });

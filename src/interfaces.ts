@@ -1,10 +1,12 @@
+import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs/Observable';
 
 export interface FirebaseAppConfig {
-  apiKey: string;
-  authDomain: string;
-  databaseURL: string;
-  storageBucket: string;
+  apiKey?: string;
+  authDomain?: string;
+  databaseURL?: string;
+  storageBucket?: string;
+  messagingSenderId?: string;
 }
 
 export interface FirebaseOperationCases {
@@ -64,7 +66,6 @@ export interface FirebaseListFactoryOpts {
 
 export interface FirebaseObjectFactoryOpts {
   preserveSnapshot?: boolean;
-  query?: Query
 }
 
 
@@ -87,3 +88,10 @@ export enum QueryOptions {
 }
 
 export type Primitive = number | string | boolean;
+
+export type DatabaseSnapshot = firebase.database.DataSnapshot;
+export type DatabaseReference = firebase.database.Reference;
+export type DatabaseQuery = firebase.database.Query;
+export type QueryReference = DatabaseReference | DatabaseQuery;
+export type PathReference = QueryReference | string;
+export type Auth = firebase.auth.Auth;

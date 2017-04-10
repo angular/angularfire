@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "lib": ["es6", "dom"],
+    "module": "es6",
+    "target": "es5",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "skipLibCheck": false,
+    "skipDefaultLibCheck": false,
+    "noEmit": true
+  },
+  "files": [
+    "index.ts"
+  ]
+}
