@@ -9,7 +9,7 @@ observables emit new values, the query is automatically re-run.
 Queries are created by specifying a `query` object on the `FirebaseListObservable` options.
 
 ```ts
-const queryObservable = af.database.list('/items', {
+const queryObservable = db.list('/items', {
   query: {
     orderByChild: 'size',
     equalTo: 'large' 
@@ -40,7 +40,7 @@ const queryObservable = af.database.list('/items', {
 
 ```ts
 // WARNING: Do not copy and paste. This will not work!
-const queryObservable = af.database.list('/items', {
+const queryObservable = db.list('/items', {
   query: {
     orderByChild: 'size',
     equalTo: 'large',
@@ -53,7 +53,7 @@ You can only use `limitToFirst` or `limitToLast`, but not both in combination.
 
 ```ts
 // WARNING: Do not copy and paste. This will not work!
-const queryObservable = af.database.list('/items', {
+const queryObservable = db.list('/items', {
   query: {
     limitToFirst: 10,
     limitToLast: 100,
@@ -72,7 +72,7 @@ An RxJS Subject is imported below. A Subject is like an Observable, but can mult
 
 ```ts
 const subject = new Subject(); // import {Subject} from 'rxjs/Subject';
-const queryObservable = af.database.list('/items', {
+const queryObservable = db.list('/items', {
   query: {
     orderByChild: 'size',
     equalTo: subject 
@@ -95,7 +95,7 @@ subject.next('small');
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFire, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2';
+import { AngularFireDatabase, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2/database';
 import { Subject } from 'rxjs/Subject';
 
 @Component({
@@ -118,9 +118,9 @@ export class AppComponent {
   items: FirebaseListObservable<any[]>;
   sizeSubject: Subject<any>;
   
-  constructor(af: AngularFire) {
+  constructor(db: AngularFireDatabase) {
     this.sizeSubject = new Subject();
-    this.items = af.database.list('/items', {
+    this.items = db.list('/items', {
       query: {
         orderByChild: 'size',
         equalTo: this.sizeSubject

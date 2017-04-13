@@ -95,7 +95,7 @@ You can optionally provide a custom FirebaseApp name with `initializeApp`.
 @NgModule({
   imports: [
     BrowserModule,
-    AngularFireModule.initializeApp(firebaseConfig, authConfig, 'my-app-name')
+    AngularFireModule.initializeApp(firebaseConfig, 'my-app-name')
   ],
   declarations: [ AppComponent ],
   bootstrap: [ AppComponent ]
@@ -110,7 +110,8 @@ Open `/src/app/app.component.ts`, and make sure to modify/delete any tests to ge
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFire, FirebaseListObservable } from 'angularfire2';
+import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+
 
 @Component({
 
@@ -119,7 +120,7 @@ import { AngularFire, FirebaseListObservable } from 'angularfire2';
   styleUrls: ['app.component.css']
 })
 export class AppComponent {
-  constructor(af: AngularFire) {
+  constructor(db: AngularFireDatabase) {
 
   }
 }
@@ -132,7 +133,7 @@ In `/src/app/app.component.ts`:
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFire, FirebaseListObservable } from 'angularfire2';
+import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 
 @Component({
 
@@ -142,8 +143,8 @@ import { AngularFire, FirebaseListObservable } from 'angularfire2';
 })
 export class AppComponent {
   items: FirebaseListObservable<any[]>;
-  constructor(af: AngularFire) {
-    this.items = af.database.list('/items');
+  constructor(db: AngularFireDatabase) {
+    this.items = db.list('/items');
   }
 }
 ```
