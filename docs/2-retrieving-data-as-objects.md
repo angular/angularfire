@@ -14,7 +14,7 @@ If you've followed the earlier step "Installation and Setup"  your `/src/app/app
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFire, FirebaseListObservable } from 'angularfire2';
+import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 
 @Component({
   selector: 'app-root',
@@ -23,8 +23,8 @@ import { AngularFire, FirebaseListObservable } from 'angularfire2';
 })
 export class AppComponent {
   items: FirebaseListObservable<any[]>;
-  constructor(af: AngularFire) {
-    this.items = af.database.list('items');
+  constructor(db: AngularFireDatabase) {
+    this.items = db.list('items');
   }
 }
 ```
@@ -42,9 +42,9 @@ There are two ways to create an object binding:
 
 ```ts
 // relative URL, uses the database url provided in bootstrap
-const relative = af.database.object('/item');
+const relative = db.object('/item');
 // absolute URL
-const absolute = af.database.object('https://<your-app>.firebaseio.com/item');
+const absolute = db.object('https://<your-app>.firebaseio.com/item');
 ```
 
 ### Retrieve data
@@ -56,8 +56,8 @@ Replace the FirebaseListObservable to FirebaseObjectObservable in your `/src/app
 Also notice the templateUrl changed to inline template below:
 
 ```ts
-import {Component} from '@angular/core';
-import {AngularFire, FirebaseObjectObservable} from 'angularfire2';
+import { Component } from '@angular/core';
+import { AngularFireDatabase, FirebaseObjectObservable } from 'angularfire2/database';
 
 @Component({
   selector: 'app-root',
@@ -67,8 +67,8 @@ import {AngularFire, FirebaseObjectObservable} from 'angularfire2';
 })
 export class AppComponent {
   item: FirebaseObjectObservable<any>;
-  constructor(af: AngularFire) {
-    this.item = af.database.object('/item');
+  constructor(db: AngularFireDatabase) {
+    this.item = db.object('/item');
   }
 }
 ```
@@ -94,7 +94,7 @@ The promise can be useful to chain multiple operations, catching possible errors
 from security rules denials, or for debugging.
 
 ```ts
-const promise = af.database.object('/item').remove();
+const promise = db.object('/item').remove();
 promise
   .then(_ => console.log('success'))
   .catch(err => console.log(err, 'You dont have access!'));
@@ -105,7 +105,7 @@ promise
 Use the `set()` method for **destructive updates**.
 
 ```ts
-const itemObservable = af.database.object('/item');
+const itemObservable = db.object('/item');
 itemObservable.set({ name: 'new name!'});
 ```
 
@@ -114,7 +114,7 @@ itemObservable.set({ name: 'new name!'});
 Use the `update()` method for **non-destructive updates**.
 
 ```ts
-const itemObservable = af.database.object('/item');
+const itemObservable = db.object('/item');
 itemObservable.update({ age: newAge });
 ```
 
@@ -125,7 +125,7 @@ using an update with a primitive is the exact same as doing a `.set()` with a pr
 Use the `remove()` method to remove data at the object's location.
 
 ```ts
-const itemObservable = af.database.object('/item');
+const itemObservable = db.object('/item');
 itemObservable.remove();
 ```
 
@@ -133,7 +133,7 @@ itemObservable.remove();
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFire, FirebaseObjectObservable } from 'angularfire2';
+import { AngularFireDatabase, FirebaseObjectObservable } from 'angularfire2/database';
 
 @Component({
   selector: 'app-root',
@@ -149,8 +149,8 @@ import { AngularFire, FirebaseObjectObservable } from 'angularfire2';
 })
 export class AppComponent {
   item: FirebaseObjectObservable<any>;
-  constructor(af: AngularFire) {
-    this.item = af.database.object('/item');
+  constructor(db: AngularFireDatabase) {
+    this.item = db.object('/item');
   }
   save(newName: string) {
     this.item.set({ name: newName });
@@ -177,7 +177,7 @@ Data retrieved from the object binding contains special properties retrieved fro
 AngularFire2 unwraps the Firebase DataSnapshot by default, but you can get the data as the original snapshot by specifying the `preserveSnapshot` option. 
 
 ```ts
-this.item = af.database.object('/item', { preserveSnapshot: true });
+this.item = db.object('/item', { preserveSnapshot: true });
 this.item.subscribe(snapshot => {
   console.log(snapshot.key)
   console.log(snapshot.val())
