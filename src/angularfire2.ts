@@ -3,7 +3,7 @@ import * as utils from './utils';
 import { FirebaseAppConfigToken, FirebaseApp, _firebaseAppFactory } from './app/index';
 import { FirebaseListFactoryOpts, FirebaseObjectFactoryOpts, FirebaseAppConfig } from './interfaces';
 import { FirebaseAppName } from './tokens';
-import { Injectable, OpaqueToken, NgModule } from '@angular/core';
+import { Injectable, InjectionToken, OpaqueToken, NgModule } from '@angular/core';
 
 export const FirebaseAppProvider = {
   provide: FirebaseApp,

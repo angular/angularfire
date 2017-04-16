@@ -35,17 +35,17 @@
   },
   "homepage": "https://github.com/angular/angularfire2#readme",
   "dependencies": {
-    "@angular/common": "^2.0.0",
-    "@angular/compiler": "^2.0.0",
-    "@angular/core": "^2.0.0",
-    "@angular/platform-browser": "^2.0.0",
-    "@angular/platform-browser-dynamic": "^2.0.0",
+    "@angular/common": "^4.0.0",
+    "@angular/compiler": "^4.0.0",
+    "@angular/core": "^4.0.0",
+    "@angular/platform-browser": "^4.0.0",
+    "@angular/platform-browser-dynamic": "^4.0.0",
     "firebase": "^3.6.6",
     "rxjs": "^5.0.1"
   },
   "devDependencies": {
-    "@angular/compiler-cli": "^2.0.0",
-    "@angular/platform-server": "^2.0.0-rc.5",
+    "@angular/compiler-cli": "^4.0.0",
+    "@angular/platform-server": "^4.0.0-rc.5",
     "@types/jasmine": "^2.5.36",
     "@types/request": "0.0.30",
     "concurrently": "^2.2.0",
@@ -75,9 +75,8 @@
     "systemjs": "^0.19.16",
     "systemjs-builder": "^0.15.7",
     "traceur": "0.0.96",
-    "typedoc": "github:jeffbcross/typedoc",
     "typescript": "^2.0.2",
-    "zone.js": "^0.7.2"
+    "zone.js": "^0.8.0"
   },
   "typings": "index.d.ts"
 }
