@@ -7,6 +7,7 @@ export interface FirebaseAppConfig {
   databaseURL?: string;
   storageBucket?: string;
   messagingSenderId?: string;
+  projectId?: string;
 }
 
 export interface FirebaseOperationCases {
