@@ -1,7 +1,7 @@
-import { Injectable, OpaqueToken, Inject, NgModule, ModuleWithProviders } from '@angular/core';
+import { Injectable, Inject, InjectionToken, NgModule, ModuleWithProviders } from '@angular/core';
 import * as firebase from 'firebase/app';
 
-export const FirebaseAppConfigToken = new OpaqueToken('FirebaseAppConfigToken');
+export const FirebaseAppConfigToken = new InjectionToken('FirebaseAppConfigToken');
 
 export class FirebaseApp implements firebase.app.App {
   name: string;
