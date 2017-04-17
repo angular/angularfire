@@ -16,14 +16,12 @@ export class AngularFireDatabase {
 
   list(pathOrRef: PathReference, opts?:FirebaseListFactoryOpts):FirebaseListObservable<any[]> {
     const ref = utils.getRef(this.app, pathOrRef);
-    return FirebaseListFactory(utils.getRef(this.app, ref), opts);
+    return FirebaseListFactory(ref, opts);
   }
 
   object(pathOrRef: PathReference, opts?:FirebaseObjectFactoryOpts):FirebaseObjectObservable<any> {
-    return utils.checkForUrlOrFirebaseRef(pathOrRef, {
-      isUrl: () => FirebaseObjectFactory(this.app.database().ref(<string>pathOrRef), opts),
-      isRef: () => FirebaseObjectFactory(pathOrRef)
-    });
+    const ref = utils.getRef(this.app, pathOrRef);
+    return FirebaseObjectFactory(ref, opts);
   }
 
 }
