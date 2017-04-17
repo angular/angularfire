@@ -6,33 +6,15 @@ import { FirebaseListObservable } from './firebase_list_observable';
 import { Observer } from 'rxjs/Observer';
 import { observeOn } from 'rxjs/operator/observeOn';
 import { observeQuery } from './query_observable';
-import { Query, FirebaseListFactoryOpts, PathReference, QueryReference, DatabaseQuery, DatabaseReference } from '../interfaces';
+import { Query, FirebaseListFactoryOpts, DatabaseReference, DatabaseQuery } from '../interfaces';
 import { switchMap } from 'rxjs/operator/switchMap';
 import { map } from 'rxjs/operator/map';
 
 export function FirebaseListFactory (
-  pathRef: PathReference,
+  ref: DatabaseReference,
   { preserveSnapshot, query = {} } :FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
 
-  let ref: QueryReference;
-
-  utils.checkForUrlOrFirebaseRef(pathRef, {
-    isUrl: () => {
-      const path = pathRef as string;
-      if(utils.isAbsoluteUrl(path)) {
-        ref = firebase.database().refFromURL(path)
-      } else {
-        ref = firebase.database().ref(path);
-      } 
-    },
-    isRef: () => ref = <DatabaseReference>pathRef,
-    isQuery: () => ref = <DatabaseQuery>pathRef,
-  });
-
-  // if it's just a reference or string, create a regular list observable
-  if ((utils.isFirebaseRef(pathRef) ||
-       utils.isString(pathRef)) &&
-       utils.isEmptyObject(query)) {
+  if (utils.isEmptyObject(query)) {
     return firebaseListObservable(ref, { preserveSnapshot });
   }
 
@@ -119,7 +101,7 @@ export function FirebaseListFactory (
 }
 
 /**
- * Creates a FirebaseListObservable from a reference or query. Options can be provided as a second 
+ * Creates a FirebaseListObservable from a reference or query. Options can be provided as a second
  * parameter. This function understands the nuances of the Firebase SDK event ordering and other
  * quirks. This function takes into account that not all .on() callbacks are guaranteed to be
  * asynchonous. It creates a initial array from a promise of ref.once('value'), and then starts
