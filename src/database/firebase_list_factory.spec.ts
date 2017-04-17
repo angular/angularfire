@@ -1,5 +1,9 @@
 import * as firebase from 'firebase/app';
-import { FirebaseListFactory, FirebaseListObservable, FirebaseObjectFactory, onChildAdded, onChildChanged, onChildRemoved, onChildUpdated, AngularFireDatabase, AngularFireDatabaseModule } from './index';
+import { AngularFireDatabase } from './database';
+import { AngularFireDatabaseModule } from './database.module';
+import { FirebaseListObservable } from './firebase_list_observable';
+import { FirebaseListFactory, onChildAdded, onChildChanged, onChildRemoved, onChildUpdated } from './firebase_list_factory';
+import { FirebaseObjectFactory } from './firebase_object_factory';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule} from '../angularfire2';
 import { TestBed, inject } from '@angular/core/testing';
 import * as utils from '../utils';

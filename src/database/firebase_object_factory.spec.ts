@@ -1,6 +1,9 @@
 import * as firebase from 'firebase/app';
 import { Subscription } from 'rxjs';
-import { FirebaseObjectFactory, FirebaseObjectObservable, AngularFireDatabaseModule, AngularFireDatabase } from './index';
+import { AngularFireDatabase } from './database';
+import { AngularFireDatabaseModule } from './database.module';
+import { FirebaseObjectObservable } from './firebase_object_observable';
+import { FirebaseObjectFactory } from './firebase_object_factory';
 import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from '../angularfire2';
 import { COMMON_CONFIG } from '../test-config';

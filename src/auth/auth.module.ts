@@ -3,7 +3,7 @@ import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import { FirebaseApp } from '../app/index';
 import { AngularFireModule } from '../angularfire2';
-import { AngularFireAuth } from './index';
+import { AngularFireAuth } from './auth';
 
 export function _getAngularFireAuth(app: FirebaseApp) {
   return new AngularFireAuth(app);

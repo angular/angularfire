@@ -1,4 +1,7 @@
-import { FirebaseListObservable, AngularFireDatabase, AngularFireDatabaseModule } from './index';
+import { AngularFireDatabase } from './database';
+import { AngularFireDatabaseModule } from './database.module';
+import { FirebaseListObservable } from './firebase_list_observable';
+import { FirebaseObjectFactory } from './firebase_object_factory';
 import { Observer } from 'rxjs/Observer';
 import { map } from 'rxjs/operator/map';
 import * as firebase from 'firebase/app';

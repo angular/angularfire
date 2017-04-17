@@ -20,9 +20,9 @@
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 1"
   },
   "keywords": [
-    "angular2",
     "angular",
-    "firebase"
+    "firebase",
+    "rxjs"
   ],
   "repository": {
     "type": "git",
