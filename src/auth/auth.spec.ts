@@ -8,7 +8,8 @@ import { _do } from 'rxjs/operator/do';
 import { take } from 'rxjs/operator/take';
 import { skip } from 'rxjs/operator/skip';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from '../angularfire2';
-import { AngularFireAuth, AngularFireAuthModule } from './index';
+import { AngularFireAuth } from './auth';
+import { AngularFireAuthModule } from './auth.module';
 import { COMMON_CONFIG } from '../test-config';
 
 function authTake(auth: Observable<any>, count: number): Observable<any> {
@@ -45,7 +46,7 @@ describe('AngularFireAuth', () => {
       app = app_;
       afAuth = _auth;
       authData = null;
-      authCb = null;      
+      authCb = null;
     })();
 
     mockAuthState = new Subject<firebase.User>();

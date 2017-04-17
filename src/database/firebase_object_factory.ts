@@ -1,4 +1,4 @@
-import { FirebaseObjectObservable } from './index';
+import { FirebaseObjectObservable } from './firebase_object_observable';
 import { Observer } from 'rxjs/Observer';
 import { observeOn } from 'rxjs/operator/observeOn';
 import * as firebase from 'firebase/app';
@@ -19,7 +19,7 @@ export function FirebaseObjectFactory (
         ref = firebase.database().refFromURL(path)
       } else {
         ref = firebase.database().ref(path);
-      }      
+      }
     },
     isRef: () => ref = <DatabaseReference>pathRef
   });

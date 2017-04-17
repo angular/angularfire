@@ -2,16 +2,18 @@ import * as firebase from 'firebase/app';
 import 'firebase/database';
 import { Inject, Injectable } from '@angular/core';
 import { FirebaseAppConfigToken, FirebaseAppConfig, FirebaseApp } from '../angularfire2';
-import { FirebaseListFactory } from './index';
+import { FirebaseListFactory } from './firebase_list_factory';
+import { FirebaseListObservable } from './firebase_list_observable';
 import { FirebaseListFactoryOpts, FirebaseObjectFactoryOpts, PathReference } from '../interfaces';
+import { FirebaseObjectFactory } from './firebase_object_factory';
+import { FirebaseObjectObservable } from './firebase_object_observable';
 import * as utils from '../utils';
-import { FirebaseListObservable, FirebaseObjectObservable, FirebaseObjectFactory } from './index';
 
 @Injectable()
 export class AngularFireDatabase {
-  
+
   constructor(public app: FirebaseApp) {}
-  
+
   list(pathOrRef: PathReference, opts?:FirebaseListFactoryOpts):FirebaseListObservable<any[]> {
     const ref = utils.getRef(this.app, pathOrRef);
     return FirebaseListFactory(utils.getRef(this.app, ref), opts);
@@ -25,4 +27,3 @@ export class AngularFireDatabase {
   }
 
 }
-
