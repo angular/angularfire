@@ -15,7 +15,7 @@ export class AngularFireAuth {
    * Firebase Auth instance
    */
   auth: firebase.auth.Auth;
-  
+
   /**
    * Observable of authentication state
    */
@@ -35,7 +35,7 @@ export class AngularFireAuth {
  */
 export function FirebaseAuthStateObservable(app: FirebaseApp): Observable<firebase.User> {
   const authState = Observable.create((observer: Observer<firebase.User>) => {
-    firebase.auth().onAuthStateChanged(
+    app.auth().onAuthStateChanged(
       (user?: firebase.User) => observer.next(user),
       (error: firebase.auth.Error) => observer.error(error),
       () => observer.complete()
