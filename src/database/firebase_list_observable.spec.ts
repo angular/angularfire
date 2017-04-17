@@ -2,7 +2,7 @@ import { FirebaseListObservable, AngularFireDatabase, AngularFireDatabaseModule 
 import { Observer } from 'rxjs/Observer';
 import { map } from 'rxjs/operator/map';
 import * as firebase from 'firebase/app';
-import { unwrapMapFn } from '../utils';
+import { unwrapSnapshot } from './unwrap_snapshot';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule} from '../angularfire2';
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../test-config';
@@ -117,7 +117,7 @@ describe('FirebaseListObservable', () => {
     it('should remove the item from the Firebase db when given the unwrapped snapshot', (done:any) => {
       ref.on('child_added', (data:firebase.database.DataSnapshot) => {
         expect(data.val()).toEqual(orphan);
-        O.remove(unwrapMapFn(data))
+        O.remove(unwrapSnapshot(data))
           .then(() => (<any>ref).once('value'))
           .then((data:firebase.database.DataSnapshot) => {
             expect(data.val()).toBeNull();
@@ -205,7 +205,7 @@ describe('FirebaseListObservable', () => {
       const orphanChange = { changed: true }
       ref.on('child_added', (data:firebase.database.DataSnapshot) => {
         expect(data.val()).toEqual(orphan);
-        O.update(unwrapMapFn(data), orphanChange)
+        O.update(unwrapSnapshot(data), orphanChange)
           .then(() => (<any>child).once('value'))
           .then((data:firebase.database.DataSnapshot) => {
             expect(data.val()).toEqual({

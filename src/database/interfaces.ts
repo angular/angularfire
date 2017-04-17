@@ -1,14 +1,6 @@
 import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs/Observable';
 
-export interface FirebaseAppConfig {
-  apiKey?: string;
-  authDomain?: string;
-  databaseURL?: string;
-  storageBucket?: string;
-  messagingSenderId?: string;
-}
-
 export interface FirebaseOperationCases {
   stringCase: () => firebase.Promise<void>;
   firebaseCase?: () => firebase.Promise<void>;
@@ -16,10 +8,13 @@ export interface FirebaseOperationCases {
   unwrappedSnapshotCase?: () => firebase.Promise<void>;
 }
 
-export interface AFUnwrappedDataSnapshot {
+export type UnwrapSnapshotSignature = (snapshot: firebase.database.DataSnapshot) => UnwrappedSnapshot;
+
+export interface UnwrappedSnapshot {
   $key: string;
   $value?: string | number | boolean;
   $exists: () => boolean;
+  [key: string]: any;
 }
 
 export interface Query {
@@ -61,13 +56,13 @@ export interface LimitToSelection {
 export interface FirebaseListFactoryOpts {
   preserveSnapshot?: boolean;
   query?: Query;
+  unwrapSnapshot?: UnwrapSnapshotSignature;
 }
-
 
 export interface FirebaseObjectFactoryOpts {
   preserveSnapshot?: boolean;
+  unwrapSnapshot?: UnwrapSnapshotSignature;
 }
-
 
 export enum OrderByOptions {
   Child,
@@ -94,4 +89,3 @@ export type DatabaseReference = firebase.database.Reference;
 export type DatabaseQuery = firebase.database.Query;
 export type QueryReference = DatabaseReference | DatabaseQuery;
 export type PathReference = QueryReference | string;
-export type Auth = firebase.auth.Auth;

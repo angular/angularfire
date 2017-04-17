@@ -4,10 +4,11 @@ import { Subscriber } from 'rxjs/Subscriber';
 import { Subscription } from 'rxjs/Subscription';
 import * as firebase from 'firebase/app';
 import 'firebase/database';
-import * as utils from '../utils';
-import { AFUnwrappedDataSnapshot, FirebaseOperationCases, QueryReference, DatabaseSnapshot, DatabaseReference } from '../interfaces';
+import { isString } from '../utils';
+import { isFirebaseRef, isFirebaseDataSnapshot, isAFUnwrappedSnapshot } from './utils';
+import { UnwrappedSnapshot, FirebaseOperationCases, QueryReference, DatabaseSnapshot, DatabaseReference } from './interfaces';
 
-export type FirebaseOperation = string | firebase.database.Reference | firebase.database.DataSnapshot | AFUnwrappedDataSnapshot;
+export type FirebaseOperation = string | firebase.database.Reference | firebase.database.DataSnapshot | UnwrappedSnapshot;
 
 export class FirebaseListObservable<T> extends Observable<T> {
   constructor(public $ref: QueryReference, subscribe?: <R>(subscriber: Subscriber<R>) => Subscription | Function | void) {
@@ -33,7 +34,7 @@ export class FirebaseListObservable<T> extends Observable<T> {
       stringCase: () => this.$ref.ref.child(<string>item).update(value),
       firebaseCase: () => (<firebase.database.Reference>item).update(value),
       snapshotCase: () => (<firebase.database.DataSnapshot>item).ref.update(value),
-      unwrappedSnapshotCase: () => this.$ref.ref.child((<AFUnwrappedDataSnapshot>item).$key).update(value)
+      unwrappedSnapshotCase: () => this.$ref.ref.child((<UnwrappedSnapshot>item).$key).update(value)
     });
   }
 
@@ -46,18 +47,18 @@ export class FirebaseListObservable<T> extends Observable<T> {
       stringCase: () => this.$ref.ref.child(<string>item).remove(),
       firebaseCase: () => (<DatabaseReference>item).remove(),
       snapshotCase: () => (<DatabaseSnapshot>item).ref.remove(),
-      unwrappedSnapshotCase: () => this.$ref.ref.child((<AFUnwrappedDataSnapshot>item).$key).remove()
+      unwrappedSnapshotCase: () => this.$ref.ref.child((<UnwrappedSnapshot>item).$key).remove()
     });
   }
 
   _checkOperationCases(item: FirebaseOperation, cases: FirebaseOperationCases) : firebase.Promise<void> {
-    if (utils.isString(item)) {
+    if (isString(item)) {
       return cases.stringCase();
-    } else if (utils.isFirebaseRef(item)) {
+    } else if (isFirebaseRef(item)) {
       return cases.firebaseCase();
-    } else if (utils.isFirebaseDataSnapshot(item)) {
+    } else if (isFirebaseDataSnapshot(item)) {
       return cases.snapshotCase();
-    } else if (utils.isAFUnwrappedSnapshot(item)) {
+    } else if (isAFUnwrappedSnapshot(item)) {
       return cases.unwrappedSnapshotCase()
     }
     throw new Error(`Method requires a key, snapshot, reference, or unwrapped snapshot. Got: ${typeof item}`);

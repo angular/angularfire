@@ -1,39 +1,47 @@
 import * as firebase from 'firebase/app';
-import * as utils from '../utils';
+import { hasKey, isNil, isAbsoluteUrl, isEmptyObject, isString, ZoneScheduler } from '../utils';
+import { checkForUrlOrFirebaseRef, isFirebaseRef } from './utils';
+import { unwrapSnapshot as defaultUnwrapSnapshot } from './unwrap_snapshot';
 import 'firebase/database';
-import { AFUnwrappedDataSnapshot } from '../interfaces';
 import { FirebaseListObservable } from './firebase_list_observable';
 import { Observer } from 'rxjs/Observer';
 import { observeOn } from 'rxjs/operator/observeOn';
 import { observeQuery } from './query_observable';
-import { Query, FirebaseListFactoryOpts, PathReference, QueryReference, DatabaseQuery, DatabaseReference } from '../interfaces';
+import { Query, FirebaseListFactoryOpts, PathReference, QueryReference, DatabaseQuery, DatabaseReference } from './interfaces';
 import { switchMap } from 'rxjs/operator/switchMap';
 import { map } from 'rxjs/operator/map';
 
 export function FirebaseListFactory (
   pathRef: PathReference,
-  { preserveSnapshot, query = {} } :FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
+  { preserveSnapshot, query = {}, unwrapSnapshot } :FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
+
+  if (unwrapSnapshot && preserveSnapshot) {
+    throw new Error('Cannot use preserveSnapshot with unwrapSnapshot.');
+  }
+  if (!unwrapSnapshot) {
+    unwrapSnapshot = defaultUnwrapSnapshot;
+  }
 
   let ref: QueryReference;
 
-  utils.checkForUrlOrFirebaseRef(pathRef, {
+  checkForUrlOrFirebaseRef(pathRef, {
     isUrl: () => {
       const path = pathRef as string;
-      if(utils.isAbsoluteUrl(path)) {
+      if(isAbsoluteUrl(path)) {
         ref = firebase.database().refFromURL(path)
       } else {
         ref = firebase.database().ref(path);
-      } 
+      }
     },
     isRef: () => ref = <DatabaseReference>pathRef,
     isQuery: () => ref = <DatabaseQuery>pathRef,
   });
 
   // if it's just a reference or string, create a regular list observable
-  if ((utils.isFirebaseRef(pathRef) ||
-       utils.isString(pathRef)) &&
-       utils.isEmptyObject(query)) {
-    return firebaseListObservable(ref, { preserveSnapshot });
+  if ((isFirebaseRef(pathRef) ||
+       isString(pathRef)) &&
+       isEmptyObject(query)) {
+    return firebaseListObservable(ref, { preserveSnapshot, unwrapSnapshot });
   }
 
   const queryObs = observeQuery(query);
@@ -55,23 +63,23 @@ export function FirebaseListFactory (
       }
 
       // check equalTo
-      if (utils.hasKey(query, "equalTo")) {
-        if (utils.hasKey(query.equalTo, "value")) {
+      if (hasKey(query, "equalTo")) {
+        if (hasKey(query.equalTo, "value")) {
           queried = queried.equalTo(query.equalTo.value, query.equalTo.key);
         } else {
           queried = queried.equalTo(query.equalTo);
         }
 
-        if (utils.hasKey(query, "startAt") || utils.hasKey(query, "endAt")) {
+        if (hasKey(query, "startAt") || hasKey(query, "endAt")) {
           throw new Error('Query Error: Cannot use startAt or endAt with equalTo.');
         }
 
         // apply limitTos
-        if (!utils.isNil(query.limitToFirst)) {
+        if (!isNil(query.limitToFirst)) {
           queried = queried.limitToFirst(query.limitToFirst);
         }
 
-        if (!utils.isNil(query.limitToLast)) {
+        if (!isNil(query.limitToLast)) {
           queried = queried.limitToLast(query.limitToLast);
         }
 
@@ -79,38 +87,38 @@ export function FirebaseListFactory (
       }
 
       // check startAt
-      if (utils.hasKey(query, "startAt")) {
-        if (utils.hasKey(query.startAt, "value")) {
+      if (hasKey(query, "startAt")) {
+        if (hasKey(query.startAt, "value")) {
           queried = queried.startAt(query.startAt.value, query.startAt.key);
         } else {
           queried = queried.startAt(query.startAt);
         }
       }
 
-      if (utils.hasKey(query, "endAt")) {
-        if (utils.hasKey(query.endAt, "value")) {
+      if (hasKey(query, "endAt")) {
+        if (hasKey(query.endAt, "value")) {
           queried = queried.endAt(query.endAt.value, query.endAt.key);
         } else {
           queried = queried.endAt(query.endAt);
         }
       }
 
-      if (!utils.isNil(query.limitToFirst) && query.limitToLast) {
+      if (!isNil(query.limitToFirst) && query.limitToLast) {
         throw new Error('Query Error: Cannot use limitToFirst with limitToLast.');
       }
 
       // apply limitTos
-      if (!utils.isNil(query.limitToFirst)) {
+      if (!isNil(query.limitToFirst)) {
           queried = queried.limitToFirst(query.limitToFirst);
       }
 
-      if (!utils.isNil(query.limitToLast)) {
+      if (!isNil(query.limitToLast)) {
           queried = queried.limitToLast(query.limitToLast);
       }
 
       return queried;
     }), (queryRef: firebase.database.Reference, ix: number) => {
-      return firebaseListObservable(queryRef, { preserveSnapshot });
+      return firebaseListObservable(queryRef, { preserveSnapshot, unwrapSnapshot });
     })
     .subscribe(subscriber);
 
@@ -119,15 +127,15 @@ export function FirebaseListFactory (
 }
 
 /**
- * Creates a FirebaseListObservable from a reference or query. Options can be provided as a second 
+ * Creates a FirebaseListObservable from a reference or query. Options can be provided as a second
  * parameter. This function understands the nuances of the Firebase SDK event ordering and other
  * quirks. This function takes into account that not all .on() callbacks are guaranteed to be
  * asynchonous. It creates a initial array from a promise of ref.once('value'), and then starts
  * listening to child events. When the initial array is loaded, the observable starts emitting values.
  */
-function firebaseListObservable(ref: firebase.database.Reference | DatabaseQuery, {preserveSnapshot}: FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
+function firebaseListObservable(ref: firebase.database.Reference | DatabaseQuery, { preserveSnapshot, unwrapSnapshot }: FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
 
-  const toValue = preserveSnapshot ? (snapshot => snapshot) : utils.unwrapMapFn;
+  const toValue = preserveSnapshot ? (snapshot => snapshot) : unwrapSnapshot;
   const toKey = preserveSnapshot ? (value => value.key) : (value => value.$key);
 
   const listObs = new FirebaseListObservable(ref, (obs: Observer<any[]>) => {
@@ -204,7 +212,7 @@ function firebaseListObservable(ref: firebase.database.Reference | DatabaseQuery
   });
 
   // TODO: should be in the subscription zone instead
-  return observeOn.call(listObs, new utils.ZoneScheduler(Zone.current));
+  return observeOn.call(listObs, new ZoneScheduler(Zone.current));
 }
 
 export function onChildAdded(arr:any[], child:any, toKey:(element:any)=>string, prevKey:string): any[] {
