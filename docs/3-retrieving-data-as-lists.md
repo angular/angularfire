@@ -120,7 +120,19 @@ const items = af.database.list('/items');
 items.push({ name: newName });
 ```
 
-### Updating items in the list
+### Replacing items in the list using `set`
+
+Use the `set()` method to update existing items.
+
+```ts
+const items = af.database.list('/items');
+// to get a key, check the Example app below
+items.set('key-of-some-data', { size: newSize });
+```
+
+Replaces the current value in the database with the new value specified as the parameter. This is called a destructive update, because it deletes everything currently in place and saves the new value.
+
+### Updating items in the list using `update`
 
 Use the `update()` method to update existing items.
 
@@ -129,6 +141,8 @@ const items = af.database.list('/items');
 // to get a key, check the Example app below
 items.update('key-of-some-data', { size: newSize });
 ```
+
+Note that this updates the current value with in the database with the new value specified as the parameter. This is called a non-destructive update, because it only updates the values specified.
 
 ### Removing items from the list
 Use the `remove()` method to remove data at the list item's location.
