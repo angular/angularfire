@@ -50,7 +50,10 @@ const absolute = af.database.object('https://<your-app>.firebaseio.com/item');
 ### Retrieve data
 
 To get the object in realtime, create an object binding as a property of your component or service.
-Then in your template, you can use the `async` pipe to unwrap the binding.
+Then in your template, you can use the `async` pipe to unwrap the binding. 
+
+Replace the FirebaseListObservable to FirebaseObjectObservable in your `/src/app/app.component.ts` as below.
+Also notice the templateUrl changed to inline template below:
 
 Replace the FirebaseListObservable to FirebaseObjectObservable in your `/src/app/app.component.ts` as below.
 Also notice the templateUrl changed to inline template below:
