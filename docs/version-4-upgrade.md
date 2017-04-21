@@ -25,7 +25,7 @@ constructor(db: AngularFireDatabase) {
 
 ### Simplified Authentication API
 
-In 4.0 we've further cut the complexity of the package by auth module down to an obverser for state changes to simplify the package.
+In 4.0 we've further cut the complexity of the package by auth module down to a [`firebase.User`](https://firebase.google.com/docs/reference/js/firebase.User) observer to simplify the package.
 
 ```
 import { AngularFireAuth } from 'angularfire2/auth';
@@ -52,6 +52,8 @@ logout() {
   this.afAuth.auth.signOut();
 }
 ```
+
+(See what methods are available to `firebase.auth.Auth` in the Firebase reference guide)[https://firebase.google.com/docs/reference/js/firebase.auth.Auth].
 
 ### FirebaseListFactory and FirebaseObjectFactory API Changes
 
