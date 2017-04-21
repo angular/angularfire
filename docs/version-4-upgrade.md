@@ -3,38 +3,59 @@
 AngularFire2 4.0 is a refactor of the AngularFire2 package which implements
 @NgModule, simplifies authentication, and better supports Angular 4.
 
-The proposal was introduced by David East in [Release Candidate API proposal
-#854](https://github.com/angular/angularfire2/issues/854).
-
 ### Removing `AngularFire` for Modularity
 
-AngularFire2 does not take advantage of the Firebase SDK's modularity. Users who only need authentication receive database code and vice versa. The `AngularFire` service is a central part of this problem. The class includes each feature whether you are using it or not. Even worse, this cannot be tree-shaken. As the library grows to include more features, this will only become more of a problem.
-
-The way to fix this is to remove the `AngularFire` service and break up the library into smaller @NgModules.
+Prior to 4.0, AngularFire2 not take advantage of the Firebase SDK's modularity for tree shaking. The way we fixed this is to remove the `AngularFire` service and break up the library into smaller @NgModules:
 
 * `AngularFireModule`
 * `AngularFireDatabaseModule`
 * `AngularFireAuthModule`
 
+Rather than inject `AngularFire` you should now inject each module independently:
+
+```
+import { AngularFireDatabase } from 'angularfire2/database';
+
+...
+
+constructor(db: AngularFireDatabase) {
+  db.list('foo');
+}
+```
+
 ### Simplified Authentication API
 
-The goal of AngularFire is not to wrap the Firebase SDK. **The goal is to provide Angular-specific functionality.**
+In 4.0 we've further cut the complexity of the package by auth module down to an obverser for state changes to simplify the package.
 
-To this effect, we've cut the auth module down to an obverser for state changes.
+```
+import { AngularFireAuth } from 'angularfire2/auth';
 
-Most of the custom authentication methods were simply wrapper calls around the official SDK. Rather than creating more bytes for no value, the Firebase Auth instance is available as a property named `auth` where the same functionality exists.
+...
+
+user: Observable<firebase.User>;
+constructor(afAuth: AngularFireAuth) {
+  this.user = afAuth.authState;
+}
+```
 
 ### Removing pre-configured login
 
-While convenient, the pre-configure login feature added unneeded complexity into our codebase. You can now trigger login as expected with the Firebase SDK.
+While convenient, the pre-configure login feature added unneeded complexity into our codebase.
+
+In 4.0 you can now trigger login using the Firebase SDK:
+
+```
+login() {
+  this.afAuth.auth.signInWithPopup(new GoogleAuthProvider());
+}
+logout() {
+  this.afAuth.auth.signOut();
+}
+```
 
 ### FirebaseListFactory and FirebaseObjectFactory API Changes
 
-This change only affects a few users who directly use `FirebaseListFactory`. Most people inject `AngularFireDatabase` directly or use the `AngularFire` service.
-
-If you directly use `FirebaseListFactory` you will no longer be able to pass in a string. **The `AngularFireDatabase` module will still take paths for .list() and .object().** With the `FirebaseApp` now easily injectable, you can create a reference while still adhering to DI.
-
-This is a minor change, but again it prioritizes simplicity. It keeps the library from writing check logic at multiple abstractions. This again reduces complexity and maintenance.
+If you directly use `FirebaseListFactory` or `FirebaseObjectFactory` you will no longer be able to pass in a string, it will instead expect a Firebase database reference.
 
 ## Putting this all together
 
