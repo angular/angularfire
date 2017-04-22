@@ -38,7 +38,7 @@ constructor(afAuth: AngularFireAuth) {
 }
 ```
 
-### Removing pre-configured login
+#### Removing pre-configured login
 
 While convenient, the pre-configure login feature added unneeded complexity into our codebase.
 
@@ -53,7 +53,7 @@ logout() {
 }
 ```
 
-(See what methods are available to `firebase.auth.Auth` in the Firebase reference guide)[https://firebase.google.com/docs/reference/js/firebase.auth.Auth].
+[See what methods are available to `firebase.auth.Auth` in the Firebase reference guide](https://firebase.google.com/docs/reference/js/firebase.auth.Auth).
 
 ### FirebaseListFactory and FirebaseObjectFactory API Changes
 
