@@ -13,7 +13,7 @@ Prior to 4.0, AngularFire2 not take advantage of the Firebase SDK's modularity f
 
 Rather than inject `AngularFire` you should now inject each module independently:
 
-```
+```typescript
 import { AngularFireDatabase } from 'angularfire2/database';
 
 ...
@@ -27,7 +27,7 @@ constructor(db: AngularFireDatabase) {
 
 In 4.0 we've further cut the complexity of the package by auth module down to a [`firebase.User`](https://firebase.google.com/docs/reference/js/firebase.User) observer to simplify the package.
 
-```
+```typescript
 import { AngularFireAuth } from 'angularfire2/auth';
 
 ...
@@ -44,7 +44,7 @@ While convenient, the pre-configure login feature added unneeded complexity into
 
 In 4.0 you can now trigger login using the Firebase SDK:
 
-```
+```typescript
 login() {
   this.afAuth.auth.signInWithPopup(new GoogleAuthProvider());
 }
@@ -63,7 +63,7 @@ If you directly use `FirebaseListFactory` or `FirebaseObjectFactory` you will no
 
 Here's an example of what AngularFire2 4.0 looks like:
 
-```
+```typescript
 import { NgModule, Component } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { AngularFireModule } from 'angularfire2';
