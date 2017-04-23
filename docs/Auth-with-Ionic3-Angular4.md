@@ -4,7 +4,7 @@ This document provides you a walkthrough of integrating AngularFire2 Authenticat
 The below setup has been tested on Windows 10, but it should be same for Mac/Linux.
 
 Note: - If you're working with Ionic2 and Angular2.0, then you should refer to **Auth-with-Ionic2** tutorial 
-[here](https://github.com/angular/angularfire2/edit/master/docs/Auth-with-Ionic2.md)
+[here](https://github.com/angular/angularfire2/blob/master/docs/Auth-with-Ionic2.md)
 
 Ensure that you're executing these commands as **Administrator** on Windows and **sudo** on Mac/Linux to avoid any errors.
 
