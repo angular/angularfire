@@ -4,11 +4,11 @@
 The `FirebaseObjectObservable` is not created by itself, but through the `AngularFire.database` service. 
 The guide below demonstrates how to retrieve, save, and remove data as objects.
 
-## Injecting the AngularFire service
+## Injecting the AngularFireDatabase module
 
 **Make sure you have bootstrapped your application for AngularFire2. See the Installation guide for bootstrap setup.**
 
-AngularFire is an injectable service, which is injected through the constructor of your Angular component or `@Injectable()` service.
+AngularFireDatabase is an @NgModule, which is injected through the constructor of your Angular component or `@Injectable()` service.
 
 If you've followed the earlier step "Installation and Setup"  your `/src/app/app.component.ts` should look like below. 
 
@@ -81,9 +81,9 @@ The table below highlights some of the common methods on the `FirebaseObjectObse
 
 | method   |                    | 
 | ---------|--------------------| 
-| set(value: any)      | Replaces the current value in the database with the new value specified as the parameter. This is called a **destructive** update, because it deletes everything currently in place and saves the new value. | 
-| update(value: Object)   | Updates the current value with in the database with the new value specified as the parameter. This is called a **non-destructive** update, because it only updates the values specified. |
-| remove()   | Deletes all data present at that location. Same as calling `set(null)`. |
+| `set(value: any)`      | Replaces the current value in the database with the new value specified as the parameter. This is called a **destructive** update, because it deletes everything currently in place and saves the new value. | 
+| `update(value: Object)`   | Updates the current value with in the database with the new value specified as the parameter. This is called a **non-destructive** update, because it only updates the values specified. |
+| `remove()`   | Deletes all data present at that location. Same as calling `set(null)`. |
 
 ## Returning promises
 Each data operation method in the table above returns a promise. However,
@@ -169,8 +169,8 @@ Data retrieved from the object binding contains special properties retrieved fro
 
 | property |                    | 
 | ---------|--------------------| 
-| $key     | The key for each record. This is equivalent to each record's path in our database as it would be returned by `ref.key()`.|
-| $value   | If the data for this child node is a primitive (number, string, or boolean), then the record itself will still be an object. The primitive value will be stored under `$value` and can be changed and saved like any other field.|
+| `$key`     | The key for each record. This is equivalent to each record's path in our database as it would be returned by `ref.key()`.|
+| `$value`   | If the data for this child node is a primitive (number, string, or boolean), then the record itself will still be an object. The primitive value will be stored under `$value` and can be changed and saved like any other field.|
 
 
 ## Retrieving the snapshot
