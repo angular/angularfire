@@ -12,8 +12,7 @@ the Firebase docs for more information on what methods are availabile.](https://
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { AngularFireAuth } from 'angularfire2/auth';
-import { GoogleAuthProvider } from 'firebase/auth';
-import { User } from 'firebase';
+import * as firebase from 'firebase/app';
 
 @Component({
   selector: 'app-root',
@@ -25,14 +24,14 @@ import { User } from 'firebase';
 })
 export class AppComponent {
 
-  user: Observable<User>;
+  user: Observable<firebase.User>;
 
   constructor(public afAuth: AngularFireAuth) {
     this.user = afAuth.authState;
   }
 
   login() {
-    this.afAuth.auth.signInWithPopup(new GoogleAuthProvider());
+    this.afAuth.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
   }
 
   logout() {
