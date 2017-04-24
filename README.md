@@ -30,7 +30,7 @@ npm install firebase angularfire2 --save
 
 ```ts
 import {Component} from '@angular/core';
-import {AngularFire, FirebaseListObservable} from 'angularfire2';
+import {AngularFireDatabase, FirebaseListObservable} from 'angularfire2/database';
 
 @Component({
   selector: 'project-name-app',
@@ -44,8 +44,8 @@ import {AngularFire, FirebaseListObservable} from 'angularfire2';
 })
 export class MyApp {
   items: FirebaseListObservable<any[]>;
-  constructor(af: AngularFire) {
-    this.items = af.database.list('/items');
+  constructor(db: AngularFireDatabase) {
+    this.items = db.list('/items');
   }
 }
 ```
