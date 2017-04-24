@@ -49,11 +49,13 @@ Firebase authentication wasn't entirely compatible with cordova. You need to add
 
 Login with Facebook.
 
-1- Install cordova plugin
+1. Install the cordova plugin
 
-```cordova plugin add cordova-plugin-facebook4 --save --variable APP_ID="123456789" --variable APP_NAME="myApplication"```
+```bash
+cordova plugin add cordova-plugin-facebook4 --save --variable APP_ID="123456789" --variable APP_NAME="myApplication"
+```
 
-2- Use `signInWithCredential` method
+2. Use `signInWithCredential` method
 
 ```ts
 console.log("Facebook success: " + JSON.stringify(result));
