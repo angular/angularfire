@@ -148,4 +148,4 @@ export class AppComponent {
            -|text: sample large text    
  ```
 
-###[Next Step: User Authentication](5-user-authentication.md)
+### [Next Step: User Authentication](5-user-authentication.md)
