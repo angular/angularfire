@@ -104,7 +104,7 @@ export class AppModule {}
 ```
 
 
-### 5. Inject AngularFire
+### 5. Inject AngularFireDatabase
 
 Open `/src/app/app.component.ts`, and make sure to modify/delete any tests to get the sample working (tests are still important, you know):
 
@@ -112,9 +112,7 @@ Open `/src/app/app.component.ts`, and make sure to modify/delete any tests to ge
 import { Component } from '@angular/core';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 
-
 @Component({
-
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.css']
@@ -136,7 +134,6 @@ import { Component } from '@angular/core';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 
 @Component({
-
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.css']
