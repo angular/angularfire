@@ -1,14 +1,14 @@
 # 3. Retrieving data as lists
 
 > AngularFire2 synchronizes data as lists using the `FirebaseListObservable`. 
-The `FirebaseListObservable` is not created by itself, but through the `AngularFire.database` service. 
+The `FirebaseListObservable` is not created by itself, but through the `AngularFire.database` module. 
 The guide below demonstrates how to retrieve, save, and remove data as lists.
 
-## Injecting the AngularFire service
+## Injecting the AngularFireDatabase module
 
 **Make sure you have bootstrapped your application for AngularFire2. See the Installation guide for bootstrap setup.**
 
-AngularFire is an injectable service, which is injected through the constructor of your Angular component or `@Injectable()` service.
+AngularFireDatabase is an injectable module, which is injected through the constructor of your Angular component or `@Injectable()` service.
 In the previous step, we modified the `/src/app/app.component.ts` to retrieve data as object. In this step, let's start with a clean slate.
 
 Replace your  `/src/app/app.component.ts` from previous step to look like below.
@@ -92,9 +92,9 @@ The table below highlights some of the common methods on the `FirebaseListObserv
 
 | method   |                    | 
 | ---------|--------------------| 
-| push(value: any) | Creates a new record on the list, using the Realtime Database's push-ids. | 
-| update(keyRefOrSnap: string) | Firebase | AFUnwrappedSnapshot, value: Object) | Updates an existing item in the array. Accepts a key, database reference, or an unwrapped snapshot. |
-| remove(key: string?) | Deletes the item by key. If no parameter is provided, the entire list will be deleted. |
+| `push(value: any)` | Creates a new record on the list, using the Realtime Database's push-ids. | 
+| `update(keyRefOrSnap: string)` | Firebase | AFUnwrappedSnapshot, value: Object) | Updates an existing item in the array. Accepts a key, database reference, or an unwrapped snapshot. |
+| `remove(key: string?)` | Deletes the item by key. If no parameter is provided, the entire list will be deleted. |
 
 ## Returning promises
 Each data operation method in the table above returns a promise. However,
@@ -194,8 +194,8 @@ Data retrieved from the object binding contains special properties retrieved fro
 
 | property |                    | 
 | ---------|--------------------| 
-| $key     | The key for each record. This is equivalent to each record's path in our database as it would be returned by `ref.key()`.|
-| $value   | If the data for this child node is a primitive (number, string, or boolean), then the record itself will still be an object. The primitive value will be stored under `$value` and can be changed and saved like any other field.|
+| `$key`     | The key for each record. This is equivalent to each record's path in our database as it would be returned by `ref.key()`.|
+| `$value`   | If the data for this child node is a primitive (number, string, or boolean), then the record itself will still be an object. The primitive value will be stored under `$value` and can be changed and saved like any other field.|
 
 ## Retrieving the snapshot
 AngularFire2 unwraps the Firebase DataSnapshot by default, but you can get the data as the original snapshot by specifying the `preserveSnapshot` option. 
@@ -211,4 +211,4 @@ this.items
   })
 ```
 
-###[Next Step: Querying lists](4-querying-lists.md)
+### [Next Step: Querying lists](4-querying-lists.md)
