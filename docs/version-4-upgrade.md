@@ -11,21 +11,26 @@ Prior to 4.0, AngularFire2 not take advantage of the Firebase SDK's modularity f
 * `AngularFireDatabaseModule`
 * `AngularFireAuthModule`
 
-Rather than inject `AngularFire` you should now inject each module independently:
+When upgrading, replace calls to `AngularFire.database` and `AngularFire.auth` with `AngularFireDatabase` and `AngularFireAuth` respectively.
 
 ```typescript
-import { AngularFireDatabase } from 'angularfire2/database';
+constructor(af: AngularFire) {
+  af.database.list('foo');
+  af.auth;
+}
+```
+Should now be:
 
-...
-
-constructor(db: AngularFireDatabase) {
+```typescript
+constructor(db: AngularFireDatabasem, afAuth: AngularFireAuth) {
   db.list('foo');
+  afAuth.authState;
 }
 ```
 
 ### Simplified Authentication API
 
-In 4.0 we've reduced the complexity of the auth module by providing a [`firebase.User`](https://firebase.google.com/docs/reference/js/firebase.User) observer and cutting the methods that were wrapping the Firebase SDK.
+In 4.0 we've reduced the complexity of the auth module by providing only a [`firebase.User`](https://firebase.google.com/docs/reference/js/firebase.User) observer (`AngularFireAuth.authState`) and cutting the methods that were wrapping the Firebase SDK.
 
 ```typescript
 import { AngularFireAuth } from 'angularfire2/auth';
@@ -40,9 +45,7 @@ constructor(afAuth: AngularFireAuth) {
 
 AngularFire2 exposes the raw Firebase Auth object via `AngularFireAuth.auth`. For actions like login, logout, user creation, etc. you should use the [methods available to `firebase.auth.Auth`](https://firebase.google.com/docs/reference/js/firebase.auth.Auth).
 
-#### Removing pre-configured login
-
-While convenient, the pre-configure login feature added unneeded complexity. `AngularFireModule.initializeApp` no longer takes a default sign in method. Sign in should be done with the Firebase SDK via `firebase.auth.Auth`:
+While convenient, the pre-configured login feature added unneeded complexity. `AngularFireModule.initializeApp` no longer takes a default sign in method. Sign in should be done with the Firebase SDK via `firebase.auth.Auth`:
 
 ```typescript
 login() {
