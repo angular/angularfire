@@ -5,7 +5,7 @@ AngularFire2 4.0 is a refactor of the AngularFire2 package which implements
 
 ### Removing `AngularFire` for Modularity
 
-Prior to 4.0, AngularFire2 not take advantage of the Firebase SDK's modularity for tree shaking. The way we fixed this is to remove the `AngularFire` service and break up the library into smaller @NgModules:
+Prior to 4.0, AngularFire2 not take advantage of the Firebase SDK's modularity for tree shaking. The `AngularFire` service has now been removed and the library broken up into smaller @NgModules:
 
 * `AngularFireModule`
 * `AngularFireDatabaseModule`
@@ -25,7 +25,7 @@ constructor(db: AngularFireDatabase) {
 
 ### Simplified Authentication API
 
-In 4.0 we've further cut the complexity of the package by auth module down to a [`firebase.User`](https://firebase.google.com/docs/reference/js/firebase.User) observer to simplify the package.
+In 4.0 we've reduced the complexity of the auth module by providing a [`firebase.User`](https://firebase.google.com/docs/reference/js/firebase.User) observer and cutting the methods that were wrapping the Firebase SDK.
 
 ```typescript
 import { AngularFireAuth } from 'angularfire2/auth';
@@ -38,11 +38,11 @@ constructor(afAuth: AngularFireAuth) {
 }
 ```
 
+AngularFire2 exposes the raw Firebase Auth object via `AngularFireAuth.auth`. For actions like login, logout, user creation, etc. you should use the [methods available to `firebase.auth.Auth`](https://firebase.google.com/docs/reference/js/firebase.auth.Auth).
+
 #### Removing pre-configured login
 
-While convenient, the pre-configure login feature added unneeded complexity into our codebase.
-
-In 4.0 you can now trigger login using the Firebase SDK:
+While convenient, the pre-configure login feature added unneeded complexity. `AngularFireModule.initializeApp` no longer takes a default sign in method. Sign in should be done with the Firebase SDK via `firebase.auth.Auth`:
 
 ```typescript
 login() {
@@ -52,8 +52,6 @@ logout() {
   this.afAuth.auth.signOut();
 }
 ```
-
-[See what methods are available to `firebase.auth.Auth` in the Firebase reference guide](https://firebase.google.com/docs/reference/js/firebase.auth.Auth).
 
 ### FirebaseListFactory and FirebaseObjectFactory API Changes
 
@@ -69,7 +67,8 @@ import { Observable } from 'rxjs/Observable';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireDatabaseModule, AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { AngularFireAuthModule, AngularFireAuth } from 'angularfire2/auth';
-import { GoogleAuthProvider, User as FirebaseUser } from 'firebase/auth';
+import { GoogleAuthProvider } from 'firebase/auth';
+import { User } from 'firebase';
 import { environment } from '../environments/environment';
 
 @NgModule({
@@ -94,7 +93,7 @@ export class MyModule { }
   `
 })
 export class App {
-  user: Observable<FirebaseUser>;
+  user: Observable<User>;
   items: FirebaseListObservable<any[]>;
   constructor(afAuth: AngularFireAuth, db: AngularFireDatabase) {
     this.user = afAuth.authState;
