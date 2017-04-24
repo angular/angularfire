@@ -178,15 +178,15 @@ export const firebaseConfig = {
 export class AppModule { }
 
 ```
-### Inject AngularFire and Bind it to List
+### Inject AngularFireDatabase and Bind it to List
 
-Now inject AngularFire in your component. Open your `home.ts` by going into `src/pages/home/home.ts` and make the following changes:
+Now inject AngularFireDatabase in your component. Open your `home.ts` by going into `src/pages/home/home.ts` and make the following changes:
 
->1) Import "AngularFire, FirebaseListObservable" at the top of your component.
+>1) Import "AngularFireDatabase, FirebaseListObservable" at the top of your component.
 
->2) Inject your AngularFire dependency in the constructor.
+>2) Inject your AngularFireDatabase dependency in the constructor.
 
->3) Call the list method on angularFire's database object.
+>3) Call the list method on the AngularFireDatabase module.
 
 Your `home.ts` file should look like this.
 
@@ -195,7 +195,7 @@ Your `home.ts` file should look like this.
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 
-import { AngularFire, FirebaseListObservable } from 'angularfire2';
+import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 
 @Component({
   selector: 'page-home',
@@ -205,8 +205,8 @@ export class HomePage {
 
   items: FirebaseListObservable<any[]>;
 
-  constructor(public navCtrl: NavController,af: AngularFire) {
-    this.items = af.database.list('/items');
+  constructor(public navCtrl: NavController, db: AngularFireDatabase) {
+    this.items = db.list('/items');
   }
 
 }
@@ -260,39 +260,39 @@ This should create the AuthService under `src/providers/auth-service.ts`.
 Update the service with the following code.
 
 ```bash
-
+import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
-import { AuthProviders, AngularFireAuth, FirebaseAuthState, AuthMethods } from 'angularfire2';
+import { AngularFireAuth } from 'angularfire2/auth';
+import { User } from 'firebase';
+import { FacebookAuthProvider } from 'firebase/auth';
 
 @Injectable()
 export class AuthService {
-  private authState: FirebaseAuthState;
+  private authState: Observable<User>;
+  private currentUser: User;
 
-  constructor(public auth$: AngularFireAuth) {
-    this.authState = auth$.getAuth();
-    auth$.subscribe((state: FirebaseAuthState) => {
-      this.authState = state;
+  constructor(public afAuth$: AngularFireAuth) {
+    this.authState = afAuth$.authState;
+    afAuth$.subscribe((user: User) => {
+      this.currentUser = user;
     });
   }
 
   get authenticated(): boolean {
-    return this.authState !== null;
+    return this.currentUser !== null;
   }
 
   signInWithFacebook(): firebase.Promise<FirebaseAuthState> {
-    return this.auth$.login({
-      provider: AuthProviders.Facebook,
-      method: AuthMethods.Popup
-    });
+    return this.afAuth$.auth.signInWithPopup(new FacebookAuthProvider());
   }
 
   signOut(): void {
-    this.auth$.logout();
+    this.afAuth$.signOut();
   }
 
   displayName(): string {
-    if (this.authState != null) {
-      return this.authState.facebook.displayName;
+    if (this.currentUser !== null) {
+      return this.currentUser.facebook.displayName;
     } else {
       return '';
     }
@@ -375,7 +375,7 @@ import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 
 import { AuthService } from '../../providers/auth-service';
-import { AngularFire, FirebaseListObservable } from 'angularfire2';
+import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 
 @Component({
   selector: 'page-home',
@@ -385,8 +385,8 @@ export class HomePage {
 
   items: FirebaseListObservable<any[]>;
 
-  constructor(public navCtrl: NavController,af: AngularFire,private _auth: AuthService) {
-    this.items = af.database.list('/items');
+  constructor(public navCtrl: NavController, db: AngularFireDatabase, private _auth: AuthService) {
+    this.items = db.list('/items');
   }
 
   signInWithFacebook(): void {
@@ -467,51 +467,49 @@ and update the signInWithFacebook() method.
 your ```auth-service.ts``` code should look like this.
 
 ```ts
-
-
+import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
-import { AuthProviders, AngularFireAuth, FirebaseAuthState, AuthMethods } from 'angularfire2';
-
+import { AngularFireAuth } from 'angularfire2/auth';
+import { User } from 'firebase';
+import { FacebookAuthProvider } from 'firebase/auth';
 import { Platform } from 'ionic-angular';
 import { Facebook } from 'ionic-native';
 
 @Injectable()
 export class AuthService {
-  private authState: FirebaseAuthState;
+  private authState: Observable<User>;
+  private currentUser: User;
 
-  constructor(public auth$: AngularFireAuth, private platform: Platform) {
-    this.authState = auth$.getAuth();
-    auth$.subscribe((state: FirebaseAuthState) => {
-      this.authState = state;
+  constructor(public afAuth$: AngularFireAuth) {
+    this.authState = afAuth$.authState;
+    afAuth$.subscribe((user: User) => {
+      this.currentUser = user;
     });
   }
 
   get authenticated(): boolean {
-    return this.authState !== null;
+    return this.currentUser !== null;
   }
 
   signInWithFacebook(): firebase.Promise<FirebaseAuthState> {
     if (this.platform.is('cordova')) {
       return Facebook.login(['email', 'public_profile']).then(res => {
         const facebookCredential = firebase.auth.FacebookAuthProvider.credential(res.authResponse.accessToken);
-        return firebase.auth().signInWithCredential(facebookCredential);
+        return this.afAuth$.aut.signInWithCredential(facebookCredential);
       });
     } else {
-      return this.auth$.login({
-        provider: AuthProviders.Facebook,
-        method: AuthMethods.Popup
-      });
+      return this.afAuth$.auth.signInWithPopup(new FacebookAuthProvider());
     }
 
   }
 
   signOut(): void {
-    this.auth$.logout();
+    this.afAuth$.signOut();
   }
 
   displayName(): string {
-    if (this.authState != null) {
-      return this.authState.facebook.displayName;
+    if (this.currentUser !== null) {
+      return this.currentUser.facebook.displayName;
     } else {
       return '';
     }
