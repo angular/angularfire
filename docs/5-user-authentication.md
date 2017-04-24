@@ -1,10 +1,9 @@
 # 5. User authentication
 
-> AngularFire2 provides you an Observable for your Firebase Authentication
-State via the `AngularFireAuth` module.
+`AngularFireAuth.authState` provides you an `Observable<firebase.User>` to monitor your application's authentication State.
 
-AngularFireAuth's `.auth` object will return an initialized
-`firebase.auth.Auth` instance, allowing you to log users in and out. [See
+`AngularFireAuth.auth` returns an initialized
+`firebase.auth.Auth` instance, allowing you to log users in, out, etc. [See
 the Firebase docs for more information on what methods are availabile.](https://firebase.google.com/docs/reference/js/firebase.auth.Auth)
 
 **Example app:**
@@ -13,7 +12,8 @@ the Firebase docs for more information on what methods are availabile.](https://
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { AngularFireAuth } from 'angularfire2/auth';
-import { GoogleAuthProvider, User as FirebaseUser } from 'firebase/auth';
+import { GoogleAuthProvider } from 'firebase/auth';
+import { User } from 'firebase';
 
 @Component({
   selector: 'app-root',
@@ -25,7 +25,7 @@ import { GoogleAuthProvider, User as FirebaseUser } from 'firebase/auth';
 })
 export class AppComponent {
 
-  user: Observable<FirebaseUser>;
+  user: Observable<User>;
 
   constructor(public afAuth: AngularFireAuth) {
     this.user = afAuth.authState;
@@ -53,17 +53,17 @@ Login with Facebook.
 
 ```cordova plugin add cordova-plugin-facebook4 --save --variable APP_ID="123456789" --variable APP_NAME="myApplication"```
 
-2- Use signInWithCredential login method
+2- Use `signInWithCredential` method
 
 ```ts
-  console.log("Facebook success: " + JSON.stringify(result));
-  var provider = firebase.auth.FacebookAuthProvider.credential(result.authResponse.accessToken);
+console.log("Facebook success: " + JSON.stringify(result));
+var provider = firebase.auth.FacebookAuthProvider.credential(result.authResponse.accessToken);
 
-   firebase.auth().signInWithCredential(provider)
-    .then((success) => {
-      console.log("Firebase success: " + JSON.stringify(success));
-    })
-    .catch((error) => {
-      console.log("Firebase failure: " + JSON.stringify(error));
-    });
+afAuth.auth.signInWithCredential(provider)
+  .then((success) => {
+    console.log("Firebase success: " + JSON.stringify(success));
+  })
+  .catch((error) => {
+    console.log("Firebase failure: " + JSON.stringify(error));
+  });
 ```
