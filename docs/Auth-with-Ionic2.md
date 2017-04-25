@@ -186,7 +186,7 @@ Now inject AngularFireDatabase in your component. Open your `home.ts` by going i
 
 >2) Inject your AngularFireDatabase dependency in the constructor.
 
->3) Call the list method on the AngularFireDatabase module.
+>3) Call the list method on the AngularFireDatabase service.
 
 Your `home.ts` file should look like this.
 
@@ -270,8 +270,8 @@ export class AuthService {
   private authState: Observable<firebase.User>;
   private currentUser: firebase.User;
 
-  constructor(public afAuth$: AngularFireAuth) {
-    this.authState = afAuth$.authState;
+  constructor(public afAuth: AngularFireAuth) {
+    this.authState = afAuth.authState;
     afAuth$.subscribe((user: firebase.User) => {
       this.currentUser = user;
     });
@@ -282,11 +282,11 @@ export class AuthService {
   }
 
   signInWithFacebook(): firebase.Promise<FirebaseAuthState> {
-    return this.afAuth$.auth.signInWithPopup(new firebase.auth.FacebookAuthProvider());
+    return this.afAuth.auth.signInWithPopup(new firebase.auth.FacebookAuthProvider());
   }
 
   signOut(): void {
-    this.afAuth$.signOut();
+    this.afAuth.signOut();
   }
 
   displayName(): string {
@@ -479,8 +479,8 @@ export class AuthService {
   private authState: Observable<firebase.User>;
   private currentUser: firebase.User;
 
-  constructor(public afAuth$: AngularFireAuth) {
-    this.authState = afAuth$.authState;
+  constructor(public afAuth: AngularFireAuth) {
+    this.authState = afAuth.authState;
     afAuth$.subscribe((user: firebase.User) => {
       this.currentUser = user;
     });
@@ -494,16 +494,16 @@ export class AuthService {
     if (this.platform.is('cordova')) {
       return Facebook.login(['email', 'public_profile']).then(res => {
         const facebookCredential = firebase.auth.FacebookAuthProvider.credential(res.authResponse.accessToken);
-        return this.afAuth$.auth.signInWithCredential(facebookCredential);
+        return this.afAuth.auth.signInWithCredential(facebookCredential);
       });
     } else {
-      return this.afAuth$.auth.signInWithPopup(new firebase.auth.FacebookAuthProvider());
+      return this.afAuth.auth.signInWithPopup(new firebase.auth.FacebookAuthProvider());
     }
 
   }
 
   signOut(): void {
-    this.afAuth$.signOut();
+    this.afAuth.signOut();
   }
 
   displayName(): string {
