@@ -1,14 +1,14 @@
 # 3. Retrieving data as lists
 
 > AngularFire2 synchronizes data as lists using the `FirebaseListObservable`. 
-The `FirebaseListObservable` is not created by itself, but through the `AngularFire.database` module. 
+The `FirebaseListObservable` is not created by itself, but through the `AngularFire.database` service. 
 The guide below demonstrates how to retrieve, save, and remove data as lists.
 
-## Injecting the AngularFireDatabase module
+## Injecting the AngularFireDatabase service
 
 **Make sure you have bootstrapped your application for AngularFire2. See the Installation guide for bootstrap setup.**
 
-AngularFireDatabase is an injectable module, which is injected through the constructor of your Angular component or `@Injectable()` service.
+AngularFireDatabase is a service which can be injected through the constructor of your Angular component or `@Injectable()` service.
 In the previous step, we modified the `/src/app/app.component.ts` to retrieve data as object. In this step, let's start with a clean slate.
 
 Replace your  `/src/app/app.component.ts` from previous step to look like below.
@@ -33,7 +33,7 @@ In this section, we're going to modify the `/src/app/app.component.ts`  to retre
 
 ## Create a list binding
 
-Data is retrieved through the `AngularFireDatabase` module.
+Data is retrieved through the `AngularFireDatabase` service.
 
 There are three ways to create a list binding:
 
