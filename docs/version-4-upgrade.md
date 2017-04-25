@@ -34,7 +34,8 @@ In 4.0 we've reduced the complexity of the auth module by providing only a [`fir
 
 ```typescript
 import { AngularFireAuth } from 'angularfire2/auth';
-
+// Do not import from 'firebase' as you'd lose the tree shaking benefits
+import * as firebase from 'firebase/app';
 ...
 
 user: Observable<firebase.User>;
@@ -49,7 +50,7 @@ While convenient, the pre-configured login feature added unneeded complexity. `A
 
 ```typescript
 login() {
-  this.afAuth.auth.signInWithPopup(new GoogleAuthProvider());
+  this.afAuth.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
 }
 logout() {
   this.afAuth.auth.signOut();
@@ -70,9 +71,11 @@ import { Observable } from 'rxjs/Observable';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireDatabaseModule, AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { AngularFireAuthModule, AngularFireAuth } from 'angularfire2/auth';
-import { GoogleAuthProvider } from 'firebase/auth';
-import { User } from 'firebase';
 import { environment } from '../environments/environment';
+
+// Do not import from 'firebase' as you'd lose the tree shaking benefits
+import * from 'firebase/app';
+
 
 @NgModule({
   declarations: [ App ],
@@ -96,14 +99,14 @@ export class MyModule { }
   `
 })
 export class App {
-  user: Observable<User>;
+  user: Observable<firebase.User>;
   items: FirebaseListObservable<any[]>;
   constructor(afAuth: AngularFireAuth, db: AngularFireDatabase) {
     this.user = afAuth.authState;
     this.items = db.list('items');
   }
   login() {
-    this.afAuth.auth.signInWithPopup(new GoogleAuthProvider());
+    this.afAuth.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
   }
   logout() {
      this.afAuth.auth.signOut();
