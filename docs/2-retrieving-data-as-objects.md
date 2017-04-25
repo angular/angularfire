@@ -4,11 +4,11 @@
 The `FirebaseObjectObservable` is not created by itself, but through the `AngularFire.database` service. 
 The guide below demonstrates how to retrieve, save, and remove data as objects.
 
-## Injecting the AngularFireDatabase module
+## Injecting the AngularFireDatabase service
 
 **Make sure you have bootstrapped your application for AngularFire2. See the Installation guide for bootstrap setup.**
 
-AngularFireDatabase is an @NgModule, which is injected through the constructor of your Angular component or `@Injectable()` service.
+AngularFireDatabase is a service which can be injected through the constructor of your Angular component or `@Injectable()` service.
 
 If you've followed the earlier step "Installation and Setup"  your `/src/app/app.component.ts` should look like below. 
 
