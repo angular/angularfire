@@ -14,11 +14,11 @@ Status: Beta
 - **Authentication** - Monitor authentication state in realtime.
 
 #### Quick links
-[Contributing](https://github.com/angular/angularfire2/blob/master/CONTRIBUTING.md)
+[Contributing](CONTRIBUTING.md)
 
 [Plunker Template](http://plnkr.co/edit/8yY4tH?p=preview) - Requires to set your Firebase credentials in `app.module.ts`.
 
-[Upgrading to v4.0? Check out our guide.](https://github.com/angular/angularfire2/blob/master/docs/version-4-upgrade.md)
+[Upgrading to v4.0? Check out our guide.](docs/version-4-upgrade.md)
 
 ## Install
 
