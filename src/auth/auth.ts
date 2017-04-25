@@ -19,10 +19,10 @@ export class AngularFireAuth {
   /**
    * Observable of authentication state
    */
-  authState: Observable<firebase.User>;
+  user: Observable<firebase.User>;
 
   constructor(public app: FirebaseApp) {
-    this.authState = FirebaseAuthStateObservable(app);
+    this.user = FirebaseAuthStateObservable(app);
     this.auth = app.auth();
   }
 

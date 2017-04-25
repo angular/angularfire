@@ -50,8 +50,8 @@ describe('AngularFireAuth', () => {
     })();
 
     mockAuthState = new Subject<firebase.User>();
-    spyOn(afAuth, 'authState').and.returnValue(mockAuthState);
-    afAuth.authState = mockAuthState;
+    spyOn(afAuth, 'user').and.returnValue(mockAuthState);
+    afAuth.user = mockAuthState;
   });
 
   afterEach(done => {
@@ -65,7 +65,7 @@ describe('AngularFireAuth', () => {
         name: 'ngZone'
       });
       ngZone.run(() => {
-        const subs = afAuth.authState.subscribe(user => {
+        const subs = afAuth.user.subscribe(user => {
           expect(Zone.current.name).toBe('ngZone');
           done();
         }, done.fail);
@@ -83,11 +83,11 @@ describe('AngularFireAuth', () => {
     expect(afAuth.auth).toBeDefined();
   });
 
-  it('should emit auth updates through authState', (done: any) => {
+  it('should emit auth updates through user', (done: any) => {
     let count = 0;
 
     // Check that the first value is null and second is the auth user
-    const subs = afAuth.authState.subscribe(user => {
+    const subs = afAuth.user.subscribe(user => {
       if (count === 0) {
         expect(user).toBe(null);
         count = count + 1;
