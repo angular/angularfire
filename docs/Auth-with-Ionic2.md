@@ -273,7 +273,7 @@ export class AuthService {
 
   constructor(public afAuth: AngularFireAuth) {
     this.authState = afAuth.authState;
-    afAuth$.subscribe((user: firebase.User) => {
+    afAuth.subscribe((user: firebase.User) => {
       this.currentUser = user;
     });
   }
@@ -483,7 +483,7 @@ export class AuthService {
 
   constructor(public afAuth: AngularFireAuth) {
     this.authState = afAuth.authState;
-    afAuth$.subscribe((user: firebase.User) => {
+    afAuth.subscribe((user: firebase.User) => {
       this.currentUser = user;
     });
   }
