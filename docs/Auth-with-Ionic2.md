@@ -142,7 +142,7 @@ and add the following three entries.
 
 your `app.module.ts` file should look something like this.
 
-```bash
+```ts
 
 import { NgModule } from '@angular/core';
 import { IonicApp, IonicModule } from 'ionic-angular';
@@ -190,7 +190,7 @@ Now inject AngularFireDatabase in your component. Open your `home.ts` by going i
 
 Your `home.ts` file should look like this.
 
-```bash
+```ts
 
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
@@ -215,7 +215,7 @@ export class HomePage {
 
 **Update** your `home.html` at `src/pages/home/home.html`, with following entry
 
-```bash
+```html
 
 <ion-header>
   <ion-navbar>
@@ -259,21 +259,20 @@ C:\projects\Ionic_AngularFire2_Project> ionic g provider AuthService
 This should create the AuthService under `src/providers/auth-service.ts`.
 Update the service with the following code.
 
-```bash
+```typescript
 import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from 'angularfire2/auth';
-import { User } from 'firebase';
-import { FacebookAuthProvider } from 'firebase/auth';
+import * as firebase from 'firebase/app';
 
 @Injectable()
 export class AuthService {
-  private authState: Observable<User>;
-  private currentUser: User;
+  private authState: Observable<firebase.User>;
+  private currentUser: firebase.User;
 
   constructor(public afAuth$: AngularFireAuth) {
     this.authState = afAuth$.authState;
-    afAuth$.subscribe((user: User) => {
+    afAuth$.subscribe((user: firebase.User) => {
       this.currentUser = user;
     });
   }
@@ -283,7 +282,7 @@ export class AuthService {
   }
 
   signInWithFacebook(): firebase.Promise<FirebaseAuthState> {
-    return this.afAuth$.auth.signInWithPopup(new FacebookAuthProvider());
+    return this.afAuth$.auth.signInWithPopup(new firebase.auth.FacebookAuthProvider());
   }
 
   signOut(): void {
@@ -303,7 +302,7 @@ export class AuthService {
 
 Add your service in `app.module.ts`. Your `app.module.ts` should look like this
 
-```bash
+```ts
 
 import { NgModule } from '@angular/core';
 import { IonicApp, IonicModule } from 'ionic-angular';
@@ -344,7 +343,7 @@ export class AppModule { }
 
 Update your `home.html` to add a login button. Your `home.html` should look like this
 
-```bash
+```html
 
 <ion-header>
   <ion-navbar>
@@ -369,7 +368,7 @@ Update your `home.html` to add a login button. Your `home.html` should look like
 and finally, add the corresponding click handlers in `home.ts` as follows.
 Also, ensure the *AuthService* is injected in the constructor. Your `home.ts` should look like this
 
-```bash
+```ts
 
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
@@ -457,7 +456,7 @@ Add the platform to your facebook portal as mentioned in the document [here](htt
 
 Now import the Platform and Facebook objects in your ```auth-service.ts```
 
-```
+```ts
 import { Platform } from 'ionic-angular';
 import { Facebook } from 'ionic-native';
 ```
@@ -470,19 +469,19 @@ your ```auth-service.ts``` code should look like this.
 import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from 'angularfire2/auth';
-import { User } from 'firebase';
-import { FacebookAuthProvider } from 'firebase/auth';
+import * as firebase from 'firebase/app';
+
 import { Platform } from 'ionic-angular';
 import { Facebook } from 'ionic-native';
 
 @Injectable()
 export class AuthService {
-  private authState: Observable<User>;
-  private currentUser: User;
+  private authState: Observable<firebase.User>;
+  private currentUser: firebase.User;
 
   constructor(public afAuth$: AngularFireAuth) {
     this.authState = afAuth$.authState;
-    afAuth$.subscribe((user: User) => {
+    afAuth$.subscribe((user: firebase.User) => {
       this.currentUser = user;
     });
   }
@@ -495,10 +494,10 @@ export class AuthService {
     if (this.platform.is('cordova')) {
       return Facebook.login(['email', 'public_profile']).then(res => {
         const facebookCredential = firebase.auth.FacebookAuthProvider.credential(res.authResponse.accessToken);
-        return this.afAuth$.aut.signInWithCredential(facebookCredential);
+        return this.afAuth$.auth.signInWithCredential(facebookCredential);
       });
     } else {
-      return this.afAuth$.auth.signInWithPopup(new FacebookAuthProvider());
+      return this.afAuth$.auth.signInWithPopup(new firebase.auth.FacebookAuthProvider());
     }
 
   }
