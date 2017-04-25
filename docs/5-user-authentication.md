@@ -40,31 +40,6 @@ export class AppComponent {
 }
 ```
 
-## Cordova case
+## Cordova
 
-Firebase authentication wasn't entirely compatible with cordova. You need to add some specific operations.
-
-**Example:**
-
-Login with Facebook.
-
-1. Install the cordova plugin
-
-```bash
-cordova plugin add cordova-plugin-facebook4 --save --variable APP_ID="123456789" --variable APP_NAME="myApplication"
-```
-
-2. Use `signInWithCredential` method
-
-```ts
-console.log("Facebook success: " + JSON.stringify(result));
-var provider = firebase.auth.FacebookAuthProvider.credential(result.authResponse.accessToken);
-
-afAuth.auth.signInWithCredential(provider)
-  .then((success) => {
-    console.log("Firebase success: " + JSON.stringify(success));
-  })
-  .catch((error) => {
-    console.log("Firebase failure: " + JSON.stringify(error));
-  });
-```
+Learn how to [setup Firebase Authentication with Cordova](https://firebase.google.com/docs/auth/web/cordova) in the Firebase Guides.
