@@ -1,7 +1,7 @@
 # 3. Retrieving data as lists
 
 > AngularFire2 synchronizes data as lists using the `FirebaseListObservable`. 
-The `FirebaseListObservable` is not created by itself, but through the `AngularFire.database` service. 
+The `FirebaseListObservable` is not created by itself, but through the `AngularFireDatabase` service. 
 The guide below demonstrates how to retrieve, save, and remove data as lists.
 
 ## Injecting the AngularFireDatabase service
