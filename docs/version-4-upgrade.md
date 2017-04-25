@@ -5,7 +5,7 @@ AngularFire2 4.0 is a refactor of the AngularFire2 package which implements
 
 ### Removing `AngularFire` for Modularity
 
-Prior to 4.0, AngularFire2 not take advantage of the Firebase SDK's modularity for tree shaking. The `AngularFire` service has now been removed and the library broken up into smaller @NgModules:
+Prior to 4.0, AngularFire2 did not take advantage of the Firebase SDK's modularity for tree shaking. The `AngularFire` service has now been removed and the library broken up into smaller @NgModules:
 
 * `AngularFireModule`
 * `AngularFireDatabaseModule`
@@ -22,7 +22,7 @@ constructor(af: AngularFire) {
 Should now be:
 
 ```typescript
-constructor(db: AngularFireDatabasem, afAuth: AngularFireAuth) {
+constructor(db: AngularFireDatabase, afAuth: AngularFireAuth) {
   db.list('foo');
   afAuth.authState;
 }

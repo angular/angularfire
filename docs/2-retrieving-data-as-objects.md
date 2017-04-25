@@ -1,7 +1,7 @@
 # 2. Retrieving data as objects
 
 > AngularFire2 synchronizes data as objects using the `FirebaseObjectObservable`. 
-The `FirebaseObjectObservable` is not created by itself, but through the `AngularFire.database` service. 
+The `FirebaseObjectObservable` is not created by itself, but through the `AngularFireDatabase` service. 
 The guide below demonstrates how to retrieve, save, and remove data as objects.
 
 ## Injecting the AngularFireDatabase service
