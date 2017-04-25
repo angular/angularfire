@@ -12,7 +12,14 @@ import * as utils from '../utils';
 @Injectable()
 export class AngularFireDatabase {
 
-  constructor(public app: FirebaseApp) {}
+  /**
+   * Firebase Database instance
+   */
+  Database: firebase.database.Database;
+
+  constructor(public app: FirebaseApp) {
+    this.Database = app.database();
+  }
 
   list(pathOrRef: PathReference, opts?:FirebaseListFactoryOpts):FirebaseListObservable<any[]> {
     const ref = utils.getRef(this.app, pathOrRef);

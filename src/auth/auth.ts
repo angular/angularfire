@@ -14,7 +14,7 @@ export class AngularFireAuth {
   /**
    * Firebase Auth instance
    */
-  auth: firebase.auth.Auth;
+  Auth: firebase.auth.Auth;
 
   /**
    * Observable of authentication state
@@ -23,7 +23,7 @@ export class AngularFireAuth {
 
   constructor(public app: FirebaseApp) {
     this.user = FirebaseAuthStateObservable(app);
-    this.auth = app.auth();
+    this.Auth = app.auth();
   }
 
 }

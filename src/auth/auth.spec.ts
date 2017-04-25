@@ -80,7 +80,7 @@ describe('AngularFireAuth', () => {
   });
 
   it('should have the Firebase Auth instance', () => {
-    expect(afAuth.auth).toBeDefined();
+    expect(afAuth.Auth).toBeDefined();
   });
 
   it('should emit auth updates through user', (done: any) => {
