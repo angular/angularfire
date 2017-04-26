@@ -1,12 +1,15 @@
 # Using AngularFire2 with Ionic 3-Angular 4
 
-This document provides you a walkthrough of integrating AngularFire2 Authentication with Ionic3/Angular4. 
+This tutorial provides a walkthrough of integrating AngularFire2 Authentication with Ionic3/Angular4. 
 The below setup has been tested on Windows 10, but it should be same for Mac/Linux.
 
 Note: - If you're working with Ionic2 and Angular2.0, then you should refer to **Auth-with-Ionic2** tutorial 
 [here](https://github.com/angular/angularfire2/blob/master/docs/Auth-with-Ionic2.md)
 
 Ensure that you're executing these commands as **Administrator** on Windows and **sudo** on Mac/Linux to avoid any errors.
+
+This tutorial uses **Facebook** as the sign-in provider. After completion of this tutorial, you should be able to configure
+other sign-in providers like **Twitter**, **Google** on your own.
 
 ### Prerequisites
 The first step is to ensure you've latest version of **Node** installed.
