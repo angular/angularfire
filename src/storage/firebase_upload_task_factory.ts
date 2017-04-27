@@ -4,24 +4,19 @@ import { observeOn } from 'rxjs/operator/observeOn';
 import * as firebase from 'firebase/app';
 import 'firebase/storage';
 import * as utils from '../utils';
-import { UploadTask, UploadTaskState } from '../interfaces';
+import { UploadTask, UploadTaskSnapshot } from '../interfaces';
 
-export function FirebaseUploadTaskFactory (uploadTask: UploadTask): FirebaseUploadTaskObservable<any> {
+export function FirebaseUploadTaskFactory (uploadTask: UploadTask): FirebaseUploadTaskObservable<UploadTaskSnapshot> {
 
-  const objectObservable = new FirebaseUploadTaskObservable((obs: Observer<UploadTaskState>) => {
-    let state: any = undefined;
-    let snapshot: any = undefined;
-    uploadTask.then(_snapshot => {
-        snapshot = _snapshot;
-        obs.next({state, snapshot});
+  const objectObservable = new FirebaseUploadTaskObservable((obs: Observer<UploadTaskSnapshot>) => {
+    uploadTask.on('state_changed', snapshot => {
+        obs.next(snapshot);
     });
-    let fn = uploadTask.on('STATE_CHANGE', _state => {
-        state = _state;
-        obs.next({state, snapshot})
-    }, err => {
-        obs.error(err);
+    uploadTask.then(snapshot => {
+        obs.next(snapshot);
         obs.complete();
-    }, () => {
+    }).catch(error => {
+        obs.error(error.toString());
         obs.complete();
     });
   }, uploadTask);

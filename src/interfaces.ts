@@ -105,9 +105,4 @@ export type StorageReference = firebase.storage.Reference;
 export type UploadTaskSnapshot = firebase.storage.UploadTaskSnapshot;
 export type StoragePathReference = StorageReference | string;
 
-export interface UploadTaskState {
-  state: String;
-  snapshot: UploadTaskSnapshot;
-}
-
 export type Messaging = firebase.messaging.Messaging;

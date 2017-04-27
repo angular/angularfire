@@ -22,6 +22,8 @@
     "src/test-root.ts",
     "src/auth.ts",
     "src/database.ts",
+    "src/storage.ts",
+    "src/messaging.ts",
     "node_modules/zone.js/dist/zone.js.d.ts"
   ],
   "angularCompilerOptions": {
