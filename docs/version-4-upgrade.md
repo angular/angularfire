@@ -81,9 +81,9 @@ import * from 'firebase/app';
   declarations: [ App ],
   exports: [ App ],
   imports: [ 
-    AngularFireModule.initializeApp(environment.firebase, 'my-app')
+    AngularFireModule.initializeApp(environment.firebase, 'my-app'),
     AngularFireDatabaseModule,
-    AngularFireAuthModule,
+    AngularFireAuthModule
   ],
   bootstrap[ App ]
 })
