@@ -263,6 +263,7 @@ Update the service with the following code.
 
 import { Injectable } from '@angular/core';
 import { AuthProviders, AngularFireAuth, FirebaseAuthState, AuthMethods } from 'angularfire2';
+import * as firebase from 'firebase';
 
 @Injectable()
 export class AuthService {
@@ -360,6 +361,8 @@ Update your `home.html` to add a login button. Your `home.html` should look like
     {{item | json}}
   </ion-item>
   </ion-list>
+  
+  <p>{{displayName || 'On Successful Authentication, shows Facebook Display Name'}}</p>
 
   <button ion-button outline (click)="signInWithFacebook()">Facebook</button>
 </ion-content>
@@ -384,6 +387,7 @@ import { AngularFire, FirebaseListObservable } from 'angularfire2';
 export class HomePage {
 
   items: FirebaseListObservable<any[]>;
+  displayName = '';
 
   constructor(public navCtrl: NavController,af: AngularFire,private _auth: AuthService) {
     this.items = af.database.list('/items');
@@ -395,7 +399,8 @@ export class HomePage {
   }
 
   private onSignInSuccess(): void {
-    console.log("Facebook display name ",this._auth.displayName());
+    this.displayName = this._auth.displayName();
+    console.log('Facebook display name ',this.displayName);
   }
 
 }
@@ -538,3 +543,24 @@ C:\projects\Ionic_AngularFire2_Project> ionic run android
 ```
 
 Once the App launches click on the Facebook login button and it should open up the native facebook app for authentication and once your enter credentials and gets succesfully authenticated, it should redirect you back to the home page.
+
+You should see your Facebook display name on Home page. 
+
+Ensure that your mobile phone is connected to your computer. You've executed the following command, and your app is now running on your device.
+```
+ionic run android
+```
+Open a new tab in your chrome browser and in the URL bar type: chrome://inspect. 
+
+This will open a new window and show your computer's connected devices. 
+
+Now click on the inspect link under the device name of your mobile phone and it will open up a new browser window.
+You can interact with your application and see your console window.
+
+Although the link [here](http://ionicframework.com/docs/v2/native/facebook/) talks about configuring and installing Facebook plugin, double check the below items to avoid any basic issues.
+
+> 1. In the Firebase console under the Authentication section, go to where you enable Facebook as a Sign-In provider. The App ID and App Secret are correctly copied from your Facebook App found [here](https://developers.facebook.com/apps/).
+
+> 2. The Firbease console also provides `OAuth redirect URI` for Facebook app configuration. Copy this URL and go to the Facebook App Dashboard. Then under `Product --> Facebook Login --> Settings, paste the copied URI to Valid OAuth redirect URIs. Click Save Changes.
+
+> 3. You can find more information [here](https://firebase.google.com/docs/auth/web/facebook-login).
