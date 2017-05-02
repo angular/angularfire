@@ -1,3 +1,23 @@
+<a name="4.0.0-rc0"></a>
+# [4.0.0-rc0](https://github.com/angular/angularfire2/compare/2.0.0-beta.8...v4.0.0-rc0) (2017-05-02)
+
+
+### Bug Fixes
+
+* **auth:** Use the injected app ([980c447](https://github.com/angular/angularfire2/commit/980c447))
+* **build:** Add package.json files for deep paths ([cd5f2d1](https://github.com/angular/angularfire2/commit/cd5f2d1)), closes [#880](https://github.com/angular/angularfire2/issues/880)
+* **database:** Fix test TypeScript errors ([750737c](https://github.com/angular/angularfire2/commit/750737c)), closes [#875](https://github.com/angular/angularfire2/issues/875)
+* **database:** use switchMap when a list's query changes ([#831](https://github.com/angular/angularfire2/issues/831)) ([b85147d](https://github.com/angular/angularfire2/commit/b85147d)), closes [#830](https://github.com/angular/angularfire2/issues/830)
+
+
+### Features
+
+* **auth:** New Auth API ([12aa422](https://github.com/angular/angularfire2/commit/12aa422))
+* **database:** Add AngularFireDatabaseModule ([b388627](https://github.com/angular/angularfire2/commit/b388627))
+* **database:** support optional endAt/equalTo key ([#838](https://github.com/angular/angularfire2/issues/838)) ([e146492](https://github.com/angular/angularfire2/commit/e146492)), closes [#837](https://github.com/angular/angularfire2/issues/837)
+* **rc:** Implement rc0 API ([398e4e2](https://github.com/angular/angularfire2/commit/398e4e2))
+
+
 <a name="2.0.0-beta.8"></a>
 # [2.0.0-beta.8](https://github.com/angular/angularfire2/compare/2.0.0-beta7...v2.0.0-beta.8) (2017-02-16)
 
