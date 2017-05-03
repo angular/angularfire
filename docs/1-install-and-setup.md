@@ -56,7 +56,25 @@ npm install angularfire2 firebase --save
 
 Now that you have a new project setup, install AngularFire2 and Firebase from npm.
 
-### 4. Setup @NgModule
+### 4. Add Firebase config to environments variable
+
+Open `/src/environments/environment.ts` and add your Firebase configuration:
+
+```ts
+export const environment = {
+  production: false,
+  firebase: {
+    apiKey: '<your-key>',
+    authDomain: '<your-project-authdomain>',
+    databaseURL: '<your-database-URL>',
+    projectId: '<your-project-id>',
+    storageBucket: '<your-storage-bucket>',
+    messagingSenderId: '<your-messaging-sender-id>'
+  }
+};
+```
+
+### 5. Setup @NgModule
 
 Open `/src/app/app.module.ts`, inject the Firebase providers, and specify your Firebase configuration.
 This can be found in your project at [the Firebase Console](https://console.firebase.google.com):
@@ -66,20 +84,12 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { AngularFireModule } from 'angularfire2';
-
-// Must export the config
-export const firebaseConfig = {
-  apiKey: '<your-key>',
-  authDomain: '<your-project-authdomain>',
-  databaseURL: '<your-database-URL>',
-  storageBucket: '<your-storage-bucket>',
-  messagingSenderId: '<your-messaging-sender-id>'
-};
+import { environment } from '../environments/environment';
 
 @NgModule({
   imports: [
     BrowserModule,
-    AngularFireModule.initializeApp(firebaseConfig)
+    AngularFireModule.initializeApp(environment.firebase)
   ],
   declarations: [ AppComponent ],
   bootstrap: [ AppComponent ]
@@ -95,7 +105,7 @@ You can optionally provide a custom FirebaseApp name with `initializeApp`.
 @NgModule({
   imports: [
     BrowserModule,
-    AngularFireModule.initializeApp(firebaseConfig, 'my-app-name')
+    AngularFireModule.initializeApp(environment.firebase, 'my-app-name')
   ],
   declarations: [ AppComponent ],
   bootstrap: [ AppComponent ]
@@ -104,7 +114,7 @@ export class AppModule {}
 ```
 
 
-### 5. Inject AngularFireDatabase
+### 6. Inject AngularFireDatabase
 
 Open `/src/app/app.component.ts`, and make sure to modify/delete any tests to get the sample working (tests are still important, you know):
 
@@ -125,7 +135,7 @@ export class AppComponent {
 
 ```
 
-### 6. Bind to a list
+### 7. Bind to a list
 
 In `/src/app/app.component.ts`:
 
@@ -156,7 +166,7 @@ Open `/src/app/app.component.html`:
 </ul>
 ```
 
-### 7. Run your app
+### 8. Run your app
 
 ```bash
 ng serve
