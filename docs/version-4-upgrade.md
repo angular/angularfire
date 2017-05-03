@@ -74,7 +74,7 @@ import { AngularFireAuthModule, AngularFireAuth } from 'angularfire2/auth';
 import { environment } from '../environments/environment';
 
 // Do not import from 'firebase' as you'd lose the tree shaking benefits
-import * from 'firebase/app';
+import * as firebase from 'firebase/app';
 
 
 @NgModule({
