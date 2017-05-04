@@ -135,9 +135,9 @@ export const firebaseConfig = {
 @NgModule({
   imports: [
     BrowserModule,
-    AngularFireModule.initializeApp(firebaseConfig, 'my-app-name'),
-    AngularFireDatabaseModule,
-    AngularFireAuthModule,
+    AngularFireModule.initializeApp(firebaseConfig, 'my-app-name'), // imports firebase/app needed for everything
+    AngularFireDatabaseModule, // imports firebase/database, only needed for database features
+    AngularFireAuthModule, // imports firebase/auth, only needed for auth features
   ],
   declarations: [ AppComponent ],
   bootstrap: [ AppComponent ]
