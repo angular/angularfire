@@ -113,7 +113,7 @@ You can optionally provide a custom FirebaseApp name with `initializeApp`.
 export class AppModule {}
 ```
 
-### 5. Setup individual @NgModules
+### 6. Setup individual @NgModules
 
 After adding the AngularFireModule you also need to add modules for the individual @NgModules that your application needs.  
  - AngularFireAuthModule
@@ -148,7 +148,7 @@ export class AppModule {}
 
 ```
 
-### 6. Inject AngularFireDatabase
+### 7. Inject AngularFireDatabase
 
 Open `/src/app/app.component.ts`, and make sure to modify/delete any tests to get the sample working (tests are still important, you know):
 
@@ -169,7 +169,7 @@ export class AppComponent {
 
 ```
 
-### 7. Bind to a list
+### 8. Bind to a list
 
 In `/src/app/app.component.ts`:
 
@@ -200,7 +200,7 @@ Open `/src/app/app.component.html`:
 </ul>
 ```
 
-### 8. Run your app
+### 9. Run your app
 
 ```bash
 ng serve
