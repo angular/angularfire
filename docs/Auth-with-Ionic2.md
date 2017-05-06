@@ -313,6 +313,8 @@ import { HomePage } from '../pages/home/home';
 import { AngularFireModule } from 'angularfire2';
 import { AuthService } from '../providers/auth-service';
 
+// need to import to use AngularFireAuthModule in Angularfire2 4.0.0-rc0
+import { AngularFireAuthModule } from 'angularfire2/auth';
 
 export const firebaseConfig = {
   apiKey: "xxxxxxxxxx",
@@ -329,7 +331,8 @@ export const firebaseConfig = {
   ],
   imports: [
     IonicModule.forRoot(MyApp),
-    AngularFireModule.initializeApp(firebaseConfig)
+    AngularFireModule.initializeApp(firebaseConfig),
+    AngularFireAuthModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -459,7 +462,7 @@ Now import the Platform and Facebook objects in your ```auth-service.ts```
 
 ```ts
 import { Platform } from 'ionic-angular';
-import { Facebook } from 'ionic-native';
+import { Facebook } from '@ionic-native/facebook';
 ```
 
 and update the signInWithFacebook() method.
@@ -474,16 +477,16 @@ import { AngularFireAuth } from 'angularfire2/auth';
 import * as firebase from 'firebase/app';
 
 import { Platform } from 'ionic-angular';
-import { Facebook } from 'ionic-native';
+import { Facebook } from '@ionic-native/facebook';
 
 @Injectable()
 export class AuthService {
   private authState: Observable<firebase.User>;
   private currentUser: firebase.User;
 
-  constructor(public afAuth: AngularFireAuth) {
+  constructor(public afAuth: AngularFireAuth, public platform: Platform, public facebook: Facebook) {
     this.authState = afAuth.authState;
-    afAuth.subscribe((user: firebase.User) => {
+    afAuth.authState.subscribe((user: firebase.User) => {
       this.currentUser = user;
     });
   }
@@ -492,9 +495,9 @@ export class AuthService {
     return this.currentUser !== null;
   }
 
-  signInWithFacebook(): firebase.Promise<FirebaseAuthState> {
+  signInWithFacebook(): firebase.Promise<any> {
     if (this.platform.is('cordova')) {
-      return Facebook.login(['email', 'public_profile']).then(res => {
+      return this.facebook.login(['email', 'public_profile']).then(res => {
         const facebookCredential = firebase.auth.FacebookAuthProvider.credential(res.authResponse.accessToken);
         return this.afAuth.auth.signInWithCredential(facebookCredential);
       });
@@ -504,13 +507,13 @@ export class AuthService {
 
   }
 
-  signOut(): void {
-    this.afAuth.signOut();
+  signOut(): firebase.Promise<any> {
+    return this.afAuth.auth.signOut();
   }
 
   displayName(): string {
     if (this.currentUser !== null) {
-      return this.currentUser.facebook.displayName;
+      return this.currentUser.displayName;
     } else {
       return '';
     }
