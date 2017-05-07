@@ -93,10 +93,10 @@ Change to the project directory, which was just created with above command
 
 ```bash
 Cordova CLI: 6.4.0
-Ionic Framework Version: 3.0.1
+Ionic Framework Version: 3.1.1
 Ionic CLI Version: 2.2.3
 Ionic App Lib Version: 2.2.1
-Ionic App Scripts Version: 1.3.0
+Ionic App Scripts Version: 1.3.7
 ios-deploy version: Not installed
 ios-sim version: Not installed
 OS: Windows 10
@@ -110,26 +110,26 @@ Alternatively you can open `package.json` to ensure you've got the following ang
 
 ```bash
 "dependencies": {
-    "@angular/common": "4.0.0",
-    "@angular/compiler": "4.0.0",
-    "@angular/compiler-cli": "4.0.0",
-    "@angular/core": "4.0.0",
-    "@angular/forms": "4.0.0",
-    "@angular/http": "4.0.0",
-    "@angular/platform-browser": "4.0.0",
-    "@angular/platform-browser-dynamic": "4.0.0",
-    "@ionic-native/core": "3.4.2",
-    "@ionic-native/splash-screen": "3.4.2",
-    "@ionic-native/status-bar": "3.4.2",
+    "@angular/common": "4.0.2",
+    "@angular/compiler": "4.0.2",
+    "@angular/compiler-cli": "4.0.2",
+    "@angular/core": "4.0.2",
+    "@angular/forms": "4.0.2",
+    "@angular/http": "4.0.2",
+    "@angular/platform-browser": "4.0.2",
+    "@angular/platform-browser-dynamic": "4.0.2",
+    "@ionic-native/core": "3.6.1",
+    "@ionic-native/splash-screen": "3.6.1",
+    "@ionic-native/status-bar": "3.6.1",
     "@ionic/storage": "2.0.1",
-    "ionic-angular": "3.0.1",
+    "ionic-angular": "3.1.1",
     "ionicons": "3.0.0",
     "rxjs": "5.1.1",
     "sw-toolbox": "3.4.0",
-    "zone.js": "^0.8.4"
+    "zone.js": "^0.8.10"
   },
   "devDependencies": {
-    "@ionic/app-scripts": "1.3.0",
+    "@ionic/app-scripts": "1.3.7",
     "typescript": "~2.2.1"
   }
 
@@ -159,20 +159,22 @@ C:\projects\auth-ng4-ionic3-af2>npm install angularfire2 firebase --save
 
 _This should add angularfire2 and firebase entry in your project's package.json file in dependencies section. Something similar_
 
-> "angularfire2": "^2.0.0-beta.8",
+> "angularfire2": "^4.0.0-rc.0",
 
-> "firebase": "^3.8.0",
+> "firebase": "^3.9.0",
 
 ### Setup @NgModule
 
 Open your project in your favourite editor and open the `app.module.ts` file, under `src/app`
 and add the following three entries.
 
->1) Import AngularFireModule at top.
+>1) Import AngularFireModule and AngularFireDatabaseModule at top.
 
 >2) Define your firebaseConfig constant.
 
->3) Initialize your app, by calling it in the "imports" array in @NgModule
+>3) Initialize your app, by adding AngularFireModule in the "imports" array in @NgModule
+
+>3) Also, add AngularFireDatabaseModule in the "imports" array in @NgModule
 
 your `app.module.ts` file should look something like this.
 
@@ -188,6 +190,7 @@ import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
 
 import { AngularFireModule } from 'angularfire2';
+import { AngularFireDatabaseModule } from 'angularfire2/database';
 
 export const firebaseConfig = {
   apiKey: "xxxxxxxxxx",
@@ -205,7 +208,8 @@ export const firebaseConfig = {
   imports: [
     BrowserModule,
     IonicModule.forRoot(MyApp),
-    AngularFireModule.initializeApp(firebaseConfig)
+    AngularFireModule.initializeApp(firebaseConfig),
+    AngularFireDatabaseModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -224,13 +228,14 @@ export class AppModule {}
 
 ### Inject AngularFire and Bind it to List
 
-Now inject AngularFire in your component. Open your `home.ts` by going into `src/pages/home/home.ts` and make the following changes:
+Now inject AngularFireDatabase in your component. Open your `home.ts` by going into `src/pages/home/home.ts` and make the 
+following changes:
 
->1) Import "AngularFire, FirebaseListObservable" at the top of your component.
+>1) Import "AngularFireDatabase, FirebaseListObservable" at the top of your component.
 
->2) Inject your AngularFire dependency in the constructor.
+>2) Inject your AngularFireDatabase dependency in the constructor.
 
->3) Call the list method on angularFire's database object.
+>3) Call the list method on AngularFireDatabase object.
 
 Your `home.ts` file should look like this.
 
@@ -239,18 +244,17 @@ Your `home.ts` file should look like this.
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 
-import { AngularFire, FirebaseListObservable } from 'angularfire2';
+import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
 })
 export class HomePage {
-
   items: FirebaseListObservable<any[]>;
 
-  constructor(public navCtrl: NavController,af: AngularFire) {
-    this.items = af.database.list('/items');
+  constructor(public navCtrl: NavController, afDB: AngularFireDatabase) {
+    this.items = afDB.list('/cuisines');
   }
 
 }
@@ -291,6 +295,7 @@ C:\projects\auth-ng4-ionic3-af2> ionic serve
 
 This should fetch the data from firebase.
 
+
 ## Configuring Firebase/Facebook to talk to each other
 
 Go to Facebook Developers Page [here](https://developers.facebook.com/apps/) and create a new App.
@@ -315,6 +320,8 @@ see "Valid OAuth redirect URIs" input field.
 
 *_That's it. This will ensure Facebook and Firebase are able to talk to each other._*
 
+### As we were able to fetch data from Firebase database in the above step, let's focus on authentication below, by 
+removing calls to fetch data from  database. ###
 
 *Let's add the following two buttons in our `home.html`*
 
@@ -339,10 +346,9 @@ The `home.html` should look like below
 
 Let's update the `home.ts` to add the corresponding methods:
 
-1) First import AuthProviders, AuthMethods, AngularFire from AngularFire2.
-2) Inject AngularFire in the constructor
-3) The AngularFireAuth has a login method to which a configuration object can be provided, stating the provider and
-the method used for authentication .
+1) First import AngularFireAuth from AngularFire2/auth.
+2) Inject AngularFireAuth in the constructor
+3) The AngularFireAuth has various signIn methods to which we can pass instance of AuthProviders as shown below.
 
 The `home.ts` should look like below
 
@@ -350,7 +356,8 @@ The `home.ts` should look like below
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 
-import { AuthProviders, AuthMethods, AngularFire } from 'angularfire2';
+import { AngularFireAuth } from 'angularfire2/auth';
+import * as firebase from 'firebase/app';
 
 @Component({
   selector: 'page-home',
@@ -358,36 +365,41 @@ import { AuthProviders, AuthMethods, AngularFire } from 'angularfire2';
 })
 export class HomePage {
 
-  constructor(public navCtrl: NavController, private af: AngularFire) {
-
-  }
+  constructor(public navCtrl: NavController,
+    private afAuth: AngularFireAuth) { }
 
   signInWithFacebook() {
-    this.af.auth.login({
-      provider: AuthProviders.Facebook,
-      method: AuthMethods.Popup
-    }).then(
-      res => console.log(res)
-      );
+    this.afAuth.auth
+      .signInWithPopup(new firebase.auth.FacebookAuthProvider())
+      .then(res => console.log(res));
   }
 
   signOut() {
-    this.af.auth.logout();
+    this.afAuth.auth.signOut();
   }
 
 }
 
 ```
+** Note the import of firebase from firebase/app, to take advantage of the tree-shaking **
+
+Also, update your `app.module.ts` to contain following import
+
+`import { AngularFireAuthModule } from 'angularfire2/auth';`
+
+and add it to the imports array.
+
 
 Run the app and click on the Login Button, you should see a pop-up asking you to enter username and password for facebook to 
 authenticate. Once authenticated, you should see the response from Facebook in console window.
 
-Inspect the Object in the console, under `auth` property, you should see all the attributes and we're going to use two of them, next.
+Inspect the Object in the console, under `user` property, you should see all the attributes and we're going to use two of them, next.
 
-Let's get the `displayName` and `photoUrl` from the `auth` property, which we just saw on the console to be rendered on the screen.
-Since the `AngularFireAuth` is an observable, let's subcribe it to get notified everytime the Auth object changes.
+Let's get the `displayName` and `photoURL` from the `user` property, which we just saw on the console to be rendered on the screen.
+The `AngularFireAuth` has an `authState` property, which returns an observable, let's subcribe it to get notified everytime the
+Authentication state changes.
 
-Add two class properties `displayName`, `photoUrl` and subscribe to the Auth Observable in the constructor. 
+Add two class properties `displayName`, `photoUrl` and subscribe to the AngularFireAuth.authState property in the constructor. 
 Also add the two properties in our template to render them on screen.
 
 Your `home.ts` should look as follows:
@@ -397,7 +409,8 @@ Your `home.ts` should look as follows:
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 
-import { AuthProviders, AuthMethods, AngularFire } from 'angularfire2';
+import { AngularFireAuth } from 'angularfire2/auth';
+import * as firebase from 'firebase/app';
 
 @Component({
   selector: 'page-home',
@@ -408,33 +421,31 @@ export class HomePage {
   displayName;
   photoUrl;
 
-  constructor(public navCtrl: NavController, private af: AngularFire) {
-    this.af.auth.subscribe(authState => {
-      if(!authState){
-          this.displayName = null;
-          this.photoUrl = null;
-          return; 
+  constructor(public navCtrl: NavController,
+    private afAuth: AngularFireAuth) {
+    afAuth.authState.subscribe(user => {
+      if (!user) {
+        this.displayName = null;
+        this.photoUrl = null;
+        return;
       }
-        this.displayName = authState.auth.displayName;
-        this.photoUrl = authState.auth.photoURL;
-      
-    })
+      this.displayName = user.displayName;
+      this.photoUrl = user.photoURL;
+    });
   }
 
   signInWithFacebook() {
-    this.af.auth.login({
-      provider: AuthProviders.Facebook,
-      method: AuthMethods.Popup
-    }).then(
-      res => console.log(res)
-      );
+    this.afAuth.auth
+      .signInWithPopup(new firebase.auth.FacebookAuthProvider())
+      .then(res => console.log(res));
   }
 
   signOut() {
-    this.af.auth.logout();
+    this.afAuth.auth.signOut();
   }
 
 }
+
 
 ```
 
@@ -465,7 +476,7 @@ Now run your app and if everything is configured correctly, you should be able t
 which should open the facebook pop-up.
 
 Once you authenticate yourself, you should see your Facebook display name and profile picture on your screen. 
-Click the Logout button, which will make the Auth Object null and you should see the difference on your screen.
+Click the Logout button, which will make the AuthState to null and you should see the difference on your screen.
 
 You can try redirecting yourself to another page to grab additional details from Facebook and experiement on your own.
 
