@@ -320,8 +320,8 @@ see "Valid OAuth redirect URIs" input field.
 
 *_That's it. This will ensure Facebook and Firebase are able to talk to each other._*
 
-### As we were able to fetch data from Firebase database in the above step, let's focus on authentication below, by 
-removing calls to fetch data from  database. ###
+`As we were able to fetch data from Firebase database in the above step, let's focus on authentication below, by 
+removing calls to fetch data.`
 
 *Let's add the following two buttons in our `home.html`*
 
@@ -381,7 +381,7 @@ export class HomePage {
 }
 
 ```
-** Note the import of firebase from firebase/app, to take advantage of the tree-shaking **
+**_Note the import of firebase from firebase/app, to take advantage of the tree-shaking_**
 
 Also, update your `app.module.ts` to contain following import
 
@@ -395,12 +395,12 @@ authenticate. Once authenticated, you should see the response from Facebook in c
 
 Inspect the Object in the console, under `user` property, you should see all the attributes and we're going to use two of them, next.
 
-Let's get the `displayName` and `photoURL` from the `user` property, which we just saw on the console to be rendered on the screen.
+Let's get the `displayName` from the `user` property, which we just saw on the console to be rendered on the screen.
 The `AngularFireAuth` has an `authState` property, which returns an observable, let's subcribe it to get notified everytime the
 Authentication state changes.
 
-Add two class properties `displayName`, `photoUrl` and subscribe to the AngularFireAuth.authState property in the constructor. 
-Also add the two properties in our template to render them on screen.
+Add class property `displayName` and subscribe to the AngularFireAuth.authState property in the constructor. 
+Also add the property in our template to render them on screen.
 
 Your `home.ts` should look as follows:
 
@@ -418,19 +418,16 @@ import * as firebase from 'firebase/app';
 })
 export class HomePage {
 
-  displayName;
-  photoUrl;
+  displayName;  
 
   constructor(public navCtrl: NavController,
     private afAuth: AngularFireAuth) {
     afAuth.authState.subscribe(user => {
       if (!user) {
-        this.displayName = null;
-        this.photoUrl = null;
+        this.displayName = null;        
         return;
       }
-      this.displayName = user.displayName;
-      this.photoUrl = user.photoURL;
+      this.displayName = user.displayName;      
     });
   }
 
@@ -463,8 +460,7 @@ and `home.html` shouldlook like this
 
 <ion-content padding>
 
-  <h1>Hello {{displayName}}</h1>
-  <img *ngIf="photoUrl" src="{{photoUrl}}" alt="" />
+  <h1>Hello {{displayName}}</h1>  
   
 	<button ion-button outline (click)="signInWithFacebook()">Login</button>  
   <button ion-button outline (click)="signOut()">Logout</button>
@@ -475,7 +471,7 @@ and `home.html` shouldlook like this
 Now run your app and if everything is configured correctly, you should be able to click on the login button in your app, 
 which should open the facebook pop-up.
 
-Once you authenticate yourself, you should see your Facebook display name and profile picture on your screen. 
+Once you authenticate yourself, you should see your Facebook display name on your screen. 
 Click the Logout button, which will make the AuthState to null and you should see the difference on your screen.
 
 You can try redirecting yourself to another page to grab additional details from Facebook and experiement on your own.
@@ -558,13 +554,11 @@ Now import the `Platform` and `Facebook` objects in your `home.ts` and inject th
 ```bash
 
 import { Platform } from 'ionic-angular';
-import { Facebook } from 'ionic-native';
+import { Facebook } from '@ionic-native/facebook';
 
 ```
 
 Update the "signInWithFacebook" method and use Platform Service to determine the platform and run the appropriate code. 
-
-You'll also need to refer firebase in your `home.ts`.
 
 your `home.ts` should look as below
 
@@ -573,10 +567,11 @@ your `home.ts` should look as below
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 
-import { AuthProviders, AuthMethods, AngularFire } from 'angularfire2';
-import { Facebook } from '@ionic-native/facebook';
+import { AngularFireAuth } from 'angularfire2/auth';
+import * as firebase from 'firebase/app';
+
 import { Platform } from 'ionic-angular';
-import * as firebase from 'firebase';
+import { Facebook } from '@ionic-native/facebook';
 
 @Component({
   selector: 'page-home',
@@ -585,41 +580,40 @@ import * as firebase from 'firebase';
 export class HomePage {
 
   displayName;
-  photoUrl;
 
-  constructor(public navCtrl: NavController, private af: AngularFire,
-      private fb: Facebook, private platform: Platform) {
-    this.af.auth.subscribe(authState => {
-      if(!authState){
-          this.displayName = null;
-          this.photoUrl = null;
-          return; 
+  constructor(public navCtrl: NavController,
+    private afAuth: AngularFireAuth, private fb: Facebook, private platform: Platform) {
+    afAuth.authState.subscribe(user => {
+      if (!user) {
+        this.displayName = null;
+        return;
       }
-        this.displayName = authState.auth.displayName;
-        this.photoUrl = authState.auth.photoURL;
-      
-    })
+      this.displayName = user.displayName;      
+    });
   }
 
   signInWithFacebook() {
     if (this.platform.is('cordova')) {
-      this.fb.login(['email', 'public_profile']).then(res => {
-        const facebookCredential = firebase.auth.FacebookAuthProvider.credential(res.authResponse.accessToken);
-        return firebase.auth().signInWithCredential(facebookCredential);
-      })      
+      if (this.platform.is('cordova')) {
+        this.fb.login(['email', 'public_profile']).then(res => {
+          const facebookCredential = firebase.auth.FacebookAuthProvider.credential(res.authResponse.accessToken);
+          return firebase.auth().signInWithCredential(facebookCredential);
+        })
+      }
     } else {
-      this.af.auth.login({
-      provider: AuthProviders.Facebook,
-      method: AuthMethods.Popup
-    })    
-    }  
+      this.afAuth.auth
+        .signInWithPopup(new firebase.auth.FacebookAuthProvider())
+        .then(res => console.log(res));
+    }
+
   }
 
   signOut() {
-    this.af.auth.logout();
+    this.afAuth.auth.signOut();
   }
 
 }
+
 
 ```
 
@@ -639,6 +633,8 @@ import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
 
 import { AngularFireModule } from 'angularfire2';
+import { AngularFireDatabaseModule } from 'angularfire2/database';
+import { AngularFireAuthModule } from 'angularfire2/auth';
 import { Facebook } from '@ionic-native/facebook';
 
 export const firebaseConfig = {
@@ -657,7 +653,9 @@ export const firebaseConfig = {
   imports: [
     BrowserModule,
     IonicModule.forRoot(MyApp),
-    AngularFireModule.initializeApp(firebaseConfig)
+    AngularFireModule.initializeApp(firebaseConfig),
+    AngularFireDatabaseModule,
+    AngularFireAuthModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -667,11 +665,12 @@ export const firebaseConfig = {
   providers: [
     StatusBar,
     SplashScreen,
-    Facebook,
-    {provide: ErrorHandler, useClass: IonicErrorHandler}
+    {provide: ErrorHandler, useClass: IonicErrorHandler},
+    Facebook
   ]
 })
 export class AppModule {}
+
 
 ```
 
