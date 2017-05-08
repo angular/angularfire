@@ -583,7 +583,7 @@ export class HomePage {
 
   constructor(public navCtrl: NavController,
     private afAuth: AngularFireAuth, private fb: Facebook, private platform: Platform) {
-    afAuth.authState.subscribe(user => {
+    afAuth.authState.subscribe((user: firebase.User) => {
       if (!user) {
         this.displayName = null;
         return;
@@ -594,18 +594,16 @@ export class HomePage {
 
   signInWithFacebook() {
     if (this.platform.is('cordova')) {
-      if (this.platform.is('cordova')) {
-        this.fb.login(['email', 'public_profile']).then(res => {
-          const facebookCredential = firebase.auth.FacebookAuthProvider.credential(res.authResponse.accessToken);
-          return firebase.auth().signInWithCredential(facebookCredential);
-        })
-      }
-    } else {
-      this.afAuth.auth
+      return this.fb.login(['email', 'public_profile']).then(res => {
+        const facebookCredential = firebase.auth.FacebookAuthProvider.credential(res.authResponse.accessToken);
+        return firebase.auth().signInWithCredential(facebookCredential);
+      })
+    }
+    else {
+      return this.afAuth.auth
         .signInWithPopup(new firebase.auth.FacebookAuthProvider())
         .then(res => console.log(res));
     }
-
   }
 
   signOut() {
