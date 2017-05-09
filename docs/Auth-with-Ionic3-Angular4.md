@@ -34,7 +34,7 @@ C:\projects>npm -v
 3.10.10
 
 ```
-Install the latest verion of `angular4` aka `angular`, by executing the command
+Install the Angular CLI, which will be used to build our Angular project and install Angular version 4 later.
 
 ```bash
 C:\projects>npm install -g @angular/cli
