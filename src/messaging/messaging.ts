@@ -8,7 +8,7 @@ import { FirebaseApp } from '../app/index';
 export class AngularFireMessaging {
 
   /**
-   * Firebase Storage instance
+   * Firebase Messaging instance
    */
   messaging: firebase.messaging.Messaging;
 
