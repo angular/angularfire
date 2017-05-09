@@ -188,3 +188,4 @@ Login with Facebook.
       console.log("Firebase failure: " + JSON.stringify(error));
     });
 ```
+### [Next Step: Uploading Files](6-upload-files.md)
