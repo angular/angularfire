@@ -1,6 +1,6 @@
 # 6. Uploading Files
 
-`AngularFireStorage.upload` provides you an `Observable<firebase.storage.UploadTaskSnapshot>` to upload files to [Firebase Storage](https://firebase.google.com/docs/storage/) and monitor progress.
+`AngularFireStorage.upload` provides you an function returning `Observable<firebase.storage.UploadTaskSnapshot>` to upload files to [Firebase Storage](https://firebase.google.com/docs/storage/) and monitor progress.
 
 `AngularFireStorage.storage` returns an initialized
 `firebase.storage.Storage` instance, so you can perform operations other than upload. [See
