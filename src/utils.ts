@@ -2,7 +2,7 @@ import * as firebase from 'firebase/app';
 import { Subscription } from 'rxjs/Subscription';
 import { Scheduler } from 'rxjs/Scheduler';
 import { queue } from 'rxjs/scheduler/queue';
-import { AFUnwrappedDataSnapshot, PathReference, DatabaseReference } from './interfaces';
+import { AFUnwrappedDataSnapshot, PathReference, DatabaseReference, StoragePathReference, StorageReference } from './interfaces';
 import { FirebaseApp } from './app/index';
 
 const REGEX_ABSOLUTE_URL = /^[a-z]+:\/\/.*/;
@@ -121,6 +121,26 @@ export function getRef(app: FirebaseApp, pathRef: PathReference): DatabaseRefere
     return app.database().refFromURL(path);
   }
   return app.database().ref(path);
+}
+
+
+/**
+ * Returns a database reference given a Firebase App and an
+ * absolute or relative path.
+ * @param app - Firebase App
+ * @param path - Database path, relative or absolute
+ */
+export function getStorageRef(app: FirebaseApp, pathRef: StoragePathReference): StorageReference {
+  // if a db ref was passed in, just return it
+  if(isFirebaseRef(pathRef)) {
+    return pathRef as StorageReference;
+  }
+
+  const path = pathRef as string;
+  if(isAbsoluteUrl(<string>pathRef)) {
+    return app.storage().refFromURL(path);
+  }
+  return app.storage().ref(path);
 }
 
 /**

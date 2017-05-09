@@ -43,3 +43,5 @@ export class AppComponent {
 ## Cordova
 
 Learn how to [setup Firebase Authentication with Cordova](https://firebase.google.com/docs/auth/web/cordova) in the Firebase Guides.
+
+### [Next Step: Uploading Files](6-upload-files.md)

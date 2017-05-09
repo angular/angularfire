@@ -95,4 +95,14 @@ export type DatabaseReference = firebase.database.Reference;
 export type DatabaseQuery = firebase.database.Query;
 export type QueryReference = DatabaseReference | DatabaseQuery;
 export type PathReference = QueryReference | string;
+
 export type Auth = firebase.auth.Auth;
+
+export type Storage = firebase.storage.Storage;
+export type UploadTask = firebase.storage.UploadTask;
+export type UploadMetadata = firebase.storage.UploadMetadata;
+export type StorageReference = firebase.storage.Reference;
+export type UploadTaskSnapshot = firebase.storage.UploadTaskSnapshot;
+export type StoragePathReference = StorageReference | string;
+
+export type Messaging = firebase.messaging.Messaging;
