@@ -61,3 +61,4 @@ productive with AngularFire2.
 4. [Querying lists](docs/4-querying-lists.md)
 5. [User Authentication - FirebaseAuthentication](docs/5-user-authentication.md)
 6. [Using AngularFire2 with Ionic 2](docs/Auth-with-Ionic2.md)
+7. [Using AngularFire2 with Ionic 3 and Angular 4](docs/Auth-with-Ionic3-Angular4.md)
