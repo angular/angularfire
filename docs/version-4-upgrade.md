@@ -30,7 +30,8 @@ constructor(db: AngularFireDatabase, afAuth: AngularFireAuth) {
 
 ### Simplified Authentication API
 
-In 4.0 we've reduced the complexity of the auth module by providing only a [`firebase.User`](https://firebase.google.com/docs/reference/js/firebase.User) observer (`AngularFireAuth.authState`) and cutting the methods that were wrapping the Firebase SDK.
+In 4.0 we've reduced the complexity of the auth module by providing only [`firebase.User`](https://firebase.google.com/docs/reference/js/firebase.User) observers (`AngularFireAuth.authState`, `AngularFireAuth.idToken`) and cutting the methods that were wrapping the Firebase SDK.
+
 
 ```typescript
 import { AngularFireAuth } from 'angularfire2/auth';
@@ -40,7 +41,7 @@ import * as firebase from 'firebase/app';
 
 user: Observable<firebase.User>;
 constructor(afAuth: AngularFireAuth) {
-  this.user = afAuth.authState;
+  this.user = afAuth.authState; // only triggered on sign-in/out (for old behavior use .idToken)
 }
 ```
 
