@@ -62,11 +62,10 @@ This should install angular-cli without errors.
 #### Post this installation, follow the installation [guide](https://github.com/angular/angularfire2/blob/master/docs/1-install-and-setup.md) to install AngularFire2 and everything should work as expected.
 
 
-### Note:- 
+### Note:
 When you start your app using "ng serve" in the console, you might still see the below errors. Despite these errors, the application should work as expected and should be able to talk to Firebase.
 
 ```ts
-
 ERROR in [default] C:\angularFire2Test\node_modules\angularfire2\interfaces.d.ts:12:34
 Cannot find namespace 'firebase'.
 
@@ -77,5 +76,4 @@ but here has type 'any'.
 ERROR in [default] C:\angularFire2Test\src\typings.d.ts:7:12
 Subsequent variable declarations must have the same type.  Variable 'module' must be of type 'NodeModule',
 but here has type 'any'.
-
 ```
