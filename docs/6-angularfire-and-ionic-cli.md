@@ -43,9 +43,19 @@ Now that you have a new project setup, install AngularFire2 and Firebase from np
 
 ### 4. Add Firebase config to environments variable
 
-Your Firebase config can be added to the root `src/app/app.module.ts` or to it's own file.
-We'll use the root `app.module.ts` for this example.
+Let's create a new file, `src/environment.ts` and start adding our Firebase config:
 
+```ts
+export const firebaseConfig = {
+    apiKey: '<your-key>',
+    authDomain: '<your-project-authdomain>',
+    databaseURL: '<your-database-URL>',
+    projectId: '<your-project-id>',
+    storageBucket: '<your-storage-bucket>',
+    messagingSenderId: '<your-messaging-sender-id>'
+  }
+
+```
 
 
 ### 5. Setup @NgModule for the AngularFireModule
@@ -60,15 +70,7 @@ import { IonicApp, IonicModule } from 'ionic-angular';
 import { MyApp } from './app.component';
 
 import { AngularFireModule } from 'angularfire2';
-
-const firebaseConfig = {
-    apiKey: '<your-key>',
-    authDomain: '<your-project-authdomain>',
-    databaseURL: '<your-database-URL>',
-    projectId: '<your-project-id>',
-    storageBucket: '<your-storage-bucket>',
-    messagingSenderId: '<your-messaging-sender-id>'
-  }
+import { firebaseConfig } from '../environment';
 
 @NgModule({
   declarations: [ MyApp ],
@@ -121,17 +123,10 @@ import { IonicApp, IonicModule } from 'ionic-angular';
 import { MyApp } from './app.component';
 
 import { AngularFireModule } from 'angularfire2';
+import { firebaseConfig } from '../environment';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 
-const firebaseConfig = {
-    apiKey: '<your-key>',
-    authDomain: '<your-project-authdomain>',
-    databaseURL: '<your-database-URL>',
-    projectId: '<your-project-id>',
-    storageBucket: '<your-storage-bucket>',
-    messagingSenderId: '<your-messaging-sender-id>'
-  }
 
 @NgModule({
   declarations: [ MyApp ],
