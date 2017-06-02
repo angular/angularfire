@@ -9,7 +9,7 @@ observables emit new values, the query is automatically re-run.
 Queries are created by specifying a `query` object on the `FirebaseListObservable` options.
 
 ```ts
-const queryObservable = af.database.list('/items', {
+const queryObservable = db.list('/items', {
   query: {
     orderByChild: 'size',
     equalTo: 'large' 
@@ -19,19 +19,21 @@ const queryObservable = af.database.list('/items', {
 
 **Query Options:**
 
-| method   | purpose            | 
-| ---------|--------------------| 
+| method   | purpose            |
+| ---------|--------------------|
 | `orderByChild` | Specify a child to order by. |
 | `orderByKey` | Boolean to order by Firebase Database keys. |
-| `orderByPriority` | Boolean to order by Firebase Database priority. |
 | `orderByValue` | Specify a value to order by. |
-| `equalTo` <sup>1</sup> | Limit list to items that contain certain value. |
+| ~~`orderByPriority`~~<sup>1</sup> | Boolean to order by Firebase Database priority.|
+| `equalTo`<sup>2</sup> | Limit list to items that contain certain value. |
 | `limitToFirst` | Sets the maximum number of items to return from the beginning of the ordered list of results. |
 | `limitToLast` | Sets the maximum number of items to return from the end of the ordered list of results. |
-| `startAt` <sup>1</sup> | Return items greater than or equal to the specified key or value, depending on the order-by method chosen. |
-| `endAt` <sup>1</sup> | Return items less than or equal to the specified key or value, depending on the order-by method chosen. |
+| `startAt`<sup>2</sup> | Return items greater than or equal to the specified key or value, depending on the order-by method chosen. |
+| `endAt`<sup>2</sup> | Return items less than or equal to the specified key or value, depending on the order-by method chosen. |
 
-<sup>1</sup> The Firebase SDK supports an optional `key` parameter for [`startAt`](https://firebase.google.com/docs/reference/js/firebase.database.Reference#startAt), [`endAt`](https://firebase.google.com/docs/reference/js/firebase.database.Reference#endAt), and [`equalTo`](https://firebase.google.com/docs/reference/js/firebase.database.Reference#equalTo) when ordering by child, value, or priority. You can specify the `key` parameter using an object literal that contains the `value` and the `key`. For example: `startAt: { value: 'some-value', key: 'some-key' }`.
+<sup>1</sup> [This is the old way of doing things and is no longer recommended for use](https://youtu.be/3WTQZV5-roY?t=3m). Anything you can achieve with `orderByPriority` you should be doing with `orderByChild`.
+
+<sup>2</sup> The Firebase SDK supports an optional `key` parameter for [`startAt`](https://firebase.google.com/docs/reference/js/firebase.database.Reference#startAt), [`endAt`](https://firebase.google.com/docs/reference/js/firebase.database.Reference#endAt), and [`equalTo`](https://firebase.google.com/docs/reference/js/firebase.database.Reference#equalTo) when ordering by child, value, or priority. You can specify the `key` parameter using an object literal that contains the `value` and the `key`. For example: `startAt: { value: 'some-value', key: 'some-key' }`.
 
 ## Invalid query combinations
 
@@ -40,7 +42,7 @@ const queryObservable = af.database.list('/items', {
 
 ```ts
 // WARNING: Do not copy and paste. This will not work!
-const queryObservable = af.database.list('/items', {
+const queryObservable = db.list('/items', {
   query: {
     orderByChild: 'size',
     equalTo: 'large',
@@ -53,7 +55,7 @@ You can only use `limitToFirst` or `limitToLast`, but not both in combination.
 
 ```ts
 // WARNING: Do not copy and paste. This will not work!
-const queryObservable = af.database.list('/items', {
+const queryObservable = db.list('/items', {
   query: {
     limitToFirst: 10,
     limitToLast: 100,
@@ -72,7 +74,7 @@ An RxJS Subject is imported below. A Subject is like an Observable, but can mult
 
 ```ts
 const subject = new Subject(); // import {Subject} from 'rxjs/Subject';
-const queryObservable = af.database.list('/items', {
+const queryObservable = db.list('/items', {
   query: {
     orderByChild: 'size',
     equalTo: subject 
@@ -95,7 +97,7 @@ subject.next('small');
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFire, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2';
+import { AngularFireDatabase, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2/database';
 import { Subject } from 'rxjs/Subject';
 
 @Component({
@@ -118,9 +120,9 @@ export class AppComponent {
   items: FirebaseListObservable<any[]>;
   sizeSubject: Subject<any>;
   
-  constructor(af: AngularFire) {
+  constructor(db: AngularFireDatabase) {
     this.sizeSubject = new Subject();
-    this.items = af.database.list('/items', {
+    this.items = db.list('/items', {
       query: {
         orderByChild: 'size',
         equalTo: this.sizeSubject
@@ -148,4 +150,4 @@ export class AppComponent {
            -|text: sample large text    
  ```
 
-###[Next Step: User Authentication](5-user-authentication.md)
+### [Next Step: User Authentication](5-user-authentication.md)

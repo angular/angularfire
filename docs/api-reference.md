@@ -1,4 +1,4 @@
-#API Reference
+# API Reference
 
 **Work in progress. [See the developer guide](/docs/1-install-and-setup.md) for a comprehensive walkthrough of AngularFire2.**
 

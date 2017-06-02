@@ -14,9 +14,11 @@ Status: Beta
 - **Authentication** - Monitor authentication state in realtime.
 
 #### Quick links
-[Contributing](https://github.com/angular/angularfire2/blob/master/CONTRIBUTING.md)
+[Contributing](CONTRIBUTING.md)
 
 [Plunker Template](http://plnkr.co/edit/8yY4tH?p=preview) - Requires to set your Firebase credentials in `app.module.ts`.
+
+[Upgrading to v4.0? Check out our guide.](docs/version-4-upgrade.md)
 
 ## Install
 
@@ -28,7 +30,7 @@ npm install firebase angularfire2 --save
 
 ```ts
 import {Component} from '@angular/core';
-import {AngularFire, FirebaseListObservable} from 'angularfire2';
+import {AngularFireDatabase, FirebaseListObservable} from 'angularfire2/database';
 
 @Component({
   selector: 'project-name-app',
@@ -42,8 +44,8 @@ import {AngularFire, FirebaseListObservable} from 'angularfire2';
 })
 export class MyApp {
   items: FirebaseListObservable<any[]>;
-  constructor(af: AngularFire) {
-    this.items = af.database.list('/items');
+  constructor(db: AngularFireDatabase) {
+    this.items = db.list('/items');
   }
 }
 ```
@@ -59,3 +61,4 @@ productive with AngularFire2.
 4. [Querying lists](docs/4-querying-lists.md)
 5. [User Authentication - FirebaseAuthentication](docs/5-user-authentication.md)
 6. [Using AngularFire2 with Ionic 2](docs/Auth-with-Ionic2.md)
+7. [Using AngularFire2 with Ionic 3 and Angular 4](docs/Auth-with-Ionic3-Angular4.md)
