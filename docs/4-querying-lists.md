@@ -19,19 +19,21 @@ const queryObservable = db.list('/items', {
 
 **Query Options:**
 
-| method   | purpose            | 
-| ---------|--------------------| 
+| method   | purpose            |
+| ---------|--------------------|
 | `orderByChild` | Specify a child to order by. |
 | `orderByKey` | Boolean to order by Firebase Database keys. |
-| `orderByPriority` | Boolean to order by Firebase Database priority. |
 | `orderByValue` | Specify a value to order by. |
-| `equalTo` <sup>1</sup> | Limit list to items that contain certain value. |
+| ~~`orderByPriority`~~<sup>1</sup> | Boolean to order by Firebase Database priority.|
+| `equalTo`<sup>2</sup> | Limit list to items that contain certain value. |
 | `limitToFirst` | Sets the maximum number of items to return from the beginning of the ordered list of results. |
 | `limitToLast` | Sets the maximum number of items to return from the end of the ordered list of results. |
-| `startAt` <sup>1</sup> | Return items greater than or equal to the specified key or value, depending on the order-by method chosen. |
-| `endAt` <sup>1</sup> | Return items less than or equal to the specified key or value, depending on the order-by method chosen. |
+| `startAt`<sup>2</sup> | Return items greater than or equal to the specified key or value, depending on the order-by method chosen. |
+| `endAt`<sup>2</sup> | Return items less than or equal to the specified key or value, depending on the order-by method chosen. |
 
-<sup>1</sup> The Firebase SDK supports an optional `key` parameter for [`startAt`](https://firebase.google.com/docs/reference/js/firebase.database.Reference#startAt), [`endAt`](https://firebase.google.com/docs/reference/js/firebase.database.Reference#endAt), and [`equalTo`](https://firebase.google.com/docs/reference/js/firebase.database.Reference#equalTo) when ordering by child, value, or priority. You can specify the `key` parameter using an object literal that contains the `value` and the `key`. For example: `startAt: { value: 'some-value', key: 'some-key' }`.
+<sup>1</sup> [This is the old way of doing things and is no longer recommended for use](https://youtu.be/3WTQZV5-roY?t=3m). Anything you can achieve with `orderByPriority` you should be doing with `orderByChild`.
+
+<sup>2</sup> The Firebase SDK supports an optional `key` parameter for [`startAt`](https://firebase.google.com/docs/reference/js/firebase.database.Reference#startAt), [`endAt`](https://firebase.google.com/docs/reference/js/firebase.database.Reference#endAt), and [`equalTo`](https://firebase.google.com/docs/reference/js/firebase.database.Reference#equalTo) when ordering by child, value, or priority. You can specify the `key` parameter using an object literal that contains the `value` and the `key`. For example: `startAt: { value: 'some-value', key: 'some-key' }`.
 
 ## Invalid query combinations
 
