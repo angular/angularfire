@@ -261,7 +261,7 @@ export class HomePage {
 
 ```
 
-*_Ensure you've `items` node in your database with some primitive data._
+*_Ensure you've `cuisines` node in your database with some primitive data._
 
 **Update** your `home.html` at `src/pages/home/home.html`, with following entry
 
