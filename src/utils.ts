@@ -73,19 +73,6 @@ export function unwrapMapFn (snapshot:firebase.database.DataSnapshot): AFUnwrapp
   return unwrapped;
 }
 
-export function checkForUrlOrFirebaseRef(urlOrRef: string | firebase.database.Reference | firebase.database.Query, cases: CheckUrlRef): any {
-  if (isString(urlOrRef)) {
-    return cases.isUrl();
-  }
-  if (isFirebaseRef(urlOrRef)) {
-    return cases.isRef();
-  }
-  if (isFirebaseQuery(urlOrRef)) {
-    return cases.isQuery();
-  }
-  throw new Error('Provide a url or a Firebase database reference');
-}
-
 export function stripTrailingSlash(value: string): string {
   // Is the last char a /
   if (value.substring(value.length - 1, value.length) === '/') {
@@ -118,7 +105,7 @@ export function isAbsoluteUrl(url: string) {
 }
 
 /**
- * Returns a database reference given a Firebase App and an 
+ * Returns a database reference given a Firebase App and an
  * absolute or relative path.
  * @param app - Firebase App
  * @param path - Database path, relative or absolute

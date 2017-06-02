@@ -7,6 +7,7 @@ export interface FirebaseAppConfig {
   databaseURL?: string;
   storageBucket?: string;
   messagingSenderId?: string;
+  projectId?: string;
 }
 
 export interface FirebaseOperationCases {
@@ -94,3 +95,4 @@ export type DatabaseReference = firebase.database.Reference;
 export type DatabaseQuery = firebase.database.Query;
 export type QueryReference = DatabaseReference | DatabaseQuery;
 export type PathReference = QueryReference | string;
+export type Auth = firebase.auth.Auth;

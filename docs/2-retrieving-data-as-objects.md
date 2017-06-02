@@ -1,20 +1,20 @@
 # 2. Retrieving data as objects
 
 > AngularFire2 synchronizes data as objects using the `FirebaseObjectObservable`. 
-The `FirebaseObjectObservable` is not created by itself, but through the `AngularFire.database` service. 
+The `FirebaseObjectObservable` is not created by itself, but through the `AngularFireDatabase` service. 
 The guide below demonstrates how to retrieve, save, and remove data as objects.
 
-## Injecting the AngularFire service
+## Injecting the AngularFireDatabase service
 
 **Make sure you have bootstrapped your application for AngularFire2. See the Installation guide for bootstrap setup.**
 
-AngularFire is an injectable service, which is injected through the constructor of your Angular component or `@Injectable()` service.
+AngularFireDatabase is a service which can be injected through the constructor of your Angular component or `@Injectable()` service.
 
 If you've followed the earlier step "Installation and Setup"  your `/src/app/app.component.ts` should look like below. 
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFire, FirebaseListObservable } from 'angularfire2';
+import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 
 @Component({
   selector: 'app-root',
@@ -23,8 +23,8 @@ import { AngularFire, FirebaseListObservable } from 'angularfire2';
 })
 export class AppComponent {
   items: FirebaseListObservable<any[]>;
-  constructor(af: AngularFire) {
-    this.items = af.database.list('items');
+  constructor(db: AngularFireDatabase) {
+    this.items = db.list('items');
   }
 }
 ```
@@ -42,9 +42,9 @@ There are two ways to create an object binding:
 
 ```ts
 // relative URL, uses the database url provided in bootstrap
-const relative = af.database.object('/item');
+const relative = db.object('/item');
 // absolute URL
-const absolute = af.database.object('https://<your-app>.firebaseio.com/item');
+const absolute = db.object('https://<your-app>.firebaseio.com/item');
 ```
 
 ### Retrieve data
@@ -56,8 +56,8 @@ Replace the FirebaseListObservable to FirebaseObjectObservable in your `/src/app
 Also notice the templateUrl changed to inline template below:
 
 ```ts
-import {Component} from '@angular/core';
-import {AngularFire, FirebaseObjectObservable} from 'angularfire2';
+import { Component } from '@angular/core';
+import { AngularFireDatabase, FirebaseObjectObservable } from 'angularfire2/database';
 
 @Component({
   selector: 'app-root',
@@ -67,8 +67,8 @@ import {AngularFire, FirebaseObjectObservable} from 'angularfire2';
 })
 export class AppComponent {
   item: FirebaseObjectObservable<any>;
-  constructor(af: AngularFire) {
-    this.item = af.database.object('/item');
+  constructor(db: AngularFireDatabase) {
+    this.item = db.object('/item');
   }
 }
 ```
@@ -81,9 +81,9 @@ The table below highlights some of the common methods on the `FirebaseObjectObse
 
 | method   |                    | 
 | ---------|--------------------| 
-| set(value: any)      | Replaces the current value in the database with the new value specified as the parameter. This is called a **destructive** update, because it deletes everything currently in place and saves the new value. | 
-| update(value: Object)   | Updates the current value with in the database with the new value specified as the parameter. This is called a **non-destructive** update, because it only updates the values specified. |
-| remove()   | Deletes all data present at that location. Same as calling `set(null)`. |
+| `set(value: any)`      | Replaces the current value in the database with the new value specified as the parameter. This is called a **destructive** update, because it deletes everything currently in place and saves the new value. | 
+| `update(value: Object)`   | Updates the current value with in the database with the new value specified as the parameter. This is called a **non-destructive** update, because it only updates the values specified. |
+| `remove()`   | Deletes all data present at that location. Same as calling `set(null)`. |
 
 ## Returning promises
 Each data operation method in the table above returns a promise. However,
@@ -94,7 +94,7 @@ The promise can be useful to chain multiple operations, catching possible errors
 from security rules denials, or for debugging.
 
 ```ts
-const promise = af.database.object('/item').remove();
+const promise = db.object('/item').remove();
 promise
   .then(_ => console.log('success'))
   .catch(err => console.log(err, 'You dont have access!'));
@@ -105,7 +105,7 @@ promise
 Use the `set()` method for **destructive updates**.
 
 ```ts
-const itemObservable = af.database.object('/item');
+const itemObservable = db.object('/item');
 itemObservable.set({ name: 'new name!'});
 ```
 
@@ -114,7 +114,7 @@ itemObservable.set({ name: 'new name!'});
 Use the `update()` method for **non-destructive updates**.
 
 ```ts
-const itemObservable = af.database.object('/item');
+const itemObservable = db.object('/item');
 itemObservable.update({ age: newAge });
 ```
 
@@ -125,7 +125,7 @@ using an update with a primitive is the exact same as doing a `.set()` with a pr
 Use the `remove()` method to remove data at the object's location.
 
 ```ts
-const itemObservable = af.database.object('/item');
+const itemObservable = db.object('/item');
 itemObservable.remove();
 ```
 
@@ -133,7 +133,7 @@ itemObservable.remove();
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFire, FirebaseObjectObservable } from 'angularfire2';
+import { AngularFireDatabase, FirebaseObjectObservable } from 'angularfire2/database';
 
 @Component({
   selector: 'app-root',
@@ -149,8 +149,8 @@ import { AngularFire, FirebaseObjectObservable } from 'angularfire2';
 })
 export class AppComponent {
   item: FirebaseObjectObservable<any>;
-  constructor(af: AngularFire) {
-    this.item = af.database.object('/item');
+  constructor(db: AngularFireDatabase) {
+    this.item = db.object('/item');
   }
   save(newName: string) {
     this.item.set({ name: newName });
@@ -169,15 +169,15 @@ Data retrieved from the object binding contains special properties retrieved fro
 
 | property |                    | 
 | ---------|--------------------| 
-| $key     | The key for each record. This is equivalent to each record's path in our database as it would be returned by `ref.key()`.|
-| $value   | If the data for this child node is a primitive (number, string, or boolean), then the record itself will still be an object. The primitive value will be stored under `$value` and can be changed and saved like any other field.|
+| `$key`     | The key for each record. This is equivalent to each record's path in our database as it would be returned by `ref.key()`.|
+| `$value`   | If the data for this child node is a primitive (number, string, or boolean), then the record itself will still be an object. The primitive value will be stored under `$value` and can be changed and saved like any other field.|
 
 
 ## Retrieving the snapshot
 AngularFire2 unwraps the Firebase DataSnapshot by default, but you can get the data as the original snapshot by specifying the `preserveSnapshot` option. 
 
 ```ts
-this.item = af.database.object('/item', { preserveSnapshot: true });
+this.item = db.object('/item', { preserveSnapshot: true });
 this.item.subscribe(snapshot => {
   console.log(snapshot.key)
   console.log(snapshot.val())
@@ -188,4 +188,4 @@ this.item.subscribe(snapshot => {
 
 Because `FirebaseObjectObservable` synchronizes objects from the realtime database, sorting will have no effect for queries that are not also limited by a range. For example, when paginating you would provide a query with a sort and filter. Both the sort operation and the filter operation affect which subset of the data is returned by the query; however, because the resulting object is simply json, the sort order will not be preseved locally. Hence, for operations that require sorting, you are probably looking for a [list](3-retrieving-data-as-lists.md)
 
-###[Next Step: Retrieving data as lists](3-retrieving-data-as-lists.md)
+### [Next Step: Retrieving data as lists](3-retrieving-data-as-lists.md)

@@ -1,9 +1,12 @@
 import * as firebase from 'firebase/app';
 import { Subscription } from 'rxjs';
-import { FirebaseObjectFactory, FirebaseObjectObservable } from './index';
+import { AngularFireDatabase } from './database';
+import { AngularFireDatabaseModule } from './database.module';
+import { FirebaseObjectObservable } from './firebase_object_observable';
+import { FirebaseObjectFactory } from './firebase_object_factory';
 import { TestBed, inject } from '@angular/core/testing';
-import { FIREBASE_PROVIDERS, FirebaseApp, FirebaseAppConfig, AngularFire, AngularFireModule } from '../angularfire2';
-import { COMMON_CONFIG, ANON_AUTH_CONFIG } from '../test-config';
+import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from '../angularfire2';
+import { COMMON_CONFIG } from '../test-config';
 
 describe('FirebaseObjectFactory', () => {
   let i = 0;
@@ -12,13 +15,18 @@ describe('FirebaseObjectFactory', () => {
   let subscription: Subscription;
   let nextSpy: jasmine.Spy;
   let app: firebase.app.App;
+  let db: AngularFireDatabase;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG)]
+      imports: [
+        AngularFireModule.initializeApp(COMMON_CONFIG, '[DEFAULT]'),
+        AngularFireDatabaseModule
+      ]
     });
-    inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
-      app = firebaseApp;
+    inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {
+      app = app_;
+      db = _db;
     })();
   });
 
@@ -28,20 +36,9 @@ describe('FirebaseObjectFactory', () => {
 
   describe('<constructor>', () => {
 
-    it('should accept a Firebase db url in the constructor', () => {
-      const object = FirebaseObjectFactory(`questions`);
-      expect(object instanceof FirebaseObjectObservable).toBe(true);
-    });
-
     it('should accept a Firebase db ref in the constructor', () => {
-      const object = FirebaseObjectFactory(firebase.database().ref().child(`questions`));
+      const object = FirebaseObjectFactory(app.database().ref().child(`questions`));
       expect(object instanceof FirebaseObjectObservable).toBe(true);
-    });
-
-    it('should take an absolute url in the constructor', () => {
-      const absoluteUrl = COMMON_CONFIG.databaseURL + '/questions/one';
-      const list = FirebaseObjectFactory(absoluteUrl);
-      expect(list instanceof FirebaseObjectObservable).toBe(true);
     });
 
   });
@@ -50,9 +47,9 @@ describe('FirebaseObjectFactory', () => {
 
     beforeEach((done: any) => {
       i = Date.now();
-      ref = firebase.database().ref().child(`questions/${i}`);
+      ref = app.database().ref().child(`questions/${i}`);
       nextSpy = nextSpy = jasmine.createSpy('next');
-      observable = FirebaseObjectFactory(`questions/${i}`);
+      observable = FirebaseObjectFactory(app.database().ref(`questions/${i}`));
       ref.remove(done);
     });
 
@@ -110,7 +107,7 @@ describe('FirebaseObjectFactory', () => {
     });
 
     it('should emit snapshots if preserveSnapshot option is true', (done: any) => {
-      observable = FirebaseObjectFactory(`questions/${i}`, { preserveSnapshot: true });
+      observable = FirebaseObjectFactory(app.database().ref(`questions/${i}`), { preserveSnapshot: true });
       ref.remove(() => {
         ref.set('preserved snapshot!', () => {
           subscription = observable.subscribe(data => {
@@ -123,7 +120,7 @@ describe('FirebaseObjectFactory', () => {
 
 
     it('should call off on all events when disposed', () => {
-      const dbRef = firebase.database().ref();
+      const dbRef = app.database().ref();
       let firebaseSpy = spyOn(dbRef, 'off');
       subscription = FirebaseObjectFactory(dbRef).subscribe();
       expect(firebaseSpy).not.toHaveBeenCalled();
@@ -137,7 +134,7 @@ describe('FirebaseObjectFactory', () => {
       })
       .run(() => {
         // Creating a new observable so that the current zone is captured.
-        subscription = FirebaseObjectFactory(`questions/${i}`)
+        subscription = FirebaseObjectFactory(app.database().ref(`questions/${i}`))
           .filter(d => d.$value === 'in-the-zone')
           .subscribe(data => {
             expect(Zone.current.name).toBe('newZone');

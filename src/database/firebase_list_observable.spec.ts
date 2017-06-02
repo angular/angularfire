@@ -1,23 +1,31 @@
-import { FirebaseListObservable } from './index';
+import { AngularFireDatabase } from './database';
+import { AngularFireDatabaseModule } from './database.module';
+import { FirebaseListObservable } from './firebase_list_observable';
+import { FirebaseObjectFactory } from './firebase_object_factory';
 import { Observer } from 'rxjs/Observer';
 import { map } from 'rxjs/operator/map';
 import * as firebase from 'firebase/app';
 import { unwrapMapFn } from '../utils';
-import { FIREBASE_PROVIDERS, FirebaseApp, FirebaseAppConfig, AngularFire, AngularFireModule} from '../angularfire2';
+import { FirebaseApp, FirebaseAppConfig, AngularFireModule} from '../angularfire2';
 import { TestBed, inject } from '@angular/core/testing';
-import { COMMON_CONFIG, ANON_AUTH_CONFIG } from '../test-config';
+import { COMMON_CONFIG } from '../test-config';
 
 describe('FirebaseListObservable', () => {
-  let O:FirebaseListObservable<any>;
-  let ref:firebase.database.Reference;
+  let O: FirebaseListObservable<any>;
+  let ref: firebase.database.Reference;
   let app: firebase.app.App;
+  let db: AngularFireDatabase;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [AngularFireModule.initializeApp(COMMON_CONFIG, ANON_AUTH_CONFIG)]
+      imports: [
+        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireDatabaseModule
+      ]
     });
-    inject([FirebaseApp, AngularFire], (firebaseApp: firebase.app.App, _af: AngularFire) => {
-      app = firebaseApp;
+    inject([FirebaseApp, AngularFireDatabase], (_app: firebase.app.App, _db: AngularFireDatabase) => {
+      app = _app;
+      db = _db;
       ref = firebase.database().ref();
       O = new FirebaseListObservable(ref, (observer:Observer<any>) => {
       });

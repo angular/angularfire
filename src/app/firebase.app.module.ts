@@ -1,7 +1,8 @@
-import { Injectable, OpaqueToken, Inject, NgModule, ModuleWithProviders } from '@angular/core';
+import { InjectionToken, } from '@angular/core';
+import { FirebaseAppConfig } from '../interfaces';
 import * as firebase from 'firebase/app';
 
-export const FirebaseAppConfigToken = new OpaqueToken('FirebaseAppConfigToken');
+export const FirebaseAppConfigToken = new InjectionToken<FirebaseAppConfig>('FirebaseAppConfigToken');
 
 export class FirebaseApp implements firebase.app.App {
   name: string;
@@ -13,7 +14,7 @@ export class FirebaseApp implements firebase.app.App {
   delete: () => firebase.Promise<any>;
 }
 
-export function _firebaseAppFactory(config: {}, appName?: string): FirebaseApp {
+export function _firebaseAppFactory(config: FirebaseAppConfig, appName?: string): FirebaseApp {
   try {
     if (appName) {
       return firebase.initializeApp(config, appName);
@@ -23,26 +24,5 @@ export function _firebaseAppFactory(config: {}, appName?: string): FirebaseApp {
   }
   catch (e) {
     return firebase.app(null);
-  }
-}
-
-export const FirebaseAppProvider = {
-  provide: FirebaseApp,
-  useFactory: _firebaseAppFactory,
-  deps: [ FirebaseAppConfigToken ]
-};
-
-@NgModule({
-  providers: [FirebaseAppProvider]
-})
-export class FirebaseAppModule {
-  static initializeApp(config): ModuleWithProviders {
-    return {
-      ngModule: FirebaseAppModule,
-      providers: [
-        { provide: FirebaseAppConfigToken, useValue: config },
-        FirebaseAppProvider,
-      ]
-    }
   }
 }

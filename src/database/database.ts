@@ -2,27 +2,33 @@ import * as firebase from 'firebase/app';
 import 'firebase/database';
 import { Inject, Injectable } from '@angular/core';
 import { FirebaseAppConfigToken, FirebaseAppConfig, FirebaseApp } from '../angularfire2';
-import { FirebaseListFactory } from './index';
+import { FirebaseListFactory } from './firebase_list_factory';
+import { FirebaseListObservable } from './firebase_list_observable';
 import { FirebaseListFactoryOpts, FirebaseObjectFactoryOpts, PathReference } from '../interfaces';
+import { FirebaseObjectFactory } from './firebase_object_factory';
+import { FirebaseObjectObservable } from './firebase_object_observable';
 import * as utils from '../utils';
-import { FirebaseListObservable, FirebaseObjectObservable, FirebaseObjectFactory } from './index';
 
 @Injectable()
 export class AngularFireDatabase {
+
+  /**
+   * Firebase Database instance
+   */
+  database: firebase.database.Database;
   
-  constructor(private app: FirebaseApp) {}
-  
+  constructor(public app: FirebaseApp) {
+    this.database = app.database();
+  }
+
   list(pathOrRef: PathReference, opts?:FirebaseListFactoryOpts):FirebaseListObservable<any[]> {
     const ref = utils.getRef(this.app, pathOrRef);
-    return FirebaseListFactory(utils.getRef(this.app, ref), opts);
+    return FirebaseListFactory(ref, opts);
   }
 
   object(pathOrRef: PathReference, opts?:FirebaseObjectFactoryOpts):FirebaseObjectObservable<any> {
-    return utils.checkForUrlOrFirebaseRef(pathOrRef, {
-      isUrl: () => FirebaseObjectFactory(this.app.database().ref(<string>pathOrRef), opts),
-      isRef: () => FirebaseObjectFactory(pathOrRef)
-    });
+    const ref = utils.getRef(this.app, pathOrRef);
+    return FirebaseObjectFactory(ref, opts);
   }
 
 }
-
