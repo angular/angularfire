@@ -28,6 +28,15 @@ export class FirebaseListObservable<T> extends Observable<T> {
     return this.$ref.ref.push(val);
   }
 
+  set(item: FirebaseOperation, value: Object): firebase.Promise<void> {
+    return this._checkOperationCases(item, {
+      stringCase: () => this.$ref.ref.child(<string>item).set(value),
+      firebaseCase: () => (<firebase.database.Reference>item).set(value),
+      snapshotCase: () => (<firebase.database.DataSnapshot>item).ref.set(value),
+      unwrappedSnapshotCase: () => this.$ref.ref.child((<AFUnwrappedDataSnapshot>item).$key).set(value)
+    });
+  }
+
   update(item: FirebaseOperation, value: Object): firebase.Promise<void> {
     return this._checkOperationCases(item, {
       stringCase: () => this.$ref.ref.child(<string>item).update(value),
@@ -50,7 +59,7 @@ export class FirebaseListObservable<T> extends Observable<T> {
     });
   }
 
-  _checkOperationCases(item: FirebaseOperation, cases: FirebaseOperationCases) : firebase.Promise<void> {
+  protected _checkOperationCases(item: FirebaseOperation, cases: FirebaseOperationCases) : firebase.Promise<void> {
     if (utils.isString(item)) {
       return cases.stringCase();
     } else if (utils.isFirebaseRef(item)) {

@@ -145,6 +145,99 @@ describe('FirebaseListObservable', () => {
     })
   });
 
+
+  describe('set', () => {
+    let orphan = { orphan: true };
+    let child:firebase.database.Reference;
+
+    beforeEach(() => {
+      child = ref.push(orphan);
+    });
+
+    it('should set(replace) the item from the Firebase db when given the key', (done:any) => {
+      let childChangedSpy = jasmine.createSpy('childChanged');
+      const orphanChange = { changed: true }
+      ref.on('child_changed', childChangedSpy);
+      O.set(child.key, orphanChange)
+        .then(() => (<any>ref).once('value'))
+        .then((data:firebase.database.DataSnapshot) => {
+          expect(childChangedSpy.calls.argsFor(0)[0].val()).not.toEqual({
+            orphan: true,
+            changed: true
+          });
+          expect(childChangedSpy.calls.argsFor(0)[0].val()).toEqual({
+            changed: true
+          });
+
+          ref.off();
+        })
+        .then(done, done.fail);
+    });
+
+    it('should set(replace) the item from the Firebase db when given the reference', (done:any) => {
+      let childChangedSpy = jasmine.createSpy('childChanged');
+      const orphanChange = { changed: true }
+      ref.on('child_changed', childChangedSpy);
+      O.set(child.ref, orphanChange)
+        .then(() => (<any>ref).once('value'))
+        .then((data:firebase.database.DataSnapshot) => {
+          expect(childChangedSpy.calls.argsFor(0)[0].val()).not.toEqual({
+            orphan: true,
+            changed: true
+          });
+          expect(childChangedSpy.calls.argsFor(0)[0].val()).toEqual({
+            changed: true
+          });
+
+          ref.off();
+        })
+        .then(done, done.fail);
+    });
+
+    it('should set(replace) the item from the Firebase db when given the snapshot', (done:any) => {
+      let childChangedSpy = jasmine.createSpy('childChanged');
+      const orphanChange = { changed: true }
+      ref.on('child_changed', childChangedSpy);
+      O.set(child, orphanChange)
+        .then(() => (<any>ref).once('value'))
+        .then((data:firebase.database.DataSnapshot) => {
+          expect(childChangedSpy.calls.argsFor(0)[0].val()).not.toEqual({
+            orphan: true,
+            changed: true
+          });
+          expect(childChangedSpy.calls.argsFor(0)[0].val()).toEqual({
+            changed: true
+          });
+
+          ref.off();
+        })
+        .then(done, done.fail);
+    });
+
+    it('should set(replace) the item from the Firebase db when given the unwrapped snapshot', (done:any) => {
+      const orphanChange = { changed: true }
+      ref.on('child_added', (data:firebase.database.DataSnapshot) => {
+        expect(data.val()).toEqual(orphan);
+        O.set(unwrapMapFn(data), orphanChange)
+          .then(() => (<any>child).once('value'))
+          .then((data:firebase.database.DataSnapshot) => {
+            expect(data.val()).not.toEqual({
+              orphan: true,
+              changed: true
+            });
+            expect(data.val()).toEqual({
+              changed: true
+            });
+            ref.off();
+          })
+          .then(done, done.fail);
+      });
+    });
+
+  });
+
+
+
   describe('update', () => {
     let orphan = { orphan: true };
     let child:firebase.database.Reference;
