@@ -1,4 +1,4 @@
-#  Using AngularFire2 with Ionic 2
+#  Using AngularFire2 with Ionic 3
 
 This document provides you a walkthrough of integrating AngularFire2 Authentication with Ionic2.
 The below setup has been tested on Windows 10, but it should be same for Mac/Linux.
@@ -125,9 +125,9 @@ C:\projects\Ionic_AngularFire2_Project>npm install angularfire2 firebase --save
 
 _This should add angularfire2 and firebase entry in your project's package.json file in dependencies section. Something similar_
 
->"angularfire2": "^2.0.0-beta.6",
+>"angularfire2": "^4.0.0-rc.0",
 
->"firebase": "^3.6.1",
+>"firebase": "^3.9.0",
 
 ### Setup @NgModule
 
@@ -245,7 +245,7 @@ C:\projects\Ionic_AngularFire2_Project> ionic serve
 
 This should fetch the data from firebase.
 
-## Configuring AngularFire2 Auth with Ionic2
+## Configuring AngularFire2 Auth with Ionic3
 
 Continuing with the above example stop your server by pressing `ctrl+c` and go to command prompt and
 generate a service by executing the following command
@@ -313,6 +313,8 @@ import { HomePage } from '../pages/home/home';
 import { AngularFireModule } from 'angularfire2';
 import { AuthService } from '../providers/auth-service';
 
+// need to import to use AngularFireAuth in Angularfire2 4.0.0-rc0
+import { AngularFireAuthModule } from 'angularfire2/auth';
 
 export const firebaseConfig = {
   apiKey: "xxxxxxxxxx",
@@ -329,7 +331,8 @@ export const firebaseConfig = {
   ],
   imports: [
     IonicModule.forRoot(MyApp),
-    AngularFireModule.initializeApp(firebaseConfig)
+    AngularFireModule.initializeApp(firebaseConfig),
+    AngularFireAuthModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -459,7 +462,7 @@ Now import the Platform and Facebook objects in your ```auth-service.ts```
 
 ```ts
 import { Platform } from 'ionic-angular';
-import { Facebook } from 'ionic-native';
+import { Facebook } from '@ionic-native/facebook';
 ```
 
 and update the signInWithFacebook() method.
@@ -474,16 +477,16 @@ import { AngularFireAuth } from 'angularfire2/auth';
 import * as firebase from 'firebase/app';
 
 import { Platform } from 'ionic-angular';
-import { Facebook } from 'ionic-native';
+import { Facebook } from '@ionic-native/facebook';
 
 @Injectable()
 export class AuthService {
   private authState: Observable<firebase.User>;
   private currentUser: firebase.User;
 
-  constructor(public afAuth: AngularFireAuth) {
+  constructor(public afAuth: AngularFireAuth, public platform: Platform, public facebook: Facebook) {
     this.authState = afAuth.authState;
-    afAuth.subscribe((user: firebase.User) => {
+    afAuth.authState.subscribe((user: firebase.User) => {
       this.currentUser = user;
     });
   }
@@ -492,9 +495,9 @@ export class AuthService {
     return this.currentUser !== null;
   }
 
-  signInWithFacebook(): firebase.Promise<FirebaseAuthState> {
+  signInWithFacebook(): firebase.Promise<any> {
     if (this.platform.is('cordova')) {
-      return Facebook.login(['email', 'public_profile']).then(res => {
+      return this.facebook.login(['email', 'public_profile']).then(res => {
         const facebookCredential = firebase.auth.FacebookAuthProvider.credential(res.authResponse.accessToken);
         return this.afAuth.auth.signInWithCredential(facebookCredential);
       });
@@ -504,13 +507,13 @@ export class AuthService {
 
   }
 
-  signOut(): void {
-    this.afAuth.signOut();
+  signOut(): firebase.Promise<any> {
+    return this.afAuth.auth.signOut();
   }
 
   displayName(): string {
     if (this.currentUser !== null) {
-      return this.currentUser.facebook.displayName;
+      return this.currentUser.displayName;
     } else {
       return '';
     }
