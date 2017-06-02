@@ -125,7 +125,7 @@ items.push({ name: newName });
 Use the `set()` method to update existing items.
 
 ```ts
-const items = af.database.list('/items');
+const items = db.list('/items');
 // to get a key, check the Example app below
 items.set('key-of-some-data', { size: newSize });
 ```
