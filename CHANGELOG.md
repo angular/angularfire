@@ -1,3 +1,8 @@
+<a name="4.0.0-rc.1"></a>
+# [4.0.0-rc.1](https://github.com/angular/angularfire2/compare/4.0.0-rc.0...v4.0.0-rc.1) (2017-06-02)
+
+* **rc:** Update to Firebase JS SDK 4.0 ([9642f5](https://github.com/angular/angularfire2/commit/9642f589ba73add6d49a5818a1109028f8c7729b)
+
 <a name="4.0.0-rc0"></a>
 # [4.0.0-rc0](https://github.com/angular/angularfire2/compare/2.0.0-beta.8...v4.0.0-rc0) (2017-05-02)
 
