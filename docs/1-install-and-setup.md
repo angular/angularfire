@@ -123,7 +123,7 @@ After adding the AngularFireModule you also need to add modules for the individu
 
 #### Adding the Firebase Database and Auth Modules
 
-For example if you application was using both Firebase authentication and the Firebase database you would add:
+For example if your application was using both Firebase authentication and the Firebase database you would add:
 
 ```ts
 import { BrowserModule } from '@angular/platform-browser';
