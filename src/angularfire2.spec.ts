@@ -47,7 +47,7 @@ describe('angularfire', () => {
     it('should have the provided name', () => {
       expect(app.name).toBe(APP_NAME);
     })
-    it('should use an already intialized firebase app if it exists', async(() => {
+    it('should use an already intialized firebase app if it exists', done => {
       @NgModule({
         imports: [
           AngularFireModule.initializeApp(COMMON_CONFIG, APP_NAME),
@@ -65,7 +65,10 @@ describe('angularfire', () => {
         .then(moduleRef => {
           const ref = moduleRef.injector.get(FirebaseApp);
           expect(ref.name).toEqual(app.name);
+        }).then(done, e => {
+          fail(e);
+          done()
         });
-    }))
+    })
   });
 });
