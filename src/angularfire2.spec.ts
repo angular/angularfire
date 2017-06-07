@@ -1,9 +1,10 @@
 import * as firebase from 'firebase/app';
-import { TestBed, inject } from '@angular/core/testing';
-import { ReflectiveInjector, Provider } from '@angular/core';
+import { TestBed, inject, withModule, async } from '@angular/core/testing';
+import { ReflectiveInjector, Provider, PlatformRef, NgModule, Compiler, ApplicationRef, CompilerFactory } from '@angular/core';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from './angularfire2';
 import { Subscription } from 'rxjs/Subscription';
 import { COMMON_CONFIG } from './test-config';
+import { BrowserModule } from '@angular/platform-browser';
 
 describe('angularfire', () => {
   let subscription:Subscription;
@@ -11,6 +12,8 @@ describe('angularfire', () => {
   let rootRef: firebase.database.Reference;
   let questionsRef: firebase.database.Reference;
   let listOfQuestionsRef: firebase.database.Reference;
+  let defaultPlatform: PlatformRef;
+
   const APP_NAME = 'super-awesome-test-firebase-app-name';
 
   beforeEach(() => {
@@ -19,11 +22,12 @@ describe('angularfire', () => {
       imports: [AngularFireModule.initializeApp(COMMON_CONFIG, APP_NAME)]
     });
 
-    inject([FirebaseApp], (_app: FirebaseApp) => {
+    inject([FirebaseApp, PlatformRef], (_app: FirebaseApp, _platform: PlatformRef) => {
       app = _app;
       rootRef = app.database().ref();
       questionsRef = rootRef.child('questions');
       listOfQuestionsRef = rootRef.child('list-of-questions');
+      defaultPlatform = _platform;
     })();
 
   });
@@ -42,6 +46,29 @@ describe('angularfire', () => {
     });
     it('should have the provided name', () => {
       expect(app.name).toBe(APP_NAME);
+    })
+    it('should use an already intialized firebase app if it exists', done => {
+      @NgModule({
+        imports: [
+          AngularFireModule.initializeApp(COMMON_CONFIG, APP_NAME),
+          BrowserModule
+        ]})
+      class MyModule {
+        ngDoBootstrap() {}
+      }
+
+      const compilerFactory: CompilerFactory =
+          defaultPlatform.injector.get(CompilerFactory, null);
+      const moduleFactory = compilerFactory.createCompiler().compileModuleSync(MyModule);
+
+      defaultPlatform.bootstrapModuleFactory(moduleFactory)
+        .then(moduleRef => {
+          const ref = moduleRef.injector.get(FirebaseApp);
+          expect(ref.name).toEqual(app.name);
+        }).then(done, e => {
+          fail(e);
+          done()
+        });
     })
   });
 });

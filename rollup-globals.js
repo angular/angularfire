@@ -7,5 +7,6 @@ export default (mod) => {
 
   if (mod === 'firebase') return 'firebase';
   if (mod === '@angular/core') return 'ng.core';
+  if (mod === '@angular/platform-browser') return 'ng.platformBrowser';
   if (mod === '@angular/core/testing') return 'ng.core.testing';
 }
