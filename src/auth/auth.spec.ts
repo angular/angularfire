@@ -90,7 +90,6 @@ describe('AngularFireAuth', () => {
 
     // Check that the first value is null and second is the auth user
     const subs = afAuth.authState.subscribe(user => {
-      console.log('What...', count, user);
       if (count === 0) {
         expect(user).toBe(null);
         count = count + 1;
@@ -101,7 +100,6 @@ describe('AngularFireAuth', () => {
         done();
       }
     }, done, done.fail);
-    console.log('....!?');
     mockAuthState.next(null);
   });
 
@@ -110,7 +108,6 @@ describe('AngularFireAuth', () => {
     
     // Check that the first value is null and second is the auth user
     const subs = afAuth.idToken.subscribe(user => {
-      console.log("HI!....", count, user);
       if (count === 0) {
         expect(user).toBe(null);
         count = count + 1;
