@@ -70,7 +70,7 @@ C:\projects>cordova -v
 6.4.0
 
 C:\projects>ionic -v
-2.2.3
+3.0.0
 ```
 
 These are the latest versions as of writting this document.
@@ -80,12 +80,12 @@ On successful execution of above commands, you're all set to create your app wit
 To create your app, change into the directory where you want your app to reside and execute the following command
 
 ```bash
-C:\projects> ionic start auth-ng4-ionic3-af2 blank --v2
+C:\projects> ionic start auth-ng4-ionic3-af2 blank --v3
 ```
 
 >The command ionic start will create the project with name "Ionic_AngularFire2_Project" using "blank" template.
 
->The --v2 flag ensures, this is a Ionic2 project.
+>The --v3 flag ensures, this is a Ionic3 project.
 
 Change to the project directory, which was just created with above command
 
