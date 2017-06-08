@@ -52,7 +52,7 @@ describe('FirebaseListObservable', () => {
 
   describe('push', () => {
     it('should throw an exception if pushed when not subscribed', () => {
-      O = new FirebaseListObservable(null, (observer:Observer<any>) => {});
+      O = new FirebaseListObservable(null!, (observer:Observer<any>) => {});
 
       expect(() => {
         O.push('foo');
@@ -76,7 +76,7 @@ describe('FirebaseListObservable', () => {
       let childAddedSpy = jasmine.createSpy('childAdded');
 
       ref.on('child_added', childAddedSpy);
-      O.remove(child.key)
+      O.remove(child.key!)
         .then(() => (<any>ref).once('value'))
         .then((data:firebase.database.DataSnapshot) => {
           expect(childAddedSpy.calls.argsFor(0)[0].val()).toEqual(orphan);
@@ -158,7 +158,7 @@ describe('FirebaseListObservable', () => {
       let childChangedSpy = jasmine.createSpy('childChanged');
       const orphanChange = { changed: true }
       ref.on('child_changed', childChangedSpy);
-      O.set(child.key, orphanChange)
+      O.set(child.key!, orphanChange)
         .then(() => (<any>ref).once('value'))
         .then((data:firebase.database.DataSnapshot) => {
           expect(childChangedSpy.calls.argsFor(0)[0].val()).not.toEqual({
@@ -250,7 +250,7 @@ describe('FirebaseListObservable', () => {
       let childChangedSpy = jasmine.createSpy('childChanged');
       const orphanChange = { changed: true }
       ref.on('child_changed', childChangedSpy);
-      O.update(child.key, orphanChange)
+      O.update(child.key!, orphanChange)
         .then(() => (<any>ref).once('value'))
         .then((data:firebase.database.DataSnapshot) => {
           expect(childChangedSpy.calls.argsFor(0)[0].val()).toEqual({

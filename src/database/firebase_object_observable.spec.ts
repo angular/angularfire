@@ -44,7 +44,7 @@ describe('FirebaseObjectObservable', () => {
 
   describe('$ref', () => {
     it('should match the database path passed in the constructor', () => {
-      expect(O.$ref.toString()).toEqual(ref.toString());
+      expect(O.$ref!.toString()).toEqual(ref.toString());
     });
   });
 

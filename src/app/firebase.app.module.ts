@@ -27,6 +27,6 @@ export function _firebaseAppFactory(config: FirebaseAppConfig, appName?: string)
       return firebase.app(e.name);
     }
 
-    return firebase.app(null);
+    return firebase.app(null!);
   }
 }

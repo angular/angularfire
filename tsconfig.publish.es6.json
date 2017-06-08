@@ -11,6 +11,7 @@
     "inlineSources": true,
     "declaration": true,
     "removeComments": true,
+    "strictNullChecks": true,
     "lib": [
       "es2015",
       "dom"

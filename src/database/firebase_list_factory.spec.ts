@@ -416,7 +416,7 @@ describe('FirebaseListFactory', () => {
 
       questions.$ref.ref.push({ number: 1 })
         .then(() => {
-          let calls = [];
+          let calls: string[] = [];
           questions.$ref.ref.once('child_added', (snap) => calls.push('child_added:' + snap.val().number));
           skipAndTake(questions).subscribe(
             (list) => {
@@ -611,13 +611,13 @@ describe('FirebaseListFactory', () => {
 
       it('should move the child to the beginning if prevKey is null', () => {
         expect(
-          onChildChanged([val1, val2, val3], val2, toKey, null)
+          onChildChanged([val1, val2, val3], val2, toKey, null!)
         ).toEqual([val2, val1, val3]);
       });
 
       it('should not duplicate the first item if it is the one that changed', () => {
         expect(
-          onChildChanged([val1, val2, val3], val1, toKey, null)
+          onChildChanged([val1, val2, val3], val1, toKey, null!)
         ).not.toEqual([val1, val1, val2, val3]);
       });
 

@@ -38,7 +38,7 @@ describe('observeQuery', () => {
     let completeSpy = jasmine.createSpy('complete');
     let query = { orderByChild: 'height', equalTo: 10 };
     let obs = observeQuery(query, false);
-    obs.subscribe(nextSpy, null, completeSpy);
+    obs.subscribe(nextSpy, () => {}, completeSpy);
     expect(nextSpy).toHaveBeenCalledWith({
       orderByChild: 'height',
       equalTo: 10
@@ -51,7 +51,7 @@ describe('observeQuery', () => {
     let completeSpy = jasmine.createSpy('complete');
     let query:any = null;
     let obs = observeQuery(query, false);
-    obs.subscribe(nextSpy, null, completeSpy);
+    obs.subscribe(nextSpy, () => {}, completeSpy);
     expect(nextSpy).toHaveBeenCalledWith(null);
     expect(completeSpy).toHaveBeenCalled();
   });
@@ -65,7 +65,7 @@ describe('observeQuery', () => {
     };
     let obs = observeQuery(query, false);
     let noOrderyQuery = { orderByKey: false };
-    obs.subscribe(nextSpy, null, completeSpy);
+    obs.subscribe(nextSpy, () => {}, completeSpy);
     query.orderByKey.next(true);
     expect(nextSpy).toHaveBeenCalledWith({ orderByKey: true});
     nextSpy.calls.reset();
@@ -82,11 +82,11 @@ describe('observeQuery', () => {
       orderByKey: new Subject<boolean>()
     };
     let obs = observeQuery(query, false);
-    obs.subscribe(nextSpy, null, completeSpy);
+    obs.subscribe(nextSpy, () => {}, completeSpy);
     query.orderByKey.next(true);
     expect(nextSpy).toHaveBeenCalledWith({ orderByKey: true });
     nextSpy.calls.reset();
-    query.orderByKey.next(null);
+    query.orderByKey.next(null!);
     expect(nextSpy).toHaveBeenCalledWith({});
   });
 
