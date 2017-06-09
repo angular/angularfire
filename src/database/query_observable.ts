@@ -11,7 +11,7 @@ import { hasKey, isNil } from '../utils';
 
 export function observeQuery(query: Query, audit: boolean = true): Observable<ScalarQuery> {
   if (isNil(query)) {
-    return observableOf(null);
+    return observableOf(null!);
   }
 
   return Observable.create((observer: Observer<ScalarQuery>) => {
@@ -93,7 +93,7 @@ export function getOrderObservables(query: Query): Observable<OrderBySelection> 
     return merge.apply(observables[0], observables.slice(1));
   } else {
     return new Observable<OrderBySelection>(subscriber => {
-      subscriber.next(null);
+      subscriber.next(null!);
     });
   }
 }
@@ -111,7 +111,7 @@ export function getLimitToObservables(query: Query): Observable<LimitToSelection
     return mergedObs;
   } else {
     return new Observable<LimitToSelection>(subscriber => {
-      subscriber.next(null);
+      subscriber.next(null!);
     });
   }
 }

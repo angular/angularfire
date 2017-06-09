@@ -6,7 +6,7 @@ import { FirebaseListObservable } from './firebase_list_observable';
 import { Observer } from 'rxjs/Observer';
 import { observeOn } from 'rxjs/operator/observeOn';
 import { observeQuery } from './query_observable';
-import { Query, FirebaseListFactoryOpts, DatabaseReference, DatabaseQuery } from '../interfaces';
+import { Query, FirebaseListFactoryOpts, DatabaseReference, DatabaseQuery, DatabaseSnapshot } from '../interfaces';
 import { switchMap } from 'rxjs/operator/switchMap';
 import { map } from 'rxjs/operator/map';
 
@@ -115,10 +115,10 @@ function firebaseListObservable(ref: firebase.database.Reference | DatabaseQuery
   const listObs = new FirebaseListObservable(ref, (obs: Observer<any[]>) => {
 
     // Keep track of callback handles for calling ref.off(event, handle)
-    const handles = [];
+    const handles: { event: string, handle: (a: DatabaseSnapshot, b?: string | null | undefined) => any }[] = [];
     let hasLoaded = false;
-    let lastLoadedKey: string = null;
-    let array = [];
+    let lastLoadedKey: string = null!;
+    let array: DatabaseSnapshot[] = [];
 
     // The list children are always added to, removed from and changed within
     // the array using the child_added/removed/changed events. The value event
@@ -193,7 +193,7 @@ export function onChildAdded(arr:any[], child:any, toKey:(element:any)=>string, 
   if (!arr.length) {
     return [child];
   }
-  return arr.reduce((accumulator:firebase.database.DataSnapshot[], curr:firebase.database.DataSnapshot, i:number) => {
+  return arr.reduce((accumulator: DatabaseSnapshot[], curr: DatabaseSnapshot, i:number) => {
     if (!prevKey && i===0) {
       accumulator.push(child);
     }

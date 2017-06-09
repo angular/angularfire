@@ -91,7 +91,7 @@ describe('AngularFireAuth', () => {
     // Check that the first value is null and second is the auth user
     const subs = afAuth.authState.subscribe(user => {
       if (count === 0) {
-        expect(user).toBe(null);
+        expect(user).toBe(null!);
         count = count + 1;
         mockAuthState.next(firebaseUser);
       } else {
@@ -100,7 +100,7 @@ describe('AngularFireAuth', () => {
         done();
       }
     }, done, done.fail);
-    mockAuthState.next(null);
+    mockAuthState.next(null!);
   });
 
   it('should emit auth updates through idToken', (done: any) => {
@@ -109,7 +109,7 @@ describe('AngularFireAuth', () => {
     // Check that the first value is null and second is the auth user
     const subs = afAuth.idToken.subscribe(user => {
       if (count === 0) {
-        expect(user).toBe(null);
+        expect(user).toBe(null!);
         count = count + 1;
         mockAuthState.next(firebaseUser);
       } else {
@@ -118,7 +118,7 @@ describe('AngularFireAuth', () => {
         done();
       }
     }, done, done.fail);
-    mockAuthState.next(null);
+    mockAuthState.next(null!);
   });
 
 });
