@@ -41,7 +41,6 @@
     "@angular/platform-browser": "^4.0.0",
     "@angular/platform-browser-dynamic": "^4.0.0",
     "firebase": "^4.0.0",
-    "rollup-plugin-re": "^1.0.6",
     "rxjs": "^5.0.1"
   },
   "devDependencies": {
