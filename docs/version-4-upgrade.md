@@ -102,7 +102,7 @@ export class MyModule { }
 export class App {
   user: Observable<firebase.User>;
   items: FirebaseListObservable<any[]>;
-  constructor(afAuth: AngularFireAuth, db: AngularFireDatabase) {
+  constructor(private afAuth: AngularFireAuth, private db: AngularFireDatabase) {
     this.user = afAuth.authState;
     this.items = db.list('items');
   }
