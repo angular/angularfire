@@ -67,42 +67,51 @@ Once the above commands are executed successfully, Check the versions of corodva
 
 ```bash
 C:\projects>cordova -v
-6.4.0
+7.0.1
 
 C:\projects>ionic -v
-2.2.3
+3.4.0
 ```
 
 These are the latest versions as of writting this document.
 
-On successful execution of above commands, you're all set to create your app with Ionic 3 framework.
+On successful execution of above commands, you're all set to create your app with Ionic framework.
 
 To create your app, change into the directory where you want your app to reside and execute the following command
 
 ```bash
-C:\projects> ionic start auth-ng4-ionic3-af2 blank --v2
+C:\projects> ionic start auth-ng4-ionic3-af2 blank
 ```
 
 >The command ionic start will create the project with name "Ionic_AngularFire2_Project" using "blank" template.
-
->The --v2 flag ensures, this is a Ionic2 project.
 
 Change to the project directory, which was just created with above command
 
 > C:\projects\auth-ng4-ionic3-af2>ionic info
 
 ```bash
-Cordova CLI: 6.4.0
-Ionic Framework Version: 3.1.1
-Ionic CLI Version: 2.2.3
-Ionic App Lib Version: 2.2.1
-Ionic App Scripts Version: 1.3.7
-ios-deploy version: Not installed
-ios-sim version: Not installed
-OS: Windows 10
-Node Version: v6.10.2
-Xcode version: Not installed
+global packages:
 
+    @ionic/cli-utils : 1.4.0
+    Cordova CLI      : 7.0.1
+    Ionic CLI        : 3.4.0
+
+local packages:
+
+    @ionic/app-scripts              : 1.3.12
+    @ionic/cli-plugin-cordova       : 1.4.0
+    @ionic/cli-plugin-ionic-angular : 1.3.1
+    Cordova Platforms               : none
+    Ionic Framework                 : ionic-angular 3.5.0
+
+System:
+
+    Node       : v8.1.2
+    OS         : Windows 10
+    Xcode      : not installed
+    ios-deploy : not installed
+    ios-sim    : not installed
+    npm        : 5.0.4
 ```
 You need to ensure you've got Ionic Framework Version 3, as shown above.
 
@@ -110,27 +119,28 @@ Alternatively you can open `package.json` to ensure you've got the following ang
 
 ```bash
 "dependencies": {
-    "@angular/common": "4.0.2",
-    "@angular/compiler": "4.0.2",
-    "@angular/compiler-cli": "4.0.2",
-    "@angular/core": "4.0.2",
-    "@angular/forms": "4.0.2",
-    "@angular/http": "4.0.2",
-    "@angular/platform-browser": "4.0.2",
-    "@angular/platform-browser-dynamic": "4.0.2",
-    "@ionic-native/core": "3.6.1",
-    "@ionic-native/splash-screen": "3.6.1",
-    "@ionic-native/status-bar": "3.6.1",
+    "@angular/common": "4.1.3",
+    "@angular/compiler": "4.1.3",
+    "@angular/compiler-cli": "4.1.3",
+    "@angular/core": "4.1.3",
+    "@angular/forms": "4.1.3",
+    "@angular/http": "4.1.3",
+    "@angular/platform-browser": "4.1.3",
+    "@angular/platform-browser-dynamic": "4.1.3",
+    "@ionic-native/core": "3.12.1",
+    "@ionic-native/splash-screen": "3.12.1",
+    "@ionic-native/status-bar": "3.12.1",
     "@ionic/storage": "2.0.1",
-    "ionic-angular": "3.1.1",
+    "ionic-angular": "3.5.0",
     "ionicons": "3.0.0",
-    "rxjs": "5.1.1",
-    "sw-toolbox": "3.4.0",
-    "zone.js": "^0.8.10"
+    "rxjs": "5.4.0",
+    "sw-toolbox": "3.6.0",
+    "zone.js": "0.8.12"
   },
   "devDependencies": {
-    "@ionic/app-scripts": "1.3.7",
-    "typescript": "~2.2.1"
+    "@ionic/app-scripts": "1.3.12",
+    "@ionic/cli-plugin-ionic-angular": "1.3.1",
+    "typescript": "~2.3.4"
   }
 
 ```
@@ -159,9 +169,9 @@ C:\projects\auth-ng4-ionic3-af2>npm install angularfire2 firebase --save
 
 _This should add angularfire2 and firebase entry in your project's package.json file in dependencies section. Something similar_
 
-> "angularfire2": "^4.0.0-rc.0",
+> "angularfire2": "^4.0.0-rc.1",
 
-> "firebase": "^3.9.0",
+> "firebase": "^4.1.3",
 
 ### Setup @NgModule
 
@@ -178,7 +188,7 @@ and add the following three entries.
 
 your `app.module.ts` file should look something like this.
 
-```bash
+```typescript
 
 import { BrowserModule } from '@angular/platform-browser';
 import { ErrorHandler, NgModule } from '@angular/core';
@@ -241,7 +251,7 @@ following changes:
 
 Your `home.ts` file should look like this.
 
-```bash
+```typescript
 
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
@@ -267,7 +277,7 @@ export class HomePage {
 
 **Update** your `home.html` at `src/pages/home/home.html`, with following entry
 
-```bash
+```html
 
 <ion-header>
 	<ion-navbar>
@@ -329,7 +339,7 @@ removing calls to fetch data.`
 
 The `home.html` should look like below
 
-```bash
+```html
 
 <ion-header>
 	<ion-navbar>
@@ -354,7 +364,7 @@ Let's update the `home.ts` to add the corresponding methods:
 
 The `home.ts` should look like below
 
-```bash
+```typescript
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 
@@ -406,7 +416,7 @@ Also add the property in our template to render them on screen.
 
 Your `home.ts` should look as follows:
 
-```bash
+```typescript
 
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
@@ -450,7 +460,7 @@ export class HomePage {
 
 and `home.html` shouldlook like this
 
-```bash
+```html
 
 <ion-header>
 	<ion-navbar>
@@ -518,13 +528,13 @@ and `APP_NAME` with your App Name.
  ```bash
  
 C:\projects\auth-ng4-ionic3-af2>
-ionic plugin add cordova-plugin-facebook4 --variable APP_ID="123456789" --variable APP_NAME="myApplication" --save
+ionic cordova plugin add cordova-plugin-facebook4 --variable APP_ID="123456789" --variable APP_NAME="myApplication"
 
 ```
 
 This should add following entry in your config.xml, located at the root of your project.
 
-```bash
+```xml
 
 <plugin name="cordova-plugin-facebook4" spec="~1.7.4">
         <variable name="APP_ID" value="1689092456387654" />
@@ -548,12 +558,12 @@ After executing the above command, ensure you got following entry in your `packa
 
 ```bash
 
-"@ionic-native/facebook": "^3.5.0",
+"@ionic-native/facebook": "^3.12.1",
 
 ```
 Now import the `Platform` and `Facebook` objects in your `home.ts` and inject the objects in constructor.
 
-```bash
+```typescript
 
 import { Platform } from 'ionic-angular';
 import { Facebook } from '@ionic-native/facebook';
@@ -564,7 +574,7 @@ Update the "signInWithFacebook" method and use Platform Service to determine the
 
 your `home.ts` should look as below
 
-```bash
+```typescript
 
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
@@ -621,7 +631,7 @@ You'll also need to add the "Facebook" object in the provider section in app.mod
 
 The final `app.module.ts` should look like below
 
-```bash
+```typescript
 
 import { BrowserModule } from '@angular/platform-browser';
 import { ErrorHandler, NgModule } from '@angular/core';
@@ -686,7 +696,7 @@ Everything should work. Now trying running the app on your android phone
 
 ```bash
 
-C:\projects\auth-ng4-ionic3-af2> ionic run android
+C:\projects\auth-ng4-ionic3-af2> ionic cordova run android
 
 ```
 
