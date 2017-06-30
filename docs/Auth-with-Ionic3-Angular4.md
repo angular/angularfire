@@ -117,7 +117,7 @@ You need to ensure you've got Ionic Framework Version 3, as shown above.
 
 Alternatively you can open `package.json` to ensure you've got the following angualr and Ionic versions
 
-```bash
+```json
 "dependencies": {
     "@angular/common": "4.1.3",
     "@angular/compiler": "4.1.3",
