@@ -62,3 +62,4 @@ productive with AngularFire2.
 5. [User Authentication - FirebaseAuthentication](docs/5-user-authentication.md)
 6. [Using AngularFire2 with Ionic 2](docs/Auth-with-Ionic2.md)
 7. [Using AngularFire2 with Ionic 3 and Angular 4](docs/Auth-with-Ionic3-Angular4.md)
+8. [Deploying AngularFire2 to FirebaseHosting](docs/7-deploying-angularfire-to-firebase.md)
