@@ -56,8 +56,8 @@ If you want to get started quickly on building with AngularFire2, check out our
 productive with AngularFire2.
 
 1. [Installation & Setup](docs/1-install-and-setup.md)
-2. [Retreiving data as objects - FirebaseObjectObservable](docs/2-retrieving-data-as-objects.md)
-3. [Retreiving data as lists - FirebaseListObservable](docs/3-retrieving-data-as-lists.md)
+2. [Retrieving data as objects - FirebaseObjectObservable](docs/2-retrieving-data-as-objects.md)
+3. [Retrieving data as lists - FirebaseListObservable](docs/3-retrieving-data-as-lists.md)
 4. [Querying lists](docs/4-querying-lists.md)
 5. [User Authentication - FirebaseAuthentication](docs/5-user-authentication.md)
 6. [Using AngularFire2 with Ionic 2](docs/Auth-with-Ionic2.md)
