@@ -11,7 +11,7 @@ addons:
     packages:
       - g++-4.8
 
-cache: yarn
+cache: npm
 
 env:
   - CXX=g++-4.8
@@ -20,15 +20,12 @@ before_script:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
 
-install:
-  - yarn --frozen-lockfile
-  - yarn run tsc -- -v
-
 script:
-  - yarn run build
+  - ./node_modules/typescript/bin/tsc -v
+  - npm run build
   - ./node_modules/.bin/karma start --single-run --browsers Firefox --reporters mocha
   # Make sure the build that ships to npm builds without errors
-  - yarn run build_npm
+  - npm run build_npm
   # Run integration test to make sure our typings are correct for user-land.
   - node tools/run-typings-test.js
   # Can't run until https://github.com/angular/protractor/issues/2784 is resolved
