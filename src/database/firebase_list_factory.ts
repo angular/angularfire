@@ -112,7 +112,7 @@ function firebaseListObservable(ref: firebase.database.Reference | DatabaseQuery
   const toValue = preserveSnapshot ? (snapshot => snapshot) : utils.unwrapMapFn;
   const toKey = preserveSnapshot ? (value => value.key) : (value => value.$key);
 
-  const listObs = new FirebaseListObservable(ref, (obs: Observer<any[]>) => {
+  const listObs = new FirebaseListObservable(ref, (obs: Observer<any>) => {
 
     // Keep track of callback handles for calling ref.off(event, handle)
     const handles: { event: string, handle: (a: DatabaseSnapshot, b?: string | null | undefined) => any }[] = [];
