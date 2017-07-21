@@ -1,7 +1,7 @@
 language: node_js
 sudo: false
 node_js:
-- '6'
+- 'node'
 
 addons:
   firefox: latest
@@ -11,16 +11,10 @@ addons:
     packages:
       - g++-4.8
 
-cache:
-  directories:
-    - node_modules
+cache: yarn
 
 env:
   - CXX=g++-4.8
-
-install:
-  - npm install -g yarn
-  - yarn install
 
 before_script:
   - export DISPLAY=:99.0
