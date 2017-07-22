@@ -16,6 +16,9 @@ cache: npm
 env:
   - CXX=g++-4.8
 
+install:
+  - npm
+
 before_script:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
