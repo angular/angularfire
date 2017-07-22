@@ -63,7 +63,7 @@ describe('observeQuery', () => {
     let query = {
       orderByKey: new Subject<boolean>()
     };
-    let obs = observeQuery(query, false);
+    let obs = observeQuery(query as {orderByKey: Observable<boolean>}, false);
     let noOrderyQuery = { orderByKey: false };
     obs.subscribe(nextSpy, () => {}, completeSpy);
     query.orderByKey.next(true);
@@ -81,7 +81,7 @@ describe('observeQuery', () => {
     let query = {
       orderByKey: new Subject<boolean>()
     };
-    let obs = observeQuery(query, false);
+    let obs = observeQuery(query as {orderByKey: Observable<boolean>}, false);
     obs.subscribe(nextSpy, () => {}, completeSpy);
     query.orderByKey.next(true);
     expect(nextSpy).toHaveBeenCalledWith({ orderByKey: true });
@@ -99,7 +99,12 @@ describe('observeQuery', () => {
       orderByValue: new Subject<boolean>(),
       orderByChild: new Subject<string>()
     };
-    let obs = observeQuery(query, false);
+    let obs = observeQuery(query as {
+      orderByKey: Observable<boolean>,
+      orderByPriority: Observable<boolean>,
+      orderByValue: Observable<boolean>,
+      orderByChild: Observable<string>
+    }, false);
     obs.subscribe(nextSpy);
     query.orderByChild.next('height');
     expect(nextSpy).toHaveBeenCalledWith({

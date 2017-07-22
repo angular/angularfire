@@ -46,8 +46,8 @@ describe('AngularFireAuth', () => {
     mockAuthState = new Subject<firebase.User>();
     spyOn(afAuth, 'authState').and.returnValue(mockAuthState);
     spyOn(afAuth, 'idToken').and.returnValue(mockAuthState);
-    afAuth.authState = mockAuthState;
-    afAuth.idToken = mockAuthState;
+    afAuth.authState = mockAuthState as Observable<firebase.User>;
+    afAuth.idToken = mockAuthState as Observable<firebase.User>;
   });
 
   afterEach(done => {
