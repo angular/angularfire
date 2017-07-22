@@ -17,14 +17,14 @@ env:
   - CXX=g++-4.8
 
 install:
-  - npm
+  # ditched yarn, since it was acting up and giving old versions of tsc
+  - npm install
 
 before_script:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
 
 script:
-  - ./node_modules/typescript/bin/tsc -v
   - npm run build
   - ./node_modules/.bin/karma start --single-run --browsers Firefox --reporters mocha
   # Make sure the build that ships to npm builds without errors
