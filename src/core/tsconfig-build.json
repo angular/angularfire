@@ -5,11 +5,11 @@
     "module": "es2015",
     "target": "es2015",
     "noImplicitAny": false,
-    "outDir": "../../dist/packages/core",
+    "outDir": "../../dist/packages-dist/es2015",
     "rootDir": ".",
     "sourceMap": true,
     "inlineSources": true,
-    "declaration": true,
+    "declaration": false,
     "removeComments": true,
     "strictNullChecks": true,
     "lib": [
