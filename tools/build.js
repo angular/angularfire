@@ -62,15 +62,12 @@ const TSC_ARGS = (name, config = 'build') => [`-p`, `${process.cwd()}/src/${name
 
 function buildModule(name) {
   // Run tsc on module (TS -> ES2015)
-  return spawnObservable(TSC, TSC_ARGS(name))
-    // Copy package.json to dist/pacakges/modulename/package.json
-    // Run tsc but for ES5 target and ES2015 imports, exports to dist/packages-dist
-    // (this is for rollup)
-    .concatMap(() => spawnObservable(TSC, TSC_ARGS(name, 'esm')))
-    .concatMap(() => Observable.from(copyPackage(name)))
-    .debounceTime(2000)
-    // Use rollup to build UMD bundle to dist/bundles`
-    .concatMap(() => Observable.from(createUmd(name)));
+  const es2015$ = spawnObservable(TSC, TSC_ARGS(name));
+  const esm$ = spawnObservable(TSC, TSC_ARGS(name, 'esm'));
+  return Observable
+    .forkJoin(es2015$, esm$)
+    .mergeMap(() => Observable.from(createUmd(name)))
+    .mergeMap(() => Observable.from(copyPackage(name)));
 }
 
 buildModule('core').subscribe(
