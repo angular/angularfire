@@ -6,7 +6,7 @@ import { Auth } from '../interfaces';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import { observeOn } from 'rxjs/operator/observeOn';
-import { FirebaseApp } from '../app/index';
+import { FirebaseApp } from '../core';
 
 @Injectable()
 export class AngularFireAuth {

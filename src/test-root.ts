@@ -1,4 +1,4 @@
-import './angularfire2.spec';
+import './core/angularfire2.spec';
 import './database/firebase_list_factory.spec';
 import './database/firebase_object_factory.spec';
 import './database/firebase_list_observable.spec';

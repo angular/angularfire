@@ -52,6 +52,7 @@
     "conventional-changelog-cli": "^1.2.0",
     "es6-module-loader": "^0.17.10",
     "es6-shim": "^0.35.0",
+    "fs-extra": "^4.0.0",
     "gulp": "^3.9.0",
     "gulp-jasmine": "^2.2.1",
     "gulp-typescript": "^2.10.0",

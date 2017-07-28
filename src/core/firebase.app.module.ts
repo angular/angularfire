@@ -1,5 +1,5 @@
 import { InjectionToken, } from '@angular/core';
-import { FirebaseAppConfig } from '../interfaces';
+import { FirebaseAppConfig } from './';
 import * as firebase from 'firebase/app';
 
 export const FirebaseAppConfigToken = new InjectionToken<FirebaseAppConfig>('FirebaseAppConfigToken');

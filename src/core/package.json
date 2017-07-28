@@ -1,0 +1,29 @@
+{
+  "name": "angularfire2",
+  "version": "4.0.0-rc.1",
+  "description": "The core module",
+  "main": "../../bundles/core.umd.js",
+  "module": "index.es5.js",
+  "es2015": "index.js",
+  "keywords": [
+    "angular",
+    "firebase",
+    "rxjs"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/angular/angularfire2.git"
+  },
+  "author": "angular,firebase",
+  "license": "MIT",
+  "peerDependencies": {
+    "@angular/common": "^4.0.0",
+    "@angular/core": "^4.0.0",
+    "@angular/platform-browser": "^4.0.0",
+    "@angular/platform-browser-dynamic": "^4.0.0",
+    "firebase": "^4.0.0",
+    "rxjs": "^5.0.1",
+    "zone.js": "^0.8.0"
+  },
+  "typings": "index.d.ts"
+}

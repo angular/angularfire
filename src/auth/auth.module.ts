@@ -1,8 +1,7 @@
 import { NgModule, NgZone } from '@angular/core';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
-import { FirebaseApp } from '../app/index';
-import { AngularFireModule } from '../angularfire2';
+import { FirebaseApp, AngularFireModule } from '../core';
 import { AngularFireAuth } from './auth';
 
 export function _getAngularFireAuth(app: FirebaseApp) {
