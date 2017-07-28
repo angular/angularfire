@@ -1,8 +1,15 @@
 import * as firebase from 'firebase/app';
-import * as utils from './utils';
-import { FirebaseAppConfigToken, FirebaseApp, _firebaseAppFactory } from './app/index';
-import { FirebaseListFactoryOpts, FirebaseObjectFactoryOpts, FirebaseAppConfig } from './interfaces';
+import { FirebaseAppConfigToken, FirebaseApp, _firebaseAppFactory } from './firebase.app.module';
 import { Injectable, InjectionToken, OpaqueToken, NgModule } from '@angular/core';
+
+export interface FirebaseAppConfig {
+  apiKey?: string;
+  authDomain?: string;
+  databaseURL?: string;
+  storageBucket?: string;
+  messagingSenderId?: string;
+  projectId?: string;
+}
 
 const FirebaseAppName = new InjectionToken<string>('FirebaseAppName');
 
@@ -27,4 +34,4 @@ export class AngularFireModule {
   }
 }
 
-export { FirebaseApp, FirebaseAppName, FirebaseAppConfigToken, FirebaseAppConfig };
+export { FirebaseApp, FirebaseAppName, FirebaseAppConfigToken };

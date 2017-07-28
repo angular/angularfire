@@ -1,7 +1,7 @@
 import * as firebase from 'firebase/app';
 import 'firebase/database';
 import { Inject, Injectable } from '@angular/core';
-import { FirebaseAppConfigToken, FirebaseAppConfig, FirebaseApp } from '../angularfire2';
+import { FirebaseAppConfigToken, FirebaseAppConfig, FirebaseApp } from '../core';
 import { FirebaseListFactory } from './firebase_list_factory';
 import { FirebaseListObservable } from './firebase_list_observable';
 import { FirebaseListFactoryOpts, FirebaseObjectFactoryOpts, PathReference } from '../interfaces';

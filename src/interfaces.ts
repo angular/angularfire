@@ -1,15 +1,6 @@
 import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs/Observable';
 
-export interface FirebaseAppConfig {
-  apiKey?: string;
-  authDomain?: string;
-  databaseURL?: string;
-  storageBucket?: string;
-  messagingSenderId?: string;
-  projectId?: string;
-}
-
 export interface FirebaseOperationCases {
   stringCase: () => firebase.Promise<void>;
   firebaseCase?: () => firebase.Promise<void>;
