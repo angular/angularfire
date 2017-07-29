@@ -1,7 +1,7 @@
 const { rollup } = require('rollup');
 const { spawn } = require('child_process');
 const { Observable } = require('rxjs');
-const { copy, readFileSync } = require('fs-extra');
+const { copy, readFileSync, writeFile } = require('fs-extra');
 const { prettySize } = require('pretty-size');
 const gzipSize = require('gzip-size');
 
@@ -32,7 +32,16 @@ const GLOBALS = {
   'angularfire2': 'angularfire2'
 };
 
-// constants for running typescript commands
+// Map of dependency versions across all packages
+const VERSIONS = {
+  ANGULAR_VERSION: '^4.0.0',
+  FIREBASE_VERSION: '^4.0.0',
+  RXJS_VERSION: '^5.0.1',
+  ZONEJS_VERSION: '^0.8.0',
+  ANGULARFIRE2_VERSION: '4.0.0-rc.2'
+};
+
+// Constants for running typescript commands
 const TSC = 'node_modules/.bin/tsc';
 const NGC = 'node_modules/.bin/ngc';
 const TSC_ARGS = (name, config = 'build') => [`-p`, `${process.cwd()}/src/${name}/tsconfig-${config}.json`];
@@ -52,6 +61,11 @@ function spawnObservable(command, args) {
   });
 }
 
+/**
+ * Create a UMD bundle given a module name
+ * @param {string} name 
+ * @param {Object} globals 
+ */
 function createUmd(name, globals) {
   // core module is angularfire2 the rest are angularfire2.feature
   const moduleName = name === 'core' ? 'angularfire2' : `angularfire2.${name}`;
@@ -76,6 +90,10 @@ function createUmd(name, globals) {
     });
 }
 
+/**
+ * Get the file path of the src package.json for a module
+ * @param {string} moduleName 
+ */
 function getSrcPackageFile(moduleName) {
   const PATHS = {
     core: `${process.cwd()}/src/core/package.json`,
@@ -85,6 +103,10 @@ function getSrcPackageFile(moduleName) {
   return PATHS[moduleName];
 }
 
+/**
+ * Get the file path of the dist package.json for a module
+ * @param {string} moduleName 
+ */
 function getDestPackageFile(moduleName) {
   const PATHS = {
     core: `${process.cwd()}/dist/packages-dist/package.json`,
@@ -92,6 +114,33 @@ function getDestPackageFile(moduleName) {
     database: `${process.cwd()}/dist/packages-dist/database/package.json`
   };
   return PATHS[moduleName];
+}
+
+/**
+ * Create an observable of package.json dependency version replacements.
+ * This keeps the dependency versions across each package in sync.
+ * @param {string} name 
+ * @param {Object} versions 
+ */
+function replaceVersionsObservable(name, versions) {
+  return Observable.create((observer) => {
+    const package = getSrcPackageFile(name);
+    let pkg = readFileSync(package, 'utf8');
+    const regexs = Object.keys(versions).map(key =>
+      ({ expr: new RegExp(key, 'g'), key, val: versions[key] }));
+    regexs.forEach(reg => {
+      pkg = pkg.replace(reg.expr, reg.val);
+    });
+    const outPath = getDestPackageFile(name);
+    writeFile(outPath, pkg, err => {
+      if(err) {
+        observer.error(err);
+      } else {
+        observer.next(pkg);
+        observer.complete();
+      }
+    });
+  });
 }
 
 function copyPackage(moduleName) {
@@ -111,7 +160,7 @@ function buildModule(name, globals) {
   return Observable
     .forkJoin(es2015$, esm$)
     .switchMap(() => Observable.from(createUmd(name, globals)))
-    .switchMap(() => Observable.from(copyPackage(name)));
+    .switchMap(() => replaceVersionsObservable(name, VERSIONS));
 }
 
 function buildLibrary(globals) {
@@ -123,13 +172,10 @@ function buildLibrary(globals) {
     .switchMapTo(auth$)
     .switchMapTo(db$)
     .do(() => {
-      const core = measure('core');
-      const auth = measure('auth');
-      const db = measure('database');
       console.log(`
-      core.umd.js - ${core}
-      auth.umd.js - ${auth}
-      database.umd.js - ${db}
+      core.umd.js - ${measure('core')}
+      auth.umd.js - ${measure('auth')}
+      database.umd.js - ${measure('database')}
       `);
     });
 }

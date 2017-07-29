@@ -1,6 +1,6 @@
 {
   "name": "angularfire2/auth",
-  "version": "ANGULARFIRE2_VERSION",
+  "version": "4.0.0-rc.1",
   "description": "The auth module",
   "main": "../bundles/auth.umd.js",
   "module": "index.js",

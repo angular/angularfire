@@ -1,6 +1,6 @@
 {
   "name": "angularfire2/database",
-  "version": "ANGULARFIRE2_VERSION",
+  "version": "4.0.0-rc.1",
   "description": "The database module",
   "main": "../bundles/database.umd.js",
   "module": "index.js",
