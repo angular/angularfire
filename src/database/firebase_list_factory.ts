@@ -1,12 +1,13 @@
 import * as firebase from 'firebase/app';
-import * as utils from '../utils';
+import { ZoneScheduler } from 'angularfire2';
+import * as utils from './utils';
 import 'firebase/database';
-import { AFUnwrappedDataSnapshot } from '../interfaces';
+import { AFUnwrappedDataSnapshot } from './interfaces';
 import { FirebaseListObservable } from './firebase_list_observable';
 import { Observer } from 'rxjs/Observer';
 import { observeOn } from 'rxjs/operator/observeOn';
 import { observeQuery } from './query_observable';
-import { Query, FirebaseListFactoryOpts, DatabaseReference, DatabaseQuery, DatabaseSnapshot } from '../interfaces';
+import { Query, FirebaseListFactoryOpts, DatabaseReference, DatabaseQuery, DatabaseSnapshot } from './interfaces';
 import { switchMap } from 'rxjs/operator/switchMap';
 import { map } from 'rxjs/operator/map';
 
@@ -186,7 +187,7 @@ function firebaseListObservable(ref: firebase.database.Reference | DatabaseQuery
   });
 
   // TODO: should be in the subscription zone instead
-  return observeOn.call(listObs, new utils.ZoneScheduler(Zone.current));
+  return observeOn.call(listObs, new ZoneScheduler(Zone.current));
 }
 
 export function onChildAdded(arr:any[], child:any, toKey:(element:any)=>string, prevKey:string): any[] {

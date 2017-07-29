@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "module": "es2015",
+    "target": "es2015",
+    "noImplicitAny": false,
+    "outDir": "../../dist/packages-dist/database/es2015",
+    "rootDir": ".",
+    "sourceMap": true,
+    "inlineSources": true,
+    "declaration": false,
+    "removeComments": true,
+    "strictNullChecks": true,
+    "lib": [
+      "es2015",
+      "dom"
+    ],
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "paths": {
+      "angularfire2": ["../../dist/packages-dist"]
+    }
+  },
+  "files": [
+    "index.ts",
+    "../../node_modules/zone.js/dist/zone.js.d.ts"
+  ],
+  "angularCompilerOptions": {
+    "skipTemplateCodegen": true,
+    "strictMetadataEmit": true,
+    "enableSummariesForJit": false
+  }
+}
+

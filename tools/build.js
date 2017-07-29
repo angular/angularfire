@@ -12,6 +12,12 @@ const GLOBALS = {
   'rxjs/observable/merge': 'Rx.Observable',
   'rxjs/operator/share': 'Rx.Observable.prototype',
   'rxjs/operator/observeOn': 'Rx.Observable.prototype',
+  'rxjs/observable/of': 'Rx.Observable.prototype',
+  'rxjs/operator/combineLatest': 'Rx.Observable.prototype',
+  'rxjs/operator/merge': 'Rx.Observable.prototype',
+  'rxjs/operator/map': 'Rx.Observable.prototype',
+  'rxjs/operator/auditTime': 'Rx.Observable.prototype',
+  'rxjs/operator/switchMap': 'Rx.Observable.prototype',
   'rxjs/operator': 'Rx.Observable.prototype',
   '@angular/core': 'ng.core',
   '@angular/compiler': 'ng.compiler',
@@ -102,9 +108,11 @@ function buildModule(name, globals) {
 function buildLibrary(globals) {
   const core$ = buildModule('core', globals);
   const auth$ = buildModule('auth', globals);
+  const db$ = buildModule('database', globals);
   return Observable
     .forkJoin(core$)
-    .switchMapTo(auth$);
+    .switchMapTo(auth$)
+    .switchMapTo(db$);
 }
 
 const $lib = buildLibrary(GLOBALS).subscribe(
