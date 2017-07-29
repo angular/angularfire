@@ -1,12 +1,12 @@
 import * as firebase from 'firebase/app';
-import * as utils from '../utils';
 import 'firebase/auth';
 import { Injectable, NgZone } from '@angular/core';
-import { Auth } from '../interfaces';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import { observeOn } from 'rxjs/operator/observeOn';
-import { FirebaseApp } from '../core';
+import { FirebaseApp, ZoneScheduler } from 'angularfire2';
+
+export type Auth = firebase.auth.Auth;
 
 @Injectable()
 export class AngularFireAuth {
@@ -47,7 +47,7 @@ export function FirebaseAuthStateObservable(app: FirebaseApp): Observable<fireba
       () => observer.complete()
     );
   });
-  return observeOn.call(authState, new utils.ZoneScheduler(Zone.current));
+  return observeOn.call(authState, new ZoneScheduler(Zone.current));
 }
 
 /**
@@ -63,5 +63,5 @@ export function FirebaseIdTokenObservable(app: FirebaseApp): Observable<firebase
       () => observer.complete()
     )
   });
-  return observeOn.call(idToken, new utils.ZoneScheduler(Zone.current));
+  return observeOn.call(idToken, new ZoneScheduler(Zone.current));
 }

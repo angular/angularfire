@@ -122,15 +122,3 @@ export function getRef(app: FirebaseApp, pathRef: PathReference): DatabaseRefere
   }
   return app.database().ref(path);
 }
-
-/**
- * TODO: remove this scheduler once Rx has a more robust story for working
- * with zones.
- */
-export class ZoneScheduler {
-  constructor(public zone: Zone) {}
-
-  schedule(...args): Subscription {
-    return <Subscription>this.zone.run(() => queue.schedule.apply(queue, args));
-  }
-}

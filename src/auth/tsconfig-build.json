@@ -1,15 +1,16 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "module": "es2015",
     "target": "es2015",
     "noImplicitAny": false,
-    "outDir": "../../dist/packages/auth",
+    "outDir": "../../dist/packages-dist/auth/es2015",
     "rootDir": ".",
     "sourceMap": true,
     "inlineSources": true,
-    "declaration": true,
+    "declaration": false,
     "removeComments": true,
     "strictNullChecks": true,
     "lib": [
@@ -17,7 +18,10 @@
       "dom"
     ],
     "skipLibCheck": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "paths": {
+      "angularfire2": ["../../dist/packages-dist"]
+    }
   },
   "files": [
     "index.ts",
@@ -25,6 +29,8 @@
   ],
   "angularCompilerOptions": {
     "skipTemplateCodegen": true,
-    "strictMetadataEmit": true
+    "strictMetadataEmit": true,
+    "enableSummariesForJit": false
   }
 }
+

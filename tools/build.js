@@ -1,8 +1,39 @@
 const { rollup } = require('rollup');
 const { spawn } = require('child_process');
 const { Observable } = require('rxjs');
-const { copy, rename, readdirSync } = require('fs-extra');
+const { copy } = require('fs-extra');
 
+// Rollup globals
+const GLOBALS = {
+  'rxjs/Observable': 'Rx',
+  'rxjs/Subject': 'Rx',
+  'rxjs/Observer': 'Rx',
+  'rxjs/Subscription': 'Rx',
+  'rxjs/observable/merge': 'Rx.Observable',
+  'rxjs/operator/share': 'Rx.Observable.prototype',
+  'rxjs/operator/observeOn': 'Rx.Observable.prototype',
+  'rxjs/operator': 'Rx.Observable.prototype',
+  '@angular/core': 'ng.core',
+  '@angular/compiler': 'ng.compiler',
+  '@angular/platform-browser': 'ng.platformBrowser',
+  'firebase/auth': 'firebase',
+  'firebase/app': 'firebase',
+  'firebase/database': 'firebase',
+  'rxjs/scheduler/queue': 'Rx.Scheduler',
+  '@angular/core/testing': 'ng.core.testing',
+  'angularfire2': 'angularfire2'
+};
+
+// constants for running typescript commands
+const TSC = 'node_modules/.bin/tsc';
+const NGC = 'node_modules/.bin/ngc';
+const TSC_ARGS = (name, config = 'build') => [`-p`, `${process.cwd()}/src/${name}/tsconfig-${config}.json`];
+
+/**
+ * Create an Observable of a spawned child process.
+ * @param {string} command 
+ * @param {string[]} args 
+ */
 function spawnObservable(command, args) {
   return Observable.create(observer => {
     const cmd = spawn(command, args);
@@ -13,7 +44,7 @@ function spawnObservable(command, args) {
   });
 }
 
-function createUmd(name) {
+function createUmd(name, globals) {
   // core module is angularfire2 the rest are angularfire2.feature
   const moduleName = name === 'core' ? 'angularfire2' : `angularfire2.${name}`;
   // core is at the root and the rest are in their own folders
@@ -23,11 +54,15 @@ function createUmd(name) {
     .then(bundle => {
       const result = bundle.generate({
         format: 'umd',
+        external: Object.keys(globals),
+        globals,
         moduleName
       });
       return bundle.write({
         format: 'umd',
-        dest: `${process.cwd()}/dist/bundles/${name}.umd.js`,
+        dest: `${process.cwd()}/dist/packages-dist/bundles/${name}.umd.js`,
+        external: Object.keys(globals),
+        globals,
         moduleName
       });
     });
@@ -55,23 +90,25 @@ function copyPackage(moduleName) {
   return copy(getSrcPackageFile(moduleName), getDestPackageFile(moduleName));
 }
 
-// constants for running typescript commands
-const TSC = 'node_modules/.bin/tsc';
-const NGC = 'node_modules/.bin/ngc';
-const TSC_ARGS = (name, config = 'build') => [`-p`, `${process.cwd()}/src/${name}/tsconfig-${config}.json`];
-
-function buildModule(name) {
-  // Run tsc on module (TS -> ES2015)
-  const es2015$ = spawnObservable(TSC, TSC_ARGS(name));
-  const esm$ = spawnObservable(TSC, TSC_ARGS(name, 'esm'));
+function buildModule(name, globals) {
+  const es2015$ = spawnObservable(NGC, TSC_ARGS(name));
+  const esm$ = spawnObservable(NGC, TSC_ARGS(name, 'esm'));
   return Observable
     .forkJoin(es2015$, esm$)
-    .mergeMap(() => Observable.from(createUmd(name)))
-    .mergeMap(() => Observable.from(copyPackage(name)));
+    .switchMap(() => Observable.from(createUmd(name, globals)))
+    .switchMap(() => Observable.from(copyPackage(name)));
 }
 
-buildModule('core').subscribe(
-  data => { console.log(data) },
-  err => { console.log(err) },
+function buildLibrary(globals) {
+  const core$ = buildModule('core', globals);
+  const auth$ = buildModule('auth', globals);
+  return Observable
+    .forkJoin(core$)
+    .switchMapTo(auth$);
+}
+
+const $lib = buildLibrary(GLOBALS).subscribe(
+  data => { console.log('data', data) },
+  err => { console.log('err', err) },
   () => { console.log('complete') }
 );
