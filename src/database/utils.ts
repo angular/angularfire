@@ -3,7 +3,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { Scheduler } from 'rxjs/Scheduler';
 import { queue } from 'rxjs/scheduler/queue';
 import { AFUnwrappedDataSnapshot, PathReference, DatabaseReference } from './interfaces';
-import { FirebaseApp } from './app/index';
+import { FirebaseApp } from 'angularfire2';
 
 const REGEX_ABSOLUTE_URL = /^[a-z]+:\/\/.*/;
 
