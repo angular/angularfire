@@ -1,7 +1,9 @@
 const { rollup } = require('rollup');
 const { spawn } = require('child_process');
 const { Observable } = require('rxjs');
-const { copy } = require('fs-extra');
+const { copy, readFileSync } = require('fs-extra');
+const { prettySize } = require('pretty-size');
+const gzipSize = require('gzip-size');
 
 // Rollup globals
 const GLOBALS = {
@@ -96,6 +98,13 @@ function copyPackage(moduleName) {
   return copy(getSrcPackageFile(moduleName), getDestPackageFile(moduleName));
 }
 
+function measure(module, gzip = true) {
+  const path = `${process.cwd()}/dist/packages-dist/bundles/${module}.umd.js`;
+  const file = readFileSync(path);
+  const bytes = gzipSize.sync(file);
+  return prettySize(bytes, gzip);
+}
+
 function buildModule(name, globals) {
   const es2015$ = spawnObservable(NGC, TSC_ARGS(name));
   const esm$ = spawnObservable(NGC, TSC_ARGS(name, 'esm'));
@@ -112,7 +121,17 @@ function buildLibrary(globals) {
   return Observable
     .forkJoin(core$)
     .switchMapTo(auth$)
-    .switchMapTo(db$);
+    .switchMapTo(db$)
+    .do(() => {
+      const core = measure('core');
+      const auth = measure('auth');
+      const db = measure('database');
+      console.log(`
+      core.umd.js - ${core}
+      auth.umd.js - ${auth}
+      database.umd.js - ${db}
+      `);
+    });
 }
 
 const $lib = buildLibrary(GLOBALS).subscribe(
