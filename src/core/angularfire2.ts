@@ -34,4 +34,20 @@ export class AngularFireModule {
   }
 }
 
+import { Subscription } from 'rxjs/Subscription';
+import { Scheduler } from 'rxjs/Scheduler';
+import { queue } from 'rxjs/scheduler/queue';
+
+/**
+ * TODO: remove this scheduler once Rx has a more robust story for working
+ * with zones.
+ */
+export class ZoneScheduler {
+  constructor(public zone: Zone) {}
+
+  schedule(...args): Subscription {
+    return <Subscription>this.zone.run(() => queue.schedule.apply(queue, args));
+  }
+}
+
 export { FirebaseApp, FirebaseAppName, FirebaseAppConfigToken };

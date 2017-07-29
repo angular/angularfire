@@ -86,4 +86,3 @@ export type DatabaseReference = firebase.database.Reference;
 export type DatabaseQuery = firebase.database.Query;
 export type QueryReference = DatabaseReference | DatabaseQuery;
 export type PathReference = QueryReference | string;
-export type Auth = firebase.auth.Auth;

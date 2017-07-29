@@ -1,6 +1,6 @@
 {
   "name": "angularfire2",
-  "version": "4.0.0-rc.1",
+  "version": "ANGULARFIRE2_VERSION",
   "description": "The core module",
   "main": "./bundles/core.umd.js",
   "module": "index.js",
@@ -17,13 +17,13 @@
   "author": "angular,firebase",
   "license": "MIT",
   "peerDependencies": {
-    "@angular/common": "^4.0.0",
-    "@angular/core": "^4.0.0",
-    "@angular/platform-browser": "^4.0.0",
-    "@angular/platform-browser-dynamic": "^4.0.0",
-    "firebase": "^4.0.0",
-    "rxjs": "^5.0.1",
-    "zone.js": "^0.8.0"
+    "@angular/common": "ANGULAR_VERSION",
+    "@angular/core": "ANGULAR_VERSION",
+    "@angular/platform-browser": "ANGULAR_VERSION",
+    "@angular/platform-browser-dynamic": "ANGULAR_VERSION",
+    "firebase": "FIREBASE_VERSION",
+    "rxjs": "RXJS_VERSION",
+    "zone.js": "ZONEJS_VERSION"
   },
   "typings": "index.d.ts"
 }
