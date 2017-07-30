@@ -80,12 +80,10 @@ On successful execution of above commands, you're all set to create your app wit
 To create your app, change into the directory where you want your app to reside and execute the following command
 
 ```bash
-C:\projects> ionic start auth-ng4-ionic3-af2 blank --v2
+C:\projects> ionic start auth-ng4-ionic3-af2 blank
 ```
 
 >The command ionic start will create the project with name "Ionic_AngularFire2_Project" using "blank" template.
-
->The --v2 flag ensures, this is a Ionic2 project.
 
 Change to the project directory, which was just created with above command
 
