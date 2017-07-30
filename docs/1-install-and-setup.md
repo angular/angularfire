@@ -118,10 +118,10 @@ export class AppModule {}
 ### 6. Setup individual @NgModules
 
 After adding the AngularFireModule you also need to add modules for the individual @NgModules that your application needs.
- - AngularFireAuthModule
- - AngularFireDatabaseModule
- - AngularFireStorageModule (Future release)
- - AngularFireMessagingModule (Future release)
+ - AngularFireAuth
+ - AngularFireDatabase
+ - AngularFireStorage (Future release)
+ - AngularFireMessaging (Future release)
 
 #### Adding the Firebase Database and Auth Modules
 
@@ -132,16 +132,16 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { AngularFireModule } from 'angularfire2';
-import { AngularFireDatabaseModule } from 'angularfire2/database';
-import { AngularFireAuthModule } from 'angularfire2/auth';
+import { AngularFireDatabase } from 'angularfire2/database';
+import { AngularFireAuth } from 'angularfire2/auth';
 import { environment } from '../environments/environment';
 
 @NgModule({
   imports: [
     BrowserModule,
     AngularFireModule.initializeApp(environment.firebase, 'my-app-name'), // imports firebase/app needed for everything
-    AngularFireDatabaseModule, // imports firebase/database, only needed for database features
-    AngularFireAuthModule, // imports firebase/auth, only needed for auth features
+    AngularFireDatabase, // imports firebase/database, only needed for database features
+    AngularFireAuth, // imports firebase/auth, only needed for auth features
   ],
   declarations: [ AppComponent ],
   bootstrap: [ AppComponent ]
