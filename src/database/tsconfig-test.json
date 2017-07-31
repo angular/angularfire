@@ -1,5 +1,5 @@
 {
-  "extends": "./tsconfig-build.json",
+  "extends": "./tsconfig-esm.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {

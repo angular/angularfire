@@ -25,7 +25,6 @@
   },
   "files": [
     "index.ts",
-    "index.spec.ts",
     "../../node_modules/zone.js/dist/zone.js.d.ts"
   ],
   "angularCompilerOptions": {
