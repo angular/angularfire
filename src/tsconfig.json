@@ -1,15 +1,24 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "declaration": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strictNullChecks": true,
+    "noImplicitAny": false,
+    "noFallthroughCasesInSwitch": true,
     "paths": {
       "angularfire2": ["./core"],
       "angularfire2/auth": ["./auth"],
       "angularfire2/database": ["./database"]
-    }
-  },
-  "files": [
-    "../../node_modules/zone.js/dist/zone.js.d.ts",
-    "core/index.ts",
-    "auth/index.ts",
-    "database/index.ts"
-  ]
+    },
+    "rootDir": ".",
+    "inlineSourceMap": true,
+    "lib": ["es5", "dom", "es2015.promise", "es2015.collection", "es2015.iterable"],
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true,
+    "target": "es2015"
+  }
 }

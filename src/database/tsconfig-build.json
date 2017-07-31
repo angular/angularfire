@@ -13,10 +13,7 @@
     "declaration": false,
     "removeComments": true,
     "strictNullChecks": true,
-    "lib": [
-      "es2015",
-      "dom"
-    ],
+    "lib": ["es2015", "dom", "es2015.promise", "es2015.collection", "es2015.iterable"],
     "skipLibCheck": true,
     "moduleResolution": "node",
     "paths": {

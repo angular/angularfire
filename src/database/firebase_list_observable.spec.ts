@@ -1,12 +1,10 @@
-import { AngularFireDatabase } from './database';
-import { AngularFireDatabaseModule } from './database.module';
-import { FirebaseListObservable } from './firebase_list_observable';
-import { FirebaseObjectFactory } from './firebase_object_factory';
+import { FirebaseApp, FirebaseAppConfig, AngularFireModule} from 'angularfire2';
+import { AngularFireDatabase, AngularFireDatabaseModule, FirebaseListObservable, FirebaseObjectFactory } from 'angularfire2/database';
 import { Observer } from 'rxjs/Observer';
 import { map } from 'rxjs/operator/map';
 import * as firebase from 'firebase/app';
 import { unwrapMapFn } from './utils';
-import { FirebaseApp, FirebaseAppConfig, AngularFireModule} from 'angularfire2';
+
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from './test-config';
 

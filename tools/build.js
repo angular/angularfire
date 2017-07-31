@@ -5,6 +5,7 @@ const { copy, readFileSync, writeFile } = require('fs-extra');
 const { prettySize } = require('pretty-size');
 const gzipSize = require('gzip-size');
 const resolve = require('rollup-plugin-node-resolve');
+const pkg = require(`${process.cwd()}/package.json`);
 
 // Rollup globals
 const GLOBALS = {
@@ -44,11 +45,11 @@ const GLOBALS = {
 
 // Map of dependency versions across all packages
 const VERSIONS = {
-  ANGULAR_VERSION: '^4.0.0',
-  FIREBASE_VERSION: '^4.0.0',
-  RXJS_VERSION: '^5.0.1',
-  ZONEJS_VERSION: '^0.8.0',
-  ANGULARFIRE2_VERSION: '4.0.0-rc.2'
+  ANGULAR_VERSION: pkg.dependencies['@angular/core'],
+  FIREBASE_VERSION: pkg.dependencies['firebase'],
+  RXJS_VERSION: pkg.dependencies['rxjs'],
+  ZONEJS_VERSION: pkg.dependencies['zone.js'],
+  ANGULARFIRE2_VERSION: pkg.version
 };
 
 // Constants for running typescript commands
@@ -182,6 +183,10 @@ function copyRootTest() {
   return copy(`${process.cwd()}/src/root.spec.js`, `${process.cwd()}/dist/root.spec.js`);
 }
 
+function copyNpmIgnore() {
+  return copy(`${process.cwd()}/.npmignore`, `${process.cwd()}/dist/packages-dist/.npmignore`);
+}
+
 function measure(module, gzip = true) {
   const path = `${process.cwd()}/dist/packages-dist/bundles/${module}.umd.js`;
   const file = readFileSync(path);
@@ -199,6 +204,10 @@ function buildModule(name, globals) {
     .switchMap(() => replaceVersionsObservable(name, VERSIONS));
 }
 
+/**
+ * Create an observable of module build status. This method builds
+ * @param {Object} globals 
+ */
 function buildModules(globals) {
   const core$ = buildModule('core', globals);
   const auth$ = buildModule('auth', globals);
@@ -220,7 +229,8 @@ function buildLibrary(globals) {
   const modules$ = buildModules(globals);
   return Observable
     .forkJoin(modules$)
-    .switchMap(() => Observable.from(createTestUmd(globals)));
+    .switchMap(() => Observable.from(createTestUmd(globals)))
+    .switchMap(() => Observable.from(copyNpmIgnore()));
 }
 
 buildLibrary(GLOBALS).subscribe(

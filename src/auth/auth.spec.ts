@@ -8,8 +8,7 @@ import { _do } from 'rxjs/operator/do';
 import { take } from 'rxjs/operator/take';
 import { skip } from 'rxjs/operator/skip';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2';
-import { AngularFireAuth } from './auth';
-import { AngularFireAuthModule } from './auth.module';
+import { AngularFireAuth, AngularFireAuthModule } from 'angularfire2/auth';
 import { COMMON_CONFIG } from './test-config';
 
 function authTake(auth: Observable<any>, count: number): Observable<any> {

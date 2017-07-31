@@ -1,11 +1,8 @@
 import * as firebase from 'firebase/app';
 import { Subscription } from 'rxjs';
-import { AngularFireDatabase } from './database';
-import { AngularFireDatabaseModule } from './database.module';
-import { FirebaseObjectObservable } from './firebase_object_observable';
-import { FirebaseObjectFactory } from './firebase_object_factory';
-import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2';
+import { AngularFireDatabase, AngularFireDatabaseModule, FirebaseObjectObservable, FirebaseObjectFactory } from 'angularfire2/database';
+import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from './test-config';
 
 describe('FirebaseObjectFactory', () => {
@@ -16,7 +13,7 @@ describe('FirebaseObjectFactory', () => {
   let nextSpy: jasmine.Spy;
   let app: firebase.app.App;
   let db: AngularFireDatabase;
-
+  
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [

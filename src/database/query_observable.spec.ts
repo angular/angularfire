@@ -2,7 +2,7 @@ import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import { Subject } from 'rxjs/Subject';
 import { Query, ScalarQuery } from './interfaces';
-import { getOrderObservables, observeQuery } from './query_observable';
+import { getOrderObservables, observeQuery } from 'angularfire2/database';
 
 function scalarQueryTest(query: ScalarQuery, done: any) {
   const queryObservable = observeQuery(query);

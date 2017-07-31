@@ -27,12 +27,8 @@ before_script:
 script:
   - npm run build
   - ./node_modules/.bin/karma start --single-run --browsers Firefox --reporters mocha
-  # Make sure the build that ships to npm builds without errors
-  - npm run build_npm
   # Run integration test to make sure our typings are correct for user-land.
   - node tools/run-typings-test.js
-  # Can't run until https://github.com/angular/protractor/issues/2784 is resolved
-  #- ./node_modules/.bin/protractor protractor.conf.js --browser firefox
 
 notifications:
   webhooks:

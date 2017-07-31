@@ -41,7 +41,8 @@
     "@angular/platform-browser": "^4.0.0",
     "@angular/platform-browser-dynamic": "^4.0.0",
     "firebase": "^4.0.0",
-    "rxjs": "^5.0.1"
+    "rxjs": "^5.0.1",
+    "zone.js": "^0.8.0"
   },
   "devDependencies": {
     "@angular/compiler-cli": "^4.0.0",
@@ -79,8 +80,7 @@
     "systemjs": "^0.19.16",
     "systemjs-builder": "^0.15.7",
     "traceur": "0.0.96",
-    "typescript": "^2.3.2",
-    "zone.js": "^0.8.0"
+    "typescript": "^2.3.4"
   },
   "typings": "index.d.ts"
 }

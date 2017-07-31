@@ -27,6 +27,8 @@ module.exports = function(config) {
       'karma-test-shim.js',
       'node_modules/firebase/firebase.js',
       'dist/packages-dist/bundles/core.umd.{js,map}',
+      'dist/packages-dist/bundles/auth.umd.{js,map}',
+      'dist/packages-dist/bundles/database.umd.{js,map}',
       'dist/packages-dist/bundles/test.umd.{js,map}',
     ],
 

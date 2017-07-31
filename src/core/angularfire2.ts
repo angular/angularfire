@@ -42,9 +42,9 @@ export class AngularFireModule {
  * with zones.
  */
 export class ZoneScheduler {
-  constructor(public zone: any) {}
+  constructor(public zone: Zone) {}
 
-  schedule(...args): Subscription {
+  schedule(...args: any[]): Subscription {
     return <Subscription>this.zone.run(() => queue.schedule.apply(queue, args));
   }
 }
