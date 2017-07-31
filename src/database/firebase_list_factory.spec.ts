@@ -1,10 +1,9 @@
 import * as firebase from 'firebase/app';
-import { AngularFireDatabase } from './database';
-import { AngularFireDatabaseModule } from './database.module';
-import { FirebaseListObservable } from './firebase_list_observable';
-import { FirebaseListFactory, onChildAdded, onChildChanged, onChildRemoved, onChildUpdated } from './firebase_list_factory';
-import { FirebaseObjectFactory } from './firebase_object_factory';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule} from 'angularfire2';
+import { AngularFireDatabase, AngularFireDatabaseModule, FirebaseListObservable, 
+  FirebaseListFactory, onChildAdded, onChildChanged, onChildRemoved, onChildUpdated, 
+  FirebaseObjectFactory 
+} from 'angularfire2/database';
 import { TestBed, inject } from '@angular/core/testing';
 import * as utils from './utils';
 import { Query, AFUnwrappedDataSnapshot } from './interfaces';
@@ -22,7 +21,7 @@ const questionsPath = 'questions';
 function queryTest(observable: Observable<any>, subject: Subject<any>, done: any) {
   let nexted = false;
   skipAndTake(observable, 2)
-    .subscribe(val => {
+    .subscribe((val: any) => {
       if (!nexted) {
         subject.next('2');
       }
@@ -364,7 +363,7 @@ describe('FirebaseListFactory', () => {
 
   describe('methods', () => {
 
-    let toKey;
+    let toKey: any;
     let val1: any;
     let val2: any;
     let val3: any;
@@ -375,7 +374,7 @@ describe('FirebaseListFactory', () => {
     let subscription: Subscription;
 
     beforeEach((done: any) => {
-      toKey = (val) => val.key;
+      toKey = (val: any) => val.key;
       val1 = { key: 'key1' };
       val2 = { key: 'key2' };
       val3 = { key: 'key3' };
@@ -419,9 +418,9 @@ describe('FirebaseListFactory', () => {
           let calls: string[] = [];
           questions.$ref.ref.once('child_added', (snap) => calls.push('child_added:' + snap.val().number));
           skipAndTake(questions).subscribe(
-            (list) => {
+            (list: any) => {
               expect(calls).toEqual(['child_added:2', 'pushed']);
-              expect(list.map(i => i.number)).toEqual([1, 2]);
+              expect(list.map((i: any) => i.number)).toEqual([1, 2]);
               done();
             },
             done.fail
@@ -481,10 +480,10 @@ describe('FirebaseListFactory', () => {
 
     it('should re-emit identical instances of unchanged children', (done: any) => {
 
-      let prev;
+      let prev: any;
 
       take.call(questions, 2).subscribe(
-        (list) => {
+        (list: any) => {
           if (prev) {
             expect(list[0]).toBe(prev[0]);
             done();
@@ -501,10 +500,10 @@ describe('FirebaseListFactory', () => {
 
     it('should re-emit identical instances of unchanged children as snapshots', (done: any) => {
 
-      let prev;
+      let prev: any;
 
       take.call(questionsSnapshotted, 2).subscribe(
-        (list) => {
+        (list: any) => {
           if (prev) {
             expect(list[0]).toBe(prev[0]);
             done();
@@ -536,7 +535,7 @@ describe('FirebaseListFactory', () => {
         });
 
         take.call(query, 1).subscribe(
-          (list) => {
+          (list: any) => {
             expect(list.length).toEqual(1);
             expect(list[0].$key).toEqual("val1");
             done();
@@ -565,7 +564,7 @@ describe('FirebaseListFactory', () => {
         });
 
         take.call(query, 1).subscribe(
-          (list) => {
+          (list: any) => {
             expect(list.length).toEqual(1);
             expect(list[0].$key).toEqual("val1");
             done();
@@ -685,7 +684,7 @@ describe('FirebaseListFactory', () => {
         // Creating a new observable so that the current zone is captured.
         subscription = FirebaseListFactory(app.database().ref(`questions`))
           .filter(d => d
-            .map(v => v.$value)
+            .map((v: any) => v.$value)
             .indexOf('in-the-zone') > -1)
           .subscribe(data => {
             expect(Zone.current.name).toBe('newZone');
@@ -763,8 +762,8 @@ describe('FirebaseListFactory', () => {
           let promise2 = toPromise.call(take.call(query2, 1));
 
           Promise.all([promise1, promise2]).then(([list1, list2]) => {
-            expect(list1.map(i => i.$key)).toEqual(['val1', 'val2', 'val3']);
-            expect(list2.map(i => i.$key)).toEqual(['val2', 'val3']);
+            expect(list1.map((i: any) => i.$key)).toEqual(['val1', 'val2', 'val3']);
+            expect(list2.map((i: any) => i.$key)).toEqual(['val2', 'val3']);
             done();
           });
         })
@@ -801,8 +800,8 @@ describe('FirebaseListFactory', () => {
           let promise2 = toPromise.call(take.call(query2, 1));
 
           Promise.all([promise1, promise2]).then(([list1, list2]) => {
-            expect(list1.map(i => i.$key)).toEqual(['val1', 'val2', 'val3']);
-            expect(list2.map(i => i.$key)).toEqual(['val2']);
+            expect(list1.map((i: any) => i.$key)).toEqual(['val1', 'val2', 'val3']);
+            expect(list2.map((i: any) => i.$key)).toEqual(['val2']);
             done();
           });
         })
@@ -839,8 +838,8 @@ describe('FirebaseListFactory', () => {
           let promise2 = toPromise.call(take.call(query2, 1));
 
           Promise.all([promise1, promise2]).then(([list1, list2]) => {
-            expect(list1.map(i => i.$key)).toEqual(['val1', 'val2', 'val3']);
-            expect(list2.map(i => i.$key)).toEqual(['val1', 'val2']);
+            expect(list1.map((i: any) => i.$key)).toEqual(['val1', 'val2', 'val3']);
+            expect(list2.map((i: any) => i.$key)).toEqual(['val1', 'val2']);
             done();
           });
         })
@@ -867,7 +866,7 @@ describe('FirebaseListFactory', () => {
             }
           });
 
-          query = map.call(query, (list, index) => {
+          query = map.call(query, (list: any, index: any) => {
             switch (index) {
             case 0:
               subject.next(true);
@@ -886,8 +885,8 @@ describe('FirebaseListFactory', () => {
           query = take.call(query, 3);
           query = toArray.call(query);
 
-          toPromise.call(query).then((emits) => {
-            expect(emits.map(e => e.map(i => i.$key))).toEqual([
+          toPromise.call(query).then((emits: any) => {
+            expect(emits.map((e: any) => e.map((i: any) => i.$key))).toEqual([
               ['key1'],
               ['key2'],
               ['key2', 'key4']

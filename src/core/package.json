@@ -1,6 +1,6 @@
 {
   "name": "angularfire2",
-  "version": "4.0.0-rc.2",
+  "version": "ANGULARFIRE2_VERSION",
   "description": "The core module",
   "main": "./bundles/core.umd.js",
   "module": "index.js",
