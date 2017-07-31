@@ -578,8 +578,8 @@ describe('FirebaseListFactory', () => {
 
     it('should call off on all events when disposed', (done: any) => {
       const questionRef = app.database().ref().child('questions');
-      let firebaseSpy = spyOn(questionRef, 'off').and.callThrough();
       subscription = FirebaseListFactory(questionRef).subscribe(_ => {
+        let firebaseSpy = spyOn(questionRef, 'off').and.callThrough();
         expect(firebaseSpy).not.toHaveBeenCalled();
         subscription.unsubscribe();
         expect(firebaseSpy).toHaveBeenCalled();

@@ -4,9 +4,11 @@ const { Observable } = require('rxjs');
 const { copy, readFileSync, writeFile } = require('fs-extra');
 const { prettySize } = require('pretty-size');
 const gzipSize = require('gzip-size');
+const resolve = require('rollup-plugin-node-resolve');
 
 // Rollup globals
 const GLOBALS = {
+  'rxjs': 'Rx',
   'rxjs/Observable': 'Rx',
   'rxjs/Subject': 'Rx',
   'rxjs/Observer': 'Rx',
@@ -18,8 +20,14 @@ const GLOBALS = {
   'rxjs/operator/combineLatest': 'Rx.Observable.prototype',
   'rxjs/operator/merge': 'Rx.Observable.prototype',
   'rxjs/operator/map': 'Rx.Observable.prototype',
+  'rxjs/observable/of': 'Rx.Observable',
   'rxjs/operator/auditTime': 'Rx.Observable.prototype',
   'rxjs/operator/switchMap': 'Rx.Observable.prototype',
+  'rxjs/operator/do': 'Rx.Observable.prototype',
+  'rxjs/operator/skip': 'Rx.Observable.prototype',
+  'rxjs/operator/take': 'Rx.Observable.prototype',
+  'rxjs/operator/toArray': 'Rx.Observable.prototype',
+  'rxjs/operator/toPromise': 'Rx.Observable.prototype',
   'rxjs/operator': 'Rx.Observable.prototype',
   '@angular/core': 'ng.core',
   '@angular/compiler': 'ng.compiler',
@@ -29,7 +37,9 @@ const GLOBALS = {
   'firebase/database': 'firebase',
   'rxjs/scheduler/queue': 'Rx.Scheduler',
   '@angular/core/testing': 'ng.core.testing',
-  'angularfire2': 'angularfire2'
+  'angularfire2': 'angularfire2',
+  'angularfire2/auth': 'angularfire2.auth',
+  'angularfire2/database': 'angularfire2.database'
 };
 
 // Map of dependency versions across all packages
@@ -45,6 +55,7 @@ const VERSIONS = {
 const TSC = 'node_modules/.bin/tsc';
 const NGC = 'node_modules/.bin/ngc';
 const TSC_ARGS = (name, config = 'build') => [`-p`, `${process.cwd()}/src/${name}/tsconfig-${config}.json`];
+const TSC_TEST_ARGS = [`-p`, `${process.cwd()}/src/tsconfig-test.json`];
 
 /**
  * Create an Observable of a spawned child process.
@@ -61,33 +72,53 @@ function spawnObservable(command, args) {
   });
 }
 
+function generateBundle(entry, { dest, globals, moduleName }) {
+  return rollup({ entry }).then(bundle => {
+    return bundle.write({
+      format: 'umd',
+      external: Object.keys(globals),
+      plugins: [resolve()],
+      dest,
+      globals,
+      moduleName,
+    });
+  });
+}
+
 /**
- * Create a UMD bundle given a module name
+ * Create a UMD bundle given a module name.
  * @param {string} name 
  * @param {Object} globals 
  */
 function createUmd(name, globals) {
   // core module is angularfire2 the rest are angularfire2.feature
-  const moduleName = name === 'core' ? 'angularfire2' : `angularfire2.${name}`;
-  // core is at the root and the rest are in their own folders
-  const entry = name === 'core' ? `${process.cwd()}/dist/packages-dist/index.js` : 
-    `${process.cwd()}/dist/packages-dist/${name}/index.js`;
-  return rollup({ entry })
-    .then(bundle => {
-      const result = bundle.generate({
-        format: 'umd',
-        external: Object.keys(globals),
-        globals,
-        moduleName
-      });
-      return bundle.write({
-        format: 'umd',
-        dest: `${process.cwd()}/dist/packages-dist/bundles/${name}.umd.js`,
-        external: Object.keys(globals),
-        globals,
-        moduleName
-      });
-    });
+  const MODULE_NAMES = {
+    core: 'angularfire2',
+    auth: 'angularfire2.auth',
+    database: 'angularfire2.database',
+  };
+  const ENTRIES = {
+    core: `${process.cwd()}/dist/packages-dist/index.js`,
+    auth: `${process.cwd()}/dist/packages-dist/auth/index.js`,
+    database: `${process.cwd()}/dist/packages-dist/database/index.js`,
+  };
+  const moduleName = MODULE_NAMES[name];
+  const entry = ENTRIES[name];
+  return generateBundle(entry, {
+    dest: `${process.cwd()}/dist/packages-dist/bundles/${name}.umd.js`,
+    globals,
+    moduleName
+  });
+}
+
+function createTestUmd(globals) {
+  const entry = `${process.cwd()}/dist/root.spec.js`;
+  const moduleName = 'angularfire2.test';
+  return generateBundle(entry, {
+    dest: `${process.cwd()}/dist/packages-dist/bundles/test.umd.js`,
+    globals,
+    moduleName
+  });
 }
 
 /**
@@ -133,7 +164,7 @@ function replaceVersionsObservable(name, versions) {
     });
     const outPath = getDestPackageFile(name);
     writeFile(outPath, pkg, err => {
-      if(err) {
+      if (err) {
         observer.error(err);
       } else {
         observer.next(pkg);
@@ -147,6 +178,10 @@ function copyPackage(moduleName) {
   return copy(getSrcPackageFile(moduleName), getDestPackageFile(moduleName));
 }
 
+function copyRootTest() {
+  return copy(`${process.cwd()}/src/root.spec.js`, `${process.cwd()}/dist/root.spec.js`);
+}
+
 function measure(module, gzip = true) {
   const path = `${process.cwd()}/dist/packages-dist/bundles/${module}.umd.js`;
   const file = readFileSync(path);
@@ -157,18 +192,19 @@ function measure(module, gzip = true) {
 function buildModule(name, globals) {
   const es2015$ = spawnObservable(NGC, TSC_ARGS(name));
   const esm$ = spawnObservable(NGC, TSC_ARGS(name, 'esm'));
+  const test$ = spawnObservable(TSC, TSC_ARGS(name, 'test'));
   return Observable
-    .forkJoin(es2015$, esm$)
+    .forkJoin(es2015$, esm$, test$)
     .switchMap(() => Observable.from(createUmd(name, globals)))
     .switchMap(() => replaceVersionsObservable(name, VERSIONS));
 }
 
-function buildLibrary(globals) {
+function buildModules(globals) {
   const core$ = buildModule('core', globals);
   const auth$ = buildModule('auth', globals);
   const db$ = buildModule('database', globals);
   return Observable
-    .forkJoin(core$)
+    .forkJoin(core$, Observable.from(copyRootTest()))
     .switchMapTo(auth$)
     .switchMapTo(db$)
     .do(() => {
@@ -180,7 +216,14 @@ function buildLibrary(globals) {
     });
 }
 
-const $lib = buildLibrary(GLOBALS).subscribe(
+function buildLibrary(globals) {
+  const modules$ = buildModules(globals);
+  return Observable
+    .forkJoin(modules$)
+    .switchMap(() => Observable.from(createTestUmd(globals)));
+}
+
+buildLibrary(GLOBALS).subscribe(
   data => { console.log('data', data) },
   err => { console.log('err', err) },
   () => { console.log('complete') }

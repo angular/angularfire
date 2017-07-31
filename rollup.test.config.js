@@ -4,6 +4,6 @@ export default {
   entry: 'dist/test-root.js',
   dest: 'dist/bundles/test-root.umd.js',
   format: 'umd',
-  moduleName: 'angularFire2.test',
+  moduleName: 'angularfire2.test',
   globals
 }

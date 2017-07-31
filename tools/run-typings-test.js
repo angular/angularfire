@@ -28,7 +28,7 @@ ncp(pathToTestSrcFolder, pathToTestFolder, () => {
   const samplePackage = require(`${pathToTestFolder}/package.sample.json`);
 
   fs.writeFileSync(`${pathToTestFolder}/package.json`, JSON.stringify(samplePackage, null, 2)
-    .replace('{{ANGULARFIRE_VERSION}}', path.resolve(__dirname, '../dist'))
+    .replace('{{ANGULARFIRE_VERSION}}', path.resolve(__dirname, '../dist/packages-dist'))
     .replace('{{FIREBASE_VERSION}}', rootPackage.dependencies.firebase)
     .replace('{{RXJS_VERSION}}', rootPackage.dependencies.rxjs)
     .replace('{{ZONE_VERSION}}', rootPackage.devDependencies['zone.js'])
