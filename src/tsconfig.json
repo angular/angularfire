@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "angularfire2": ["./core"],
+      "angularfire2/auth": ["./auth"],
+      "angularfire2/database": ["./database"]
+    }
+  }
+}
