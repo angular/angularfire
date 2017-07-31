@@ -5,5 +5,11 @@
       "angularfire2/auth": ["./auth"],
       "angularfire2/database": ["./database"]
     }
-  }
+  },
+  "files": [
+    "../../node_modules/zone.js/dist/zone.js.d.ts",
+    "core/index.ts",
+    "auth/index.ts",
+    "database/index.ts"
+  ]
 }
