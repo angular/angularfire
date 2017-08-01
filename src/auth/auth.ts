@@ -42,9 +42,9 @@ export class AngularFireAuth {
 export function FirebaseAuthStateObservable(app: FirebaseApp): Observable<firebase.User> {
   const authState = Observable.create((observer: Observer<firebase.User>) => {
     app.auth().onAuthStateChanged(
-      (user?: firebase.User) => observer.next(user!),
+      (user: firebase.User) => observer.next(user!),
       (error: firebase.auth.Error) => observer.error(error),
-      () => observer.complete()
+      () => { observer.complete(); return undefined; }
     );
   });
   return observeOn.call(authState, new ZoneScheduler(Zone.current));
@@ -58,9 +58,9 @@ export function FirebaseAuthStateObservable(app: FirebaseApp): Observable<fireba
 export function FirebaseIdTokenObservable(app: FirebaseApp): Observable<firebase.User> {
   const idToken = Observable.create((observer: Observer<firebase.User>) => {
     app.auth().onIdTokenChanged(
-      (user?: firebase.User) => observer.next(user!),
+      (user: firebase.User) => observer.next(user!),
       (error: firebase.auth.Error) => observer.error(error),
-      () => observer.complete()
+      () => { observer.complete(); return undefined; }
     )
   });
   return observeOn.call(idToken, new ZoneScheduler(Zone.current));
