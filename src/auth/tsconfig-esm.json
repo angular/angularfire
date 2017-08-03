@@ -4,5 +4,16 @@
     "target": "es5",
     "outDir": "../../dist/packages-dist/auth",
     "declaration": true
-  }
+  },
+  "files": [
+    "public_api.ts",
+    "../../node_modules/zone.js/dist/zone.js.d.ts"
+  ],  
+  "angularCompilerOptions": {
+    "skipTemplateCodegen": true,
+    "strictMetadataEmit": true,
+    "enableSummariesForJit": false,
+    "flatModuleOutFile": "index.js",
+    "flatModuleId": "angularfire2/auth"
+  }    
 }

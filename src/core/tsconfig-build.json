@@ -17,12 +17,14 @@
     "moduleResolution": "node"
   },
   "files": [
-    "index.ts",
+    "public_api.ts",
     "../../node_modules/zone.js/dist/zone.js.d.ts"
   ],
   "angularCompilerOptions": {
     "skipTemplateCodegen": true,
     "strictMetadataEmit": true,
-    "enableSummariesForJit": false
+    "enableSummariesForJit": true,
+    "flatModuleOutFile": "index.js",
+    "flatModuleId": "angularfire2"
   }
 }

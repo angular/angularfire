@@ -1,2 +1,1 @@
-export * from './auth';
-export * from './auth.module';
+export * from './public_api';
