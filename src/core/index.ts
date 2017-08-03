@@ -1,1 +1,1 @@
-export * from './angularfire2';
+export * from './index.api';
