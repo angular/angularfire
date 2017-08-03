@@ -12,7 +12,7 @@
     "delayed_rollup": "sleep 5 && rollup --watch -c rollup.test.config.js",
     "build:watch": "rm -rf dist && concurrently \"tsc -w\" \"npm run delayed_rollup\"",
     "build": "rm -rf dist && tsc && rollup -c rollup.test.config.js",
-    "build_npm": "rm -rf dist && ngc -p tsconfig.publish.es6.json && rollup -c rollup.publish.config.js && npm run postbuild_npm",
+    "build_npm": "rm -rf dist && ngc -p tsconfig.publish.es6.json && rollup -c rollup.publish.config.js && rollup -c rollup.all.publish.config.js && npm run postbuild_npm",
     "build_e2e": "rm -rf dist-test && npm run build && tsc -p test/ && cp test/e2e/firebase_object/index.html dist-test/e2e/firebase_object/ && cp test/e2e/firebase_list/index.html dist-test/e2e/firebase_list/ && cp test/e2e/auth/index.html dist-test/e2e/auth/",
     "postbuild_npm": "cp package.json README.md .npmignore dist/ && npm run rewrite_npm_package",
     "rewrite_npm_package": "node tools/rewrite-published-package.js",
