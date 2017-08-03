@@ -63,7 +63,7 @@ C:\projects>npm install -g ionic
 
 ```
 
-Once the above commands are executed successfully, Check the versions of corodva and ionic by executing the following commands.
+Once the above commands are executed successfully, Check the versions of cordova and ionic by executing the following commands.
 
 ```bash
 C:\projects>cordova -v
@@ -500,11 +500,11 @@ C:\projects\auth-ng4-ionic3-af2> ionic run android
 
 This should run the app on your mobile phone. Now click on the Facebook button and you'll notice the button doesn't work anymore.
 This is because the code written so far is good for running our application in browsers, but when running the application on
-mobile phones, we need to have access to ***Native Mobile API's***, which are provided by _Corodova Plugins_.
+mobile phones, we need to have access to ***Native Mobile API's***, which are provided by _Cordova Plugins_.
 
-**We can access these corodva plugins, using Ionic Native, which are nothing but wrappers for cordova plugins.**
+**We can access these cordova plugins, using Ionic Native, which are nothing but wrappers for cordova plugins.**
 
-List of all Ionic Native API's for corodova plugins can be found [here](http://ionicframework.com/docs/v2/native/).
+List of all Ionic Native API's for cordova plugins can be found [here](http://ionicframework.com/docs/v2/native/).
 
 Let's look at configuring and installing facebook plugin [here](http://ionicframework.com/docs/v2/native/facebook/).
 _Ensure you follow the steps correctly to configure your app._
@@ -530,7 +530,7 @@ This should add following entry in your config.xml, located at the root of your 
 </plugin>
 
 ```
-This will install the corodva plugin for facebook. 
+This will install the cordova plugin for facebook. 
 
 You should also see a sub-folder named `cordova-plugin-facebook4` under your `plugins` folder.
 
