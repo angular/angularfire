@@ -4,6 +4,7 @@ import { Injectable, InjectionToken, OpaqueToken, NgModule } from '@angular/core
 import { Subscription } from 'rxjs/Subscription';
 import { Scheduler } from 'rxjs/Scheduler';
 import { queue } from 'rxjs/scheduler/queue';
+import 'zone.js';
 
 export interface FirebaseAppConfig {
   apiKey?: string;
