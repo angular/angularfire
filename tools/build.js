@@ -187,6 +187,10 @@ function copyNpmIgnore() {
   return copy(`${process.cwd()}/.npmignore`, `${process.cwd()}/dist/packages-dist/.npmignore`);
 }
 
+function copyReadme() {
+  return copy(`${process.cwd()}/README.md`, `${process.cwd()}/dist/packages-dist/README.md`);
+}
+
 function measure(module, gzip = true) {
   const path = `${process.cwd()}/dist/packages-dist/bundles/${module}.umd.js`;
   const file = readFileSync(path);
@@ -230,7 +234,8 @@ function buildLibrary(globals) {
   return Observable
     .forkJoin(modules$)
     .switchMap(() => Observable.from(createTestUmd(globals)))
-    .switchMap(() => Observable.from(copyNpmIgnore()));
+    .switchMap(() => Observable.from(copyNpmIgnore()))
+    .switchMap(() => Observable.from(copyReadme()));
 }
 
 buildLibrary(GLOBALS).subscribe(

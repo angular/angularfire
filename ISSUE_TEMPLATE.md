@@ -2,20 +2,16 @@
 
 IMPORTANT! YOU MUST FOLLOW THESE INSTRUCTIONS OR YOUR ISSUE WILL BE CLOSED.
 
-Thank you for contributing to the Firebase community!
+Thank you for contributing to the Angular and Firebase communities!
 
 Have a usage question?
 =======================
-We get lots of those and we love helping you, but GitHub is not the best place for them and they
-will be closed. Here are some resources to get help:
+We get lots of those and we love helping you, but GitHub is not the best place for them and they will be closed. Here are some resources to get help:
 
-- Start with the README: https://github.com/angular/angularfire2
 - Go through the Developer's Guide: https://github.com/angular/angularfire2#developer-guide
-- Read the full API reference: https://github.com/angular/angularfire2/blob/master/docs/api-reference.md
 
 If the official documentation doesn't help, try asking through our officially supported channels:
 
-- Angular Google Group: https://groups.google.com/forum/#!forum/angular
 - Firebase Google Group: https://groups.google.com/forum/#!forum/firebase-talk
 - Stack Overflow: https://stackoverflow.com/questions/tagged/angular (include the firebase and angularfire tags, too!)
 
@@ -23,8 +19,7 @@ If the official documentation doesn't help, try asking through our officially su
 
 Think you found a bug?
 =======================
-Yeah, we're definitely not perfect! Please use the bug report template below and include a minimal
-repro when opening the issue.
+Yeah, we're definitely not perfect! Please use the bug report template below and include a minimal repro when opening the issue.
 
 Have a feature request?
 ========================
