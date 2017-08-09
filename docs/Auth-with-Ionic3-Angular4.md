@@ -115,7 +115,7 @@ System:
 ```
 You need to ensure you've got Ionic Framework Version 3, as shown above.
 
-Alternatively you can open `package.json` to ensure you've got the following angualr and Ionic versions
+Alternatively you can open `package.json` to ensure you've got the following Angular and Ionic versions
 
 ```json
 "dependencies": {
