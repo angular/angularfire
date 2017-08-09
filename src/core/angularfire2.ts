@@ -4,7 +4,6 @@ import { Injectable, InjectionToken, OpaqueToken, NgModule } from '@angular/core
 import { Subscription } from 'rxjs/Subscription';
 import { Scheduler } from 'rxjs/Scheduler';
 import { queue } from 'rxjs/scheduler/queue';
-import 'zone.js';
 
 export interface FirebaseAppConfig {
   apiKey?: string;
@@ -43,7 +42,9 @@ export class AngularFireModule {
  * with zones.
  */
 export class ZoneScheduler {
-  constructor(public zone: Zone) {}
+
+  // TODO: Correctly add ambient zone typings instead of using any.
+  constructor(public zone: any) {}
 
   schedule(...args: any[]): Subscription {
     return <Subscription>this.zone.run(() => queue.schedule.apply(queue, args));
