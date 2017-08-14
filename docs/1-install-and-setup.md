@@ -244,3 +244,12 @@ If you run into this error while trying to invoke `ng serve`, open `src/typings.
 declare var require: any;
 declare var module: any;
 ```
+
+
+#### 3 firebase.d.ts is not a module
+
+If you run into this error while trying to invoke `ng serve`, update your typescript:
+
+```
+npm install -g typescript@latest
+```
