@@ -16,7 +16,7 @@ Status: Release candidate
 #### Quick links
 [Contributing](CONTRIBUTING.md)
 
-[Plunker Template](http://plnkr.co/edit/8yY4tH?p=preview) - Requires to set your Firebase credentials in `app.module.ts`.
+[Stackbliz Template](https://stackblitz.com/edit/angular-2ed5zx?) - Remember to set your Firebase configuration in `app/app.module.ts`.
 
 [Upgrading to v4.0? Check out our guide.](docs/version-4-upgrade.md)
 
@@ -29,8 +29,8 @@ npm install firebase angularfire2 --save
 ## Example use:
 
 ```ts
-import {Component} from '@angular/core';
-import {AngularFireDatabase, FirebaseListObservable} from 'angularfire2/database';
+import { Component } from '@angular/core';
+import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 
 @Component({
   selector: 'project-name-app',
