@@ -198,6 +198,32 @@ function measure(module, gzip = true) {
   return prettySize(bytes, gzip);
 }
 
+/**
+ * Returns each version of each AngularFire module.
+ * This is used to help ensure each package has the same verison.
+ */
+function getVersions() {
+  const paths = [
+    getDestPackageFile('core'),
+    getDestPackageFile('auth'),
+    getDestPackageFile('database')
+  ];
+  return paths
+    .map(path => require(path))
+    .map(pkgs => pkgs.version);
+}
+
+function verifyVersions() {
+  const versions = getVersions();
+  console.log(versions);
+  versions.map(version => {
+    if(version !== pkg.version) {
+      throw new Error('Versions mistmatch');
+      process.exit(1);
+    }
+  });
+}
+
 function buildModule(name, globals) {
   const es2015$ = spawnObservable(NGC, TSC_ARGS(name));
   const esm$ = spawnObservable(NGC, TSC_ARGS(name, 'esm'));
@@ -219,14 +245,7 @@ function buildModules(globals) {
   return Observable
     .forkJoin(core$, Observable.from(copyRootTest()))
     .switchMapTo(auth$)
-    .switchMapTo(db$)
-    .do(() => {
-      console.log(`
-      core.umd.js - ${measure('core')}
-      auth.umd.js - ${measure('auth')}
-      database.umd.js - ${measure('database')}
-      `);
-    });
+    .switchMapTo(db$);
 }
 
 function buildLibrary(globals) {
@@ -235,7 +254,15 @@ function buildLibrary(globals) {
     .forkJoin(modules$)
     .switchMap(() => Observable.from(createTestUmd(globals)))
     .switchMap(() => Observable.from(copyNpmIgnore()))
-    .switchMap(() => Observable.from(copyReadme()));
+    .switchMap(() => Observable.from(copyReadme()))
+    .do(() => {
+      console.log(`
+      core.umd.js - ${measure('core')}
+      auth.umd.js - ${measure('auth')}
+      database.umd.js - ${measure('database')}
+      `);
+      verifyVersions();
+    });
 }
 
 buildLibrary(GLOBALS).subscribe(
