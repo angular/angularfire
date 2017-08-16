@@ -16,7 +16,7 @@ Status: Release candidate
 #### Quick links
 [Contributing](CONTRIBUTING.md)
 
-[Stackbliz Template](https://stackblitz.com/edit/angular-2ed5zx?) - Remember to set your Firebase configuration in `app/app.module.ts`.
+[Stackblitz Template](https://stackblitz.com/edit/angular-2ed5zx?) - Remember to set your Firebase configuration in `app/app.module.ts`.
 
 [Upgrading to v4.0? Check out our guide.](docs/version-4-upgrade.md)
 
