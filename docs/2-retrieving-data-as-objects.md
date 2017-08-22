@@ -8,7 +8,7 @@ The guide below demonstrates how to retrieve, save, and remove data as objects.
 
 **Make sure you have bootstrapped your application for AngularFire2. See the Installation guide for bootstrap setup.**
 
-AngularFireDatabase is a service which can be injected through the constructor of your Angular component or `@Injectable()` service.
+`AngularFireDatabase` is a service which can be injected through the constructor of your Angular component or `@Injectable()` service.
 
 If you've followed the earlier step "Installation and Setup"  your `/src/app/app.component.ts` should look like below. 
 
@@ -33,7 +33,7 @@ In this section, we're going to modify the `/src/app/app.component.ts`  to retre
 
 ## Create an object binding
 
-Data is retrieved through the `af.database` service.
+Data is retrieved through the `AngularFireDatabase` service.
 
 There are two ways to create an object binding:
 
@@ -52,7 +52,7 @@ const absolute = db.object('https://<your-app>.firebaseio.com/item');
 To get the object in realtime, create an object binding as a property of your component or service.
 Then in your template, you can use the `async` pipe to unwrap the binding.
 
-Replace the FirebaseListObservable to FirebaseObjectObservable in your `/src/app/app.component.ts` as below.
+Replace the `FirebaseListObservable` to `FirebaseObjectObservable` in your `/src/app/app.component.ts` as below.
 Also notice the templateUrl changed to inline template below:
 
 ```ts
