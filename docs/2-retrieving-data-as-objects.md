@@ -82,7 +82,7 @@ The table below highlights some of the common methods on the `FirebaseObjectObse
 | method   |                    | 
 | ---------|--------------------| 
 | `set(value: any)`      | Replaces the current value in the database with the new value specified as the parameter. This is called a **destructive** update, because it deletes everything currently in place and saves the new value. | 
-| `update(value: Object)`   | Updates the current value with in the database with the new value specified as the parameter. This is called a **non-destructive** update, because it only updates the values specified. |
+| `update(value: Object)`   | Updates the current value with in the database with the new value specified as the parameter. This is called a **non-destructive** update, because it only updates the values specified. Note: Only values at the key level are non-destructive. |
 | `remove()`   | Deletes all data present at that location. Same as calling `set(null)`. |
 
 ## Returning promises
