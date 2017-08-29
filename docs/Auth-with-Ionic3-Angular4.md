@@ -12,11 +12,11 @@ This tutorial uses **Facebook** as the sign-in provider. After completion of thi
 other sign-in providers like **Twitter**, **Google** on your own.
 
 ### Prerequisites
-The first step is to ensure you've latest version of **Node** installed.
+The first step is to ensure you have latest version of **Node** installed.
 You can get the latest version from [here](https://nodejs.org).
 This will install both node and npm.
 
-After installing node, check the version by executing the following command in your prompt window.
+After installing node, check the version by executing the following command in your prompt window:
 
 ```bash
 
@@ -24,22 +24,22 @@ C:\projects>node -v
 v6.10.2
 
 ```
-As of writting this document, this is the most stable version. If you're not on this version,
+As of this writing, this is the most stable version. If you're not on this version,
 please upgrade yourself to latest version by installing node from [here](https://nodejs.org).
 
-Check your npm version by executing the following command.
+Check your npm version by executing the following command:
 ```bash
 
 C:\projects>npm -v
 3.10.10
 
 ```
-Install the Angular CLI, which will be used to build our Angular project and install Angular version 4 later.
+Install the Angular CLI, which will be used to build our Angular project and install Angular version 4 or later.
 
 ```bash
 C:\projects>npm install -g @angular/cli
 ```
-Check your angular version by executing the following command.
+Check your angular version by executing the following command:
 
 ```bash
 C:\projects>ng -v
@@ -63,7 +63,7 @@ C:\projects>npm install -g ionic
 
 ```
 
-Once the above commands are executed successfully, Check the versions of cordova and ionic by executing the following commands.
+Once the above commands are executed successfully, check the versions of cordova and ionic by executing the following commands.
 
 ```bash
 C:\projects>cordova -v
@@ -73,11 +73,11 @@ C:\projects>ionic -v
 3.4.0
 ```
 
-These are the latest versions as of writting this document.
+These are the latest versions as of this writing.
 
-On successful execution of above commands, you're all set to create your app with Ionic framework.
+On successful execution of the above commands, you're all set to create your app with Ionic framework.
 
-To create your app, change into the directory where you want your app to reside and execute the following command
+To create your app, change into the directory where you want your app to reside and execute the following command:
 
 ```bash
 C:\projects> ionic start auth-ng4-ionic3-af2 blank
@@ -85,7 +85,7 @@ C:\projects> ionic start auth-ng4-ionic3-af2 blank
 
 >The command ionic start will create the project with name "Ionic_AngularFire2_Project" using "blank" template.
 
-Change to the project directory, which was just created with above command
+Change to the project directory, which was just created with the above command.
 
 > C:\projects\auth-ng4-ionic3-af2>ionic info
 
@@ -115,7 +115,7 @@ System:
 ```
 You need to ensure you've got Ionic Framework Version 3, as shown above.
 
-Alternatively you can open `package.json` to ensure you've got the following Angular and Ionic versions
+Alternatively you can open `package.json` to ensure you've got the following Angular and Ionic versions:
 
 ```json
 "dependencies": {
@@ -147,19 +147,19 @@ Alternatively you can open `package.json` to ensure you've got the following Ang
 
 If not, replace them to match above. These are the latest as of writing this tutorial.
 
-To start your app, execute the following command
+To start your app, execute the following command:
 
 ```bash
 
 C:\projects\auth-ng4-ionic3-af2> ionic serve
 
 ```
-If everything is installed correctly, the app should open your browser with the dev server running at following url
+If everything is installed correctly, the app should open your browser with the dev server running at the following url
 **`http://localhost:8100`** and will display default home page.
 
 ### Configuring AngularFire2 and Firebase
 
-Install angularfire2 and firebase by executing the following command in your project directory
+Install angularfire2 and firebase by executing the following command in your project directory:
 
 ```ts
 
@@ -249,7 +249,7 @@ following changes:
 
 >3) Call the list method on AngularFireDatabase object.
 
-Your `home.ts` file should look like this.
+Your `home.ts` file should look like this:
 
 ```typescript
 
@@ -402,7 +402,7 @@ Also, update your `app.module.ts` to contain following import
 and add it to the imports array.
 
 
-Run the app and click on the Login Button, you should see a pop-up asking you to enter username and password for facebook to 
+Run the app and click on the Login Button, you should see a pop-up asking you to enter username and password for Facebook to 
 authenticate. Once authenticated, you should see the response from Facebook in console window.
 
 Inspect the Object in the console, under `user` property, you should see all the attributes and we're going to use two of them, next.
@@ -458,7 +458,7 @@ export class HomePage {
 
 ```
 
-and `home.html` shouldlook like this
+and `home.html` should look like this:
 
 ```html
 
@@ -486,12 +486,12 @@ which should open the facebook pop-up.
 Once you authenticate yourself, you should see your Facebook display name on your screen. 
 Click the Logout button, which will make the AuthState to null and you should see the difference on your screen.
 
-You can try redirecting yourself to another page to grab additional details from Facebook and experiement on your own.
+You can try redirecting yourself to another page to grab additional details from Facebook and experiment on your own.
 
 
 ***Running our application on mobile phone***
 
-Ensure you've the platform added to your project. If not add the platform by executing the following command.
+Ensure you've the platform added to your project. If not add the platform by executing the following command:
 
 ```
 
@@ -502,7 +502,7 @@ C:\projects\auth-ng4-ionic3-af2>ionic platform add android
 This adds android platform for your project.
 Replace android with ios, if you're on Mac book or add both. The generic command is ```ionic platform add <platform-name>```
 
-Now, let's try to run the app in browser. Execute the command
+Now, let's try to run the app in browser. Execute the command:
 
 ```
 
@@ -518,10 +518,10 @@ mobile phones, we need to have access to ***Native Mobile API's***, which are pr
 
 List of all Ionic Native API's for cordova plugins can be found [here](http://ionicframework.com/docs/v2/native/).
 
-Let's look at configuring and installing facebook plugin [here](http://ionicframework.com/docs/v2/native/facebook/).
+Let's look at configuring and installing the Facebook plugin [here](http://ionicframework.com/docs/v2/native/facebook/).
 _Ensure you follow the steps correctly to configure your app._
 
-Login to facebook dashboard [here](https://developers.facebook.com/apps/), go to your App and make a note of your App ID.
+Login to the Facebook dashboard [here](https://developers.facebook.com/apps/), go to your App and make a note of your App ID.
 Next go to command prompt in your project directory and execute the following command by replacing the `APP_ID` with your App Id 
 and `APP_NAME` with your App Name.
 
@@ -532,7 +532,7 @@ ionic cordova plugin add cordova-plugin-facebook4 --variable APP_ID="123456789" 
 
 ```
 
-This should add following entry in your config.xml, located at the root of your project.
+This should add the following entry in your config.xml, located at the root of your project:
 
 ```xml
 
@@ -546,7 +546,7 @@ This will install the cordova plugin for facebook.
 
 You should also see a sub-folder named `cordova-plugin-facebook4` under your `plugins` folder.
 
-Add the native dependencies by executing the following command.
+Add the native dependencies by executing the following command:
 
 ```bash
 
@@ -554,7 +554,7 @@ C:\projects\auth-ng4-ionic3-af2>npm install --save @ionic-native/facebook
 
 ```
 
-After executing the above command, ensure you got following entry in your `package.json`
+After executing the above command, ensure you have the following entry in your `package.json`:
 
 ```bash
 
@@ -572,7 +572,7 @@ import { Facebook } from '@ionic-native/facebook';
 
 Update the "signInWithFacebook" method and use Platform Service to determine the platform and run the appropriate code. 
 
-your `home.ts` should look as below
+Your `home.ts` should look as below:
 
 ```typescript
 
@@ -629,7 +629,7 @@ export class HomePage {
 
 You'll also need to add the "Facebook" object in the provider section in app.module.ts.
 
-The final `app.module.ts` should look like below
+The final `app.module.ts` should look like below:
 
 ```typescript
 
@@ -684,7 +684,7 @@ export class AppModule {}
 
 ```
 
-Verfiy your app is running in browser by executing the following command
+Verfiy your app is running in browser by executing the following command:
 
 ```bash
 
@@ -692,7 +692,7 @@ C:\projects\auth-ng4-ionic3-af2>ionic serve
 
 ```
 
-Everything should work. Now trying running the app on your android phone
+Everything should work. Now trying running the app on your android phone:
 
 ```bash
 
@@ -700,5 +700,5 @@ C:\projects\auth-ng4-ionic3-af2> ionic cordova run android
 
 ```
 
-Once the App launches click on the Login button. You should get the facebook pop-up window. Enter your credentials. 
+Once the App launches click on the Login button. You should get the Facebook pop-up window. Enter your credentials. 
 On successful authentication, you should see your Facebook Display name and profile picture on your screen.
