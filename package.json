@@ -33,6 +33,7 @@
     "@angular/platform-browser": "^4.0.0",
     "@angular/platform-browser-dynamic": "^4.0.0",
     "firebase": "^4.0.0",
+    "promise-polyfill": "6.0.2",
     "rxjs": "^5.0.1",
     "zone.js": "^0.8.0"
   },
