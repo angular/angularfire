@@ -1,6 +1,6 @@
 {
   "name": "angularfire2",
-  "version": "4.0.0-rc.2",
+  "version": "4.0.0-rc.3",
   "description": "The official library of Firebase and Angular.",
   "private": true,
   "scripts": {
@@ -33,6 +33,7 @@
     "@angular/platform-browser": "^4.0.0",
     "@angular/platform-browser-dynamic": "^4.0.0",
     "firebase": "^4.0.0",
+    "firestore": "file:firestore-module.tgz",
     "rxjs": "^5.0.1",
     "zone.js": "^0.8.0"
   },
@@ -72,7 +73,7 @@
     "systemjs": "^0.19.16",
     "systemjs-builder": "^0.15.7",
     "traceur": "0.0.96",
-    "typescript": "^2.3.4"
+    "typescript": "^2.4.2"
   },
   "typings": "index.d.ts"
 }

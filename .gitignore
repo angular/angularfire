@@ -9,3 +9,6 @@ npm-debug.log
 angularfire2-*.tgz
 *.ngfactory.ts
 *.ngsummary.json
+firestore-module.tgz
+.DS_Store
+yarn-error.log

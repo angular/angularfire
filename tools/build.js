@@ -49,7 +49,8 @@ const VERSIONS = {
   FIREBASE_VERSION: pkg.dependencies['firebase'],
   RXJS_VERSION: pkg.dependencies['rxjs'],
   ZONEJS_VERSION: pkg.dependencies['zone.js'],
-  ANGULARFIRE2_VERSION: pkg.version
+  ANGULARFIRE2_VERSION: pkg.version,
+  FIRESTORE_VERSION: pkg.dependencies['firestore']
 };
 
 // Constants for running typescript commands
@@ -97,11 +98,13 @@ function createUmd(name, globals) {
     core: 'angularfire2',
     auth: 'angularfire2.auth',
     database: 'angularfire2.database',
+    firestore: 'angularfire2.firestore'
   };
   const ENTRIES = {
     core: `${process.cwd()}/dist/packages-dist/index.js`,
     auth: `${process.cwd()}/dist/packages-dist/auth/index.js`,
     database: `${process.cwd()}/dist/packages-dist/database/index.js`,
+    firestore: `${process.cwd()}/dist/packages-dist/firestore/index.js`,
   };
   const moduleName = MODULE_NAMES[name];
   const entry = ENTRIES[name];
@@ -130,7 +133,8 @@ function getSrcPackageFile(moduleName) {
   const PATHS = {
     core: `${process.cwd()}/src/core/package.json`,
     auth: `${process.cwd()}/src/auth/package.json`,
-    database: `${process.cwd()}/src/database/package.json`
+    database: `${process.cwd()}/src/database/package.json`,
+    firestore: `${process.cwd()}/src/firestore/package.json`
   };
   return PATHS[moduleName];
 }
@@ -143,7 +147,8 @@ function getDestPackageFile(moduleName) {
   const PATHS = {
     core: `${process.cwd()}/dist/packages-dist/package.json`,
     auth: `${process.cwd()}/dist/packages-dist/auth/package.json`,
-    database: `${process.cwd()}/dist/packages-dist/database/package.json`
+    database: `${process.cwd()}/dist/packages-dist/database/package.json`,
+    firestore: `${process.cwd()}/dist/packages-dist/firestore/package.json`
   };
   return PATHS[moduleName];
 }
@@ -191,11 +196,13 @@ function copyReadme() {
   return copy(`${process.cwd()}/README.md`, `${process.cwd()}/dist/packages-dist/README.md`);
 }
 
-function measure(module, gzip = true) {
+function measure(module) {
   const path = `${process.cwd()}/dist/packages-dist/bundles/${module}.umd.js`;
   const file = readFileSync(path);
   const bytes = gzipSize.sync(file);
-  return prettySize(bytes, gzip);
+  const gzipped = prettySize(bytes, true);
+  const regular = prettySize(bytes);
+  return { regular, gzipped };
 }
 
 /**
@@ -206,7 +213,8 @@ function getVersions() {
   const paths = [
     getDestPackageFile('core'),
     getDestPackageFile('auth'),
-    getDestPackageFile('database')
+    getDestPackageFile('database'),
+    getDestPackageFile('firestore')
   ];
   return paths
     .map(path => require(path))
@@ -242,10 +250,12 @@ function buildModules(globals) {
   const core$ = buildModule('core', globals);
   const auth$ = buildModule('auth', globals);
   const db$ = buildModule('database', globals);
+  const afs$ = buildModule('firestore', globals);
   return Observable
     .forkJoin(core$, Observable.from(copyRootTest()))
     .switchMapTo(auth$)
-    .switchMapTo(db$);
+    .switchMapTo(db$)
+    .switchMapTo(afs$);
 }
 
 function buildLibrary(globals) {
@@ -256,10 +266,15 @@ function buildLibrary(globals) {
     .switchMap(() => Observable.from(copyNpmIgnore()))
     .switchMap(() => Observable.from(copyReadme()))
     .do(() => {
+      const core = measure('core');
+      const auth = measure('auth');
+      const database = measure('database');
+      const firestore = measure('firestore');
       console.log(`
-      core.umd.js - ${measure('core')}
-      auth.umd.js - ${measure('auth')}
-      database.umd.js - ${measure('database')}
+      core.umd.js - ${core.regular}, ${core.gzipped}
+      auth.umd.js - ${auth.regular}, ${auth.gzipped}}
+      database.umd.js - ${database.regular}, ${database.gzipped}}
+      firestore.umd.js - ${firestore.regular}, ${firestore.gzipped}}
       `);
       verifyVersions();
     });
