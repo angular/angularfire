@@ -40,7 +40,8 @@ const GLOBALS = {
   '@angular/core/testing': 'ng.core.testing',
   'angularfire2': 'angularfire2',
   'angularfire2/auth': 'angularfire2.auth',
-  'angularfire2/database': 'angularfire2.database'
+  'angularfire2/database': 'angularfire2.database',
+  'angularfire2/firestore': 'angularfire2.firestore'
 };
 
 // Map of dependency versions across all packages

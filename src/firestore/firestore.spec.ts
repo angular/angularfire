@@ -5,9 +5,9 @@ import * as firebase from 'firebase/app';
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from './test-config';
 
-describe('AngularFirestore', () => {
+fdescribe('AngularFirestore', () => {
   let app: firebase.app.App;
-  let db: AngularFirestore;
+  let afs: AngularFirestore;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -16,9 +16,9 @@ describe('AngularFirestore', () => {
         AngularFirestoreModule
       ]
     });
-    inject([FirebaseApp, AngularFirestore], (_app: firebase.app.App, _db: AngularFirestore) => {
+    inject([FirebaseApp, AngularFirestore], (_app: firebase.app.App, _afs: AngularFirestore) => {
       app = _app;
-      db = _db;
+      afs = _afs;
     })();
   });
 
@@ -26,6 +26,15 @@ describe('AngularFirestore', () => {
     app.delete().then(done, done.fail);
     // ref.off();
     // ref.remove(done);
+  });
+
+  describe('AngularFirestore', () => {
+
+    // document
+    it('should have an initialized Firebase app', () => {
+      expect(afs.app).toBeDefined();
+    });
+
   });
 
 });
