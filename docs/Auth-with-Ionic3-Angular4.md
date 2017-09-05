@@ -163,7 +163,7 @@ Install angularfire2 and firebase by executing the following command in your pro
 
 ```ts
 
-C:\projects\auth-ng4-ionic3-af2>npm install angularfire2 firebase --save
+C:\projects\auth-ng4-ionic3-af2>npm install angularfire2 firebase promise-polyfill --save
 
 ```
 
