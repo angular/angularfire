@@ -4,7 +4,7 @@
   "description": "The official library of Firebase and Angular.",
   "private": true,
   "scripts": {
-    "test": "karma start --single-run",
+    "test": "npm run build && karma start --single-run",
     "test:watch": "concurrently \"npm run build:watch\" \"npm run delayed_karma\"",
     "test:debug": "npm run build && karma start",
     "delayed_karma": "sleep 10 && karma start",
@@ -20,7 +20,7 @@
     "type": "git",
     "url": "git+https://github.com/angular/angularfire2.git"
   },
-  "author": "jeffbcross,davideast",
+  "author": "davideast",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/angular/angularfire2/issues"

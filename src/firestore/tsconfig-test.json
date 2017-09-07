@@ -2,6 +2,7 @@
   "extends": "./tsconfig-esm.json",
   "compilerOptions": {
     "baseUrl": ".",
+    "target": "es2015",
     "paths": {
       "angularfire2": ["../../dist/packages-dist"],
       "angularfire2/firestore": ["../../dist/packages-dist/firestore"]

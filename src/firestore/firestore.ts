@@ -3,6 +3,7 @@ import 'firestore';
 import { Firestore, CollectionReference, DocumentReference, Query, DocumentChangeType, SnapshotMetadata, DocumentSnapshot, QuerySnapshot, DocumentChange } from 'firestore';
 import { Observable } from 'rxjs/Observable';
 import { Subscriber } from 'rxjs/Subscriber';
+import 'rxjs/add/operator/map';
 
 import { Injectable } from '@angular/core';
 import { FirebaseApp } from 'angularfire2';
@@ -231,12 +232,21 @@ export class AngularFirestoreDocument<T> implements ArrayLike<T> {
   }
 
   /**
-   * Listen to data in the document.
+   * Listen to snapshot updates from the document.
    */
-  valueChanges(): Observable<DocumentSnapshot> {
+  snapshotChanges(): Observable<DocumentSnapshot> {
     return new Observable<DocumentSnapshot>(subscriber => {
       const unsubscribe = this.ref.onSnapshot(subscriber);
       return { unsubscribe };
+    });
+  }
+
+  /**
+   * Listen to unwrapped snapshot updates from the document.
+   */  
+  valueChanges(): Observable<T> {
+    return this.snapshotChanges().map(snap => {
+      return (snap.exists ? snap.data() : null) as T;
     });
   }
 
@@ -315,19 +325,27 @@ export class AngularFirestoreCollection<T> implements ArrayLike<T> {
    */  
   constructor(
     public readonly ref: CollectionReference,
-    public readonly query: Query) { }
+    private readonly query: Query) { }
 
   /**
    * Listen to all documents in the collection and its possible query as an Observable.
    * This method returns a stream of DocumentSnapshots which gives the ability to get
    * the data set back as array and/or the delta updates in the collection.
-   */    
-  valueChanges<T>(): Observable<T[]> {
+   */
+  snapshotChanges(): Observable<QuerySnapshot> {
     return new Observable<QuerySnapshot>(subscriber => {
       const unsubscribe = this.query.onSnapshot(subscriber);
       return { unsubscribe };
-    })
-    .map(snap => snap.docs.map(doc => doc.data()) as T[]);
+    });
+  }
+
+  /**
+   * Listen to all documents in the collection and its possible query as an Observable.
+   * This method returns a stream of unwrapped snapshots.
+   */  
+  valueChanges(): Observable<T[]> {
+    return this.snapshotChanges()
+      .map(snap => snap.docs.map(doc => doc.data()) as T[]);
   }
 
   /**
@@ -363,7 +381,7 @@ export class AngularFirestoreCollection<T> implements ArrayLike<T> {
    * on a non-existent document. We are converting to null to provide
    * flexibility in the view template.
    */  
-  [Symbol.observable]() {
+  [Symbol.observable] () {
     const query = this.query;
     return {
       subscribe(subscriber: Subscriber<T[]>) {
