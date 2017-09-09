@@ -4,6 +4,8 @@
 The `FirebaseObjectObservable` is not created by itself, but through the `AngularFireDatabase` service. 
 The guide below demonstrates how to retrieve, save, and remove data as objects.
 
+_You should retrieve data as an object when you do not plan iterating over it, to iterate over data use **Retrieving data as list** [here](3-retrieving-data-as-lists.md)._
+
 ## Injecting the AngularFireDatabase service
 
 **Make sure you have bootstrapped your application for AngularFire2. See the Installation guide for bootstrap setup.**
