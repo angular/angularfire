@@ -1,13 +1,6 @@
 import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs/Observable';
 
-export interface AngularFireList<T> {
-  query: DatabaseQuery;
-  valueChanges<T>(events: ChildEvent[]): Observable<T[]>;
-  //snapshotChanges<T>(): Observable<DatabaseSnapshot>;
-  //childChanges<T>(events: ChildEvent[]): Observable<DatabaseSnapshot>;
-}
-
 export interface FirebaseOperationCases {
   stringCase: () => firebase.Promise<void>;
   firebaseCase?: () => firebase.Promise<void>;
@@ -84,15 +77,6 @@ export enum QueryOptions {
   EqualTo,
   StartAt,
   EndAt
-}
-
-export type QueryFn = (ref: DatabaseReference) => DatabaseQuery;
-export type ChildEvent = 'added' | 'removed' | 'changed' | 'moved';
-export type ListenEvent = 'value' | ChildEvent;
-
-export type SnapshotChange = { 
-  event: string; 
-  snapshot: DatabaseSnapshot | null; 
 }
 
 export type Primitive = number | string | boolean;

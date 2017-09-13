@@ -1,8 +1,8 @@
-import { fromRef } from './fromRef';
+import { fromRef } from '../observable/fromRef';
 import { Observable } from 'rxjs/Observable';
 import { DatabaseQuery, ChildEvent, SnapshotChange} from '../interfaces';
 
-export function changes<T>(ref: DatabaseQuery, events: ChildEvent[]): Observable<SnapshotChange[]> {
+export function listChanges<T>(ref: DatabaseQuery, events: ChildEvent[]): Observable<SnapshotChange[]> {
   const childEvent$ = events.map(event => fromRef(ref, event));
   return Observable.merge(...childEvent$)
   .scan((current, change) => {
