@@ -55,3 +55,16 @@ export function getRef(app: FirebaseApp, pathRef: PathReference): DatabaseRefere
   }
   return app.database().ref(path);
 }
+
+export function checkOperationCases(item: FirebaseOperation, cases: FirebaseOperationCases) : firebase.Promise<void> {
+  if (utils.isString(item)) {
+    return cases.stringCase();
+  } else if (utils.isFirebaseRef(item)) {
+    return cases.firebaseCase!();
+  } else if (utils.isFirebaseDataSnapshot(item)) {
+    return cases.snapshotCase!();
+  } else if (utils.isAFUnwrappedSnapshot(item)) {
+    return cases.unwrappedSnapshotCase!()
+  }
+  throw new Error(`Method requires a key, snapshot, reference, or unwrapped snapshot. Got: ${typeof item}`);
+}

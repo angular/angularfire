@@ -1,10 +1,16 @@
 import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs/Observable';
 
+export type FirebaseOperation = string | firebase.database.Reference | firebase.database.DataSnapshot;
+
 export interface ListReference<T> {
   query: DatabaseQuery;
   valueChanges<T>(events?: ChildEvent[]): Observable<T[]>;
   snapshotChanges<T>(events?: ChildEvent[]): Observable<DatabaseSnapshot[]>;
+  update(item: FirebaseOperation, data: T): Promise<any>;
+  set(item: FirebaseOperation, data: T): Promise<any>;
+  push(data: T): Promise<any>;
+  remove(item: FirebaseOperation): Promise<any>;
 }
 
 export interface ObjectReference<T> {
