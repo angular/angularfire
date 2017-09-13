@@ -6,7 +6,7 @@
     "module": "es2015",
     "target": "es2015",
     "noImplicitAny": false,
-    "outDir": "../../dist/packages-dist/database/es2015",
+    "outDir": "../../dist/packages-dist/database-deprecated/es2015",
     "rootDir": ".",
     "sourceMap": true,
     "inlineSources": true,

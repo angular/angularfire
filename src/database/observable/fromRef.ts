@@ -1,5 +1,6 @@
 import { DatabaseQuery, DatabaseSnapshot, ListenEvent, SnapshotChange } from '../interfaces';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
 
 /**
  * Create an observable from a Database Reference or Database Query.
