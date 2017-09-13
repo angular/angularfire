@@ -2,10 +2,18 @@ import * as firebase from 'firebase/app';
 import { Subscription } from 'rxjs/Subscription';
 import { Scheduler } from 'rxjs/Scheduler';
 import { queue } from 'rxjs/scheduler/queue';
-import { PathReference, DatabaseReference } from './interfaces';
+import { PathReference, DatabaseReference, FirebaseOperation, FirebaseOperationCases } from './interfaces';
 import { FirebaseApp } from 'angularfire2';
 
 const REGEX_ABSOLUTE_URL = /^[a-z]+:\/\/.*/;
+
+export function isString(value: any): boolean {
+  return typeof value === 'string';
+}
+
+export function isFirebaseDataSnapshot(value: any): boolean {
+  return typeof value.exportVal === 'function';
+}
 
 export function isNil(obj: any): boolean {
   return obj === undefined || obj === null;
@@ -56,15 +64,13 @@ export function getRef(app: FirebaseApp, pathRef: PathReference): DatabaseRefere
   return app.database().ref(path);
 }
 
-export function checkOperationCases(item: FirebaseOperation, cases: FirebaseOperationCases) : firebase.Promise<void> {
-  if (utils.isString(item)) {
+export function checkOperationCases(item: FirebaseOperation, cases: FirebaseOperationCases) : Promise<void | any> {
+  if (isString(item)) {
     return cases.stringCase();
-  } else if (utils.isFirebaseRef(item)) {
+  } else if (isFirebaseRef(item)) {
     return cases.firebaseCase!();
-  } else if (utils.isFirebaseDataSnapshot(item)) {
+  } else if (isFirebaseDataSnapshot(item)) {
     return cases.snapshotCase!();
-  } else if (utils.isAFUnwrappedSnapshot(item)) {
-    return cases.unwrappedSnapshotCase!()
   }
-  throw new Error(`Method requires a key, snapshot, reference, or unwrapped snapshot. Got: ${typeof item}`);
+  throw new Error(`Method requires a key, snapshot, reference. Got: ${typeof item}`);
 }

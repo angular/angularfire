@@ -7,10 +7,10 @@ export interface ListReference<T> {
   query: DatabaseQuery;
   valueChanges<T>(events?: ChildEvent[]): Observable<T[]>;
   snapshotChanges<T>(events?: ChildEvent[]): Observable<DatabaseSnapshot[]>;
-  update(item: FirebaseOperation, data: T): Promise<any>;
-  set(item: FirebaseOperation, data: T): Promise<any>;
-  push(data: T): Promise<any>;
-  remove(item: FirebaseOperation): Promise<any>;
+  update(item: FirebaseOperation, data: T): Promise<void>;
+  set(item: FirebaseOperation, data: T): Promise<void>;
+  push(data: T): firebase.database.ThenableReference;
+  remove(item?: FirebaseOperation): Promise<any>;
 }
 
 export interface ObjectReference<T> {
@@ -20,10 +20,10 @@ export interface ObjectReference<T> {
 }
 
 export interface FirebaseOperationCases {
-  stringCase: () => firebase.Promise<void>;
-  firebaseCase?: () => firebase.Promise<void>;
-  snapshotCase?: () => firebase.Promise<void>;
-  unwrappedSnapshotCase?: () => firebase.Promise<void>;
+  stringCase: () => Promise<void | any>;
+  firebaseCase?: () => Promise<void | any>;
+  snapshotCase?: () => Promise<void | any>;
+  unwrappedSnapshotCase?: () => Promise<void | any>;
 }
 
 export type QueryFn = (ref: DatabaseReference) => DatabaseQuery;
