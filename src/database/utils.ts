@@ -5,8 +5,6 @@ import { queue } from 'rxjs/scheduler/queue';
 import { PathReference, DatabaseReference, FirebaseOperation, FirebaseOperationCases } from './interfaces';
 import { FirebaseApp } from 'angularfire2';
 
-const REGEX_ABSOLUTE_URL = /^[a-z]+:\/\/.*/;
-
 export function isString(value: any): boolean {
   return typeof value === 'string';
 }
@@ -23,28 +21,6 @@ export function isFirebaseRef(value: any): boolean {
   return typeof value.set === 'function';
 }
 
-function getAbsUrl(root: string, url:string) {
-  if (!(/^[a-z]+:\/\/.*/.test(url))) {
-    // Provided url is relative.
-    // Strip any leading slash
-    url = root + '/' + stripLeadingSlash(url);
-  }
-  return url;
-}
-
-export function stripLeadingSlash(value: string): string {
-  // Is the last char a /
-  if (value.substring(0, 1) === '/') {
-    return value.substring(1, value.length);
-  } else {
-    return value;
-  }
-}
-
-export function isAbsoluteUrl(url: string) {
-  return REGEX_ABSOLUTE_URL.test(url);
-}
-
 /**
  * Returns a database reference given a Firebase App and an
  * absolute or relative path.
@@ -53,15 +29,8 @@ export function isAbsoluteUrl(url: string) {
  */
 export function getRef(app: FirebaseApp, pathRef: PathReference): DatabaseReference {
   // if a db ref was passed in, just return it
-  if(isFirebaseRef(pathRef)) {
-    return pathRef as DatabaseReference;
-  }
-
-  const path = pathRef as string;
-  if(isAbsoluteUrl(<string>pathRef)) {
-    return app.database().refFromURL(path);
-  }
-  return app.database().ref(path);
+  return isFirebaseRef(pathRef) ? pathRef as DatabaseReference 
+    : app.database().ref(pathRef as string);
 }
 
 export function checkOperationCases(item: FirebaseOperation, cases: FirebaseOperationCases) : Promise<void | any> {
@@ -72,5 +41,5 @@ export function checkOperationCases(item: FirebaseOperation, cases: FirebaseOper
   } else if (isFirebaseDataSnapshot(item)) {
     return cases.snapshotCase!();
   }
-  throw new Error(`Method requires a key, snapshot, reference. Got: ${typeof item}`);
+  throw new Error(`Expects a string, snapshot, or reference. Got: ${typeof item}`);
 }

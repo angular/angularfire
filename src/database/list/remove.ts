@@ -15,4 +15,3 @@ export function createRemoveMethod(ref: DatabaseReference) {
     }) as any;
   }
 }
-

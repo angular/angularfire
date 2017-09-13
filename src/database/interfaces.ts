@@ -17,6 +17,9 @@ export interface ObjectReference<T> {
   query: DatabaseQuery;
   valueChanges<T>(): Observable<T | null>;
   snapshotChanges<T>(): Observable<DatabaseSnapshot | null>;
+  update(data: T): Promise<any>;
+  set(data: T): Promise<void>;
+  remove(): Promise<any>;
 }
 
 export interface FirebaseOperationCases {
