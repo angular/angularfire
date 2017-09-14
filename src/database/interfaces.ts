@@ -36,6 +36,12 @@ export type ListenEvent = 'value' | ChildEvent;
 export type SnapshotChange = { 
   event: string; 
   snapshot: DatabaseSnapshot | null; 
+  prevKey: string | undefined;
+}
+
+export interface SnapshotPrevKey {
+  snapshot: DatabaseSnapshot | null;
+  prevKey: string | undefined;
 }
 
 export type Primitive = number | string | boolean;

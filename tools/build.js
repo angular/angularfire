@@ -32,6 +32,8 @@ const GLOBALS = {
   'rxjs/add/operator/map': 'Rx.Observable.prototype',
   'rxjs/add/operator/scan': 'Rx.Observable.prototype',
   'rxjs/add/observable/merge': 'Rx.Observable',
+  'rxjs/add/operator/delay': 'Rx.Observable',
+  'rxjs/add/operator/debounce': 'Rx.Observable',
   'rxjs/observable/fromEvent': 'Rx.Observable',
   'rxjs/operator': 'Rx.Observable.prototype',
   '@angular/core': 'ng.core',

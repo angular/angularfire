@@ -6,3 +6,26 @@ export function validateEventsArray(events?: any[]) {
   }
   return events;
 }
+
+export function positionFor(changes, key) {
+  const len = changes.length;
+  for(let i=0; i<len; i++) {
+    if(changes[i].snapshot.key === key) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+export function positionAfter(changes, prevKey: string) {
+  if(prevKey === null) { 
+    return 0; 
+  } else {
+    const i = positionFor(changes, prevKey);
+    if( i === -1) {
+      return changes.length;
+    } else {
+      return i + 1;
+    }
+  }
+}

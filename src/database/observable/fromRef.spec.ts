@@ -8,16 +8,14 @@ import { COMMON_CONFIG } from '../test-config';
 const rando = () => (Math.random() + 1).toString(36).substring(7);
 const FIREBASE_APP_NAME = rando();
 
-fdescribe('fromRef', () => {
+describe('fromRef', () => {
   let app: FirebaseApp;
-  let db: AngularFireDatabase;
   let ref: (path: string) => firebase.database.Reference;
   let batch = {};
-  const items = [{ name: 'one' }, { name: 'two' }, { name: 'three' }];
+  const items = [{ name: 'one' }, { name: 'two' }, { name: 'three' }].map(item => ( { key: rando(), ...item } ));
   Object.keys(items).forEach(function (key) {
-    var pushId = rando();
-    var itemValue = items[key];
-    batch[pushId] = itemValue;
+    const itemValue = items[key];
+    batch[itemValue.key] = itemValue;
   });
   // make batch immutable to preserve integrity
   batch = Object.freeze(batch);
@@ -29,12 +27,10 @@ fdescribe('fromRef', () => {
         AngularFireDatabaseModule
       ]
     });
-    inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {
+    inject([FirebaseApp], (app_: FirebaseApp) => {
       app = app_;
-      db = _db;
       app.database().goOffline();
       ref = (path: string) => { app.database().goOffline(); return app.database().ref(path); };
-      ref('items').set(batch);
     })();
   });
 
@@ -42,41 +38,135 @@ fdescribe('fromRef', () => {
     app.delete().then(done, done.fail);
   });
 
-  describe('child_added', () => {
+  it('it should be async', (done) => {
+    const itemRef = ref(rando());
+    itemRef.set(batch);
+    const obs = fromRef(itemRef, 'value');
+    let count = 0;
+    expect(count).toEqual(0);
+    const sub = obs.subscribe(change => {
+      count = count + 1;
+      expect(count).toEqual(1);
+      done();
+      sub.unsubscribe();
+    });
+    expect(count).toEqual(0);
+  });
 
-    it('should stream back a child_added event', (done: any) => {
-      const obs = fromRef(ref('items'), 'child_added');
+  it('it should listen and then unsubscribe', (done) => {
+    const itemRef = ref(rando());
+    itemRef.set(batch);
+    const obs = fromRef(itemRef, 'value');
+    let count = 0;
+    const sub = obs.subscribe(change => {
+      count = count + 1;
+      // hard coding count to one will fail if the unsub
+      // doesn't actually unsub
+      expect(count).toEqual(1);
+      done();
+      sub.unsubscribe();
+      itemRef.push({ name: 'anotha one' });
+    });
+  });
+
+  describe('events', () => {
+
+    it('should stream back a child_added event', async (done: any) => {
+      const itemRef = ref(rando());
+      itemRef.set(batch);
+      const obs = fromRef(itemRef, 'child_added');
       let count = 0;
       const sub = obs.subscribe(change => {
-        console.log(sub);
         count = count + 1;
         const { event, snapshot } = change;
         expect(event).toEqual('child_added');
         expect(snapshot!.val()).toEqual(batch[snapshot!.key!]);
         if (count === items.length) {
           done();
+          sub.unsubscribe();
+          expect(sub.closed).toEqual(true);
         }
-        //sub.unsubscribe();
-        //expect(sub.closed).toEqual(true);
       });
     });
 
-  });
-
-  describe('value', () => {
+    it('should stream back a child_changed event', async (done: any) => {
+      const itemRef = ref(rando());
+      itemRef.set(batch);
+      const obs = fromRef(itemRef, 'child_changed');
+      const name = 'look at what you made me do';
+      const key = items[0].key;
+      const sub = obs.subscribe(change => {
+        const { event, snapshot } = change;
+        expect(event).toEqual('child_changed');
+        expect(snapshot!.key).toEqual(key);
+        expect(snapshot!.val()).toEqual({ key, name });
+        sub.unsubscribe();
+        done();
+      });
+      itemRef.child(key).update({ name });
+    });
+    
+    it('should stream back a child_removed event', async (done: any) => {
+      const itemRef = ref(rando());
+      itemRef.set(batch);
+      const obs = fromRef(itemRef, 'child_removed');
+      const key = items[0].key;
+      const name = items[0].name;
+      const sub = obs.subscribe(change => {
+        const { event, snapshot } = change;
+        expect(event).toEqual('child_removed');
+        expect(snapshot!.key).toEqual(key);
+        expect(snapshot!.val()).toEqual({ key, name });
+        sub.unsubscribe();
+        done();
+      });
+      itemRef.child(key).remove();
+    });
+    
+    it('should stream back a child_moved event', async (done: any) => {
+      const itemRef = ref(rando());
+      itemRef.set(batch);
+      const obs = fromRef(itemRef, 'child_moved');
+      const key = items[2].key;
+      const name = items[2].name;
+      const sub = obs.subscribe(change => {
+        const { event, snapshot } = change;
+        expect(event).toEqual('child_moved');
+        expect(snapshot!.key).toEqual(key);
+        expect(snapshot!.val()).toEqual({ key, name });
+        sub.unsubscribe();
+        done();
+      });
+      itemRef.child(key).setPriority(-100, () => {});
+    });    
 
     it('should stream back a value event', (done: any) => {
-      const obs = fromRef(ref('items'), 'value');
+      const itemRef = ref(rando());
+      itemRef.set(batch);
+      const obs = fromRef(itemRef, 'value');
       const sub = obs.subscribe(change => {
         const { event, snapshot } = change;
         expect(event).toEqual('value');
         expect(snapshot!.val()).toEqual(batch);
         done();
-        // sub.unsubscribe();
-        // expect(sub.closed).toEqual(true);
+        sub.unsubscribe();
+        expect(sub.closed).toEqual(true);
+      });
+    });  
+
+    it('should stream back query results', (done: any) => {
+      const itemRef = ref(rando());
+      itemRef.set(batch).then(console.log);
+      const query = itemRef.orderByChild('name').equalTo(items[0].name);
+      const obs = fromRef(query, 'value');
+      const sub = obs.subscribe(change => {
+        let child;
+        change.snapshot!.forEach(snap => { child = snap.val(); return true; });
+        expect(child).toEqual(items[0]);
+        done();
       });
     });
-
+    
   });
 
 });
