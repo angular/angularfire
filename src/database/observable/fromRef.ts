@@ -9,11 +9,9 @@ import 'rxjs/add/operator/map';
  */
 export function fromRef(ref: DatabaseQuery, event: ListenEvent): Observable<SnapshotChange> {
   return new Observable<DatabaseSnapshot | null>(subscriber => {
-    ref.on(event, subscriber.next, subscriber.error);
-    return { 
-      unsubscribe() { 
-        ref.off(event); 
-      } 
-    };
-  }).map(snapshot => ({ event, snapshot }));
+    debugger;
+    const fn = ref.on(event, subscriber.next.bind(subscriber), subscriber.error.bind(subscriber));
+    return { unsubscribe() { ref.off(event, fn); } }
+  })  
+  .map((snapshot: DatabaseSnapshot) => ({ event, snapshot }));
 }

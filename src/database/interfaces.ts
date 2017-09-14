@@ -30,7 +30,7 @@ export interface FirebaseOperationCases {
 }
 
 export type QueryFn = (ref: DatabaseReference) => DatabaseQuery;
-export type ChildEvent = 'added' | 'removed' | 'changed' | 'moved';
+export type ChildEvent = 'child_added' | 'child_removed' | 'child_changed' | 'child_moved';
 export type ListenEvent = 'value' | ChildEvent;
 
 export type SnapshotChange = { 

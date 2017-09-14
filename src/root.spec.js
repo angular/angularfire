@@ -8,3 +8,4 @@ export * from './packages-dist/database-deprecated/query_observable.spec';
 export * from './packages-dist/auth/auth.spec';
 export * from './packages-dist/database/database.spec';
 export * from './packages-dist/database/utils.spec';
+export * from './packages-dist/database/observable/fromRef.spec';

@@ -2,20 +2,12 @@ import * as firebase from 'firebase/app';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule} from 'angularfire2';
 import { AngularFireDatabase, AngularFireDatabaseModule } from 'angularfire2/database';
 import { TestBed, inject } from '@angular/core/testing';
-import * as utils from './utils';
-import { Subscription, Observable, Subject } from 'rxjs';
 import { COMMON_CONFIG } from './test-config';
-import { _do } from 'rxjs/operator/do';
-import { map } from 'rxjs/operator/map';
-import { skip } from 'rxjs/operator/skip';
-import { take } from 'rxjs/operator/take';
-import { toArray } from 'rxjs/operator/toArray';
-import { toPromise } from 'rxjs/operator/toPromise';
 
 // generate random string to test fidelity of naming
 const FIREBASE_APP_NAME = (Math.random() + 1).toString(36).substring(7);
 
-fdescribe('AngularFireDatabase', () => {
+describe('AngularFireDatabase', () => {
   let app: FirebaseApp;
   let db: AngularFireDatabase;
 
