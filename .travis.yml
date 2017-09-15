@@ -4,7 +4,7 @@ node_js:
 - 'node'
 
 addons:
-  chrome: latest
+  chrome: stable
   apt:
     sources:
       - ubuntu-toolchain-r-test
