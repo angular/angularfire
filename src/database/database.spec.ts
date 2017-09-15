@@ -45,9 +45,7 @@ fdescribe('AngularFireDatabase', () => {
 
     it('should have an initialized Firebase database instance member', () => {
       expect(db.database.app.name).toEqual(FIREBASE_APP_NAME);
-      debugger;
     });    
-
   });
 
 });
