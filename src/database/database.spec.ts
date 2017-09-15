@@ -7,7 +7,7 @@ import { COMMON_CONFIG } from './test-config';
 // generate random string to test fidelity of naming
 const FIREBASE_APP_NAME = (Math.random() + 1).toString(36).substring(7);
 
-fdescribe('AngularFireDatabase', () => {
+describe('AngularFireDatabase', () => {
   let app: FirebaseApp;
   let db: AngularFireDatabase;
 

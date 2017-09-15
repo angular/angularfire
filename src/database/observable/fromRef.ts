@@ -8,9 +8,9 @@ import 'rxjs/add/operator/delay';
  * @param ref Database Reference
  * @param event Listen event type ('value', 'added', 'changed', 'removed', 'moved')
  */
-export function fromRef(ref: DatabaseQuery, event: ListenEvent): Observable<SnapshotChange> {
+export function fromRef(ref: DatabaseQuery, event: ListenEvent, listenType = 'on'): Observable<SnapshotChange> {
   return new Observable<SnapshotPrevKey | null | undefined>(subscriber => {
-    const fn = ref.on(event, (snapshot, prevKey) => {
+    const fn = ref[listenType](event, (snapshot, prevKey) => {
       subscriber.next({ snapshot, prevKey })
     }, subscriber.error.bind(subscriber));
     return { unsubscribe() { ref.off(event, fn)} }

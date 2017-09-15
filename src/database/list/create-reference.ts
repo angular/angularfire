@@ -8,7 +8,7 @@ export function createListReference<T>(query: DatabaseQuery): ListReference<T> {
   return {
     query,
     snapshotChanges: createListSnapshotChanges(query),
-    valueChanges() { return createListSnapshotChanges(query)().map(snaps => snaps.map(snap => snap!.val())); },
+    valueChanges<T>() { return createListSnapshotChanges(query)().map(snaps => snaps.map(snap => snap!.val())); },
     update: createDataOperationMethod<T>(query.ref, 'update'),
     set: createDataOperationMethod<T>(query.ref, 'set'),
     push: (data: T) => query.ref.push(data),
