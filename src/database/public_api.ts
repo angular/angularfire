@@ -5,5 +5,3 @@ export * from './list/snapshot-changes';
 export * from './list/loaded';
 export * from './observable/fromRef';
 export * from './database.module'
-export * from './object/create-reference';
-export * from './object/snapshot-changes';
