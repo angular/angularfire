@@ -7,7 +7,7 @@ import { COMMON_CONFIG } from './test-config';
 // generate random string to test fidelity of naming
 const FIREBASE_APP_NAME = (Math.random() + 1).toString(36).substring(7);
 
-describe('AngularFireDatabase', () => {
+fdescribe('AngularFireDatabase', () => {
   let app: FirebaseApp;
   let db: AngularFireDatabase;
 
@@ -45,6 +45,7 @@ describe('AngularFireDatabase', () => {
 
     it('should have an initialized Firebase database instance member', () => {
       expect(db.database.app.name).toEqual(FIREBASE_APP_NAME);
+      debugger;
     });    
 
   });

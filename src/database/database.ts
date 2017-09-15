@@ -31,3 +31,15 @@ export class AngularFireDatabase {
 
 }
 
+export { 
+  PathReference, 
+  DatabaseQuery, 
+  DatabaseReference, 
+  DatabaseSnapshot, 
+  ChildEvent, 
+  ListenEvent,
+  SnapshotChange, 
+  QueryFn, 
+  ListReference, 
+  ObjectReference 
+} from './interfaces';

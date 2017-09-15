@@ -10,3 +10,4 @@ export * from './packages-dist/database/database.spec';
 export * from './packages-dist/database/utils.spec';
 export * from './packages-dist/database/observable/fromRef.spec';
 export * from './packages-dist/database/list/changes.spec';
+export * from './packages-dist/database/list/snapshot-changes.spec';
