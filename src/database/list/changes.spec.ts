@@ -48,7 +48,7 @@ describe('listChanges', () => {
       someRef.set(batch);
       const obs = listChanges(someRef, ['child_added']);
       const sub = obs.skip(2).subscribe(changes => {
-        const data = changes.map(change => change.snapshot!.val());
+        const data = changes.map(change => change.payload.snapshot!.val());
         expect(data).toEqual(items);
         done();
       });
@@ -59,7 +59,7 @@ describe('listChanges', () => {
       aref.set(batch);
       const obs = listChanges(aref, ['child_added']);
       const sub = obs.skip(3).subscribe(changes => {
-        const data = changes.map(change => change.snapshot!.val());
+        const data = changes.map(change => change.payload.snapshot!.val());
         expect(data[3]).toEqual({ name: 'anotha one' });
         done();
       });
@@ -72,7 +72,7 @@ describe('listChanges', () => {
       const obs = listChanges(aref, ['child_added','child_removed'])
 
       const sub = obs.skip(3).subscribe(changes => {
-        const data = changes.map(change => change.snapshot!.val());
+        const data = changes.map(change => change.payload.snapshot!.val());
         expect(data.length).toEqual(items.length - 1);
         done();
       });
@@ -84,9 +84,9 @@ describe('listChanges', () => {
       const aref = ref(rando());
       aref.set(batch);
       const obs = listChanges(aref, ['child_added','child_changed'])
-
+      debugger;
       const sub = obs.skip(3).subscribe(changes => {
-        const data = changes.map(change => change.snapshot!.val());
+        const data = changes.map(change => change.payload.snapshot!.val());
         expect(data[0].name).toEqual('lol');
         done();
       });
@@ -99,7 +99,7 @@ describe('listChanges', () => {
       aref.set(batch);
       const obs = listChanges(aref, ['child_added','child_moved'])
       const sub = obs.skip(3).subscribe(changes => {
-        const data = changes.map(change => change.snapshot!.val());
+        const data = changes.map(change => change.payload.snapshot!.val());
         // We moved the first item to the last item, so we check that
         // the new result is now the last result
         expect(data[data.length - 1]).toEqual(items[0]);

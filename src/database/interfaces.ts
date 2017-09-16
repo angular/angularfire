@@ -39,10 +39,17 @@ export type SnapshotChange = {
   prevKey: string | undefined;
 }
 
+export type Action<T> = {
+  type: string;
+  payload: T;
+};
+
 export interface SnapshotPrevKey {
   snapshot: DatabaseSnapshot | null;
   prevKey: string | undefined;
 }
+
+export type SnapshotAction = Action<SnapshotPrevKey>;
 
 export type Primitive = number | string | boolean;
 

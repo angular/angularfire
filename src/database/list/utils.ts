@@ -1,4 +1,5 @@
 import { isNil } from '../utils';
+import { SnapshotAction } from '../interfaces';
 
 export function validateEventsArray(events?: any[]) {
   if(isNil(events) || events!.length === 0) {
@@ -7,17 +8,17 @@ export function validateEventsArray(events?: any[]) {
   return events;
 }
 
-export function positionFor(changes, key) {
+export function positionFor(changes: SnapshotAction[], key) {
   const len = changes.length;
   for(let i=0; i<len; i++) {
-    if(changes[i].snapshot.key === key) {
+    if(changes[i].payload.snapshot!.key === key) {
       return i;
     }
   }
   return -1;
 }
 
-export function positionAfter(changes, prevKey: string) {
+export function positionAfter(changes: SnapshotAction[], prevKey: string) {
   if(prevKey === null) { 
     return 0; 
   } else {

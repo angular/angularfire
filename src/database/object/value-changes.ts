@@ -5,6 +5,6 @@ import { DatabaseQuery, ChildEvent } from '../interfaces';
 export function createObjectValueChanges<T>(query: DatabaseQuery) {
   return function valueChanges<T>(): Observable<T | null> {
     return fromRef(query, 'value')
-      .map(change => change.snapshot ? change.snapshot.val() : null);
+      .map(change => change.payload.snapshot ? change.payload.snapshot.val() : null);
   }
 }

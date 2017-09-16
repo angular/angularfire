@@ -1,6 +1,6 @@
 import * as firebase from 'firebase/app';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2';
-import { AngularFireDatabase, AngularFireDatabaseModule, createListSnapshotChanges, ChildEvent } from 'angularfire2/database';
+import { AngularFireDatabase, AngularFireDatabaseModule, snapshotChanges, ChildEvent } from 'angularfire2/database';
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../test-config';
 import 'rxjs/add/operator/skip';
@@ -45,16 +45,16 @@ describe('snapshotChanges', () => {
     const { events, skip } = opts;
     const aref = createRef(rando());
     aref.set(batch);
-    const snapshotChanges = createListSnapshotChanges(aref);
+    const snapChanges = snapshotChanges(aref, events);
     return {
-      snapshotChanges: snapshotChanges(events).skip(skip),
+      snapChanges: snapChanges.skip(skip),
       ref: aref 
     };
   }
 
   it('should listen to all events by default', (done) => {
-    const { snapshotChanges } = prepareSnapshotChanges({ skip: 2 });
-    const sub = snapshotChanges.subscribe(snaps => {
+    const { snapChanges } = prepareSnapshotChanges({ skip: 2 });
+    const sub = snapChanges.subscribe(snaps => {
       const data = snaps.map(snap => snap.val())
       expect(data).toEqual(items);
       done();
@@ -63,8 +63,8 @@ describe('snapshotChanges', () => {
   });
 
   it('should listen to only child_added events', (done) => {
-    const { snapshotChanges } = prepareSnapshotChanges({ events: ['child_added'], skip: 2 });
-    const sub = snapshotChanges.subscribe(snaps => {
+    const { snapChanges } = prepareSnapshotChanges({ events: ['child_added'], skip: 2 });
+    const sub = snapChanges.subscribe(snaps => {
       const data = snaps.map(snap => snap.val())
       expect(data).toEqual(items);
       done();
@@ -73,12 +73,12 @@ describe('snapshotChanges', () => {
   });
 
   it('should listen to only child_added, child_changed events', (done) => {
-    const {snapshotChanges, ref } = prepareSnapshotChanges({ 
+    const { snapChanges, ref } = prepareSnapshotChanges({ 
       events: ['child_added', 'child_changed'], 
       skip: 3 
     });
     const name = 'ligatures';
-    const sub = snapshotChanges.subscribe(snaps => {
+    const sub = snapChanges.subscribe(snaps => {
       const data = snaps.map(snap => snap.val());
       const copy = [...items];
       copy[0].name = name;

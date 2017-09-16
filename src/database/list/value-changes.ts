@@ -8,6 +8,6 @@ export function createListValueChanges<T>(query: DatabaseQuery) {
   return function valueChanges<T>(events?: ChildEvent[]): Observable<T[]> {
     events = validateEventsArray(events);
     return listChanges<T>(query, events!)
-      .map(changes => changes.map(change => change.snapshot!.val()))
+      .map(changes => changes.map(change => change.payload.snapshot!.val()))
   }
 }

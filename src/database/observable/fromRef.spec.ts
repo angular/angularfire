@@ -78,9 +78,9 @@ describe('fromRef', () => {
       let count = 0;
       const sub = obs.subscribe(change => {
         count = count + 1;
-        const { event, snapshot } = change;
-        expect(event).toEqual('child_added');
-        expect(snapshot!.val()).toEqual(batch[snapshot!.key!]);
+        const { type, payload } = change;
+        expect(type).toEqual('child_added');
+        expect(payload.snapshot!.val()).toEqual(batch[payload.snapshot!.key!]);
         if (count === items.length) {
           done();
           sub.unsubscribe();
@@ -96,10 +96,10 @@ describe('fromRef', () => {
       const name = 'look at what you made me do';
       const key = items[0].key;
       const sub = obs.subscribe(change => {
-        const { event, snapshot } = change;
-        expect(event).toEqual('child_changed');
-        expect(snapshot!.key).toEqual(key);
-        expect(snapshot!.val()).toEqual({ key, name });
+        const { type, payload } = change;
+        expect(type).toEqual('child_changed');
+        expect(payload.snapshot!.key).toEqual(key);
+        expect(payload.snapshot!.val()).toEqual({ key, name });
         sub.unsubscribe();
         done();
       });
@@ -113,10 +113,10 @@ describe('fromRef', () => {
       const key = items[0].key;
       const name = items[0].name;
       const sub = obs.subscribe(change => {
-        const { event, snapshot } = change;
-        expect(event).toEqual('child_removed');
-        expect(snapshot!.key).toEqual(key);
-        expect(snapshot!.val()).toEqual({ key, name });
+        const { type, payload } = change;
+        expect(type).toEqual('child_removed');
+        expect(payload.snapshot!.key).toEqual(key);
+        expect(payload.snapshot!.val()).toEqual({ key, name });
         sub.unsubscribe();
         done();
       });
@@ -130,10 +130,10 @@ describe('fromRef', () => {
       const key = items[2].key;
       const name = items[2].name;
       const sub = obs.subscribe(change => {
-        const { event, snapshot } = change;
-        expect(event).toEqual('child_moved');
-        expect(snapshot!.key).toEqual(key);
-        expect(snapshot!.val()).toEqual({ key, name });
+        const { type, payload } = change;
+        expect(type).toEqual('child_moved');
+        expect(payload.snapshot!.key).toEqual(key);
+        expect(payload.snapshot!.val()).toEqual({ key, name });
         sub.unsubscribe();
         done();
       });
@@ -145,9 +145,9 @@ describe('fromRef', () => {
       itemRef.set(batch);
       const obs = fromRef(itemRef, 'value');
       const sub = obs.subscribe(change => {
-        const { event, snapshot } = change;
-        expect(event).toEqual('value');
-        expect(snapshot!.val()).toEqual(batch);
+        const { type, payload } = change;
+        expect(type).toEqual('value');
+        expect(payload.snapshot!.val()).toEqual(batch);
         done();
         sub.unsubscribe();
         expect(sub.closed).toEqual(true);
@@ -161,7 +161,7 @@ describe('fromRef', () => {
       const obs = fromRef(query, 'value');
       const sub = obs.subscribe(change => {
         let child;
-        change.snapshot!.forEach(snap => { child = snap.val(); return true; });
+        change.payload.snapshot!.forEach(snap => { child = snap.val(); return true; });
         expect(child).toEqual(items[0]);
         done();
       });
