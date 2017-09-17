@@ -1,10 +1,10 @@
 {
   "name": "angularfire2",
-  "version": "4.0.0-rc.3-exp.2",
+  "version": "4.0.0-rc.3-exp.6",
   "description": "The official library of Firebase and Angular.",
   "private": true,
   "scripts": {
-    "test": "karma start --single-run",
+    "test": "npm run build && karma start --single-run",
     "test:watch": "concurrently \"npm run build:watch\" \"npm run delayed_karma\"",
     "test:debug": "npm run build && karma start",
     "delayed_karma": "sleep 10 && karma start",

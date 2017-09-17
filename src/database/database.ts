@@ -41,6 +41,9 @@ export {
   SnapshotChange, 
   QueryFn, 
   ListReference, 
-  ObjectReference 
+  ObjectReference,
+  AngularFireAction,
+  Action,
+  SnapshotAction
 } from './interfaces';
  

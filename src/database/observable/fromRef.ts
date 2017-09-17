@@ -1,5 +1,7 @@
 import { DatabaseQuery, DatabaseSnapshot, ListenEvent, SnapshotPrevKey, AngularFireAction } from '../interfaces';
 import { Observable } from 'rxjs/Observable';
+import { observeOn } from 'rxjs/operator/observeOn';
+import { ZoneScheduler } from 'angularfire2';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/delay';
 
@@ -9,7 +11,7 @@ import 'rxjs/add/operator/delay';
  * @param event Listen event type ('value', 'added', 'changed', 'removed', 'moved')
  */
 export function fromRef(ref: DatabaseQuery, event: ListenEvent, listenType = 'on'): Observable<AngularFireAction<DatabaseSnapshot | null>> {
-  return new Observable<SnapshotPrevKey | null | undefined>(subscriber => {
+  const ref$ = new Observable<SnapshotPrevKey | null | undefined>(subscriber => {
     const fn = ref[listenType](event, (snapshot, prevKey) => {
       subscriber.next({ snapshot, prevKey })
     }, subscriber.error.bind(subscriber));
@@ -25,4 +27,5 @@ export function fromRef(ref: DatabaseQuery, event: ListenEvent, listenType = 'on
   // a quirk in the SDK where on/once callbacks can happen
   // synchronously.
   .delay(0); 
+  return observeOn.call(ref$, new ZoneScheduler(Zone.current));
 }
