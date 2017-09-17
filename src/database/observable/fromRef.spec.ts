@@ -80,7 +80,7 @@ describe('fromRef', () => {
         count = count + 1;
         const { type, payload } = change;
         expect(type).toEqual('child_added');
-        expect(payload.snapshot!.val()).toEqual(batch[payload.snapshot!.key!]);
+        expect(payload!.val()).toEqual(batch[payload!.key!]);
         if (count === items.length) {
           done();
           sub.unsubscribe();
@@ -98,8 +98,8 @@ describe('fromRef', () => {
       const sub = obs.subscribe(change => {
         const { type, payload } = change;
         expect(type).toEqual('child_changed');
-        expect(payload.snapshot!.key).toEqual(key);
-        expect(payload.snapshot!.val()).toEqual({ key, name });
+        expect(payload!.key).toEqual(key);
+        expect(payload!.val()).toEqual({ key, name });
         sub.unsubscribe();
         done();
       });
@@ -115,8 +115,8 @@ describe('fromRef', () => {
       const sub = obs.subscribe(change => {
         const { type, payload } = change;
         expect(type).toEqual('child_removed');
-        expect(payload.snapshot!.key).toEqual(key);
-        expect(payload.snapshot!.val()).toEqual({ key, name });
+        expect(payload!.key).toEqual(key);
+        expect(payload!.val()).toEqual({ key, name });
         sub.unsubscribe();
         done();
       });
@@ -132,8 +132,8 @@ describe('fromRef', () => {
       const sub = obs.subscribe(change => {
         const { type, payload } = change;
         expect(type).toEqual('child_moved');
-        expect(payload.snapshot!.key).toEqual(key);
-        expect(payload.snapshot!.val()).toEqual({ key, name });
+        expect(payload!.key).toEqual(key);
+        expect(payload!.val()).toEqual({ key, name });
         sub.unsubscribe();
         done();
       });
@@ -147,7 +147,7 @@ describe('fromRef', () => {
       const sub = obs.subscribe(change => {
         const { type, payload } = change;
         expect(type).toEqual('value');
-        expect(payload.snapshot!.val()).toEqual(batch);
+        expect(payload!.val()).toEqual(batch);
         done();
         sub.unsubscribe();
         expect(sub.closed).toEqual(true);
@@ -156,12 +156,12 @@ describe('fromRef', () => {
 
     it('should stream back query results', (done: any) => {
       const itemRef = ref(rando());
-      itemRef.set(batch).then(console.log);
+      itemRef.set(batch);
       const query = itemRef.orderByChild('name').equalTo(items[0].name);
       const obs = fromRef(query, 'value');
       const sub = obs.subscribe(change => {
         let child;
-        change.payload.snapshot!.forEach(snap => { child = snap.val(); return true; });
+        change.payload!.forEach(snap => { child = snap.val(); return true; });
         expect(child).toEqual(items[0]);
         done();
       });

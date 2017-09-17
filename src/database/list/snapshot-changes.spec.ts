@@ -54,8 +54,8 @@ describe('snapshotChanges', () => {
 
   it('should listen to all events by default', (done) => {
     const { snapChanges } = prepareSnapshotChanges({ skip: 2 });
-    const sub = snapChanges.subscribe(snaps => {
-      const data = snaps.map(snap => snap.val())
+    const sub = snapChanges.subscribe(actions => {
+      const data = actions.map(a => a.payload!.val());
       expect(data).toEqual(items);
       done();
       sub.unsubscribe();
@@ -64,8 +64,8 @@ describe('snapshotChanges', () => {
 
   it('should listen to only child_added events', (done) => {
     const { snapChanges } = prepareSnapshotChanges({ events: ['child_added'], skip: 2 });
-    const sub = snapChanges.subscribe(snaps => {
-      const data = snaps.map(snap => snap.val())
+    const sub = snapChanges.subscribe(actions => {
+      const data = actions.map(a => a.payload!.val());
       expect(data).toEqual(items);
       done();
       sub.unsubscribe();
@@ -78,8 +78,8 @@ describe('snapshotChanges', () => {
       skip: 3 
     });
     const name = 'ligatures';
-    const sub = snapChanges.subscribe(snaps => {
-      const data = snaps.map(snap => snap.val());
+    const sub = snapChanges.subscribe(actions => {
+      const data = actions.map(a => a.payload!.val());;
       const copy = [...items];
       copy[0].name = name;
       expect(data).toEqual(copy);

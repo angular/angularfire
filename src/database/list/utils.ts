@@ -11,15 +11,15 @@ export function validateEventsArray(events?: any[]) {
 export function positionFor(changes: SnapshotAction[], key) {
   const len = changes.length;
   for(let i=0; i<len; i++) {
-    if(changes[i].payload.snapshot!.key === key) {
+    if(changes[i].payload!.key === key) {
       return i;
     }
   }
   return -1;
 }
 
-export function positionAfter(changes: SnapshotAction[], prevKey: string) {
-  if(prevKey === null) { 
+export function positionAfter(changes: SnapshotAction[], prevKey?: string) {
+  if(isNil(prevKey)) { 
     return 0; 
   } else {
     const i = positionFor(changes, prevKey);

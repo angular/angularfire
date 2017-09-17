@@ -6,7 +6,9 @@ export type FirebaseOperation = string | firebase.database.Reference | firebase.
 export interface ListReference<T> {
   query: DatabaseQuery;
   valueChanges<T>(events?: ChildEvent[]): Observable<T[]>;
-  snapshotChanges<T>(events?: ChildEvent[]): Observable<DatabaseSnapshot[]>;
+  snapshotChanges(events?: ChildEvent[]): Observable<SnapshotAction[]>;
+  stateChanges(events?: ChildEvent[]): Observable<SnapshotAction>;
+  auditTrail(events?: ChildEvent[]): Observable<SnapshotAction[]>;
   update(item: FirebaseOperation, data: T): Promise<void>;
   set(item: FirebaseOperation, data: T): Promise<void>;
   push(data: T): firebase.database.ThenableReference;
@@ -16,7 +18,7 @@ export interface ListReference<T> {
 export interface ObjectReference<T> {
   query: DatabaseQuery;
   valueChanges<T>(): Observable<T | null>;
-  snapshotChanges<T>(): Observable<DatabaseSnapshot | null>;
+  snapshotChanges<T>(): Observable<SnapshotAction>;
   update(data: T): Promise<any>;
   set(data: T): Promise<void>;
   remove(): Promise<any>;
@@ -39,17 +41,22 @@ export type SnapshotChange = {
   prevKey: string | undefined;
 }
 
-export type Action<T> = {
+export interface Action<T> {
   type: string;
   payload: T;
 };
+
+export interface AngularFireAction<T> extends Action<T> {
+  prevKey: string | undefined;
+  key: string | null;
+}
 
 export interface SnapshotPrevKey {
   snapshot: DatabaseSnapshot | null;
   prevKey: string | undefined;
 }
 
-export type SnapshotAction = Action<SnapshotPrevKey>;
+export type SnapshotAction = AngularFireAction<DatabaseSnapshot | null>;
 
 export type Primitive = number | string | boolean;
 

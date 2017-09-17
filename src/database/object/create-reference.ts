@@ -5,9 +5,12 @@ export function createObjectReference<T>(query: DatabaseQuery): ObjectReference<
   return {
     query,
     snapshotChanges: createObjectSnapshotChanges(query),
-    valueChanges<T>() { return createObjectSnapshotChanges(query)().map(snap => snap ? snap.val() as T : null) },
     update(data: T) { return query.ref.update(data) as Promise<any>; },
     set(data: T) { return query.ref.set(data) as Promise<any>; },
-    remove() { return query.ref.remove() as Promise<any>; }
+    remove() { return query.ref.remove() as Promise<any>; },
+    valueChanges<T>() { 
+      return createObjectSnapshotChanges(query)()
+        .map(action => action.payload ? action.payload.val() as T : null) 
+    },
   }
 }
