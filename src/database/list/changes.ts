@@ -1,12 +1,12 @@
 import { fromRef } from '../observable/fromRef';
 import { Observable } from 'rxjs/Observable';
-import { DatabaseQuery, ChildEvent, SnapshotChange, AngularFireAction} from '../interfaces';
+import { DatabaseQuery, ChildEvent, SnapshotChange, AngularFireAction, SnapshotAction } from '../interfaces';
 import { positionFor, positionAfter } from './utils';
 import 'rxjs/add/operator/scan';
 import 'rxjs/add/observable/merge';
 
 // TODO(davideast): check safety of ! operator in scan
-export function listChanges<T>(ref: DatabaseQuery, events: ChildEvent[]): Observable<AngularFireAction<any>[]> {
+export function listChanges<T>(ref: DatabaseQuery, events: ChildEvent[]): Observable<SnapshotAction[]> {
   const childEvent$ = events.map(event => fromRef(ref, event));
   return Observable.merge(...childEvent$)
   .scan((current, action) => {

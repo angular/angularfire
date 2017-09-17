@@ -29,6 +29,10 @@ export class AngularFireDatabase {
     return createObjectReference<T>(ref);    
   }
 
+  createPushId() {
+    return this.database.ref().push().key;
+  }
+
 }
 
 export { 
