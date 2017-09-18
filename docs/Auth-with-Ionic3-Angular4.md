@@ -182,9 +182,9 @@ and add the following three entries.
 
 >2) Define your firebaseConfig constant.
 
->3) Initialize your app, by adding AngularFireModule in the "imports" array in @NgModule
+>3) Initialize your app, by adding AngularFireModule and AngularFireAuthModule in the "imports" array in @NgModule
 
->3) Also, add AngularFireDatabaseModule in the "imports" array in @NgModule
+>4) Also, add AngularFireDatabase in the "providers" array in @NgModule
 
 your `app.module.ts` file should look something like this.
 
