@@ -1,7 +1,7 @@
 const { rollup } = require('rollup');
 const { spawn } = require('child_process');
 const { Observable } = require('rxjs');
-const { copy, readFileSync, writeFile } = require('fs-extra');
+const { copy, readFileSync, writeFile, statSync } = require('fs-extra');
 const { prettySize } = require('pretty-size');
 const gzipSize = require('gzip-size');
 const resolve = require('rollup-plugin-node-resolve');
@@ -29,6 +29,18 @@ const GLOBALS = {
   'rxjs/operator/take': 'Rx.Observable.prototype',
   'rxjs/operator/toArray': 'Rx.Observable.prototype',
   'rxjs/operator/toPromise': 'Rx.Observable.prototype',
+  'rxjs/add/operator/map': 'Rx.Observable.prototype',
+  'rxjs/add/operator/scan': 'Rx.Observable.prototype',
+  'rxjs/add/operator/skip': 'Rx.Observable.prototype',
+  'rxjs/add/operator/do': 'Rx.Observable.prototype',
+  'rxjs/add/operator/filter': 'Rx.Observable.prototype',
+  'rxjs/add/operator/skipUntil': 'Rx.Observable.prototype',
+  'rxjs/add/operator/skipWhile': 'Rx.Observable.prototype',
+  'rxjs/add/operator/withLatestFrom': 'Rx.Observable.prototype',
+  'rxjs/add/observable/merge': 'Rx.Observable',
+  'rxjs/add/operator/delay': 'Rx.Observable',
+  'rxjs/add/operator/debounce': 'Rx.Observable',
+  'rxjs/observable/fromEvent': 'Rx.Observable',
   'rxjs/operator': 'Rx.Observable.prototype',
   '@angular/core': 'ng.core',
   '@angular/compiler': 'ng.compiler',
@@ -41,6 +53,7 @@ const GLOBALS = {
   'angularfire2': 'angularfire2',
   'angularfire2/auth': 'angularfire2.auth',
   'angularfire2/database': 'angularfire2.database',
+  'angularfire2/database-deprecated': 'angularfire2.database_deprecated',
   'angularfire2/firestore': 'angularfire2.firestore'
 };
 
@@ -52,6 +65,38 @@ const VERSIONS = {
   ZONEJS_VERSION: pkg.dependencies['zone.js'],
   ANGULARFIRE2_VERSION: pkg.version,
   FIRESTORE_VERSION: pkg.dependencies['firestore']
+};
+
+const MODULE_NAMES = {
+  core: 'angularfire2',
+  auth: 'angularfire2.auth',
+  database: 'angularfire2.database',
+  "database-deprecated": 'angularfire2.database_deprecated',
+  firestore: 'angularfire2.firestore'
+};
+
+const ENTRIES = {
+  core: `${process.cwd()}/dist/packages-dist/index.js`,
+  auth: `${process.cwd()}/dist/packages-dist/auth/index.js`,
+  database: `${process.cwd()}/dist/packages-dist/database/index.js`,
+  "database-deprecated": `${process.cwd()}/dist/packages-dist/database-deprecated/index.js`,
+  firestore: `${process.cwd()}/dist/packages-dist/firestore/index.js`
+};
+
+const SRC_PKG_PATHS = {
+  core: `${process.cwd()}/src/core/package.json`,
+  auth: `${process.cwd()}/src/auth/package.json`,
+  database: `${process.cwd()}/src/database/package.json`,
+  "database-deprecated": `${process.cwd()}/src/database-deprecated/package.json`,
+  firestore: `${process.cwd()}/src/firestore/package.json`
+};
+
+const DEST_PKG_PATHS = {
+  core: `${process.cwd()}/dist/packages-dist/package.json`,
+  auth: `${process.cwd()}/dist/packages-dist/auth/package.json`,
+  database: `${process.cwd()}/dist/packages-dist/database/package.json`,
+  "database-deprecated": `${process.cwd()}/dist/packages-dist/database-deprecated/package.json`,
+  firestore: `${process.cwd()}/dist/packages-dist/firestore/package.json`
 };
 
 // Constants for running typescript commands
@@ -70,7 +115,7 @@ function spawnObservable(command, args) {
     const cmd = spawn(command, args);
     observer.next(''); // hack to kick things off, not every command will have a stdout
     cmd.stdout.on('data', (data) => { observer.next(data.toString('utf8')); });
-    cmd.stderr.on('data', (data) => { observer.error(data.toString('utf8')); });
+    cmd.stderr.on('data', (data) => { console.log(data); observer.error(data.toString('utf8')); });
     cmd.on('close', (data) => { observer.complete(); });
   });
 }
@@ -95,18 +140,6 @@ function generateBundle(entry, { dest, globals, moduleName }) {
  */
 function createUmd(name, globals) {
   // core module is angularfire2 the rest are angularfire2.feature
-  const MODULE_NAMES = {
-    core: 'angularfire2',
-    auth: 'angularfire2.auth',
-    database: 'angularfire2.database',
-    firestore: 'angularfire2.firestore'
-  };
-  const ENTRIES = {
-    core: `${process.cwd()}/dist/packages-dist/index.js`,
-    auth: `${process.cwd()}/dist/packages-dist/auth/index.js`,
-    database: `${process.cwd()}/dist/packages-dist/database/index.js`,
-    firestore: `${process.cwd()}/dist/packages-dist/firestore/index.js`,
-  };
   const moduleName = MODULE_NAMES[name];
   const entry = ENTRIES[name];
   return generateBundle(entry, {
@@ -131,13 +164,7 @@ function createTestUmd(globals) {
  * @param {string} moduleName 
  */
 function getSrcPackageFile(moduleName) {
-  const PATHS = {
-    core: `${process.cwd()}/src/core/package.json`,
-    auth: `${process.cwd()}/src/auth/package.json`,
-    database: `${process.cwd()}/src/database/package.json`,
-    firestore: `${process.cwd()}/src/firestore/package.json`
-  };
-  return PATHS[moduleName];
+  return SRC_PKG_PATHS[moduleName];
 }
 
 /**
@@ -145,13 +172,7 @@ function getSrcPackageFile(moduleName) {
  * @param {string} moduleName 
  */
 function getDestPackageFile(moduleName) {
-  const PATHS = {
-    core: `${process.cwd()}/dist/packages-dist/package.json`,
-    auth: `${process.cwd()}/dist/packages-dist/auth/package.json`,
-    database: `${process.cwd()}/dist/packages-dist/database/package.json`,
-    firestore: `${process.cwd()}/dist/packages-dist/firestore/package.json`
-  };
-  return PATHS[moduleName];
+  return DEST_PKG_PATHS[moduleName];
 }
 
 /**
@@ -200,10 +221,9 @@ function copyReadme() {
 function measure(module) {
   const path = `${process.cwd()}/dist/packages-dist/bundles/${module}.umd.js`;
   const file = readFileSync(path);
-  const bytes = gzipSize.sync(file);
-  const gzipped = prettySize(bytes, true);
-  const regular = prettySize(bytes);
-  return { regular, gzipped };
+  const gzip = prettySize(gzipSize.sync(file), true);
+  const size = prettySize(statSync(path).size, true);
+  return { size, gzip };
 }
 
 /**
@@ -251,12 +271,12 @@ function buildModules(globals) {
   const core$ = buildModule('core', globals);
   const auth$ = buildModule('auth', globals);
   const db$ = buildModule('database', globals);
-  const afs$ = buildModule('firestore', globals);
+  const firestore$ = buildModule('firestore', globals);
   return Observable
     .forkJoin(core$, Observable.from(copyRootTest()))
     .switchMapTo(auth$)
     .switchMapTo(db$)
-    .switchMapTo(afs$);
+    .switchMapTo(firestore$);
 }
 
 function buildLibrary(globals) {
@@ -267,15 +287,15 @@ function buildLibrary(globals) {
     .switchMap(() => Observable.from(copyNpmIgnore()))
     .switchMap(() => Observable.from(copyReadme()))
     .do(() => {
-      const core = measure('core');
-      const auth = measure('auth');
-      const database = measure('database');
-      const firestore = measure('firestore');
+      const coreStats = measure('core');
+      const authStats = measure('auth');
+      const dbStats = measure('database');
+      const fsStats = measure('firestore');
       console.log(`
-      core.umd.js - ${core.regular}, ${core.gzipped}
-      auth.umd.js - ${auth.regular}, ${auth.gzipped}}
-      database.umd.js - ${database.regular}, ${database.gzipped}}
-      firestore.umd.js - ${firestore.regular}, ${firestore.gzipped}}
+      core.umd.js - ${coreStats.size}, ${coreStats.gzip}
+      auth.umd.js - ${authStats.size}, ${authStats.gzip}
+      database.umd.js - ${dbStats.size}, ${dbStats.gzip}
+      firestore.umd.js - ${fsStats.size}, ${fsStats.gzip}
       `);
       verifyVersions();
     });

@@ -8,17 +8,6 @@ import 'rxjs/add/operator/map';
 import { Injectable } from '@angular/core';
 import { FirebaseApp } from 'angularfire2';
 
-/**
- * Bring in the types for Symbol.observable. Appending
- * Symbole.observable to the prototype allows us to turn
- * references into Observables.
- */
-declare global {
-  export interface SymbolConstructor {
-    readonly observable: symbol;
-  }
-}
-
 // A convience type for making a query.
 // Example: const query = (ref) => ref.where('name', == 'david');
 export type QueryFn = (ref: CollectionReference) => Query;
@@ -249,37 +238,6 @@ export class AngularFirestoreDocument<T> implements ArrayLike<T> {
       return (snap.exists ? snap.data() : null) as T;
     });
   }
-
-  /**
-   * Provide the ability to create an Observable from this reference. The 
-   * underlying reference's onSnapshot() method is compatible with rxjs's 
-   * observer pattern. The method needs to return an object that maps an
-   * Observable's subscribe() method to onSnapshot().
-   * 
-   * Unlike valueChanges(), this observable automatically unwraps the snapshot
-   * returning to you an observable of the type you provided.
-   * 
-   * Note: We are currently checking data.exists and returning null if the
-   * document does not exist. Firestore will throw if you call snap.data() 
-   * on a non-existent document. We are converting to null to provide
-   * flexibility in the view template.
-   */
-  [Symbol.observable]() {
-    const ref = this.ref;
-    return {
-      subscribe(observer) {
-        const unsubscribe = ref.onSnapshot((snap) => {
-          try {
-            const unwrapped = snap.exists ? snap.data() : null;
-            observer.next(unwrapped as T); 
-          } catch (e) {
-            observer.error(e);
-          }
-        }, observer.error, observer.complete);
-        return { unsubscribe };
-      }
-    }
-  }
 }
 
 /**
@@ -307,12 +265,7 @@ export class AngularFirestoreDocument<T> implements ArrayLike<T> {
  * // OR! Avoid unwrapping and transform from an Observable
  * Observable.from(fakeStock).subscribe(value => console.log(value));
  */
-export class AngularFirestoreCollection<T> implements ArrayLike<T> {
-  // TODO(davideast):  Remove these properties once TypeScript is down with Observable.from
-  // These are totally useless and are used to appease TypeScript.
-  public length: number;
-  [n: number]: T;
-
+export class AngularFirestoreCollection<T> {
   /**
    * The contstuctor takes in a CollectionReference and Query to provide wrapper methods
    * for data operations, data streaming, and Symbol.observable.
@@ -365,32 +318,5 @@ export class AngularFirestoreCollection<T> implements ArrayLike<T> {
    */
   doc(path: string) {
     return new AngularFirestoreDocument(this.ref.doc(path));
-  }
-
-  /**
-   * Provide the ability to create an Observable from this reference. The 
-   * underlying reference's onSnapshot() method is compatible with rxjs's 
-   * observer pattern. The method needs to return an object that maps an
-   * Observable's subscribe() method to onSnapshot().
-   * 
-   * Unlike valueChanges(), this observable automatically unwraps the snapshot
-   * returning to you an observable of the type you provided.
-   * 
-   * Note: We are currently checking data.exists and returning null if the
-   * document does not exist. Firestore will throw if you call snap.data() 
-   * on a non-existent document. We are converting to null to provide
-   * flexibility in the view template.
-   */  
-  [Symbol.observable] () {
-    const query = this.query;
-    return {
-      subscribe(subscriber: Subscriber<T[]>) {
-        const unsubscribe = query.onSnapshot((snap: QuerySnapshot) => {
-          const records = snap.docs.map(docs => docs.data()) as T[];
-          subscriber.next(records);
-        }, subscriber.error, subscriber.complete);
-        return { unsubscribe };
-      }
-    }
   }
 }
