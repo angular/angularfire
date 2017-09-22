@@ -5,6 +5,9 @@ import { Observable } from 'rxjs/Observable';
 import { Subscriber } from 'rxjs/Subscriber';
 import { fromCollectionRef } from '../observable/fromRef';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/observable/do';
+
 
 import { Injectable } from '@angular/core';
 import { FirebaseApp } from 'angularfire2';
@@ -71,7 +74,10 @@ export class AngularFirestoreCollection<T> {
       return changes(this.query);
     }
     return changes(this.query)
-      .map(actions => actions.filter(change => events.indexOf(change.type) > -1))
+      .map(actions => {
+        debugger;
+        return actions.filter(change => events.indexOf(change.type) > -1);
+      })
       .filter(changes =>  changes.length > 0);
   }
 

@@ -7,3 +7,5 @@ export * from './packages-dist/database/firebase_object_observable.spec';
 export * from './packages-dist/database/query_observable.spec';
 export * from './packages-dist/auth/auth.spec';
 export * from './packages-dist/firestore/firestore.spec';
+export * from './packages-dist/firestore/document/document.spec';
+export * from './packages-dist/firestore/collection/collection.spec';

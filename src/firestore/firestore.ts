@@ -8,7 +8,7 @@ import 'rxjs/add/operator/map';
 import { Injectable } from '@angular/core';
 import { FirebaseApp } from 'angularfire2';
 
-import { QueryFn } from './interfaces';
+import { QueryFn, AssociatedReference } from './interfaces';
 import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 
