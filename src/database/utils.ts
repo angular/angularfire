@@ -47,11 +47,11 @@ export interface CheckUrlRef {
 }
 
 /**
- * Unwraps the data returned in the DataSnapshot. Exposes the DataSnapshot key and exists methods through the $key and $exists properties respectively. If the value is primitive, it is unwrapped using a $value property. The $ properies mean they cannot be saved in the Database as those characters are invalid.
+ * Unwraps the data returned in the DataSnapshot. Exposes the DataSnapshot key, exists method and getPriority method through the $key, $exists and $priority properties respectively. If the value is primitive, it is unwrapped using a $value property. The $ properies mean they cannot be saved in the Database as those characters are invalid.
  * @param {DataSnapshot} snapshot - The snapshot to unwrap
  * @return AFUnwrappedDataSnapshot
  * @example
- * unwrapMapFn(snapshot) => { name: 'David', $key: 'david', $exists: Function }
+ * unwrapMapFn(snapshot) => { name: 'David', $key: 'david', $exists: Function, $priority: Function }
  */
 export function unwrapMapFn (snapshot:firebase.database.DataSnapshot): AFUnwrappedDataSnapshot {
   var unwrapped = !isNil(snapshot.val()) ? snapshot.val() : { $value: null };
@@ -67,6 +67,12 @@ export function unwrapMapFn (snapshot:firebase.database.DataSnapshot): AFUnwrapp
   Object.defineProperty(unwrapped, '$exists', {
     value: () => {
       return snapshot.exists();
+    },
+    enumerable: false
+  });
+  Object.defineProperty(unwrapped, '$priority', {
+    value: () => {
+      return snapshot.getPriority();
     },
     enumerable: false
   });
