@@ -2,6 +2,7 @@ import { fromCollectionRef } from '../observable/fromRef';
 import { Query, DocumentChangeType, DocumentChange, DocumentSnapshot, QuerySnapshot } from 'firestore';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/map';
+import 'rxjs/add/observable/filter';
 import 'rxjs/add/operator/scan';
 
 import { DocumentChangeAction, Action } from '../interfaces';
@@ -26,7 +27,8 @@ export function sortedChanges(query: Query, events: DocumentChangeType[]): Obser
   return fromCollectionRef(query)
     .map(changes => changes.payload.docChanges)
     .scan((current, changes) => combineChanges(current, changes, events), [])
-    .map(changes => changes.map(c => ({ type: c.type, payload: c })));
+    .map(changes => changes.map(c => ({ type: c.type, payload: c })))
+    .filter(changes => changes.length > 0);
 }
 
 /**
@@ -37,14 +39,13 @@ export function sortedChanges(query: Query, events: DocumentChangeType[]): Obser
  * @param events
  */
 export function combineChanges(current: DocumentChange[], changes: DocumentChange[], events: DocumentChangeType[]) {
-  let combined: DocumentChange[] = [];
   changes.forEach(change => {
     // skip unwanted change types
     if(events.indexOf(change.type) > -1) {
-      combined = combineChange(combined, change);
+      current = combineChange(current, change);
     }
   });
-  return combined;
+  return current;
 }
 
 /**
@@ -55,12 +56,19 @@ export function combineChanges(current: DocumentChange[], changes: DocumentChang
 export function combineChange(combined: DocumentChange[], change: DocumentChange): DocumentChange[] {
   switch(change.type) {
     case 'added': 
-      return [...combined, change];
-    case 'modified': 
-      return combined.map(x => x.doc.id === change.doc.id ? change : x);
+      combined.splice(change.newIndex, 0, change);
+      break;
+    case 'modified':
+      // When an item changes position we first remove it
+      // and then add it's new position
+      if(change.oldIndex !== change.newIndex) {
+        combined.splice(change.oldIndex, 1);
+      } 
+      combined.splice(change.newIndex, 0, change);
+      break;
     case 'removed':
-      return combined.filter(x => x.doc.id !== change.doc.id);
+      combined.splice(change.oldIndex, 1);
+      break;
   }
   return combined;
 }
-

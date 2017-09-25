@@ -74,19 +74,19 @@ export class AngularFirestoreCollection<T> {
       return docChanges(this.query);
     }
     return docChanges(this.query)
-      .map(actions => {
-        debugger;
-        return actions.filter(change => events.indexOf(change.type) > -1);
-      })
+      .map(actions => actions.filter(change => events.indexOf(change.type) > -1))
       .filter(changes =>  changes.length > 0);
   }
 
+  auditTrail(events?: DocumentChangeType[]): Observable<DocumentChangeAction[]> {
+    return this.stateChanges(events).scan((current, action) => [...current, ...action], []);
+  }
+  
   snapshotChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction[]> {
     events = validateEventsArray(events);
     return sortedChanges(this.query, events);
   }
   
-
   /**
    * Listen to all documents in the collection and its possible query as an Observable.
    * This method returns a stream of unwrapped snapshots.
