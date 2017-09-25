@@ -13,7 +13,7 @@ import { Injectable } from '@angular/core';
 import { FirebaseApp } from 'angularfire2';
 
 import { QueryFn, AssociatedReference, DocumentChangeAction } from '../interfaces';
-import { changes } from './changes';
+import { docChanges, sortedChanges } from './changes';
 import { AngularFirestoreDocument } from '../document/document';
 
 export function validateEventsArray(events?: DocumentChangeType[]) {
@@ -69,11 +69,11 @@ export class AngularFirestoreCollection<T> {
    * This method returns a stream of DocumentSnapshots which gives the ability to get
    * the data set back as array and/or the delta updates in the collection.
    */
-  snapshotChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction[]> {
+  stateChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction[]> {
     if(!events || events.length === 0) {
-      return changes(this.query);
+      return docChanges(this.query);
     }
-    return changes(this.query)
+    return docChanges(this.query)
       .map(actions => {
         debugger;
         return actions.filter(change => events.indexOf(change.type) > -1);
@@ -81,12 +81,18 @@ export class AngularFirestoreCollection<T> {
       .filter(changes =>  changes.length > 0);
   }
 
+  snapshotChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction[]> {
+    events = validateEventsArray(events);
+    return sortedChanges(this.query, events);
+  }
+  
+
   /**
    * Listen to all documents in the collection and its possible query as an Observable.
    * This method returns a stream of unwrapped snapshots.
    */  
   valueChanges(events?: DocumentChangeType[]): Observable<T[]> {
-    return this.snapshotChanges()
+    return this.stateChanges()
       .map(actions => actions.map(a => a.payload.doc.data()) as T[]);
   }
 

@@ -11,31 +11,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../test-config';
 
-interface Stock {
-  name: string;
-  price: number;
-}
-
-const FAKE_STOCK_DATA = { name: 'FAKE', price: 1 };
-
-const randomName = (firestore): string => firestore.collection('a').doc().id;
-
-const createRandomStocks = async (firestore: firestore.Firestore, collectionRef: firestore.CollectionReference, numberOfItems) => {
-  // Create a batch to update everything at once
-  const batch = firestore.batch();
-  // Store the random names to delete them later
-  let count = 0;
-  let names: string[] = [];
-  Array.from(Array(numberOfItems)).forEach((a, i) => {
-    const name = randomName(firestore);
-    batch.set(collectionRef.doc(name), FAKE_STOCK_DATA);
-    names = [...names, name];
-  });
-  // Create the batch entries
-  // Commit!
-  await batch.commit();
-  return names;
-}
+import { Stock, randomName, FAKE_STOCK_DATA } from '../utils.spec';
 
 describe('AngularFirestoreDocument', () => {
   let app: firebase.app.App;
