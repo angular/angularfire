@@ -12,6 +12,7 @@ export interface AFUnwrappedDataSnapshot {
   $key: string;
   $value?: string | number | boolean;
   $exists: () => boolean;
+  $priority: () => string | number;
 }
 
 export interface Query {
