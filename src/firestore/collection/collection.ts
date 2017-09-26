@@ -6,7 +6,6 @@ import { Subscriber } from 'rxjs/Subscriber';
 import { fromCollectionRef } from '../observable/fromRef';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/filter';
-import 'rxjs/add/observable/do';
 
 import { Injectable } from '@angular/core';
 import { FirebaseApp } from 'angularfire2';

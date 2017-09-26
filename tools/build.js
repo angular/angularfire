@@ -218,6 +218,10 @@ function copyReadme() {
   return copy(`${process.cwd()}/README.md`, `${process.cwd()}/dist/packages-dist/README.md`);
 }
 
+function copyDocs() {
+  return copy(`${process.cwd()}/docs`, `${process.cwd()}/dist/packages-dist/docs`);
+}
+
 function measure(module) {
   const path = `${process.cwd()}/dist/packages-dist/bundles/${module}.umd.js`;
   const file = readFileSync(path);
@@ -286,6 +290,7 @@ function buildLibrary(globals) {
     .switchMap(() => Observable.from(createTestUmd(globals)))
     .switchMap(() => Observable.from(copyNpmIgnore()))
     .switchMap(() => Observable.from(copyReadme()))
+    .switchMap(() => Observable.from(copyDocs()))
     .do(() => {
       const coreStats = measure('core');
       const authStats = measure('auth');

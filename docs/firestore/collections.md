@@ -190,12 +190,16 @@ Imagine you're querying a list of T-Shirts. Every facet of the query should be p
     // You'll use an Observable source from a ReactiveForm control or even
     // an AngularFirestoreDocument
     const criteria$ = of({ 
-      size: { op: '==', value: 'large' }, 
-      price: { op: '>', value: 10  }
+      size: 'large', 
+      price: 10
     });
-    this.items = size$.switchMap(size => {
+    this.items = criteria$.switchMap(criteria => {
       return this.afs
-        .collection('tshirts', ref => ref.where('size', '==', size))
+        .collection<Item>('tshirts', ref => {
+          return ref
+                  .where('size', '==', criteria.size)
+                  .where('price', '>', criteria.price)
+        })
         .snapshotChanges();
     });
   }

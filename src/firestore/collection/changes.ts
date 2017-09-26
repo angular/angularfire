@@ -1,8 +1,8 @@
 import { fromCollectionRef } from '../observable/fromRef';
 import { Query, DocumentChangeType, DocumentChange, DocumentSnapshot, QuerySnapshot } from 'firestore';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/map';
-import 'rxjs/add/observable/filter';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/scan';
 
 import { DocumentChangeAction, Action } from '../interfaces';
