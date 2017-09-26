@@ -1,7 +1,9 @@
 # 3. Retrieving data as lists
 
-> AngularFire2 synchronizes data as lists using the `FirebaseListObservable`. 
-The `FirebaseListObservable` is not created by itself, but through the `AngularFireDatabase` service. 
+> AngularFire synchronizes data as lists using the `AngularFireList` service.
+
+The `AngularFireList` service is not created by itself, but through the `AngularFireDatabase` service. 
+
 The guide below demonstrates how to retrieve, save, and remove data as lists.
 
 ## Injecting the AngularFireDatabase service
@@ -9,7 +11,7 @@ The guide below demonstrates how to retrieve, save, and remove data as lists.
 **Make sure you have bootstrapped your application for AngularFire2. See the Installation guide for bootstrap setup.**
 
 AngularFireDatabase is a service which can be injected through the constructor of your Angular component or `@Injectable()` service.
-In the previous step, we modified the `/src/app/app.component.ts` to retrieve data as object. In this step, let's start with a clean slate.
+In the previous step, we modified the `/src/app/app.component.ts` to retrieve data as an object. In this step, let's start with a clean slate.
 
 Replace your  `/src/app/app.component.ts` from previous step to look like below.
 
@@ -33,38 +35,25 @@ In this section, we're going to modify the `/src/app/app.component.ts`  to retre
 
 ## Create a list binding
 
-Data is retrieved through the `AngularFireDatabase` service.
-
-There are three ways to create a list binding:
-
-1. Relative URL
-1. Absolute URL
-1. Query
+Data is retrieved through the `AngularFireDatabase` service. The service is also generic. Provide the singular type and not the array type.
 
 ```ts
-// relative URL, uses the database url provided in bootstrap
-const relative = db.list('/items');
-// absolute URL
-const absolute = db.list('https://<your-app>.firebaseio.com/items');
-// query 
-const queryList = db.list('/items', {
-  query: {
-    limitToLast: 10,
-    orderByKey: true
-  }
-});
+const listRef = db.list('items');
+const shirtsRef = db.list<Shirt>('shirts');
 ```
 
 ### Retrieve data
 
 To get the list in realtime, create a list binding as a property of your component or service.
+
 Then in your template, you can use the `async` pipe to unwrap the binding.
 
-Update `/src/app/app.component.ts` to import `FirebaseListObservable` from angularfire2 and iterate thru the list once data is retrieved. Also note the change in attribute `templateUrl` to inline `template` below.
+Update `/src/app/app.component.ts` to import `AngularFireList` from angularfire2 and iterate thru the list once data is retrieved. Also note the change in attribute `templateUrl` to inline `template` below.
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import { AngularFireDatabase } from 'angularfire2/database';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'app-root',
@@ -77,23 +66,70 @@ import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/databa
   `,
 })
 export class AppComponent {
-  items: FirebaseListObservable<any>;
+  items: Observable<any[]>;
   constructor(db: AngularFireDatabase) {
-    this.items = db.list('/items');
+    this.items = db.list('items').valueChanges();
   }
 }
+```
+
+## `AngularFireAction` - Action based API
+AngularFire provides methods that stream data back as redux compatible actions. This gives you extra horsepower when using libraries like Animations, ngrx, and ReactiveForms. 
+
+### `valueChanges()`
+**What is it?** - Returns an Observable of data as a synchronized array of JSON objects. All Snapshot metadata is stripped and just the method provides only the data.
+
+**Why would you use it?** - When you just need a list of data. No snapshot metadata is attached to the resulting array which makes it simple to render to a view.
+
+**When would you not use it?** - When you need a more complex data structure than an array or you need the `key` of each snapshot for data manipulation methods. This method assumes you either are saving the `key` for the snapshot data or using a "readonly" approach.
+
+### `snapshotChanges()`
+**What is it?** - Returns an Observable of data as a synchronized array of `AngularFireAction<DatabaseSnapshot>[]`. 
+
+**Why would you use it?** - When you need a list of data but also want to keep around metadata. Metadata provides you the underyling `DatabaseReference` and snapshot key. Having the snapshot's `key` around makes it easier to use data manipulation methods. This method gives you more horsepower with other Angular integrations such as ngrx, forms, and animations due to the `type` property. The `type` property on each `AngularFireAction` is useful for ngrx reducers, form states, and animation states.
+
+**When would you not use it?** - When you need a more complex data structure than an array or if you need to process changes as they occur. This array is synchronized with the remote and local changes in the Firebase Database.
+
+### `stateChanges()`
+**What is it?** - Returns an Observable of the most recent changes as a `AngularFireAction[]`. 
+
+**Why would you use it?** - The above methods return a synchronized array sorted in query order. `stateChanges()` emits changes as they occur rather than syncing the query order. This works well for ngrx integrations as you can build your own data structure in your reducer methods.
+
+**When would you not use it?** - When you just need a list of data. This is a more advanced usage of `AngularFireDatabase`. 
+
+### `auditTrail()`
+**What is it?** - Returns an Observable of `AngularFireAction[]` as they occur. Similar to `stateChanges()`, but instead it keeps around the trail of events as an array.
+
+**Why would you use it?** - This method is like `stateChanges()` except it is not ephemeral. It collects each change in an array as they occur. This is useful for ngrx integrations where you need to replay the entire state of an application. This also works as a great debugging tool for all applications. You can simple write `db.list('items').auditTrail().subscribe(console.log)` and check the events in the console as they occur.
+
+**When would you not use it?** - When you just need a list of data. This is a more advanced usage of AngularFireDatabase. 
+
+### Limiting events
+
+There are four child events: `"child_added"`, `"child_changed"`, `"child_removed"`, and `"child_moved"`. Each streaming method listens to all four by default. However, your site may only be intrested in one of these events. You can specify which events you'd like to use through the first parameter of each method:
+
+```ts
+this.itemsRef = db.list('items');
+this.items.snapshotChanges(['child_added'])
+  .subscribe(action => {
+    actions.forEach(action => {
+      console.log(action.type);
+      console.log(action.snapshot.key)
+      console.log(action.snapshot.val())
+    });
+  })
 ```
 
 ## Saving data
 
 ### API Summary
 
-The table below highlights some of the common methods on the `FirebaseListObservable`.
+The table below highlights some of the common methods on the `AngularFireList`.
 
 | method   |                    | 
 | ---------|--------------------| 
-| `push(value: any)` | Creates a new record on the list, using the Realtime Database's push-ids. | 
-| `update(keyRefOrSnap: string)` | Firebase | AFUnwrappedSnapshot, value: Object) | Updates an existing item in the array. Accepts a key, database reference, or an unwrapped snapshot. |
+| `push(value: T)` | Creates a new record on the list, using the Realtime Database's push-ids. | 
+| `update(keyRefOrSnap: string, value: T)` | Firebase | AFUnwrappedSnapshot, value: Object) | Updates an existing item in the array. Accepts a key, database reference, or an unwrapped snapshot. |
 | `remove(key: string?)` | Deletes the item by key. If no parameter is provided, the entire list will be deleted. |
 
 ## Returning promises
@@ -105,7 +141,7 @@ The promise can be useful to chain multiple operations, catching possible errors
 from security rules denials, or for debugging.
 
 ```ts
-const promise = db.list('/items').remove();
+const promise = db.list('items').remove();
 promise
   .then(_ => console.log('success'))
   .catch(err => console.log(err, 'You do not have access!'));
@@ -116,8 +152,8 @@ promise
 Use the `push()` method to add new items on the list.
 
 ```ts
-const items = db.list('/items');
-items.push({ name: newName });
+const itemsRef = db.list('items');
+itemsRef.push({ name: newName });
 ```
 
 ### Replacing items in the list using `set`
@@ -125,9 +161,9 @@ items.push({ name: newName });
 Use the `set()` method to update existing items.
 
 ```ts
-const items = db.list('/items');
+const itemsRef = db.list('items');
 // to get a key, check the Example app below
-items.set('key-of-some-data', { size: newSize });
+itemsRef.set('key-of-some-data', { size: newSize });
 ```
 
 Replaces the current value in the database with the new value specified as the parameter. This is called a destructive update, because it deletes everything currently in place and saves the new value.
@@ -137,9 +173,9 @@ Replaces the current value in the database with the new value specified as the p
 Use the `update()` method to update existing items.
 
 ```ts
-const items = db.list('/items');
+const itemsRef = db.list('items');
 // to get a key, check the Example app below
-items.update('key-of-some-data', { size: newSize });
+itemsRef.update('key-of-some-data', { size: newSize });
 ```
 
 Note that this updates the current value with in the database with the new value specified as the parameter. This is called a non-destructive update, because it only updates the values specified.
@@ -148,9 +184,9 @@ Note that this updates the current value with in the database with the new value
 Use the `remove()` method to remove data at the list item's location.
 
 ```ts
-const items = db.list('/items');
+const itemsRef = db.list('items');
 // to get a key, check the Example app below
-items.remove('key-of-some-data');
+itemsRef.remove('key-of-some-data');
 ```
 
 ## Deleting the entire list
@@ -158,15 +194,16 @@ items.remove('key-of-some-data');
 If you omit the `key` parameter from `.remove()` it deletes the entire list.
 
 ```ts
-const items = db.list('/items');
-items.remove();
+const itemsRef = db.list('items');
+itemsRef.remove();
 ```
 
 **Example app**
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireDatabase, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2/database';
+import { AngularFireDatabase } from 'angularfire2/database';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'app-root',
@@ -184,21 +221,21 @@ import { AngularFireDatabase, FirebaseListObservable, FirebaseObjectObservable }
   `,
 })
 export class AppComponent {
-  items: FirebaseListObservable<any>;
+  itemsRef: Observable<any[]>;
   constructor(db: AngularFireDatabase) {
-    this.items = db.list('/messages');
+    this.itemsRef = db.list('messages').valueChanges();
   }
   addItem(newName: string) {
-    this.items.push({ text: newName });
+    this.itemsRef.push({ text: newName });
   }
   updateItem(key: string, newText: string) {
-    this.items.update(key, { text: newText });
+    this.itemsRef.update(key, { text: newText });
   }
   deleteItem(key: string) {    
-    this.items.remove(key); 
+    this.itemsRef.remove(key); 
   }
   deleteEverything() {
-    this.items.remove();
+    this.itemsRef.remove();
   }
 }
 ```
@@ -211,18 +248,5 @@ Data retrieved from the object binding contains special properties retrieved fro
 | `$key`     | The key for each record. This is equivalent to each record's path in our database as it would be returned by `ref.key()`.|
 | `$value`   | If the data for this child node is a primitive (number, string, or boolean), then the record itself will still be an object. The primitive value will be stored under `$value` and can be changed and saved like any other field.|
 
-## Retrieving the snapshot
-AngularFire2 unwraps the Firebase DataSnapshot by default, but you can get the data as the original snapshot by specifying the `preserveSnapshot` option. 
-
-```ts
-this.items = db.list('/items', { preserveSnapshot: true });
-this.items
-  .subscribe(snapshots => {
-    snapshots.forEach(snapshot => {
-      console.log(snapshot.key)
-      console.log(snapshot.val())
-    });
-  })
-```
 
 ### [Next Step: Querying lists](4-querying-lists.md)

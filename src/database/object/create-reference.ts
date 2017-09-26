@@ -1,7 +1,7 @@
-import { DatabaseQuery, ObjectReference } from '../interfaces';
+import { DatabaseQuery, AngularFireObject } from '../interfaces';
 import { createObjectSnapshotChanges } from './snapshot-changes';
 
-export function createObjectReference<T>(query: DatabaseQuery): ObjectReference<T> {
+export function createObjectReference<T>(query: DatabaseQuery): AngularFireObject<T> {
   return {
     query,
     snapshotChanges: createObjectSnapshotChanges(query),

@@ -1,35 +1,13 @@
 # 1. Installation and Setup
 
-> Getting started with AngularFire2 is easy with the [Angular CLI](https://github.com/angular/angular-cli). Follow the 10 steps below to get started. Don't worry, we're always working to make this shorter.
-
 > Using Ionic and the Ionic CLI? Check out these [specific instructions](6-angularfire-and-ionic-cli.md) for Ionic and their CLI.
 
 ### 0. Prerequisites
 
-Before you start installing AngularFire2, make sure you have latest version of angular-cli installed.
-To verify run the command `ng -v` and ensure you see `angular-cli: 1.x.x-beta.xx`. The lowest compatible version is `1.x.x-beta.14`.
-
-If not, you may need to do the following:
+AngularFire provides multiple module formats for different types of builds. The guide is based off the Angular CLI. It is possible to do a manual setup with Webpack or a SystemJS build as well.
 
 ```bash
-# if you have the wrong cli version only
-npm uninstall -g angular-cli
-npm uninstall -g @angular/cli
-npm cache clean
-
-# reinstall clean version
-npm install -g @angular/cli@latest
-```
-
-You need the Angular CLI, typings, and TypeScript.
-
-```bash
-npm install -g @angular/cli@latest
-# or install locally
-npm install @angular/cli --save-dev
-# make sure you have typings installed
-npm install -g typings
-npm install -g typescript
+npm install @angular/cli
 ```
 
 ### 1. Create a new project
@@ -50,13 +28,13 @@ open http://localhost:4200
 
 You should see a message that says *App works!*
 
-### 3. Install AngularFire 2 and Firebase
+### 3. Install AngularFire and Firebase
 
 ```bash
 npm install angularfire2 firebase --save
 ```
 
-Now that you have a new project setup, install AngularFire2 and Firebase from npm.
+Now that you have a new project setup, install AngularFire and Firebase from npm.
 
 ### 4. Add Firebase config to environments variable
 
@@ -79,6 +57,7 @@ export const environment = {
 ### 5. Setup @NgModule for the AngularFireModule
 
 Open `/src/app/app.module.ts`, inject the Firebase providers, and specify your Firebase configuration.
+
 This can be found in your project at [the Firebase Console](https://console.firebase.google.com):
 
 ```ts
@@ -177,7 +156,8 @@ In `/src/app/app.component.ts`:
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import { AngularFireDatabase } from 'angularfire2/database';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'app-root',
@@ -185,9 +165,9 @@ import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/databa
   styleUrls: ['app.component.css']
 })
 export class AppComponent {
-  items: FirebaseListObservable<any[]>;
+  items: Observable<any[]>;
   constructor(db: AngularFireDatabase) {
-    this.items = db.list('/items');
+    this.items = db.list('items').valueChanges();
   }
 }
 ```
@@ -197,7 +177,7 @@ Open `/src/app/app.component.html`:
 ```html
 <ul>
   <li class="text" *ngFor="let item of items | async">
-    {{item.$value}}
+    {{ item | json }}
   </li>
 </ul>
 ```
@@ -214,33 +194,3 @@ And that's it! If it's totally *borked*, file an issue and let us know.
 
 ### [Next Step: Retrieving data as objects](2-retrieving-data-as-objects.md)
 
-### Troubleshooting
-
-#### 1. Cannot find namespace 'firebase'.
-
-If you run into this error while trying to invoke `ng serve`, open `src/tsconfig.json` and add the "types" array as follows:
-
-```json
-{
-  "compilerOptions": {
-    ...
-    "typeRoots": [
-      "../node_modules/@types"
-    ],
-
-    // ADD THIS
-    "types": [
-      "firebase"
-    ]
-  }
-}
-```
-
-#### 2. Cannot find name 'require' (This is just a temporary workaround for the Angular CLI).
-
-If you run into this error while trying to invoke `ng serve`, open `src/typings.d.ts` and add the following two entries as follows:
-
-```bash
-declare var require: any;
-declare var module: any;
-```

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { database } from 'firebase/app';
 import 'firebase/database';
 import { FirebaseApp } from 'angularfire2';
-import { PathReference, DatabaseQuery, DatabaseReference, DatabaseSnapshot, ChildEvent, ListenEvent, SnapshotChange, QueryFn, ListReference, ObjectReference } from './interfaces';
+import { PathReference, DatabaseQuery, DatabaseReference, DatabaseSnapshot, ChildEvent, ListenEvent, SnapshotChange, QueryFn, AngularFireList, AngularFireObject } from './interfaces';
 import { getRef } from './utils';
 import { createListReference } from './list/create-reference';
 import { createObjectReference } from './object/create-reference';
@@ -15,7 +15,7 @@ export class AngularFireDatabase {
     this.database = app.database();
   }
 
-  list<T>(pathOrRef: PathReference, queryFn?: QueryFn): ListReference<T> {
+  list<T>(pathOrRef: PathReference, queryFn?: QueryFn): AngularFireList<T> {
     const ref = getRef(this.app, pathOrRef);
     let query: DatabaseQuery = ref;
     if(queryFn) {
@@ -24,7 +24,7 @@ export class AngularFireDatabase {
     return createListReference<T>(query);
   }
 
-  object<T>(pathOrRef: PathReference): ObjectReference<T>  {
+  object<T>(pathOrRef: PathReference): AngularFireObject<T>  {
     const ref = getRef(this.app, pathOrRef);
     return createObjectReference<T>(ref);    
   }
@@ -44,8 +44,8 @@ export {
   ListenEvent,
   SnapshotChange, 
   QueryFn, 
-  ListReference, 
-  ObjectReference,
+  AngularFireList, 
+  AngularFireObject,
   AngularFireAction,
   Action,
   SnapshotAction

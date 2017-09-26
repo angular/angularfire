@@ -1,11 +1,11 @@
-import { DatabaseQuery, ListReference, ChildEvent } from '../interfaces';
+import { DatabaseQuery, AngularFireList, ChildEvent } from '../interfaces';
 import { createLoadedChanges, loadedSnapshotChanges } from './loaded';
 import { createStateChanges } from './state-changes';
 import { createAuditTrail } from './audit-trail';
 import { createDataOperationMethod } from './data-operation';
 import { createRemoveMethod } from './remove';
 
-export function createListReference<T>(query: DatabaseQuery): ListReference<T> {
+export function createListReference<T>(query: DatabaseQuery): AngularFireList<T> {
   return {
     query,
     update: createDataOperationMethod<T>(query.ref, 'update'),

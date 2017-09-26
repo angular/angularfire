@@ -19,7 +19,6 @@ export function listChanges<T>(ref: DatabaseQuery, events: ChildEvent[]): Observ
         return current.filter(x => x.payload!.key !== payload!.key);
       case 'child_changed':
         return current.map(x => x.payload!.key === key ? action : x);
-      // default will also remove null results
       case 'child_moved':
         const curPos = positionFor(current, payload!.key)
         if(curPos > -1) {
@@ -29,6 +28,7 @@ export function listChanges<T>(ref: DatabaseQuery, events: ChildEvent[]): Observ
           return current;
         }
         return current;
+      // default will also remove null results
       default:
         return current;
     }
