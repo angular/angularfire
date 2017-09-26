@@ -217,4 +217,4 @@ To add a new document to a collection with a generated id use the `add()` method
 
 To retrieve, update, or delete an individual document you can use the `doc()` method. This method returns an `AngularFirestoreDocument`, which provides methods for streaming, updating, and deleting. 
 
-See the Documents page for complete documentation.
+See the [Documents page for complete documentation]((docs/firestore/documents.md).

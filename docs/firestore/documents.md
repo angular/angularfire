@@ -107,4 +107,4 @@ To retrieve a nested collection use the `collection(path: string)` method.
   }
 ```
 
-For more information about using collections read the collection documentation.
+For more information about using collections read the [collection documentation](docs/firestore/collection.md).

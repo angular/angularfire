@@ -118,6 +118,7 @@ export class AppModule {}
 ### 6. Setup individual @NgModules
 
 After adding the AngularFireModule you also need to add modules for the individual @NgModules that your application needs.
+ - AngularFirestoreModule
  - AngularFireAuthModule
  - AngularFireDatabaseModule
  - AngularFireStorageModule (Future release)
@@ -132,7 +133,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { AngularFireModule } from 'angularfire2';
-import { AngularFireDatabaseModule } from 'angularfire2/database';
+import { AngularFirestoreModule } from 'angularfire2/firestore';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { environment } from '../environments/environment';
 
@@ -140,7 +141,7 @@ import { environment } from '../environments/environment';
   imports: [
     BrowserModule,
     AngularFireModule.initializeApp(environment.firebase, 'my-app-name'), // imports firebase/app needed for everything
-    AngularFireDatabaseModule, // imports firebase/database, only needed for database features
+    AngularFirestoreModule, // imports firebase/firestore, only needed for database features
     AngularFireAuthModule, // imports firebase/auth, only needed for auth features
   ],
   declarations: [ AppComponent ],
@@ -150,13 +151,13 @@ export class AppModule {}
 
 ```
 
-### 7. Inject AngularFireDatabase
+### 7. Inject AngularFirestore
 
 Open `/src/app/app.component.ts`, and make sure to modify/delete any tests to get the sample working (tests are still important, you know):
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import { AngularFirestore } from 'angularfire2/firestore';
 
 @Component({
   selector: 'app-root',
@@ -164,7 +165,7 @@ import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/databa
   styleUrls: ['app.component.css']
 })
 export class AppComponent {
-  constructor(db: AngularFireDatabase) {
+  constructor(db: AngularFirestore) {
 
   }
 }
@@ -177,7 +178,8 @@ In `/src/app/app.component.ts`:
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import { AngularFirestore } from 'angularfire2/firestore';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'app-root',
@@ -185,9 +187,9 @@ import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/databa
   styleUrls: ['app.component.css']
 })
 export class AppComponent {
-  items: FirebaseListObservable<any[]>;
-  constructor(db: AngularFireDatabase) {
-    this.items = db.list('/items');
+  items: Observable<any[]>;
+  constructor(db: AngularFirestore) {
+    this.items = db.collection('items').valueChanges();
   }
 }
 ```
@@ -197,7 +199,7 @@ Open `/src/app/app.component.html`:
 ```html
 <ul>
   <li class="text" *ngFor="let item of items | async">
-    {{item.$value}}
+    {{item.name}}
   </li>
 </ul>
 ```
@@ -212,35 +214,4 @@ Run the serve command and go to `localhost:4200` in your browser.
 
 And that's it! If it's totally *borked*, file an issue and let us know.
 
-### [Next Step: Retrieving data as objects](2-retrieving-data-as-objects.md)
-
-### Troubleshooting
-
-#### 1. Cannot find namespace 'firebase'.
-
-If you run into this error while trying to invoke `ng serve`, open `src/tsconfig.json` and add the "types" array as follows:
-
-```json
-{
-  "compilerOptions": {
-    ...
-    "typeRoots": [
-      "../node_modules/@types"
-    ],
-
-    // ADD THIS
-    "types": [
-      "firebase"
-    ]
-  }
-}
-```
-
-#### 2. Cannot find name 'require' (This is just a temporary workaround for the Angular CLI).
-
-If you run into this error while trying to invoke `ng serve`, open `src/typings.d.ts` and add the following two entries as follows:
-
-```bash
-declare var require: any;
-declare var module: any;
-```
+### [Next Step: Understanding collections in Firestore](firestore/collections.md)
