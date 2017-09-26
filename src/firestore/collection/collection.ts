@@ -8,7 +8,6 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/observable/do';
 
-
 import { Injectable } from '@angular/core';
 import { FirebaseApp } from 'angularfire2';
 
@@ -22,7 +21,6 @@ export function validateEventsArray(events?: DocumentChangeType[]) {
   }
   return events;
 }
-
 
 /**
  * AngularFirestoreCollection service
@@ -45,14 +43,12 @@ export function validateEventsArray(events?: DocumentChangeType[]) {
  * await fakeStock.add({ name: 'FAKE', price: 0.01 });
  * 
  * // Subscribe to changes as snapshots. This provides you data updates as well as delta updates.
- * fakeStock.valueChanges().map(snap => snap.docs.map(doc => doc.data()).subscribe(value => console.log(value));
- * // OR! Avoid unwrapping and transform from an Observable
- * Observable.from(fakeStock).subscribe(value => console.log(value));
+ * fakeStock.valueChanges().subscribe(value => console.log(value));
  */
 export class AngularFirestoreCollection<T> {
   /**
    * The contstuctor takes in a CollectionReference and Query to provide wrapper methods
-   * for data operations, data streaming, and Symbol.observable.
+   * for data operations and data streaming.
    * 
    * Note: Data operation methods are done on the reference not the query. This means
    * when you update data it is not updating data to the window of your query unless
@@ -65,9 +61,10 @@ export class AngularFirestoreCollection<T> {
     private readonly query: Query) { }
 
   /**
-   * Listen to all documents in the collection and its possible query as an Observable.
-   * This method returns a stream of DocumentSnapshots which gives the ability to get
-   * the data set back as array and/or the delta updates in the collection.
+   * Listen to the latest change in the stream. This method returns changes
+   * as they occur and they are not sorted by query order. This allows you to construct
+   * your own data structure.
+   * @param events 
    */
   stateChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction[]> {
     if(!events || events.length === 0) {
@@ -78,10 +75,20 @@ export class AngularFirestoreCollection<T> {
       .filter(changes =>  changes.length > 0);
   }
 
+  /**
+   * Create a stream of changes as they occur it time. This method is similar to stateChanges()
+   * but it collects each event in an array over time.
+   * @param events 
+   */
   auditTrail(events?: DocumentChangeType[]): Observable<DocumentChangeAction[]> {
     return this.stateChanges(events).scan((current, action) => [...current, ...action], []);
   }
   
+  /**
+   * Create a stream of synchronized shanges. This method keeps the local array in sorted
+   * query order.
+   * @param events 
+   */
   snapshotChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction[]> {
     events = validateEventsArray(events);
     return sortedChanges(this.query, events);
@@ -89,10 +96,9 @@ export class AngularFirestoreCollection<T> {
   
   /**
    * Listen to all documents in the collection and its possible query as an Observable.
-   * This method returns a stream of unwrapped snapshots.
    */  
   valueChanges(events?: DocumentChangeType[]): Observable<T[]> {
-    return this.stateChanges()
+    return this.snapshotChanges()
       .map(actions => actions.map(a => a.payload.doc.data()) as T[]);
   }
 
