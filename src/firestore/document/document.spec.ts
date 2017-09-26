@@ -13,7 +13,7 @@ import { COMMON_CONFIG } from '../test-config';
 
 import { Stock, randomName, FAKE_STOCK_DATA } from '../utils.spec';
 
-describe('AngularFirestoreDocument', () => {
+fdescribe('AngularFirestoreDocument', () => {
   let app: firebase.app.App;
   let afs: AngularFirestore;
   let sub: Subscription;

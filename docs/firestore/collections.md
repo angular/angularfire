@@ -74,7 +74,7 @@ There are multiple ways of streaming collection data from Firestore.
 ### `valueChanges()`
 **What is it?** - Returns an Observable of data as a synchronized array of JSON objects. All Snapshot metadata is stripped and just the method provides only the data.
 
-**Why would you use it?** - When you just need a list of data. No document metadata is attach to the resulting array which makes it simple to render to a view.
+**Why would you use it?** - When you just need a list of data. No document metadata is attached to the resulting array which makes it simple to render to a view.
 
 **When would you not use it?** - When you need a more complex data structure than an array or you need the `id` of each document to use data manipulation metods. This method assumes you either are saving the `id` to the document data or using a "readonly" approach.
 

@@ -64,7 +64,7 @@ export function combineChange(combined: DocumentChange[], change: DocumentChange
       if(change.oldIndex !== change.newIndex) {
         combined.splice(change.oldIndex, 1);
       } 
-      combined.splice(change.newIndex, 0, change);
+      combined.splice(change.newIndex, 1, change);
       break;
     case 'removed':
       combined.splice(change.oldIndex, 1);

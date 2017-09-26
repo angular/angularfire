@@ -26,7 +26,7 @@ async function collectionHarness(afs: AngularFirestore, items: number, queryFn?:
   return { randomCollectionName, ref, stocks, names };  
 }
 
-describe('AngularFirestoreCollection', () => {
+fdescribe('AngularFirestoreCollection', () => {
   let app: firebase.app.App;
   let afs: AngularFirestore;
   let sub: Subscription;
@@ -78,11 +78,13 @@ describe('AngularFirestoreCollection', () => {
 
   describe('snapshotChanges()', () => {
 
-    it('should listen to all snapshotChanges() by default', async (done) => {
+    fit('should listen to all snapshotChanges() by default', async (done) => {
       const ITEMS = 10;
       let count = 0;
       const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
       const sub = stocks.snapshotChanges().subscribe(data => {
+        const ids = data.map(d => d.payload.doc.id);
+        debugger;
         count = count + 1;
         // the first time should all be 'added'
         if(count === 1) {

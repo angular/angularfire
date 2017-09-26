@@ -8,10 +8,11 @@ import { Action, Reference } from '../interfaces';
 import 'rxjs/add/operator/map';
 
 function _fromRef<T, R>(ref: Reference<T>): Observable<R> {
-  return new Observable(subscriber => {
+  const ref$ = new Observable(subscriber => {
     const unsubscribe = ref.onSnapshot(subscriber);
     return { unsubscribe };
   });
+  return observeOn.call(ref$, new ZoneScheduler(Zone.current));
 }
 
 export function fromRef<R>(ref: DocumentReference | Query) {
@@ -20,7 +21,7 @@ export function fromRef<R>(ref: DocumentReference | Query) {
 
 export function fromDocRef(ref: DocumentReference): Observable<Action<DocumentSnapshot>>{
   return fromRef<DocumentSnapshot>(ref)
-    .map(payload => ({ payload, type: 'modified' }));
+    .map(payload => ({ payload, type: 'value' }));
 }
 
 export function fromCollectionRef(ref: Query): Observable<Action<QuerySnapshot>> {
