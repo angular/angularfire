@@ -1,6 +1,6 @@
-# Using AngularFire2 with Ionic 3-Angular 4
+# Using AngularFire with Ionic
 
-This tutorial provides a walkthrough of integrating AngularFire2 Authentication with Ionic3/Angular4. 
+This tutorial provides a walkthrough of integrating ANgularFIre Authentication with Ionic 3 /Angular 4+. 
 The below setup has been tested on Windows 10, but it should be same for Mac/Linux.
 
 Note: - If you're working with Ionic2 and Angular2.0, then you should refer to **Auth-with-Ionic2** tutorial 
@@ -243,7 +243,7 @@ export class AppModule {}
 Now inject AngularFireDatabase in your component. Open your `home.ts` by going into `src/pages/home/home.ts` and make the 
 following changes:
 
->1) Import "AngularFireDatabase, FirebaseListObservable" at the top of your component.
+>1) Import "AngularFireDatabase" at the top of your component.
 
 >2) Inject your AngularFireDatabase dependency in the constructor.
 
@@ -256,17 +256,18 @@ Your `home.ts` file should look like this.
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 
-import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import { AngularFireDatabase } from 'angularfire2/database';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
 })
 export class HomePage {
-  items: FirebaseListObservable<any[]>;
+  items: Observable<any[]>;
 
   constructor(public navCtrl: NavController, afDB: AngularFireDatabase) {
-    this.items = afDB.list('/cuisines');
+    this.items = afDB.list('cuisines').valueChanges();
   }
 
 }
@@ -290,7 +291,7 @@ export class HomePage {
 <ion-content padding>
 	<ion-list>
 		<ion-item class="text" *ngFor="let item of items | async">
-			{{item.$value}}
+			{{item | json}}
 		</ion-item>
 	</ion-list>
 </ion-content>
@@ -344,7 +345,7 @@ The `home.html` should look like below
 <ion-header>
 	<ion-navbar>
 		<ion-title>
-			Auth with Ionic 3
+			Auth with Ionic
 		</ion-title>
 	</ion-navbar>
 </ion-header>
@@ -465,7 +466,7 @@ and `home.html` shouldlook like this
 <ion-header>
 	<ion-navbar>
 		<ion-title>
-			Auth with Ionic 3
+			Auth with Ionic
 		</ion-title>
 	</ion-navbar>
 </ion-header>

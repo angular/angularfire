@@ -157,7 +157,7 @@ import { Observable } from 'rxjs/Observable';
   templateUrl: 'home.html'
 })
 export class HomePage {
-  items: FirebaseListObservable<any[]>;
+  items: Observable<any[]>;
   constructor(
     public db: AngularFireDatabase,
     public navCtrl: NavController,
@@ -173,21 +173,20 @@ In `/src/pages/home/home.ts`:
 ```ts
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
-import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import { AngularFireDatabase } from 'angularfire2/database';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
 })
 export class HomePage {
-  items: FirebaseListObservable<any[]>;
+  items: Observable<any[]>;
   constructor(
     public db: AngularFireDatabase,
     public navCtrl: NavController,
   ) {
-    // In this case, '/list' is a placeholder.
-    this.items = db.list('/list')
-
+    this.items = db.list('list').valueChanges();
   }
 
 }
@@ -202,7 +201,7 @@ Open `/src/pages/home/home.html`:
 
 <ion-content padding>
   <ion-item *ngFor="let item of items | async">
-    {{item.$value}}
+    {{item | json}}
   </ion-item>
 </ion-content>
 ```
@@ -213,5 +212,5 @@ Open `/src/pages/home/home.html`:
 ionic serve
 ```
 
-And that's it! If there's any issues, be sure to file an issue on the Angularfire repo or the Ionic repo, depending on who's to blame :smile:
+That's it! If there's any issues, be sure to file an issue on the AngularFire repo or the Ionic repo, depending on who's to blame :smile:
 
