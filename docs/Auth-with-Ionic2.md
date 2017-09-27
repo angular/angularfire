@@ -19,7 +19,7 @@ v6.9.1
 
 ```
 
-As of writting this document, this is the most stable version. If you're not on this version,
+As of writing this document, this is the most stable version. If you're not on this version,
 please upgrade yourself to latest version by installing node from [here](https://nodejs.org).
 
 Check your npm version by executing the following command.

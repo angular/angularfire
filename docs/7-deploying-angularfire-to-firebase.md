@@ -12,7 +12,7 @@ ng build -prod
 
 ### 1. Run Firebase init
 
-You must initliazie firebase hosting in order to deploy your application. In order to this run the `firebase init` command.
+You must initialize Firebase Hosting in order to deploy your application. In order to do this run the `firebase init` command.
 This command prompts you to give the public directory. Choose the /dist directory created by the `ng build -prod`. 
 `firebase init` will also ask you if you want to overwrite your index file. Type `no` since your angular app includes a index file.
 
