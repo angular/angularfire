@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "project": {
+    "name": "universal-test"
+  },
+  "apps": [
+    {
+      "platform": "server",
+      "root": "src",
+      "outDir": "dist-server",
+      "index": "index.html",
+      "main": "main.server.ts",
+      "tsconfig": "tsconfig.server.json",
+      "prefix": "app"
+    }
+  ]
+}
