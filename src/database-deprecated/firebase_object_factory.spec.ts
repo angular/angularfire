@@ -1,7 +1,7 @@
 import * as firebase from 'firebase/app';
 import { Subscription } from 'rxjs';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2';
-import { AngularFireDatabase, AngularFireDatabaseModule, FirebaseObjectObservable, FirebaseObjectFactory } from 'angularfire2/database';
+import { AngularFireDatabase, AngularFireDatabaseModule, FirebaseObjectObservable, FirebaseObjectFactory } from 'angularfire2/database-deprecated';
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from './test-config';
 

@@ -241,7 +241,8 @@ function getVersions() {
     getDestPackageFile('core'),
     getDestPackageFile('auth'),
     getDestPackageFile('database'),
-    getDestPackageFile('firestore')
+    getDestPackageFile('firestore'),
+    getDestPackageFile('database-deprecated')
   ];
   return paths
     .map(path => require(path))
@@ -278,11 +279,13 @@ function buildModules(globals) {
   const auth$ = buildModule('auth', globals);
   const db$ = buildModule('database', globals);
   const firestore$ = buildModule('firestore', globals);
+  const dbdep$ = buildModule('database-deprecated', globals);
   return Observable
     .forkJoin(core$, Observable.from(copyRootTest()))
     .switchMapTo(auth$)
     .switchMapTo(db$)
-    .switchMapTo(firestore$);
+    .switchMapTo(firestore$)
+    .switchMapTo(dbdep$);
 }
 
 function buildLibrary(globals) {
@@ -298,11 +301,13 @@ function buildLibrary(globals) {
       const authStats = measure('auth');
       const dbStats = measure('database');
       const fsStats = measure('firestore');
+      const dbdepStats = measure('database-deprecated');
       console.log(`
       core.umd.js - ${coreStats.size}, ${coreStats.gzip}
       auth.umd.js - ${authStats.size}, ${authStats.gzip}
       database.umd.js - ${dbStats.size}, ${dbStats.gzip}
       firestore.umd.js - ${fsStats.size}, ${fsStats.gzip}
+      database-deprecated.umd.js - ${dbdepStats.size}, ${dbdepStats.gzip}
       `);
       verifyVersions();
     });

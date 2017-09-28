@@ -10,7 +10,7 @@ Status: Release candidate
 ## What is AngularFire?
 
 - **Observable based** - Use the power of RxJS, Angular, and Firebase.
-- **Realtime bindings** - Synchronize data in reatime.
+- **Realtime bindings** - Synchronize data in realtime.
 - **Authentication** - Log users in with a variety of providers and monitor authentication state in realtime.
 - **Offline Data** - Store data offline automatically with AngularFirestore.
 - **ngrx friendly** - Integrate with ngrx using AngularFire's action based APIs.
@@ -20,7 +20,7 @@ Status: Release candidate
 
 [Stackblitz Template](https://stackblitz.com/edit/angular-2ed5zx?) - Remember to set your Firebase configuration in `app/app.module.ts`.
 
-[Upgrading to v4.0? Check out our guide.](docs/version-4-upgrade.md)
+[Upgrading to v5.0? Check out our guide.](docs/version-5-upgrade.md)
 
 ## Install
 
@@ -70,9 +70,9 @@ export class MyApp {
 - [Retrieving data as lists](docs/3-retrieving-data-as-lists.md)
 - [Querying lists](docs/4-querying-lists.md)
 
+### Deploy to Firebase Hosting
+- [Deploying AngularFire to Firebase Hosting](docs/7-deploying-angularfire-to-firebase.md)
+
 ### Ionic
 - [Using AngularFire with Ionic 2](docs/Auth-with-Ionic2.md)
 - [Using AngularFire with Ionic 3 and Angular 4](docs/Auth-with-Ionic3-Angular4.md)
-
-### Deploy to Firebase Hosting
-- [Deploying AngularFire to Firebase Hosting](docs/7-deploying-angularfire-to-firebase.md)

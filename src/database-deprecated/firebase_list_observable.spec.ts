@@ -1,5 +1,5 @@
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule} from 'angularfire2';
-import { AngularFireDatabase, AngularFireDatabaseModule, FirebaseListObservable, FirebaseObjectFactory } from 'angularfire2/database';
+import { AngularFireDatabase, AngularFireDatabaseModule, FirebaseListObservable, FirebaseObjectFactory } from 'angularfire2/database-deprecated';
 import { Observer } from 'rxjs/Observer';
 import { map } from 'rxjs/operator/map';
 import * as firebase from 'firebase/app';
