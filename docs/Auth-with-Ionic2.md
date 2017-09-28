@@ -1,6 +1,6 @@
-#  Using AngularFire2 with Ionic 2
+#  Using AngularFire with Ionic 2
 
-This document provides you a walkthrough of integrating AngularFire2 Authentication with Ionic2.
+This document provides you a walkthrough of integrating AngularFire Authentication with Ionic2.
 The below setup has been tested on Windows 10, but it should be same for Mac/Linux.
 
 Ensure that you're executing these commands as **Administrator** on Windows and **sudo** on Mac/Linux to avoid any errors.
@@ -59,28 +59,28 @@ C:\projects>ionic -v
 
 These are the latest versions as of writting this document.
 
-On successful execution of above commands, you're all set to create your Ionic 2 app.
+On successful execution of above commands, you're all set to create your Ionic app.
 To create your app, change into the directory where you want your app to reside and execute the following command
 
 ```bash
 
-C:\projects> ionic start Ionic_AngularFire2_Project blank --v2
+C:\projects> ionic start Ionic_AngularFire_Project blank --v2
 
 ```
 
->The command ionic start will create the project with name "Ionic_AngularFire2_Project" using "blank" template.
+>The command ionic start will create the project with name "Ionic_AngularFire_Project" using "blank" template.
 
 >The --v2 flag ensures, this is a Ionic2 project.
 
 Change to the project directory, which was just created with above command
 
->C:\projects\Ionic_AngularFire2_Project>
+>C:\projects\Ionic_AngularFire_Project>
 
 To start your app, execute the following command
 
 ```bash
 
-C:\projects\Ionic_AngularFire2_Project> ionic serve
+C:\projects\Ionic_AngularFire_Project> ionic serve
 
 ```
 
@@ -95,9 +95,9 @@ external libraries and extend this application.
 
 ```bash
 
-C:\projects\Ionic_AngularFire2_Project>npm install -g typings
+C:\projects\Ionic_AngularFire_Project>npm install -g typings
 
-C:\projects\Ionic_AngularFire2_Project>npm install -g typescript
+C:\projects\Ionic_AngularFire_Project>npm install -g typescript
 
 ```
 
@@ -105,27 +105,27 @@ Check typings and typescript versions by executing following commands:
 
 ```bash
 
-C:\projects\Ionic_AngularFire2_Project>typings -v
+C:\projects\Ionic_AngularFire_Project>typings -v
 2.0.0
 
-C:\projects\Ionic_AngularFire2_Project>tsc -v
+C:\projects\Ionic_AngularFire_Project>tsc -v
 Version 2.0.10
 
 ```
 
-### Configuring AngularFire2 and Firebase
+### Configuring AngularFire and Firebase
 
-Install angularfire2 and firebase by executing the following command in your project directory
+Install AngularFire and firebase by executing the following command in your project directory
 
 ```ts
 
-C:\projects\Ionic_AngularFire2_Project>npm install angularfire2 firebase --save
+C:\projects\Ionic_AngularFire_Project>npm install AngularFire firebase --save
 
 ```
 
-_This should add angularfire2 and firebase entry in your project's package.json file in dependencies section. Something similar_
+_This should add AngularFire and firebase entry in your project's package.json file in dependencies section. Something similar_
 
->"angularfire2": "^2.0.0-beta.6",
+>"AngularFire": "^2.0.0-beta.6",
 
 >"firebase": "^3.6.1",
 
@@ -149,7 +149,7 @@ import { IonicApp, IonicModule } from 'ionic-angular';
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
 
-import { AngularFireModule } from 'angularfire2';
+import { AngularFireModule } from 'AngularFire';
 
 export const firebaseConfig = {
   apiKey: "xxxxxxxxxx",
@@ -195,7 +195,7 @@ Your `home.ts` file should look like this.
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 
-import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import { AngularFireDatabase, FirebaseListObservable } from 'AngularFire/database';
 
 @Component({
   selector: 'page-home',
@@ -239,20 +239,20 @@ export class HomePage {
 
 ```bash
 
-C:\projects\Ionic_AngularFire2_Project> ionic serve
+C:\projects\Ionic_AngularFire_Project> ionic serve
 
 ```
 
 This should fetch the data from firebase.
 
-## Configuring AngularFire2 Auth with Ionic2
+## Configuring AngularFire Auth with Ionic2
 
 Continuing with the above example stop your server by pressing `ctrl+c` and go to command prompt and
 generate a service by executing the following command
 
 ```bash
 
-C:\projects\Ionic_AngularFire2_Project> ionic g provider AuthService
+C:\projects\Ionic_AngularFire_Project> ionic g provider AuthService
 
 ```
 
@@ -262,7 +262,7 @@ Update the service with the following code.
 ```typescript
 import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
-import { AngularFireAuth } from 'angularfire2/auth';
+import { AngularFireAuth } from 'AngularFire/auth';
 // Do not import from 'firebase' as you'll lose the tree shaking benefits
 import * as firebase from 'firebase/app';
 
@@ -306,7 +306,7 @@ import { IonicApp, IonicModule } from 'ionic-angular';
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
 
-import { AngularFireModule } from 'angularfire2';
+import { AngularFireModule } from 'AngularFire';
 import { AuthService } from '../providers/auth-service';
 
 
@@ -371,7 +371,7 @@ import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 
 import { AuthService } from '../../providers/auth-service';
-import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import { AngularFireDatabase, FirebaseListObservable } from 'AngularFire/database';
 
 @Component({
   selector: 'page-home',
@@ -412,7 +412,7 @@ Ensure you've the platform added to your project. If not add the platform by exe
 
 ```
 
-C:\projects\Ionic_AngularFire2_Project>ionic platform add android
+C:\projects\Ionic_AngularFire_Project>ionic platform add android
 
 ```
 
@@ -423,7 +423,7 @@ Now, let's try to run the app in browser. Execute the command
 
 ```
 
-C:\projects\Ionic_AngularFire2_Project> ionic run android
+C:\projects\Ionic_AngularFire_Project> ionic run android
 
 ```
 
@@ -440,7 +440,7 @@ _Ensure you follow the steps correctly to configure your app._
  Once you create your app and make a note of your App ID, go to command prompt in your project directory and execute the following command
 
  ```
- C:\projects\Ionic_AngularFire2_Project>
+ C:\projects\Ionic_AngularFire_Project>
  ionic plugin add cordova-plugin-facebook4 --save --variable APP_ID="123456789" --variable APP_NAME="myApp"
 
  ```
@@ -465,7 +465,7 @@ your ```auth-service.ts``` code should look like this.
 ```ts
 import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
-import { AngularFireAuth } from 'angularfire2/auth';
+import { AngularFireAuth } from 'AngularFire/auth';
 // Do not import from 'firebase' as you'll lose the tree shaking benefits
 import * as firebase from 'firebase/app';
 
@@ -516,7 +516,7 @@ Verfiy your app is running in browser by executing the following command
 
 ```
 
-C:\projects\Ionic_AngularFire2_Project>ionic serve
+C:\projects\Ionic_AngularFire_Project>ionic serve
 
 ```
 
@@ -524,7 +524,7 @@ Everything should work. Now trying running the app on your android phone
 
 ```
 
-C:\projects\Ionic_AngularFire2_Project> ionic run android
+C:\projects\Ionic_AngularFire_Project> ionic run android
 
 ```
 

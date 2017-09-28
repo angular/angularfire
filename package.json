@@ -1,10 +1,10 @@
 {
   "name": "angularfire2",
-  "version": "4.0.0-rc.2",
+  "version": "5.0.0-rc.0",
   "description": "The official library of Firebase and Angular.",
   "private": true,
   "scripts": {
-    "test": "karma start --single-run",
+    "test": "npm run build && karma start --single-run",
     "test:watch": "concurrently \"npm run build:watch\" \"npm run delayed_karma\"",
     "test:debug": "npm run build && karma start",
     "test:universal": "npm run build && cp -R dist/packages-dist test/universal-test/node_modules/angularfire2 && cd test/universal-test && npm run prerender",
@@ -50,7 +50,7 @@
     "gulp": "^3.9.0",
     "gulp-jasmine": "^2.2.1",
     "gulp-typescript": "^2.10.0",
-    "gzip-size": "^3.0.0",
+    "gzip-size": "^4.0.0",
     "http-server": "^0.8.5",
     "jasmine": "^2.4.1",
     "jasmine-core": "^2.4.1",
@@ -73,7 +73,7 @@
     "systemjs": "^0.19.16",
     "systemjs-builder": "^0.15.7",
     "traceur": "0.0.96",
-    "typescript": "^2.3.4"
+    "typescript": "^2.5.2"
   },
   "typings": "index.d.ts"
 }

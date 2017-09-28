@@ -3,7 +3,7 @@ import { FirebaseApp, FirebaseAppConfig, AngularFireModule} from 'angularfire2';
 import { AngularFireDatabase, AngularFireDatabaseModule, FirebaseListObservable, 
   FirebaseListFactory, onChildAdded, onChildChanged, onChildRemoved, onChildUpdated, 
   FirebaseObjectFactory 
-} from 'angularfire2/database';
+} from 'angularfire2/database-deprecated';
 import { TestBed, inject } from '@angular/core/testing';
 import * as utils from './utils';
 import { Query, AFUnwrappedDataSnapshot } from './interfaces';

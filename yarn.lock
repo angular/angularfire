@@ -1366,11 +1366,11 @@ fs-exists-sync@^0.1.0:
   resolved "https://registry.npmjs.org/fs-exists-sync/-/fs-exists-sync-0.1.0.tgz#982d6893af918e72d08dec9e8673ff2b5a8d6add"
 
 fs-extra@^4.0.0:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-4.0.1.tgz#7fc0c6c8957f983f57f306a24e5b9ddd8d0dd880"
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-4.0.2.tgz#f91704c53d1b461f893452b0c307d9997647ab6b"
   dependencies:
     graceful-fs "^4.1.2"
-    jsonfile "^3.0.0"
+    jsonfile "^4.0.0"
     universalify "^0.1.0"
 
 fs.realpath@^1.0.0:
@@ -1719,11 +1719,12 @@ gulplog@^1.0.0:
   dependencies:
     glogg "^1.0.0"
 
-gzip-size@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/gzip-size/-/gzip-size-3.0.0.tgz#546188e9bdc337f673772f81660464b389dce520"
+gzip-size@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/gzip-size/-/gzip-size-4.0.0.tgz#a80e13e18938bcb2e6702fec606f5cf8b666db3a"
   dependencies:
     duplexer "^0.1.1"
+    pify "^3.0.0"
 
 handlebars@^4.0.2:
   version "4.0.5"
@@ -2207,10 +2208,9 @@ json@^9.0.3:
   version "9.0.4"
   resolved "https://registry.npmjs.org/json/-/json-9.0.4.tgz#d0dbf2404c128572a935ecafadfc782ec81112ce"
 
-jsonfile@^3.0.0:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/jsonfile/-/jsonfile-3.0.1.tgz#a5ecc6f65f53f662c4415c7675a0331d0992ec66"
-  optionalDependencies:
+jsonfile@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/jsonfile/-/jsonfile-4.0.0.tgz#8771aae0799b64076b76640fca058f9c10e33ecb"
     graceful-fs "^4.1.6"
 
 jsonify@~0.0.0:
@@ -2927,6 +2927,10 @@ path-type@^1.0.0:
 pify@^2.0.0, pify@^2.3.0:
   version "2.3.0"
   resolved "https://registry.npmjs.org/pify/-/pify-2.3.0.tgz#ed141a6ac043a849ea588498e7dca8b15330e90c"
+
+pify@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/pify/-/pify-3.0.0.tgz#e5a4acd2c101fdf3d9a4d07f0dbc4db49dd28176"
 
 pinkie-promise@^2.0.0:
   version "2.0.1"
@@ -3735,11 +3739,7 @@ type-is@~1.6.13:
     media-typer "0.3.0"
     mime-types "~2.1.11"
 
-typescript@1.8.10:
-  version "1.8.10"
-  resolved "https://registry.npmjs.org/typescript/-/typescript-1.8.10.tgz#b475d6e0dff0bf50f296e5ca6ef9fbb5c7320f1e"
-
-typescript@^2.3.4:
+typescript@^2.5.2:
   version "2.5.2"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.5.2.tgz#038a95f7d9bbb420b1bf35ba31d4c5c1dd3ffe34"
 

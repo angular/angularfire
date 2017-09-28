@@ -4,7 +4,7 @@
     "baseUrl": ".",
     "paths": {
       "angularfire2": ["../../dist/packages-dist"],
-      "angularfire2/auth": ["../../dist/packages-dist/auth"]
+      "angularfire2/database-deprecated": ["../../dist/packages-dist/database-deprecated"]
     }
   },
   "files": [

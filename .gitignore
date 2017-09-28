@@ -9,3 +9,5 @@ npm-debug.log
 angularfire2-*.tgz
 *.ngfactory.ts
 *.ngsummary.json
+*.bak
+.DS_Store

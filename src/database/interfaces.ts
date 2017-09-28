@@ -1,83 +1,62 @@
 import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs/Observable';
 
+export type FirebaseOperation = string | firebase.database.Reference | firebase.database.DataSnapshot;
+
+export interface AngularFireList<T> {
+  query: DatabaseQuery;
+  valueChanges<T>(events?: ChildEvent[]): Observable<T[]>;
+  snapshotChanges(events?: ChildEvent[]): Observable<SnapshotAction[]>;
+  stateChanges(events?: ChildEvent[]): Observable<SnapshotAction>;
+  auditTrail(events?: ChildEvent[]): Observable<SnapshotAction[]>;
+  update(item: FirebaseOperation, data: T): Promise<void>;
+  set(item: FirebaseOperation, data: T): Promise<void>;
+  push(data: T): firebase.database.ThenableReference;
+  remove(item?: FirebaseOperation): Promise<any>;
+}
+
+export interface AngularFireObject<T> {
+  query: DatabaseQuery;
+  valueChanges<T>(): Observable<T | null>;
+  snapshotChanges<T>(): Observable<SnapshotAction>;
+  update(data: T): Promise<any>;
+  set(data: T): Promise<void>;
+  remove(): Promise<any>;
+}
+
 export interface FirebaseOperationCases {
-  stringCase: () => firebase.Promise<void>;
-  firebaseCase?: () => firebase.Promise<void>;
-  snapshotCase?: () => firebase.Promise<void>;
-  unwrappedSnapshotCase?: () => firebase.Promise<void>;
+  stringCase: () => Promise<void | any>;
+  firebaseCase?: () => Promise<void | any>;
+  snapshotCase?: () => Promise<void | any>;
+  unwrappedSnapshotCase?: () => Promise<void | any>;
 }
 
-export interface AFUnwrappedDataSnapshot {
-  $key: string;
-  $value?: string | number | boolean;
-  $exists: () => boolean;
+export type QueryFn = (ref: DatabaseReference) => DatabaseQuery;
+export type ChildEvent = 'child_added' | 'child_removed' | 'child_changed' | 'child_moved';
+export type ListenEvent = 'value' | ChildEvent;
+
+export type SnapshotChange = { 
+  event: string; 
+  snapshot: DatabaseSnapshot | null; 
+  prevKey: string | undefined;
 }
 
-export interface Query {
-  [key: string]: any;
-  orderByKey?: boolean | Observable<boolean>;
-  orderByPriority?: boolean | Observable<boolean>;
-  orderByChild?: string | Observable<string>;
-  orderByValue?: boolean | Observable<boolean>;
-  equalTo?: any | Observable<any>;
-  startAt?: any | Observable<any>;
-  endAt?: any | Observable<any>;
-  limitToFirst?: number | Observable<number>;
-  limitToLast?: number | Observable<number>;
+export interface Action<T> {
+  type: string;
+  payload: T;
+};
+
+export interface AngularFireAction<T> extends Action<T> {
+  prevKey: string | undefined;
+  key: string | null;
 }
 
-export interface ScalarQuery {
-  [key: string]: any;
-  orderByKey?: boolean;
-  orderByPriority?: boolean;
-  orderByChild?: string;
-  orderByValue?: boolean;
-  equalTo?: any;
-  startAt?: any;
-  endAt?: any;
-  limitToFirst?: number;
-  limitToLast?: number;
+export interface SnapshotPrevKey {
+  snapshot: DatabaseSnapshot | null;
+  prevKey: string | undefined;
 }
 
-export interface OrderBySelection {
-  key: OrderByOptions;
-  value: boolean | string;
-}
-
-export interface LimitToSelection {
-  key: LimitToOptions;
-  value: number;
-}
-
-export interface FirebaseListFactoryOpts {
-  preserveSnapshot?: boolean;
-  query?: Query;
-}
-
-
-export interface FirebaseObjectFactoryOpts {
-  preserveSnapshot?: boolean;
-}
-
-
-export enum OrderByOptions {
-  Child,
-  Key,
-  Value,
-  Priority
-}
-
-export enum LimitToOptions {
-  First,
-  Last
-}
-
-export enum QueryOptions {
-  EqualTo,
-  StartAt,
-  EndAt
-}
+export type SnapshotAction = AngularFireAction<DatabaseSnapshot | null>;
 
 export type Primitive = number | string | boolean;
 
