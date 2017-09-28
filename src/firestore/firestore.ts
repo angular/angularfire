@@ -2,6 +2,7 @@ import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 import { Observable } from 'rxjs/Observable';
 import { Subscriber } from 'rxjs/Subscriber';
+import { from } from 'rxjs/observable/from';
 import 'rxjs/add/operator/map';
 
 import { Injectable } from '@angular/core';
@@ -88,6 +89,7 @@ export function associateQuery(collectionRef: firebase.firestore.CollectionRefer
 @Injectable()
 export class AngularFirestore {
   public readonly firestore: firebase.firestore.Firestore;
+  public readonly persistenceEnabled$: Observable<boolean>;
 
   /**
    * Each Feature of AngularFire has a FirebaseApp injected. This way we
@@ -95,8 +97,12 @@ export class AngularFirestore {
    * apps and use multiple apps.
    * @param app 
    */
-  constructor(public app: FirebaseApp) {
+  constructor(public app: FirebaseApp, shouldEnablePersistence) {
     this.firestore = app.firestore();
+
+    this.persistenceEnabled$ = shouldEnablePersistence ? 
+      from(app.firestore().enablePersistence().then(() => true)) :
+      from(new Promise((res, rej) => { res(false); }));
   }
   
   /**

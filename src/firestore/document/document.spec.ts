@@ -21,7 +21,7 @@ describe('AngularFirestoreDocument', () => {
     TestBed.configureTestingModule({
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG),
-        AngularFirestoreModule
+        AngularFirestoreModule.enablePersistence()
       ]
     });
     inject([FirebaseApp, AngularFirestore], (_app: firebase.app.App, _afs: AngularFirestore) => {

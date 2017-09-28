@@ -25,7 +25,7 @@ describe('AngularFirestore', () => {
     TestBed.configureTestingModule({
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG),
-        AngularFirestoreModule
+        AngularFirestoreModule.enablePersistence()
       ]
     });
     inject([FirebaseApp, AngularFirestore], (_app: firebase.app.App, _afs: AngularFirestore) => {
@@ -70,5 +70,12 @@ describe('AngularFirestore', () => {
     expect(singleWrapper).toThrowError();
     expect(quadWrapper).toThrowError();
   }); 
+
+  it('should enable persistence', (done) => {
+    const sub = afs.persistenceEnabled$.subscribe(isEnabled => {
+      expect(isEnabled).toBe(true);
+      done();
+    });
+  });
 
 });

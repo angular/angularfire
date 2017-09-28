@@ -34,7 +34,7 @@ describe('AngularFirestoreCollection', () => {
     TestBed.configureTestingModule({
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG),
-        AngularFirestoreModule
+        AngularFirestoreModule.enablePersistence()
       ]
     });
     inject([FirebaseApp, AngularFirestore], (_app: firebase.app.App, _afs: AngularFirestore) => {
@@ -102,7 +102,7 @@ describe('AngularFirestoreCollection', () => {
       });
     });
 
-    fit('should update order on queries', async (done) => {
+    it('should update order on queries', async (done) => {
       const ITEMS = 10;
       let count = 0;
       let firstIndex = 0;

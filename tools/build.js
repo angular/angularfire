@@ -41,6 +41,7 @@ const GLOBALS = {
   'rxjs/add/operator/delay': 'Rx.Observable',
   'rxjs/add/operator/debounce': 'Rx.Observable',
   'rxjs/observable/fromEvent': 'Rx.Observable',
+  'rxjs/observable/from': 'Rx.Observable',
   'rxjs/operator': 'Rx.Observable.prototype',
   '@angular/core': 'ng.core',
   '@angular/compiler': 'ng.compiler',
