@@ -1,8 +1,6 @@
 import { InjectionToken, } from '@angular/core';
 import { FirebaseAppConfig } from './';
 import * as firebase from 'firebase/app';
-// TODO(davideast): Replace once Firestore is merged in firebase.d.ts
-import { Firestore } from 'firestore';
 
 export const FirebaseAppConfigToken = new InjectionToken<FirebaseAppConfig>('FirebaseAppConfigToken');
 
@@ -13,8 +11,8 @@ export class FirebaseApp implements firebase.app.App {
   database: () => firebase.database.Database;
   messaging: () => firebase.messaging.Messaging;
   storage: () => firebase.storage.Storage;
-  delete: () => firebase.Promise<any>;
-  firestore: () => Firestore;
+  delete: () => Promise<any>;
+  firestore: () => firebase.firestore.Firestore;
 }
 
 export function _firebaseAppFactory(config: FirebaseAppConfig, appName?: string): FirebaseApp {

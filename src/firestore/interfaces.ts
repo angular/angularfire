@@ -1,9 +1,9 @@
 import { Subscriber } from 'rxjs/Subscriber';
-import { Firestore, CollectionReference, DocumentReference, Query, DocumentChangeType, SnapshotMetadata, DocumentSnapshot, QuerySnapshot, DocumentChange } from 'firestore';
+import * as firebase from 'firebase/app';
 
 export interface DocumentChangeAction {
-  type: DocumentChangeType;
-  payload: DocumentChange;
+  type: firebase.firestore.DocumentChangeType;
+  payload: firebase.firestore.DocumentChange;
 }
 
 export interface Action<T> {
@@ -17,7 +17,7 @@ export interface Reference<T> {
 
 // A convience type for making a query.
 // Example: const query = (ref) => ref.where('name', == 'david');
-export type QueryFn = (ref: CollectionReference) => Query;
+export type QueryFn = (ref: firebase.firestore.CollectionReference) => firebase.firestore.Query;
 
 /**
  * A structure that provides an association between a reference
@@ -42,6 +42,6 @@ export type QueryFn = (ref: CollectionReference) => Query;
  * });
  */
 export interface AssociatedReference {
-  ref: CollectionReference;
-  query: Query;
+  ref: firebase.firestore.CollectionReference;
+  query: firebase.firestore.Query;
 }

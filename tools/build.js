@@ -48,6 +48,7 @@ const GLOBALS = {
   'firebase/auth': 'firebase',
   'firebase/app': 'firebase',
   'firebase/database': 'firebase',
+  'firebase/firestore': 'firebase',
   'rxjs/scheduler/queue': 'Rx.Scheduler',
   '@angular/core/testing': 'ng.core.testing',
   'angularfire2': 'angularfire2',

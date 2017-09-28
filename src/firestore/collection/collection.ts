@@ -1,6 +1,5 @@
 import * as firebase from 'firebase/app';
-import 'firestore';
-import { Firestore, CollectionReference, DocumentReference, Query, DocumentChangeType, SnapshotMetadata, DocumentSnapshot, QuerySnapshot, DocumentChange } from 'firestore';
+import 'firebase/firestore';
 import { Observable } from 'rxjs/Observable';
 import { Subscriber } from 'rxjs/Subscriber';
 import { fromCollectionRef } from '../observable/fromRef';
@@ -14,7 +13,7 @@ import { QueryFn, AssociatedReference, DocumentChangeAction } from '../interface
 import { docChanges, sortedChanges } from './changes';
 import { AngularFirestoreDocument } from '../document/document';
 
-export function validateEventsArray(events?: DocumentChangeType[]) {
+export function validateEventsArray(events?: firebase.firestore.DocumentChangeType[]) {
   if(!events || events!.length === 0) {
     events = ['added', 'removed', 'modified'];
   }
@@ -56,8 +55,8 @@ export class AngularFirestoreCollection<T> {
    * @param ref 
    */  
   constructor(
-    public readonly ref: CollectionReference,
-    private readonly query: Query) { }
+    public readonly ref: firebase.firestore.CollectionReference,
+    private readonly query: firebase.firestore.Query) { }
 
   /**
    * Listen to the latest change in the stream. This method returns changes
@@ -65,7 +64,7 @@ export class AngularFirestoreCollection<T> {
    * your own data structure.
    * @param events 
    */
-  stateChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction[]> {
+  stateChanges(events?: firebase.firestore.DocumentChangeType[]): Observable<DocumentChangeAction[]> {
     if(!events || events.length === 0) {
       return docChanges(this.query);
     }
@@ -79,7 +78,7 @@ export class AngularFirestoreCollection<T> {
    * but it collects each event in an array over time.
    * @param events 
    */
-  auditTrail(events?: DocumentChangeType[]): Observable<DocumentChangeAction[]> {
+  auditTrail(events?: firebase.firestore.DocumentChangeType[]): Observable<DocumentChangeAction[]> {
     return this.stateChanges(events).scan((current, action) => [...current, ...action], []);
   }
   
@@ -88,7 +87,7 @@ export class AngularFirestoreCollection<T> {
    * query order.
    * @param events 
    */
-  snapshotChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction[]> {
+  snapshotChanges(events?: firebase.firestore.DocumentChangeType[]): Observable<DocumentChangeAction[]> {
     events = validateEventsArray(events);
     return sortedChanges(this.query, events);
   }
@@ -96,7 +95,7 @@ export class AngularFirestoreCollection<T> {
   /**
    * Listen to all documents in the collection and its possible query as an Observable.
    */  
-  valueChanges(events?: DocumentChangeType[]): Observable<T[]> {
+  valueChanges(events?: firebase.firestore.DocumentChangeType[]): Observable<T[]> {
     return this.snapshotChanges()
       .map(actions => actions.map(a => a.payload.doc.data()) as T[]);
   }

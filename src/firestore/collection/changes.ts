@@ -1,5 +1,6 @@
 import { fromCollectionRef } from '../observable/fromRef';
-import { Query, DocumentChangeType, DocumentChange, DocumentSnapshot, QuerySnapshot } from 'firestore';
+import * as firebase from 'firebase/app';
+import 'firebase/firestore';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/filter';
@@ -12,7 +13,7 @@ import { DocumentChangeAction, Action } from '../interfaces';
  * order of occurence. 
  * @param query 
  */
-export function docChanges(query: Query): Observable<DocumentChangeAction[]> {
+export function docChanges(query: firebase.firestore.Query): Observable<DocumentChangeAction[]> {
   return fromCollectionRef(query)
     .map(action => 
       action.payload.docChanges
@@ -23,7 +24,7 @@ export function docChanges(query: Query): Observable<DocumentChangeAction[]> {
  * Return a stream of document changes on a query. These results are in sort order.
  * @param query 
  */
-export function sortedChanges(query: Query, events: DocumentChangeType[]): Observable<DocumentChangeAction[]> {
+export function sortedChanges(query: firebase.firestore.Query, events: firebase.firestore.DocumentChangeType[]): Observable<DocumentChangeAction[]> {
   return fromCollectionRef(query)
     .map(changes => changes.payload.docChanges)
     .scan((current, changes) => combineChanges(current, changes, events), [])
@@ -38,7 +39,7 @@ export function sortedChanges(query: Query, events: DocumentChangeType[]): Obser
  * @param changes 
  * @param events
  */
-export function combineChanges(current: DocumentChange[], changes: DocumentChange[], events: DocumentChangeType[]) {
+export function combineChanges(current: firebase.firestore.DocumentChange[], changes: firebase.firestore.DocumentChange[], events: firebase.firestore.DocumentChangeType[]) {
   changes.forEach(change => {
     // skip unwanted change types
     if(events.indexOf(change.type) > -1) {
@@ -53,18 +54,21 @@ export function combineChanges(current: DocumentChange[], changes: DocumentChang
  * @param combined 
  * @param change 
  */
-export function combineChange(combined: DocumentChange[], change: DocumentChange): DocumentChange[] {
+export function combineChange(combined: firebase.firestore.DocumentChange[], change: firebase.firestore.DocumentChange): firebase.firestore.DocumentChange[] {
   switch(change.type) {
     case 'added': 
       combined.splice(change.newIndex, 0, change);
       break;
     case 'modified':
+      debugger;
       // When an item changes position we first remove it
       // and then add it's new position
       if(change.oldIndex !== change.newIndex) {
         combined.splice(change.oldIndex, 1);
-      } 
-      combined.splice(change.newIndex, 1, change);
+        combined.splice(change.newIndex, 0, change);
+      } else {
+        combined.splice(change.newIndex, 1, change);
+      }
       break;
     case 'removed':
       combined.splice(change.oldIndex, 1);

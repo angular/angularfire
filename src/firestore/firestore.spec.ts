@@ -5,7 +5,6 @@ import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 
 import * as firebase from 'firebase/app';
-import * as firestore from 'firestore';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 

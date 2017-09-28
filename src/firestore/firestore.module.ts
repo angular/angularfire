@@ -1,7 +1,6 @@
 import { NgModule, NgZone } from '@angular/core';
 import { FirebaseApp, AngularFireModule } from 'angularfire2';
 import { AngularFirestore } from './firestore';
-import * as firestore from 'firestore';
 
 export function _getAngularFirestore(app: FirebaseApp) {
   return new AngularFirestore(app);

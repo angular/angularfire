@@ -1,6 +1,5 @@
 import * as firebase from 'firebase/app';
-import 'firestore';
-import { Firestore, CollectionReference, DocumentReference, Query, DocumentChangeType, SnapshotMetadata, DocumentSnapshot, QuerySnapshot, DocumentChange } from 'firestore';
+import 'firebase/firestore';
 import { Observable } from 'rxjs/Observable';
 import { Subscriber } from 'rxjs/Subscriber';
 import 'rxjs/add/operator/map';
@@ -25,7 +24,7 @@ import { AngularFirestoreCollection } from './collection/collection';
  *  return ref.where('age', '<', 200);
  * });
  */
-export function associateQuery(collectionRef: CollectionReference, queryFn = ref => ref): AssociatedReference {
+export function associateQuery(collectionRef: firebase.firestore.CollectionReference, queryFn = ref => ref): AssociatedReference {
   const query = queryFn(collectionRef);
   const ref = collectionRef;
   return { query, ref };
@@ -88,7 +87,7 @@ export function associateQuery(collectionRef: CollectionReference, queryFn = ref
  */
 @Injectable()
 export class AngularFirestore {
-  public readonly firestore: Firestore;
+  public readonly firestore: firebase.firestore.Firestore;
 
   /**
    * Each Feature of AngularFire has a FirebaseApp injected. This way we

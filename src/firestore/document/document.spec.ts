@@ -4,7 +4,6 @@ import { AngularFirestoreModule } from '../firestore.module';
 import { AngularFirestoreDocument } from '../document/document';
 
 import * as firebase from 'firebase/app';
-import * as firestore from 'firestore';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
@@ -13,7 +12,7 @@ import { COMMON_CONFIG } from '../test-config';
 
 import { Stock, randomName, FAKE_STOCK_DATA } from '../utils.spec';
 
-fdescribe('AngularFirestoreDocument', () => {
+describe('AngularFirestoreDocument', () => {
   let app: firebase.app.App;
   let afs: AngularFirestore;
   let sub: Subscription;

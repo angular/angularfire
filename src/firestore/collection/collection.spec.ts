@@ -6,7 +6,6 @@ import { AngularFirestoreCollection } from './collection';
 import { QueryFn } from '../interfaces';
 
 import * as firebase from 'firebase/app';
-import * as firestore from 'firestore';
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { Subscription } from 'rxjs/Subscription';
@@ -26,7 +25,7 @@ async function collectionHarness(afs: AngularFirestore, items: number, queryFn?:
   return { randomCollectionName, ref, stocks, names };  
 }
 
-fdescribe('AngularFirestoreCollection', () => {
+describe('AngularFirestoreCollection', () => {
   let app: firebase.app.App;
   let afs: AngularFirestore;
   let sub: Subscription;
@@ -78,7 +77,7 @@ fdescribe('AngularFirestoreCollection', () => {
 
   describe('snapshotChanges()', () => {
 
-    fit('should listen to all snapshotChanges() by default', async (done) => {
+    it('should listen to all snapshotChanges() by default', async (done) => {
       const ITEMS = 10;
       let count = 0;
       const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
@@ -103,14 +102,13 @@ fdescribe('AngularFirestoreCollection', () => {
       });
     });
 
-    it('should update order on queries', async (done) => {
+    fit('should update order on queries', async (done) => {
       const ITEMS = 10;
       let count = 0;
       let firstIndex = 0;
       const { randomCollectionName, ref, stocks, names } = 
         await collectionHarness(afs, ITEMS, ref => ref.orderBy('price', 'desc'));
       const sub = stocks.snapshotChanges().subscribe(data => {
-        debugger;
         count = count + 1;
         // the first time should all be 'added'
         if(count === 1) {

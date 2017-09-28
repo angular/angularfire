@@ -1,6 +1,5 @@
 import * as firebase from 'firebase/app';
-import 'firestore';
-import { Firestore, CollectionReference, DocumentReference, Query, DocumentChangeType, SnapshotMetadata, DocumentSnapshot, QuerySnapshot, DocumentChange } from 'firestore';
+import 'firebase/firestore';
 import { Observable } from 'rxjs/Observable';
 import { Subscriber } from 'rxjs/Subscriber';
 import { QueryFn, AssociatedReference, Action } from '../interfaces';
@@ -43,7 +42,7 @@ export class AngularFirestoreDocument<T> {
    * for data operations, data streaming, and Symbol.observable.
    * @param ref 
    */
-  constructor(public ref: DocumentReference) { }
+  constructor(public ref: firebase.firestore.DocumentReference) { }
 
   /**
    * Create or overwrite a single document.
@@ -83,7 +82,7 @@ export class AngularFirestoreDocument<T> {
   /**
    * Listen to snapshot updates from the document.
    */
-  snapshotChanges(): Observable<Action<DocumentSnapshot>> {
+  snapshotChanges(): Observable<Action<firebase.firestore.DocumentSnapshot>> {
     return fromDocRef(this.ref);
   }
 
