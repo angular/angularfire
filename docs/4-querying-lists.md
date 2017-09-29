@@ -7,7 +7,7 @@
 Queries are created by building on the [`firebase.database.Reference`](https://firebase.google.com/docs/reference/js/firebase.database.Reference).
 
 ```ts
-db.list('/items', ref => ref.orderByChild('size').equalTo('large')).valueChanges();
+db.list('/items', ref => ref.orderByChild('size').equalTo('large'))
 ```
 
 **Query Options:**
@@ -37,14 +37,14 @@ To learn more about how sorting and ordering data works in Firebase, check out t
 
 ```ts
 // WARNING: Do not copy and paste. This will not work!
-ref.orderByChild('size').equalTo('large').orderByKey(true);
+ref.orderByChild('size').equalTo('large').orderByKey(true)
 ```
 
 You can only use `limitToFirst` or `limitToLast`, but not both in combination.
 
 ```ts
 // WARNING: Do not copy and paste. This will not work!
-ref.limitToFirst(10).limitToLast(100);
+ref.limitToFirst(10).limitToLast(100)
 ```
 
 ## Creating a query with observable values
@@ -74,6 +74,8 @@ size$.next('small');
 ```
 
 **Example app:**
+ 
+[See this example in action on StackBlitz](https://stackblitz.com/edit/angularfire-db-api-s8ip7m).
 
 ```ts
 import { Component } from '@angular/core';
@@ -115,7 +117,7 @@ export class AppComponent {
 }
 ```
 
-+**To run the above example as is, you need to have sample data in you firebase database with the following structure:"**
+**To run the above example as is, you need to have sample data in you firebase database with the following structure:"**
  
  ```json
 {
@@ -135,7 +137,5 @@ export class AppComponent {
   }
 }
  ```
-
- [See this example in action on StackBlitz](https://stackblitz.com/edit/angularfire-db-api-s8ip7m).
 
 ### [Next Step: User Authentication](5-user-authentication.md)
