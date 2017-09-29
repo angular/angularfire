@@ -117,7 +117,7 @@ export class AppComponent {
 }
 ```
 
-**To run the above example as is, you need to have sample data in you firebase database with the following structure:"**
+**To run the above example as is, you need to have sample data in you firebase database with the following structure:**
  
  ```json
 {
