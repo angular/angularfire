@@ -81,7 +81,7 @@ size$.next('small');
 import { Component } from '@angular/core';
 import { AngularFireDatabase, AngularFireAction } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/operator/switchMap';
 
@@ -98,17 +98,22 @@ import 'rxjs/add/operator/switchMap';
     <button (click)="filterBy('small')">Small</button>
     <button (click)="filterBy('medium')">Medium</button>
     <button (click)="filterBy('large')">Large</button>
+    <button (click)="filterBy(null)" *ngIf="this.size$.getValue()">
+      <em>clear filter</em>
+    </button>
   </div>
   `,
 })
 export class AppComponent {
   items: Observable<AngularFireAction<firebase.database.DataSnapshot>[]>;
-  size$: Subject<string>;
+  size$: BehaviorSubject<string|null>;
   
   constructor(db: AngularFireDatabase) {
-    this.size$ = new Subject();
+    this.size$ = new BehaviorSubject(null);
     this.items = this.size$.switchMap(size =>
-      db.list('/items', ref => ref.orderByChild('size').equalTo(size)).valueChanges();
+      db.list('/items', ref =>
+        size ? ref.orderByChild('size').equalTo(size) : ref
+      ).valueChanges();
     );
   }
   filterBy(size: string) {
