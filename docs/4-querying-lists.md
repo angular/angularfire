@@ -116,7 +116,7 @@ export class AppComponent {
       ).valueChanges();
     );
   }
-  filterBy(size: string) {
+  filterBy(size: string|null) {
     this.size$.next(size);
   }
 }
