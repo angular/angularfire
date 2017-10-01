@@ -25,7 +25,11 @@ Status: Release candidate
 
 ```bash
 npm install firebase angularfire2 --save
+# Or use the 5.0 beta API! Will be released soon
+npm install firebase angularfire2@next --save
 ```
+
+## Note: These docs reference the beta 5.0 API which will be released soon.
 
 ## Example use:
 
