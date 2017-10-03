@@ -1,3 +1,18 @@
+<a name="5.0.0-rc.0"></a>
+# [5.0.0-rc.0](https://github.com/angular/angularfire2/compare/4.0.0-rc.2...v5.0.0-rc.0) (2017-10-03)
+
+### Features
+* **AngularFirestore:** Module for Cloud Firestore ([90c8ede](https://github.com/angular/angularfire2/commit/90c8ede))
+* **New AngularFireDatabase API:** New API for the database [#1158](https://github.com/angular/angularfire2/issues/1158)
+
+### Breaking changes
+
+AngularFire 5.0 brings a new API for the Realtime Database. [See the migration doc for converting to the new API](https://github.com/angular/angularfire2/blob/master/docs/version-5-upgrade.md). If you want to stay on the old database API you can use:
+
+```ts
+import { AngularFireModule } from 'angularfire2/database-deprecated';
+```
+
 <a name="4.0.0-rc.1"></a>
 # [4.0.0-rc.1](https://github.com/angular/angularfire2/compare/4.0.0-rc.0...v4.0.0-rc.1) (2017-06-02)
 
