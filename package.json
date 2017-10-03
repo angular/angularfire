@@ -73,7 +73,7 @@
     "systemjs": "^0.19.16",
     "systemjs-builder": "^0.15.7",
     "traceur": "0.0.96",
-    "typescript": "^2.5.2"
+    "typescript": "^2.5.3"
   },
   "typings": "index.d.ts"
 }
