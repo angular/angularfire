@@ -1,12 +1,11 @@
-# Using Documents with Firestore
+# 2. Documents in AngularFirestore
 
-## Understanding Documents
+> Cloud Firestore is a NoSQL, document-oriented database. Unlike a SQL database, there are no tables or rows. Instead, you store data in *documents*, which are organized into *collections*.
+Each *document* contains a set of key-value pairs. Cloud Firestore is optimized for storing large collections of small documents.
 
-A Document is apart of a Collection. Firestore follows a `Collection > Document > Collection > Document` structure. Collections nested under a Document are not retrieved with a Document. You must explicitly retrieve the Collection underneath that path. This gives you a much more flexible structure. Gone are the days of worrying about pulling back the whole tree.
+## Using `AngularFirestoreDocument`
 
-## Using an AngularFirestoreDocument
-
-The `AngularFirestoreDocument` service is a wrapper around the native Firestore SDK's `DocumentReference` type. It is a generic service that provides you with a strongly typed set of methods for manipulating and streaming data. This service is designed for use as an `@Injectable()`.
+The `AngularFirestoreDocument` service is a wrapper around the native Firestore SDK's [`DocumentReference` type](https://firebase.google.com/docs/reference/js/firebase.firestore.DocumentReference). It is a generic service that provides you with a strongly typed set of methods for manipulating and streaming data. This service is designed for use as an `@Injectable()`.
 
 ```ts
 import { Component } from '@angular/core';
@@ -14,7 +13,7 @@ import { AngularFirestore, AngularFirestoreDocument } from 'angularfire2/firesto
 import { Observable } from 'rxjs/Observable';
 
 @Component({
-  selector: 'afs-app',
+  selector: 'app-root',
   template: `
     <div>
       {{ (item | async)?.name }}
@@ -22,9 +21,9 @@ import { Observable } from 'rxjs/Observable';
   `
 })
 export class AppComponent {
-  private itemDoc: AngularFirestoreDocument<Item>: 
+  private itemDoc: AngularFirestoreDocument<Item>;
   item: Observable<Item>;
-  constructor(private afs: AngularFirestore): {
+  constructor(private afs: AngularFirestore) {
     this.itemDoc = afs.doc<Item>('items/1');
     this.item = this.itemDoc.valueChanges();
   }
@@ -101,10 +100,10 @@ Nesting collections is a great way to structure your data. This allows you to gr
 To retrieve a nested collection use the `collection(path: string)` method.
 
 ```ts
-  constructor(private afs: AngularFirestore): {
+  constructor(private afs: AngularFirestore) {
     this.userDoc = afs.doc<Item>('user/david');
     this.tasks = this.userDoc.collection<Task>('tasks').valueChanges();
   }
 ```
 
-For more information about using collections read the [collection documentation](docs/firestore/collection.md).
+### [Next Step: Collections in AngularFirestore](collections.md)

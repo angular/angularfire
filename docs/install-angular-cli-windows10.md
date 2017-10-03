@@ -59,7 +59,7 @@ npm install -g angular-cli
 
 This should install angular-cli without errors.
 
-#### Post this installation, follow the installation [guide](https://github.com/angular/angularfire2/blob/master/docs/1-install-and-setup.md) to install AngularFire2 and everything should work as expected.
+#### Post this installation, follow the installation [guide](https://github.com/angular/angularfire2/blob/master/docs/install-and-setup.md) to install AngularFire and everything should work as expected.
 
 
 ### Note:

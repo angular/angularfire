@@ -8,7 +8,7 @@ The guide below demonstrates how to retrieve, save, and remove data as lists.
 
 ## Injecting the AngularFireDatabase service
 
-**Make sure you have bootstrapped your application for AngularFire2. See the Installation guide for bootstrap setup.**
+**Make sure you have bootstrapped your application for AngularFire. See the Installation guide for bootstrap setup.**
 
 AngularFireDatabase is a service which can be injected through the constructor of your Angular component or `@Injectable()` service.
 In the previous step, we modified the `/src/app/app.component.ts` to retrieve data as an object. In this step, let's start with a clean slate.
@@ -240,13 +240,4 @@ export class AppComponent {
 }
 ```
 
-## Meta-fields on the object
-Data retrieved from the object binding contains special properties retrieved from the unwrapped Firebase DataSnapshot.
-
-| property |                    | 
-| ---------|--------------------| 
-| `$key`     | The key for each record. This is equivalent to each record's path in our database as it would be returned by `ref.key()`.|
-| `$value`   | If the data for this child node is a primitive (number, string, or boolean), then the record itself will still be an object. The primitive value will be stored under `$value` and can be changed and saved like any other field.|
-
-
-### [Next Step: Querying lists](4-querying-lists.md)
+### [Next Step: Querying lists](querying-lists.md)

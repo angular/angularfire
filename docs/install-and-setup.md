@@ -1,6 +1,6 @@
 # 1. Installation and Setup
 
-> Using Ionic and the Ionic CLI? Check out these [specific instructions](6-angularfire-and-ionic-cli.md) for Ionic and their CLI.
+> Using Ionic and the Ionic CLI? Check out these [specific instructions](ionic/cli.md) for Ionic and their CLI.
 
 ### 0. Prerequisites
 
@@ -99,6 +99,7 @@ export class AppModule {}
 After adding the AngularFireModule you also need to add modules for the individual @NgModules that your application needs.
  - AngularFirestoreModule
  - AngularFireAuthModule
+ - AngularFirestoreModule
  - AngularFireDatabaseModule
  - AngularFireStorageModule (Future release)
  - AngularFireMessagingModule (Future release)
@@ -193,4 +194,4 @@ Run the serve command and go to `localhost:4200` in your browser.
 
 And that's it! If it's totally *borked*, file an issue and let us know.
 
-### [Next Step: Understanding collections in Firestore](firestore/collections.md)
+### [Next Step: Documents in AngularFirestore](firestore/documents.md)

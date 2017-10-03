@@ -1,6 +1,6 @@
-# Contributing to AngularFire2
+# Contributing to AngularFire
 
-We would love for you to contribute to AngularFire2 and help make it even better than it is
+We would love for you to contribute to AngularFire and help make it even better than it is
 today! As a contributor, here are the guidelines we would like you to follow:
 
  - [Code of Conduct](#coc)
@@ -50,7 +50,7 @@ and help you to craft the change so that it is successfully accepted into the pr
 
 ## <a name="setup"></a> Initial Setup
 
-1) Create a fork of AngularFire2 (See [Forking a Project][github-fork])
+1) Create a fork of AngularFire (See [Forking a Project][github-fork])
 
 2) CD into your clone and install dependencies
 

@@ -1,11 +1,11 @@
-# Using Collections with AngularFirestore
+# 3. Collections in AngularFirestore
 
-## Understanding Collections
-Every Firestore application starts with a collection. Firestore is structured in a `Collection > Document > Collection > Document` manner. This provides you with a flexible data structure. When you query a collection you only pull back the documents and not their collections. This is different from the Firebase Realtime Database where a query at a top-level location pulls back the entire tree. No more worrying about pulling back all the way down the tree 😎.
+> Cloud Firestore is a NoSQL, document-oriented database. Unlike a SQL database, there are no tables or rows. Instead, you store data in *documents*, which are organized into *collections*.
+Each *document* contains a set of key-value pairs. Cloud Firestore is optimized for storing large collections of small documents.
 
-## Using an AngularFirestoreCollection
+## Using `AngularFirestoreCollection`
 
-The `AngularFirestoreCollection` service is a wrapper around the native Firestore SDK's `CollectionReference` and `Query` types. It is a generic service that provides you with a strongly typed set of methods for manipulating and streaming data. This service is designed for use as an `@Injectable()`.
+The `AngularFirestoreCollection` service is a wrapper around the native Firestore SDK's [`CollectionReference`](https://firebase.google.com/docs/reference/js/firebase.firestore.CollectionReference) and [`Query`](https://firebase.google.com/docs/reference/js/firebase.firestore.Query) types. It is a generic service that provides you with a strongly typed set of methods for manipulating and streaming data. This service is designed for use as an `@Injectable()`.
 
 ```ts
 import { Component } from '@angular/core';
@@ -13,21 +13,21 @@ import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/fires
 import { Observable } from 'rxjs/Observable';
 
 @Component({
-  selector: 'afs-app',
+  selector: 'app-root',
   template: `
     <ul>
-      <li *ngFor="item of items | async">
+      <li *ngFor="let item of items | async">
         {{ item.name }}
       </li>
     </ul>
   `
 })
 export class AppComponent {
-  private itemsCollection: AngularFirestoreCollection<Item>: 
+  private itemsCollection: AngularFirestoreCollection<Item>;
   items: Observable<Item[]>;
-  constructor(private afs: AngularFirestore): {
+  constructor(private afs: AngularFirestore) {
     this.itemsCollection = afs.collection<Item>('items');
-    this.items = this.itemsCollection.snapshotChanges(['added', 'removed']);
+    this.items = this.itemsCollection.valueChanges();
   }
   addItem(item: Item) {
     this.itemsCollection.add(item);
@@ -118,91 +118,23 @@ import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/fires
 import { Observable } from 'rxjs/Observable';
 
 @Component({
-  selector: 'afs-app',
+  selector: 'app-root',
   template: `
     <ul>
-      <li *ngFor="item of items | async">
+      <li *ngFor="let item of items | async">
         {{ item.name }}
       </li>
     </ul>
   `
 })
 export class AppComponent {
-  private itemsCollection: AngularFirestoreCollection<Item>: 
+  private itemsCollection: AngularFirestoreCollection<Item>;
   items: Observable<Item[]>;
-  constructor(private afs: AngularFirestore): {
+  constructor(private afs: AngularFirestore) {
     this.itemsCollection = afs.collection<Item>('items');
-    this.items = this.itemsCollection.snapshotChanges(['added', 'removed']);
+    this.items = this.itemsCollection.valueChanges();
   }
 }
-```
-
-### Querying
-
-Firestore has powerful querying syntax and the `AngularFirestoreCollection` provides a thin wrapper around it. This keeps you from having to learn two query syntax systems. If you know the Firestore query API then you know it for AngularFirestore ‼
-
-When creating an `AngularFirestoreCollection`, use the optional callback to create a queried reference.
-
-#### Basic Sample
-```ts
-  constructor(private afs: AngularFirestore): {
-    this.itemsCollection = afs.collection<Item>('items', ref => ref.where('size', '==', 'large'));
-    this.items = this.itemsCollection.snapshotChanges();
-  }
-```
-
-#### Component Sample
-```ts
-import { Component } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
-import { Observable } from 'rxjs/Observable';
-
-@Component({
-  selector: 'afs-app',
-  template: `
-    <ul>
-      <li *ngFor="item of items | async">
-        {{ item.name }}
-      </li>
-    </ul>
-  `
-})
-export class AppComponent {
-  private itemsCollection: AngularFirestoreCollection<Item>: 
-  items: Observable<Item[]>;
-  constructor(private afs: AngularFirestore): {
-    this.itemsCollection = afs.collection<Item>('items', ref => {
-      return ref.where('size', '==', 'large').where('price', '>', 10);
-    });
-    this.items = this.itemsCollection.snapshotChanges(['added', 'removed']);
-  }
-}
-```
-
-### Dynamic querying
-
-Imagine you're querying a list of T-Shirts. Every facet of the query should be parameterized. Sometimes the user will search small sizes, prices less than $20, or by a specific brand. AngularFirestore intergrates with RxJS to make this easy.
-
-#### Basic Sample
-```ts
-  constructor(private afs: AngularFirestore): {
-    // import { of } from 'rxjs/observable/of;
-    // You'll use an Observable source from a ReactiveForm control or even
-    // an AngularFirestoreDocument
-    const criteria$ = of({ 
-      size: 'large', 
-      price: 10
-    });
-    this.items = criteria$.switchMap(criteria => {
-      return this.afs
-        .collection<Item>('tshirts', ref => {
-          return ref
-                  .where('size', '==', criteria.size)
-                  .where('price', '>', criteria.price)
-        })
-        .snapshotChanges();
-    });
-  }
 ```
 
 ## Adding documents to a collection
@@ -219,6 +151,6 @@ To add a new document to a collection with a generated id use the `add()` method
 
 ## Manipulating individual documents
 
-To retrieve, update, or delete an individual document you can use the `doc()` method. This method returns an `AngularFirestoreDocument`, which provides methods for streaming, updating, and deleting. 
+To retrieve, update, or delete an individual document you can use the `doc()` method. This method returns an `AngularFirestoreDocument`, which provides methods for streaming, updating, and deleting. [See Using Documents with AngularFirestore for more information on how to use documents](documents.md).
 
-See the [Documents page for complete documentation]((docs/firestore/documents.md).
+### [Next Step: Querying Collections in AngularFirestore](querying-collections.md)

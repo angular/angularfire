@@ -1,20 +1,11 @@
 # 4. Querying lists
 
-> Querying is a killer feature of AngularFire2. 
-You can specify query values as observables, and when those
-observables emit new values, the query is automatically re-run.
-
 ## Creating a query with primitive/scalar values
 
-Queries are created by specifying a `query` object on the `FirebaseListObservable` options.
+Queries are created by building on the [`firebase.database.Reference`](https://firebase.google.com/docs/reference/js/firebase.database.Reference).
 
 ```ts
-const queryObservable = db.list('/items', {
-  query: {
-    orderByChild: 'size',
-    equalTo: 'large' 
-  }
-});
+db.list('/items', ref => ref.orderByChild('size').equalTo('large'))
 ```
 
 **Query Options:**
@@ -35,6 +26,8 @@ const queryObservable = db.list('/items', {
 
 <sup>2</sup> The Firebase SDK supports an optional `key` parameter for [`startAt`](https://firebase.google.com/docs/reference/js/firebase.database.Reference#startAt), [`endAt`](https://firebase.google.com/docs/reference/js/firebase.database.Reference#endAt), and [`equalTo`](https://firebase.google.com/docs/reference/js/firebase.database.Reference#equalTo) when ordering by child, value, or priority. You can specify the `key` parameter using an object literal that contains the `value` and the `key`. For example: `startAt: { value: 'some-value', key: 'some-key' }`.
 
+To learn more about how sorting and ordering data works in Firebase, check out the Firebase documentation on [working with lists of data](https://firebase.google.com/docs/database/web/lists-of-data#sorting_and_filtering_data).
+
 ## Invalid query combinations
 
 **Queries can only be ordered by one method.** This means you can only specify
@@ -42,44 +35,29 @@ const queryObservable = db.list('/items', {
 
 ```ts
 // WARNING: Do not copy and paste. This will not work!
-const queryObservable = db.list('/items', {
-  query: {
-    orderByChild: 'size',
-    equalTo: 'large',
-    orderByKey: true,
-  }
-});
+ref.orderByChild('size').equalTo('large').orderByKey(true)
 ```
 
 You can only use `limitToFirst` or `limitToLast`, but not both in combination.
 
 ```ts
 // WARNING: Do not copy and paste. This will not work!
-const queryObservable = db.list('/items', {
-  query: {
-    limitToFirst: 10,
-    limitToLast: 100,
-  }
-});
+ref.limitToFirst(10).limitToLast(100)
 ```
 
-## Creating a query with observable values
+## Dynamic querying
 
-Rather than specifying regular values, observables can be used to dynamically
-re-run queries when the observable emits a new value.
-
-This is the magic of AngularFire2.
+To enable dynamic queries one should lean on RxJS Operators like `switchMap`.
 
 An RxJS Subject is imported below. A Subject is like an Observable, but can multicast to many Observers. Subjects are like EventEmitters: they maintain a registry of many listeners. See, [What is a Subject](http://reactivex.io/rxjs/manual/overview.html#subject) for more information.
 
+When we call [`switchMap` on the Subject](https://www.learnrxjs.io/operators/transformation/switchmap.html), we cap map each value to a new Observable; in this case a database query.
+
 ```ts
-const subject = new Subject(); // import {Subject} from 'rxjs/Subject';
-const queryObservable = db.list('/items', {
-  query: {
-    orderByChild: 'size',
-    equalTo: subject 
-  }
-});
+const size$ = new Subject<string>();
+const queryObservable = size$.switchMap(size =>
+  db.list('/items', ref => ref.orderByChild('size').equalTo(size)).valueChanges();
+);
 
 // subscribe to changes
 queryObservable.subscribe(queriedItems => {
@@ -87,18 +65,23 @@ queryObservable.subscribe(queriedItems => {
 });
 
 // trigger the query
-subject.next('large');
+size$.next('large');
 
 // re-trigger the query!!!
-subject.next('small');
+size$.next('small');
 ```
 
 **Example app:**
+ 
+[See this example in action on StackBlitz](https://stackblitz.com/edit/angularfire-db-api-s8ip7m).
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireDatabase, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2/database';
-import { Subject } from 'rxjs/Subject';
+import { AngularFireDatabase, AngularFireAction } from 'angularfire2/database';
+import { Observable } from 'rxjs/Observable';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subscription } from 'rxjs/Subscription';
+import 'rxjs/add/operator/switchMap';
 
 @Component({
   selector: 'app-root',
@@ -113,41 +96,49 @@ import { Subject } from 'rxjs/Subject';
     <button (click)="filterBy('small')">Small</button>
     <button (click)="filterBy('medium')">Medium</button>
     <button (click)="filterBy('large')">Large</button>
+    <button (click)="filterBy(null)" *ngIf="this.size$.getValue()">
+      <em>clear filter</em>
+    </button>
   </div>
   `,
 })
 export class AppComponent {
-  items: FirebaseListObservable<any[]>;
-  sizeSubject: Subject<any>;
+  items: Observable<AngularFireAction<firebase.database.DataSnapshot>[]>;
+  size$: BehaviorSubject<string|null>;
   
   constructor(db: AngularFireDatabase) {
-    this.sizeSubject = new Subject();
-    this.items = db.list('/items', {
-      query: {
-        orderByChild: 'size',
-        equalTo: this.sizeSubject
-      }
-    });
+    this.size$ = new BehaviorSubject(null);
+    this.items = this.size$.switchMap(size =>
+      db.list('/items', ref =>
+        size ? ref.orderByChild('size').equalTo(size) : ref
+      ).valueChanges();
+    );
   }
-  filterBy(size: string) {
-    this.sizeSubject.next(size); 
+  filterBy(size: string|null) {
+    this.size$.next(size);
   }
 }
 ```
 
-+**To run the above example as is, you need to have sample data in you firebase database with the following structure:"**
+**To run the above example as is, you need to have sample data in you firebase database with the following structure:**
  
- ```ts
-   -|items
-       -|item1
-           -|size: small
-           -|text: sample small text
-       -|item2
-           -|size: medium
-           -|text: sample medium text
-       -|item3
-           -|size: large
-           -|text: sample large text    
+ ```json
+{
+  "items": {
+    "a" : {
+      "size" : "small",
+      "text" : "small thing"
+    },
+    "b" : {
+      "size" : "medium",
+      "text" : "medium sample"
+    },
+    "c" : {
+      "size" : "large",
+      "text" : "large widget"
+    }
+  }
+}
  ```
 
-### [Next Step: User Authentication](5-user-authentication.md)
+### [Next Step: Getting started with Firebase Authentication](../auth/getting-started.md)

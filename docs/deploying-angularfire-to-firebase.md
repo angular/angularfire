@@ -1,4 +1,4 @@
-# 7. Deploy AngularFire2 to Firebase
+# 7. Deploy AngularFire to Firebase
 
 ### 0. Build your Angular project for prod
 

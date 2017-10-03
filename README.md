@@ -36,7 +36,7 @@ import { AngularFirestore } from 'angularfire2/firestore';
 import { Observable } from 'rxjs/Observable';
 
 @Component({
-  selector: 'project-name-app',
+  selector: 'app-root',
   template: `
   <ul>
     <li *ngFor="let item of items | async">
@@ -56,23 +56,40 @@ export class MyApp {
 ## Developer Guide
 
 ### Getting started
+
 - [Installation & Setup](docs/1-install-and-setup.md)
 
-### AngularFirestore
-- [Using collections](docs/firestore/collections.md)
-- [Using documents](docs/firestore/documents.md)
+### Interacting with your database(s)
 
-### AngularFireAuth
-- [User Authentication](docs/5-user-authentication.md)
+Firebase offers two cloud-based, client-accessible database solutions that support realtime data syncing. [Learn about the differences between them in the Firebase Documentation](https://firebase.google.com/docs/firestore/rtdb-vs-firestore).
 
-### AngularFireDatabase
-- [Retrieving data as objects](docs/2-retrieving-data-as-objects.md)
-- [Retrieving data as lists](docs/3-retrieving-data-as-lists.md)
-- [Querying lists](docs/4-querying-lists.md)
+#### Cloud Firestore
+
+> `AngularFirestore` allows you to work with Cloud Firestore, the new flagship database for mobile app development. It improves on the successes of Realtime Database with a new, more intuitive data model. Cloud Firestore also features richer, faster queries and scales better than Realtime Database.
+
+- [Documents](docs/firestore/documents.md)
+- [Collections](docs/firestore/collections.md)
+- [Querying Collections](docs/firestore/querying-collections.md)
+- [Offline data](docs/firestore/offline-data.md)
+
+#### Realtime Database
+
+> `AngularFireDatabase` allows you to work with the Realtime Database, Firebase's original database. It's an efficient, low-latency solution for mobile apps that require synced states across clients in realtime.
+
+- [Objects](docs/rtdb/objects.md)
+- [Lists](docs/rtdb/lists.md)
+- [Querying lists](docs/rtdb/querying-lists.md)
+
+### Authenticate users
+
+- [Getting started with Firebase Authentication](docs/auth/getting-started.md)
 
 ### Deploy to Firebase Hosting
-- [Deploying AngularFire to Firebase Hosting](docs/7-deploying-angularfire-to-firebase.md)
+
+- [Deploying AngularFire to Firebase Hosting](docs/deploying-angularfire-to-firebase.md)
 
 ### Ionic
-- [Using AngularFire with Ionic 2](docs/Auth-with-Ionic2.md)
-- [Using AngularFire with Ionic 3 and Angular 4](docs/Auth-with-Ionic3-Angular4.md)
+
+- [Installation and Setup with Ionic CLI](docs/ionic/cli.md)
+- [Using AngularFire with Ionic 2](docs/ionic/v2.md)
+- [Using AngularFire with Ionic 3](docs/ionic/v3.md)
