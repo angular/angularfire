@@ -9,7 +9,7 @@ import 'rxjs/add/operator/map';
 
 function _fromRef<T, R>(ref: Reference<T>): Observable<R> {
   const ref$ = new Observable(subscriber => {
-    const unsubscribe = ref.onSnapshot(subscriber);
+    const unsubscribe = ref.onSnapshot({ includeQueryMetadataChanges: true }, subscriber);
     return { unsubscribe };
   });
   return observeOn.call(ref$, new ZoneScheduler(Zone.current));
