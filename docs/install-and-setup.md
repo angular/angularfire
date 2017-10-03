@@ -1,6 +1,6 @@
 # 1. Installation and Setup
 
-> Using Ionic and the Ionic CLI? Check out these [specific instructions](6-angularfire-and-ionic-cli.md) for Ionic and their CLI.
+> Using Ionic and the Ionic CLI? Check out these [specific instructions](ionic/cli.md) for Ionic and their CLI.
 
 ### 0. Prerequisites
 
@@ -97,7 +97,9 @@ export class AppModule {}
 ### 6. Setup individual @NgModules
 
 After adding the AngularFireModule you also need to add modules for the individual @NgModules that your application needs.
+ - AngularFirestoreModule
  - AngularFireAuthModule
+ - AngularFirestoreModule
  - AngularFireDatabaseModule
  - AngularFireStorageModule (Future release)
  - AngularFireMessagingModule (Future release)
@@ -111,7 +113,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { AngularFireModule } from 'angularfire2';
-import { AngularFireDatabaseModule } from 'angularfire2/database';
+import { AngularFirestoreModule } from 'angularfire2/firestore';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { environment } from '../environments/environment';
 
@@ -119,7 +121,7 @@ import { environment } from '../environments/environment';
   imports: [
     BrowserModule,
     AngularFireModule.initializeApp(environment.firebase, 'my-app-name'), // imports firebase/app needed for everything
-    AngularFireDatabaseModule, // imports firebase/database, only needed for database features
+    AngularFirestoreModule, // imports firebase/firestore, only needed for database features
     AngularFireAuthModule, // imports firebase/auth, only needed for auth features
   ],
   declarations: [ AppComponent ],
@@ -129,13 +131,13 @@ export class AppModule {}
 
 ```
 
-### 7. Inject AngularFireDatabase
+### 7. Inject AngularFirestore
 
 Open `/src/app/app.component.ts`, and make sure to modify/delete any tests to get the sample working (tests are still important, you know):
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import { AngularFirestore } from 'angularfire2/firestore';
 
 @Component({
   selector: 'app-root',
@@ -143,7 +145,7 @@ import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/databa
   styleUrls: ['app.component.css']
 })
 export class AppComponent {
-  constructor(db: AngularFireDatabase) {
+  constructor(db: AngularFirestore) {
 
   }
 }
@@ -156,7 +158,7 @@ In `/src/app/app.component.ts`:
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireDatabase } from 'angularfire2/database';
+import { AngularFirestore } from 'angularfire2/firestore';
 import { Observable } from 'rxjs/Observable';
 
 @Component({
@@ -166,8 +168,8 @@ import { Observable } from 'rxjs/Observable';
 })
 export class AppComponent {
   items: Observable<any[]>;
-  constructor(db: AngularFireDatabase) {
-    this.items = db.list('items').valueChanges();
+  constructor(db: AngularFirestore) {
+    this.items = db.collection('items').valueChanges();
   }
 }
 ```
@@ -177,7 +179,7 @@ Open `/src/app/app.component.html`:
 ```html
 <ul>
   <li class="text" *ngFor="let item of items | async">
-    {{ item | json }}
+    {{item.name}}
   </li>
 </ul>
 ```
@@ -192,5 +194,4 @@ Run the serve command and go to `localhost:4200` in your browser.
 
 And that's it! If it's totally *borked*, file an issue and let us know.
 
-### [Next Step: Retrieving data as objects](2-retrieving-data-as-objects.md)
-
+### [Next Step: Documents in AngularFirestore](firestore/documents.md)

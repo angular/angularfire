@@ -1,6 +1,6 @@
 {
   "name": "angularfire2",
-  "version": "5.0.0-rc.0",
+  "version": "5.0.0-rc.0-fs.1",
   "description": "The official library of Firebase and Angular.",
   "private": true,
   "scripts": {
@@ -21,7 +21,7 @@
     "type": "git",
     "url": "git+https://github.com/angular/angularfire2.git"
   },
-  "author": "jeffbcross,davideast",
+  "author": "davideast",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/angular/angularfire2/issues"
@@ -34,6 +34,7 @@
     "@angular/platform-browser": "^4.0.0",
     "@angular/platform-browser-dynamic": "^4.0.0",
     "firebase": "^4.0.0",
+    "firestore": "file:firestore-module.tgz",
     "rxjs": "^5.0.1",
     "zone.js": "^0.8.0"
   },

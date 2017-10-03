@@ -1,7 +1,5 @@
 # 4. Querying lists
 
-> Querying is a killer feature of AngularFire2.
-
 ## Creating a query with primitive/scalar values
 
 Queries are created by building on the [`firebase.database.Reference`](https://firebase.google.com/docs/reference/js/firebase.database.Reference).
@@ -47,7 +45,7 @@ You can only use `limitToFirst` or `limitToLast`, but not both in combination.
 ref.limitToFirst(10).limitToLast(100)
 ```
 
-## Creating a query with observable values
+## Dynamic querying
 
 To enable dynamic queries one should lean on RxJS Operators like `switchMap`.
 
@@ -143,4 +141,4 @@ export class AppComponent {
 }
  ```
 
-### [Next Step: User Authentication](5-user-authentication.md)
+### [Next Step: Getting started with Firebase Authentication](../auth/getting-started.md)

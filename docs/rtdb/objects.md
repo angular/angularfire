@@ -167,7 +167,7 @@ Data retrieved from the object binding contains special properties retrieved fro
 
 
 ## Retrieving the snapshot
-AngularFire2 unwraps the Firebase DataSnapshot by default, but you can get the data as the original snapshot by specifying the `preserveSnapshot` option. 
+AngularFire unwraps the Firebase DataSnapshot by default, but you can get the data as the original snapshot by specifying the `preserveSnapshot` option. 
 
 ```ts
 this.itemRef = db.object('item');
@@ -180,6 +180,6 @@ this.itemRef.snapshotChanges().subscribe(action => {
 
 ## Querying?
 
-Because `AngularFireObject` synchronizes objects from the realtime database, sorting will have no effect for queries that are not also limited by a range. For example, when paginating you would provide a query with a sort and filter. Both the sort operation and the filter operation affect which subset of the data is returned by the query; however, because the resulting object is simply json, the sort order will not be preseved locally. Hence, for operations that require sorting, you are probably looking for a [list](3-retrieving-data-as-lists.md)
+Because `AngularFireObject` synchronizes objects from the realtime database, sorting will have no effect for queries that are not also limited by a range. For example, when paginating you would provide a query with a sort and filter. Both the sort operation and the filter operation affect which subset of the data is returned by the query; however, because the resulting object is simply json, the sort order will not be preseved locally. Hence, for operations that require sorting, you are probably looking for a [list](lists.md)
 
-### [Next Step: Retrieving data as lists](3-retrieving-data-as-lists.md)
+### [Next Step: Retrieving data as lists](lists.md)

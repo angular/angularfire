@@ -1,8 +1,8 @@
-# 6. Installation and Setup with Ionic
+# Installation and Setup with Ionic CLI
 
 ### 0. Prerequisites
 
-Before you start installing AngularFire2, make sure you have latest version of Ionic cli installed.
+Before you start installing AngularFire, make sure you have latest version of Ionic cli installed.
 To verify run the command `ionic -v` and check your version. The CLI should be at least version 3.0.0 or greater.
 
 If not, you may need to do the following:
@@ -39,7 +39,7 @@ Your default browser should start up and display a working Ionic app.
 npm install angularfire2 firebase --save
 ```
 
-Now that you have a new project setup, install AngularFire2 and Firebase from npm.
+Now that you have a new project setup, install AngularFire and Firebase from npm.
 
 ### 4. Add Firebase config to environments variable
 

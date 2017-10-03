@@ -1,4 +1,4 @@
-# 5. User authentication
+# 5. Getting started with Firebase Authentication
 
 `AngularFireAuth.authState` provides you an `Observable<firebase.User>` to monitor your application's authentication State.
 

@@ -41,6 +41,7 @@ const GLOBALS = {
   'rxjs/add/operator/delay': 'Rx.Observable',
   'rxjs/add/operator/debounce': 'Rx.Observable',
   'rxjs/observable/fromEvent': 'Rx.Observable',
+  'rxjs/observable/from': 'Rx.Observable',
   'rxjs/operator': 'Rx.Observable.prototype',
   '@angular/core': 'ng.core',
   '@angular/compiler': 'ng.compiler',
@@ -48,12 +49,14 @@ const GLOBALS = {
   'firebase/auth': 'firebase',
   'firebase/app': 'firebase',
   'firebase/database': 'firebase',
+  'firebase/firestore': 'firebase',
   'rxjs/scheduler/queue': 'Rx.Scheduler',
   '@angular/core/testing': 'ng.core.testing',
   'angularfire2': 'angularfire2',
   'angularfire2/auth': 'angularfire2.auth',
   'angularfire2/database': 'angularfire2.database',
-  'angularfire2/database-deprecated': 'angularfire2.database_deprecated'
+  'angularfire2/database-deprecated': 'angularfire2.database_deprecated',
+  'angularfire2/firestore': 'angularfire2.firestore'
 };
 
 // Map of dependency versions across all packages
@@ -62,7 +65,8 @@ const VERSIONS = {
   FIREBASE_VERSION: pkg.dependencies['firebase'],
   RXJS_VERSION: pkg.dependencies['rxjs'],
   ZONEJS_VERSION: pkg.dependencies['zone.js'],
-  ANGULARFIRE2_VERSION: pkg.version
+  ANGULARFIRE2_VERSION: pkg.version,
+  FIRESTORE_VERSION: pkg.dependencies['firestore']
 };
 
 const MODULE_NAMES = {
@@ -70,6 +74,7 @@ const MODULE_NAMES = {
   auth: 'angularfire2.auth',
   database: 'angularfire2.database',
   "database-deprecated": 'angularfire2.database_deprecated',
+  firestore: 'angularfire2.firestore'
 };
 
 const ENTRIES = {
@@ -77,20 +82,23 @@ const ENTRIES = {
   auth: `${process.cwd()}/dist/packages-dist/auth/index.js`,
   database: `${process.cwd()}/dist/packages-dist/database/index.js`,
   "database-deprecated": `${process.cwd()}/dist/packages-dist/database-deprecated/index.js`,
+  firestore: `${process.cwd()}/dist/packages-dist/firestore/index.js`
 };
 
 const SRC_PKG_PATHS = {
   core: `${process.cwd()}/src/core/package.json`,
   auth: `${process.cwd()}/src/auth/package.json`,
   database: `${process.cwd()}/src/database/package.json`,
-  "database-deprecated": `${process.cwd()}/src/database-deprecated/package.json`
+  "database-deprecated": `${process.cwd()}/src/database-deprecated/package.json`,
+  firestore: `${process.cwd()}/src/firestore/package.json`
 };
 
 const DEST_PKG_PATHS = {
   core: `${process.cwd()}/dist/packages-dist/package.json`,
   auth: `${process.cwd()}/dist/packages-dist/auth/package.json`,
   database: `${process.cwd()}/dist/packages-dist/database/package.json`,
-  "database-deprecated": `${process.cwd()}/dist/packages-dist/database-deprecated/package.json`
+  "database-deprecated": `${process.cwd()}/dist/packages-dist/database-deprecated/package.json`,
+  firestore: `${process.cwd()}/dist/packages-dist/firestore/package.json`
 };
 
 // Constants for running typescript commands
@@ -212,6 +220,10 @@ function copyReadme() {
   return copy(`${process.cwd()}/README.md`, `${process.cwd()}/dist/packages-dist/README.md`);
 }
 
+function copyDocs() {
+  return copy(`${process.cwd()}/docs`, `${process.cwd()}/dist/packages-dist/docs`);
+}
+
 function measure(module) {
   const path = `${process.cwd()}/dist/packages-dist/bundles/${module}.umd.js`;
   const file = readFileSync(path);
@@ -229,6 +241,7 @@ function getVersions() {
     getDestPackageFile('core'),
     getDestPackageFile('auth'),
     getDestPackageFile('database'),
+    getDestPackageFile('firestore'),
     getDestPackageFile('database-deprecated')
   ];
   return paths
@@ -265,11 +278,13 @@ function buildModules(globals) {
   const core$ = buildModule('core', globals);
   const auth$ = buildModule('auth', globals);
   const db$ = buildModule('database', globals);
+  const firestore$ = buildModule('firestore', globals);
   const dbdep$ = buildModule('database-deprecated', globals);
   return Observable
     .forkJoin(core$, Observable.from(copyRootTest()))
     .switchMapTo(auth$)
     .switchMapTo(db$)
+    .switchMapTo(firestore$)
     .switchMapTo(dbdep$);
 }
 
@@ -280,15 +295,18 @@ function buildLibrary(globals) {
     .switchMap(() => Observable.from(createTestUmd(globals)))
     .switchMap(() => Observable.from(copyNpmIgnore()))
     .switchMap(() => Observable.from(copyReadme()))
+    .switchMap(() => Observable.from(copyDocs()))
     .do(() => {
       const coreStats = measure('core');
       const authStats = measure('auth');
       const dbStats = measure('database');
+      const fsStats = measure('firestore');
       const dbdepStats = measure('database-deprecated');
       console.log(`
       core.umd.js - ${coreStats.size}, ${coreStats.gzip}
       auth.umd.js - ${authStats.size}, ${authStats.gzip}
       database.umd.js - ${dbStats.size}, ${dbStats.gzip}
+      firestore.umd.js - ${fsStats.size}, ${fsStats.gzip}
       database-deprecated.umd.js - ${dbdepStats.size}, ${dbdepStats.gzip}
       `);
       verifyVersions();

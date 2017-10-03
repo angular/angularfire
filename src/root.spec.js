@@ -1,6 +1,9 @@
 // These paths are written to use the dist build
 export * from './packages-dist/angularfire2.spec';
 export * from './packages-dist/auth/auth.spec';
+export * from './packages-dist/firestore/firestore.spec';
+export * from './packages-dist/firestore/document/document.spec';
+export * from './packages-dist/firestore/collection/collection.spec';
 export * from './packages-dist/database/database.spec';
 export * from './packages-dist/database/utils.spec';
 export * from './packages-dist/database/observable/fromRef.spec';
