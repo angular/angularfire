@@ -202,7 +202,7 @@ itemsRef.remove();
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireDatabase } from 'angularfire2/database';
+import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
 
 @Component({
@@ -221,9 +221,11 @@ import { Observable } from 'rxjs/Observable';
   `,
 })
 export class AppComponent {
-  itemsRef: Observable<any[]>;
+  itemsRef: AngularFireList<any>;
+  items: Observable<any[]>;
   constructor(db: AngularFireDatabase) {
-    this.itemsRef = db.list('messages').valueChanges();
+    this.itemsRef = db.list('messages');
+    this.items = this.itemsRef.valueChanges();
   }
   addItem(newName: string) {
     this.itemsRef.push({ text: newName });
