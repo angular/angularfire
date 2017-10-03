@@ -139,6 +139,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
 export interface Shirt { name: string; price: number; }
+export interface ShirtId extends Shirt { id: string; }
 
 @Component({
   selector: 'app-root',
@@ -152,14 +153,18 @@ export interface Shirt { name: string; price: number; }
 })
 export class AppComponent {
   private shirtCollection: AngularFirestoreCollection<Shirt>;
-  shirts: Observable<Shirt[]>;
+  shirts: Observable<ShirtId[]>;
   constructor(private readonly afs: AngularFirestore) {
     this.shirtCollection = afs.collection<Shirt>('shirts');
     // .snapshotChanges() returns a DocumentChangeAction[], which contains
     // a lot of information about "what happened" with each change. If you want to
     // get the data and the id use the map operator.
     this.shirts = this.shirtCollection.snapshotChanges().map(actions => {
-      return actions.map(a => ({ id: a.payload.doc.id(), ...a.payload.doc.data() }))
+      return actions.map(a => {
+        const data = a.payload.doc.data() as Shirt;
+        const id = a.payload.doc.id;
+        return { id, ...data };
+      });
     });
   }
 }
@@ -179,6 +184,7 @@ import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/fires
 import { Observable } from 'rxjs/Observable';
 
 export interface AccountDeposit { description: string; amount: number; }
+export interface AccountDepoistId extends AccountDeposit { id: string; }
 
 @Component({
   selector: 'app-root',
@@ -191,13 +197,17 @@ export interface AccountDeposit { description: string; amount: number; }
   `
 })
 export class AppComponent {
-  private depositCollection: AngularFirestoreCollection<Shirt>;
-  deposits: Observable<Shirt[]>;
+  private depositCollection: AngularFirestoreCollection<AccountDeposit>;
+  deposits: Observable<AccountDepositId[]>;
   constructor(private readonly afs: AngularFirestore) {
     this.depositCollection = afs.collection<AccountDeposit>('deposits');
     this.deposits = this.shirtCollection.stateChanges(['added'])
       .map(actions => {
-        return actions.map(a => ({ id: a.payload.doc.id(), ...a.payload.doc.data() }))
+        return actions.map(a => {
+          const data = a.payload.doc.data() as AccountDeposit;
+          const id = a.payload.doc.id;
+          return { id, ...data };
+        })
       });
   }
 }
@@ -219,6 +229,7 @@ import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/fires
 import { Observable } from 'rxjs/Observable';
 
 export interface AccountLogItem { description: string; amount: number; }
+export interface AccountLogItemId extends AccountLogItem { id: string; }
 
 @Component({
   selector: 'app-root',
@@ -232,12 +243,16 @@ export interface AccountLogItem { description: string; amount: number; }
 })
 export class AppComponent {
   private accountLogCollection: AngularFirestoreCollection<AccountLogItem>;
-  accountLogs: Observable<AccountLogItem[]>;
+  accountLogs: Observable<AccountLogItemId[]>;
   constructor(private readonly afs: AngularFirestore) {
-    this.accountLogCollection = afs.collection<AccountDeposit>('accountLog');
+    this.accountLogCollection = afs.collection<AccountLogItem>('accountLog');
     this.accountLogs = this.shirtCollection.auditTrail()
       .map(actions => {
-        return actions.map(a => ({ id: a.payload.doc.id(), ...a.payload.doc.data() }))
+        return actions.map(a => {
+          const data = a.payload.doc.data() as AccountLogItem;
+          const id = a.payload.doc.id;
+          return { id, ...data };
+        })
       });
   }
 }
