@@ -7,6 +7,7 @@ import { QueryFn } from '../interfaces';
 
 import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs/Observable';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { of } from 'rxjs/observable/of';
 import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/operator/skip';
@@ -73,6 +74,34 @@ describe('AngularFirestoreCollection', () => {
       });
   
     });
+
+    it('should handle dynamic queries that return empty sets', async (done) => {
+      const ITEMS = 10;
+      let count = 0;
+      let firstIndex = 0;
+      let pricefilter$ = new BehaviorSubject<number|null>(null);
+      const randomCollectionName = randomName(afs.firestore);
+      const ref = afs.firestore.collection(`${randomCollectionName}`);
+      let names = await createRandomStocks(afs.firestore, ref, ITEMS);
+      const sub = pricefilter$.switchMap(price => {
+        return afs.collection(randomCollectionName, ref => price ? ref.where('price', '==', price) : ref).valueChanges()
+      }).subscribe(data => {
+        count = count + 1;
+        // the first time should all be 'added'
+        if(count === 1) {
+          expect(data.length).toEqual(ITEMS);
+          pricefilter$.next(-1);
+        }
+        // on the second round, make sure the array is still the same
+        // length but the updated item is now modified
+        if(count === 2) {
+          expect(data.length).toEqual(0);
+          sub.unsubscribe();
+          deleteThemAll(names, ref).then(done).catch(done.fail);
+        }
+      });
+    });
+
   });
 
   describe('snapshotChanges()', () => {
@@ -83,7 +112,6 @@ describe('AngularFirestoreCollection', () => {
       const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
       const sub = stocks.snapshotChanges().subscribe(data => {
         const ids = data.map(d => d.payload.doc.id);
-        debugger;
         count = count + 1;
         // the first time should all be 'added'
         if(count === 1) {
@@ -133,7 +161,7 @@ describe('AngularFirestoreCollection', () => {
       const ITEMS = 10;
       const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
       
-      const sub = stocks.snapshotChanges(['modified']).subscribe(data => {
+      const sub = stocks.snapshotChanges(['modified']).skip(1).subscribe(data => {
         sub.unsubscribe();
         const change = data.filter(x => x.payload.doc.id === names[0])[0];
         expect(data.length).toEqual(1);

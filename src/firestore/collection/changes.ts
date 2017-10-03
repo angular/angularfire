@@ -28,8 +28,7 @@ export function sortedChanges(query: firebase.firestore.Query, events: firebase.
   return fromCollectionRef(query)
     .map(changes => changes.payload.docChanges)
     .scan((current, changes) => combineChanges(current, changes, events), [])
-    .map(changes => changes.map(c => ({ type: c.type, payload: c })))
-    .filter(changes => changes.length > 0);
+    .map(changes => changes.map(c => ({ type: c.type, payload: c })));
 }
 
 /**
