@@ -77,7 +77,7 @@ size$.next('small');
 
 **Example app:**
  
-[See this example in action on StackBlitz](https://stackblitz.com/edit/angularfire-db-api-bimovw).
+[See this example in action on StackBlitz](https://stackblitz.com/edit/angularfire-db-api-fbad9p).
 
 ```ts
 import { Component } from '@angular/core';
