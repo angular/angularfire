@@ -127,4 +127,11 @@ export class AngularFirestore {
     const ref = this.firestore.doc(path);
     return new AngularFirestoreDocument<T>(ref);
   }
+
+  /**
+   * Returns a generated Firestore Document Id.
+   */
+  createId() {
+    return this.firestore.collection('_').doc().id
+  }
 }
