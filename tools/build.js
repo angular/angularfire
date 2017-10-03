@@ -14,6 +14,7 @@ const GLOBALS = {
   'rxjs/Subject': 'Rx',
   'rxjs/Observer': 'Rx',
   'rxjs/Subscription': 'Rx',
+  'rxjs/BehaviorSubject': 'Rx',
   'rxjs/observable/merge': 'Rx.Observable',
   'rxjs/operator/share': 'Rx.Observable.prototype',
   'rxjs/operator/observeOn': 'Rx.Observable.prototype',
