@@ -73,6 +73,33 @@ describe('AngularFirestoreCollection', () => {
       });
   
     });
+
+    it('should handle multiple subscriptions', async (done: any) => {
+      const ITEMS = 4;
+      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+  
+      const changes = stocks.valueChanges();
+
+      const subA = changes.subscribe(data => {
+        subA.unsubscribe();
+        expect(data.length).toEqual(ITEMS);
+        data.forEach(stock => {
+          expect(stock).toEqual(FAKE_STOCK_DATA);
+        });
+      });
+
+      const subB = changes.subscribe(data => {
+        subB.unsubscribe();
+        expect(data.length).toEqual(ITEMS);
+        data.forEach(stock => {
+          expect(stock).toEqual(FAKE_STOCK_DATA);
+        });
+
+        const promises = names.map(name => ref.doc(name).delete());
+        Promise.all(promises).then(done).catch(fail);
+      });
+  
+    });
   });
 
   describe('snapshotChanges()', () => {
