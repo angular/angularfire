@@ -57,7 +57,7 @@ export class MyApp {
 
 ### Getting started
 
-- [Installation & Setup](docs/1-install-and-setup.md)
+- [Installation & Setup](docs/install-and-setup.md)
 
 ### Interacting with your database(s)
 
