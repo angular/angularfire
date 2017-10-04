@@ -60,7 +60,6 @@ export function combineChange(combined: firebase.firestore.DocumentChange[], cha
       combined.splice(change.newIndex, 0, change);
       break;
     case 'modified':
-      debugger;
       // When an item changes position we first remove it
       // and then add it's new position
       if(change.oldIndex !== change.newIndex) {
