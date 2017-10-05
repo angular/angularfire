@@ -72,7 +72,7 @@ There are multiple ways of streaming collection data from Firestore.
 
 **Why would you use it?** - When you just need the object data. No document metadata is attached which makes it simple to render to a view.
 
-**When would you not use it?** - When you need the `id` of the document to use data manipulation metods. This method assumes you either are saving the `id` to the document data or using a "readonly" approach.
+**When would you not use it?** - When you need the `id` of the document to use data manipulation methods. This method assumes you either are saving the `id` to the document data or using a "readonly" approach.
 
 ### `snapshotChanges()`
 **What is it?** - Returns an Observable of data as a `DocumentChangeAction`. 
