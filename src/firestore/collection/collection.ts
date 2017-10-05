@@ -83,7 +83,7 @@ export class AngularFirestoreCollection<T> {
   }
   
   /**
-   * Create a stream of synchronized shanges. This method keeps the local array in sorted
+   * Create a stream of synchronized changes. This method keeps the local array in sorted
    * query order.
    * @param events 
    */
@@ -96,8 +96,8 @@ export class AngularFirestoreCollection<T> {
    * Listen to all documents in the collection and its possible query as an Observable.
    */  
   valueChanges(events?: firebase.firestore.DocumentChangeType[]): Observable<T[]> {
-    return this.snapshotChanges()
-      .map(actions => actions.map(a => a.payload.doc.data()) as T[]);
+    return fromCollectionRef(this.query)
+      .map(actions => actions.payload.docs.map(a => a.data()) as T[]);
   }
 
   /**

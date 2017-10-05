@@ -5,7 +5,9 @@ import { Subscription } from 'rxjs/Subscription';
 import { observeOn } from 'rxjs/operator/observeOn';
 import { ZoneScheduler } from 'angularfire2';
 import { Action, Reference } from '../interfaces';
+
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/share';
 
 function _fromRef<T, R>(ref: Reference<T>): Observable<R> {
   const ref$ = new Observable(subscriber => {
@@ -16,7 +18,7 @@ function _fromRef<T, R>(ref: Reference<T>): Observable<R> {
 }
 
 export function fromRef<R>(ref: firebase.firestore.DocumentReference | firebase.firestore.Query) {
-  return _fromRef<typeof ref, R>(ref);
+  return _fromRef<typeof ref, R>(ref).share();
 }
 
 export function fromDocRef(ref: firebase.firestore.DocumentReference): Observable<Action<firebase.firestore.DocumentSnapshot>>{
