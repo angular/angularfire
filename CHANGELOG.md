@@ -1,3 +1,16 @@
+<a name="5.0.0-rc.2"></a>
+# [5.0.0-rc.2](https://github.com/angular/angularfire2/compare/5.0.0-rc.0...5.0.0-rc.2) (2017-10-05)
+
+
+### Bug Fixes
+
+* **afs:** Allow multiple subscribers by using share, closes [#1191](https://github.com/angular/angularfire2/issues/1191) ([#1192](https://github.com/angular/angularfire2/issues/1192)) ([21522ab](https://github.com/angular/angularfire2/commit/21522ab))
+* **afs:** Don't filter empty changes (allow for null set) ([eb71edc](https://github.com/angular/angularfire2/commit/eb71edc))
+* **afs:** remove debugger statement from collection/changes.ts ([#1190](https://github.com/angular/angularfire2/issues/1190)) ([88a25e7](https://github.com/angular/angularfire2/commit/88a25e7))
+* **auth:** Clean up the authentication module ([8ab3803](https://github.com/angular/angularfire2/commit/8ab3803))
+
+
+
 <a name="5.0.0-rc.0"></a>
 # [5.0.0-rc.0](https://github.com/angular/angularfire2/compare/4.0.0-rc.2...v5.0.0-rc.0) (2017-10-03)
 
