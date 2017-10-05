@@ -11,7 +11,6 @@ import 'rxjs/add/operator/share';
 
 function _fromRef<T, R>(ref: Reference<T>): Observable<R> {
   const ref$ = new Observable(subscriber => {
-    subscriber.next(undefined); // fire an undefined to let subcribers know this is a new Observable
     const unsubscribe = ref.onSnapshot(subscriber);
     return { unsubscribe };
   });
@@ -24,10 +23,9 @@ export function fromRef<R>(ref: firebase.firestore.DocumentReference | firebase.
 
 export function fromDocRef(ref: firebase.firestore.DocumentReference): Observable<Action<firebase.firestore.DocumentSnapshot>>{
   return fromRef<firebase.firestore.DocumentSnapshot>(ref)
-    .filter(payload => !!payload)
     .map(payload => ({ payload, type: 'value' }));
 }
 
 export function fromCollectionRef(ref: firebase.firestore.Query): Observable<Action<firebase.firestore.QuerySnapshot>> {
-  return fromRef<firebase.firestore.QuerySnapshot>(ref).map(payload => payload && ({ payload, type: 'query' }))
+  return fromRef<firebase.firestore.QuerySnapshot>(ref).map(payload => ({ payload, type: 'query' }))
 }
