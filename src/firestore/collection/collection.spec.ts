@@ -7,6 +7,7 @@ import { QueryFn } from '../interfaces';
 
 import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs/Observable';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { of } from 'rxjs/observable/of';
 import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/operator/skip';
@@ -115,6 +116,32 @@ describe('AngularFirestoreCollection', () => {
         });
       });
     });
+    
+    it('should handle dynamic queries that return empty sets', async (done) => {
+      const ITEMS = 10;
+      let count = 0;
+      let firstIndex = 0;
+      let pricefilter$ = new BehaviorSubject<number|null>(null);
+      const randomCollectionName = randomName(afs.firestore);
+      const ref = afs.firestore.collection(`${randomCollectionName}`);
+      let names = await createRandomStocks(afs.firestore, ref, ITEMS);
+      const sub = pricefilter$.switchMap(price => {
+        return afs.collection(randomCollectionName, ref => price ? ref.where('price', '==', price) : ref).valueChanges()
+      }).subscribe(data => {
+        count = count + 1;
+        // the first time should all be 'added'
+        if(count === 1) {
+          expect(data.length).toEqual(ITEMS);
+          pricefilter$.next(-1);
+        }
+        // on the second round, we should have filtered out everything
+        if(count === 2) {
+          expect(data.length).toEqual(0);
+          sub.unsubscribe();
+          deleteThemAll(names, ref).then(done).catch(done.fail);
+        }
+      });
+    });
 
   });
 
@@ -189,7 +216,7 @@ describe('AngularFirestoreCollection', () => {
       const ITEMS = 10;
       const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
       
-      const sub = stocks.snapshotChanges(['modified']).subscribe(data => {
+      const sub = stocks.snapshotChanges(['modified']).skip(1).subscribe(data => {
         sub.unsubscribe();
         const change = data.filter(x => x.payload.doc.id === names[0])[0];
         expect(data.length).toEqual(1);
@@ -217,6 +244,35 @@ describe('AngularFirestoreCollection', () => {
       });
   
       
+      names = names.concat([nextId]);
+      delayAdd(stocks, nextId, { price: 2 });
+    });
+
+    it('should be able to filter snapshotChanges() types - added/modified', async (done) => {
+      const ITEMS = 10;
+      let { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const nextId = ref.doc('a').id;
+      let count = 0;
+
+      const sub = stocks.snapshotChanges(['added', 'modified']).skip(1).take(2).subscribe(data => {
+        count += 1;
+        if (count == 1) {
+          const change = data.filter(x => x.payload.doc.id === nextId)[0];
+          expect(data.length).toEqual(ITEMS + 1);
+          expect(change.payload.doc.data().price).toEqual(2);
+          expect(change.type).toEqual('added');
+          delayUpdate(stocks, names[0], { price: 2 });
+        }
+        if (count == 2) {
+          const change = data.filter(x => x.payload.doc.id === names[0])[0];
+          expect(data.length).toEqual(ITEMS + 1);
+          expect(change.payload.doc.data().price).toEqual(2);
+          expect(change.type).toEqual('modified');
+        }
+      }).add(() => {
+        deleteThemAll(names, ref).then(done).catch(done.fail);
+      });
+
       names = names.concat([nextId]);
       delayAdd(stocks, nextId, { price: 2 });
     });

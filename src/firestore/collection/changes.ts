@@ -31,7 +31,6 @@ export function sortedChanges(query: firebase.firestore.Query, events: firebase.
     .map(changes => changes && changes.payload.docChanges)
     .scan((current, changes) => combineChanges(current, changes, events), [])
     .map(changes => changes.map(c => ({ type: c.type, payload: c })))
-    .filter(changes => changes.length > 0)
     .shareReplay(1);
 }
 
@@ -70,7 +69,6 @@ export function combineChange(combined: firebase.firestore.DocumentChange[], cha
       combined.splice(change.newIndex, 0, change);
       break;
     case 'modified':
-      debugger;
       // When an item changes position we first remove it
       // and then add it's new position
       if(change.oldIndex !== change.newIndex) {
