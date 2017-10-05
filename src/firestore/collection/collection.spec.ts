@@ -77,29 +77,28 @@ describe('AngularFirestoreCollection', () => {
     it('should handle multiple subscriptions', async (done: any) => {
       const ITEMS = 4;
       const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
-  
       const changes = stocks.valueChanges();
-
-      const subA = changes.subscribe(data => {
-        subA.unsubscribe();
-        expect(data.length).toEqual(ITEMS);
-        data.forEach(stock => {
-          expect(stock).toEqual(FAKE_STOCK_DATA);
-        });
-      });
-
-      const subB = changes.subscribe(data => {
-        subB.unsubscribe();
-        expect(data.length).toEqual(ITEMS);
-        data.forEach(stock => {
-          expect(stock).toEqual(FAKE_STOCK_DATA);
-        });
-
-        const promises = names.map(name => ref.doc(name).delete());
-        Promise.all(promises).then(done).catch(fail);
-      });
-  
+      const sub = changes.subscribe(() => {}).add(
+        changes.subscribe(data => {
+          expect(data.length).toEqual(ITEMS);
+          sub.unsubscribe();
+        })
+      ).add(done);
     });
+
+    it('should handle multiple subscriptions + cold observer', async (done: any) => {
+      const ITEMS = 4;
+      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const changes = stocks.valueChanges();
+      const sub = changes.take(1).subscribe(() => {
+        sub.unsubscribe();
+      }).add(() => {
+        changes.take(1).subscribe(data => {
+          expect(data.length).toEqual(ITEMS);
+        }).add(done);
+      });
+    });
+
   });
 
   describe('snapshotChanges()', () => {
@@ -110,7 +109,6 @@ describe('AngularFirestoreCollection', () => {
       const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
       const sub = stocks.snapshotChanges().subscribe(data => {
         const ids = data.map(d => d.payload.doc.id);
-        debugger;
         count = count + 1;
         // the first time should all be 'added'
         if(count === 1) {
@@ -127,6 +125,18 @@ describe('AngularFirestoreCollection', () => {
           deleteThemAll(names, ref).then(done).catch(done.fail);
         }
       });
+    });
+
+    it('should handle multiple subscriptions', async (done: any) => {
+      const ITEMS = 4;
+      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const changes = stocks.snapshotChanges();
+      const sub = changes.subscribe(() => {}).add(
+        changes.subscribe(data => {
+          expect(data.length).toEqual(ITEMS);
+          sub.unsubscribe();
+        })
+      ).add(done);
     });
 
     it('should update order on queries', async (done) => {
