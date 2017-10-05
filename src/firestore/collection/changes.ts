@@ -16,6 +16,7 @@ import { DocumentChangeAction, Action } from '../interfaces';
  */
 export function docChanges(query: firebase.firestore.Query): Observable<DocumentChangeAction[]> {
   return fromCollectionRef(query)
+    .filter(action => !!action)
     .map(action => 
       action.payload.docChanges
         .map(change => ({ type: change.type, payload: change })));
@@ -27,7 +28,7 @@ export function docChanges(query: firebase.firestore.Query): Observable<Document
  */
 export function sortedChanges(query: firebase.firestore.Query, events: firebase.firestore.DocumentChangeType[]): Observable<DocumentChangeAction[]> {
   return fromCollectionRef(query)
-    .map(changes => changes.payload.docChanges)
+    .map(changes => changes && changes.payload.docChanges)
     .scan((current, changes) => combineChanges(current, changes, events), [])
     .map(changes => changes.map(c => ({ type: c.type, payload: c })))
     .filter(changes => changes.length > 0)
@@ -41,14 +42,21 @@ export function sortedChanges(query: firebase.firestore.Query, events: firebase.
  * @param changes 
  * @param events
  */
-export function combineChanges(current: firebase.firestore.DocumentChange[], changes: firebase.firestore.DocumentChange[], events: firebase.firestore.DocumentChangeType[]) {
-  changes.forEach(change => {
-    // skip unwanted change types
-    if(events.indexOf(change.type) > -1) {
-      current = combineChange(current, change);
-    }
-  });
-  return current;
+export function combineChanges(current: firebase.firestore.DocumentChange[], changes: firebase.firestore.DocumentChange[] | undefined, events: firebase.firestore.DocumentChangeType[]) {
+  if (changes) {
+    changes.forEach(change => {
+      // skip unwanted change types
+      if(events.indexOf(change.type) > -1) {
+        current = combineChange(current, change);
+      }
+    });
+    return current;
+  } else {
+    // in the case of undefined, empty current
+    // if you do odd things with the subscribes/unsubscrbes you can mess things
+    // up and get double or tripled results
+    return [];
+  }
 }
 
 /**

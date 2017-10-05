@@ -74,28 +74,45 @@ describe('AngularFirestoreCollection', () => {
   
     });
 
-    it('should handle multiple subscriptions', async (done: any) => {
+    it('should handle multiple subscriptions (hot)', async (done: any) => {
       const ITEMS = 4;
       const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
       const changes = stocks.valueChanges();
       const sub = changes.subscribe(() => {}).add(
-        changes.subscribe(data => {
+        changes.take(1).subscribe(data => {
           expect(data.length).toEqual(ITEMS);
           sub.unsubscribe();
         })
-      ).add(done);
+      ).add(() => {
+        deleteThemAll(names, ref).then(done).catch(done.fail);
+      });
     });
 
-    it('should handle multiple subscriptions + cold observer', async (done: any) => {
+    it('should handle multiple subscriptions (warm)', async (done: any) => {
       const ITEMS = 4;
       const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
       const changes = stocks.valueChanges();
-      const sub = changes.take(1).subscribe(() => {
+      changes.take(1).subscribe(() => {}).add(() => {
+        const sub = changes.take(1).subscribe(data => {
+          expect(data.length).toEqual(ITEMS);
+        }).add(() => {
+          deleteThemAll(names, ref).then(done).catch(done.fail);
+        });
+      });
+    });
+
+    it('should handle multiple subscriptions (cold)', async (done: any) => {
+      const ITEMS = 4;
+      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const changes = stocks.valueChanges();
+      const sub = changes.subscribe(() => {
         sub.unsubscribe();
       }).add(() => {
         changes.take(1).subscribe(data => {
           expect(data.length).toEqual(ITEMS);
-        }).add(done);
+        }).add(() => {
+          deleteThemAll(names, ref).then(done).catch(done.fail);
+        });
       });
     });
 
@@ -132,11 +149,13 @@ describe('AngularFirestoreCollection', () => {
       const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
       const changes = stocks.snapshotChanges();
       const sub = changes.subscribe(() => {}).add(
-        changes.subscribe(data => {
+        changes.take(1).subscribe(data => {
           expect(data.length).toEqual(ITEMS);
           sub.unsubscribe();
         })
-      ).add(done);
+      ).add(() => {
+        deleteThemAll(names, ref).then(done).catch(done.fail);
+      });
     });
 
     it('should update order on queries', async (done) => {
