@@ -89,28 +89,12 @@ describe('AngularFirestoreCollection', () => {
       });
     });
 
-    // We need a clean way of handling now that we are no longer filtering empty
-    xit('should handle multiple subscriptions (warm)', async (done: any) => {
+    it('should handle multiple subscriptions (warm)', async (done: any) => {
       const ITEMS = 4;
       const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
       const changes = stocks.valueChanges();
       changes.take(1).subscribe(() => {}).add(() => {
         const sub = changes.take(1).subscribe(data => {
-          expect(data.length).toEqual(ITEMS);
-        }).add(() => {
-          deleteThemAll(names, ref).then(done).catch(done.fail);
-        });
-      });
-    });
-
-    it('should handle multiple subscriptions (cold)', async (done: any) => {
-      const ITEMS = 4;
-      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
-      const changes = stocks.valueChanges();
-      const sub = changes.subscribe(() => {
-        sub.unsubscribe();
-      }).add(() => {
-        changes.take(1).subscribe(data => {
           expect(data.length).toEqual(ITEMS);
         }).add(() => {
           deleteThemAll(names, ref).then(done).catch(done.fail);
@@ -172,7 +156,7 @@ describe('AngularFirestoreCollection', () => {
       });
     });
 
-    it('should handle multiple subscriptions', async (done: any) => {
+    it('should handle multiple subscriptions (hot)', async (done: any) => {
       const ITEMS = 4;
       const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
       const changes = stocks.snapshotChanges();
@@ -183,6 +167,19 @@ describe('AngularFirestoreCollection', () => {
         })
       ).add(() => {
         deleteThemAll(names, ref).then(done).catch(done.fail);
+      });
+    });
+
+    it('should handle multiple subscriptions (warm)', async (done: any) => {
+      const ITEMS = 4;
+      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const changes = stocks.snapshotChanges();
+      changes.take(1).subscribe(() => {}).add(() => {
+        const sub = changes.take(1).subscribe(data => {
+          expect(data.length).toEqual(ITEMS);
+        }).add(() => {
+          deleteThemAll(names, ref).then(done).catch(done.fail);
+        });
       });
     });
 
@@ -334,6 +331,33 @@ describe('AngularFirestoreCollection', () => {
           expect(data[0].type).toEqual('modified');
           deleteThemAll(names, ref).then(done).catch(done.fail);
         }
+      });
+    });
+
+    it('should handle multiple subscriptions (hot)', async (done: any) => {
+      const ITEMS = 4;
+      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const changes = stocks.stateChanges();
+      const sub = changes.subscribe(() => {}).add(
+        changes.take(1).subscribe(data => {
+          expect(data.length).toEqual(ITEMS);
+          sub.unsubscribe();
+        })
+      ).add(() => {
+        deleteThemAll(names, ref).then(done).catch(done.fail);
+      });
+    });
+
+    it('should handle multiple subscriptions (warm)', async (done: any) => {
+      const ITEMS = 4;
+      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const changes = stocks.stateChanges();
+      changes.take(1).subscribe(() => {}).add(() => {
+        const sub = changes.take(1).subscribe(data => {
+          expect(data.length).toEqual(ITEMS);
+        }).add(() => {
+          deleteThemAll(names, ref).then(done).catch(done.fail);
+        });
       });
     });
     

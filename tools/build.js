@@ -44,7 +44,6 @@ const GLOBALS = {
   'rxjs/add/observable/fromPromise': 'Rx.Observable.prototype',
   'rxjs/add/operator/delay': 'Rx.Observable',
   'rxjs/add/operator/debounce': 'Rx.Observable',
-  'rxjs/add/operator/shareReplay': 'Rx.Observable',
   'rxjs/add/operator/share': 'Rx.Observable',
   'rxjs/observable/fromEvent': 'Rx.Observable',
   'rxjs/observable/from': 'Rx.Observable',

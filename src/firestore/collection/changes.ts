@@ -5,7 +5,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/scan';
-import 'rxjs/add/operator/shareReplay';
+import 'rxjs/add/operator/share';
 
 import { DocumentChangeAction, Action } from '../interfaces';
 
@@ -30,7 +30,7 @@ export function sortedChanges(query: firebase.firestore.Query, events: firebase.
     .map(changes => changes.payload.docChanges)
     .scan((current, changes) => combineChanges(current, changes, events), [])
     .map(changes => changes.map(c => ({ type: c.type, payload: c })))
-    .shareReplay(1);
+    .share();
 }
 
 /**
@@ -57,8 +57,12 @@ export function combineChanges(current: firebase.firestore.DocumentChange[], cha
  */
 export function combineChange(combined: firebase.firestore.DocumentChange[], change: firebase.firestore.DocumentChange): firebase.firestore.DocumentChange[] {
   switch(change.type) {
-    case 'added': 
-      combined.splice(change.newIndex, 0, change);
+    case 'added':
+      if (combined[change.newIndex] && combined[change.newIndex].doc.id == change.doc.id) {
+        // Not sure why the duplicates are getting fired
+      } else {
+        combined.splice(change.newIndex, 0, change);
+      }
       break;
     case 'modified':
       // When an item changes position we first remove it
