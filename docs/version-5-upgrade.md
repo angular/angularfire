@@ -43,7 +43,7 @@ constructor(afDb: AngularFireDatabase) {
 constructor(afDb: AngularFireDatabase) {
   afDb.object('items').snapshotChanges().map(action => {
     const $key = action.payload.key;
-    const data = { key, ...action.payload.val() };
+    const data = { $key, ...action.payload.val() };
     return data;
   }).subscribe(item => console.log(item.key));
 }
