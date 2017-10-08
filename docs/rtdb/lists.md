@@ -110,14 +110,14 @@ There are four child events: `"child_added"`, `"child_changed"`, `"child_removed
 
 ```ts
 this.itemsRef = db.list('items');
-this.items.snapshotChanges(['child_added'])
-  .subscribe(action => {
+this.itemsRef.snapshotChanges(['child_added'])
+  .subscribe(actions => {
     actions.forEach(action => {
       console.log(action.type);
-      console.log(action.snapshot.key)
-      console.log(action.snapshot.val())
+      console.log(action.key);
+      console.log(action.payload.val());
     });
-  })
+  });
 ```
 
 ## Saving data
