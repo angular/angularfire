@@ -44,8 +44,7 @@ describe('createLoadedChanges', () => {
   it('should not emit until the array is whole', done => {
     const ref = createRef(rando());
     ref.set(batch).then(() => {
-      console.log('fail');
-      createLoadedChanges(ref)().subscribe(actions => {
+      createLoadedChanges(ref)().take(1).subscribe(actions => {
         const data = actions.map(a => a.payload!.val());
         expect(data).toEqual(items);
       }).add(done);

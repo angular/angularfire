@@ -34,6 +34,7 @@ const GLOBALS = {
   'rxjs/add/operator/scan': 'Rx.Observable.prototype',
   'rxjs/add/operator/skip': 'Rx.Observable.prototype',
   'rxjs/add/operator/do': 'Rx.Observable.prototype',
+  'rxjs/add/operator/distinctUntilChanged': 'Rx.Observable.prototype',
   'rxjs/add/operator/filter': 'Rx.Observable.prototype',
   'rxjs/add/operator/skipUntil': 'Rx.Observable.prototype',
   'rxjs/add/operator/skipWhile': 'Rx.Observable.prototype',

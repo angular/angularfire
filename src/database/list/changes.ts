@@ -12,10 +12,6 @@ import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/delay';
 import 'rxjs/add/operator/distinctUntilChanged';
 
-import 'rxjs/add/operator/do';
-
-import * as firebase from 'firebase/app';
-
 // TODO(davideast): check safety of ! operator in scan
 export function listChanges<T>(ref: DatabaseQuery, events: ChildEvent[]): Observable<SnapshotAction[]> {
   return Observable.fromPromise(ref.once('value'))
@@ -65,6 +61,5 @@ export function listChanges<T>(ref: DatabaseQuery, events: ChildEvent[]): Observ
       }
     }, [])
   })
-  .distinctUntilChanged()
-  //.map(actions => actions.filter(action => events.indexOf(action.type as ChildEvent) > -1));
+  .distinctUntilChanged();
 }
