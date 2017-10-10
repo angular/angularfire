@@ -39,6 +39,7 @@ export type SnapshotChange = {
   event: string; 
   snapshot: DatabaseSnapshot | null; 
   prevKey: string | undefined;
+  loaded?: boolean;
 }
 
 export interface Action<T> {
@@ -49,6 +50,7 @@ export interface Action<T> {
 export interface AngularFireAction<T> extends Action<T> {
   prevKey: string | undefined;
   key: string | null;
+  loaded?: boolean;
 }
 
 export interface SnapshotPrevKey {

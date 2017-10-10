@@ -19,11 +19,13 @@ export function listChanges<T>(ref: DatabaseQuery, events: ChildEvent[]): Observ
   .switchMap(snapshot => {
     const childEvent$ = new Array<Observable<SnapshotAction>>();
     if (snapshot.exists()) {
-      snapshot.forEach(child => {
-        childEvent$.push(Observable.of({payload: child, type: 'child_added', prevKey: undefined, key: child.key}));
+      let finalKey = null;
+      snapshot.forEach(payload => { finalKey = payload.key });
+      snapshot.forEach(payload => {
+        childEvent$.push(Observable.of({payload, type: 'child_added', prevKey: undefined, key: payload.key, loaded: payload.key == finalKey}));
       });
     } else {
-      childEvent$.push(Observable.of({payload: null, type: 'empty', prevKey: undefined, key: null}));
+      childEvent$.push(Observable.of({payload: null, type: 'empty', prevKey: undefined, key: null, loaded: true}));
     }
     events.forEach(event => childEvent$.push(fromRef(ref, event)));
     return Observable.merge(...childEvent$)

@@ -5,6 +5,7 @@ import { database } from 'firebase/app';
 import { Observable } from 'rxjs/Observable';
 
 import 'rxjs/add/operator/skipWhile';
+import 'rxjs/add/operator/do';
 
 /**
  * Creates a function that creates a "loaded observable".
@@ -19,8 +20,8 @@ export function createLoadedChanges(query: DatabaseQuery): (events?: ChildEvent[
   return (events?: ChildEvent[]) => loadedSnapshotChanges(query, events);
 }
 
-export function waitForLoaded(query: DatabaseQuery, action$: Observable<SnapshotAction[]>) {
-  return action$;
+export function waitForLoaded(query: DatabaseQuery, action$: Observable<SnapshotAction[]>): Observable<SnapshotAction[]> {
+  return action$.skipWhile((actions:SnapshotAction[]) => actions.filter(action => action.loaded).length == 0);
 }
 
 export function loadedSnapshotChanges(query: DatabaseQuery, events?: ChildEvent[]): Observable<SnapshotAction[]> {
