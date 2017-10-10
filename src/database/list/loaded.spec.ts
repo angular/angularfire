@@ -40,15 +40,16 @@ describe('createLoadedChanges', () => {
   afterEach(done => {
     app.delete().then(done, done.fail);
   });
-/*
-  it('should not emit until the array is whole', (done) => {
+
+  it('should not emit until the array is whole', done => {
     const ref = createRef(rando());
-    ref.set(batch);
-    createLoadedChanges(ref)().subscribe(actions => {
-      const data = actions.map(a => a.payload!.val());
-      expect(data).toEqual(items);
-      done();
+    ref.set(batch).then(() => {
+      console.log('fail');
+      createLoadedChanges(ref)().subscribe(actions => {
+        const data = actions.map(a => a.payload!.val());
+        expect(data).toEqual(items);
+      }).add(done);
     });
   });
-*/
+
 });

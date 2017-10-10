@@ -37,6 +37,7 @@ export function loadedData(query: DatabaseQuery): Observable<LoadedMetadata> {
     data.payload!.forEach(child => {
       lastKeyToLoad = child.key; return false;
     });
+    console.log(data, lastKeyToLoad);
     // return data set and the current last key loaded
     return { data, lastKeyToLoad };
   });
@@ -53,6 +54,7 @@ export function waitForLoaded(query: DatabaseQuery, action$: Observable<Snapshot
       let lastKeyToLoad = loaded.lastKeyToLoad;
       // Store all child keys loaded at this point
       const loadedKeys = actions.map(snap => snap.key);
+      console.log(actions, lastKeyToLoad, loadedKeys);
       return { actions, lastKeyToLoad, loadedKeys }
     })
     // This is the magical part, only emit when the last load key

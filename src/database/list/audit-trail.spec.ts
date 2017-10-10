@@ -9,7 +9,7 @@ import 'rxjs/add/operator/skip';
 const rando = () => (Math.random() + 1).toString(36).substring(7);
 const FIREBASE_APP_NAME = rando();
 
-describe('stateChanges', () => {
+describe('auditTrail', () => {
   let app: FirebaseApp;
   let db: AngularFireDatabase;
   let createRef: (path: string) => firebase.database.Reference;

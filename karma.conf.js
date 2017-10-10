@@ -41,7 +41,8 @@ module.exports = function(config) {
     autoWatch: true,
     reporters: ['mocha'],
     browsers: ['Chrome'],
-    singleRun: false
+    singleRun: false,
+    browserNoActivityTimeout: 3000
   })
 };
 
