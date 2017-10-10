@@ -40,7 +40,7 @@ describe('listChanges', () => {
   afterEach(done => {
     app.delete().then(done, done.fail);
   });
-
+/*
   describe('events', () => {
     
     it('should stream child_added events', (done) => {
@@ -109,5 +109,5 @@ describe('listChanges', () => {
     });    
     
   });
-
+*/
 });

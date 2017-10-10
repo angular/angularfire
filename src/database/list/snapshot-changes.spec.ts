@@ -32,8 +32,8 @@ describe('snapshotChanges', () => {
     inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {
       app = app_;
       db = _db;
-      app.database().goOffline();
-      createRef = (path: string) => { app.database().goOffline(); return app.database().ref(path); };
+      app.database().goOnline();
+      createRef = (path: string) => { app.database().goOnline(); return app.database().ref(path); };
     })();
   });
 
@@ -53,7 +53,7 @@ describe('snapshotChanges', () => {
   }
 
   it('should listen to all events by default', (done) => {
-    const { snapChanges } = prepareSnapshotChanges({ skip: 2 });
+    const { snapChanges } = prepareSnapshotChanges({ skip: 0 });
     const sub = snapChanges.subscribe(actions => {
       const data = actions.map(a => a.payload!.val());
       expect(data).toEqual(items);
@@ -62,8 +62,19 @@ describe('snapshotChanges', () => {
     });
   });
 
-  it('should listen to only child_added events', (done) => {
-    const { snapChanges } = prepareSnapshotChanges({ events: ['child_added'], skip: 2 });
+  it('should handle an empty set', (done) => {
+    const aref = app.database().ref(rando());
+    const snapChanges = snapshotChanges(aref, []);
+    const sub = snapChanges.subscribe(actions => {
+      const data = actions.map(a => a.payload!.val());
+      expect(data.length).toEqual(0);
+      done();
+      sub.unsubscribe();
+    });
+  });
+
+ it('should listen to only child_added events', (done) => {
+    const { snapChanges } = prepareSnapshotChanges({ events: ['child_added'], skip: 0 });
     const sub = snapChanges.subscribe(actions => {
       const data = actions.map(a => a.payload!.val());
       expect(data).toEqual(items);
@@ -75,7 +86,7 @@ describe('snapshotChanges', () => {
   it('should listen to only child_added, child_changed events', (done) => {
     const { snapChanges, ref } = prepareSnapshotChanges({ 
       events: ['child_added', 'child_changed'], 
-      skip: 3 
+      skip: 0
     });
     const name = 'ligatures';
     const sub = snapChanges.subscribe(actions => {

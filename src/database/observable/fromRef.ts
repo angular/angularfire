@@ -4,6 +4,7 @@ import { observeOn } from 'rxjs/operator/observeOn';
 import { ZoneScheduler } from 'angularfire2';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/delay';
+import 'rxjs/add/operator/share';
 
 /**
  * Create an observable from a Database Reference or Database Query.
