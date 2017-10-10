@@ -173,8 +173,8 @@ AngularFire unwraps the Firebase DataSnapshot by default, but you can get the da
 this.itemRef = db.object('item');
 this.itemRef.snapshotChanges().subscribe(action => {
   console.log(action.type);
-  console.log(action.snapshot.key)
-  console.log(action.snapshot.val())
+  console.log(action.key)
+  console.log(action.payload.val())
 });
 ```
 
