@@ -55,7 +55,7 @@ To enable dynamic queries one should lean on RxJS Operators like `switchMap`.
 
 An RxJS Subject is imported below. A Subject is like an Observable, but can multicast to many Observers. Subjects are like EventEmitters: they maintain a registry of many listeners. See, [What is a Subject](http://reactivex.io/rxjs/manual/overview.html#subject) for more information.
 
-When we call [`switchMap` on the Subject](https://www.learnrxjs.io/operators/transformation/switchmap.html), we cap map each value to a new Observable; in this case a database query.
+When we call [`switchMap` on the Subject](https://www.learnrxjs.io/operators/transformation/switchmap.html), we can map each value to a new Observable; in this case a database query.
 
 ```ts
 const size$ = new Subject<string>();
