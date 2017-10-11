@@ -48,7 +48,7 @@ export class AngularFirestoreDocument<T> {
    * Create or overwrite a single document.
    * @param data
    */
-  set(data: T): Promise<void> {
+  set(data): Promise<void> {
     return this.ref.set(data);
   }
 
@@ -56,7 +56,7 @@ export class AngularFirestoreDocument<T> {
    * Update some fields of a document without overwriting the entire document.
    * @param data 
    */
-  update(data: T): Promise<void> {
+  update(data): Promise<void> {
     return this.ref.update(data);
   }
 
