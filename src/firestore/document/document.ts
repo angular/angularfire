@@ -56,7 +56,7 @@ export class AngularFirestoreDocument<T> {
    * Update some fields of a document without overwriting the entire document.
    * @param data 
    */
-  update(data: T): Promise<void> {
+  update(data: Partial<T>): Promise<void> {
     return this.ref.update(data);
   }
 
