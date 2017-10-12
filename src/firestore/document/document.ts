@@ -48,7 +48,7 @@ export class AngularFirestoreDocument<T> {
    * Create or overwrite a single document.
    * @param data
    */
-  set(data: Partial<T>): Promise<void> {
+  set(data: T): Promise<void> {
     return this.ref.set(data);
   }
 
