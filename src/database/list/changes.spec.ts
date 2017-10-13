@@ -60,10 +60,8 @@ describe('listChanges', () => {
         const data = changes.map(change => change.payload!.val());
         expect(data[3]).toEqual({ name: 'anotha one' });
       }).add(done);
-      app.database().goOnline();
-      aref.set(batch).then(() => {
-        aref.push({ name: 'anotha one' });
-      });
+      aref.set(batch);
+      aref.push({ name: 'anotha one' });
     });
 
     it('should stream in order events', (done) => {
@@ -88,10 +86,8 @@ describe('listChanges', () => {
         expect(names[2]).toEqual('two');
         expect(names[3]).toEqual('zero');
       }).add(done);
-      app.database().goOnline();
-      aref.set(batch).then(() => {
-        aref.push({ name: 'anotha one' });
-      });
+      aref.set(batch);
+      aref.push({ name: 'anotha one' });
     });
 
     it('should stream events filtering', (done) => {
@@ -102,13 +98,11 @@ describe('listChanges', () => {
         expect(names[0]).toEqual('zero');
         expect(names[1]).toEqual('zero');
       }).add(done);
-      app.database().goOnline();
-      aref.set(batch).then(() => {
-        aref.push({ name: 'zero' });
-      });
+      aref.set(batch);
+      aref.push({ name: 'zero' });
     });
 
-    it('should process a new child_removed event', async (done) => {
+    it('should process a new child_removed event', done => {
       const aref = ref(rando());
       const obs = listChanges(aref, ['child_added','child_removed']);
       const sub = obs.skip(1).take(1).subscribe(changes => {
@@ -117,8 +111,7 @@ describe('listChanges', () => {
       }).add(done);
       app.database().goOnline();
       aref.set(batch).then(() => {
-        const childR = aref.child(items[0].key);
-        return childR.remove();
+        aref.child(items[0].key).remove();
       });
     });
 
@@ -131,8 +124,7 @@ describe('listChanges', () => {
       }).add(done);
       app.database().goOnline();
       aref.set(batch).then(() => {
-        const childR = aref.child(items[1].key);
-        return childR.update({ name: 'lol'});
+        aref.child(items[1].key).update({ name: 'lol'});
       });
     });
 
@@ -147,8 +139,7 @@ describe('listChanges', () => {
       }).add(done);
       app.database().goOnline();
       aref.set(batch).then(() => {
-        const childR = aref.child(items[0].key);
-        return childR.setPriority('a', () => {});
+        aref.child(items[0].key).setPriority('a', () => {});
       });
     });    
     

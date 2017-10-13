@@ -105,26 +105,25 @@ describe('snapshotChanges', () => {
     }).add(done);
     app.database().goOnline();
     ref.set(batch).then(() => {
-      ref.child(items[0].key).update({ name });
-    })
+      ref.child(items[0].key).update({ name })
+    });
   });
   
-  it('should handle empty sets', async (done) => {
+  it('should handle empty sets', done => {
     const aref = createRef(rando());
-    app.database().goOnline();
+    aref.set({});
     snapshotChanges(aref).take(1).subscribe(data => {
       expect(data.length).toEqual(0);
     }).add(done);
   });
 
-  it('should handle dynamic queries that return empty sets', async (done) => {
+  it('should handle dynamic queries that return empty sets', done => {
     const ITEMS = 10;
     let count = 0;
     let firstIndex = 0;
     let namefilter$ = new BehaviorSubject<number|null>(null);
     const aref = createRef(rando());
-    app.database().goOnline();
-    await aref.set(batch);
+    aref.set(batch);
     namefilter$.switchMap(name => {
       const filteredRef = name ? aref.child('name').equalTo(name) : aref
       return snapshotChanges(filteredRef);
