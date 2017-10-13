@@ -19,7 +19,7 @@ export function createListReference<T>(query: DatabaseQuery): AngularFireList<T>
     auditTrail: createAuditTrail(query),
     valueChanges<T>(events?: ChildEvent[]) { 
       return snapshotChanges(query, events)
-        .map(actions => actions.map(a => a.payload!.val())); 
+        .map(actions => actions.map(a => a.payload.val())); 
     }
   }
 }

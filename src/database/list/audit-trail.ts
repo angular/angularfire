@@ -33,7 +33,7 @@ function loadedData(query: DatabaseQuery): Observable<LoadedMetadata> {
     // Store the last key in the data set
     let lastKeyToLoad;
     // Loop through loaded dataset to find the last key
-    data.payload!.forEach(child => {
+    data.payload.forEach(child => {
       lastKeyToLoad = child.key; return false;
     });
     // return data set and the current last key loaded

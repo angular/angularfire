@@ -1,6 +1,6 @@
 import { fromRef } from '../observable/fromRef';
 import { Observable } from 'rxjs/Observable';
-import { DatabaseQuery, ChildEvent, SnapshotChange, AngularFireAction, SnapshotAction } from '../interfaces';
+import { DatabaseQuery, ChildEvent, AngularFireAction, SnapshotAction } from '../interfaces';
 import { isNil } from '../utils';
 
 import 'rxjs/add/operator/scan';
@@ -11,7 +11,6 @@ import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/delay';
 import 'rxjs/add/operator/distinctUntilChanged';
 
-// TODO(davideast): check safety of ! operator in scan
 export function listChanges<T>(ref: DatabaseQuery, events: ChildEvent[]): Observable<SnapshotAction[]> {
   return fromRef(ref, 'value', 'once').switchMap(snapshotAction => {
     const childEvent$ = [Observable.of(snapshotAction)];
@@ -24,7 +23,7 @@ export function listChanges<T>(ref: DatabaseQuery, events: ChildEvent[]): Observ
 function positionFor(changes: SnapshotAction[], key) {
   const len = changes.length;
   for(let i=0; i<len; i++) {
-    if(changes[i].payload!.key === key) {
+    if(changes[i].payload.key === key) {
       return i;
     }
   }
@@ -65,7 +64,7 @@ function buildView(current, action) {
         // check that the previouskey is what we expect, else reorder
         const previous = current[currentKeyPosition - 1];
         if ((previous && previous.key || null) != prevKey) {
-          current = current.filter(x => x.payload!.key !== payload!.key);
+          current = current.filter(x => x.payload.key !== payload.key);
           current.splice(afterPreviousKeyPosition, 0, action);
         }
       } else if (prevKey == null) {
@@ -76,10 +75,9 @@ function buildView(current, action) {
       }
       return current;
     case 'child_removed':
-      // ! is okay here because only value events produce null results
-      return current.filter(x => x.payload!.key !== payload!.key);
+      return current.filter(x => x.payload.key !== payload.key);
     case 'child_changed':
-      return current.map(x => x.payload!.key === key ? action : x);
+      return current.map(x => x.payload.key === key ? action : x);
     case 'child_moved':
       if(currentKeyPosition > -1) {
         const data = current.splice(currentKeyPosition, 1)[0];

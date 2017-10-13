@@ -35,28 +35,17 @@ export type QueryFn = (ref: DatabaseReference) => DatabaseQuery;
 export type ChildEvent = 'child_added' | 'child_removed' | 'child_changed' | 'child_moved';
 export type ListenEvent = 'value' | ChildEvent;
 
-export type SnapshotChange = { 
-  event: string; 
-  snapshot: DatabaseSnapshot | null; 
-  prevKey: string | undefined;
-}
-
 export interface Action<T> {
   type: ListenEvent;
   payload: T;
 };
 
 export interface AngularFireAction<T> extends Action<T> {
-  prevKey: string | undefined;
+  prevKey: string | null | undefined;
   key: string | null;
 }
 
-export interface SnapshotPrevKey {
-  snapshot: DatabaseSnapshot | null;
-  prevKey: string | undefined;
-}
-
-export type SnapshotAction = AngularFireAction<DatabaseSnapshot | null>;
+export type SnapshotAction = AngularFireAction<DatabaseSnapshot>;
 
 export type Primitive = number | string | boolean;
 
