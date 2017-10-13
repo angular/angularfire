@@ -53,6 +53,13 @@ describe('fromRef', () => {
     expect(count).toEqual(0);
   });
 
+  it('once should complete', (done) => {
+    const itemRef = ref(rando());
+    itemRef.set(batch);
+    const obs = fromRef(itemRef, 'value', 'once');
+    obs.subscribe(change => {}, () => {}, done);
+  });
+
   it('it should listen and then unsubscribe', (done) => {
     const itemRef = ref(rando());
     itemRef.set(batch);

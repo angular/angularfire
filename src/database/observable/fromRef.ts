@@ -14,7 +14,8 @@ import 'rxjs/add/operator/share';
 export function fromRef(ref: DatabaseQuery, event: ListenEvent, listenType = 'on'): Observable<AngularFireAction<DatabaseSnapshot | null>> {
   const ref$ = new Observable<SnapshotPrevKey | null | undefined>(subscriber => {
     const fn = ref[listenType](event, (snapshot, prevKey) => {
-      subscriber.next({ snapshot, prevKey })
+      subscriber.next({ snapshot, prevKey });
+      if (listenType == 'once') { subscriber.complete(); }
     }, subscriber.error.bind(subscriber));
     if (listenType == 'on') {
       return { unsubscribe() { ref.off(event, fn)} };
