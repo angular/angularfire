@@ -27,7 +27,7 @@ export function fromRef(ref: DatabaseQuery, event: ListenEvent, listenType = 'on
     const { snapshot, prevKey } = payload;
     let key: string | null = null;
     if(snapshot) { key = snapshot.key; }
-    return { type: event, payload: snapshot, prevKey, key, loaded: true };
+    return { type: event, payload: snapshot, prevKey, key };
   })
   // Ensures subscribe on observable is async. This handles
   // a quirk in the SDK where on/once callbacks can happen
