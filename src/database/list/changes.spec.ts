@@ -69,6 +69,18 @@ describe('listChanges', () => {
     it('should stream in order events', (done) => {
       const aref = ref(rando());
       const obs = listChanges(aref.orderByChild('name'), ['child_added']);
+      const sub = obs.take(1).subscribe(changes => {
+        const names = changes.map(change => change.payload!.val().name);
+        expect(names[0]).toEqual('one');
+        expect(names[1]).toEqual('two');
+        expect(names[2]).toEqual('zero');
+      }).add(done);
+      aref.set(batch);
+    });
+
+    it('should stream in order events w/child_added', (done) => {
+      const aref = ref(rando());
+      const obs = listChanges(aref.orderByChild('name'), ['child_added']);
       const sub = obs.skip(1).take(1).subscribe(changes => {
         const names = changes.map(change => change.payload!.val().name);
         expect(names[0]).toEqual('anotha one');
