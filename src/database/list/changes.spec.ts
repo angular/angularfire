@@ -43,7 +43,7 @@ describe('listChanges', () => {
 
   describe('events', () => {
     
-    it('should stream child_added events', (done) => {
+    it('should stream value at first', (done) => {
       const someRef = ref(rando());
       const obs = listChanges(someRef, ['child_added']);
       const sub = obs.take(1).subscribe(changes => {
@@ -59,6 +59,23 @@ describe('listChanges', () => {
       const sub = obs.skip(1).take(1).subscribe(changes => {
         const data = changes.map(change => change.payload!.val());
         expect(data[3]).toEqual({ name: 'anotha one' });
+      }).add(done);
+      app.database().goOnline();
+      aref.set(batch).then(() => {
+        aref.push({ name: 'anotha one' });
+      });
+    });
+
+    it('should stream in order events', (done) => {
+      const aref = ref(rando());
+      const obs = listChanges(aref.orderByChild('name'), ['child_added']);
+      const sub = obs.skip(1).take(1).subscribe(changes => {
+        const names = changes.map(change => change.payload!.val().name);
+        console.log(names);
+        expect(names[0]).toEqual('anotha one');
+        expect(names[1]).toEqual('one');
+        expect(names[2]).toEqual('two');
+        expect(names[3]).toEqual('zero');
       }).add(done);
       app.database().goOnline();
       aref.set(batch).then(() => {
