@@ -71,7 +71,6 @@ describe('listChanges', () => {
       const obs = listChanges(aref.orderByChild('name'), ['child_added']);
       const sub = obs.skip(1).take(1).subscribe(changes => {
         const names = changes.map(change => change.payload!.val().name);
-        console.log(names);
         expect(names[0]).toEqual('anotha one');
         expect(names[1]).toEqual('one');
         expect(names[2]).toEqual('two');
@@ -80,6 +79,20 @@ describe('listChanges', () => {
       app.database().goOnline();
       aref.set(batch).then(() => {
         aref.push({ name: 'anotha one' });
+      });
+    });
+
+    it('should stream events filtering', (done) => {
+      const aref = ref(rando());
+      const obs = listChanges(aref.orderByChild('name').equalTo('zero'), ['child_added']);
+      obs.skip(1).take(1).subscribe(changes => {
+        const names = changes.map(change => change.payload!.val().name);
+        expect(names[0]).toEqual('zero');
+        expect(names[1]).toEqual('zero');
+      }).add(done);
+      app.database().goOnline();
+      aref.set(batch).then(() => {
+        aref.push({ name: 'zero' });
       });
     });
 
