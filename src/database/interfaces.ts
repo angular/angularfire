@@ -12,51 +12,40 @@ export interface AngularFireList<T> {
   update(item: FirebaseOperation, data: T): Promise<void>;
   set(item: FirebaseOperation, data: T): Promise<void>;
   push(data: T): firebase.database.ThenableReference;
-  remove(item?: FirebaseOperation): Promise<any>;
+  remove(item?: FirebaseOperation): Promise<void>;
 }
 
 export interface AngularFireObject<T> {
   query: DatabaseQuery;
   valueChanges<T>(): Observable<T | null>;
-  snapshotChanges<T>(): Observable<SnapshotAction>;
-  update(data: T): Promise<any>;
+  snapshotChanges(): Observable<SnapshotAction>;
+  update(data: Partial<T>): Promise<void>;
   set(data: T): Promise<void>;
-  remove(): Promise<any>;
+  remove(): Promise<void>;
 }
 
 export interface FirebaseOperationCases {
-  stringCase: () => Promise<void | any>;
-  firebaseCase?: () => Promise<void | any>;
-  snapshotCase?: () => Promise<void | any>;
-  unwrappedSnapshotCase?: () => Promise<void | any>;
+  stringCase: () => Promise<void>;
+  firebaseCase?: () => Promise<void>;
+  snapshotCase?: () => Promise<void>;
+  unwrappedSnapshotCase?: () => Promise<void>;
 }
 
 export type QueryFn = (ref: DatabaseReference) => DatabaseQuery;
 export type ChildEvent = 'child_added' | 'child_removed' | 'child_changed' | 'child_moved';
 export type ListenEvent = 'value' | ChildEvent;
 
-export type SnapshotChange = { 
-  event: string; 
-  snapshot: DatabaseSnapshot | null; 
-  prevKey: string | undefined;
-}
-
 export interface Action<T> {
-  type: string;
+  type: ListenEvent;
   payload: T;
 };
 
 export interface AngularFireAction<T> extends Action<T> {
-  prevKey: string | undefined;
+  prevKey: string | null | undefined;
   key: string | null;
 }
 
-export interface SnapshotPrevKey {
-  snapshot: DatabaseSnapshot | null;
-  prevKey: string | undefined;
-}
-
-export type SnapshotAction = AngularFireAction<DatabaseSnapshot | null>;
+export type SnapshotAction = AngularFireAction<DatabaseSnapshot>;
 
 export type Primitive = number | string | boolean;
 

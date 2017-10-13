@@ -57,7 +57,7 @@ describe('stateChanges', () => {
     const { changes } = prepareStateChanges({ skip: 2 });
     changes.subscribe(action => {
       expect(action.key).toEqual('2');
-      expect(action.payload!.val()).toEqual(items[items.length - 1]);
+      expect(action.payload.val()).toEqual(items[items.length - 1]);
       done();
     });
 
