@@ -42,14 +42,13 @@ export type SnapshotChange = {
 }
 
 export interface Action<T> {
-  type: string;
+  type: ListenEvent;
   payload: T;
 };
 
 export interface AngularFireAction<T> extends Action<T> {
   prevKey: string | undefined;
   key: string | null;
-  type: ChildEvent
 }
 
 export interface SnapshotPrevKey {
