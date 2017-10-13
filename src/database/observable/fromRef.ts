@@ -33,5 +33,5 @@ export function fromRef(ref: DatabaseQuery, event: ListenEvent, listenType = 'on
   // a quirk in the SDK where on/once callbacks can happen
   // synchronously.
   .delay(0); 
-  return observeOn.call(ref$, new ZoneScheduler(Zone.current));
+  return observeOn.call(ref$, new ZoneScheduler(Zone.current)).share();
 }
