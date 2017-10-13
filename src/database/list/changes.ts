@@ -51,8 +51,10 @@ function buildView(current, action) {
   switch (action.type) {
     case 'value':
       if (action.payload && action.payload.exists()) {
+        let prevKey = null;
         action.payload.forEach(payload => {
-          const action = {payload, type: 'value', prevKey: undefined, key: payload.key};
+          const action = {payload, type: 'value', prevKey, key: payload.key};
+          prevKey = payload.key;
           current = [...current, action];
           return false;
         });
@@ -60,7 +62,6 @@ function buildView(current, action) {
       return current;
     case 'child_added':
       if (currentKeyPosition > -1) {
-        // TODO(james): check that it hasn't changed
         // check that the previouskey is what we expect, else reorder
         if (prevKey == null) {
           if (currentKeyPosition != 0) {
