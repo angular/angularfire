@@ -63,26 +63,18 @@ function buildView(current, action) {
     case 'child_added':
       if (currentKeyPosition > -1) {
         // check that the previouskey is what we expect, else reorder
-        if (prevKey == null) {
-          if (currentKeyPosition != 0) {
-            current = current.filter(x => x.payload!.key !== payload!.key);
-            return [action, ...current];
-          }
-        } else {
-          const previous = current[currentKeyPosition - 1];
-          if ((previous && previous.key) != prevKey) {
-            current = current.filter(x => x.payload!.key !== payload!.key);
-            current.splice(afterPreviousKeyPosition, 0, action);
-          }
+        const previous = current[currentKeyPosition - 1];
+        if ((previous && previous.key || null) != prevKey) {
+          current = current.filter(x => x.payload!.key !== payload!.key);
+          current.splice(afterPreviousKeyPosition, 0, action);
         }
-        return current;
       } else if (prevKey == null) {
         return [action, ...current];
       } else {
         current = current.slice()
         current.splice(afterPreviousKeyPosition, 0, action);
-        return current;
       }
+      return current;
     case 'child_removed':
       // ! is okay here because only value events produce null results
       return current.filter(x => x.payload!.key !== payload!.key);
