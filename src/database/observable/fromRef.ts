@@ -16,7 +16,11 @@ export function fromRef(ref: DatabaseQuery, event: ListenEvent, listenType = 'on
     const fn = ref[listenType](event, (snapshot, prevKey) => {
       subscriber.next({ snapshot, prevKey })
     }, subscriber.error.bind(subscriber));
-    return { unsubscribe() { ref.off(event, fn)} }
+    if (listenType == 'on') {
+      return { unsubscribe() { ref.off(event, fn)} };
+    } else {
+      return { unsubscribe() { } };
+    }
   })
   .map((payload: SnapshotPrevKey) =>  { 
     const { snapshot, prevKey } = payload;

@@ -46,22 +46,20 @@ describe('listChanges', () => {
     it('should stream child_added events', (done) => {
       const someRef = ref(rando());
       const obs = listChanges(someRef, ['child_added']);
-      const sub = obs.skip(2).subscribe(changes => {
+      const sub = obs.take(1).subscribe(changes => {
         const data = changes.map(change => change.payload!.val());
         expect(data).toEqual(items);
-        done();
-      });
+      }).add(done);
       someRef.set(batch);
     });
 
     it('should process a new child_added event', done => {
       const aref = ref(rando());
       const obs = listChanges(aref, ['child_added']);
-      const sub = obs.skip(3).subscribe(changes => {
+      const sub = obs.skip(1).take(1).subscribe(changes => {
         const data = changes.map(change => change.payload!.val());
         expect(data[3]).toEqual({ name: 'anotha one' });
-        done();
-      });
+      }).add(done);
       app.database().goOnline();
       aref.set(batch).then(() => {
         aref.push({ name: 'anotha one' });
@@ -71,11 +69,10 @@ describe('listChanges', () => {
     it('should process a new child_removed event', async (done) => {
       const aref = ref(rando());
       const obs = listChanges(aref, ['child_added','child_removed']);
-      const sub = obs.skip(3).subscribe(changes => {
+      const sub = obs.skip(1).take(1).subscribe(changes => {
         const data = changes.map(change => change.payload!.val());
         expect(data.length).toEqual(items.length - 1);
-        done();
-      });
+      }).add(done);
       app.database().goOnline();
       aref.set(batch).then(() => {
         const childR = aref.child(items[0].key);
@@ -86,11 +83,10 @@ describe('listChanges', () => {
     it('should process a new child_changed event', (done) => {
       const aref = ref(rando());
       const obs = listChanges(aref, ['child_added','child_changed'])
-      const sub = obs.skip(3).subscribe(changes => {
+      const sub = obs.skip(1).take(1).subscribe(changes => {
         const data = changes.map(change => change.payload!.val());
         expect(data[1].name).toEqual('lol');
-        done();
-      });
+      }).add(done);
       app.database().goOnline();
       aref.set(batch).then(() => {
         const childR = aref.child(items[1].key);
@@ -101,13 +97,12 @@ describe('listChanges', () => {
     it('should process a new child_moved event', (done) => {
       const aref = ref(rando());
       const obs = listChanges(aref, ['child_added','child_moved'])
-      const sub = obs.skip(3).subscribe(changes => {
+      const sub = obs.skip(1).take(1).subscribe(changes => {
         const data = changes.map(change => change.payload!.val());
         // We moved the first item to the last item, so we check that
         // the new result is now the last result
         expect(data[data.length - 1]).toEqual(items[0]);
-        done();
-      });
+      }).add(done);
       app.database().goOnline();
       aref.set(batch).then(() => {
         const childR = aref.child(items[0].key);

@@ -33,8 +33,8 @@ describe('snapshotChanges', () => {
     inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {
       app = app_;
       db = _db;
-      app.database().goOnline();
-      createRef = (path: string) => { app.database().goOnline(); return app.database().ref(path); };
+      app.database().goOffline();
+      createRef = (path: string) => { app.database().goOffline(); return app.database().ref(path); };
     })();
   });
 
@@ -53,31 +53,28 @@ describe('snapshotChanges', () => {
   }
 
   it('should listen to all events by default', (done) => {
-    const { snapChanges, ref } = prepareSnapshotChanges({ skip: 2 });
-    const sub = snapChanges.subscribe(actions => {
+    const { snapChanges, ref } = prepareSnapshotChanges();
+    snapChanges.take(1).subscribe(actions => {
       const data = actions.map(a => a.payload!.val());
       expect(data).toEqual(items);
-      done();
-      sub.unsubscribe();
-    });
+    }).add(done);
     ref.set(batch);
   });
 
   it('should handle multiple subscriptions (hot)', (done) => {
-    const { snapChanges, ref } = prepareSnapshotChanges({ skip: 2 });
-    const sub = snapChanges.subscribe(() => {}).add(
-      snapChanges.take(1).subscribe(actions => {
-        const data = actions.map(a => a.payload!.val());
-        expect(data).toEqual(items);
-      })
-    ).add(done);
+    const { snapChanges, ref } = prepareSnapshotChanges();
+    const sub = snapChanges.subscribe(() => {}).add(done);
+    snapChanges.take(1).subscribe(actions => {
+      const data = actions.map(a => a.payload!.val());
+      expect(data).toEqual(items);
+    }).add(sub);
     ref.set(batch);
   });
 
-  it('should handle multiple subscriptions (warm)', async (done: any) => {
-    const { snapChanges, ref } = prepareSnapshotChanges({ skip: 2 });
+  it('should handle multiple subscriptions (warm)', done => {
+    const { snapChanges, ref } = prepareSnapshotChanges();
     snapChanges.take(1).subscribe(() => {}).add(() => {
-      const sub = snapChanges.take(1).subscribe(actions => {
+      snapChanges.take(1).subscribe(actions => {
         const data = actions.map(a => a.payload!.val());
         expect(data).toEqual(items);
       }).add(done);
@@ -86,30 +83,27 @@ describe('snapshotChanges', () => {
   });
 
  it('should listen to only child_added events', (done) => {
-    const { snapChanges, ref } = prepareSnapshotChanges({ events: ['child_added'], skip: 2 });
-    const sub = snapChanges.subscribe(actions => {
+    const { snapChanges, ref } = prepareSnapshotChanges({ events: ['child_added'], skip: 0 });
+    snapChanges.take(1).subscribe(actions => {
       const data = actions.map(a => a.payload!.val());
       expect(data).toEqual(items);
-      done();
-      sub.unsubscribe();
-    });
+    }).add(done);
     ref.set(batch);
   });
 
   it('should listen to only child_added, child_changed events', (done) => {
     const { snapChanges, ref } = prepareSnapshotChanges({ 
       events: ['child_added', 'child_changed'], 
-      skip: 3
+      skip: 1
     });
     const name = 'ligatures';
-    const sub = snapChanges.subscribe(actions => {
+    snapChanges.take(1).subscribe(actions => {
       const data = actions.map(a => a.payload!.val());;
       const copy = [...items];
       copy[0].name = name;
       expect(data).toEqual(copy);
-      done();
-      sub.unsubscribe();
-    });
+    }).add(done);
+    app.database().goOnline();
     ref.set(batch).then(() => {
       ref.child(items[0].key).update({ name });
     })
@@ -117,7 +111,8 @@ describe('snapshotChanges', () => {
   
   it('should handle empty sets', async (done) => {
     const aref = createRef(rando());
-    const sub = snapshotChanges(aref).take(1).subscribe(data => {
+    app.database().goOnline();
+    snapshotChanges(aref).take(1).subscribe(data => {
       expect(data.length).toEqual(0);
     }).add(done);
   });
@@ -128,11 +123,12 @@ describe('snapshotChanges', () => {
     let firstIndex = 0;
     let namefilter$ = new BehaviorSubject<number|null>(null);
     const aref = createRef(rando());
+    app.database().goOnline();
     await aref.set(batch);
-    const sub = namefilter$.switchMap(name => {
+    namefilter$.switchMap(name => {
       const filteredRef = name ? aref.child('name').equalTo(name) : aref
       return snapshotChanges(filteredRef);
-    }).skip(2).subscribe(data => {
+    }).take(2).subscribe(data => {
       count = count + 1;
       // the first time should all be 'added'
       if(count === 1) {
@@ -142,7 +138,6 @@ describe('snapshotChanges', () => {
       // on the second round, we should have filtered out everything
       if(count === 2) {
         expect(Object.keys(data).length).toEqual(0);
-        sub.unsubscribe();
       }
     }).add(done);
   });
