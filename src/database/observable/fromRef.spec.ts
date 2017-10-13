@@ -53,6 +53,16 @@ describe('fromRef', () => {
     expect(count).toEqual(0);
   });
 
+  it('it should should handle non-existence', (done) => {
+    const itemRef = ref(rando());
+    itemRef.set({});
+    const obs = fromRef(itemRef, 'value');
+    const sub = obs.take(1).subscribe(change => {
+      expect(change.payload.exists()).toEqual(false);
+      expect(change.payload.val()).toEqual(null);
+    }).add(done);
+  });
+
   it('once should complete', (done) => {
     const itemRef = ref(rando());
     itemRef.set(batch);
