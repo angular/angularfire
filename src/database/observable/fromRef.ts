@@ -17,7 +17,7 @@ interface SnapshotPrevKey {
  * @param event Listen event type ('value', 'added', 'changed', 'removed', 'moved')
  */
 export function fromRef(ref: DatabaseQuery, event: ListenEvent, listenType = 'on'): Observable<AngularFireAction<DatabaseSnapshot>> {
-  const ref$ = new Observable<SnapshotPrevKey | null | undefined>(subscriber => {
+  const ref$ = new Observable<SnapshotPrevKey>(subscriber => {
     const fn = ref[listenType](event, (snapshot, prevKey) => {
       subscriber.next({ snapshot, prevKey });
       if (listenType == 'once') { subscriber.complete(); }

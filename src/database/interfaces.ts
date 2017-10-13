@@ -17,7 +17,7 @@ export interface AngularFireList<T> {
 
 export interface AngularFireObject<T> {
   query: DatabaseQuery;
-  valueChanges<T>(): Observable<T | null>;
+  valueChanges<T>(): Observable<T>;
   snapshotChanges<T>(): Observable<SnapshotAction>;
   update(data: T): Promise<any>;
   set(data: T): Promise<void>;

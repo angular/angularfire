@@ -20,7 +20,7 @@ export function auditTrail(query: DatabaseQuery, events?: ChildEvent[]): Observa
 }
 
 interface LoadedMetadata {
-  data: AngularFireAction<database.DataSnapshot | null>;
+  data: AngularFireAction<database.DataSnapshot>;
   lastKeyToLoad: any;
 }
 
