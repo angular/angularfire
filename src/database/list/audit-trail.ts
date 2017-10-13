@@ -1,8 +1,13 @@
-import { DatabaseQuery, ChildEvent, AngularFireAction, SnapshotAction } from '../interfaces';
+import { DatabaseQuery, ChildEvent, DatabaseSnapshot, AngularFireAction, SnapshotAction } from '../interfaces';
 import { stateChanges } from './state-changes';
-import { waitForLoaded } from './loaded';
 import { Observable } from 'rxjs/Observable';
 import { database } from 'firebase/app';
+import { fromRef } from '../observable/fromRef';
+
+
+import 'rxjs/add/operator/skipWhile';
+import 'rxjs/add/operator/withLatestFrom';
+import 'rxjs/add/operator/map';
 
 export function createAuditTrail(query: DatabaseQuery) {
   return (events?: ChildEvent[]) => auditTrail(query, events);
@@ -12,4 +17,48 @@ export function auditTrail(query: DatabaseQuery, events?: ChildEvent[]): Observa
   const auditTrail$ = stateChanges(query, events)
     .scan((current, action) => [...current, action], []);
   return waitForLoaded(query, auditTrail$);
+}
+
+interface LoadedMetadata {
+  data: AngularFireAction<database.DataSnapshot | null>;
+  lastKeyToLoad: any;
+}
+
+function loadedData(query: DatabaseQuery): Observable<LoadedMetadata> {
+  // Create an observable of loaded values to retrieve the
+  // known dataset. This will allow us to know what key to
+  // emit the "whole" array at when listening for child events.
+  return fromRef(query, 'value')
+  .map(data => {
+    // Store the last key in the data set
+    let lastKeyToLoad;
+    // Loop through loaded dataset to find the last key
+    data.payload!.forEach(child => {
+      lastKeyToLoad = child.key; return false;
+    });
+    // return data set and the current last key loaded
+    return { data, lastKeyToLoad };
+  });
+}
+
+function waitForLoaded(query: DatabaseQuery, action$: Observable<SnapshotAction[]>) {
+  const loaded$ = loadedData(query);
+  return loaded$
+    .withLatestFrom(action$)
+    // Get the latest values from the "loaded" and "child" datasets
+    // We can use both datasets to form an array of the latest values.
+    .map(([loaded, actions]) => {
+      // Store the last key in the data set
+      let lastKeyToLoad = loaded.lastKeyToLoad;
+      // Store all child keys loaded at this point
+      const loadedKeys = actions.map(snap => snap.key);
+      return { actions, lastKeyToLoad, loadedKeys }
+    })
+    // This is the magical part, only emit when the last load key
+    // in the dataset has been loaded by a child event. At this point
+    // we can assume the dataset is "whole".
+    .skipWhile(meta => meta.loadedKeys.indexOf(meta.lastKeyToLoad) === -1)
+    // Pluck off the meta data because the user only cares
+    // to iterate through the snapshots
+    .map(meta => meta.actions);  
 }
