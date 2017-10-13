@@ -33,7 +33,7 @@ export function getRef(app: FirebaseApp, pathRef: PathReference): DatabaseRefere
     : app.database().ref(pathRef as string);
 }
 
-export function checkOperationCases(item: FirebaseOperation, cases: FirebaseOperationCases) : Promise<void | any> {
+export function checkOperationCases(item: FirebaseOperation, cases: FirebaseOperationCases) : Promise<void> {
   if (isString(item)) {
     return cases.stringCase();
   } else if (isFirebaseRef(item)) {

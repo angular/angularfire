@@ -12,23 +12,23 @@ export interface AngularFireList<T> {
   update(item: FirebaseOperation, data: T): Promise<void>;
   set(item: FirebaseOperation, data: T): Promise<void>;
   push(data: T): firebase.database.ThenableReference;
-  remove(item?: FirebaseOperation): Promise<any>;
+  remove(item?: FirebaseOperation): Promise<void>;
 }
 
 export interface AngularFireObject<T> {
   query: DatabaseQuery;
   valueChanges<T>(): Observable<T | null>;
   snapshotChanges(): Observable<SnapshotAction>;
-  update(data: Partial<T>): Promise<any>;
+  update(data: Partial<T>): Promise<void>;
   set(data: T): Promise<void>;
-  remove(): Promise<any>;
+  remove(): Promise<void>;
 }
 
 export interface FirebaseOperationCases {
-  stringCase: () => Promise<void | any>;
-  firebaseCase?: () => Promise<void | any>;
-  snapshotCase?: () => Promise<void | any>;
-  unwrappedSnapshotCase?: () => Promise<void | any>;
+  stringCase: () => Promise<void>;
+  firebaseCase?: () => Promise<void>;
+  snapshotCase?: () => Promise<void>;
+  unwrappedSnapshotCase?: () => Promise<void>;
 }
 
 export type QueryFn = (ref: DatabaseReference) => DatabaseQuery;
