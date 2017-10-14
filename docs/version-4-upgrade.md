@@ -2,6 +2,7 @@
 
 AngularFire2 4.0 is a refactor of the AngularFire2 package which implements
 @NgModule, simplifies authentication, and better supports Angular 4.
+For background on the motivations and implementation of these change you may refer to the for these API changes  [`Proposal`](https://github.com/angular/angularfire2/issues/1158). 
 
 ### Removing `AngularFire` for Modularity
 
