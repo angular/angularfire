@@ -31,7 +31,7 @@ export class AppComponent {
 }
 ```
 
-In this section, we're going to modify the `/src/app/app.component.ts`  to retreive data as list, but before that let's look at ways around how to bind to a list.
+In this section, we're going to modify the `/src/app/app.component.ts`  to retrieve data as list, but before that let's look at ways around how to bind to a list.
 
 ## Create a list binding
 
