@@ -4,6 +4,5 @@ export * from './list/create-reference';
 export * from './list/snapshot-changes';
 export * from './list/state-changes';
 export * from './list/audit-trail';
-export * from './list/loaded';
 export * from './observable/fromRef';
 export * from './database.module'

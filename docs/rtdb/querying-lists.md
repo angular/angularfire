@@ -86,16 +86,23 @@ import 'rxjs/add/operator/switchMap';
 @Component({
   selector: 'app-root',
   template: `
-  <ul>
-    <li *ngFor="let item of items | async">
-      {{ item.text }}
-    </li>
-  </ul>
+  <h1>Firebase widgets!</h1>
+  <div *ngIf="items$ | async; let items; else loading">
+    <ul>
+      <li *ngFor="let item of items">
+        {{ item.payload.val().text }}
+        <code>{{ item.payload.key }}</code>
+      </li>
+    </ul>
+    <div *ngIf="items.length === 0">No results, try clearing filters</div>
+  </div>
+  <ng-template #loading>Loading&hellip;</ng-template>
   <div>
     <h4>Filter by size</h4>
     <button (click)="filterBy('small')">Small</button>
     <button (click)="filterBy('medium')">Medium</button>
     <button (click)="filterBy('large')">Large</button>
+    <button (click)="filterBy('x-large')">Extra Large</button>
     <button (click)="filterBy(null)" *ngIf="this.size$.getValue()">
       <em>clear filter</em>
     </button>
@@ -103,15 +110,15 @@ import 'rxjs/add/operator/switchMap';
   `,
 })
 export class AppComponent {
-  items: Observable<AngularFireAction<firebase.database.DataSnapshot>[]>;
+  items$: Observable<AngularFireAction<firebase.database.DataSnapshot>[]>;
   size$: BehaviorSubject<string|null>;
   
   constructor(db: AngularFireDatabase) {
     this.size$ = new BehaviorSubject(null);
-    this.items = this.size$.switchMap(size =>
+    this.items$ = this.size$.switchMap(size =>
       db.list('/items', ref =>
         size ? ref.orderByChild('size').equalTo(size) : ref
-      ).valueChanges();
+      ).snapshotChanges();
     );
   }
   filterBy(size: string|null) {

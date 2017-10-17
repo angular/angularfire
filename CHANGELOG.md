@@ -1,3 +1,13 @@
+<a name="5.0.0-rc.3"></a>
+# [5.0.0-rc.3](https://github.com/angular/angularfire2/compare/2.0.0-beta.8...5.0.0-rc.3) (2017-10-14)
+
+
+### Bug Fixes
+
+* **afs:** change doc.update() parameter type to Partial<T> ([#1247](https://github.com/angular/angularfire2/issues/1247)) ([297cabb](https://github.com/angular/angularfire2/commit/297cabb)), closes [#1245](https://github.com/angular/angularfire2/issues/1245) [#1215](https://github.com/angular/angularfire2/issues/1215)
+* **rtdb:** Fixed null set handling, ordering, and cleaned up types ([#1264](https://github.com/angular/angularfire2/issues/1264)) ([eda1c41](https://github.com/angular/angularfire2/commit/eda1c41))
+
+
 <a name="5.0.0-rc.2"></a>
 # [5.0.0-rc.2](https://github.com/angular/angularfire2/compare/5.0.0-rc.0...5.0.0-rc.2) (2017-10-05)
 
