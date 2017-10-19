@@ -115,7 +115,7 @@ export class AngularFirestoreCollection<T> {
    * Create a reference to a single document in a collection.
    * @param path 
    */
-  doc(path: string) {
-    return new AngularFirestoreDocument(this.ref.doc(path));
+  doc<T>(path: string) {
+    return new AngularFirestoreDocument<T>(this.ref.doc(path));
   }
 }
