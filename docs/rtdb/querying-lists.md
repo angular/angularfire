@@ -56,7 +56,7 @@ When we call [`switchMap` on the Subject](https://www.learnrxjs.io/operators/tra
 ```ts
 const size$ = new Subject<string>();
 const queryObservable = size$.switchMap(size =>
-  db.list('/items', ref => ref.orderByChild('size').equalTo(size)).valueChanges();
+  db.list('/items', ref => ref.orderByChild('size').equalTo(size)).valueChanges()
 );
 
 // subscribe to changes
@@ -118,7 +118,7 @@ export class AppComponent {
     this.items$ = this.size$.switchMap(size =>
       db.list('/items', ref =>
         size ? ref.orderByChild('size').equalTo(size) : ref
-      ).snapshotChanges();
+      ).snapshotChanges()
     );
   }
   filterBy(size: string|null) {
