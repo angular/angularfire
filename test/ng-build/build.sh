@@ -1,0 +1,1 @@
+cd ng5 && ng build --prod
