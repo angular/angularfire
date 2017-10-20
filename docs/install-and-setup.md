@@ -99,7 +99,6 @@ export class AppModule {}
 After adding the AngularFireModule you also need to add modules for the individual @NgModules that your application needs.
  - AngularFirestoreModule
  - AngularFireAuthModule
- - AngularFirestoreModule
  - AngularFireDatabaseModule
  - AngularFireStorageModule (Future release)
  - AngularFireMessagingModule (Future release)

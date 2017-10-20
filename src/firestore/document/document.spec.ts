@@ -57,13 +57,10 @@ describe('AngularFirestoreDocument', () => {
     const stock = new AngularFirestoreDocument<Stock>(ref);
     await stock.set(FAKE_STOCK_DATA);
     const obs$ = stock.valueChanges();
-    const sub = obs$.catch(e => { console.log(e); return e; })
-      .take(1) // this will unsubscribe after the first
-      .subscribe(async (data: Stock) => {
-        sub.unsubscribe();
-        expect(JSON.stringify(data)).toBe(JSON.stringify(FAKE_STOCK_DATA));
-        stock.delete().then(done).catch(done.fail);
-      });
+    obs$.take(1).subscribe(async (data: Stock) => {
+      expect(JSON.stringify(data)).toBe(JSON.stringify(FAKE_STOCK_DATA));
+      stock.delete().then(done).catch(done.fail);
+    });
   });
 
 });

@@ -4,6 +4,7 @@ import { AngularFireDatabase, AngularFireDatabaseModule, snapshotChanges, ChildE
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../test-config';
 import 'rxjs/add/operator/skip';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 // generate random string to test fidelity of naming
 const rando = () => (Math.random() + 1).toString(36).substring(7);
@@ -44,7 +45,6 @@ describe('snapshotChanges', () => {
   function prepareSnapshotChanges(opts: { events?: ChildEvent[], skip: number } = { skip: 0 }) {
     const { events, skip } = opts;
     const aref = createRef(rando());
-    aref.set(batch);
     const snapChanges = snapshotChanges(aref, events);
     return {
       snapChanges: snapChanges.skip(skip),
@@ -53,40 +53,92 @@ describe('snapshotChanges', () => {
   }
 
   it('should listen to all events by default', (done) => {
-    const { snapChanges } = prepareSnapshotChanges({ skip: 2 });
-    const sub = snapChanges.subscribe(actions => {
+    const { snapChanges, ref } = prepareSnapshotChanges();
+    snapChanges.take(1).subscribe(actions => {
       const data = actions.map(a => a.payload!.val());
       expect(data).toEqual(items);
-      done();
-      sub.unsubscribe();
-    });
+    }).add(done);
+    ref.set(batch);
   });
 
-  it('should listen to only child_added events', (done) => {
-    const { snapChanges } = prepareSnapshotChanges({ events: ['child_added'], skip: 2 });
-    const sub = snapChanges.subscribe(actions => {
+  it('should handle multiple subscriptions (hot)', (done) => {
+    const { snapChanges, ref } = prepareSnapshotChanges();
+    const sub = snapChanges.subscribe(() => {}).add(done);
+    snapChanges.take(1).subscribe(actions => {
       const data = actions.map(a => a.payload!.val());
       expect(data).toEqual(items);
-      done();
-      sub.unsubscribe();
+    }).add(sub);
+    ref.set(batch);
+  });
+
+  it('should handle multiple subscriptions (warm)', done => {
+    const { snapChanges, ref } = prepareSnapshotChanges();
+    snapChanges.take(1).subscribe(() => {}).add(() => {
+      snapChanges.take(1).subscribe(actions => {
+        const data = actions.map(a => a.payload!.val());
+        expect(data).toEqual(items);
+      }).add(done);
     });
+    ref.set(batch);
+  });
+
+ it('should listen to only child_added events', (done) => {
+    const { snapChanges, ref } = prepareSnapshotChanges({ events: ['child_added'], skip: 0 });
+    snapChanges.take(1).subscribe(actions => {
+      const data = actions.map(a => a.payload!.val());
+      expect(data).toEqual(items);
+    }).add(done);
+    ref.set(batch);
   });
 
   it('should listen to only child_added, child_changed events', (done) => {
     const { snapChanges, ref } = prepareSnapshotChanges({ 
       events: ['child_added', 'child_changed'], 
-      skip: 3 
+      skip: 1
     });
     const name = 'ligatures';
-    const sub = snapChanges.subscribe(actions => {
+    snapChanges.take(1).subscribe(actions => {
       const data = actions.map(a => a.payload!.val());;
       const copy = [...items];
       copy[0].name = name;
       expect(data).toEqual(copy);
-      done();
-      sub.unsubscribe();
+    }).add(done);
+    app.database().goOnline();
+    ref.set(batch).then(() => {
+      ref.child(items[0].key).update({ name })
     });
-    ref.child(items[0].key).update({ name });
-  });  
+  });
+  
+  it('should handle empty sets', done => {
+    const aref = createRef(rando());
+    aref.set({});
+    snapshotChanges(aref).take(1).subscribe(data => {
+      expect(data.length).toEqual(0);
+    }).add(done);
+  });
+
+  it('should handle dynamic queries that return empty sets', done => {
+    const ITEMS = 10;
+    let count = 0;
+    let firstIndex = 0;
+    let namefilter$ = new BehaviorSubject<number|null>(null);
+    const aref = createRef(rando());
+    aref.set(batch);
+    namefilter$.switchMap(name => {
+      const filteredRef = name ? aref.child('name').equalTo(name) : aref
+      return snapshotChanges(filteredRef);
+    }).take(2).subscribe(data => {
+      count = count + 1;
+      // the first time should all be 'added'
+      if(count === 1) {
+        expect(Object.keys(data).length).toEqual(3);
+        namefilter$.next(-1);
+      }
+      // on the second round, we should have filtered out everything
+      if(count === 2) {
+        expect(Object.keys(data).length).toEqual(0);
+      }
+    }).add(done);
+  });
 
 });

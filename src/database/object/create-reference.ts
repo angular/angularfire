@@ -5,12 +5,12 @@ export function createObjectReference<T>(query: DatabaseQuery): AngularFireObjec
   return {
     query,
     snapshotChanges: createObjectSnapshotChanges(query),
-    update(data: T) { return query.ref.update(data) as Promise<any>; },
-    set(data: T) { return query.ref.set(data) as Promise<any>; },
-    remove() { return query.ref.remove() as Promise<any>; },
+    update(data: Partial<T>) { return query.ref.update(data) as Promise<void>; },
+    set(data: T) { return query.ref.set(data) as Promise<void>; },
+    remove() { return query.ref.remove() as Promise<void>; },
     valueChanges<T>() { 
       return createObjectSnapshotChanges(query)()
-        .map(action => action.payload ? action.payload.val() as T : null) 
+        .map(action => action.payload.exists() ? action.payload.val() as T : null)
     },
   }
 }

@@ -32,7 +32,7 @@ export class AppComponent {
 }
 ```
 
-In this section, we're going to modify the `/src/app/app.component.ts`  to retreive data as object.
+In this section, we're going to modify the `/src/app/app.component.ts`  to retrieve data as object.
 
 ## Create an object binding
 
@@ -173,8 +173,8 @@ AngularFire unwraps the Firebase DataSnapshot by default, but you can get the da
 this.itemRef = db.object('item');
 this.itemRef.snapshotChanges().subscribe(action => {
   console.log(action.type);
-  console.log(action.snapshot.key)
-  console.log(action.snapshot.val())
+  console.log(action.key)
+  console.log(action.payload.val())
 });
 ```
 

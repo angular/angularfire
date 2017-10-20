@@ -31,7 +31,7 @@ export class AppComponent {
 }
 ```
 
-In this section, we're going to modify the `/src/app/app.component.ts`  to retreive data as list, but before that let's look at ways around how to bind to a list.
+In this section, we're going to modify the `/src/app/app.component.ts`  to retrieve data as list, but before that let's look at ways around how to bind to a list.
 
 ## Create a list binding
 
@@ -110,14 +110,14 @@ There are four child events: `"child_added"`, `"child_changed"`, `"child_removed
 
 ```ts
 this.itemsRef = db.list('items');
-this.items.snapshotChanges(['child_added'])
-  .subscribe(action => {
+this.itemsRef.snapshotChanges(['child_added'])
+  .subscribe(actions => {
     actions.forEach(action => {
       console.log(action.type);
-      console.log(action.snapshot.key)
-      console.log(action.snapshot.val())
+      console.log(action.key);
+      console.log(action.payload.val());
     });
-  })
+  });
 ```
 
 ## Saving data
@@ -202,8 +202,9 @@ itemsRef.remove();
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireDatabase } from 'angularfire2/database';
+import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
 
 @Component({
   selector: 'app-root',
@@ -211,8 +212,8 @@ import { Observable } from 'rxjs/Observable';
   <ul>
     <li *ngFor="let item of items | async">
       <input type="text" #updatetext [value]="item.text" />
-      <button (click)="updateItem(item.$key, updatetext.value)">Update</button>
-      <button (click)="deleteItem(item.$key)">Delete</button>
+      <button (click)="updateItem(item.key, updatetext.value)">Update</button>
+      <button (click)="deleteItem(item.key)">Delete</button>
     </li>
   </ul>
   <input type="text" #newitem />
@@ -221,9 +222,14 @@ import { Observable } from 'rxjs/Observable';
   `,
 })
 export class AppComponent {
-  itemsRef: Observable<any[]>;
+  itemsRef: AngularFireList<any>;
+  items: Observable<any[]>;
   constructor(db: AngularFireDatabase) {
-    this.itemsRef = db.list('messages').valueChanges();
+    this.itemsRef = db.list('messages');
+    // Use snapshotChanges().map() to store the key
+    this.items = this.itemsRef.snapshotChanges().map(changes => {
+      return changes.map(c => ({ key: c.payload.key, ...c.payload.val() }));
+    });
   }
   addItem(newName: string) {
     this.itemsRef.push({ text: newName });

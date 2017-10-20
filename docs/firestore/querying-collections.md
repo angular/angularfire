@@ -77,25 +77,34 @@ size$.next('small');
 
 **Example app:**
  
-[See this example in action on StackBlitz](https://stackblitz.com/edit/angularfire-db-api-bimovw).
+[See this example in action on StackBlitz](https://stackblitz.com/edit/angularfire-db-api-fbad9p).
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
+import { AngularFirestore } from 'angularfire2/firestore';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/observable/combineLatest';
+
+export interface Item {
+  text: string;
+  color: string;
+  size: string;
+}
 
 @Component({
   selector: 'app-root',
   template: `
-  <ul>
-    <li *ngFor="let item of items | async">
-      {{ item.text }}
-    </li>
-  </ul>
+  <div *ngIf="items$ | async; let items; else loading">
+    <ul>
+      <li *ngFor="let item of items">
+        {{ item.text }}
+      </li>
+    </ul>
+    <div *ngIf="items.length === 0">No results, try clearing filters</div>
+  </div>
+  <ng-template #loading>Loading&hellip;</ng-template>
   <div>
     <h4>Filter by size</h4>
     <button (click)="filterBySize('small')">Small</button>
@@ -117,15 +126,14 @@ import 'rxjs/add/observable/combineLatest';
   `,
 })
 export class AppComponent {
-  items: Observable<AngularFireAction<firebase.firestore.DataSnapshot>[]>;
+  items$: Observable<Item[]>;
   sizeFilter$: BehaviorSubject<string|null>;
   colorFilter$: BehaviorSubject<string|null>;
-  filter$: Observable<[string, string]>;
   
   constructor(afs: AngularFirestore) {
     this.sizeFilter$ = new BehaviorSubject(null);
     this.colorFilter$ = new BehaviorSubject(null);
-    this.items = Observable.combineLatest(
+    this.items$ = Observable.combineLatest(
       this.sizeFilter$,
       this.colorFilter$
     ).switchMap(([size, color]) => 
