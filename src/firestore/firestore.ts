@@ -100,8 +100,8 @@ export class AngularFirestore {
   constructor(public app: FirebaseApp, shouldEnablePersistence) {
     this.firestore = app.firestore();
 
-    this.persistenceEnabled$ = shouldEnablePersistence ? 
-      from(app.firestore().enablePersistence().then(() => true)) :
+    this.persistenceEnabled$ = shouldEnablePersistence ?
+      from(app.firestore().enablePersistence().then(() => true, () => false)) :
       from(new Promise((res, rej) => { res(false); }));
   }
   
