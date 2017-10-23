@@ -201,7 +201,7 @@ export class AppComponent {
   deposits: Observable<AccountDepositId[]>;
   constructor(private readonly afs: AngularFirestore) {
     this.depositCollection = afs.collection<AccountDeposit>('deposits');
-    this.deposits = this.shirtCollection.stateChanges(['added'])
+    this.deposits = this.depositCollection.stateChanges(['added'])
       .map(actions => {
         return actions.map(a => {
           const data = a.payload.doc.data() as AccountDeposit;
@@ -246,7 +246,7 @@ export class AppComponent {
   accountLogs: Observable<AccountLogItemId[]>;
   constructor(private readonly afs: AngularFirestore) {
     this.accountLogCollection = afs.collection<AccountLogItem>('accountLog');
-    this.accountLogs = this.shirtCollection.auditTrail()
+    this.accountLogs = this.accountLogCollection.auditTrail()
       .map(actions => {
         return actions.map(a => {
           const data = a.payload.doc.data() as AccountLogItem;
