@@ -12,4 +12,3 @@ angularfire2-*.tgz
 .DS_Store
 yarn-error.log
 *.bak
-.DS_Store
