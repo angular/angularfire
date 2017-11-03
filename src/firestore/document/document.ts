@@ -15,20 +15,20 @@ import { AngularFirestoreCollection } from '../collection/collection';
 
 /**
  * AngularFirestoreDocument service
- * 
- * This class creates a reference to a Firestore Document. A reference is provided in 
+ *
+ * This class creates a reference to a Firestore Document. A reference is provided in
  * in the constructor. The class is generic which gives you type safety for data update
  * methods and data streaming.
- * 
+ *
  * This class uses Symbol.observable to transform into Observable using Observable.from().
- * 
+ *
  * This class is rarely used directly and should be created from the AngularFirestore service.
- * 
+ *
  * Example:
- * 
+ *
  * const fakeStock = new AngularFirestoreDocument<Stock>(firebase.firestore.doc('stocks/FAKE'));
  * await fakeStock.set({ name: 'FAKE', price: 0.01 });
- * fakeStock.valueChanges().map(snap => { 
+ * fakeStock.valueChanges().map(snap => {
  *   if(snap.exists) return snap.data();
  *   return null;
  * }).subscribe(value => console.log(value));
@@ -40,7 +40,7 @@ export class AngularFirestoreDocument<T> {
   /**
    * The contstuctor takes in a DocumentReference to provide wrapper methods
    * for data operations, data streaming, and Symbol.observable.
-   * @param ref 
+   * @param ref
    */
   constructor(public ref: firebase.firestore.DocumentReference) { }
 
@@ -54,7 +54,7 @@ export class AngularFirestoreDocument<T> {
 
   /**
    * Update some fields of a document without overwriting the entire document.
-   * @param data 
+   * @param data
    */
   update(data: Partial<T>): Promise<void> {
     return this.ref.update(data);
@@ -70,8 +70,8 @@ export class AngularFirestoreDocument<T> {
   /**
    * Create a reference to a sub-collection given a path and an optional query
    * function.
-   * @param path 
-   * @param queryFn 
+   * @param path
+   * @param queryFn
    */
   collection<T>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<T> {
     const collectionRef = this.ref.collection(path);
@@ -89,9 +89,9 @@ export class AngularFirestoreDocument<T> {
   /**
    * Listen to unwrapped snapshot updates from the document.
    */
-  valueChanges(): Observable<T> {
+  valueChanges(): Observable<T|null> {
     return this.snapshotChanges().map(action => {
-      return (action.payload.exists ? action.payload.data() : null) as T;
+      return action.payload.exists ? action.payload.data() : null;
     });
   }
 }
