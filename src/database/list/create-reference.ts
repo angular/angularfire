@@ -8,7 +8,7 @@ import { createRemoveMethod } from './remove';
 export function createListReference<T>(query: DatabaseQuery): AngularFireList<T> {
   return {
     query,
-    update: createDataOperationMethod<T>(query.ref, 'update'),
+    update: createDataOperationMethod<Partial<T>>(query.ref, 'update'),
     set: createDataOperationMethod<T>(query.ref, 'set'),
     push: (data: T) => query.ref.push(data),
     remove: createRemoveMethod(query.ref),
