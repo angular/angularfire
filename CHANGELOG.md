@@ -1,5 +1,19 @@
+<a name="5.0.0-rc.4"></a>
+# [5.0.0-rc.4](https://github.com/angular/angularfire2/compare/5.0.0-rc.3...5.0.0-rc.4) (2017-11-17)
+
+
+### Bug Fixes
+
+* **afs:** added missing type to doc() ([#1286](https://github.com/angular/angularfire2/issues/1286)) ([3e00e16](https://github.com/angular/angularfire2/commit/3e00e16))
+* **afs:** allow document set options ([#1333](https://github.com/angular/angularfire2/issues/1333)) ([81018ed](https://github.com/angular/angularfire2/commit/81018ed)), closes [#1332](https://github.com/angular/angularfire2/issues/1332)
+* **afs:** catch error when enabling persistence ([#1300](https://github.com/angular/angularfire2/issues/1300)) ([61245a3](https://github.com/angular/angularfire2/commit/61245a3))
+* **afs:** export interfaces ([#1277](https://github.com/angular/angularfire2/issues/1277)) ([4a21857](https://github.com/angular/angularfire2/commit/4a21857))
+* **db:** inherit generics in valueChanges interface ([10afd64](https://github.com/angular/angularfire2/commit/10afd64)), closes [#1214](https://github.com/angular/angularfire2/issues/1214)
+* **db:** update should take a Partial<T> object ([#1330](https://github.com/angular/angularfire2/issues/1330)) ([20e66f5](https://github.com/angular/angularfire2/commit/20e66f5)), closes [#1329](https://github.com/angular/angularfire2/issues/1329)
+
+
 <a name="5.0.0-rc.3"></a>
-# [5.0.0-rc.3](https://github.com/angular/angularfire2/compare/2.0.0-beta.8...5.0.0-rc.3) (2017-10-14)
+# [5.0.0-rc.3](https://github.com/angular/angularfire2/compare/5.0.0-rc.2...5.0.0-rc.3) (2017-10-14)
 
 
 ### Bug Fixes
