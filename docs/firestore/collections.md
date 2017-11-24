@@ -262,7 +262,7 @@ export class AppComponent {
 
 There are three `DocumentChangeType`s in Firestore: `added`, `removed`, and `modified`. Each streaming method listens to all three by default. However, you may only be intrested in one of these events. You can specify which events you'd like to use through the first parameter of each method:
 
-#### Basic smaple
+#### Basic sample
 ```ts
   constructor(private afs: AngularFirestore): {
     this.itemsCollection = afs.collection<Item>('items');
