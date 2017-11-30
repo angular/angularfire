@@ -167,7 +167,7 @@ Data retrieved from the object binding contains special properties retrieved fro
 
 
 ## Retrieving the snapshot
-AngularFire unwraps the Firebase DataSnapshot by default, but you can get the data as the original snapshot by specifying the `preserveSnapshot` option. 
+AngularFire unwraps the Firebase DataSnapshot by default, but you can get the data as the original snapshot by specifying the `snapshotChanges` option. 
 
 ```ts
 this.itemRef = db.object('item');
