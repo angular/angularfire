@@ -17,7 +17,7 @@ export class AngularFireStorage {
       return new AngularFireStorageRef(this.storage.ref(path));
     }
 
-    upload(pathOrRef: string, data: any, metadata: storage.UploadMetadata | undefined) {
+    upload(pathOrRef: string, data: any, metadata?: storage.UploadMetadata) {
       const storageRef = this.storage.ref(pathOrRef);
       const ref = new AngularFireStorageRef(storageRef);
       return ref.put(data, metadata);
