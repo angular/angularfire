@@ -23,6 +23,7 @@ const GLOBALS = {
   'rxjs/operator/merge': 'Rx.Observable.prototype',
   'rxjs/operator/map': 'Rx.Observable.prototype',
   'rxjs/observable/of': 'Rx.Observable',
+  'rxjs/observable/forkJoin': 'Rx.Observable',
   'rxjs/operator/auditTime': 'Rx.Observable.prototype',
   'rxjs/operator/switchMap': 'Rx.Observable.prototype',
   'rxjs/operator/do': 'Rx.Observable.prototype',
