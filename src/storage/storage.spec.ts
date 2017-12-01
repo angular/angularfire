@@ -1,9 +1,9 @@
 import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs/Observable'
-import { Subject } from 'rxjs/Subject'
+import { forkJoin } from 'rxjs/observable/forkJoin';
 import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2';
-import { AngularFireStorageModule, AngularFireStorage, AngularFireUploadTask, AngularFireStorageRef } from 'angularfire2/storage';
+import { AngularFireStorageModule, AngularFireStorage } from 'angularfire2/storage';
 import { COMMON_CONFIG } from './test-config';
 
 console.log(AngularFireStorageModule);
@@ -37,18 +37,36 @@ fdescribe('AngularFireStorage', () => {
     expect(afStorage.storage).toBeDefined();
   });
 
-  describe('AngularFireUploadTask', () => {
+  describe('upload task', () => {
 
-    it('should upload a file', (done) => {
+    it('should upload and delete a file', (done) => {
       const data = { angular: "fire" };
       const blob = new Blob([JSON.stringify(data)], { type : 'application/json' });
-      const task = afStorage.upload('af.json', blob);
+      const ref = afStorage.ref('af.json');
+      const task = ref.put(blob);
       const sub = task.snapshotChanges()
         .subscribe(
-          snap => { console.log(snap); expect(snap).toBeDefined() },
+          snap => { expect(snap).toBeDefined() },
           e => { done.fail(); },
-          done);
+          () => {
+            ref.delete().subscribe(done, done.fail);
+          });
+    });
 
+  });
+
+  describe('reference', () => {
+
+    it('it should upload, download, and delete', (done) => {
+      const data = { angular: "fire" };
+      const blob = new Blob([JSON.stringify(data)], { type : 'application/json' });
+      const ref = afStorage.ref('af.json');
+      const task = ref.put(blob);
+      const sub = forkJoin(task.snapshotChanges())
+        .mergeMap(() => ref.getDownloadURL())
+        .do(url => expect(url).toBeDefined())
+        .mergeMap(url => ref.delete())
+        .subscribe(done, done.fail);
     });
 
   });
