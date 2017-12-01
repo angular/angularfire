@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { storage } from 'firebase/app';
 import { FirebaseApp } from 'angularfire2';
-import { createStorageRef } from './ref';
-import { createUploadTask } from './task';
+import { createStorageRef, AngularFireStorageReference } from './ref';
+import { createUploadTask, AngularFireUploadTask } from './task';
 import { Observable } from 'rxjs/Observable';
 
 /**
