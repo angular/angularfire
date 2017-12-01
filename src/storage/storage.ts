@@ -1,10 +1,18 @@
 import { Injectable } from '@angular/core';
 import { storage } from 'firebase/app';
-import 'firebase/storage';
 import { FirebaseApp } from 'angularfire2';
-import { AngularFireStorageRef } from './ref';
-import { AngularFireUploadTask } from './task';
+import { createStorageRef } from './ref';
+import { createUploadTask } from './task';
+import { Observable } from 'rxjs/Observable';
 
+/**
+ * AngularFireStorage Service
+ * 
+ * This service is the main entry point for this feature module. It provides
+ * an API for uploading and downloading binary files from Cloud Storage for
+ * Firebase.
+ * 
+ */
 @Injectable()
 export class AngularFireStorage {
   storage: storage.Storage;
@@ -14,12 +22,12 @@ export class AngularFireStorage {
     }
 
     ref(path: string) {
-      return new AngularFireStorageRef(this.storage.ref(path));
+      return createStorageRef(this.storage.ref(path));
     }
 
-    upload(pathOrRef: string, data: any, metadata?: storage.UploadMetadata) {
-      const storageRef = this.storage.ref(pathOrRef);
-      const ref = new AngularFireStorageRef(storageRef);
+    upload(path: string, data: any, metadata?: storage.UploadMetadata) {
+      const storageRef = this.storage.ref(path);
+      const ref = createStorageRef(storageRef);
       return ref.put(data, metadata);
     }
 
