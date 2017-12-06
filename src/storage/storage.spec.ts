@@ -51,6 +51,18 @@ describe('AngularFireStorage', () => {
           });
     });
 
+    it('should upload a file and observe the download url', (done) => {
+      const data = { angular: "fire" };
+      const blob = new Blob([JSON.stringify(data)], { type : 'application/json' });
+      const ref = afStorage.ref('afs.json');
+      const task = ref.put(blob);
+      const url$ = task.downloadURL();
+      url$.subscribe(
+        url => { console.log(url); expect(url).toBeDefined(); },
+        e => { done.fail(); },
+        () => { ref.delete().subscribe(done, done.fail); }
+      );
+    });
   });
 
   describe('reference', () => {
