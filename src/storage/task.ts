@@ -1,7 +1,7 @@
 import { storage } from 'firebase/app';
 import { fromTask } from './observable/fromTask';
 import { Observable } from 'rxjs/Observable';
-import { map, filter } from 'rxjs/operators';
+import { map, filter, shareReplay } from 'rxjs/operators';
 
 export interface AngularFireUploadTask {
   snapshotChanges(): Observable<storage.UploadTaskSnapshot | undefined>;
@@ -15,6 +15,7 @@ export interface AngularFireUploadTask {
 }
 
 export function createUploadTask(task: storage.UploadTask): AngularFireUploadTask {
+  const inner$ = fromTask(task).pipe(shareReplay());
   return { 
     pause() { return task.pause(); },    
     cancel() { return task.cancel(); },    
@@ -23,17 +24,15 @@ export function createUploadTask(task: storage.UploadTask): AngularFireUploadTas
     catch(onRejected: (a: Error) => any) { 
       return task.catch(onRejected);
     },
-    snapshotChanges() { return fromTask(task); },   
+    snapshotChanges() { return inner$; },   
     percentageChanges() { 
-      return fromTask(task).pipe(
+      return inner$.pipe(
         filter(s => s !== undefined),
-        map(s => {
-          return s!.bytesTransferred / s!.totalBytes * 100;
-        })
+        map(s => s!.bytesTransferred / s!.totalBytes * 100)
       );
     },
     downloadURL() {
-      return fromTask(task).pipe(
+      return inner$.pipe(
         filter(s => s !== undefined),
         filter(s => s!.bytesTransferred === s!.totalBytes),
         map(s => s!.downloadURL)

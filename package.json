@@ -1,6 +1,6 @@
 {
   "name": "angularfire2",
-  "version": "5.0.0-rc.5",
+  "version": "5.0.0-rc.5-next",
   "description": "The official library of Firebase and Angular.",
   "private": true,
   "scripts": {
@@ -35,7 +35,7 @@
     "@angular/platform-browser": "^5.0.0",
     "@angular/platform-browser-dynamic": "^5.0.0",
     "firebase": "^4.5.0",
-    "rxjs": "^5.5.2",
+    "rxjs": "^5.5.4",
     "zone.js": "^0.8.0"
   },
   "devDependencies": {
