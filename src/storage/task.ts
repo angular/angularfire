@@ -1,7 +1,7 @@
 import { storage } from 'firebase/app';
 import { fromTask } from './observable/fromTask';
 import { Observable } from 'rxjs/Observable';
-import { map, filter, shareReplay } from 'rxjs/operators';
+import { map, filter } from 'rxjs/operators';
 
 export interface AngularFireUploadTask {
   snapshotChanges(): Observable<storage.UploadTaskSnapshot | undefined>;
@@ -15,7 +15,7 @@ export interface AngularFireUploadTask {
 }
 
 export function createUploadTask(task: storage.UploadTask): AngularFireUploadTask {
-  const inner$ = fromTask(task).pipe(shareReplay());
+  const inner$ = fromTask(task);
   return { 
     pause() { return task.pause(); },    
     cancel() { return task.cancel(); },    
