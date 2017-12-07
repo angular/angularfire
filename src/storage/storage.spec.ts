@@ -58,7 +58,7 @@ describe('AngularFireStorage', () => {
       const task = ref.put(blob);
       const url$ = task.downloadURL();
       url$.subscribe(
-        url => { console.log(url); expect(url).toBeDefined(); },
+        url => { expect(url).toBeDefined(); },
         e => { done.fail(); },
         () => { ref.delete().subscribe(done, done.fail); }
       );
