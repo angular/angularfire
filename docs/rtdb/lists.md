@@ -91,7 +91,7 @@ AngularFire provides methods that stream data back as redux compatible actions. 
 **When would you not use it?** - When you need a more complex data structure than an array or if you need to process changes as they occur. This array is synchronized with the remote and local changes in the Firebase Database.
 
 ### `stateChanges()`
-**What is it?** - Returns an Observable of the most recent change as a `AngularFireAction`. 
+**What is it?** - Returns an Observable of the most recent change as an `AngularFireAction`. 
 
 **Why would you use it?** - The above methods return a singular `AngularFireAction` from each child event that occurs. `stateChanges()` emits changes as they occur rather than syncing the query order. This works well for ngrx integrations as you can build your own data structure in your reducer methods.
 
