@@ -158,7 +158,7 @@ export class AppComponent {
 ```
 
 ## Retrieving the snapshot
-AngularFire `valueChanges()` unwraps the Firebase DataSnapshot by default, but you can get the data as the original snapshot by using the `snapshowChanges()` option instead.
+AngularFire `valueChanges()` unwraps the Firebase DataSnapshot by default, but you can get the data as the original snapshot by using the `snapshotChanges()` option instead.
 
 ```ts
 this.itemRef = db.object('item');
