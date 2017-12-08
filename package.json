@@ -33,9 +33,13 @@
     "@angular/core": "^5.0.0",
     "@angular/platform-browser": "^5.0.0",
     "@angular/platform-browser-dynamic": "^5.0.0",
-    "firebase": "^4.5.0",
+    "bufferutil": "^3.0.3",
+    "firebase": "^4.8.0",
     "rxjs": "^5.5.2",
-    "zone.js": "^0.8.0"
+    "utf-8-validate": "^4.0.0",
+    "ws": "^3.3.2",
+    "zone.js": "^0.8.0",
+    "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
     "@angular/compiler-cli": "^5.0.0",

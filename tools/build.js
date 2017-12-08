@@ -72,7 +72,11 @@ const VERSIONS = {
   RXJS_VERSION: pkg.dependencies['rxjs'],
   ZONEJS_VERSION: pkg.dependencies['zone.js'],
   ANGULARFIRE2_VERSION: pkg.version,
-  FIRESTORE_VERSION: pkg.dependencies['firestore']
+  FIRESTORE_VERSION: pkg.dependencies['firestore'],
+  WS_VERSION: pkg.dependencies['ws'],
+  BUFFERUTIL_VERSION: pkg.dependencies['bufferutil'],
+  UTF_8_VALIDATE_VERSION: pkg.dependencies['utf-8-validate'],
+  XMLHTTPREQUEST_VERSION: pkg.dependencies['xmlhttprequest']
 };
 
 const MODULE_NAMES = {
@@ -96,7 +100,8 @@ const SRC_PKG_PATHS = {
   auth: `${process.cwd()}/src/auth/package.json`,
   database: `${process.cwd()}/src/database/package.json`,
   "database-deprecated": `${process.cwd()}/src/database-deprecated/package.json`,
-  firestore: `${process.cwd()}/src/firestore/package.json`
+  firestore: `${process.cwd()}/src/firestore/package.json`,
+  "firebase-node": `${process.cwd()}/src/firebase-node/package.json`
 };
 
 const DEST_PKG_PATHS = {
@@ -104,7 +109,8 @@ const DEST_PKG_PATHS = {
   auth: `${process.cwd()}/dist/packages-dist/auth/package.json`,
   database: `${process.cwd()}/dist/packages-dist/database/package.json`,
   "database-deprecated": `${process.cwd()}/dist/packages-dist/database-deprecated/package.json`,
-  firestore: `${process.cwd()}/dist/packages-dist/firestore/package.json`
+  firestore: `${process.cwd()}/dist/packages-dist/firestore/package.json`,
+  "firebase-node": `${process.cwd()}/dist/packages-dist/firebase-node/package.json`
 };
 
 // Constants for running typescript commands
@@ -230,6 +236,10 @@ function copyDocs() {
   return copy(`${process.cwd()}/docs`, `${process.cwd()}/dist/packages-dist/docs`);
 }
 
+function copyNodeFixes() {
+  return copy(`${process.cwd()}/src/firebase-node`, `${process.cwd()}/dist/packages-dist/firebase-node`);
+}
+
 function measure(module) {
   const path = `${process.cwd()}/dist/packages-dist/bundles/${module}.umd.js`;
   const file = readFileSync(path);
@@ -248,7 +258,8 @@ function getVersions() {
     getDestPackageFile('auth'),
     getDestPackageFile('database'),
     getDestPackageFile('firestore'),
-    getDestPackageFile('database-deprecated')
+    getDestPackageFile('database-deprecated'),
+    getDestPackageFile('firebase-node')
   ];
   return paths
     .map(path => require(path))
@@ -302,6 +313,8 @@ function buildLibrary(globals) {
     .switchMap(() => Observable.from(copyNpmIgnore()))
     .switchMap(() => Observable.from(copyReadme()))
     .switchMap(() => Observable.from(copyDocs()))
+    .switchMap(() => Observable.from(copyNodeFixes()))
+    .switchMap(() => replaceVersionsObservable('firebase-node', VERSIONS))
     .do(() => {
       const coreStats = measure('core');
       const authStats = measure('auth');
