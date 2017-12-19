@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { database } from 'firebase/app';
-import 'firebase/database';
+import { FirebaseDatabase } from '@firebase/database-types';
 import { FirebaseApp } from 'angularfire2';
 import { PathReference, DatabaseQuery, DatabaseReference, DatabaseSnapshot, ChildEvent, ListenEvent, QueryFn, AngularFireList, AngularFireObject } from './interfaces';
 import { getRef } from './utils';
@@ -9,7 +8,7 @@ import { createObjectReference } from './object/create-reference';
 
 @Injectable()
 export class AngularFireDatabase {
-  database: database.Database;
+  database: FirebaseDatabase;
 
   constructor(public app: FirebaseApp) {
     this.database = app.database();
@@ -26,7 +25,7 @@ export class AngularFireDatabase {
 
   object<T>(pathOrRef: PathReference): AngularFireObject<T>  {
     const ref = getRef(this.app, pathOrRef);
-    return createObjectReference<T>(ref);    
+    return createObjectReference<T>(ref);
   }
 
   createPushId() {
@@ -35,18 +34,17 @@ export class AngularFireDatabase {
 
 }
 
-export { 
-  PathReference, 
-  DatabaseQuery, 
-  DatabaseReference, 
-  DatabaseSnapshot, 
-  ChildEvent, 
-  ListenEvent, 
-  QueryFn, 
-  AngularFireList, 
+export {
+  PathReference,
+  DatabaseQuery,
+  DatabaseReference,
+  DatabaseSnapshot,
+  ChildEvent,
+  ListenEvent,
+  QueryFn,
+  AngularFireList,
   AngularFireObject,
   AngularFireAction,
   Action,
   SnapshotAction
 } from './interfaces';
- 

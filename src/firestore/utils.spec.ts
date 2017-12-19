@@ -1,4 +1,4 @@
-import * as firebase from 'firebase/app';
+import { FirebaseFirestore, CollectionReference } from '@firebase/firestore-types';
 import { AngularFirestoreCollection } from './collection/collection';
 
 export interface Stock {
@@ -10,7 +10,7 @@ export const FAKE_STOCK_DATA = { name: 'FAKE', price: 1 };
 
 export const randomName = (firestore): string => firestore.collection('a').doc().id;
 
-export const createRandomStocks = async (firestore: firebase.firestore.Firestore, collectionRef: firebase.firestore.CollectionReference, numberOfItems) => {
+export const createRandomStocks = async (firestore: FirebaseFirestore, collectionRef: CollectionReference, numberOfItems) => {
   // Create a batch to update everything at once
   const batch = firestore.batch();
   // Store the random names to delete them later
@@ -48,4 +48,4 @@ export function delayDelete<T>(collection: AngularFirestoreCollection<T>, path, 
   setTimeout(() => {
     collection.doc(path).delete();
   }, delay);
-}  
+}

@@ -1,4 +1,4 @@
-import * as firebase from 'firebase/app';
+import { Reference } from '@firebase/database-types';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2';
 import { AngularFireDatabase, AngularFireDatabaseModule, fromRef } from 'angularfire2/database';
 import { TestBed, inject } from '@angular/core/testing';
@@ -10,7 +10,7 @@ const FIREBASE_APP_NAME = rando();
 
 describe('fromRef', () => {
   let app: FirebaseApp;
-  let ref: (path: string) => firebase.database.Reference;
+  let ref: (path: string) => Reference;
   let batch = {};
   const items = [{ name: 'one' }, { name: 'two' }, { name: 'three' }].map(item => ( { key: rando(), ...item } ));
   Object.keys(items).forEach(function (key) {
@@ -122,7 +122,7 @@ describe('fromRef', () => {
       });
       itemRef.child(key).update({ name });
     });
-    
+
     it('should stream back a child_removed event', async (done: any) => {
       const itemRef = ref(rando());
       itemRef.set(batch);
@@ -139,7 +139,7 @@ describe('fromRef', () => {
       });
       itemRef.child(key).remove();
     });
-    
+
     it('should stream back a child_moved event', async (done: any) => {
       const itemRef = ref(rando());
       itemRef.set(batch);
@@ -155,7 +155,7 @@ describe('fromRef', () => {
         done();
       });
       itemRef.child(key).setPriority(-100, () => {});
-    });    
+    });
 
     it('should stream back a value event', (done: any) => {
       const itemRef = ref(rando());
@@ -169,7 +169,7 @@ describe('fromRef', () => {
         sub.unsubscribe();
         expect(sub.closed).toEqual(true);
       });
-    });  
+    });
 
     it('should stream back query results', (done: any) => {
       const itemRef = ref(rando());
@@ -183,7 +183,7 @@ describe('fromRef', () => {
         done();
       });
     });
-    
+
   });
 
 });

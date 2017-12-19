@@ -1,5 +1,4 @@
-import * as firebase from 'firebase/app';
-import 'firebase/firestore';
+import { DocumentReference, SetOptions, DocumentSnapshot } from '@firebase/firestore-types';
 import { Observable } from 'rxjs/Observable';
 import { Subscriber } from 'rxjs/Subscriber';
 import { QueryFn, AssociatedReference, Action } from '../interfaces';
@@ -26,7 +25,7 @@ import { AngularFirestoreCollection } from '../collection/collection';
  *
  * Example:
  *
- * const fakeStock = new AngularFirestoreDocument<Stock>(firebase.firestore.doc('stocks/FAKE'));
+ * const fakeStock = new AngularFirestoreDocument<Stock>(doc('stocks/FAKE'));
  * await fakeStock.set({ name: 'FAKE', price: 0.01 });
  * fakeStock.valueChanges().map(snap => {
  *   if(snap.exists) return snap.data();
@@ -42,14 +41,14 @@ export class AngularFirestoreDocument<T> {
    * for data operations, data streaming, and Symbol.observable.
    * @param ref
    */
-  constructor(public ref: firebase.firestore.DocumentReference) { }
+  constructor(public ref: DocumentReference) { }
 
   /**
    * Create or overwrite a single document.
    * @param data
    * @param options
    */
-  set(data: T, options?: firebase.firestore.SetOptions): Promise<void> {
+  set(data: T, options?: SetOptions): Promise<void> {
     return this.ref.set(data, options);
   }
 
@@ -83,7 +82,7 @@ export class AngularFirestoreDocument<T> {
   /**
    * Listen to snapshot updates from the document.
    */
-  snapshotChanges(): Observable<Action<firebase.firestore.DocumentSnapshot>> {
+  snapshotChanges(): Observable<Action<DocumentSnapshot>> {
     return fromDocRef(this.ref);
   }
 

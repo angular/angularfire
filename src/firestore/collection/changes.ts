@@ -1,6 +1,5 @@
 import { fromCollectionRef } from '../observable/fromRef';
-import * as firebase from 'firebase/app';
-import 'firebase/firestore';
+import { Query, DocumentChangeType, DocumentChange } from '@firebase/firestore-types';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/filter';
@@ -10,21 +9,21 @@ import { DocumentChangeAction, Action } from '../interfaces';
 
 /**
  * Return a stream of document changes on a query. These results are not in sort order but in
- * order of occurence. 
- * @param query 
+ * order of occurence.
+ * @param query
  */
-export function docChanges(query: firebase.firestore.Query): Observable<DocumentChangeAction[]> {
+export function docChanges(query: Query): Observable<DocumentChangeAction[]> {
   return fromCollectionRef(query)
-    .map(action => 
+    .map(action =>
       action.payload.docChanges
         .map(change => ({ type: change.type, payload: change })));
 }
 
 /**
  * Return a stream of document changes on a query. These results are in sort order.
- * @param query 
+ * @param query
  */
-export function sortedChanges(query: firebase.firestore.Query, events: firebase.firestore.DocumentChangeType[]): Observable<DocumentChangeAction[]> {
+export function sortedChanges(query: Query, events: DocumentChangeType[]): Observable<DocumentChangeAction[]> {
   return fromCollectionRef(query)
     .map(changes => changes.payload.docChanges)
     .scan((current, changes) => combineChanges(current, changes, events), [])
@@ -34,11 +33,11 @@ export function sortedChanges(query: firebase.firestore.Query, events: firebase.
 /**
  * Combines the total result set from the current set of changes from an incoming set
  * of changes.
- * @param current 
- * @param changes 
+ * @param current
+ * @param changes
  * @param events
  */
-export function combineChanges(current: firebase.firestore.DocumentChange[], changes: firebase.firestore.DocumentChange[], events: firebase.firestore.DocumentChangeType[]) {
+export function combineChanges(current: DocumentChange[], changes: DocumentChange[], events: DocumentChangeType[]) {
   changes.forEach(change => {
     // skip unwanted change types
     if(events.indexOf(change.type) > -1) {
@@ -50,10 +49,10 @@ export function combineChanges(current: firebase.firestore.DocumentChange[], cha
 
 /**
  * Creates a new sorted array from a new change.
- * @param combined 
- * @param change 
+ * @param combined
+ * @param change
  */
-export function combineChange(combined: firebase.firestore.DocumentChange[], change: firebase.firestore.DocumentChange): firebase.firestore.DocumentChange[] {
+export function combineChange(combined: DocumentChange[], change: DocumentChange): DocumentChange[] {
   switch(change.type) {
     case 'added':
       if (combined[change.newIndex] && combined[change.newIndex].doc.id == change.doc.id) {
