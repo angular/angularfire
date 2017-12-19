@@ -54,11 +54,11 @@ const GLOBALS = {
   '@angular/core': 'ng.core',
   '@angular/compiler': 'ng.compiler',
   '@angular/platform-browser': 'ng.platformBrowser',
-  'firebase/auth': 'firebase',
-  'firebase/app': 'firebase',
-  'firebase/database': 'firebase',
-  'firebase/firestore': 'firebase',
-  'firebase/storage': 'firebase',
+  '@firebase/auth': 'firebase',
+  '@firebase/app': 'firebase',
+  '@firebase/database': 'firebase',
+  '@firebase/firestore': 'firebase',
+  '@firebase/storage': 'firebase',
   'rxjs/scheduler/queue': 'Rx.Scheduler',
   '@angular/core/testing': 'ng.core.testing',
   'angularfire2': 'angularfire2',
@@ -123,8 +123,8 @@ const TSC_TEST_ARGS = [`-p`, `${process.cwd()}/src/tsconfig-test.json`];
 
 /**
  * Create an Observable of a spawned child process.
- * @param {string} command 
- * @param {string[]} args 
+ * @param {string} command
+ * @param {string[]} args
  */
 function spawnObservable(command, args) {
   return Observable.create(observer => {
@@ -151,8 +151,8 @@ function generateBundle(entry, { dest, globals, moduleName }) {
 
 /**
  * Create a UMD bundle given a module name.
- * @param {string} name 
- * @param {Object} globals 
+ * @param {string} name
+ * @param {Object} globals
  */
 function createUmd(name, globals) {
   // core module is angularfire2 the rest are angularfire2.feature
@@ -177,7 +177,7 @@ function createTestUmd(globals) {
 
 /**
  * Get the file path of the src package.json for a module
- * @param {string} moduleName 
+ * @param {string} moduleName
  */
 function getSrcPackageFile(moduleName) {
   return SRC_PKG_PATHS[moduleName];
@@ -185,7 +185,7 @@ function getSrcPackageFile(moduleName) {
 
 /**
  * Get the file path of the dist package.json for a module
- * @param {string} moduleName 
+ * @param {string} moduleName
  */
 function getDestPackageFile(moduleName) {
   return DEST_PKG_PATHS[moduleName];
@@ -194,8 +194,8 @@ function getDestPackageFile(moduleName) {
 /**
  * Create an observable of package.json dependency version replacements.
  * This keeps the dependency versions across each package in sync.
- * @param {string} name 
- * @param {Object} versions 
+ * @param {string} name
+ * @param {Object} versions
  */
 function replaceVersionsObservable(name, versions) {
   return Observable.create((observer) => {
@@ -287,7 +287,7 @@ function buildModule(name, globals) {
 
 /**
  * Create an observable of module build status. This method builds
- * @param {Object} globals 
+ * @param {Object} globals
  */
 function buildModules(globals) {
   const core$ = buildModule('core', globals);
