@@ -1,4 +1,4 @@
-import * as firebase from 'firebase/app';
+import { DataSnapshot } from '@firebase/database-types';
 import { Subscription } from 'rxjs/Subscription';
 import { Scheduler } from 'rxjs/Scheduler';
 import { queue } from 'rxjs/scheduler/queue';
@@ -53,7 +53,7 @@ export interface CheckUrlRef {
  * @example
  * unwrapMapFn(snapshot) => { name: 'David', $key: 'david', $exists: Function }
  */
-export function unwrapMapFn (snapshot:firebase.database.DataSnapshot): AFUnwrappedDataSnapshot {
+export function unwrapMapFn (snapshot:DataSnapshot): AFUnwrappedDataSnapshot {
   var unwrapped = !isNil(snapshot.val()) ? snapshot.val() : { $value: null };
   if ((/string|number|boolean/).test(typeof unwrapped)) {
     unwrapped = {

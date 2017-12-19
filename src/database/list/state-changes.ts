@@ -2,9 +2,9 @@ import { DatabaseQuery, ChildEvent, AngularFireAction, SnapshotAction } from '..
 import { fromRef } from '../observable/fromRef';
 import { validateEventsArray } from './utils';
 import { Observable } from 'rxjs/Observable';
-import { database } from 'firebase/app';
 import 'rxjs/add/observable/merge';
 import 'rxjs/add/operator/scan';
+import { DataSnapshot } from '@firebase/database-types';
 
 export function createStateChanges(query: DatabaseQuery) {
   return (events?: ChildEvent[]) => stateChanges(query, events);

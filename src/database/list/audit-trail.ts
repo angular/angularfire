@@ -1,7 +1,7 @@
 import { DatabaseQuery, ChildEvent, DatabaseSnapshot, AngularFireAction, SnapshotAction } from '../interfaces';
 import { stateChanges } from './state-changes';
 import { Observable } from 'rxjs/Observable';
-import { database } from 'firebase/app';
+import { DataSnapshot } from '@firebase/database-types';
 import { fromRef } from '../observable/fromRef';
 
 
@@ -20,7 +20,7 @@ export function auditTrail(query: DatabaseQuery, events?: ChildEvent[]): Observa
 }
 
 interface LoadedMetadata {
-  data: AngularFireAction<database.DataSnapshot>;
+  data: AngularFireAction<DataSnapshot>;
   lastKeyToLoad: any;
 }
 
@@ -60,5 +60,5 @@ function waitForLoaded(query: DatabaseQuery, action$: Observable<SnapshotAction[
     .skipWhile(meta => meta.loadedKeys.indexOf(meta.lastKeyToLoad) === -1)
     // Pluck off the meta data because the user only cares
     // to iterate through the snapshots
-    .map(meta => meta.actions);  
+    .map(meta => meta.actions);
 }

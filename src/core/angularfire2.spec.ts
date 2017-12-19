@@ -1,4 +1,5 @@
-import * as firebase from 'firebase/app';
+
+import { Reference } from '@firebase/database-types';
 import { TestBed, inject, withModule, async } from '@angular/core/testing';
 import { ReflectiveInjector, Provider, PlatformRef, NgModule, Compiler, ApplicationRef, CompilerFactory } from '@angular/core';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2';
@@ -9,9 +10,9 @@ import { BrowserModule } from '@angular/platform-browser';
 describe('angularfire', () => {
   let subscription:Subscription;
   let app: FirebaseApp;
-  let rootRef: firebase.database.Reference;
-  let questionsRef: firebase.database.Reference;
-  let listOfQuestionsRef: firebase.database.Reference;
+  let rootRef: Reference;
+  let questionsRef: Reference;
+  let listOfQuestionsRef: Reference;
   let defaultPlatform: PlatformRef;
 
   const APP_NAME = 'super-awesome-test-firebase-app-name';

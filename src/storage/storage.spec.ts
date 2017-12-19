@@ -1,4 +1,4 @@
-import * as firebase from 'firebase/app';
+import { FirebaseApp as FBApp } from '@firebase/app-types';
 import { Observable } from 'rxjs/Observable'
 import { forkJoin } from 'rxjs/observable/forkJoin';
 import { TestBed, inject } from '@angular/core/testing';
@@ -7,7 +7,7 @@ import { AngularFireStorageModule, AngularFireStorage } from 'angularfire2/stora
 import { COMMON_CONFIG } from './test-config';
 
 describe('AngularFireStorage', () => {
-  let app: firebase.app.App;
+  let app: FBApp;
   let afStorage: AngularFireStorage;
 
   beforeEach(() => {

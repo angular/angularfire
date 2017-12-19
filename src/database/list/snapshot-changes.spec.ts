@@ -1,4 +1,4 @@
-import * as firebase from 'firebase/app';
+import { Reference } from '@firebase/database-types';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2';
 import { AngularFireDatabase, AngularFireDatabaseModule, snapshotChanges, ChildEvent } from 'angularfire2/database';
 import { TestBed, inject } from '@angular/core/testing';
@@ -13,7 +13,7 @@ const FIREBASE_APP_NAME = rando();
 describe('snapshotChanges', () => {
   let app: FirebaseApp;
   let db: AngularFireDatabase;
-  let createRef: (path: string) => firebase.database.Reference;
+  let createRef: (path: string) => Reference;
   let batch = {};
   const items = [{ name: 'zero' }, { name: 'one' }, { name: 'two' }].map((item, i) => ( { key: i.toString(), ...item } ));
   Object.keys(items).forEach(function (key, i) {
@@ -48,7 +48,7 @@ describe('snapshotChanges', () => {
     const snapChanges = snapshotChanges(aref, events);
     return {
       snapChanges: snapChanges.skip(skip),
-      ref: aref 
+      ref: aref
     };
   }
 
@@ -92,8 +92,8 @@ describe('snapshotChanges', () => {
   });
 
   it('should listen to only child_added, child_changed events', (done) => {
-    const { snapChanges, ref } = prepareSnapshotChanges({ 
-      events: ['child_added', 'child_changed'], 
+    const { snapChanges, ref } = prepareSnapshotChanges({
+      events: ['child_added', 'child_changed'],
       skip: 1
     });
     const name = 'ligatures';
@@ -108,7 +108,7 @@ describe('snapshotChanges', () => {
       ref.child(items[0].key).update({ name })
     });
   });
-  
+
   it('should handle empty sets', done => {
     const aref = createRef(rando());
     aref.set({});

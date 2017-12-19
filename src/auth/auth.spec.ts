@@ -1,4 +1,5 @@
-import * as firebase from 'firebase/app';
+import { FirebaseApp as FBApp } from '@firebase/app-types';
+import { User } from '@firebase/auth-types';
 import { ReflectiveInjector, Provider } from '@angular/core';
 import { Observable } from 'rxjs/Observable'
 import { Subject } from 'rxjs/Subject'
@@ -19,16 +20,16 @@ function authSkip(auth: Observable<any>, count: number): Observable<any> {
   return skip.call(auth, 1);
 }
 
-const firebaseUser = <firebase.User> {
+const firebaseUser = <User> {
   uid: '12345',
   providerData: [{ displayName: 'jeffbcrossyface' }]
 };
 
 describe('AngularFireAuth', () => {
-  let app: firebase.app.App;
+  let app: FBApp;
   let afAuth: AngularFireAuth;
   let authSpy: jasmine.Spy;
-  let mockAuthState: Subject<firebase.User>;
+  let mockAuthState: Subject<User>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -42,11 +43,11 @@ describe('AngularFireAuth', () => {
       afAuth = _auth;
     })();
 
-    mockAuthState = new Subject<firebase.User>();
+    mockAuthState = new Subject<User>();
     spyOn(afAuth, 'authState').and.returnValue(mockAuthState);
     spyOn(afAuth, 'idToken').and.returnValue(mockAuthState);
-    afAuth.authState = mockAuthState as Observable<firebase.User>;
-    afAuth.idToken = mockAuthState as Observable<firebase.User>;
+    afAuth.authState = mockAuthState as Observable<User>;
+    afAuth.idToken = mockAuthState as Observable<User>;
   });
 
   afterEach(done => {
@@ -104,7 +105,7 @@ describe('AngularFireAuth', () => {
 
   it('should emit auth updates through idToken', (done: any) => {
     let count = 0;
-    
+
     // Check that the first value is null and second is the auth user
     const subs = afAuth.idToken.subscribe(user => {
       if (count === 0) {

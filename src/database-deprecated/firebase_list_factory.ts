@@ -1,4 +1,4 @@
-import * as firebase from 'firebase/app';
+import * as database from '@firebase/database-types';
 import { ZoneScheduler } from 'angularfire2';
 import * as utils from './utils';
 import 'firebase/database';
@@ -92,7 +92,7 @@ export function FirebaseListFactory (
       }
 
       return queried;
-    }), (queryRef: firebase.database.Reference, ix: number) => {
+    }), (queryRef: database.Reference, ix: number) => {
       return firebaseListObservable(queryRef, { preserveSnapshot });
     })
     .subscribe(subscriber);
@@ -108,7 +108,7 @@ export function FirebaseListFactory (
  * asynchonous. It creates a initial array from a promise of ref.once('value'), and then starts
  * listening to child events. When the initial array is loaded, the observable starts emitting values.
  */
-function firebaseListObservable(ref: firebase.database.Reference | DatabaseQuery, {preserveSnapshot}: FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
+function firebaseListObservable(ref: database.Reference | DatabaseQuery, {preserveSnapshot}: FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
 
   const toValue = preserveSnapshot ? (snapshot => snapshot) : utils.unwrapMapFn;
   const toKey = preserveSnapshot ? (value => value.key) : (value => value.$key);

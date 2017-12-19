@@ -1,4 +1,4 @@
-import * as firebase from 'firebase/app';
+import { Reference } from '@firebase/database-types';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2';
 import { AngularFireDatabase, AngularFireDatabaseModule, listChanges } from 'angularfire2/database';
 import { TestBed, inject } from '@angular/core/testing';
@@ -12,7 +12,7 @@ const FIREBASE_APP_NAME = rando();
 describe('listChanges', () => {
   let app: FirebaseApp;
   let db: AngularFireDatabase;
-  let ref: (path: string) => firebase.database.Reference;
+  let ref: (path: string) => Reference;
   let batch = {};
   const items = [{ name: 'zero' }, { name: 'one' }, { name: 'two' }].map((item, i) => ( { key: i.toString(), ...item } ));
   Object.keys(items).forEach(function (key, i) {
@@ -42,7 +42,7 @@ describe('listChanges', () => {
   });
 
   describe('events', () => {
-    
+
     it('should stream value at first', (done) => {
       const someRef = ref(rando());
       const obs = listChanges(someRef, ['child_added']);
@@ -141,8 +141,8 @@ describe('listChanges', () => {
       aref.set(batch).then(() => {
         aref.child(items[0].key).setPriority('a', () => {});
       });
-    });    
-    
+    });
+
   });
 
 });
