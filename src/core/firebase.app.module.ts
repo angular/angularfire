@@ -1,6 +1,6 @@
 import { InjectionToken, } from '@angular/core';
 import { FirebaseAppConfig } from './';
-import { firebase } from '@firebase/app';
+import firebase from '@firebase/app';
 
 import { FirebaseApp as FBApp } from '@firebase/app-types';
 import { FirebaseAuth } from '@firebase/auth-types';

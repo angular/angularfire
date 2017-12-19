@@ -1,7 +1,6 @@
 import * as database from '@firebase/database-types';
 import { ZoneScheduler } from 'angularfire2';
 import * as utils from './utils';
-import 'firebase/database';
 import { AFUnwrappedDataSnapshot } from './interfaces';
 import { FirebaseListObservable } from './firebase_list_observable';
 import { Observer } from 'rxjs/Observer';
