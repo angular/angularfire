@@ -1,4 +1,3 @@
-import * as firebase from 'firebase/app';
 import { Subscription } from 'rxjs/Subscription';
 import { Scheduler } from 'rxjs/Scheduler';
 import { queue } from 'rxjs/scheduler/queue';
@@ -29,7 +28,7 @@ export function isFirebaseRef(value: any): boolean {
  */
 export function getRef(app: FirebaseApp, pathRef: PathReference): DatabaseReference {
   // if a db ref was passed in, just return it
-  return isFirebaseRef(pathRef) ? pathRef as DatabaseReference 
+  return isFirebaseRef(pathRef) ? pathRef as DatabaseReference
     : app.database().ref(pathRef as string);
 }
 

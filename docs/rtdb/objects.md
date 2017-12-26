@@ -157,17 +157,8 @@ export class AppComponent {
 }
 ```
 
-## Meta-fields on the object
-Data retrieved from the object binding contains special properties retrieved from the unwrapped Firebase DataSnapshot.
-
-| property |                    | 
-| ---------|--------------------| 
-| `$key`     | The key for each record. This is equivalent to each record's path in our database as it would be returned by `ref.key()`.|
-| `$value`   | If the data for this child node is a primitive (number, string, or boolean), then the record itself will still be an object. The primitive value will be stored under `$value` and can be changed and saved like any other field.|
-
-
 ## Retrieving the snapshot
-AngularFire unwraps the Firebase DataSnapshot by default, but you can get the data as the original snapshot by specifying the `snapshotChanges` option. 
+AngularFire `valueChanges()` unwraps the Firebase DataSnapshot by default, but you can get the data as the original snapshot by using the `snapshotChanges()` option.
 
 ```ts
 this.itemRef = db.object('item');

@@ -1,18 +1,25 @@
 import { InjectionToken, } from '@angular/core';
 import { FirebaseAppConfig } from './';
-import * as firebase from 'firebase/app';
+import firebase from '@firebase/app';
+
+import { FirebaseApp as FBApp } from '@firebase/app-types';
+import { FirebaseAuth } from '@firebase/auth-types';
+import { FirebaseDatabase } from '@firebase/database-types';
+import { FirebaseMessaging } from '@firebase/messaging-types';
+import { FirebaseStorage } from '@firebase/storage-types';
+import { FirebaseFirestore } from '@firebase/firestore-types';
 
 export const FirebaseAppConfigToken = new InjectionToken<FirebaseAppConfig>('FirebaseAppConfigToken');
 
-export class FirebaseApp implements firebase.app.App {
+export class FirebaseApp implements FBApp {
   name: string;
   options: {};
-  auth: () => firebase.auth.Auth;
-  database: () => firebase.database.Database;
-  messaging: () => firebase.messaging.Messaging;
-  storage: () => firebase.storage.Storage;
+  auth: () => FirebaseAuth;
+  database: () => FirebaseDatabase;
+  messaging: () => FirebaseMessaging;
+  storage: () => FirebaseStorage;
   delete: () => Promise<any>;
-  firestore: () => firebase.firestore.Firestore;
+  firestore: () => FirebaseFirestore;
 }
 
 export function _firebaseAppFactory(config: FirebaseAppConfig, appName?: string): FirebaseApp {

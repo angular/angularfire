@@ -220,8 +220,6 @@ export class AppComponent {
 
 **When would you not use it?** - When you just need a list of data. This is a more advanced usage of AngularFirestore. 
 
-**Best Practices** - 
-
 #### Example
 ```ts
 import { Component } from '@angular/core';
@@ -269,8 +267,6 @@ There are three `DocumentChangeType`s in Firestore: `added`, `removed`, and `mod
     this.items = this.itemsCollection.snapshotChanges(['added', 'removed']);
   }
 ```
-
-**Note:** Using 
 
 #### Component Sample
 ```ts

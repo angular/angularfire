@@ -1,5 +1,4 @@
-import * as firebase from 'firebase/app';
-import 'firebase/firestore';
+import { DocumentChangeType, CollectionReference, Query, DocumentReference } from '@firebase/firestore-types';
 import { Observable } from 'rxjs/Observable';
 import { Subscriber } from 'rxjs/Subscriber';
 import { fromCollectionRef } from '../observable/fromRef';
@@ -13,7 +12,7 @@ import { QueryFn, AssociatedReference, DocumentChangeAction } from '../interface
 import { docChanges, sortedChanges } from './changes';
 import { AngularFirestoreDocument } from '../document/document';
 
-export function validateEventsArray(events?: firebase.firestore.DocumentChangeType[]) {
+export function validateEventsArray(events?: DocumentChangeType[]) {
   if(!events || events!.length === 0) {
     events = ['added', 'removed', 'modified'];
   }
@@ -22,49 +21,49 @@ export function validateEventsArray(events?: firebase.firestore.DocumentChangeTy
 
 /**
  * AngularFirestoreCollection service
- * 
- * This class creates a reference to a Firestore Collection. A reference and a query are provided in 
- * in the constructor. The query can be the unqueried reference if no query is desired.The class 
+ *
+ * This class creates a reference to a Firestore Collection. A reference and a query are provided in
+ * in the constructor. The query can be the unqueried reference if no query is desired.The class
  * is generic which gives you type safety for data update methods and data streaming.
- * 
+ *
  * This class uses Symbol.observable to transform into Observable using Observable.from().
- * 
+ *
  * This class is rarely used directly and should be created from the AngularFirestore service.
- * 
+ *
  * Example:
- * 
+ *
  * const collectionRef = firebase.firestore.collection('stocks');
  * const query = collectionRef.where('price', '>', '0.01');
  * const fakeStock = new AngularFirestoreCollection<Stock>(collectionRef, query);
- * 
+ *
  * // NOTE!: the updates are performed on the reference not the query
  * await fakeStock.add({ name: 'FAKE', price: 0.01 });
- * 
+ *
  * // Subscribe to changes as snapshots. This provides you data updates as well as delta updates.
  * fakeStock.valueChanges().subscribe(value => console.log(value));
  */
 export class AngularFirestoreCollection<T> {
   /**
-   * The contstuctor takes in a CollectionReference and Query to provide wrapper methods
+   * The constructor takes in a CollectionReference and Query to provide wrapper methods
    * for data operations and data streaming.
-   * 
+   *
    * Note: Data operation methods are done on the reference not the query. This means
    * when you update data it is not updating data to the window of your query unless
-   * the data fits the criteria of the query. See the AssociatedRefence type for details 
+   * the data fits the criteria of the query. See the AssociatedRefence type for details
    * on this implication.
-   * @param ref 
-   */  
+   * @param ref
+   */
   constructor(
-    public readonly ref: firebase.firestore.CollectionReference,
-    private readonly query: firebase.firestore.Query) { }
+    public readonly ref: CollectionReference,
+    private readonly query: Query) { }
 
   /**
    * Listen to the latest change in the stream. This method returns changes
    * as they occur and they are not sorted by query order. This allows you to construct
    * your own data structure.
-   * @param events 
+   * @param events
    */
-  stateChanges(events?: firebase.firestore.DocumentChangeType[]): Observable<DocumentChangeAction[]> {
+  stateChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction[]> {
     if(!events || events.length === 0) {
       return docChanges(this.query);
     }
@@ -76,46 +75,46 @@ export class AngularFirestoreCollection<T> {
   /**
    * Create a stream of changes as they occur it time. This method is similar to stateChanges()
    * but it collects each event in an array over time.
-   * @param events 
+   * @param events
    */
-  auditTrail(events?: firebase.firestore.DocumentChangeType[]): Observable<DocumentChangeAction[]> {
+  auditTrail(events?: DocumentChangeType[]): Observable<DocumentChangeAction[]> {
     return this.stateChanges(events).scan((current, action) => [...current, ...action], []);
   }
-  
+
   /**
    * Create a stream of synchronized changes. This method keeps the local array in sorted
    * query order.
-   * @param events 
+   * @param events
    */
-  snapshotChanges(events?: firebase.firestore.DocumentChangeType[]): Observable<DocumentChangeAction[]> {
+  snapshotChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction[]> {
     events = validateEventsArray(events);
     return sortedChanges(this.query, events);
   }
-  
+
   /**
    * Listen to all documents in the collection and its possible query as an Observable.
-   */  
-  valueChanges(events?: firebase.firestore.DocumentChangeType[]): Observable<T[]> {
+   */
+  valueChanges(events?: DocumentChangeType[]): Observable<T[]> {
     return fromCollectionRef(this.query)
       .map(actions => actions.payload.docs.map(a => a.data()) as T[]);
   }
 
   /**
    * Add data to a collection reference.
-   * 
+   *
    * Note: Data operation methods are done on the reference not the query. This means
    * when you update data it is not updating data to the window of your query unless
    * the data fits the criteria of the query.
    */
-  add(data: T) {
+  add(data: T): Promise<DocumentReference> {
     return this.ref.add(data);
   }
 
   /**
    * Create a reference to a single document in a collection.
-   * @param path 
+   * @param path
    */
-  doc<T>(path: string) {
+  doc<T>(path: string): AngularFirestoreDocument<T> {
     return new AngularFirestoreDocument<T>(this.ref.doc(path));
   }
 }

@@ -2,12 +2,11 @@ import { Observable } from 'rxjs/Observable';
 import { Operator } from 'rxjs/Operator';
 import { Subscriber } from 'rxjs/Subscriber';
 import { Subscription } from 'rxjs/Subscription';
-import * as firebase from 'firebase/app';
-import 'firebase/database';
+import { Reference, DataSnapshot, ThenableReference } from '@firebase/database-types';
 import * as utils from './utils';
 import { AFUnwrappedDataSnapshot, FirebaseOperationCases, QueryReference, DatabaseSnapshot, DatabaseReference } from './interfaces';
 
-export type FirebaseOperation = string | firebase.database.Reference | firebase.database.DataSnapshot | AFUnwrappedDataSnapshot;
+export type FirebaseOperation = string | Reference | DataSnapshot | AFUnwrappedDataSnapshot;
 
 export class FirebaseListObservable<T> extends Observable<T> {
   constructor(public $ref: QueryReference, subscribe?: <R>(subscriber: Subscriber<R>) => Subscription | Function | void) {
@@ -21,7 +20,7 @@ export class FirebaseListObservable<T> extends Observable<T> {
     return observable;
   }
 
-  push(val:any):firebase.database.ThenableReference {
+  push(val:any):ThenableReference {
     if(!this.$ref) {
       throw new Error('No ref specified for this Observable!');
     }
@@ -31,8 +30,8 @@ export class FirebaseListObservable<T> extends Observable<T> {
   set(item: FirebaseOperation, value: Object): Promise<void> {
     return this._checkOperationCases(item, {
       stringCase: () => this.$ref.ref.child(<string>item).set(value),
-      firebaseCase: () => (<firebase.database.Reference>item).set(value),
-      snapshotCase: () => (<firebase.database.DataSnapshot>item).ref.set(value),
+      firebaseCase: () => (<Reference>item).set(value),
+      snapshotCase: () => (<DataSnapshot>item).ref.set(value),
       unwrappedSnapshotCase: () => this.$ref.ref.child((<AFUnwrappedDataSnapshot>item).$key).set(value)
     });
   }
@@ -40,8 +39,8 @@ export class FirebaseListObservable<T> extends Observable<T> {
   update(item: FirebaseOperation, value: Object): Promise<void> {
     return this._checkOperationCases(item, {
       stringCase: () => this.$ref.ref.child(<string>item).update(value),
-      firebaseCase: () => (<firebase.database.Reference>item).update(value),
-      snapshotCase: () => (<firebase.database.DataSnapshot>item).ref.update(value),
+      firebaseCase: () => (<Reference>item).update(value),
+      snapshotCase: () => (<DataSnapshot>item).ref.update(value),
       unwrappedSnapshotCase: () => this.$ref.ref.child((<AFUnwrappedDataSnapshot>item).$key).update(value)
     });
   }

@@ -1,12 +1,13 @@
 {
   "name": "angularfire2",
-  "version": "5.0.0-rc.4",
+  "version": "5.0.0-rc.5-next",
   "description": "The official library of Firebase and Angular.",
   "private": true,
   "scripts": {
     "test": "npm run build && karma start --single-run",
     "test:watch": "concurrently \"npm run build:watch\" \"npm run delayed_karma\"",
     "test:debug": "npm run build && karma start",
+    "karma": "karma start",
     "test:universal": "npm run build && cp -R dist/packages-dist test/universal-test/node_modules/angularfire2 && cd test/universal-test && npm run prerender",
     "delayed_karma": "sleep 10 && karma start",
     "build": "rm -rf dist && node tools/build.js",
@@ -34,7 +35,7 @@
     "@angular/platform-browser": "^5.0.0",
     "@angular/platform-browser-dynamic": "^5.0.0",
     "firebase": "^4.5.0",
-    "rxjs": "^5.5.2",
+    "rxjs": "^5.5.4",
     "zone.js": "^0.8.0"
   },
   "devDependencies": {

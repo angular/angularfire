@@ -1,5 +1,4 @@
-import * as firebase from 'firebase/app';
-import 'firebase/database';
+import { FirebaseDatabase } from '@firebase/database-types';
 import { Inject, Injectable } from '@angular/core';
 import { FirebaseAppConfigToken, FirebaseAppConfig, FirebaseApp } from 'angularfire2';
 import { FirebaseListFactory } from './firebase_list_factory';
@@ -15,8 +14,8 @@ export class AngularFireDatabase {
   /**
    * Firebase Database instance
    */
-  database: firebase.database.Database;
-  
+  database: FirebaseDatabase;
+
   constructor(public app: FirebaseApp) {
     this.database = app.database();
   }
