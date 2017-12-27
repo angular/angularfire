@@ -16,7 +16,7 @@ import * as firebase from 'firebase/app';
 @Component({
   selector: 'app-root',
   template: `
-    <div *ngIf="afAuth.authState | async; let user; else showLogin">
+    <div *ngIf="afAuth.authState | async as user; else showLogin">
       <h1>Hello {{ user.displayName }}!</h1>
       <button (click)="logout()">Logout</button>
     </div>
