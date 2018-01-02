@@ -39,7 +39,7 @@ import { AngularFireStorage } from 'angularfire2/storage';
   template: ``
 })
 export class AppComponent {
-  constructor(private afs: AngularFireStorage) { }
+  constructor(private storage: AngularFireStorage) { }
 }
 ```
 
@@ -49,7 +49,7 @@ There are two options for uploading files.
 
 | method   |                    | 
 | ---------|--------------------| 
-| `put(data: Blob, metadata?: storage.UploadMetadata | undefined): AngularFireUploadTask` | Starts the upload of the blob to the storage reference's path. Returns an `AngularFireUploadTask` for upload monitoring. | 
+| `put(data: Blob, metadata?: storage.UploadMetadata): AngularFireUploadTask` | Starts the upload of the blob to the storage reference's path. Returns an `AngularFireUploadTask` for upload monitoring. | 
 | `putString(keyRefOrSnap: string, value: T)` | Firebase | AFUnwrappedSnapshot, value: Object) | Updates an existing item in the array. Accepts a key, database reference, or an unwrapped snapshot. |
 
 ```ts
@@ -63,7 +63,7 @@ import { AngularFireStorage } from 'angularfire2/storage';
   `
 })
 export class AppComponent {
-  constructor(private afs: AngularFireStorage) { }
+  constructor(private storage: AngularFireStorage) { }
   uploadFile(event) {
     const file = event.target.files[0];
     const filePath = 'name-your-file-path-here';
@@ -78,9 +78,9 @@ An `AngularFireUploadTask` has methods for observing upload percentage as well a
 
 | method   |                    | 
 | ---------|--------------------| 
-| `snapshotChanges(): Observable<FirebaseStorage.UploadTaskSnapshot | undefined>` | Emits the raw `UploadTaskSnapshot` as the file upload progresses. | 
-| `percentageChanges(): Observable<number | undefined>` | Emits the upload completion percentage. | 
-| `downloadURL(): Observable<string | null>` | Emits the download url when available |
+| `snapshotChanges(): Observable<FirebaseStorage.UploadTaskSnapshot>` | Emits the raw `UploadTaskSnapshot` as the file upload progresses. | 
+| `percentageChanges(): Observable<number>` | Emits the upload completion percentage. | 
+| `downloadURL(): Observable<string>` | Emits the download url when available |
 
 #### Example Usage
 
