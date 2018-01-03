@@ -79,3 +79,29 @@ describe('AngularFirestore', () => {
   });
 
 });
+
+describe('AngularFirestore without persistance', () => {
+  let app: FBApp;
+  let afs: AngularFirestore;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFirestoreModule
+      ]
+    });
+    inject([FirebaseApp, AngularFirestore], (_app: FBApp, _afs: AngularFirestore) => {
+      app = _app;
+      afs = _afs;
+    })();
+  });
+
+  it('should not enable persistence', (done) => {
+    afs.persistenceEnabled$.subscribe(isEnabled => {
+      expect(isEnabled).toBe(false);
+      done();
+    });
+  });
+
+});
