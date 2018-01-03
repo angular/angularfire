@@ -1,36 +1,25 @@
-import { NgModule, InjectionToken } from '@angular/core';
+import { InjectionToken, ModuleWithProviders, NgModule } from '@angular/core';
 import { FirebaseApp, AngularFireModule } from 'angularfire2';
 import { AngularFirestore } from './firestore';
 import { from } from 'rxjs/observable/from';
 
-export const EnablePersistenceToken = new InjectionToken<boolean>('EnablePersistenceToken');
-
-export function _getAngularFirestore(app: FirebaseApp, enablePersistence: boolean) {
-  return new AngularFirestore(app, enablePersistence);
-}
-
-export const AngularFirestoreProvider = {
-  provide: AngularFirestore,
-  useFactory: _getAngularFirestore,
-  deps: [ FirebaseApp, EnablePersistenceToken ]
-};
-
-export const FIRESTORE_PROVIDERS = [
-  AngularFirestoreProvider,
-  { provide: EnablePersistenceToken, useValue: false },
-];
+import { EnablePersistenceToken } from './enable-persistance-token';
 
 @NgModule({
   imports: [ AngularFireModule ],
-  providers: [ FIRESTORE_PROVIDERS ]
+  providers: [
+    AngularFirestore,
+  ]
 })
 export class AngularFirestoreModule {
-  static enablePersistence() {
+  /**
+   * Attempt to enable persistent storage, if possible
+   */
+  static enablePersistence(): ModuleWithProviders {
     return {
-      ngModule: AngularFireModule,
+      ngModule: AngularFirestoreModule,
       providers: [
         { provide: EnablePersistenceToken, useValue: true },
-        AngularFirestoreProvider
       ]
     }
   }
