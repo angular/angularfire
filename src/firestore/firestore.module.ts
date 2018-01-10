@@ -2,6 +2,7 @@ import { NgModule, InjectionToken } from '@angular/core';
 import { FirebaseApp, AngularFireModule } from 'angularfire2';
 import { AngularFirestore } from './firestore';
 import { from } from 'rxjs/observable/from';
+import '@firebase/firestore';
 
 export const EnablePersistenceToken = new InjectionToken<boolean>('EnablePersistenceToken');
 

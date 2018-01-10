@@ -1,6 +1,6 @@
 {
   "name": "angularfire2",
-  "version": "5.0.0-rc.5-next",
+  "version": "5.0.0-rc.5.4-next",
   "description": "The official library of Firebase and Angular.",
   "private": true,
   "scripts": {
@@ -34,16 +34,16 @@
     "@angular/core": "^5.0.0",
     "@angular/platform-browser": "^5.0.0",
     "@angular/platform-browser-dynamic": "^5.0.0",
-    "firebase": "^4.5.0",
-    "rxjs": "^5.5.4",
-    "zone.js": "^0.8.0",
     "@firebase/app": "^0.1.5",
     "@firebase/app-types": "^0.1.0",
     "@firebase/auth-types": "^0.1.0",
     "@firebase/database-types": "^0.1.0",
+    "@firebase/firestore-types": "^0.1.0",
     "@firebase/messaging-types": "^0.1.0",
     "@firebase/storage-types": "^0.1.0",
-    "@firebase/firestore-types": "^0.1.0"
+    "firebase": "^4.8.2-0",
+    "rxjs": "^5.5.4",
+    "zone.js": "^0.8.0"
   },
   "devDependencies": {
     "@angular/compiler-cli": "^5.0.0",
