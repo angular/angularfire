@@ -64,6 +64,8 @@ const GLOBALS = {
   '@firebase/database': 'firebase',
   '@firebase/firestore': 'firebase',
   '@firebase/storage': 'firebase',
+  '@firebase/util': 'firebase',
+  '@firebase/webchannel-wrapper': 'firebase',
   'rxjs/scheduler/queue': 'Rx.Scheduler',
   '@angular/core/testing': 'ng.core.testing',
   'angularfire2': 'angularfire2',
@@ -77,7 +79,11 @@ const GLOBALS = {
 // Map of dependency versions across all packages
 const VERSIONS = {
   ANGULAR_VERSION: pkg.dependencies['@angular/core'],
-  FIREBASE_VERSION: pkg.dependencies['firebase'],
+  FIREBASE_APP_VERSION: pkg.dependencies['@firebase/app'],
+  FIREBASE_DATABASE_VERSION: pkg.dependencies['@firebase/database'],
+  FIREBASE_FIRESTORE_VERSION: pkg.dependencies['@firebase/firestore'],
+  FIREBASE_AUTH_VERSION: pkg.dependencies['@firebase/auth'],
+  FIREBASE_STORAGE_VERSION: pkg.dependencies['@firebase/storage'],
   RXJS_VERSION: pkg.dependencies['rxjs'],
   ZONEJS_VERSION: pkg.dependencies['zone.js'],
   ANGULARFIRE2_VERSION: pkg.version,
@@ -120,6 +126,15 @@ const DEST_PKG_PATHS = {
   storage: `${process.cwd()}/dist/packages-dist/storage/package.json`
 };
 
+const FIREBASE_FEATURE_MODULES = {
+  app: `${process.cwd()}/node_modules/@firebase/app/dist/esm/index.js`,
+  auth: `${process.cwd()}/node_modules/@firebase/auth/dist/auth.js`,
+  database: `${process.cwd()}/node_modules/@firebase/database/dist/esm/index.js`,
+  firestore: `${process.cwd()}/node_modules/@firebase/firestore/dist/esm/index.js`,
+  storage: `${process.cwd()}/node_modules/@firebase/storage/dist/esm/index.js`,
+  util: `${process.cwd()}/node_modules/@firebase/util/dist/esm/index.js`,
+};
+
 // Constants for running typescript commands
 const TSC = 'node_modules/.bin/tsc';
 const NGC = 'node_modules/.bin/ngc';
@@ -150,6 +165,16 @@ function generateBundle(entry, { dest, globals, moduleName }) {
       dest,
       globals,
       moduleName,
+    });
+  });
+}
+
+function createFirebaseBundles(featurePaths, globals) {
+  return Object.keys(featurePaths).map(feature => {
+    return generateBundle(featurePaths[feature], { 
+      dest: `${process.cwd()}/dist/bundles/${feature}.js`,
+      globals,
+      moduleName: `firebase.${feature}`
     });
   });
 }

@@ -1,6 +1,6 @@
 const fs = require('fs');
 const { spawn, spawnSync } = require('child_process');
-const ng5Pkg = require('./ng5/package.json');
+const ng5Pkg = require(`${__dirname}/ng5/package.json`);
 const pkg = require('../../package.json');
 const shell = require('shelljs');
 
