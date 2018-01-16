@@ -41,7 +41,7 @@ module.exports = function(config) {
     logLevel: config.LOG_INFO,
     autoWatch: true,
     reporters: ['mocha'],
-    browsers: ['Chrome'],
+    browsers: ['Firefox'],
     singleRun: false
   })
 };

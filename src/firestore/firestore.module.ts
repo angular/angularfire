@@ -2,6 +2,7 @@ import { InjectionToken, ModuleWithProviders, NgModule } from '@angular/core';
 import { FirebaseApp, AngularFireModule } from 'angularfire2';
 import { AngularFirestore } from './firestore';
 import { from } from 'rxjs/observable/from';
+import '@firebase/firestore';
 
 import { EnablePersistenceToken } from './enable-persistance-token';
 
