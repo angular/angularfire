@@ -37,7 +37,7 @@ export class AppComponent {
 }
 ```
 
-The `AngularFirestoreCollection` is service you use to create streams of the collection and perform data operations on the underyling collection.
+The `AngularFirestoreCollection` is a service you use to create streams of the collection and perform data operations on the underyling collection.
 
 ### The `DocumentChangeAction` type
 
