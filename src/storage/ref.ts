@@ -20,20 +20,18 @@ export interface AngularFireStorageReference {
  */
 export function createStorageRef(ref: Reference): AngularFireStorageReference {
   return {
-    getDownloadURL() { return from(ref.getDownloadURL()); },
-    getMetadata() { return from(ref.getMetadata()) },
-    delete() { return from(ref.delete()); },
-    child(path: string) { return createStorageRef(ref.child(path)); },
-    updateMetatdata(meta: SettableMetadata) {
-      return from(ref.updateMetadata(meta));
-    },
-    put(data: any, metadata?: UploadMetadata) {
+    getDownloadURL: () => from(ref.getDownloadURL()),
+    getMetadata: () => from(ref.getMetadata()),
+    delete: () => from(ref.delete()),
+    child: (path: string) => createStorageRef(ref.child(path)),
+    updateMetatdata: (meta: SettableMetadata) => from(ref.updateMetadata(meta)),
+    put: (data: any, metadata?: UploadMetadata) => {
       const task = ref.put(data, metadata);
       return createUploadTask(task);
     },
-    putString(data: string, format?: StringFormat, metadata?: UploadMetadata) {
+    putString: (data: string, format?: StringFormat, metadata?: UploadMetadata) => {
       const task = ref.putString(data, format, metadata);
       return createUploadTask(task);
     }
-  }
+  };
 }
