@@ -30,7 +30,7 @@ before_script:
 
 script:
   - yarn run build
-  - ./node_modules/.bin/karma start --single-run --browsers ChromeHeadless --reporters mocha
+  - ./node_modules/.bin/karma start --single-run --browsers ChromeHeadlessTravis --reporters mocha
   # Run integration test to make sure our typings are correct for user-land.
   - node tools/run-typings-test.js
 
