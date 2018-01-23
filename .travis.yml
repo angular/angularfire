@@ -4,29 +4,34 @@ node_js:
 - 'node'
 
 addons:
-  chrome: stable
   apt:
     sources:
       - ubuntu-toolchain-r-test
+      - google-chrome
     packages:
       - g++-4.8
+      - google-chrome-stable
 
 cache: npm
+
+branches:
+  only:
+    - master # otherwise pull requests get built twice
 
 env:
   - CXX=g++-4.8
 
 install:
-  # ditched yarn, since it was acting up and giving old versions of tsc
-  - npm install
+  - yarn install
 
 before_script:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
+  - sleep 3
 
 script:
-  - npm run build
-  - ./node_modules/.bin/karma start --single-run --browsers Firefox --reporters mocha
+  - yarn run build
+  - yarn run karma start --single-run --browsers ChromeHeadless --reporters mocha
   # Run integration test to make sure our typings are correct for user-land.
   - node tools/run-typings-test.js
 
