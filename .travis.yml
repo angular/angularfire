@@ -6,7 +6,12 @@ node_js:
 addons:
   chrome: stable
 
-cache: npm
+cache:
+  yarn: true
+  directories:
+    - node_modules
+    - "$HOME/.npm"
+    - "$HOME/.cache"
 
 branches:
   only:
