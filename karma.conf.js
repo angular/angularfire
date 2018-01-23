@@ -44,7 +44,7 @@ module.exports = function(config) {
     browsers: ['Chrome', 'ChromeHeadless', 'Firefox', 'ChromeHeadlessTravis'],
     singleRun: false,
     customLaunchers: {
-      Travis: {
+      ChromeHeadlessTravis: {
         base: 'ChromeHeadless',
         flags: ['--no-sandbox']
       }
