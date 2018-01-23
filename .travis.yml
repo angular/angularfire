@@ -4,13 +4,12 @@ node_js:
 - 'node'
 
 addons:
+  chrome: stable
   apt:
     sources:
       - ubuntu-toolchain-r-test
-      - google-chrome
     packages:
       - g++-4.8
-      - google-chrome-stable
 
 cache: npm
 
@@ -31,7 +30,7 @@ before_script:
 
 script:
   - yarn run build
-  - yarn run karma start --single-run --browsers ChromeHeadless --reporters mocha
+  - ./node_modules/.bin/karma start --single-run --browsers ChromeHeadless --reporters mocha
   # Run integration test to make sure our typings are correct for user-land.
   - node tools/run-typings-test.js
 
