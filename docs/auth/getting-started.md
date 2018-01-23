@@ -10,14 +10,13 @@ the Firebase docs for more information on what methods are available.](https://f
 
 ```ts
 import { Component } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
 import { AngularFireAuth } from 'angularfire2/auth';
 import * as firebase from 'firebase/app';
 
 @Component({
   selector: 'app-root',
   template: `
-    <div *ngIf="afAuth.authState | async; let user; else showLogin">
+    <div *ngIf="afAuth.authState | async as user; else showLogin">
       <h1>Hello {{ user.displayName }}!</h1>
       <button (click)="logout()">Logout</button>
     </div>

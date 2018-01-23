@@ -31,6 +31,7 @@ module.exports = function(config) {
       'dist/packages-dist/bundles/auth.umd.{js,map}',
       'dist/packages-dist/bundles/database.umd.{js,map}',
       'dist/packages-dist/bundles/firestore.umd.{js,map}',
+      'dist/packages-dist/bundles/storage.umd.{js,map}',
       'dist/packages-dist/bundles/database-deprecated.umd.{js,map}',
       'dist/packages-dist/bundles/test.umd.{js,map}',
     ],
@@ -40,7 +41,7 @@ module.exports = function(config) {
     logLevel: config.LOG_INFO,
     autoWatch: true,
     reporters: ['mocha'],
-    browsers: ['Chrome'],
+    browsers: ['Firefox'],
     singleRun: false
   })
 };

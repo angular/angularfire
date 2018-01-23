@@ -37,7 +37,7 @@ export class AppComponent {
 }
 ```
 
-The `AngularFirestoreCollection` is service you use to create streams of the collection and perform data operations on the underyling collection.
+The `AngularFirestoreCollection` is a service you use to create streams of the collection and perform data operations on the underyling collection.
 
 ### The `DocumentChangeAction` type
 
@@ -78,7 +78,7 @@ There are multiple ways of streaming collection data from Firestore.
 
 **Why would you use it?** - When you just need a list of data. No document metadata is attached to the resulting array which makes it simple to render to a view.
 
-**When would you not use it?** - When you need a more complex data structure than an array or you need the `id` of each document to use data manipulation metods. This method assumes you either are saving the `id` to the document data or using a "readonly" approach.
+**When would you not use it?** - When you need a more complex data structure than an array or you need the `id` of each document to use data manipulation methods. This method assumes you either are saving the `id` to the document data or using a "readonly" approach.
 
 **Best practices** - Use this method to display data on a page. It's simple but effective. Use `.snapshotChanges()` once your needs become more complex.
 
@@ -220,8 +220,6 @@ export class AppComponent {
 
 **When would you not use it?** - When you just need a list of data. This is a more advanced usage of AngularFirestore. 
 
-**Best Practices** - 
-
 #### Example
 ```ts
 import { Component } from '@angular/core';
@@ -262,15 +260,13 @@ export class AppComponent {
 
 There are three `DocumentChangeType`s in Firestore: `added`, `removed`, and `modified`. Each streaming method listens to all three by default. However, you may only be intrested in one of these events. You can specify which events you'd like to use through the first parameter of each method:
 
-#### Basic smaple
+#### Basic sample
 ```ts
   constructor(private afs: AngularFirestore): {
     this.itemsCollection = afs.collection<Item>('items');
     this.items = this.itemsCollection.snapshotChanges(['added', 'removed']);
   }
 ```
-
-**Note:** Using 
 
 #### Component Sample
 ```ts

@@ -1,8 +1,8 @@
-import * as firebase from 'firebase/app';
+import { DataSnapshot } from '@firebase/database-types';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule} from 'angularfire2';
-import { AngularFireDatabase, AngularFireDatabaseModule, FirebaseListObservable, 
-  FirebaseListFactory, onChildAdded, onChildChanged, onChildRemoved, onChildUpdated, 
-  FirebaseObjectFactory 
+import { AngularFireDatabase, AngularFireDatabaseModule, FirebaseListObservable,
+  FirebaseListFactory, onChildAdded, onChildChanged, onChildRemoved, onChildUpdated,
+  FirebaseObjectFactory
 } from 'angularfire2/database-deprecated';
 import { TestBed, inject } from '@angular/core/testing';
 import * as utils from './utils';
@@ -652,15 +652,15 @@ describe('FirebaseListFactory', () => {
       };
 
       it('should return an object value with a $key property', () => {
-        const unwrapped = utils.unwrapMapFn(snapshot as firebase.database.DataSnapshot);
+        const unwrapped = utils.unwrapMapFn(snapshot as DataSnapshot);
         expect(unwrapped.$key).toEqual(snapshot.ref.key);
       });
 
       it('should return an object value with a $value property if value is scalar', () => {
         const existsFn = () => { return true; }
-        const unwrappedValue5 = utils.unwrapMapFn(Object.assign(snapshot, { val: () => 5, exists: existsFn }) as firebase.database.DataSnapshot);
-        const unwrappedValueFalse = utils.unwrapMapFn(Object.assign(snapshot, { val: () => false, exists: existsFn }) as firebase.database.DataSnapshot);
-        const unwrappedValueLol = utils.unwrapMapFn(Object.assign(snapshot, { val: () => 'lol', exists: existsFn }) as firebase.database.DataSnapshot);
+        const unwrappedValue5 = utils.unwrapMapFn(Object.assign(snapshot, { val: () => 5, exists: existsFn }) as DataSnapshot);
+        const unwrappedValueFalse = utils.unwrapMapFn(Object.assign(snapshot, { val: () => false, exists: existsFn }) as DataSnapshot);
+        const unwrappedValueLol = utils.unwrapMapFn(Object.assign(snapshot, { val: () => 'lol', exists: existsFn }) as DataSnapshot);
 
         expect(unwrappedValue5.$key).toEqual('key');
         expect(unwrappedValue5.$value).toEqual(5);

@@ -2,8 +2,7 @@ import { FirebaseObjectObservable } from './firebase_object_observable';
 import { ZoneScheduler } from 'angularfire2';
 import { Observer } from 'rxjs/Observer';
 import { observeOn } from 'rxjs/operator/observeOn';
-import * as firebase from 'firebase/app';
-import 'firebase/database';
+import { DataSnapshot } from '@firebase/database-types';
 import * as utils from './utils';
 import { FirebaseObjectFactoryOpts, DatabaseReference } from './interfaces';
 
@@ -12,7 +11,7 @@ export function FirebaseObjectFactory (
   { preserveSnapshot }: FirebaseObjectFactoryOpts = {}): FirebaseObjectObservable<any> {
 
   const objectObservable = new FirebaseObjectObservable((obs: Observer<any>) => {
-    let fn = ref.on('value', (snapshot: firebase.database.DataSnapshot) => {
+    let fn = ref.on('value', (snapshot: DataSnapshot) => {
       obs.next(preserveSnapshot ? snapshot : utils.unwrapMapFn(snapshot))
     }, err => {
       if (err) { obs.error(err); obs.complete(); }

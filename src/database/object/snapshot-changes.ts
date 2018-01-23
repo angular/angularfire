@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs/Observable';
 import { fromRef } from '../observable/fromRef';
 import { DatabaseQuery, AngularFireAction, SnapshotAction } from '../interfaces';
-import { database } from 'firebase/app';
+import { DataSnapshot } from '@firebase/database-types';
 
 export function createObjectSnapshotChanges(query: DatabaseQuery) {
   return function snapshotChanges(): Observable<SnapshotAction> {

@@ -5,7 +5,7 @@ export function createObjectReference<T>(query: DatabaseQuery): AngularFireObjec
   return {
     query,
     snapshotChanges: createObjectSnapshotChanges(query),
-    update(data: Partial<T>) { return query.ref.update(data) as Promise<void>; },
+    update(data: Partial<T>) { return query.ref.update(data as any) as Promise<void>; },
     set(data: T) { return query.ref.set(data) as Promise<void>; },
     remove() { return query.ref.remove() as Promise<void>; },
     valueChanges<T>() { 

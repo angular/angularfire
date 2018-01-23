@@ -26,7 +26,7 @@ before_script:
 
 script:
   - npm run build
-  - ./node_modules/.bin/karma start --single-run --browsers Chrome --reporters mocha
+  - ./node_modules/.bin/karma start --single-run --browsers Firefox --reporters mocha
   # Run integration test to make sure our typings are correct for user-land.
   - node tools/run-typings-test.js
 

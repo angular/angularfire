@@ -4,7 +4,7 @@ import { AngularFirestoreModule } from './firestore.module';
 import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 
-import * as firebase from 'firebase/app';
+import { FirebaseApp as FBApp } from '@firebase/app-types';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
@@ -17,7 +17,7 @@ interface Stock {
 }
 
 describe('AngularFirestore', () => {
-  let app: firebase.app.App;
+  let app: FBApp;
   let afs: AngularFirestore;
   let sub: Subscription;
 
@@ -28,7 +28,7 @@ describe('AngularFirestore', () => {
         AngularFirestoreModule.enablePersistence()
       ]
     });
-    inject([FirebaseApp, AngularFirestore], (_app: firebase.app.App, _afs: AngularFirestore) => {
+    inject([FirebaseApp, AngularFirestore], (_app: FBApp, _afs: AngularFirestore) => {
       app = _app;
       afs = _afs;
     })();
@@ -62,18 +62,44 @@ describe('AngularFirestore', () => {
     const tripleWrapper = () => afs.doc('collection/doc/subcollection');
     expect(singleWrapper).toThrowError();
     expect(tripleWrapper).toThrowError();
-  });    
+  });
 
   it('should throw on an invalid collection path', () => {
     const singleWrapper = () => afs.collection('collection/doc');
     const quadWrapper = () => afs.collection('collection/doc/subcollection/doc');
     expect(singleWrapper).toThrowError();
     expect(quadWrapper).toThrowError();
-  }); 
+  });
 
   it('should enable persistence', (done) => {
     const sub = afs.persistenceEnabled$.subscribe(isEnabled => {
       expect(isEnabled).toBe(true);
+      done();
+    });
+  });
+
+});
+
+describe('AngularFirestore without persistance', () => {
+  let app: FBApp;
+  let afs: AngularFirestore;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFirestoreModule
+      ]
+    });
+    inject([FirebaseApp, AngularFirestore], (_app: FBApp, _afs: AngularFirestore) => {
+      app = _app;
+      afs = _afs;
+    })();
+  });
+
+  it('should not enable persistence', (done) => {
+    afs.persistenceEnabled$.subscribe(isEnabled => {
+      expect(isEnabled).toBe(false);
       done();
     });
   });

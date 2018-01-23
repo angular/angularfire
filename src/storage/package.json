@@ -1,0 +1,31 @@
+{
+  "name": "angularfire2/storage",
+  "version": "ANGULARFIRE2_VERSION",
+  "description": "The storage module",
+  "main": "../bundles/storage.umd.js",
+  "module": "index.js",
+  "es2015": "./es2015/index.js",
+  "keywords": [
+    "angular",
+    "firebase",
+    "rxjs"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/angular/angularfire2.git"
+  },
+  "author": "angular,firebase",
+  "license": "MIT",
+  "peerDependencies": {
+    "angularfire2": "ANGULARFIRE2_VERSION",
+    "@angular/common": "ANGULAR_VERSION",
+    "@angular/core": "ANGULAR_VERSION",
+    "@angular/platform-browser": "ANGULAR_VERSION",
+    "@angular/platform-browser-dynamic": "ANGULAR_VERSION",
+    "@firebase/app": "FIREBASE_APP_VERSION",
+    "@firebase/storage": "FIREBASE_STORAGE_VERSION",
+    "rxjs": "RXJS_VERSION",
+    "zone.js": "ZONEJS_VERSION"
+  },
+  "typings": "index.d.ts"
+}

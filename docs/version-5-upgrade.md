@@ -34,18 +34,20 @@ Calling `.valueChanges()` returns an Observable without any metadata. If you are
 ### 4.0
 ```ts
 constructor(afDb: AngularFireDatabase) {
-  afDb.object('items/1').subscribe(item => console.log(item.$key));
+  afDb.list('items').subscribe(items => { 
+    const allKeys = items.map(item => item.$key);
+  });
 }
 ```
 
 ### 5.0
 ```ts
 constructor(afDb: AngularFireDatabase) {
-  afDb.object('items/1').snapshotChanges().map(action => {
-    const $key = action.payload.key;
-    const data = { $key, ...action.payload.val() };
-    return data;
-  }).subscribe(item => console.log(item.$key));
+  afDb.list('items').snapshotChanges().map(actions => {
+    return actions.map(action => ({ key: action.key, ...action.payload.val() }));
+  }).subscribe(items => {
+    return items.map(item => item.key);
+  });
 }
 ```
 

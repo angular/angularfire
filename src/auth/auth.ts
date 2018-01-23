@@ -1,5 +1,4 @@
-import * as firebase from 'firebase/app';
-import 'firebase/auth';
+import { FirebaseAuth, User } from '@firebase/auth-types';
 import { Injectable, NgZone } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { observeOn } from 'rxjs/operator/observeOn';
@@ -15,12 +14,12 @@ export class AngularFireAuth {
   /**
    * Firebase Auth instance
    */
-  public readonly auth: firebase.auth.Auth;
+  public readonly auth: FirebaseAuth;
 
   /**
    * Observable of authentication state; as of 4.0 this is only triggered via sign-in/out
    */
-  public readonly authState: Observable<firebase.User|null>;
+  public readonly authState: Observable<User|null>;
 
   /**
    * Observable of the signed-in user's ID token; which includes sign-in, sign-out, and token refresh events
@@ -36,7 +35,7 @@ export class AngularFireAuth {
     });
     this.authState = observeOn.call(authState$, new ZoneScheduler(Zone.current));
 
-    const idToken$ = new Observable<firebase.User|null>(subscriber => {
+    const idToken$ = new Observable<User|null>(subscriber => {
       const unsubscribe = this.auth.onIdTokenChanged(subscriber);
       return { unsubscribe };
     }).switchMap(user => {
