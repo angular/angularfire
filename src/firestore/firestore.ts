@@ -4,12 +4,13 @@ import { Subscriber } from 'rxjs/Subscriber';
 import { from } from 'rxjs/observable/from';
 import 'rxjs/add/operator/map';
 
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, Optional } from '@angular/core';
 import { FirebaseApp } from 'angularfire2';
 
 import { QueryFn, AssociatedReference } from './interfaces';
 import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
+import { EnablePersistenceToken } from './enable-persistance-token';
 
 
 /**
@@ -96,7 +97,7 @@ export class AngularFirestore {
    * apps and use multiple apps.
    * @param app
    */
-  constructor(public app: FirebaseApp, shouldEnablePersistence) {
+  constructor(public app: FirebaseApp, @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean) {
     this.firestore = app.firestore();
 
     this.persistenceEnabled$ = shouldEnablePersistence ?

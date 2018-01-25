@@ -89,9 +89,9 @@ export class AngularFirestoreDocument<T> {
   /**
    * Listen to unwrapped snapshot updates from the document.
    */
-  valueChanges(): Observable<T> {
+  valueChanges(): Observable<T|null> {
     return this.snapshotChanges().map(action => {
-      return (action.payload.exists ? action.payload.data() : null) as T;
+      return action.payload.exists ? action.payload.data() as T : null;
     });
   }
 }
