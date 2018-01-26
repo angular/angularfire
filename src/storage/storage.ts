@@ -11,7 +11,6 @@ import { Observable } from 'rxjs/Observable';
  * This service is the main entry point for this feature module. It provides
  * an API for uploading and downloading binary files from Cloud Storage for
  * Firebase.
- *
  */
 @Injectable()
 export class AngularFireStorage {
