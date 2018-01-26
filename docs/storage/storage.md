@@ -47,10 +47,11 @@ export class AppComponent {
 
 There are two options for uploading files. 
 
+
 | method   |                    | 
 | ---------|--------------------| 
 | `put(data: Blob, metadata?: storage.UploadMetadata): AngularFireUploadTask` | Starts the upload of the blob to the storage reference's path. Returns an `AngularFireUploadTask` for upload monitoring. | 
-| `putString(keyRefOrSnap: string, value: T) | Firebase | AFUnwrappedSnapshot, value: Object)` | Updates an existing item in the array. Accepts a key, database reference, or an unwrapped snapshot. |
+| `putString(data: string, format?: StringFormat, metadata?: UploadMetadata): AngularFireUploadTask` | Updates an existing item in the array. Accepts a key, database reference, or an unwrapped snapshot. |
 
 ```ts
 import { Component } from '@angular/core';
