@@ -2,6 +2,9 @@ import { SettableMetadata, UploadMetadata, Reference, StringFormat } from '@fire
 import { createUploadTask, AngularFireUploadTask } from './task';
 import { Observable } from 'rxjs/Observable';
 import { from } from 'rxjs/observable/from';
+import { NgZone } from '@angular/core';
+import { observeOn } from 'rxjs/operator/observeOn';
+import { FirebaseZoneScheduler } from 'angularfire2';
 
 export interface AngularFireStorageReference {
   getDownloadURL(): Observable<any>;
@@ -26,12 +29,20 @@ export function createStorageRef(ref: Reference): AngularFireStorageReference {
     child: (path: string) => createStorageRef(ref.child(path)),
     updateMetatdata: (meta: SettableMetadata) => from(ref.updateMetadata(meta)),
     put: (data: any, metadata?: UploadMetadata) => {
-      const task = ref.put(data, metadata);
-      return createUploadTask(task);
+      const zone = new NgZone({});
+      return zone.runOutsideAngular(() => {
+        const task = ref.put(data, metadata);
+        const obs$ = createUploadTask(task);
+        return observeOn.call(obs$, new FirebaseZoneScheduler(zone));
+      });
     },
     putString: (data: string, format?: StringFormat, metadata?: UploadMetadata) => {
-      const task = ref.putString(data, format, metadata);
-      return createUploadTask(task);
+      const zone = new NgZone({});
+      return zone.runOutsideAngular(() => {
+        const task = ref.putString(data, format, metadata);
+        const obs$ = createUploadTask(task);
+        return observeOn.call(obs$, new FirebaseZoneScheduler(zone));
+      });
     }
   };
 }

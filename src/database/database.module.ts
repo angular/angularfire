@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { AngularFireDatabase, RealtimeDatabaseURL } from './database';
+import { AngularFireDatabase } from './database';
 import '@firebase/database';
 
 @NgModule({

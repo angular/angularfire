@@ -1,4 +1,4 @@
-import { DataSnapshot } from '@firebase/database-types';
+import { DataSnapshot, FirebaseDatabase } from '@firebase/database-types';
 import { Subscription } from 'rxjs/Subscription';
 import { Scheduler } from 'rxjs/Scheduler';
 import { queue } from 'rxjs/scheduler/queue';
@@ -110,7 +110,7 @@ export function isAbsoluteUrl(url: string) {
  * @param app - Firebase App
  * @param path - Database path, relative or absolute
  */
-export function getRef(app: FirebaseApp, pathRef: PathReference): DatabaseReference {
+export function getRef(database: FirebaseDatabase, pathRef: PathReference): DatabaseReference {
   // if a db ref was passed in, just return it
   if(isFirebaseRef(pathRef)) {
     return pathRef as DatabaseReference;
@@ -118,7 +118,7 @@ export function getRef(app: FirebaseApp, pathRef: PathReference): DatabaseRefere
 
   const path = pathRef as string;
   if(isAbsoluteUrl(<string>pathRef)) {
-    return app.database!().refFromURL(path);
+    return database.refFromURL(path);
   }
-  return app.database!().ref(path);
+  return database.ref(path);
 }
