@@ -6,7 +6,7 @@ import { Observable } from 'rxjs/Observable';
 import { FirebaseAppConfig, FirebaseAppName, firebaseAppFactory } from 'angularfire2';
 import { FirebaseOptions } from '@firebase/app-types';
 
-export const StorageBucket = new InjectionToken<boolean>('angularfire2.storageBucket');
+export const StorageBucket = new InjectionToken<string>('angularfire2.storageBucket');
 
 /**
  * AngularFireStorage Service
