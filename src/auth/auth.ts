@@ -1,8 +1,11 @@
 import { FirebaseAuth, User } from '@firebase/auth-types';
-import { Injectable, NgZone } from '@angular/core';
+import { FirebaseOptions } from '@firebase/app-types';
+import { Injectable, NgZone, Inject, Optional } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { observeOn } from 'rxjs/operator/observeOn';
-import { FirebaseApp, ZoneScheduler } from 'angularfire2';
+import { ZoneScheduler } from 'angularfire2';
+
+import { FirebaseAppConfig, FirebaseAppName, firebaseAppFactory } from 'angularfire2';
 
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/observable/of';
@@ -26,8 +29,12 @@ export class AngularFireAuth {
    */
   public readonly idToken: Observable<string|null>;
 
-  constructor(public app: FirebaseApp) {
-    this.auth = app.auth();
+  constructor(
+    @Inject(FirebaseAppConfig) config:FirebaseOptions,
+    @Optional() @Inject(FirebaseAppName) name:string
+  ) {
+    const app = firebaseAppFactory(config, name);
+    this.auth = app.auth!();
 
     const authState$ = new Observable(subscriber => {
       const unsubscribe = this.auth.onAuthStateChanged(subscriber);

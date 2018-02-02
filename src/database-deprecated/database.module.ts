@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
-import { AngularFireModule, FirebaseApp } from 'angularfire2';
+import { AngularFireModule } from 'angularfire2';
+import { FirebaseApp } from '@firebase/app-types';
 import { AngularFireDatabase } from './database';
 import '@firebase/database';
 

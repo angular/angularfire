@@ -2,7 +2,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { Scheduler } from 'rxjs/Scheduler';
 import { queue } from 'rxjs/scheduler/queue';
 import { PathReference, DatabaseReference, FirebaseOperation, FirebaseOperationCases } from './interfaces';
-import { FirebaseApp } from 'angularfire2';
+import { FirebaseDatabase } from '@firebase/database-types';
 
 export function isString(value: any): boolean {
   return typeof value === 'string';
@@ -26,10 +26,10 @@ export function isFirebaseRef(value: any): boolean {
  * @param app - Firebase App
  * @param path - Database path, relative or absolute
  */
-export function getRef(app: FirebaseApp, pathRef: PathReference): DatabaseReference {
+export function getRef(database: FirebaseDatabase, pathRef: PathReference): DatabaseReference {
   // if a db ref was passed in, just return it
   return isFirebaseRef(pathRef) ? pathRef as DatabaseReference
-    : app.database().ref(pathRef as string);
+    : database.ref(pathRef as string);
 }
 
 export function checkOperationCases(item: FirebaseOperation, cases: FirebaseOperationCases) : Promise<void> {

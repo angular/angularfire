@@ -1,21 +1,30 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, Optional } from '@angular/core';
 import { FirebaseDatabase } from '@firebase/database-types';
-import { FirebaseApp } from 'angularfire2';
 import { PathReference, DatabaseQuery, DatabaseReference, DatabaseSnapshot, ChildEvent, ListenEvent, QueryFn, AngularFireList, AngularFireObject } from './interfaces';
 import { getRef } from './utils';
+import { InjectionToken } from '@angular/core';
+import { FirebaseApp, FirebaseOptions } from '@firebase/app-types';
 import { createListReference } from './list/create-reference';
 import { createObjectReference } from './object/create-reference';
+import { FirebaseAppConfig, FirebaseAppName, firebaseAppFactory } from 'angularfire2';
+
+export const RealtimeDatabaseURL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
 
 @Injectable()
 export class AngularFireDatabase {
-  database: FirebaseDatabase;
+  public readonly database: FirebaseDatabase;
 
-  constructor(public app: FirebaseApp) {
-    this.database = app.database();
+  constructor(
+    @Inject(FirebaseAppConfig) config:FirebaseOptions,
+    @Optional() @Inject(FirebaseAppName) name:string,
+    @Optional() @Inject(RealtimeDatabaseURL) databaseURL:string
+  ) {
+    const app = firebaseAppFactory(config, name);
+    this.database = app.database!(databaseURL);
   }
 
   list<T>(pathOrRef: PathReference, queryFn?: QueryFn): AngularFireList<T> {
-    const ref = getRef(this.app, pathOrRef);
+    const ref = getRef(this.database, pathOrRef);
     let query: DatabaseQuery = ref;
     if(queryFn) {
       query = queryFn(ref);
@@ -24,7 +33,7 @@ export class AngularFireDatabase {
   }
 
   object<T>(pathOrRef: PathReference): AngularFireObject<T>  {
-    const ref = getRef(this.app, pathOrRef);
+    const ref = getRef(this.database, pathOrRef);
     return createObjectReference<T>(ref);
   }
 

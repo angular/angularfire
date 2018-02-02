@@ -1,16 +1,23 @@
+import { InjectionToken } from '@angular/core';
 import { FirebaseFirestore, CollectionReference } from '@firebase/firestore-types';
 import { Observable } from 'rxjs/Observable';
 import { Subscriber } from 'rxjs/Subscriber';
 import { from } from 'rxjs/observable/from';
 import 'rxjs/add/operator/map';
 
+import { FirebaseApp, FirebaseOptions } from '@firebase/app-types';
 import { Injectable, Inject, Optional } from '@angular/core';
-import { FirebaseApp } from 'angularfire2';
 
 import { QueryFn, AssociatedReference } from './interfaces';
 import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
-import { EnablePersistenceToken } from './enable-persistance-token';
+
+import { FirebaseAppConfig, FirebaseAppName, firebaseAppFactory } from 'angularfire2';
+
+/**
+ * The value of this token determines whether or not the firestore will have persistance enabled
+ */
+export const EnablePersistenceToken = new InjectionToken<boolean>('angularfire2.enableFirestorePersistence');
 
 
 /**
@@ -97,11 +104,16 @@ export class AngularFirestore {
    * apps and use multiple apps.
    * @param app
    */
-  constructor(public app: FirebaseApp, @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean) {
-    this.firestore = app.firestore();
+  constructor(
+    @Inject(FirebaseAppConfig) config:FirebaseOptions,
+    @Optional() @Inject(FirebaseAppName) name:string,
+    @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean
+  ) {
+    const app = firebaseAppFactory(config, name);
+    this.firestore = app.firestore!();
 
     this.persistenceEnabled$ = shouldEnablePersistence ?
-      from(app.firestore().enablePersistence().then(() => true, () => false)) :
+      from(this.firestore.enablePersistence().then(() => true, () => false)) :
       from(new Promise((res, rej) => { res(false); }));
   }
 

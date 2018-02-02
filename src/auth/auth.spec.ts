@@ -8,7 +8,7 @@ import { TestBed, inject } from '@angular/core/testing';
 import { _do } from 'rxjs/operator/do';
 import { take } from 'rxjs/operator/take';
 import { skip } from 'rxjs/operator/skip';
-import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2';
+import { FirebaseAppConfig, AngularFireModule } from 'angularfire2';
 import { AngularFireAuth, AngularFireAuthModule } from 'angularfire2/auth';
 import { COMMON_CONFIG } from './test-config';
 
@@ -51,7 +51,7 @@ describe('AngularFireAuth', () => {
   });
 
   afterEach(done => {
-    app.delete().then(done, done.fail);
+    afAuth.auth.app.delete().then(done, done.fail);
   });
 
   describe('Zones', () => {

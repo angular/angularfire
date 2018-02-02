@@ -6,7 +6,7 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/filter';
 
 import { Injectable } from '@angular/core';
-import { FirebaseApp } from 'angularfire2';
+import { FirebaseApp } from '@firebase/app-types';
 
 import { QueryFn, AssociatedReference, DocumentChangeAction } from '../interfaces';
 import { docChanges, sortedChanges } from './changes';

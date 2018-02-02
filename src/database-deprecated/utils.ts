@@ -3,7 +3,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { Scheduler } from 'rxjs/Scheduler';
 import { queue } from 'rxjs/scheduler/queue';
 import { AFUnwrappedDataSnapshot, PathReference, DatabaseReference } from './interfaces';
-import { FirebaseApp } from 'angularfire2';
+import { FirebaseApp } from '@firebase/app-types';
 
 const REGEX_ABSOLUTE_URL = /^[a-z]+:\/\/.*/;
 
@@ -118,7 +118,7 @@ export function getRef(app: FirebaseApp, pathRef: PathReference): DatabaseRefere
 
   const path = pathRef as string;
   if(isAbsoluteUrl(<string>pathRef)) {
-    return app.database().refFromURL(path);
+    return app.database!().refFromURL(path);
   }
-  return app.database().ref(path);
+  return app.database!().ref(path);
 }

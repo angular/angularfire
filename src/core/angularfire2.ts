@@ -1,35 +1,55 @@
-import { FirebaseAppConfigToken, FirebaseApp, _firebaseAppFactory } from './firebase.app.module';
 import { Injectable, InjectionToken, NgModule } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 import { Scheduler } from 'rxjs/Scheduler';
 import { queue } from 'rxjs/scheduler/queue';
 
-export interface FirebaseAppConfig {
-  apiKey?: string;
-  authDomain?: string;
-  databaseURL?: string;
-  storageBucket?: string;
-  messagingSenderId?: string;
-  projectId?: string;
+import firebase from '@firebase/app';
+import { FirebaseApp as FBApp, FirebaseOptions } from '@firebase/app-types';
+import { FirebaseAuth } from '@firebase/auth-types';
+import { FirebaseDatabase } from '@firebase/database-types';
+import { FirebaseMessaging } from '@firebase/messaging-types';
+import { FirebaseStorage } from '@firebase/storage-types';
+import { FirebaseFirestore } from '@firebase/firestore-types';
+
+export function firebaseAppFactory(config: FirebaseOptions, name?: string): FBApp {
+  const appName = name || '[DEFAULT]';
+  const existingApp = firebase.apps.filter(app => app.name == appName)[0];
+  return existingApp || firebase.initializeApp(config, appName);
 }
 
-const FirebaseAppName = new InjectionToken<string>('FirebaseAppName');
+export class FirebaseApp implements FBApp {
+  constructor() {
+    console.warn('FirebaseApp will be depreciated in favor @firebase/auth-types/FirebaseApp');
+  }
+  name: string;
+  options: {};
+  auth: () => FirebaseAuth;
+  database: () => FirebaseDatabase;
+  messaging: () => FirebaseMessaging;
+  storage: () => FirebaseStorage;
+  delete: () => Promise<any>;
+  firestore: () => FirebaseFirestore;
+}
+
+export const FirebaseAppName = new InjectionToken<string>('angularfire2.appName');
+export const FirebaseAppConfig = new InjectionToken<FirebaseOptions>('angularfire2.config');
 
 export const FirebaseAppProvider = {
   provide: FirebaseApp,
-  useFactory: _firebaseAppFactory,
-  deps: [ FirebaseAppConfigToken, FirebaseAppName ]
+  useFactory: firebaseAppFactory,
+  deps: [ FirebaseAppConfig, FirebaseAppName ]
 };
 
 @NgModule({
   providers: [ FirebaseAppProvider ],
 })
 export class AngularFireModule {
-  static initializeApp(config: FirebaseAppConfig, appName?: string) {
+  static initializeApp(config: FirebaseOptions, appName?: string) {
+    console.warn('initializeApp will be depreciated in favor of the angularfire2/FirebaseAppConfig provider');
     return {
       ngModule: AngularFireModule,
       providers: [
-        { provide: FirebaseAppConfigToken, useValue: config },
+        { provide: FirebaseAppConfig, useValue: config },
         { provide: FirebaseAppName, useValue: appName }
       ]
     }
@@ -49,5 +69,3 @@ export class ZoneScheduler {
     return <Subscription>this.zone.run(() => queue.schedule.apply(queue, args));
   }
 }
-
-export { FirebaseApp, FirebaseAppName, FirebaseAppConfigToken };
