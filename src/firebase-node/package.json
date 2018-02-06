@@ -1,0 +1,25 @@
+{
+    "name": "angularfire2",
+    "version": "ANGULARFIRE2_VERSION",
+    "description": "Fixes for Node.js",
+    "main": "index.js",
+    "keywords": [
+      "angular",
+      "firebase",
+      "rxjs"
+    ],
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/angular/angularfire2.git"
+    },
+    "author": "angular,firebase",
+    "license": "MIT",
+    "peerDependencies": {
+      "xmlhttprequest": "XMLHTTPREQUEST_VERSION",
+      "ws": "WS_VERSION",
+      "bufferutil": "BUFFERUTIL_VERSION",
+      "utf-8-validate": "UTF_8_VALIDATE_VERSION"
+    },
+    "typings": "index.d.ts"
+  }
+  
