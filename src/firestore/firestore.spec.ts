@@ -1,5 +1,5 @@
 import { FirebaseApp } from '@firebase/app-types';
-import { FirebaseAppConfig, AngularFireModule } from 'angularfire2';
+import { FirebaseAppConfig, AngularFireModule, FirebaseAppName } from 'angularfire2';
 import { AngularFirestore } from './firestore';
 import { AngularFirestoreModule } from './firestore.module';
 import { AngularFirestoreDocument } from './document/document';
@@ -80,8 +80,49 @@ describe('AngularFirestore', () => {
 
 });
 
+const FIREBASE_APP_NAME_TOO = (Math.random() + 1).toString(36).substring(7);
+
+describe('AngularFirestore with different app', () => {
+  let app: FirebaseApp;
+  let afs: AngularFirestore;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFirestoreModule
+      ],
+      providers: [
+        { provide: FirebaseAppName, useValue: FIREBASE_APP_NAME_TOO },
+        { provide: FirebaseAppConfig, useValue:  COMMON_CONFIG }
+      ]
+    });
+    inject([FirebaseApp, AngularFirestore], (app_: FirebaseApp, _afs: AngularFirestore) => {
+      app = app_;
+      afs = _afs;
+    })();
+  });
+
+  afterEach(done => {
+    app.delete().then(done, done.fail);
+  });
+
+  describe('<constructor>', () => {
+
+    it('should be an AngularFirestore type', () => {
+      expect(afs instanceof AngularFirestore).toEqual(true);
+    });
+
+    it('should have an initialized Firebase app instance member', () => {
+      expect(afs.firestore.app.name).toEqual(FIREBASE_APP_NAME_TOO);
+    });
+  });
+
+});
+
+
 describe('AngularFirestore without persistance', () => {
-  let app: FBApp;
+  let app: FirebaseApp;
   let afs: AngularFirestore;
 
   beforeEach(() => {
@@ -91,7 +132,7 @@ describe('AngularFirestore without persistance', () => {
         AngularFirestoreModule
       ]
     });
-    inject([FirebaseApp, AngularFirestore], (_app: FBApp, _afs: AngularFirestore) => {
+    inject([FirebaseApp, AngularFirestore], (_app: FirebaseApp, _afs: AngularFirestore) => {
       app = _app;
       afs = _afs;
     })();

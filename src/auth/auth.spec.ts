@@ -8,7 +8,7 @@ import { TestBed, inject } from '@angular/core/testing';
 import { _do } from 'rxjs/operator/do';
 import { take } from 'rxjs/operator/take';
 import { skip } from 'rxjs/operator/skip';
-import { FirebaseAppConfig, AngularFireModule } from 'angularfire2';
+import { FirebaseAppConfig, AngularFireModule, FirebaseAppName } from 'angularfire2';
 import { AngularFireAuth, AngularFireAuthModule } from 'angularfire2/auth';
 import { COMMON_CONFIG } from './test-config';
 
@@ -123,3 +123,42 @@ describe('AngularFireAuth', () => {
 
 });
 
+const FIREBASE_APP_NAME_TOO = (Math.random() + 1).toString(36).substring(7);
+
+describe('AngularFireAuth with different app', () => {
+  let app: FirebaseApp;
+  let afAuth: AngularFireAuth;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireAuthModule
+      ],
+      providers: [
+        { provide: FirebaseAppName, useValue: FIREBASE_APP_NAME_TOO },
+        { provide: FirebaseAppConfig, useValue:  COMMON_CONFIG }
+      ]
+    });
+    inject([FirebaseApp, AngularFireAuth], (app_: FirebaseApp, _afAuth: AngularFireAuth) => {
+      app = app_;
+      afAuth = _afAuth;
+    })();
+  });
+
+  afterEach(done => {
+    app.delete().then(done, done.fail);
+  });
+
+  describe('<constructor>', () => {
+
+    it('should be an AngularFireAuth type', () => {
+      expect(afAuth instanceof AngularFireAuth).toEqual(true);
+    });
+
+    it('should have an initialized Firebase app instance member', () => {
+      expect(afAuth.auth.app.name).toEqual(FIREBASE_APP_NAME_TOO);
+    });
+  });
+
+});
