@@ -4,7 +4,7 @@ import { Injectable, Inject, Optional, NgZone } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { observeOn } from 'rxjs/operator/observeOn';
 
-import { FirebaseAppConfig, FirebaseAppName, firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
+import { FirebaseAppConfig, FirebaseAppName, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
 
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/observable/of';
@@ -32,7 +32,7 @@ export class AngularFireAuth {
     @Inject(FirebaseAppConfig) config:FirebaseOptions,
     @Optional() @Inject(FirebaseAppName) name:string
   ) {
-    const app = firebaseAppFactory(config, name);
+    const app = _firebaseAppFactory(config, name);
     this.auth = app.auth!();
 
     const authStateZone = new NgZone({});

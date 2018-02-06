@@ -12,7 +12,7 @@ import { QueryFn, AssociatedReference } from './interfaces';
 import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 
-import { FirebaseAppConfig, FirebaseAppName, firebaseAppFactory } from 'angularfire2';
+import { FirebaseAppConfig, FirebaseAppName, _firebaseAppFactory } from 'angularfire2';
 
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
@@ -109,7 +109,7 @@ export class AngularFirestore {
     @Optional() @Inject(FirebaseAppName) name:string,
     @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean
   ) {
-    const app = firebaseAppFactory(config, name);
+    const app = _firebaseAppFactory(config, name);
     this.firestore = app.firestore!();
 
     this.persistenceEnabled$ = shouldEnablePersistence ?

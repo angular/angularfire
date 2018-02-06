@@ -35,6 +35,11 @@ describe('AngularFireStorage', () => {
     expect(afStorage.storage).toBeDefined();
   });
 
+  it('should have an initialized Firebase app', () => {
+    expect(afStorage.storage.app).toBeDefined();
+    expect(afStorage.storage.app).toEqual(app);
+  });
+
   describe('upload task', () => {
 
     it('should upload and delete a file', (done) => {
@@ -154,6 +159,11 @@ describe('AngularFireStorage w/options', () => {
 
     it('should have the Firebase storage instance', () => {
       expect(afStorage.storage).toBeDefined();
+    });
+
+    it('should have an initialized Firebase app', () => {
+      expect(afStorage.storage.app).toBeDefined();
+      expect(afStorage.storage.app).toEqual(app);
     });
 
     it('should be hooked up the right app', () => {

@@ -6,7 +6,7 @@ import { InjectionToken } from '@angular/core';
 import { FirebaseApp, FirebaseOptions } from '@firebase/app-types';
 import { createListReference } from './list/create-reference';
 import { createObjectReference } from './object/create-reference';
-import { FirebaseAppConfig, FirebaseAppName, RealtimeDatabaseURL, firebaseAppFactory } from 'angularfire2';
+import { FirebaseAppConfig, FirebaseAppName, RealtimeDatabaseURL, _firebaseAppFactory } from 'angularfire2';
 
 @Injectable()
 export class AngularFireDatabase {
@@ -17,7 +17,7 @@ export class AngularFireDatabase {
     @Optional() @Inject(FirebaseAppName) name:string,
     @Optional() @Inject(RealtimeDatabaseURL) databaseURL:string
   ) {
-    const app = firebaseAppFactory(config, name);
+    const app = _firebaseAppFactory(config, name);
     this.database = app.database!(databaseURL || undefined);
   }
 

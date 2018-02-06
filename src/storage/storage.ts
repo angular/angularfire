@@ -3,7 +3,7 @@ import { FirebaseStorage, UploadMetadata } from '@firebase/storage-types';
 import { createStorageRef, AngularFireStorageReference } from './ref';
 import { createUploadTask, AngularFireUploadTask } from './task';
 import { Observable } from 'rxjs/Observable';
-import { FirebaseAppConfig, FirebaseAppName, firebaseAppFactory } from 'angularfire2';
+import { FirebaseAppConfig, FirebaseAppName, _firebaseAppFactory } from 'angularfire2';
 import { FirebaseOptions } from '@firebase/app-types';
 
 export const StorageBucket = new InjectionToken<string>('angularfire2.storageBucket');
@@ -24,7 +24,7 @@ export class AngularFireStorage {
     @Optional() @Inject(FirebaseAppName) name:string,
     @Optional() @Inject(StorageBucket) storageBucket:string
   ) {
-    const app = firebaseAppFactory(config, name);
+    const app = _firebaseAppFactory(config, name);
     this.storage = app.storage!(storageBucket || undefined);
   }
 

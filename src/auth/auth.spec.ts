@@ -85,6 +85,11 @@ describe('AngularFireAuth', () => {
     expect(afAuth.auth).toBeDefined();
   });
 
+  it('should have an initialized Firebase app', () => {
+    expect(afAuth.auth.app).toBeDefined();
+    expect(afAuth.auth.app).toEqual(app);
+  });
+
   it('should emit auth updates through authState', (done: any) => {
     let count = 0;
 
@@ -154,6 +159,11 @@ describe('AngularFireAuth with different app', () => {
 
     it('should be an AngularFireAuth type', () => {
       expect(afAuth instanceof AngularFireAuth).toEqual(true);
+    });
+
+    it('should have an initialized Firebase app', () => {
+      expect(afAuth.auth.app).toBeDefined();
+      expect(afAuth.auth.app).toEqual(app);
     });
 
     it('should have an initialized Firebase app instance member', () => {

@@ -34,6 +34,11 @@ describe('AngularFireDatabase', () => {
       expect(db instanceof AngularFireDatabase).toEqual(true);
     });
 
+    it('should have an initialized Firebase app', () => {
+      expect(db.database.app).toBeDefined();
+      expect(db.database.app).toEqual(app);
+    });
+
     it('should accept a Firebase App in the constructor', () => {
       const __db = new AngularFireDatabase(app.options, app.name, null!);
       expect(__db instanceof AngularFireDatabase).toEqual(true);
@@ -81,6 +86,11 @@ describe('AngularFireDatabase w/options', () => {
 
     it('should be an AngularFireDatabase type', () => {
       expect(db instanceof AngularFireDatabase).toEqual(true);
+    });
+
+    it('should have an initialized Firebase app', () => {
+      expect(db.database.app).toBeDefined();
+      expect(db.database.app).toEqual(app);
     });
 
     it('should have an initialized Firebase app instance member', () => {
