@@ -1,4 +1,4 @@
-import { InjectionToken, NgZone } from '@angular/core';
+import { InjectionToken, NgZone, NgModule } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 import { Scheduler } from 'rxjs/Scheduler';
 import { queue } from 'rxjs/scheduler/queue';
@@ -18,6 +18,26 @@ export const FirebaseAppConfig = new InjectionToken<FirebaseOptions>('angularfir
 // Put in database.ts when we dropped depreciated
 export const RealtimeDatabaseURL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
 
+export const FirebaseAppProvider = {
+   provide: FirebaseApp,
+   useFactory: firebaseAppFactory,
+   deps: [ FirebaseAppConfig, FirebaseAppName ]
+ };
+
+ @NgModule({
+   providers: [ FirebaseAppProvider ],
+ })
+ export class AngularFireModule {
+   static initializeApp(config: FirebaseOptions, appName?: string) {
+     return {
+       ngModule: AngularFireModule,
+       providers: [
+         { provide: FirebaseAppConfig, useValue: config },
+         { provide: FirebaseAppName, useValue: appName }
+       ]
+     }
+   }
+}
 
 export class FirebaseZoneScheduler {
   constructor(public zone: NgZone) {}
