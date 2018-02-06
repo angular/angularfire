@@ -38,3 +38,5 @@ export class AngularFireDatabase {
   }
 
 }
+
+export { RealtimeDatabaseURL };
