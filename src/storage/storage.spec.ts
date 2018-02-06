@@ -1,13 +1,13 @@
-import * as firebase from 'firebase/app';
+import { FirebaseApp as FBApp } from '@firebase/app-types';
 import { Observable } from 'rxjs/Observable'
 import { forkJoin } from 'rxjs/observable/forkJoin';
 import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2';
-import { AngularFireStorageModule, AngularFireStorage } from 'angularfire2/storage';
+import { AngularFireStorageModule, AngularFireStorage, AngularFireUploadTask } from 'angularfire2/storage';
 import { COMMON_CONFIG } from './test-config';
 
 describe('AngularFireStorage', () => {
-  let app: firebase.app.App;
+  let app: FBApp;
   let afStorage: AngularFireStorage;
 
   beforeEach(() => {
@@ -63,6 +63,18 @@ describe('AngularFireStorage', () => {
         () => { ref.delete().subscribe(done, done.fail); }
       );
     });
+
+    it('should resolve the task as a promise', (done) => {
+      const data = { angular: "promise" };
+      const blob = new Blob([JSON.stringify(data)], { type : 'application/json' });
+      const ref = afStorage.ref('afs.json');
+      const task: AngularFireUploadTask = ref.put(blob);
+      task.then(snap => { 
+        expect(snap).toBeDefined(); 
+        done();
+      }).catch(done.fail);
+    });
+
   });
 
   describe('reference', () => {

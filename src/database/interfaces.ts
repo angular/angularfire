@@ -1,7 +1,7 @@
-import * as firebase from 'firebase/app';
+import { Reference, DataSnapshot, ThenableReference, Query } from '@firebase/database-types';
 import { Observable } from 'rxjs/Observable';
 
-export type FirebaseOperation = string | firebase.database.Reference | firebase.database.DataSnapshot;
+export type FirebaseOperation = string | Reference | DataSnapshot;
 
 export interface AngularFireList<T> {
   query: DatabaseQuery;
@@ -11,7 +11,7 @@ export interface AngularFireList<T> {
   auditTrail(events?: ChildEvent[]): Observable<SnapshotAction[]>;
   update(item: FirebaseOperation, data: T): Promise<void>;
   set(item: FirebaseOperation, data: T): Promise<void>;
-  push(data: T): firebase.database.ThenableReference;
+  push(data: T): ThenableReference;
   remove(item?: FirebaseOperation): Promise<void>;
 }
 
@@ -49,8 +49,8 @@ export type SnapshotAction = AngularFireAction<DatabaseSnapshot>;
 
 export type Primitive = number | string | boolean;
 
-export type DatabaseSnapshot = firebase.database.DataSnapshot;
-export type DatabaseReference = firebase.database.Reference;
-export type DatabaseQuery = firebase.database.Query;
+export type DatabaseSnapshot = DataSnapshot;
+export type DatabaseReference = Reference;
+export type DatabaseQuery = Query;
 export type QueryReference = DatabaseReference | DatabaseQuery;
 export type PathReference = QueryReference | string;

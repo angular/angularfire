@@ -25,7 +25,7 @@ before sending PRs. We cannot accept code without this.
    - Issue number for this PR: #nnn (required)
    - Docs included?: (yes/no; required for all API/functional changes) 
    - Test units included?: (yes/no; required) 
-   - In a clean directory, `npm install`, `npm run build`, and `npm test` run successfully? (yes/no; required)
+   - In a clean directory, `yarn install`, `yarn test` run successfully? (yes/no; required)
 
 ### Description
 

@@ -1,8 +1,7 @@
 import { NgModule } from '@angular/core';
-import * as firebase from 'firebase/app';
-import 'firebase/storage';
 import { AngularFireModule, FirebaseApp } from 'angularfire2';
 import { AngularFireStorage } from './storage';
+import '@firebase/storage';
 
 export function _getAngularFireStorage(app: FirebaseApp) {
   return new AngularFireStorage(app);

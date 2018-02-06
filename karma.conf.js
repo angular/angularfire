@@ -41,8 +41,14 @@ module.exports = function(config) {
     logLevel: config.LOG_INFO,
     autoWatch: true,
     reporters: ['mocha'],
-    browsers: ['Chrome'],
-    singleRun: false
+    browsers: ['ChromeHeadless'],
+    singleRun: false,
+    customLaunchers: {
+      ChromeHeadlessTravis: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox']
+      }
+    },
   })
 };
 

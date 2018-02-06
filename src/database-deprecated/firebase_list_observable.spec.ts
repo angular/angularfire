@@ -2,7 +2,8 @@ import { FirebaseApp, FirebaseAppConfig, AngularFireModule} from 'angularfire2';
 import { AngularFireDatabase, AngularFireDatabaseModule, FirebaseListObservable, FirebaseObjectFactory } from 'angularfire2/database-deprecated';
 import { Observer } from 'rxjs/Observer';
 import { map } from 'rxjs/operator/map';
-import * as firebase from 'firebase/app';
+import { FirebaseApp as FBApp } from '@firebase/app-types';
+import { DataSnapshot, Reference } from '@firebase/database-types';
 import { unwrapMapFn } from './utils';
 
 import { TestBed, inject } from '@angular/core/testing';
@@ -10,8 +11,8 @@ import { COMMON_CONFIG } from './test-config';
 
 describe('FirebaseListObservable', () => {
   let O: FirebaseListObservable<any>;
-  let ref: firebase.database.Reference;
-  let app: firebase.app.App;
+  let ref: Reference;
+  let app: FBApp;
   let db: AngularFireDatabase;
 
   beforeEach(() => {
@@ -21,10 +22,10 @@ describe('FirebaseListObservable', () => {
         AngularFireDatabaseModule
       ]
     });
-    inject([FirebaseApp, AngularFireDatabase], (_app: firebase.app.App, _db: AngularFireDatabase) => {
+    inject([FirebaseApp, AngularFireDatabase], (_app: FBApp, _db: AngularFireDatabase) => {
       app = _app;
       db = _db;
-      ref = firebase.database().ref();
+      ref = app.database().ref();
       O = new FirebaseListObservable(ref, (observer:Observer<any>) => {
       });
     })();
@@ -64,7 +65,7 @@ describe('FirebaseListObservable', () => {
 
   describe('remove', () => {
     let orphan = { orphan: true };
-    let child:firebase.database.Reference;
+    let child:Reference;
 
     beforeEach(() => {
       child = ref.push(orphan);
@@ -76,7 +77,7 @@ describe('FirebaseListObservable', () => {
       ref.on('child_added', childAddedSpy);
       O.remove(child.key!)
         .then(() => (<any>ref).once('value'))
-        .then((data:firebase.database.DataSnapshot) => {
+        .then((data:DataSnapshot) => {
           expect(childAddedSpy.calls.argsFor(0)[0].val()).toEqual(orphan);
           expect(data.val()).toBeNull();
           ref.off();
@@ -92,7 +93,7 @@ describe('FirebaseListObservable', () => {
 
       O.remove(child)
         .then(() => (<any>ref).once('value'))
-        .then((data:firebase.database.DataSnapshot) => {
+        .then((data:DataSnapshot) => {
           expect(childAddedSpy.calls.argsFor(0)[0].val()).toEqual(orphan);
           expect(data.val()).toBeNull();
           ref.off();
@@ -102,11 +103,11 @@ describe('FirebaseListObservable', () => {
 
 
     it('should remove the item from the Firebase db when given the snapshot', (done:any) => {
-      ref.on('child_added', (data:firebase.database.DataSnapshot) => {
+      ref.on('child_added', (data:DataSnapshot) => {
         expect(data.val()).toEqual(orphan);
         O.remove(data)
           .then(() => (<any>ref).once('value'))
-          .then((data:firebase.database.DataSnapshot) => {
+          .then((data:DataSnapshot) => {
             expect(data.val()).toBeNull();
             ref.off();
           })
@@ -116,11 +117,11 @@ describe('FirebaseListObservable', () => {
 
 
     it('should remove the item from the Firebase db when given the unwrapped snapshot', (done:any) => {
-      ref.on('child_added', (data:firebase.database.DataSnapshot) => {
+      ref.on('child_added', (data:DataSnapshot) => {
         expect(data.val()).toEqual(orphan);
         O.remove(unwrapMapFn(data))
           .then(() => (<any>ref).once('value'))
-          .then((data:firebase.database.DataSnapshot) => {
+          .then((data:DataSnapshot) => {
             expect(data.val()).toBeNull();
             ref.off();
           })
@@ -131,7 +132,7 @@ describe('FirebaseListObservable', () => {
     it('should remove the whole list if no item is added', () => {
       O.remove()
         .then(() => (<any>ref).once('value'))
-        .then((data:firebase.database.DataSnapshot) => {
+        .then((data:DataSnapshot) => {
           expect(data.val()).toBe(null);
         });
     });
@@ -146,7 +147,7 @@ describe('FirebaseListObservable', () => {
 
   describe('set', () => {
     let orphan = { orphan: true };
-    let child:firebase.database.Reference;
+    let child:Reference;
 
     beforeEach(() => {
       child = ref.push(orphan);
@@ -158,7 +159,7 @@ describe('FirebaseListObservable', () => {
       ref.on('child_changed', childChangedSpy);
       O.set(child.key!, orphanChange)
         .then(() => (<any>ref).once('value'))
-        .then((data:firebase.database.DataSnapshot) => {
+        .then((data:DataSnapshot) => {
           expect(childChangedSpy.calls.argsFor(0)[0].val()).not.toEqual({
             orphan: true,
             changed: true
@@ -178,7 +179,7 @@ describe('FirebaseListObservable', () => {
       ref.on('child_changed', childChangedSpy);
       O.set(child.ref, orphanChange)
         .then(() => (<any>ref).once('value'))
-        .then((data:firebase.database.DataSnapshot) => {
+        .then((data:DataSnapshot) => {
           expect(childChangedSpy.calls.argsFor(0)[0].val()).not.toEqual({
             orphan: true,
             changed: true
@@ -198,7 +199,7 @@ describe('FirebaseListObservable', () => {
       ref.on('child_changed', childChangedSpy);
       O.set(child, orphanChange)
         .then(() => (<any>ref).once('value'))
-        .then((data:firebase.database.DataSnapshot) => {
+        .then((data:DataSnapshot) => {
           expect(childChangedSpy.calls.argsFor(0)[0].val()).not.toEqual({
             orphan: true,
             changed: true
@@ -214,11 +215,11 @@ describe('FirebaseListObservable', () => {
 
     it('should set(replace) the item from the Firebase db when given the unwrapped snapshot', (done:any) => {
       const orphanChange = { changed: true }
-      ref.on('child_added', (data:firebase.database.DataSnapshot) => {
+      ref.on('child_added', (data:DataSnapshot) => {
         expect(data.val()).toEqual(orphan);
         O.set(unwrapMapFn(data), orphanChange)
           .then(() => (<any>child).once('value'))
-          .then((data:firebase.database.DataSnapshot) => {
+          .then((data:DataSnapshot) => {
             expect(data.val()).not.toEqual({
               orphan: true,
               changed: true
@@ -238,7 +239,7 @@ describe('FirebaseListObservable', () => {
 
   describe('update', () => {
     let orphan = { orphan: true };
-    let child:firebase.database.Reference;
+    let child:Reference;
 
     beforeEach(() => {
       child = ref.push(orphan);
@@ -250,7 +251,7 @@ describe('FirebaseListObservable', () => {
       ref.on('child_changed', childChangedSpy);
       O.update(child.key!, orphanChange)
         .then(() => (<any>ref).once('value'))
-        .then((data:firebase.database.DataSnapshot) => {
+        .then((data:DataSnapshot) => {
           expect(childChangedSpy.calls.argsFor(0)[0].val()).toEqual({
             orphan: true,
             changed: true
@@ -267,7 +268,7 @@ describe('FirebaseListObservable', () => {
       ref.on('child_changed', childChangedSpy);
       O.update(child.ref, orphanChange)
         .then(() => (<any>ref).once('value'))
-        .then((data:firebase.database.DataSnapshot) => {
+        .then((data:DataSnapshot) => {
           expect(childChangedSpy.calls.argsFor(0)[0].val()).toEqual({
             orphan: true,
             changed: true
@@ -284,7 +285,7 @@ describe('FirebaseListObservable', () => {
       ref.on('child_changed', childChangedSpy);
       O.update(child, orphanChange)
         .then(() => (<any>ref).once('value'))
-        .then((data:firebase.database.DataSnapshot) => {
+        .then((data:DataSnapshot) => {
           expect(childChangedSpy.calls.argsFor(0)[0].val()).toEqual({
             orphan: true,
             changed: true
@@ -297,11 +298,11 @@ describe('FirebaseListObservable', () => {
 
     it('should update the item from the Firebase db when given the unwrapped snapshot', (done:any) => {
       const orphanChange = { changed: true }
-      ref.on('child_added', (data:firebase.database.DataSnapshot) => {
+      ref.on('child_added', (data:DataSnapshot) => {
         expect(data.val()).toEqual(orphan);
         O.update(unwrapMapFn(data), orphanChange)
           .then(() => (<any>child).once('value'))
-          .then((data:firebase.database.DataSnapshot) => {
+          .then((data:DataSnapshot) => {
             expect(data.val()).toEqual({
               orphan: true,
               changed: true

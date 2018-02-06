@@ -1,3 +1,20 @@
+<a name="5.0.0-rc.6"></a>
+# [5.0.0-rc.6](https://github.com/angular/angularfire2/compare/5.0.0-rc.4...v5.0.0-rc.6) (2018-01-26)
+
+
+### Bug Fixes
+
+* Migrate imports to new Typings from 4.8.1 to resolve [#1385](https://github.com/angular/angularfire2/issues/1385) ([7ec51b2](https://github.com/angular/angularfire2/commit/7ec51b2))
+* Removing errant old import. Updating build with latest namespace. Fixing import for main [@firebase](https://github.com/firebase)/app. This resolves failing tests. ([a13bf9b](https://github.com/angular/angularfire2/commit/a13bf9b))
+* **afs:** fix di warning ([#1401](https://github.com/angular/angularfire2/issues/1401)) ([23ab383](https://github.com/angular/angularfire2/commit/23ab383))
+* **afs/typings:** valueChanges should return Observable<T|null> ([#1321](https://github.com/angular/angularfire2/issues/1321)) ([aadc71a](https://github.com/angular/angularfire2/commit/aadc71a))
+
+
+### Features
+* **storage:** Add Cloud Storage support ([e2283b1](https://github.com/angular/angularfire2/commit/e2283b1))
+
+
+
 <a name="5.0.0-rc.4"></a>
 # [5.0.0-rc.4](https://github.com/angular/angularfire2/compare/5.0.0-rc.3...5.0.0-rc.4) (2017-11-17)
 

@@ -86,6 +86,9 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 
 - [Getting started with Firebase Authentication](docs/auth/getting-started.md)
 
+## Upload files
+- [Getting started with Cloud Storage](docs/storage/storage.md)
+
 ### Deploy to Firebase Hosting
 
 - [Deploying AngularFire to Firebase Hosting](docs/deploying-angularfire-to-firebase.md)

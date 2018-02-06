@@ -4,13 +4,14 @@ import { COMMON_CONFIG } from './test-config';
 import { AngularFireDatabase, AngularFireDatabaseModule, FirebaseObjectObservable } from 'angularfire2/database-deprecated';
 import { Observer } from 'rxjs/Observer';
 import { map } from 'rxjs/operator/map';
-import * as firebase from 'firebase/app';
+import { FirebaseApp as FBApp } from '@firebase/app-types';
+import { Reference } from '@firebase/database-types';
 
 describe('FirebaseObjectObservable', () => {
 
   let O: FirebaseObjectObservable<any>;
-  let ref: firebase.database.Reference;
-  let app: firebase.app.App;
+  let ref: Reference;
+  let app: FBApp;
   let db: AngularFireDatabase;
 
   beforeEach(() => {
@@ -20,10 +21,10 @@ describe('FirebaseObjectObservable', () => {
         AngularFireDatabaseModule
       ]
     });
-    inject([FirebaseApp, AngularFireDatabase], (_app: firebase.app.App, _db: AngularFireDatabase) => {
+    inject([FirebaseApp, AngularFireDatabase], (_app: FBApp, _db: AngularFireDatabase) => {
       app = _app;
       db = _db;
-      ref = firebase.database().ref();
+      ref = app.database().ref();
       O = new FirebaseObjectObservable((observer: Observer<any>) => {
       }, ref);
     })();
