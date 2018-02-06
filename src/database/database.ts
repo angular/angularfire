@@ -55,3 +55,5 @@ export {
   Action,
   SnapshotAction
 } from './interfaces';
+
+export { RealtimeDatabaseURL };

@@ -2,8 +2,8 @@ import { FirebaseApp  } from '@firebase/app-types';
 import { Observable } from 'rxjs/Observable'
 import { forkJoin } from 'rxjs/observable/forkJoin';
 import { TestBed, inject } from '@angular/core/testing';
-import { FirebaseAppConfig, AngularFireModule } from 'angularfire2';
-import { AngularFireStorageModule, AngularFireStorage, AngularFireUploadTask } from 'angularfire2/storage';
+import { FirebaseAppConfig, AngularFireModule, FirebaseAppName } from 'angularfire2';
+import { AngularFireStorageModule, AngularFireStorage, AngularFireUploadTask, StorageBucket } from 'angularfire2/storage';
 import { COMMON_CONFIG } from './test-config';
 
 describe('AngularFireStorage', () => {
@@ -111,6 +111,57 @@ describe('AngularFireStorage', () => {
         .mergeMap(meta => ref.delete())
         // finish the test
         .subscribe(done, done.fail);
+    });
+
+  });
+
+});
+
+const FIREBASE_APP_NAME_TOO = (Math.random() + 1).toString(36).substring(7);
+const FIREBASE_STORAGE_BUCKET = `gs://test-${(Math.random() + 1).toString(36).substring(7)}/`;
+
+describe('AngularFireStorage w/options', () => {
+  let app: FirebaseApp;
+  let afStorage: AngularFireStorage;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireStorageModule
+      ],
+      providers: [
+        { provide: FirebaseAppName, useValue: FIREBASE_APP_NAME_TOO },
+        { provide: FirebaseAppConfig, useValue:  COMMON_CONFIG },
+        { provide: StorageBucket, useValue: FIREBASE_STORAGE_BUCKET }
+      ]
+    });
+    inject([FirebaseApp, AngularFireStorage], (app_: FirebaseApp, _storage: AngularFireStorage) => {
+      app = app_;
+      afStorage = _storage;
+    })();
+  });
+
+  afterEach(done => {
+    app.delete().then(done, done.fail);
+  });
+
+  describe('<constructor>', () => {
+   
+    it('should exist', () => {
+      expect(afStorage instanceof AngularFireStorage).toBe(true);
+    });
+
+    it('should have the Firebase storage instance', () => {
+      expect(afStorage.storage).toBeDefined();
+    });
+
+    it('should be hooked up the right app', () => {
+      expect(afStorage.storage.app.name).toEqual(FIREBASE_APP_NAME_TOO);
+    });
+
+    it('should be pointing towards a different bucket', () => {
+      expect(afStorage.storage.ref().toString()).toEqual(FIREBASE_STORAGE_BUCKET);
     });
 
   });
