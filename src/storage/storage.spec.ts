@@ -1,13 +1,13 @@
-import { FirebaseApp as FBApp } from '@firebase/app-types';
+import { FirebaseApp  } from '@firebase/app-types';
 import { Observable } from 'rxjs/Observable'
 import { forkJoin } from 'rxjs/observable/forkJoin';
 import { TestBed, inject } from '@angular/core/testing';
-import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2';
+import { FirebaseAppConfig, AngularFireModule } from 'angularfire2';
 import { AngularFireStorageModule, AngularFireStorage, AngularFireUploadTask } from 'angularfire2/storage';
 import { COMMON_CONFIG } from './test-config';
 
 describe('AngularFireStorage', () => {
-  let app: FBApp;
+  let app: FirebaseApp;
   let afStorage: AngularFireStorage;
 
   beforeEach(() => {

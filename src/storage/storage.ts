@@ -22,10 +22,10 @@ export class AngularFireStorage {
   constructor(
     @Inject(FirebaseAppConfig) config:FirebaseOptions,
     @Optional() @Inject(FirebaseAppName) name:string,
-    @Optional() @Inject(StorageBucket) bucket:string
+    @Optional() @Inject(StorageBucket) storageBucket:string
   ) {
     const app = firebaseAppFactory(config, name);
-    this.storage = app.storage!(bucket);
+    this.storage = app.storage!(storageBucket || undefined);
   }
 
   ref(path: string) {

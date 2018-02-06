@@ -1,10 +1,10 @@
-import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2';
+import { FirebaseApp } from '@firebase/app-types';
+import { FirebaseAppConfig, AngularFireModule } from 'angularfire2';
 import { AngularFirestore } from './firestore';
 import { AngularFirestoreModule } from './firestore.module';
 import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 
-import { FirebaseApp as FBApp } from '@firebase/app-types';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
@@ -17,7 +17,7 @@ interface Stock {
 }
 
 describe('AngularFirestore', () => {
-  let app: FBApp;
+  let app: FirebaseApp;
   let afs: AngularFirestore;
   let sub: Subscription;
 
@@ -28,7 +28,7 @@ describe('AngularFirestore', () => {
         AngularFirestoreModule.enablePersistence()
       ]
     });
-    inject([FirebaseApp, AngularFirestore], (_app: FBApp, _afs: AngularFirestore) => {
+    inject([FirebaseApp, AngularFirestore], (_app: FirebaseApp, _afs: AngularFirestore) => {
       app = _app;
       afs = _afs;
     })();
@@ -44,7 +44,7 @@ describe('AngularFirestore', () => {
   });
 
   it('should have an initialized Firebase app', () => {
-    expect(afs.app).toBeDefined();
+    expect(afs.firestore.app).toBeDefined();
   });
 
   it('should create an AngularFirestoreDocument', () => {

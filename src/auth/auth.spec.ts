@@ -1,4 +1,4 @@
-import { FirebaseApp as FBApp } from '@firebase/app-types';
+import { FirebaseApp } from '@firebase/app-types';
 import { User } from '@firebase/auth-types';
 import { ReflectiveInjector, Provider } from '@angular/core';
 import { Observable } from 'rxjs/Observable'
@@ -26,7 +26,7 @@ const firebaseUser = <User> {
 };
 
 describe('AngularFireAuth', () => {
-  let app: FBApp;
+  let app: FirebaseApp;
   let afAuth: AngularFireAuth;
   let authSpy: jasmine.Spy;
   let mockAuthState: Subject<User>;

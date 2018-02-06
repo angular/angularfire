@@ -18,7 +18,7 @@ export class AngularFireDatabase {
     @Optional() @Inject(RealtimeDatabaseURL) databaseURL:string
   ) {
     const app = firebaseAppFactory(config, name);
-    this.database = app.database!(databaseURL);
+    this.database = app.database!(databaseURL || undefined);
   }
 
   list<T>(pathOrRef: PathReference, queryFn?: QueryFn): AngularFireList<T> {

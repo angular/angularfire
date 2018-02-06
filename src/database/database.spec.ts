@@ -1,4 +1,5 @@
-import { FirebaseApp, FirebaseAppConfig, AngularFireModule} from 'angularfire2';
+import { FirebaseApp } from '@firebase/app-types';
+import { FirebaseAppConfig, AngularFireModule} from 'angularfire2';
 import { AngularFireDatabase, AngularFireDatabaseModule } from 'angularfire2/database';
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from './test-config';
@@ -34,12 +35,12 @@ describe('AngularFireDatabase', () => {
     });
 
     it('should accept a Firebase App in the constructor', () => {
-      const __db = new AngularFireDatabase(app);
+      const __db = new AngularFireDatabase(app.options, app.name, null!);
       expect(__db instanceof AngularFireDatabase).toEqual(true);
     });
 
     it('should have an initialized Firebase app instance member', () => {
-      expect(db.app.name).toEqual(FIREBASE_APP_NAME);
+      expect(db.database.app.name).toEqual(FIREBASE_APP_NAME);
     });
 
     it('should have an initialized Firebase database instance member', () => {

@@ -1,8 +1,9 @@
 
 import { Reference } from '@firebase/database-types';
+import { FirebaseApp } from '@firebase/app-types';
 import { TestBed, inject, withModule, async } from '@angular/core/testing';
 import { ReflectiveInjector, Provider, PlatformRef, NgModule, Compiler, ApplicationRef, CompilerFactory } from '@angular/core';
-import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2';
+import { FirebaseAppConfig, AngularFireModule } from 'angularfire2';
 import { Subscription } from 'rxjs/Subscription';
 import { COMMON_CONFIG } from './test-config';
 import { BrowserModule } from '@angular/platform-browser';
@@ -25,7 +26,7 @@ describe('angularfire', () => {
 
     inject([FirebaseApp, PlatformRef], (_app: FirebaseApp, _platform: PlatformRef) => {
       app = _app;
-      rootRef = app.database().ref();
+      rootRef = app.database!().ref();
       questionsRef = rootRef.child('questions');
       listOfQuestionsRef = rootRef.child('list-of-questions');
       defaultPlatform = _platform;
