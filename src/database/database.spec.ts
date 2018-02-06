@@ -48,7 +48,8 @@ describe('AngularFireDatabase', () => {
 });
 
 const FIREBASE_APP_NAME_TOO = (Math.random() + 1).toString(36).substring(7);
-const FIREBASE_DB_NAME = `https://test-${(Math.random() + 1).toString(36).substring(7)}.firebaseio.com/`;
+const FIREBASE_DB_NAME = `https://angularfire2-test2.firebaseio.com/`;
+const QUERY = (Math.random() + 1).toString(36).substring(7)
 
 describe('AngularFireDatabase w/options', () => {
   let app: FirebaseApp;
@@ -86,8 +87,16 @@ describe('AngularFireDatabase w/options', () => {
       expect(db.database.app.name).toEqual(FIREBASE_APP_NAME_TOO);
     });
 
-    it('should be pointing to the provided DB instance', () => {
+    it('database be pointing to the provided DB instance', () => {
       expect(db.database.ref().toString()).toEqual(FIREBASE_DB_NAME);
+    });
+
+    it('list should be using the provided DB instance', () => {
+      expect(db.list(QUERY).query.toString()).toEqual(`${FIREBASE_DB_NAME}${QUERY}`);
+    });
+
+    it('object should be using the provided DB instance', () => {
+      expect(db.object(QUERY).query.toString()).toEqual(`${FIREBASE_DB_NAME}${QUERY}`);
     });
   });
 
