@@ -25,7 +25,7 @@ export class AngularFireStorage {
     @Optional() @Inject(StorageBucket) storageBucket:string
   ) {
     const app = _firebaseAppFactory(config, name);
-    this.storage = app.storage!(storageBucket || undefined);
+    this.storage = app.storage(storageBucket || undefined);
   }
 
   ref(path: string) {

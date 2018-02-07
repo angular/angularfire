@@ -1,7 +1,31 @@
 import { InjectionToken, NgZone, NgModule } from '@angular/core';
-import { FirebaseApp, FirebaseOptions } from '@firebase/app-types';
 
-import { _firebaseAppFactory, FirebaseAppConfig, FirebaseAppName } from './angularfire2';
+import { FirebaseAppConfig, FirebaseAppName } from './angularfire2';
+
+import firebase from '@firebase/app';
+import { FirebaseApp as _FirebaseApp, FirebaseOptions } from '@firebase/app-types';
+import { FirebaseAuth } from '@firebase/auth-types';
+import { FirebaseDatabase } from '@firebase/database-types';
+import { FirebaseMessaging } from '@firebase/messaging-types';
+import { FirebaseStorage } from '@firebase/storage-types';
+import { FirebaseFirestore } from '@firebase/firestore-types';
+
+export class FirebaseApp implements _FirebaseApp {
+    name: string;
+    options: {};
+    auth: () => FirebaseAuth;
+    database: (databaseURL?: string) => FirebaseDatabase;
+    messaging: () => FirebaseMessaging;
+    storage: (storageBucket?: string) => FirebaseStorage;
+    delete: () => Promise<void>;
+    firestore: () => FirebaseFirestore;
+}
+
+export function _firebaseAppFactory(config: FirebaseOptions, name?: string): FirebaseApp {
+    const appName = name || '[DEFAULT]';
+    const existingApp = firebase.apps.filter(app => app.name == appName)[0] as FirebaseApp;
+    return existingApp || firebase.initializeApp(config, appName) as FirebaseApp;
+}
 
 const FirebaseAppProvider = {
     provide: FirebaseApp,

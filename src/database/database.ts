@@ -3,7 +3,7 @@ import { FirebaseDatabase } from '@firebase/database-types';
 import { PathReference, DatabaseQuery, DatabaseReference, DatabaseSnapshot, ChildEvent, ListenEvent, QueryFn, AngularFireList, AngularFireObject } from './interfaces';
 import { getRef } from './utils';
 import { InjectionToken } from '@angular/core';
-import { FirebaseApp, FirebaseOptions } from '@firebase/app-types';
+import { FirebaseOptions } from '@firebase/app-types';
 import { createListReference } from './list/create-reference';
 import { createObjectReference } from './object/create-reference';
 import { FirebaseAppConfig, FirebaseAppName, RealtimeDatabaseURL, _firebaseAppFactory } from 'angularfire2';
@@ -18,7 +18,7 @@ export class AngularFireDatabase {
     @Optional() @Inject(RealtimeDatabaseURL) databaseURL:string
   ) {
     const app = _firebaseAppFactory(config, name);
-    this.database = app.database!(databaseURL || undefined);
+    this.database = app.database(databaseURL || undefined);
   }
 
   list<T>(pathOrRef: PathReference, queryFn?: QueryFn): AngularFireList<T> {

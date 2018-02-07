@@ -110,7 +110,7 @@ export class AngularFirestore {
     @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean
   ) {
     const app = _firebaseAppFactory(config, name);
-    this.firestore = app.firestore!();
+    this.firestore = app.firestore();
 
     this.persistenceEnabled$ = shouldEnablePersistence ?
       from(this.firestore.enablePersistence().then(() => true, () => false)) :

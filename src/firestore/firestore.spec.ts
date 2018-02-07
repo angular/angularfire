@@ -1,5 +1,4 @@
-import { FirebaseApp } from '@firebase/app-types';
-import { FirebaseAppConfig, AngularFireModule, FirebaseAppName } from 'angularfire2';
+import { FirebaseApp, FirebaseAppConfig, AngularFireModule, FirebaseAppName } from 'angularfire2';
 import { AngularFirestore } from './firestore';
 import { AngularFirestoreModule } from './firestore.module';
 import { AngularFirestoreDocument } from './document/document';

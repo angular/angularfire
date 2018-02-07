@@ -33,7 +33,7 @@ export class AngularFireAuth {
     @Optional() @Inject(FirebaseAppName) name:string
   ) {
     const app = _firebaseAppFactory(config, name);
-    this.auth = app.auth!();
+    this.auth = app.auth();
 
     const authStateZone = new NgZone({});
     this.authState = authStateZone.runOutsideAngular(() => {

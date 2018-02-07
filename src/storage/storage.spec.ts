@@ -1,8 +1,7 @@
-import { FirebaseApp  } from '@firebase/app-types';
 import { Observable } from 'rxjs/Observable'
 import { forkJoin } from 'rxjs/observable/forkJoin';
 import { TestBed, inject } from '@angular/core/testing';
-import { FirebaseAppConfig, AngularFireModule, FirebaseAppName } from 'angularfire2';
+import { FirebaseApp, FirebaseAppConfig, AngularFireModule, FirebaseAppName } from 'angularfire2';
 import { AngularFireStorageModule, AngularFireStorage, AngularFireUploadTask, StorageBucket } from 'angularfire2/storage';
 import { COMMON_CONFIG } from './test-config';
 

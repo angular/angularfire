@@ -66,7 +66,6 @@ const GLOBALS = {
   '@firebase/storage': 'firebase',
   '@firebase/util': 'firebase',
   '@firebase/webchannel-wrapper': 'firebase',
-  '@firebase/app-types': 'firebase',
   'rxjs/scheduler/queue': 'Rx.Scheduler',
   '@angular/core/testing': 'ng.core.testing',
   'angularfire2': 'angularfire2',

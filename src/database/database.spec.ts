@@ -1,5 +1,4 @@
-import { FirebaseApp } from '@firebase/app-types';
-import { FirebaseAppConfig, AngularFireModule, FirebaseAppName } from 'angularfire2';
+import { FirebaseApp, FirebaseAppConfig, AngularFireModule, FirebaseAppName } from 'angularfire2';
 import { AngularFireDatabase, AngularFireDatabaseModule, RealtimeDatabaseURL } from 'angularfire2/database';
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from './test-config';
