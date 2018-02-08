@@ -19,28 +19,26 @@ interface SnapshotPrevKey {
  */
 export function fromRef(ref: DatabaseQuery, event: ListenEvent, listenType = 'on'): Observable<AngularFireAction<DatabaseSnapshot>> {
   const zone = new NgZone({});
-  return zone.runOutsideAngular(() => {
-    const ref$ = new Observable<SnapshotPrevKey>(subscriber => {
-      const fn = ref[listenType](event, (snapshot, prevKey) => {
+  const ref$ = new Observable<SnapshotPrevKey>(subscriber => {
+    const fn = ref[listenType](event, (snapshot, prevKey) => {
         subscriber.next({ snapshot, prevKey });
         if (listenType == 'once') { subscriber.complete(); }
       }, subscriber.error.bind(subscriber));
-      if (listenType == 'on') {
-        return { unsubscribe() { ref.off(event, fn)} };
-      } else {
-        return { unsubscribe() { } };
-      }
-    })
-    .map((payload: SnapshotPrevKey) =>  { 
-      const { snapshot, prevKey } = payload;
-      let key: string | null = null;
-      if (snapshot.exists()) { key = snapshot.key; }
-      return { type: event, payload: snapshot, prevKey, key };
-    })
-    // Ensures subscribe on observable is async. This handles
-    // a quirk in the SDK where on/once callbacks can happen
-    // synchronously.
-    .delay(0); 
-    return observeOn.call(ref$, new FirebaseZoneScheduler(zone)).share();
-  });
+    if (listenType == 'on') {
+      return { unsubscribe() { ref.off(event, fn) } };
+    } else {
+      return { unsubscribe() { } };
+    }
+  })
+  .map((payload: SnapshotPrevKey) => { 
+    const { snapshot, prevKey } = payload;
+    let key: string | null = null;
+    if (snapshot.exists()) { key = snapshot.key; }
+    return { type: event, payload: snapshot, prevKey, key };
+  })
+  // Ensures subscribe on observable is async. This handles
+  // a quirk in the SDK where on/once callbacks can happen
+  // synchronously.
+  .delay(0) 
+  return observeOn.call(ref$, new FirebaseZoneScheduler(zone)).share();
 }

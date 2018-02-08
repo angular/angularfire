@@ -30,30 +30,31 @@ export class AngularFireAuth {
 
   constructor(
     @Inject(FirebaseAppConfig) config:FirebaseOptions,
-    @Optional() @Inject(FirebaseAppName) name:string
+    @Optional() @Inject(FirebaseAppName) name:string,
+    private zone: NgZone
   ) {
-    const app = _firebaseAppFactory(config, name);
-    this.auth = app.auth();
+    this.auth = zone.runOutsideAngular(() => {
+      const app = _firebaseAppFactory(config, name);
+      return app.auth();
+    });
 
-    const authStateZone = new NgZone({});
-    this.authState = authStateZone.runOutsideAngular(() => {
-      const authState$ = new Observable(subscriber => {
+    const authState = new Observable(subscriber => {
+      return zone.runOutsideAngular(() => {
         const unsubscribe = this.auth.onAuthStateChanged(subscriber);
         return { unsubscribe };
       });
-      return observeOn.call(authState$, new FirebaseZoneScheduler(authStateZone));
     });
+    this.authState = observeOn.call(authState, new FirebaseZoneScheduler(zone));
 
-    const idTokenZone = new NgZone({});
-    this.idToken = idTokenZone.runOutsideAngular(() => {
-      const idToken$ = new Observable(subscriber => {
+    const idToken = new Observable(subscriber => {
+      return zone.runOutsideAngular(() => { 
         const unsubscribe = this.auth.onIdTokenChanged(subscriber);
         return { unsubscribe };
-      }).switchMap((user:User|null) => {
-        return user ? Observable.fromPromise(user.getIdToken()) : Observable.of(null)
       });
-      return observeOn.call(idToken$, new FirebaseZoneScheduler(idTokenZone));
+    }).switchMap((user:User|null) => {
+      return user ? Observable.fromPromise(user.getIdToken()) : Observable.of(null)
     });
+    this.idToken = observeOn.call(idToken, new FirebaseZoneScheduler(zone));
   }
 
 }
