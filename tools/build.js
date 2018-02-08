@@ -32,6 +32,7 @@ const GLOBALS = {
   'rxjs/operator/take': 'Rx.Observable.prototype',
   'rxjs/operator/toArray': 'Rx.Observable.prototype',
   'rxjs/operator/toPromise': 'Rx.Observable.prototype',
+  'rxjs/add/operator/first': 'Rx.Observable.prototype',
   'rxjs/add/operator/map': 'Rx.Observable.prototype',
   'rxjs/add/operator/scan': 'Rx.Observable.prototype',
   'rxjs/add/operator/skip': 'Rx.Observable.prototype',
@@ -73,7 +74,8 @@ const GLOBALS = {
   'angularfire2/database': 'angularfire2.database',
   'angularfire2/database-deprecated': 'angularfire2.database_deprecated',
   'angularfire2/firestore': 'angularfire2.firestore',
-  'angularfire2/storage': 'angularfire2.storage'
+  'angularfire2/storage': 'angularfire2.storage',
+  'zone.js': 'Zone'
 };
 
 // Map of dependency versions across all packages

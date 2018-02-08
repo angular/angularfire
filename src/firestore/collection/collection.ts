@@ -11,6 +11,11 @@ import { FirebaseApp } from '@firebase/app-types';
 import { QueryFn, AssociatedReference, DocumentChangeAction } from '../interfaces';
 import { docChanges, sortedChanges } from './changes';
 import { AngularFirestoreDocument } from '../document/document';
+import { AngularFirestore } from '../firestore';
+
+import { observeOn } from 'rxjs/operator/observeOn';
+
+import 'rxjs/add/observable/of';
 
 export function validateEventsArray(events?: DocumentChangeType[]) {
   if(!events || events!.length === 0) {
@@ -55,7 +60,8 @@ export class AngularFirestoreCollection<T> {
    */
   constructor(
     public readonly ref: CollectionReference,
-    private readonly query: Query) { }
+    private readonly query: Query,
+    private readonly afs: AngularFirestore) { }
 
   /**
    * Listen to the latest change in the stream. This method returns changes
@@ -87,15 +93,19 @@ export class AngularFirestoreCollection<T> {
    * @param events
    */
   snapshotChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction[]> {
-    events = validateEventsArray(events);
-    return sortedChanges(this.query, events);
+    const validatedEvents = validateEventsArray(events);
+    const sortedChanges$ = sortedChanges(this.query, validatedEvents);
+    const scheduledSortedChanges$ = this.afs.scheduler.runOutsideAngular(sortedChanges$);
+    return this.afs.scheduler.keepUnstableUntilFirst(scheduledSortedChanges$);
   }
 
   /**
    * Listen to all documents in the collection and its possible query as an Observable.
    */
-  valueChanges(events?: DocumentChangeType[]): Observable<T[]> {
-    return fromCollectionRef(this.query)
+  valueChanges(): Observable<T[]> {
+    const fromCollectionRef$ = fromCollectionRef(this.query);
+    const scheduled$ = this.afs.scheduler.runOutsideAngular(fromCollectionRef$);
+    return this.afs.scheduler.keepUnstableUntilFirst(scheduled$)
       .map(actions => actions.payload.docs.map(a => a.data()) as T[]);
   }
 
@@ -115,6 +125,6 @@ export class AngularFirestoreCollection<T> {
    * @param path
    */
   doc<T>(path: string): AngularFirestoreDocument<T> {
-    return new AngularFirestoreDocument<T>(this.ref.doc(path));
+    return new AngularFirestoreDocument<T>(this.ref.doc(path), this.afs);
   }
 }

@@ -8,7 +8,7 @@ import 'rxjs/add/operator/map';
 import { Injectable } from '@angular/core';
 import { FirebaseApp } from '@firebase/app-types';
 
-import { associateQuery } from '../firestore';
+import { AngularFirestore, associateQuery } from '../firestore';
 import { AngularFirestoreCollection } from '../collection/collection';
 
 /**
@@ -40,7 +40,7 @@ export class AngularFirestoreDocument<T> {
    * for data operations, data streaming, and Symbol.observable.
    * @param ref
    */
-  constructor(public ref: DocumentReference) { }
+  constructor(public ref: DocumentReference, private afs: AngularFirestore) { }
 
   /**
    * Create or overwrite a single document.
@@ -75,14 +75,16 @@ export class AngularFirestoreDocument<T> {
   collection<T>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<T> {
     const collectionRef = this.ref.collection(path);
     const { ref, query } = associateQuery(collectionRef, queryFn);
-    return new AngularFirestoreCollection<T>(ref, query);
+    return new AngularFirestoreCollection<T>(ref, query, this.afs);
   }
 
   /**
    * Listen to snapshot updates from the document.
    */
   snapshotChanges(): Observable<Action<DocumentSnapshot>> {
-    return fromDocRef(this.ref);
+    const fromDocRef$ = fromDocRef(this.ref);
+    const scheduledFromDocRef$ = this.afs.scheduler.runOutsideAngular(fromDocRef$);
+    return this.afs.scheduler.keepUnstableUntilFirst(scheduledFromDocRef$);
   }
 
   /**

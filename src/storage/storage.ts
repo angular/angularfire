@@ -1,4 +1,4 @@
-import { Injectable, Inject, Optional, InjectionToken } from '@angular/core';
+import { Injectable, Inject, Optional, InjectionToken, NgZone } from '@angular/core';
 import { FirebaseStorage, UploadMetadata } from '@firebase/storage-types';
 import { createStorageRef, AngularFireStorageReference } from './ref';
 import { createUploadTask, AngularFireUploadTask } from './task';
@@ -22,10 +22,13 @@ export class AngularFireStorage {
   constructor(
     @Inject(FirebaseAppConfig) config:FirebaseOptions,
     @Optional() @Inject(FirebaseAppName) name:string,
-    @Optional() @Inject(StorageBucket) storageBucket:string
+    @Optional() @Inject(StorageBucket) storageBucket:string,
+    zone: NgZone
   ) {
-    const app = _firebaseAppFactory(config, name);
-    this.storage = app.storage(storageBucket || undefined);
+    this.storage = zone.runOutsideAngular(() => {
+      const app = _firebaseAppFactory(config, name);
+      return app.storage(storageBucket || undefined);
+    });
   }
 
   ref(path: string) {

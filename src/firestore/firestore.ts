@@ -1,4 +1,4 @@
-import { InjectionToken } from '@angular/core';
+import { InjectionToken, NgZone } from '@angular/core';
 import { FirebaseFirestore, CollectionReference } from '@firebase/firestore-types';
 import { Observable } from 'rxjs/Observable';
 import { Subscriber } from 'rxjs/Subscriber';
@@ -12,7 +12,7 @@ import { QueryFn, AssociatedReference } from './interfaces';
 import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 
-import { FirebaseAppConfig, FirebaseAppName, _firebaseAppFactory } from 'angularfire2';
+import { FirebaseAppConfig, FirebaseAppName, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
 
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
@@ -97,6 +97,7 @@ export function associateQuery(collectionRef: CollectionReference, queryFn = ref
 export class AngularFirestore {
   public readonly firestore: FirebaseFirestore;
   public readonly persistenceEnabled$: Observable<boolean>;
+  public readonly scheduler: FirebaseZoneScheduler;
 
   /**
    * Each Feature of AngularFire has a FirebaseApp injected. This way we
@@ -107,14 +108,20 @@ export class AngularFirestore {
   constructor(
     @Inject(FirebaseAppConfig) config:FirebaseOptions,
     @Optional() @Inject(FirebaseAppName) name:string,
-    @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean
+    @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean,
+    zone: NgZone
   ) {
-    const app = _firebaseAppFactory(config, name);
-    this.firestore = app.firestore();
+    this.scheduler = new FirebaseZoneScheduler(zone);
+    this.firestore = zone.runOutsideAngular(() => {
+      const app = _firebaseAppFactory(config, name);
+      return app.firestore();
+    });
 
-    this.persistenceEnabled$ = shouldEnablePersistence ?
-      from(this.firestore.enablePersistence().then(() => true, () => false)) :
-      from(new Promise((res, rej) => { res(false); }));
+    this.persistenceEnabled$ = zone.runOutsideAngular(() => {
+      return shouldEnablePersistence ?
+        from(this.firestore.enablePersistence().then(() => true, () => false)) :
+        from(new Promise((res, rej) => { res(false); }));
+    });
   }
 
   /**
@@ -126,7 +133,7 @@ export class AngularFirestore {
   collection<T>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<T> {
     const collectionRef = this.firestore.collection(path);
     const { ref, query } = associateQuery(collectionRef, queryFn);
-    return new AngularFirestoreCollection<T>(ref, query);
+    return new AngularFirestoreCollection<T>(ref, query, this);
   }
 
   /**
@@ -137,7 +144,7 @@ export class AngularFirestore {
    */
   doc<T>(path: string): AngularFirestoreDocument<T> {
     const ref = this.firestore.doc(path);
-    return new AngularFirestoreDocument<T>(ref);
+    return new AngularFirestoreDocument<T>(ref, this);
   }
 
   /**
