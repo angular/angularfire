@@ -58,7 +58,7 @@ import { Observable } from 'rxjs/Observable';
   `,
 })
 export class AppComponent {
-  item: FirebaseObjectObservable<any>;
+  item: Observable<any>;
   constructor(db: AngularFireDatabase) {
     this.item = db.object('item').valueChanges();
   }
