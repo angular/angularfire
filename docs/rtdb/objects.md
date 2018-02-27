@@ -58,7 +58,7 @@ import { Observable } from 'rxjs/Observable';
   `,
 })
 export class AppComponent {
-  item: FirebaseObjectObservable<any>;
+  item: Observable<any>;
   constructor(db: AngularFireDatabase) {
     this.item = db.object('item').valueChanges();
   }
@@ -125,6 +125,7 @@ itemRef.remove();
 ```ts
 import { Component } from '@angular/core';
 import { AngularFireDatabase, AngularFireObject } from 'angularfire2/database';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'app-root',
@@ -140,7 +141,7 @@ import { AngularFireDatabase, AngularFireObject } from 'angularfire2/database';
 })
 export class AppComponent {
   itemRef: AngularFireObject<any>;
-  item: FirebaseObjectObservable<any>;
+  item: Observable<any>;
   constructor(db: AngularFireDatabase) {
     this.itemRef = db.object('item');
     this.item = this.itemRef.valueChanges();
