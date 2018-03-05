@@ -73,7 +73,8 @@ const GLOBALS = {
   'angularfire2/database': 'angularfire2.database',
   'angularfire2/database-deprecated': 'angularfire2.database_deprecated',
   'angularfire2/firestore': 'angularfire2.firestore',
-  'angularfire2/storage': 'angularfire2.storage'
+  'angularfire2/storage': 'angularfire2.storage',
+  'angularfire2/messaging': 'angularfire2.messaging',
 };
 
 // Map of dependency versions across all packages

@@ -4,4 +4,5 @@ export const COMMON_CONFIG = {
   authDomain: "angularfire2-test.firebaseapp.com",
   databaseURL: "https://angularfire2-test.firebaseio.com",
   storageBucket: "angularfire2-test.appspot.com",
+  messagingSenderId: "920323787688"
 };
