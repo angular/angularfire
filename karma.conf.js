@@ -27,6 +27,13 @@ module.exports = function(config) {
       'karma-test-shim.js',
       'node_modules/firebase/firebase.js',
       'node_modules/firebase/firebase-firestore.js',
+
+      // This service worker is loaded by a service worker registration
+      { 
+        pattern: 'firebase-messaging-sw.js', 
+        included: false 
+      },
+
       'dist/packages-dist/bundles/core.umd.{js,map}',
       'dist/packages-dist/bundles/auth.umd.{js,map}',
       'dist/packages-dist/bundles/database.umd.{js,map}',
@@ -35,6 +42,7 @@ module.exports = function(config) {
       'dist/packages-dist/bundles/messaging.umd.{js,map}',
       'dist/packages-dist/bundles/database-deprecated.umd.{js,map}',
       'dist/packages-dist/bundles/test.umd.{js,map}',
+
     ],
 
     port: 9876,

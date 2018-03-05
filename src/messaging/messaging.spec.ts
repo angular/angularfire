@@ -5,22 +5,34 @@ import { forkJoin } from 'rxjs/observable/forkJoin';
 import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2';
 import { AngularFireMessaging, AngularFireMessagingModule } from 'angularfire2/messaging';
+import * as firebase from 'firebase/app';
+import 'firebase/messaging';
 
 fdescribe('AngularFireMessaging', () => {
-  let app: FBApp;
+  let app: firebase.app.App;
   let afMessaging: AngularFireMessaging;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
-        AngularFireMessagingModule
-      ]
+  beforeAll((done: any) => {
+    navigator.serviceWorker.register('http://localhost:9876/base/firebase-messaging-sw.js')
+    .then((registration) => {
+      app = firebase.initializeApp(COMMON_CONFIG, 'SW-REG');
+      app.messaging!().useServiceWorker(registration);
+      TestBed.configureTestingModule({
+        imports: [
+          AngularFireModule.initializeApp(COMMON_CONFIG),
+          AngularFireMessagingModule
+        ]
+      });
+      inject([FirebaseApp, AngularFireMessaging], (app_: FirebaseApp, _messaging: AngularFireMessaging) => {
+        // app = app_;
+        afMessaging = _messaging;
+        done();
+      })();
+    })
+    .catch(e => {
+      console.error(e);
     });
-    inject([FirebaseApp, AngularFireMessaging], (app_: FirebaseApp, _messaging: AngularFireMessaging) => {
-      app = app_;
-      afMessaging = _messaging;
-    })();
+
   });
 
   afterEach(done => {
@@ -33,6 +45,14 @@ fdescribe('AngularFireMessaging', () => {
 
   it('should have the Firebase messaging instance', () => {
     expect(afMessaging.messaging).toBeDefined();
+  });
+
+  it('should give me a token after requesting permission', (done) => {
+    afMessaging.requestToken.subscribe(token => {
+      debugger;
+      expect(token).toBeDefined();
+      done();
+    }, done.fail);
   });
 
 });
