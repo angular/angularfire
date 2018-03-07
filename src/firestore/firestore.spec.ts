@@ -47,13 +47,25 @@ describe('AngularFirestore', () => {
     expect(afs.app).toBeDefined();
   });
 
-  it('should create an AngularFirestoreDocument', () => {
+  it('should create an AngularFirestoreDocument from a string path', () => {
     const doc = afs.doc('a/doc');
     expect(doc instanceof AngularFirestoreDocument).toBe(true);
   });
 
-  it('should create an AngularFirestoreCollection', () => {
+  it('should create an AngularFirestoreDocument from a string path', () => {
+    const ref = afs.doc('a/doc').ref;
+    const doc = afs.doc(ref);
+    expect(doc instanceof AngularFirestoreDocument).toBe(true);
+  });
+
+  it('should create an AngularFirestoreCollection from a string path', () => {
     const collection = afs.collection('stuffs');
+    expect(collection instanceof AngularFirestoreCollection).toBe(true);
+  });
+
+  it('should create an AngularFirestoreCollection from a reference', () => {
+    const ref = afs.collection('stuffs').ref;
+    const collection = afs.collection(ref);
     expect(collection instanceof AngularFirestoreCollection).toBe(true);
   });
 

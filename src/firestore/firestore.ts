@@ -1,4 +1,4 @@
-import { FirebaseFirestore, CollectionReference } from '@firebase/firestore-types';
+import { FirebaseFirestore, CollectionReference, DocumentReference } from '@firebase/firestore-types';
 import { Observable } from 'rxjs/Observable';
 import { Subscriber } from 'rxjs/Subscriber';
 import { from } from 'rxjs/observable/from';
@@ -106,25 +106,41 @@ export class AngularFirestore {
   }
 
   /**
-   * Create a reference to a Firestore Collection based on a path and an optional
-   * query function to narrow the result set.
-   * @param path
+   * Create a reference to a Firestore Collection based on a path or
+   * CollectionReference and an optional query function to narrow the result
+   * set.
+   * @param pathOrRef
    * @param queryFn
    */
-  collection<T>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<T> {
-    const collectionRef = this.firestore.collection(path);
+  collection<T>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<T>
+  collection<T>(ref: CollectionReference, queryFn?: QueryFn): AngularFirestoreCollection<T>
+  collection<T>(pathOrRef: string | CollectionReference, queryFn?: QueryFn): AngularFirestoreCollection<T> {
+    let collectionRef: CollectionReference;
+    if (typeof pathOrRef === 'string') {
+      collectionRef = this.firestore.collection(pathOrRef);
+    } else {
+      collectionRef = pathOrRef;
+    }
     const { ref, query } = associateQuery(collectionRef, queryFn);
     return new AngularFirestoreCollection<T>(ref, query);
   }
 
   /**
-   * Create a reference to a Firestore Document based on a path. Note that documents
-   * are not queryable because they are simply objects. However, documents have
-   * sub-collections that return a Collection reference and can be queried.
-   * @param path
+   * Create a reference to a Firestore Document based on a path or
+   * DocumentReference. Note that documents are not queryable because they are
+   * simply objects. However, documents have sub-collections that return a
+   * Collection reference and can be queried.
+   * @param pathOrRef
    */
-  doc<T>(path: string): AngularFirestoreDocument<T> {
-    const ref = this.firestore.doc(path);
+  doc<T>(path: string): AngularFirestoreDocument<T>
+  doc<T>(ref: DocumentReference): AngularFirestoreDocument<T>
+  doc<T>(pathOrRef: string | DocumentReference): AngularFirestoreDocument<T> {
+    let ref: DocumentReference;
+    if (typeof pathOrRef === 'string') {
+      ref = this.firestore.doc(pathOrRef);
+    } else {
+      ref = pathOrRef;
+    }
     return new AngularFirestoreDocument<T>(ref);
   }
 
