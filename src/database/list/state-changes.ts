@@ -5,9 +5,10 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/merge';
 import 'rxjs/add/operator/scan';
 import { DataSnapshot } from '@firebase/database-types';
+import { AngularFireDatabase } from '../database';
 
-export function createStateChanges(query: DatabaseQuery) {
-  return (events?: ChildEvent[]) => stateChanges(query, events);
+export function createStateChanges(query: DatabaseQuery, afDatabase: AngularFireDatabase) {
+  return (events?: ChildEvent[]) => afDatabase.scheduler.keepUnstableUntilFirst(stateChanges(query, events));
 }
 
 export function stateChanges(query: DatabaseQuery, events?: ChildEvent[]) {

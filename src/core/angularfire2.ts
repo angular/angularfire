@@ -22,6 +22,7 @@ export class FirebaseZoneScheduler {
   schedule(...args: any[]): Subscription {
     return <Subscription>this.zone.runGuarded(function() { return queue.schedule.apply(queue, args)});
   }
+  // TODO this is a hack, clean it up
   keepUnstableUntilFirst<T>(obs$: Observable<T>) {
     return new Observable<T>(subscriber => {
       const noop = () => {};

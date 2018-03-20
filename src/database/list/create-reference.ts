@@ -17,8 +17,8 @@ export function createListReference<T>(query: DatabaseQuery, afDatabase: Angular
       const snapshotChanges$ = snapshotChanges(query, events);
       return afDatabase.scheduler.keepUnstableUntilFirst(snapshotChanges$);
     },
-    stateChanges: createStateChanges(query),
-    auditTrail: createAuditTrail(query),
+    stateChanges: createStateChanges(query, afDatabase),
+    auditTrail: createAuditTrail(query, afDatabase),
     valueChanges<T>(events?: ChildEvent[]) { 
       const snapshotChanges$ = snapshotChanges(query, events);
       return afDatabase.scheduler.keepUnstableUntilFirst(snapshotChanges$)

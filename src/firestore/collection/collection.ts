@@ -73,9 +73,9 @@ export class AngularFirestoreCollection<T> {
     if(!events || events.length === 0) {
       return docChanges(this.query);
     }
-    return docChanges(this.query)
+    return this.afs.scheduler.keepUnstableUntilFirst(docChanges(this.query)
       .map(actions => actions.filter(change => events.indexOf(change.type) > -1))
-      .filter(changes =>  changes.length > 0);
+      .filter(changes =>  changes.length > 0));
   }
 
   /**
