@@ -6,7 +6,6 @@ import { fromDocRef } from '../observable/fromRef';
 import 'rxjs/add/operator/map';
 
 import { Injectable } from '@angular/core';
-import { FirebaseApp } from '@firebase/app-types';
 
 import { AngularFirestore, associateQuery } from '../firestore';
 import { AngularFirestoreCollection } from '../collection/collection';

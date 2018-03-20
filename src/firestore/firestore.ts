@@ -6,7 +6,7 @@ import { Subscriber } from 'rxjs/Subscriber';
 import { from } from 'rxjs/observable/from';
 import 'rxjs/add/operator/map';
 
-import { FirebaseApp, FirebaseOptions } from '@firebase/app-types';
+import { FirebaseOptions } from '@firebase/app-types';
 import { Injectable, Inject, Optional } from '@angular/core';
 
 import { QueryFn, AssociatedReference } from './interfaces';
