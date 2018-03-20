@@ -1,4 +1,3 @@
-import { NgZone } from '@angular/core';
 import { DatabaseQuery, DatabaseSnapshot, ListenEvent, AngularFireAction } from '../interfaces';
 import { Observable } from 'rxjs/Observable';
 import { observeOn } from 'rxjs/operator/observeOn';
@@ -18,19 +17,18 @@ interface SnapshotPrevKey {
  * @param event Listen event type ('value', 'added', 'changed', 'removed', 'moved')
  */
 export function fromRef(ref: DatabaseQuery, event: ListenEvent, listenType = 'on'): Observable<AngularFireAction<DatabaseSnapshot>> {
-  const zone = new NgZone({});
-  const ref$ = new Observable<SnapshotPrevKey>(subscriber => {
+  return new Observable<SnapshotPrevKey>(subscriber => {
     const fn = ref[listenType](event, (snapshot, prevKey) => {
-        subscriber.next({ snapshot, prevKey });
-        if (listenType == 'once') { subscriber.complete(); }
-      }, subscriber.error.bind(subscriber));
+      subscriber.next({ snapshot, prevKey });
+      if (listenType == 'once') { subscriber.complete(); }
+    }, subscriber.error.bind(subscriber));
     if (listenType == 'on') {
-      return { unsubscribe() { ref.off(event, fn) } };
+      return { unsubscribe() { ref.off(event, fn)} };
     } else {
       return { unsubscribe() { } };
     }
   })
-  .map((payload: SnapshotPrevKey) => { 
+  .map((payload: SnapshotPrevKey) =>  {
     const { snapshot, prevKey } = payload;
     let key: string | null = null;
     if (snapshot.exists()) { key = snapshot.key; }
@@ -39,6 +37,6 @@ export function fromRef(ref: DatabaseQuery, event: ListenEvent, listenType = 'on
   // Ensures subscribe on observable is async. This handles
   // a quirk in the SDK where on/once callbacks can happen
   // synchronously.
-  .delay(0) 
-  return observeOn.call(ref$, new FirebaseZoneScheduler(zone)).share();
+  .delay(0)
+  .share();
 }

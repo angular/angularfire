@@ -3,9 +3,6 @@ import { fromTask } from './observable/fromTask';
 import { Observable } from 'rxjs/Observable';
 import { map, filter } from 'rxjs/operators';
 import { from } from 'rxjs/observable/from';
-import { NgZone } from '@angular/core';
-import { observeOn } from 'rxjs/operator/observeOn';
-import { FirebaseZoneScheduler } from 'angularfire2';
 
 export interface AngularFireUploadTask {
   task: UploadTask,
@@ -29,10 +26,7 @@ export interface AngularFireUploadTask {
  * @param task 
  */
 export function createUploadTask(task: UploadTask): AngularFireUploadTask {
-  const zone = new NgZone({});
-  const inner$ = zone.runOutsideAngular(() =>
-    observeOn.call(fromTask(task), new FirebaseZoneScheduler(zone))
-  ) as Observable<UploadTaskSnapshot>;
+  const inner$ = fromTask(task);
   return {
     task: task,
     then: task.then.bind(task),
