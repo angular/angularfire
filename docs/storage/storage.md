@@ -60,7 +60,7 @@ import { AngularFireStorage } from 'angularfire2/storage';
 @Component({
   selector: 'app-root',
   template: `
-  <input type="file" (onchange)="uploadFile($event)">
+  <input type="file" (change)="uploadFile($event)">
   `
 })
 export class AppComponent {
@@ -124,7 +124,7 @@ export class AppComponent {
   profileUrl: Observable<string | null>;
   constructor(private storage: AngularFireStorage) {
      const ref = this.storage.ref('users/davideast.jpg');
-     this.profileUrl = ref.getDownloadUrl();
+     this.profileUrl = ref.getDownloadURL();
   }
 }
 ```
