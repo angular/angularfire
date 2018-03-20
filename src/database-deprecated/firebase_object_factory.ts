@@ -11,19 +11,16 @@ export function FirebaseObjectFactory (
   ref: DatabaseReference,
   { preserveSnapshot }: FirebaseObjectFactoryOpts = {}): FirebaseObjectObservable<any> {
 
-  const zone = new NgZone({});
-  return zone.runOutsideAngular(() => {
-    const objectObservable = new FirebaseObjectObservable((obs: Observer<any>) => {
-      let fn = ref.on('value', (snapshot: DataSnapshot) => {
-        obs.next(preserveSnapshot ? snapshot : utils.unwrapMapFn(snapshot))
-      }, err => {
-        if (err) { obs.error(err); obs.complete(); }
-      });
+  const objectObservable = new FirebaseObjectObservable((obs: Observer<any>) => {
+    let fn = ref.on('value', (snapshot: DataSnapshot) => {
+      obs.next(preserveSnapshot ? snapshot : utils.unwrapMapFn(snapshot))
+    }, err => {
+      if (err) { obs.error(err); obs.complete(); }
+    });
 
-      return () => ref.off('value', fn);
-    }, ref);
+    return () => ref.off('value', fn);
+  }, ref);
 
-    // TODO: should be in the subscription zone instead
-    return observeOn.call(objectObservable, new FirebaseZoneScheduler(zone));
-  });
+  // TODO: should be in the subscription zone instead
+  return observeOn.call(objectObservable, new FirebaseZoneScheduler(new NgZone({})));
 }

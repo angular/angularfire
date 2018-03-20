@@ -1,6 +1,5 @@
 import { FirebaseDatabase } from '@firebase/database-types';
 import { Inject, Injectable, Optional, NgZone } from '@angular/core';
-import { FirebaseApp } from '@firebase/app-types';
 import { FirebaseListFactory } from './firebase_list_factory';
 import { FirebaseListObservable } from './firebase_list_observable';
 import { FirebaseListFactoryOpts, FirebaseObjectFactoryOpts, PathReference } from './interfaces';

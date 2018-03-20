@@ -110,87 +110,85 @@ export function FirebaseListFactory (
  */
 function firebaseListObservable(ref: database.Reference | DatabaseQuery, {preserveSnapshot}: FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
 
-  const zone = new NgZone({});
-  return zone.runOutsideAngular(() => {
-    const toValue = preserveSnapshot ? (snapshot => snapshot) : utils.unwrapMapFn;
-    const toKey = preserveSnapshot ? (value => value.key) : (value => value.$key);
+  const toValue = preserveSnapshot ? (snapshot => snapshot) : utils.unwrapMapFn;
+  const toKey = preserveSnapshot ? (value => value.key) : (value => value.$key);
 
-    const listObs = new FirebaseListObservable(ref, (obs: Observer<any>) => {
+  const listObs = new FirebaseListObservable(ref, (obs: Observer<any>) => {
 
-      // Keep track of callback handles for calling ref.off(event, handle)
-      const handles: { event: string, handle: (a: DatabaseSnapshot, b?: string | null | undefined) => any }[] = [];
-      let hasLoaded = false;
-      let lastLoadedKey: string = null!;
-      let array: DatabaseSnapshot[] = [];
+    // Keep track of callback handles for calling ref.off(event, handle)
+    const handles: { event: string, handle: (a: DatabaseSnapshot, b?: string | null | undefined) => any }[] = [];
+    let hasLoaded = false;
+    let lastLoadedKey: string = null!;
+    let array: DatabaseSnapshot[] = [];
 
-      // The list children are always added to, removed from and changed within
-      // the array using the child_added/removed/changed events. The value event
-      // is only used to determine when the initial load is complete.
+    // The list children are always added to, removed from and changed within
+    // the array using the child_added/removed/changed events. The value event
+    // is only used to determine when the initial load is complete.
 
-      ref.once('value', (snap: any) => {
-        if (snap.exists()) {
-          snap.forEach((child: any) => {
-            lastLoadedKey = child.key;
-          });
-          if (array.find((child: any) => toKey(child) === lastLoadedKey)) {
-            hasLoaded = true;
-            obs.next(array);
-          }
-        } else {
-          hasLoaded = true;
-          obs.next(array);
-        }
-      }, err => {
-        if (err) { obs.error(err); obs.complete(); }
-      });
-
-      const addFn = ref.on('child_added', (child: any, prevKey: string) => {
-        array = onChildAdded(array, toValue(child), toKey, prevKey);
-        if (hasLoaded) {
-          obs.next(array);
-        } else if (child.key === lastLoadedKey) {
-          hasLoaded = true;
-          obs.next(array);
-        }
-      }, err => {
-        if (err) { obs.error(err); obs.complete(); }
-      });
-      handles.push({ event: 'child_added', handle: addFn });
-
-      let remFn = ref.on('child_removed', (child: any) => {
-        array = onChildRemoved(array, toValue(child), toKey);
-        if (hasLoaded) {
-          obs.next(array);
-        }
-      }, err => {
-        if (err) { obs.error(err); obs.complete(); }
-      });
-      handles.push({ event: 'child_removed', handle: remFn });
-
-      let chgFn = ref.on('child_changed', (child: any, prevKey: string) => {
-        array = onChildChanged(array, toValue(child), toKey, prevKey);
-        if (hasLoaded) {
-          obs.next(array);
-        }
-      }, err => {
-        if (err) { obs.error(err); obs.complete(); }
-      });
-      handles.push({ event: 'child_changed', handle: chgFn });
-
-      return () => {
-        // Loop through callback handles and dispose of each event with handle
-        // The Firebase SDK requires the reference, event name, and callback to
-        // properly unsubscribe, otherwise it can affect other subscriptions.
-        handles.forEach(item => {
-          ref.off(item.event, item.handle);
+    ref.once('value', (snap: any) => {
+      if (snap.exists()) {
+        snap.forEach((child: any) => {
+          lastLoadedKey = child.key;
         });
-      };
-
+        if (array.find((child: any) => toKey(child) === lastLoadedKey)) {
+          hasLoaded = true;
+          obs.next(array);
+        }
+      } else {
+        hasLoaded = true;
+        obs.next(array);
+      }
+    }, err => {
+      if (err) { obs.error(err); obs.complete(); }
     });
 
-    // TODO: should be in the subscription zone instead
-    return observeOn.call(listObs, new FirebaseZoneScheduler(zone));
+    const addFn = ref.on('child_added', (child: any, prevKey: string) => {
+      array = onChildAdded(array, toValue(child), toKey, prevKey);
+      if (hasLoaded) {
+        obs.next(array);
+      } else if (child.key === lastLoadedKey) {
+        hasLoaded = true;
+        obs.next(array);
+      }
+    }, err => {
+      if (err) { obs.error(err); obs.complete(); }
+    });
+    handles.push({ event: 'child_added', handle: addFn });
+
+    let remFn = ref.on('child_removed', (child: any) => {
+      array = onChildRemoved(array, toValue(child), toKey);
+      if (hasLoaded) {
+        obs.next(array);
+      }
+    }, err => {
+      if (err) { obs.error(err); obs.complete(); }
+    });
+    handles.push({ event: 'child_removed', handle: remFn });
+
+    let chgFn = ref.on('child_changed', (child: any, prevKey: string) => {
+      array = onChildChanged(array, toValue(child), toKey, prevKey);
+      if (hasLoaded) {
+        obs.next(array);
+      }
+    }, err => {
+      if (err) { obs.error(err); obs.complete(); }
+    });
+    handles.push({ event: 'child_changed', handle: chgFn });
+
+    return () => {
+      // Loop through callback handles and dispose of each event with handle
+      // The Firebase SDK requires the reference, event name, and callback to
+      // properly unsubscribe, otherwise it can affect other subscriptions.
+      handles.forEach(item => {
+        ref.off(item.event, item.handle);
+      });
+    };
+
   });
+
+  // TODO: should be in the subscription zone instead
+  return observeOn.call(listObs, new FirebaseZoneScheduler(new NgZone({})));
+
 }
 
 export function onChildAdded(arr:any[], child:any, toKey:(element:any)=>string, prevKey:string): any[] {
