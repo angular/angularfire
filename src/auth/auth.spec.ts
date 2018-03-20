@@ -1,4 +1,3 @@
-import { FirebaseApp as FBApp } from '@firebase/app-types';
 import { User } from '@firebase/auth-types';
 import { ReflectiveInjector, Provider } from '@angular/core';
 import { Observable } from 'rxjs/Observable'
@@ -8,7 +7,7 @@ import { TestBed, inject } from '@angular/core/testing';
 import { _do } from 'rxjs/operator/do';
 import { take } from 'rxjs/operator/take';
 import { skip } from 'rxjs/operator/skip';
-import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2';
+import { FirebaseApp, FirebaseAppConfig, AngularFireModule, FirebaseAppName } from 'angularfire2';
 import { AngularFireAuth, AngularFireAuthModule } from 'angularfire2/auth';
 import { COMMON_CONFIG } from './test-config';
 
@@ -26,7 +25,7 @@ const firebaseUser = <User> {
 };
 
 describe('AngularFireAuth', () => {
-  let app: FBApp;
+  let app: FirebaseApp;
   let afAuth: AngularFireAuth;
   let authSpy: jasmine.Spy;
   let mockAuthState: Subject<User>;
@@ -51,7 +50,7 @@ describe('AngularFireAuth', () => {
   });
 
   afterEach(done => {
-    app.delete().then(done, done.fail);
+    afAuth.auth.app.delete().then(done, done.fail);
   });
 
   describe('Zones', () => {
@@ -83,6 +82,11 @@ describe('AngularFireAuth', () => {
 
   it('should have the Firebase Auth instance', () => {
     expect(afAuth.auth).toBeDefined();
+  });
+
+  it('should have an initialized Firebase app', () => {
+    expect(afAuth.auth.app).toBeDefined();
+    expect(afAuth.auth.app).toEqual(app);
   });
 
   it('should emit auth updates through authState', (done: any) => {
@@ -123,3 +127,47 @@ describe('AngularFireAuth', () => {
 
 });
 
+const FIREBASE_APP_NAME_TOO = (Math.random() + 1).toString(36).substring(7);
+
+describe('AngularFireAuth with different app', () => {
+  let app: FirebaseApp;
+  let afAuth: AngularFireAuth;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireAuthModule
+      ],
+      providers: [
+        { provide: FirebaseAppName, useValue: FIREBASE_APP_NAME_TOO },
+        { provide: FirebaseAppConfig, useValue:  COMMON_CONFIG }
+      ]
+    });
+    inject([FirebaseApp, AngularFireAuth], (app_: FirebaseApp, _afAuth: AngularFireAuth) => {
+      app = app_;
+      afAuth = _afAuth;
+    })();
+  });
+
+  afterEach(done => {
+    app.delete().then(done, done.fail);
+  });
+
+  describe('<constructor>', () => {
+
+    it('should be an AngularFireAuth type', () => {
+      expect(afAuth instanceof AngularFireAuth).toEqual(true);
+    });
+
+    it('should have an initialized Firebase app', () => {
+      expect(afAuth.auth.app).toBeDefined();
+      expect(afAuth.auth.app).toEqual(app);
+    });
+
+    it('should have an initialized Firebase app instance member', () => {
+      expect(afAuth.auth.app.name).toEqual(FIREBASE_APP_NAME_TOO);
+    });
+  });
+
+});

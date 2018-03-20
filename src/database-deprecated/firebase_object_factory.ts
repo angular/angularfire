@@ -1,5 +1,6 @@
+import { NgZone } from '@angular/core';
 import { FirebaseObjectObservable } from './firebase_object_observable';
-import { ZoneScheduler } from 'angularfire2';
+import { FirebaseZoneScheduler } from 'angularfire2';
 import { Observer } from 'rxjs/Observer';
 import { observeOn } from 'rxjs/operator/observeOn';
 import { DataSnapshot } from '@firebase/database-types';
@@ -21,5 +22,5 @@ export function FirebaseObjectFactory (
   }, ref);
 
   // TODO: should be in the subscription zone instead
-  return observeOn.call(objectObservable, new ZoneScheduler(Zone.current));
+  return observeOn.call(objectObservable, new FirebaseZoneScheduler(new NgZone({})));
 }

@@ -1,8 +1,10 @@
 import { FirebaseAuth, User } from '@firebase/auth-types';
-import { Injectable, NgZone } from '@angular/core';
+import { FirebaseOptions } from '@firebase/app-types';
+import { Injectable, Inject, Optional, NgZone } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { observeOn } from 'rxjs/operator/observeOn';
-import { FirebaseApp, ZoneScheduler } from 'angularfire2';
+
+import { FirebaseAppConfig, FirebaseAppName, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
 
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/observable/of';
@@ -26,22 +28,37 @@ export class AngularFireAuth {
    */
   public readonly idToken: Observable<string|null>;
 
-  constructor(public app: FirebaseApp) {
-    this.auth = app.auth();
-
-    const authState$ = new Observable(subscriber => {
-      const unsubscribe = this.auth.onAuthStateChanged(subscriber);
-      return { unsubscribe };
+  constructor(
+    @Inject(FirebaseAppConfig) config:FirebaseOptions,
+    @Optional() @Inject(FirebaseAppName) name:string,
+    private zone: NgZone
+  ) {
+    const scheduler = new FirebaseZoneScheduler(zone);
+    this.auth = zone.runOutsideAngular(() => {
+      const app = _firebaseAppFactory(config, name);
+      return app.auth();
     });
-    this.authState = observeOn.call(authState$, new ZoneScheduler(Zone.current));
 
-    const idToken$ = new Observable<User|null>(subscriber => {
-      const unsubscribe = this.auth.onIdTokenChanged(subscriber);
-      return { unsubscribe };
-    }).switchMap(user => {
+    this.authState = scheduler.keepUnstableUntilFirst(
+      scheduler.runOutsideAngular(
+        new Observable(subscriber => {
+          const unsubscribe = this.auth.onAuthStateChanged(subscriber);
+          return { unsubscribe };
+        })
+      )
+    );
+
+    this.idToken = scheduler.keepUnstableUntilFirst(
+      scheduler.runOutsideAngular(
+        new Observable(subscriber => {
+          const unsubscribe = this.auth.onIdTokenChanged(subscriber);
+          return { unsubscribe };
+        })
+      )
+    ).switchMap((user:User|null) => {
       return user ? Observable.fromPromise(user.getIdToken()) : Observable.of(null)
     });
-    this.idToken = observeOn.call(idToken$, new ZoneScheduler(Zone.current));
+
   }
 
 }

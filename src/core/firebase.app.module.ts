@@ -1,40 +1,49 @@
-import { InjectionToken, } from '@angular/core';
-import { FirebaseAppConfig } from './';
-import firebase from '@firebase/app';
+import { InjectionToken, NgZone, NgModule } from '@angular/core';
 
-import { FirebaseApp as FBApp } from '@firebase/app-types';
+import { FirebaseAppConfig, FirebaseAppName } from './angularfire2';
+
+import firebase from '@firebase/app';
+import { FirebaseApp as _FirebaseApp, FirebaseOptions } from '@firebase/app-types';
 import { FirebaseAuth } from '@firebase/auth-types';
 import { FirebaseDatabase } from '@firebase/database-types';
 import { FirebaseMessaging } from '@firebase/messaging-types';
 import { FirebaseStorage } from '@firebase/storage-types';
 import { FirebaseFirestore } from '@firebase/firestore-types';
 
-export const FirebaseAppConfigToken = new InjectionToken<FirebaseAppConfig>('FirebaseAppConfigToken');
-
-export class FirebaseApp implements FBApp {
-  name: string;
-  options: {};
-  auth: () => FirebaseAuth;
-  database: () => FirebaseDatabase;
-  messaging: () => FirebaseMessaging;
-  storage: () => FirebaseStorage;
-  delete: () => Promise<any>;
-  firestore: () => FirebaseFirestore;
+export class FirebaseApp implements _FirebaseApp {
+    name: string;
+    options: {};
+    auth: () => FirebaseAuth;
+    database: (databaseURL?: string) => FirebaseDatabase;
+    messaging: () => FirebaseMessaging;
+    storage: (storageBucket?: string) => FirebaseStorage;
+    delete: () => Promise<void>;
+    firestore: () => FirebaseFirestore;
 }
 
-export function _firebaseAppFactory(config: FirebaseAppConfig, appName?: string): FirebaseApp {
-  try {
-    if (appName) {
-      return firebase.initializeApp(config, appName) as FirebaseApp;
-    } else {
-      return firebase.initializeApp(config) as FirebaseApp;
-    }
-  }
-  catch (e) {
-    if (e.code === "app/duplicate-app") {
-      return firebase.app(e.name) as FirebaseApp;
-    }
+export function _firebaseAppFactory(config: FirebaseOptions, name?: string): FirebaseApp {
+    const appName = name || '[DEFAULT]';
+    const existingApp = firebase.apps.filter(app => app.name == appName)[0] as FirebaseApp;
+    return existingApp || firebase.initializeApp(config, appName) as FirebaseApp;
+}
 
-    return firebase.app(null!) as FirebaseApp;
-  }
+const FirebaseAppProvider = {
+    provide: FirebaseApp,
+    useFactory: _firebaseAppFactory,
+    deps: [ FirebaseAppConfig, FirebaseAppName ]
+};
+ 
+@NgModule({
+    providers: [ FirebaseAppProvider ],
+})
+export class AngularFireModule {
+    static initializeApp(config: FirebaseOptions, appName?: string) {
+        return {
+            ngModule: AngularFireModule,
+            providers: [
+                { provide: FirebaseAppConfig, useValue: config },
+                { provide: FirebaseAppName, useValue: appName }
+            ]
+        }
+    }
 }

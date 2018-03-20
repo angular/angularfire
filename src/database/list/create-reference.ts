@@ -4,8 +4,9 @@ import { createStateChanges } from './state-changes';
 import { createAuditTrail } from './audit-trail';
 import { createDataOperationMethod } from './data-operation';
 import { createRemoveMethod } from './remove';
+import { AngularFireDatabase } from '../database';
 
-export function createListReference<T>(query: DatabaseQuery): AngularFireList<T> {
+export function createListReference<T>(query: DatabaseQuery, afDatabase: AngularFireDatabase): AngularFireList<T> {
   return {
     query,
     update: createDataOperationMethod<Partial<T>>(query.ref, 'update'),
@@ -13,12 +14,14 @@ export function createListReference<T>(query: DatabaseQuery): AngularFireList<T>
     push: (data: T) => query.ref.push(data),
     remove: createRemoveMethod(query.ref),
     snapshotChanges(events?: ChildEvent[]) {
-      return snapshotChanges(query, events);
+      const snapshotChanges$ = snapshotChanges(query, events);
+      return afDatabase.scheduler.keepUnstableUntilFirst(snapshotChanges$);
     },
-    stateChanges: createStateChanges(query),
-    auditTrail: createAuditTrail(query),
+    stateChanges: createStateChanges(query, afDatabase),
+    auditTrail: createAuditTrail(query, afDatabase),
     valueChanges<T>(events?: ChildEvent[]) { 
-      return snapshotChanges(query, events)
+      const snapshotChanges$ = snapshotChanges(query, events);
+      return afDatabase.scheduler.keepUnstableUntilFirst(snapshotChanges$)
         .map(actions => actions.map(a => a.payload.val())); 
     }
   }
