@@ -21,7 +21,7 @@ async function collectionHarness(afs: AngularFirestore, items: number, queryFn?:
   const randomCollectionName = randomName(afs.firestore);
   const ref = afs.firestore.collection(`${randomCollectionName}`);
   if(!queryFn) { queryFn = (ref) => ref; }
-  const stocks = new AngularFirestoreCollection<Stock>(ref, queryFn(ref));
+  const stocks = new AngularFirestoreCollection<Stock>(ref, queryFn(ref), afs);
   let names = await createRandomStocks(afs.firestore, ref, items);
   return { randomCollectionName, ref, stocks, names };
 }

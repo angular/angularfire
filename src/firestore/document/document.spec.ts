@@ -38,7 +38,7 @@ describe('AngularFirestoreDocument', () => {
   it('should get action updates', async (done: any) => {
     const randomCollectionName = randomName(afs.firestore);
     const ref = afs.firestore.doc(`${randomCollectionName}/FAKE`);
-    const stock = new AngularFirestoreDocument<Stock>(ref);
+    const stock = new AngularFirestoreDocument<Stock>(ref, afs);
     await stock.set(FAKE_STOCK_DATA);
     const sub = stock
       .snapshotChanges()
@@ -54,7 +54,7 @@ describe('AngularFirestoreDocument', () => {
   it('should get unwrapped snapshot', async (done: any) => {
     const randomCollectionName = afs.firestore.collection('a').doc().id;
     const ref = afs.firestore.doc(`${randomCollectionName}/FAKE`);
-    const stock = new AngularFirestoreDocument<Stock>(ref);
+    const stock = new AngularFirestoreDocument<Stock>(ref, afs);
     await stock.set(FAKE_STOCK_DATA);
     const obs$ = stock.valueChanges();
     obs$.take(1).subscribe(async (data: Stock) => {

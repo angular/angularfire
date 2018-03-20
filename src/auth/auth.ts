@@ -39,18 +39,18 @@ export class AngularFireAuth {
     });
 
     const authState = new Observable(subscriber => {
-      //return zone.runOutsideAngular(() => {
+      return zone.runOutsideAngular(() => {
         const unsubscribe = this.auth.onAuthStateChanged(subscriber);
         return { unsubscribe };
-      //});
+      });
     });
     this.authState = observeOn.call(authState, new FirebaseZoneScheduler(zone));
 
     const idToken = new Observable(subscriber => {
-      //return zone.runOutsideAngular(() => { 
+      return zone.runOutsideAngular(() => { 
         const unsubscribe = this.auth.onIdTokenChanged(subscriber);
         return { unsubscribe };
-      //});
+      });
     }).switchMap((user:User|null) => {
       return user ? Observable.fromPromise(user.getIdToken()) : Observable.of(null)
     });
