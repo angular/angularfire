@@ -28,7 +28,7 @@ describe('AngularFireFunctions', () => {
   });
 
   afterEach(done => {
-    afFns.functions.app.delete().then(done, done.fail);
+    app.delete().then(done, done.fail);
   });
 
   it('should be exist', () => {
@@ -37,11 +37,6 @@ describe('AngularFireFunctions', () => {
 
   it('should have the Firebase Functions instance', () => {
     expect(afFns.functions).toBeDefined();
-  });
-
-  it('should have an initialized Firebase app', () => {
-    expect(afFns.functions.app).toBeDefined();
-    expect(afFns.functions.app).toEqual(app);
   });
 
 });
@@ -79,14 +74,6 @@ describe('AngularFireFunctions with different app', () => {
       expect(afFns instanceof AngularFireFunctions).toEqual(true);
     });
 
-    it('should have an initialized Firebase app', () => {
-      expect(afFns.functinos.app).toBeDefined();
-      expect(afFns.functinos.app).toEqual(app);
-    });
-
-    it('should have an initialized Firebase app instance member', () => {
-      expect(afFns.functinos.app.name).toEqual(FIREBASE_APP_NAME_TOO);
-    });
   });
 
 });
