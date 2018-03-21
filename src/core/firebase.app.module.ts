@@ -9,6 +9,7 @@ import { FirebaseDatabase } from '@firebase/database-types';
 import { FirebaseMessaging } from '@firebase/messaging-types';
 import { FirebaseStorage } from '@firebase/storage-types';
 import { FirebaseFirestore } from '@firebase/firestore-types';
+import { FirebaseFunctions } from '@firebase/functions-types';
 
 export class FirebaseApp implements _FirebaseApp {
     name: string;
@@ -19,6 +20,7 @@ export class FirebaseApp implements _FirebaseApp {
     storage: (storageBucket?: string) => FirebaseStorage;
     delete: () => Promise<void>;
     firestore: () => FirebaseFirestore;
+    functions: () => FirebaseFunctions;
 }
 
 export function _firebaseAppFactory(config: FirebaseOptions, name?: string): FirebaseApp {

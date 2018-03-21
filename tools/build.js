@@ -59,11 +59,13 @@ const GLOBALS = {
   'firebase/app': 'firebase',
   'firebase/database': 'firebase',
   'firebase/firestore': 'firebase',
+  'firebase/functions': 'firebase',
   'firebase/storage': 'firebase',
   '@firebase/auth': 'firebase',
   '@firebase/app': 'firebase',
   '@firebase/database': 'firebase',
   '@firebase/firestore': 'firebase',
+  '@firebase/functions': 'firebase',
   '@firebase/storage': 'firebase',
   '@firebase/util': 'firebase',
   '@firebase/webchannel-wrapper': 'firebase',
@@ -74,6 +76,7 @@ const GLOBALS = {
   'angularfire2/database': 'angularfire2.database',
   'angularfire2/database-deprecated': 'angularfire2.database_deprecated',
   'angularfire2/firestore': 'angularfire2.firestore',
+  'angularfire2/functions': 'angularfire2.functions',
   'angularfire2/storage': 'angularfire2.storage',
   'zone.js': 'Zone'
 };
@@ -82,9 +85,10 @@ const GLOBALS = {
 const VERSIONS = {
   ANGULAR_VERSION: pkg.dependencies['@angular/core'],
   FIREBASE_APP_VERSION: pkg.dependencies['@firebase/app'],
+  FIREBASE_AUTH_VERSION: pkg.dependencies['@firebase/auth'],
   FIREBASE_DATABASE_VERSION: pkg.dependencies['@firebase/database'],
   FIREBASE_FIRESTORE_VERSION: pkg.dependencies['@firebase/firestore'],
-  FIREBASE_AUTH_VERSION: pkg.dependencies['@firebase/auth'],
+  FIREBASE_FUNCTIONS_VERSION: pkg.dependencies['@firebase/functions'],
   FIREBASE_STORAGE_VERSION: pkg.dependencies['@firebase/storage'],
   RXJS_VERSION: pkg.dependencies['rxjs'],
   ZONEJS_VERSION: pkg.dependencies['zone.js'],
@@ -102,6 +106,7 @@ const MODULE_NAMES = {
   database: 'angularfire2.database',
   "database-deprecated": 'angularfire2.database_deprecated',
   firestore: 'angularfire2.firestore',
+  functions: 'angularfire2.functions',
   storage: 'angularfire2.storage'
 };
 
@@ -111,6 +116,7 @@ const ENTRIES = {
   database: `${process.cwd()}/dist/packages-dist/database/index.js`,
   "database-deprecated": `${process.cwd()}/dist/packages-dist/database-deprecated/index.js`,
   firestore: `${process.cwd()}/dist/packages-dist/firestore/index.js`,
+  functions: `${process.cwd()}/dist/packages-dist/functions/index.js`,
   storage: `${process.cwd()}/dist/packages-dist/storage/index.js`
 };
 
@@ -121,6 +127,7 @@ const SRC_PKG_PATHS = {
   "database-deprecated": `${process.cwd()}/src/database-deprecated/package.json`,
   firestore: `${process.cwd()}/src/firestore/package.json`,
   "firebase-node": `${process.cwd()}/src/firebase-node/package.json`,
+  functions: `${process.cwd()}/src/functions/package.json`,
   storage: `${process.cwd()}/src/storage/package.json`
 };
 
@@ -131,6 +138,7 @@ const DEST_PKG_PATHS = {
   "database-deprecated": `${process.cwd()}/dist/packages-dist/database-deprecated/package.json`,
   firestore: `${process.cwd()}/dist/packages-dist/firestore/package.json`,
   "firebase-node": `${process.cwd()}/dist/packages-dist/firebase-node/package.json`,
+  functions: `${process.cwd()}/dist/packages-dist/functions/package.json`,
   storage: `${process.cwd()}/dist/packages-dist/storage/package.json`
 };
 
@@ -139,6 +147,7 @@ const FIREBASE_FEATURE_MODULES = {
   auth: `${process.cwd()}/node_modules/@firebase/auth/dist/auth.js`,
   database: `${process.cwd()}/node_modules/@firebase/database/dist/esm/index.js`,
   firestore: `${process.cwd()}/node_modules/@firebase/firestore/dist/esm/index.js`,
+  functions: `${process.cwd()}/node_modules/@firebase/functions/dist/esm/index.js`,
   storage: `${process.cwd()}/node_modules/@firebase/storage/dist/esm/index.js`,
   util: `${process.cwd()}/node_modules/@firebase/util/dist/esm/index.js`,
 };
@@ -299,6 +308,7 @@ function getVersions() {
     getDestPackageFile('database'),
     getDestPackageFile('firestore'),
     getDestPackageFile('firebase-node'),
+    getDestPackageFile('functions'),
     getDestPackageFile('storage'),
     getDestPackageFile('database-deprecated')
   ];
@@ -337,6 +347,7 @@ function buildModules(globals) {
   const auth$ = buildModule('auth', globals);
   const db$ = buildModule('database', globals);
   const firestore$ = buildModule('firestore', globals);
+  const functions$ = buildModule('functions', globals);
   const storage$ = buildModule('storage', globals);
   const dbdep$ = buildModule('database-deprecated', globals);
   return Observable
@@ -344,6 +355,7 @@ function buildModules(globals) {
     .switchMapTo(auth$)
     .switchMapTo(db$)
     .switchMapTo(firestore$)
+    .switchMapTo(functions$)
     .switchMapTo(storage$)
     .switchMapTo(dbdep$);
 }
@@ -363,6 +375,7 @@ function buildLibrary(globals) {
       const authStats = measure('auth');
       const dbStats = measure('database');
       const fsStats = measure('firestore');
+      const functionsStats = measure('functions');
       const storageStats = measure('storage');
       const dbdepStats = measure('database-deprecated');
       console.log(`
@@ -370,6 +383,7 @@ function buildLibrary(globals) {
       auth.umd.js - ${authStats.size}, ${authStats.gzip}
       database.umd.js - ${dbStats.size}, ${dbStats.gzip}
       firestore.umd.js - ${fsStats.size}, ${fsStats.gzip}
+      functions.umd.js - ${functionsStats.size}, ${functionsStats.gzip}
       storage.umd.js - ${storageStats.size}, ${storageStats.gzip}
       database-deprecated.umd.js - ${dbdepStats.size}, ${dbdepStats.gzip}
       `);
