@@ -6,6 +6,7 @@ import { Observable } from 'rxjs/Observable';
 import { FirebaseAppConfig, FirebaseAppName, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
 
 import 'rxjs/add/observable/fromPromise';
+import 'rxjs/add/operator/map'
 
 @Injectable()
 export class AngularFireFunctions {
@@ -17,14 +18,14 @@ export class AngularFireFunctions {
 
   public readonly scheduler: FirebaseZoneScheduler;
 
-  public call(name: string, data?: any) {
-    return this.scheduler.keepUnstableUntilFirst(
-      this.scheduler.runOutsideAngular(
-        Observable.fromPromise(
-          this.functions.httpsCallable(name)(data)
-        )
+  public httpsCallable<T, R>(name: string) {
+    const callable = this.functions.httpsCallable(name);
+    return (data: T) => {
+      return this.scheduler.runOutsideAngular(
+        Observable.fromPromise(callable(data))
+          .map(r => r.data as R)
       )
-    )
+    }
   }
 
   constructor(
