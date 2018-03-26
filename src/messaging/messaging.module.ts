@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { AngularFireModule, FirebaseApp } from 'angularfire2';
 import { AngularFireMessaging } from './messaging';
-import '@firebase/storage';
+import '@firebase/messaging';
 
 export function _getAngularFireMessaging(app: FirebaseApp) {
   return new AngularFireMessaging(app);

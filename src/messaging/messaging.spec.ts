@@ -8,35 +8,22 @@ import { AngularFireMessaging, AngularFireMessagingModule } from 'angularfire2/m
 import * as firebase from 'firebase/app';
 import 'firebase/messaging';
 
-fdescribe('AngularFireMessaging', () => {
+xdescribe('AngularFireMessaging', () => {
   let app: firebase.app.App;
   let afMessaging: AngularFireMessaging;
 
   beforeAll((done: any) => {
-    navigator.serviceWorker.register('http://localhost:9876/base/firebase-messaging-sw.js')
+    navigator.serviceWorker.register('/base/firebase-messaging-sw.js')
     .then((registration) => {
       app = firebase.initializeApp(COMMON_CONFIG, 'SW-REG');
       app.messaging!().useServiceWorker(registration);
-      TestBed.configureTestingModule({
-        imports: [
-          AngularFireModule.initializeApp(COMMON_CONFIG),
-          AngularFireMessagingModule
-        ]
-      });
-      inject([FirebaseApp, AngularFireMessaging], (app_: FirebaseApp, _messaging: AngularFireMessaging) => {
-        // app = app_;
-        afMessaging = _messaging;
-        done();
-      })();
+      afMessaging = new AngularFireMessaging(app as any);
+      done();
     })
     .catch(e => {
       console.error(e);
-    });
-
-  });
-
-  afterEach(done => {
-    app.delete().then(done, done.fail);
+      done.fail();
+    })
   });
 
   it('should exist', () => {
@@ -47,12 +34,20 @@ fdescribe('AngularFireMessaging', () => {
     expect(afMessaging.messaging).toBeDefined();
   });
 
-  it('should give me a token after requesting permission', (done) => {
+  it('should get request permission and get a token', (done) => {
     afMessaging.requestToken.subscribe(token => {
-      debugger;
-      expect(token).toBeDefined();
+      expect(typeof token === 'string').toBe(true);
       done();
     }, done.fail);
   });
+
+  it('should give me a token', (done) => {
+    afMessaging.getToken.subscribe(token => {
+      expect(typeof token === 'string').toBe(true);
+      done();
+    }, done.fail);
+  });
+
+  
 
 });
