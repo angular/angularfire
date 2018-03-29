@@ -29,7 +29,7 @@ branches:
 install:
   - |
     if $CANARY; then
-      yarn upgrade && yarn install firebase@canary
+      yarn upgrade && yarn add firebase@canary
     else
       if [ "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_PULL_REQUEST" = "false" ]; then
         yarn upgrade
