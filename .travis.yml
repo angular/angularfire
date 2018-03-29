@@ -31,7 +31,7 @@ install:
     if $CANARY; then
       yarn upgrade && yarn install firebase@canary
     else
-      if $TRAVIS_PULL_REQUEST="false"; then
+      if [ "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_PULL_REQUEST" = "false" ]; then
         yarn upgrade
       else
         yarn install --frozen-lockfile
