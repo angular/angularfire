@@ -13,12 +13,25 @@ cache:
     - "$HOME/.npm"
     - "$HOME/.cache"
 
+# Just use yarn commands for now, as this gets more complex lets break out
+# into a shell script
+env:
+  - YARN_COMMAND="install --frozen-lockfile"
+  - YARN_COMMAND="upgrade"
+  - YARN_COMMAND="upgrade && yarn add firebase@canary"
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - env: YARN_COMMAND="upgrade"
+    - env: YARN_COMMAND="upgrade && yarn add firebase@canary"
+
 branches:
   only:
     - master # otherwise pull requests get built twice
 
 install:
-  - yarn install
+  - yarn `echo $YARN_COMMAND`
 
 script:
   - yarn run build
