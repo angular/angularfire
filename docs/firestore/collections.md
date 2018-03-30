@@ -117,7 +117,7 @@ export class AppComponent {
     // Persist a document id
     const id = this.afs.createId();
     const item: Item = { id, name };
-    this.itemsCollection.add(item);
+    this.itemsCollection.doc(id).set(item);
   }
 }
 ```
