@@ -32,6 +32,7 @@ const GLOBALS = {
   'rxjs/operator/take': 'Rx.Observable.prototype',
   'rxjs/operator/toArray': 'Rx.Observable.prototype',
   'rxjs/operator/toPromise': 'Rx.Observable.prototype',
+  'rxjs/add/operator/catch': 'Rx.Observable.prototype',
   'rxjs/add/operator/first': 'Rx.Observable.prototype',
   'rxjs/add/operator/map': 'Rx.Observable.prototype',
   'rxjs/add/operator/scan': 'Rx.Observable.prototype',
