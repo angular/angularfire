@@ -1,16 +1,26 @@
-import { FirebaseFirestore, CollectionReference } from '@firebase/firestore-types';
+import { InjectionToken, NgZone } from '@angular/core';
+import { FirebaseFirestore, CollectionReference, DocumentReference } from '@firebase/firestore-types';
+
 import { Observable } from 'rxjs/Observable';
 import { Subscriber } from 'rxjs/Subscriber';
 import { from } from 'rxjs/observable/from';
+import { of } from 'rxjs/observable/of';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/catch';
 
+import { FirebaseOptions } from '@firebase/app-types';
 import { Injectable, Inject, Optional } from '@angular/core';
-import { FirebaseApp } from 'angularfire2';
 
 import { QueryFn, AssociatedReference } from './interfaces';
 import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
-import { EnablePersistenceToken } from './enable-persistance-token';
+
+import { FirebaseAppConfig, FirebaseAppName, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
+
+/**
+ * The value of this token determines whether or not the firestore will have persistance enabled
+ */
+export const EnablePersistenceToken = new InjectionToken<boolean>('angularfire2.enableFirestorePersistence');
 
 
 /**
@@ -90,6 +100,7 @@ export function associateQuery(collectionRef: CollectionReference, queryFn = ref
 export class AngularFirestore {
   public readonly firestore: FirebaseFirestore;
   public readonly persistenceEnabled$: Observable<boolean>;
+  public readonly scheduler: FirebaseZoneScheduler;
 
   /**
    * Each Feature of AngularFire has a FirebaseApp injected. This way we
@@ -97,35 +108,62 @@ export class AngularFirestore {
    * apps and use multiple apps.
    * @param app
    */
-  constructor(public app: FirebaseApp, @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean) {
-    this.firestore = app.firestore();
+  constructor(
+    @Inject(FirebaseAppConfig) config:FirebaseOptions,
+    @Optional() @Inject(FirebaseAppName) name:string,
+    @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean,
+    zone: NgZone
+  ) {
+    this.scheduler = new FirebaseZoneScheduler(zone);
+    this.firestore = zone.runOutsideAngular(() => {
+      const app = _firebaseAppFactory(config, name);
+      return app.firestore();
+    });
 
-    this.persistenceEnabled$ = shouldEnablePersistence ?
-      from(app.firestore().enablePersistence().then(() => true, () => false)) :
-      from(new Promise((res, rej) => { res(false); }));
+    this.persistenceEnabled$ = zone.runOutsideAngular(() =>
+        shouldEnablePersistence ? from(this.firestore.enablePersistence().then(() => true, () => false))
+                                : of(false)
+      )
+      .catch(() => of(false)); // https://github.com/firebase/firebase-js-sdk/issues/608
   }
 
   /**
-   * Create a reference to a Firestore Collection based on a path and an optional
-   * query function to narrow the result set.
-   * @param path
+   * Create a reference to a Firestore Collection based on a path or
+   * CollectionReference and an optional query function to narrow the result
+   * set.
+   * @param pathOrRef
    * @param queryFn
    */
-  collection<T>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<T> {
-    const collectionRef = this.firestore.collection(path);
+  collection<T>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<T>
+  collection<T>(ref: CollectionReference, queryFn?: QueryFn): AngularFirestoreCollection<T>
+  collection<T>(pathOrRef: string | CollectionReference, queryFn?: QueryFn): AngularFirestoreCollection<T> {
+    let collectionRef: CollectionReference;
+    if (typeof pathOrRef === 'string') {
+      collectionRef = this.firestore.collection(pathOrRef);
+    } else {
+      collectionRef = pathOrRef;
+    }
     const { ref, query } = associateQuery(collectionRef, queryFn);
-    return new AngularFirestoreCollection<T>(ref, query);
+    return new AngularFirestoreCollection<T>(ref, query, this);
   }
 
   /**
-   * Create a reference to a Firestore Document based on a path. Note that documents
-   * are not queryable because they are simply objects. However, documents have
-   * sub-collections that return a Collection reference and can be queried.
-   * @param path
+   * Create a reference to a Firestore Document based on a path or
+   * DocumentReference. Note that documents are not queryable because they are
+   * simply objects. However, documents have sub-collections that return a
+   * Collection reference and can be queried.
+   * @param pathOrRef
    */
-  doc<T>(path: string): AngularFirestoreDocument<T> {
-    const ref = this.firestore.doc(path);
-    return new AngularFirestoreDocument<T>(ref);
+  doc<T>(path: string): AngularFirestoreDocument<T>
+  doc<T>(ref: DocumentReference): AngularFirestoreDocument<T>
+  doc<T>(pathOrRef: string | DocumentReference): AngularFirestoreDocument<T> {
+    let ref: DocumentReference;
+    if (typeof pathOrRef === 'string') {
+      ref = this.firestore.doc(pathOrRef);
+    } else {
+      ref = pathOrRef;
+    }
+    return new AngularFirestoreDocument<T>(ref, this);
   }
 
   /**

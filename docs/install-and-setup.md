@@ -38,7 +38,7 @@ Now that you have a new project setup, install AngularFire and Firebase from npm
 
 ### 4. Add Firebase config to environments variable
 
-Open `/src/environments/environment.ts` and add your Firebase configuration:
+Open `/src/environments/environment.ts` and add your Firebase configuration. You can find your project configuration in [the Firebase Console](https://console.firebase.google.com). From the project overview page, click **Add Firebase to your web app**.
 
 ```ts
 export const environment = {
@@ -57,8 +57,6 @@ export const environment = {
 ### 5. Setup @NgModule for the AngularFireModule
 
 Open `/src/app/app.module.ts`, inject the Firebase providers, and specify your Firebase configuration.
-
-This can be found in your project at [the Firebase Console](https://console.firebase.google.com):
 
 ```ts
 import { BrowserModule } from '@angular/platform-browser';

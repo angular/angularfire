@@ -1,9 +1,7 @@
-
 export const COMMON_CONFIG = {
-  apiKey: "AIzaSyAcDzMU79ou1QE5OvZm4JfpfkM8f2gwPno",
-  authDomain: "day-of.firebaseapp.com",
-  databaseURL: "https://day-of.firebaseio.com",
-  projectId: "day-of",
-  storageBucket: "day-of.appspot.com",
-  messagingSenderId: "131965932953"
+  apiKey: "AIzaSyBVSy3YpkVGiKXbbxeK0qBnu3-MNZ9UIjA",
+  authDomain: "angularfire2-test.firebaseapp.com",
+  databaseURL: "https://angularfire2-test.firebaseio.com",
+  projectId: "angularfire2-test",
+  storageBucket: "angularfire2-test.appspot.com",
 };

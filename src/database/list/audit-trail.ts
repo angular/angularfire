@@ -3,14 +3,14 @@ import { stateChanges } from './state-changes';
 import { Observable } from 'rxjs/Observable';
 import { DataSnapshot } from '@firebase/database-types';
 import { fromRef } from '../observable/fromRef';
-
+import { AngularFireDatabase } from '../database';
 
 import 'rxjs/add/operator/skipWhile';
 import 'rxjs/add/operator/withLatestFrom';
 import 'rxjs/add/operator/map';
 
-export function createAuditTrail(query: DatabaseQuery) {
-  return (events?: ChildEvent[]) => auditTrail(query, events);
+export function createAuditTrail(query: DatabaseQuery, afDatabase: AngularFireDatabase) {
+  return (events?: ChildEvent[]) => afDatabase.scheduler.keepUnstableUntilFirst(auditTrail(query, events));
 }
 
 export function auditTrail(query: DatabaseQuery, events?: ChildEvent[]): Observable<SnapshotAction[]> {

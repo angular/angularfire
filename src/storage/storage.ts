@@ -1,9 +1,12 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, Optional, InjectionToken, NgZone } from '@angular/core';
 import { FirebaseStorage, UploadMetadata } from '@firebase/storage-types';
-import { FirebaseApp } from 'angularfire2';
 import { createStorageRef, AngularFireStorageReference } from './ref';
 import { createUploadTask, AngularFireUploadTask } from './task';
 import { Observable } from 'rxjs/Observable';
+import { FirebaseAppConfig, FirebaseAppName, _firebaseAppFactory } from 'angularfire2';
+import { FirebaseOptions } from '@firebase/app-types';
+
+export const StorageBucket = new InjectionToken<string>('angularfire2.storageBucket');
 
 /**
  * AngularFireStorage Service
@@ -14,20 +17,28 @@ import { Observable } from 'rxjs/Observable';
  */
 @Injectable()
 export class AngularFireStorage {
-  storage: FirebaseStorage;
+  public readonly storage: FirebaseStorage;
 
-    constructor(public app: FirebaseApp) {
-      this.storage = app.storage();
-    }
+  constructor(
+    @Inject(FirebaseAppConfig) config:FirebaseOptions,
+    @Optional() @Inject(FirebaseAppName) name:string,
+    @Optional() @Inject(StorageBucket) storageBucket:string,
+    zone: NgZone
+  ) {
+    this.storage = zone.runOutsideAngular(() => {
+      const app = _firebaseAppFactory(config, name);
+      return app.storage(storageBucket || undefined);
+    });
+  }
 
-    ref(path: string) {
-      return createStorageRef(this.storage.ref(path));
-    }
+  ref(path: string) {
+    return createStorageRef(this.storage.ref(path));
+  }
 
-    upload(path: string, data: any, metadata?: UploadMetadata) {
-      const storageRef = this.storage.ref(path);
-      const ref = createStorageRef(storageRef);
-      return ref.put(data, metadata);
-    }
+  upload(path: string, data: any, metadata?: UploadMetadata) {
+    const storageRef = this.storage.ref(path);
+    const ref = createStorageRef(storageRef);
+    return ref.put(data, metadata);
+  }
 
 }

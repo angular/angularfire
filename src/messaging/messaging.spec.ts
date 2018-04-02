@@ -48,6 +48,4 @@ xdescribe('AngularFireMessaging', () => {
     }, done.fail);
   });
 
-  
-
 });

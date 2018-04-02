@@ -68,7 +68,7 @@ interface DocumentSnapshot {
 There are multiple ways of streaming collection data from Firestore.
 
 ### `valueChanges()`
-**What is it?** - Returns an Observable of document data. All Snapshot metadata is stripped and just the method provides only the data.
+**What is it?** - Returns an Observable of document data. All Snapshot metadata is stripped. This method provides only the data.
 
 **Why would you use it?** - When you just need the object data. No document metadata is attached which makes it simple to render to a view.
 

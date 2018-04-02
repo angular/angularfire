@@ -1,5 +1,6 @@
+import { NgZone } from '@angular/core';
 import * as database from '@firebase/database-types';
-import { ZoneScheduler } from 'angularfire2';
+import { FirebaseZoneScheduler } from 'angularfire2';
 import * as utils from './utils';
 import { AFUnwrappedDataSnapshot } from './interfaces';
 import { FirebaseListObservable } from './firebase_list_observable';
@@ -186,7 +187,8 @@ function firebaseListObservable(ref: database.Reference | DatabaseQuery, {preser
   });
 
   // TODO: should be in the subscription zone instead
-  return observeOn.call(listObs, new ZoneScheduler(Zone.current));
+  return observeOn.call(listObs, new FirebaseZoneScheduler(new NgZone({})));
+
 }
 
 export function onChildAdded(arr:any[], child:any, toKey:(element:any)=>string, prevKey:string): any[] {

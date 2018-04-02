@@ -1,13 +1,12 @@
-import { FirebaseApp as FBApp } from '@firebase/app-types';
 import { Observable } from 'rxjs/Observable'
 import { forkJoin } from 'rxjs/observable/forkJoin';
 import { TestBed, inject } from '@angular/core/testing';
-import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2';
-import { AngularFireStorageModule, AngularFireStorage, AngularFireUploadTask } from 'angularfire2/storage';
+import { FirebaseApp, FirebaseAppConfig, AngularFireModule, FirebaseAppName } from 'angularfire2';
+import { AngularFireStorageModule, AngularFireStorage, AngularFireUploadTask, StorageBucket } from 'angularfire2/storage';
 import { COMMON_CONFIG } from './test-config';
 
 describe('AngularFireStorage', () => {
-  let app: FBApp;
+  let app: FirebaseApp;
   let afStorage: AngularFireStorage;
 
   beforeEach(() => {
@@ -35,6 +34,11 @@ describe('AngularFireStorage', () => {
     expect(afStorage.storage).toBeDefined();
   });
 
+  it('should have an initialized Firebase app', () => {
+    expect(afStorage.storage.app).toBeDefined();
+    expect(afStorage.storage.app).toEqual(app);
+  });
+
   describe('upload task', () => {
 
     it('should upload and delete a file', (done) => {
@@ -54,7 +58,7 @@ describe('AngularFireStorage', () => {
     it('should upload a file and observe the download url', (done) => {
       const data = { angular: "fire" };
       const blob = new Blob([JSON.stringify(data)], { type : 'application/json' });
-      const ref = afStorage.ref('afs.json');
+      const ref = afStorage.ref('af.json');
       const task = ref.put(blob);
       const url$ = task.downloadURL();
       url$.subscribe(
@@ -67,7 +71,7 @@ describe('AngularFireStorage', () => {
     it('should resolve the task as a promise', (done) => {
       const data = { angular: "promise" };
       const blob = new Blob([JSON.stringify(data)], { type : 'application/json' });
-      const ref = afStorage.ref('afs.json');
+      const ref = afStorage.ref('af.json');
       const task: AngularFireUploadTask = ref.put(blob);
       task.then(snap => { 
         expect(snap).toBeDefined(); 
@@ -109,6 +113,79 @@ describe('AngularFireStorage', () => {
         .do(meta => expect(meta.customMetadata).toEqual({ blah: 'blah' }))
         // Delete the file
         .mergeMap(meta => ref.delete())
+        // finish the test
+        .subscribe(done, done.fail);
+    });
+
+  });
+
+});
+
+const FIREBASE_APP_NAME_TOO = (Math.random() + 1).toString(36).substring(7);
+const FIREBASE_STORAGE_BUCKET = 'angularfire2-test2';
+
+describe('AngularFireStorage w/options', () => {
+  let app: FirebaseApp;
+  let afStorage: AngularFireStorage;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireStorageModule
+      ],
+      providers: [
+        { provide: FirebaseAppName, useValue: FIREBASE_APP_NAME_TOO },
+        { provide: FirebaseAppConfig, useValue:  COMMON_CONFIG },
+        { provide: StorageBucket, useValue: FIREBASE_STORAGE_BUCKET }
+      ]
+    });
+    inject([FirebaseApp, AngularFireStorage], (app_: FirebaseApp, _storage: AngularFireStorage) => {
+      app = app_;
+      afStorage = _storage;
+    })();
+  });
+
+  afterEach(done => {
+    app.delete().then(done, done.fail);
+  });
+
+  describe('<constructor>', () => {
+   
+    it('should exist', () => {
+      expect(afStorage instanceof AngularFireStorage).toBe(true);
+    });
+
+    it('should have the Firebase storage instance', () => {
+      expect(afStorage.storage).toBeDefined();
+    });
+
+    it('should have an initialized Firebase app', () => {
+      expect(afStorage.storage.app).toBeDefined();
+      expect(afStorage.storage.app).toEqual(app);
+    });
+
+    it('should be hooked up the right app', () => {
+      expect(afStorage.storage.app.name).toEqual(FIREBASE_APP_NAME_TOO);
+    });
+
+    it('storage be pointing towards a different bucket', () => {
+      expect(afStorage.storage.ref().toString()).toEqual( `gs://${FIREBASE_STORAGE_BUCKET}/`);
+    });
+
+    it('it should upload, download, and delete', (done) => {
+      const data = { angular: "fire" };
+      const blob = new Blob([JSON.stringify(data)], { type : 'application/json' });
+      const ref = afStorage.ref('af.json');
+      const task = ref.put(blob);
+      // Wait for the upload
+      const sub = forkJoin(task.snapshotChanges())
+        // get the url download
+        .mergeMap(() => ref.getDownloadURL())
+        // assert the URL
+        .do(url => expect(url).toMatch(new RegExp(`https:\\/\\/firebasestorage\\.googleapis\\.com\\/v0\\/b\\/${FIREBASE_STORAGE_BUCKET}\\/o\\/af\\.json`)))
+        // Delete the file
+        .mergeMap(url => ref.delete())
         // finish the test
         .subscribe(done, done.fail);
     });

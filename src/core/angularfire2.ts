@@ -1,53 +1,42 @@
-import { FirebaseAppConfigToken, FirebaseApp, _firebaseAppFactory } from './firebase.app.module';
-import { Injectable, InjectionToken, NgModule } from '@angular/core';
+import { InjectionToken, NgZone } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
-import { Scheduler } from 'rxjs/Scheduler';
+import { Observable } from 'rxjs/Observable';
 import { queue } from 'rxjs/scheduler/queue';
 
-export interface FirebaseAppConfig {
-  apiKey?: string;
-  authDomain?: string;
-  databaseURL?: string;
-  storageBucket?: string;
-  messagingSenderId?: string;
-  projectId?: string;
-}
+import firebase from '@firebase/app';
+import { FirebaseApp, FirebaseOptions } from '@firebase/app-types';
 
-const FirebaseAppName = new InjectionToken<string>('FirebaseAppName');
+import 'zone.js';
+import 'rxjs/add/operator/first';
+import { Subscriber } from 'rxjs/Subscriber';
+import { observeOn } from 'rxjs/operator/observeOn';
 
-export const FirebaseAppProvider = {
-  provide: FirebaseApp,
-  useFactory: _firebaseAppFactory,
-  deps: [ FirebaseAppConfigToken, FirebaseAppName ]
-};
+export const FirebaseAppName = new InjectionToken<string>('angularfire2.appName');
+export const FirebaseAppConfig = new InjectionToken<FirebaseOptions>('angularfire2.config');
 
-@NgModule({
-  providers: [ FirebaseAppProvider ],
-})
-export class AngularFireModule {
-  static initializeApp(config: FirebaseAppConfig, appName?: string) {
-    return {
-      ngModule: AngularFireModule,
-      providers: [
-        { provide: FirebaseAppConfigToken, useValue: config },
-        { provide: FirebaseAppName, useValue: appName }
-      ]
-    }
-  }
-}
+// Put in database.ts when we drop database-depreciated
+export const RealtimeDatabaseURL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
 
-/**
- * TODO: remove this scheduler once Rx has a more robust story for working
- * with zones.
- */
-export class ZoneScheduler {
-
-  // TODO: Correctly add ambient zone typings instead of using any.
-  constructor(public zone: any) {}
-
+export class FirebaseZoneScheduler {
+  constructor(public zone: NgZone) {}
   schedule(...args: any[]): Subscription {
-    return <Subscription>this.zone.run(() => queue.schedule.apply(queue, args));
+    return <Subscription>this.zone.runGuarded(function() { return queue.schedule.apply(queue, args)});
+  }
+  // TODO this is a hack, clean it up
+  keepUnstableUntilFirst<T>(obs$: Observable<T>) {
+    return new Observable<T>(subscriber => {
+      const noop = () => {};
+      const task = Zone.current.scheduleMacroTask('firebaseZoneBlock', noop, {}, noop, noop);
+      obs$.first().subscribe(() => this.zone.runOutsideAngular(() => task.invoke()));
+      return obs$.subscribe(subscriber);
+    });
+  }
+  runOutsideAngular<T>(obs$: Observable<T>): Observable<T> {
+    const outsideAngular = new Observable<T>(subscriber => {
+      return this.zone.runOutsideAngular(() => {
+        return obs$.subscribe(subscriber);
+      });
+    });
+    return observeOn.call(outsideAngular, this);
   }
 }
-
-export { FirebaseApp, FirebaseAppName, FirebaseAppConfigToken };

@@ -25,7 +25,7 @@ describe('angularfire', () => {
 
     inject([FirebaseApp, PlatformRef], (_app: FirebaseApp, _platform: PlatformRef) => {
       app = _app;
-      rootRef = app.database().ref();
+      rootRef = app.database!().ref();
       questionsRef = rootRef.child('questions');
       listOfQuestionsRef = rootRef.child('list-of-questions');
       defaultPlatform = _platform;
