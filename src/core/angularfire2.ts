@@ -17,6 +17,8 @@ export const FirebaseAppConfig = new InjectionToken<FirebaseOptions>('angularfir
 // Put in database.ts when we drop database-depreciated
 export const RealtimeDatabaseURL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
 
+export const UniversalDatabaseTransferStateKeyPrefix = new InjectionToken<string>('angularfire2.dbTransferStateKey');
+
 export class FirebaseZoneScheduler {
   constructor(public zone: NgZone) {}
   schedule(...args: any[]): Subscription {
