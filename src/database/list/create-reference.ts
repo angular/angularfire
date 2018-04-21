@@ -6,7 +6,7 @@ import { createDataOperationMethod } from './data-operation';
 import { createRemoveMethod } from './remove';
 import { AngularFireDatabase } from '../database';
 
-export function createListReference<T>(query: DatabaseQuery, afDatabase: AngularFireDatabase): AngularFireList<T> {
+export function createListReference<T>(query: DatabaseQuery, afDatabase: AngularFireDatabase, ssrCached?: T[]): AngularFireList<T> {
   return {
     query,
     update: createDataOperationMethod<Partial<T>>(query.ref, 'update'),

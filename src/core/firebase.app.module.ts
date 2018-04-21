@@ -1,6 +1,6 @@
 import { InjectionToken, NgZone, NgModule } from '@angular/core';
 
-import { FirebaseAppConfig, FirebaseAppName } from './angularfire2';
+import { FirebaseAppConfig, FirebaseAppName, UniversalDatabaseTransferStateKeyPrefix } from './angularfire2';
 
 import firebase from '@firebase/app';
 import { FirebaseApp as _FirebaseApp, FirebaseOptions } from '@firebase/app-types';
@@ -43,7 +43,8 @@ export class AngularFireModule {
             ngModule: AngularFireModule,
             providers: [
                 { provide: FirebaseAppConfig, useValue: config },
-                { provide: FirebaseAppName, useValue: appName }
+                { provide: FirebaseAppName, useValue: appName },
+                { provide: UniversalDatabaseTransferStateKeyPrefix, useValue: 'RTDB' }
             ]
         }
     }
