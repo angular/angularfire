@@ -12,6 +12,7 @@ import { FirebaseFirestore } from '@firebase/firestore-types';
 
 export class FirebaseApp implements _FirebaseApp {
     name: string;
+    automaticDataCollectionEnabled: boolean;
     options: {};
     auth: () => FirebaseAuth;
     database: (databaseURL?: string) => FirebaseDatabase;
