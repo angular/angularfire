@@ -47,7 +47,7 @@
     "@firebase/storage-types": "^0.1.1",
     "bufferutil": "^3.0.3",
     "firebase": "^4.8.2",
-    "rxjs": "^5.5.4",
+    "rxjs": "^6.0.0",
     "utf-8-validate": "^4.0.0",
     "ws": "^3.3.2",
     "xmlhttprequest": "^1.8.0",
