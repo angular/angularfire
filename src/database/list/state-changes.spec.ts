@@ -1,9 +1,11 @@
+
+import {skip} from 'rxjs/operators';
 import { Reference } from '@firebase/database-types';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2';
 import { AngularFireDatabase, AngularFireDatabaseModule, stateChanges, ChildEvent } from 'angularfire2/database';
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../test-config';
-import 'rxjs/add/operator/skip';
+
 
 // generate random string to test fidelity of naming
 const rando = () => (Math.random() + 1).toString(36).substring(7);
@@ -47,7 +49,7 @@ describe('stateChanges', () => {
     aref.set(batch);
     const changes = stateChanges(aref, events);
     return {
-      changes: changes.skip(skip),
+      changes: changes.pipe(skip(skip)),
       ref: aref
     };
   }

@@ -1,3 +1,5 @@
+
+import {map} from 'rxjs/operators';
 import { DatabaseQuery, AngularFireList, ChildEvent } from '../interfaces';
 import { snapshotChanges } from './snapshot-changes';
 import { createStateChanges } from './state-changes';
@@ -21,8 +23,8 @@ export function createListReference<T>(query: DatabaseQuery, afDatabase: Angular
     auditTrail: createAuditTrail(query, afDatabase),
     valueChanges<T>(events?: ChildEvent[]) { 
       const snapshotChanges$ = snapshotChanges(query, events);
-      return afDatabase.scheduler.keepUnstableUntilFirst(snapshotChanges$)
-        .map(actions => actions.map(a => a.payload.val())); 
+      return afDatabase.scheduler.keepUnstableUntilFirst(snapshotChanges$).pipe(
+        map(actions => actions.map(a => a.payload.val()))); 
     }
   }
 }

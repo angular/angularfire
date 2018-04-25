@@ -1,5 +1,5 @@
 import { Reference, DataSnapshot, ThenableReference, Query } from '@firebase/database-types';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 export type FirebaseOperation = string | Reference | DataSnapshot;
 

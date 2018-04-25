@@ -1,10 +1,11 @@
+
+import {map, share} from 'rxjs/operators';
 import { DocumentReference, Query, QuerySnapshot, DocumentSnapshot } from '@firebase/firestore-types';
-import { Observable } from 'rxjs/Observable';
-import { Subscriber } from 'rxjs/Subscriber';
+import { Observable ,  Subscriber } from 'rxjs';
 import { Action, Reference } from '../interfaces';
 
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/share';
+
+
 
 function _fromRef<T, R>(ref: Reference<T>): Observable<R> {
   return new Observable(subscriber => {
@@ -14,14 +15,14 @@ function _fromRef<T, R>(ref: Reference<T>): Observable<R> {
 }
 
 export function fromRef<R>(ref: DocumentReference | Query) {
-  return _fromRef<typeof ref, R>(ref).share();
+  return _fromRef<typeof ref, R>(ref).pipe(share());
 }
 
 export function fromDocRef(ref: DocumentReference): Observable<Action<DocumentSnapshot>>{
-  return fromRef<DocumentSnapshot>(ref)
-    .map(payload => ({ payload, type: 'value' }));
+  return fromRef<DocumentSnapshot>(ref).pipe(
+    map(payload => ({ payload, type: 'value' })));
 }
 
 export function fromCollectionRef(ref: Query): Observable<Action<QuerySnapshot>> {
-  return fromRef<QuerySnapshot>(ref).map(payload => ({ payload, type: 'query' }))
+  return fromRef<QuerySnapshot>(ref).pipe(map(payload => ({ payload, type: 'query' })))
 }

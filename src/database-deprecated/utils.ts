@@ -1,6 +1,5 @@
 import { DataSnapshot, FirebaseDatabase } from '@firebase/database-types';
-import { Subscription } from 'rxjs/Subscription';
-import { Scheduler } from 'rxjs/Scheduler';
+import { Subscription ,  Scheduler } from 'rxjs';
 import { queue } from 'rxjs/scheduler/queue';
 import { AFUnwrappedDataSnapshot, PathReference, DatabaseReference } from './interfaces';
 

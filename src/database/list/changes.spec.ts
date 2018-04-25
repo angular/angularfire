@@ -1,9 +1,11 @@
+
+import {skip} from 'rxjs/operators';
 import { Reference } from '@firebase/database-types';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2';
 import { AngularFireDatabase, AngularFireDatabaseModule, listChanges } from 'angularfire2/database';
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../test-config';
-import 'rxjs/add/operator/skip';
+
 
 // generate random string to test fidelity of naming
 const rando = () => (Math.random() + 1).toString(36).substring(7);
@@ -56,7 +58,7 @@ describe('listChanges', () => {
     it('should process a new child_added event', done => {
       const aref = ref(rando());
       const obs = listChanges(aref, ['child_added']);
-      const sub = obs.skip(1).take(1).subscribe(changes => {
+      const sub = obs.pipe(skip(1)).take(1).subscribe(changes => {
         const data = changes.map(change => change.payload.val());
         expect(data[3]).toEqual({ name: 'anotha one' });
       }).add(done);
@@ -79,7 +81,7 @@ describe('listChanges', () => {
     it('should stream in order events w/child_added', (done) => {
       const aref = ref(rando());
       const obs = listChanges(aref.orderByChild('name'), ['child_added']);
-      const sub = obs.skip(1).take(1).subscribe(changes => {
+      const sub = obs.pipe(skip(1)).take(1).subscribe(changes => {
         const names = changes.map(change => change.payload.val().name);
         expect(names[0]).toEqual('anotha one');
         expect(names[1]).toEqual('one');
@@ -93,7 +95,7 @@ describe('listChanges', () => {
     it('should stream events filtering', (done) => {
       const aref = ref(rando());
       const obs = listChanges(aref.orderByChild('name').equalTo('zero'), ['child_added']);
-      obs.skip(1).take(1).subscribe(changes => {
+      obs.pipe(skip(1)).take(1).subscribe(changes => {
         const names = changes.map(change => change.payload.val().name);
         expect(names[0]).toEqual('zero');
         expect(names[1]).toEqual('zero');
@@ -105,7 +107,7 @@ describe('listChanges', () => {
     it('should process a new child_removed event', done => {
       const aref = ref(rando());
       const obs = listChanges(aref, ['child_added','child_removed']);
-      const sub = obs.skip(1).take(1).subscribe(changes => {
+      const sub = obs.pipe(skip(1)).take(1).subscribe(changes => {
         const data = changes.map(change => change.payload.val());
         expect(data.length).toEqual(items.length - 1);
       }).add(done);
@@ -118,7 +120,7 @@ describe('listChanges', () => {
     it('should process a new child_changed event', (done) => {
       const aref = ref(rando());
       const obs = listChanges(aref, ['child_added','child_changed'])
-      const sub = obs.skip(1).take(1).subscribe(changes => {
+      const sub = obs.pipe(skip(1)).take(1).subscribe(changes => {
         const data = changes.map(change => change.payload.val());
         expect(data[1].name).toEqual('lol');
       }).add(done);
@@ -131,7 +133,7 @@ describe('listChanges', () => {
     it('should process a new child_moved event', (done) => {
       const aref = ref(rando());
       const obs = listChanges(aref, ['child_added','child_moved'])
-      const sub = obs.skip(1).take(1).subscribe(changes => {
+      const sub = obs.pipe(skip(1)).take(1).subscribe(changes => {
         const data = changes.map(change => change.payload.val());
         // We moved the first item to the last item, so we check that
         // the new result is now the last result

@@ -1,10 +1,12 @@
+
+import {share, delay, map} from 'rxjs/operators';
 import { DatabaseQuery, DatabaseSnapshot, ListenEvent, AngularFireAction } from '../interfaces';
-import { Observable } from 'rxjs/Observable';
-import { observeOn } from 'rxjs/operator/observeOn';
+import { Observable } from 'rxjs';
+
 import { FirebaseZoneScheduler } from 'angularfire2';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/delay';
-import 'rxjs/add/operator/share';
+
+
+
 
 interface SnapshotPrevKey {
   snapshot: DatabaseSnapshot;
@@ -27,16 +29,16 @@ export function fromRef(ref: DatabaseQuery, event: ListenEvent, listenType = 'on
     } else {
       return { unsubscribe() { } };
     }
-  })
-  .map((payload: SnapshotPrevKey) =>  {
+  }).pipe(
+  map((payload: SnapshotPrevKey) =>  {
     const { snapshot, prevKey } = payload;
     let key: string | null = null;
     if (snapshot.exists()) { key = snapshot.key; }
     return { type: event, payload: snapshot, prevKey, key };
-  })
+  }),
   // Ensures subscribe on observable is async. This handles
   // a quirk in the SDK where on/once callbacks can happen
   // synchronously.
-  .delay(0)
-  .share();
+  delay(0),
+  share(),);
 }

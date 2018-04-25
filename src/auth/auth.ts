@@ -1,14 +1,17 @@
+
+import {of as observableOf, from as observableFrom,  Observable } from 'rxjs';
+
+import {switchMap} from 'rxjs/operators';
 import { FirebaseAuth, User } from '@firebase/auth-types';
 import { FirebaseOptions } from '@firebase/app-types';
 import { Injectable, Inject, Optional, NgZone } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { observeOn } from 'rxjs/operator/observeOn';
+
 
 import { FirebaseAppConfig, FirebaseAppName, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
 
-import 'rxjs/add/operator/switchMap';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/observable/fromPromise';
+
+
+
 
 @Injectable()
 export class AngularFireAuth {
@@ -55,9 +58,9 @@ export class AngularFireAuth {
           return { unsubscribe };
         })
       )
-    ).switchMap((user:User|null) => {
-      return user ? Observable.fromPromise(user.getIdToken()) : Observable.of(null)
-    });
+    ).pipe(switchMap((user:User|null) => {
+      return user ? observableFrom(user.getIdToken()) : observableOf(null)
+    }));
 
   }
 

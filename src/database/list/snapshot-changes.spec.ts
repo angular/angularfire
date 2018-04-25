@@ -1,10 +1,12 @@
+
+import {skip} from 'rxjs/operators';
 import { Reference } from '@firebase/database-types';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2';
 import { AngularFireDatabase, AngularFireDatabaseModule, snapshotChanges, ChildEvent } from 'angularfire2/database';
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../test-config';
-import 'rxjs/add/operator/skip';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+
+import { BehaviorSubject } from 'rxjs';
 
 // generate random string to test fidelity of naming
 const rando = () => (Math.random() + 1).toString(36).substring(7);
@@ -47,7 +49,7 @@ describe('snapshotChanges', () => {
     const aref = createRef(rando());
     const snapChanges = snapshotChanges(aref, events);
     return {
-      snapChanges: snapChanges.skip(skip),
+      snapChanges: snapChanges.pipe(skip(skip)),
       ref: aref
     };
   }
