@@ -48,6 +48,7 @@
     "bufferutil": "^3.0.3",
     "firebase": "^4.8.2",
     "rxjs": "^6.0.0",
+    "rxjs-compat": "^6.0.0",
     "utf-8-validate": "^4.0.0",
     "ws": "^3.3.2",
     "xmlhttprequest": "^1.8.0",
