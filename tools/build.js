@@ -1,6 +1,7 @@
 const { rollup } = require('rollup');
 const { spawn } = require('child_process');
-const { Observable } = require('rxjs');
+const { Observable, from, forkJoin } = require('rxjs');
+const { switchMap, switchMapTo, tap } = require('rxjs/operators');
 const { copy, readFileSync, writeFile, statSync } = require('fs-extra');
 const { prettySize } = require('pretty-size');
 const gzipSize = require('gzip-size');
@@ -180,7 +181,7 @@ function generateBundle(entry, { dest, globals, moduleName }) {
 
 function createFirebaseBundles(featurePaths, globals) {
   return Object.keys(featurePaths).map(feature => {
-    return generateBundle(featurePaths[feature], { 
+    return generateBundle(featurePaths[feature], {
       dest: `${process.cwd()}/dist/bundles/${feature}.js`,
       globals,
       moduleName: `firebase.${feature}`
@@ -323,10 +324,10 @@ function buildModule(name, globals) {
   const es2015$ = spawnObservable(NGC, TSC_ARGS(name));
   const esm$ = spawnObservable(NGC, TSC_ARGS(name, 'esm'));
   const test$ = spawnObservable(TSC, TSC_ARGS(name, 'test'));
-  return Observable
-    .forkJoin(es2015$, esm$, test$)
-    .switchMap(() => Observable.from(createUmd(name, globals)))
-    .switchMap(() => replaceVersionsObservable(name, VERSIONS));
+  return forkJoin(es2015$, esm$, test$).pipe(
+    switchMap(() => from(createUmd(name, globals))),
+    switchMap(() => replaceVersionsObservable(name, VERSIONS))
+  );
 }
 
 /**
@@ -340,26 +341,25 @@ function buildModules(globals) {
   const firestore$ = buildModule('firestore', globals);
   const storage$ = buildModule('storage', globals);
   const dbdep$ = buildModule('database-deprecated', globals);
-  return Observable
-    .forkJoin(core$, Observable.from(copyRootTest()))
-    .switchMapTo(auth$)
-    .switchMapTo(db$)
-    .switchMapTo(firestore$)
-    .switchMapTo(storage$)
-    .switchMapTo(dbdep$);
+  return forkJoin(core$, from(copyRootTest())).pipe(
+    switchMapTo(auth$),
+    switchMapTo(db$),
+    switchMapTo(firestore$),
+    switchMapTo(storage$),
+    switchMapTo(dbdep$)
+  );
 }
 
 function buildLibrary(globals) {
   const modules$ = buildModules(globals);
-  return Observable
-    .forkJoin(modules$)
-    .switchMap(() => Observable.from(createTestUmd(globals)))
-    .switchMap(() => Observable.from(copyNpmIgnore()))
-    .switchMap(() => Observable.from(copyReadme()))
-    .switchMap(() => Observable.from(copyDocs()))
-    .switchMap(() => Observable.from(copyNodeFixes()))
-    .switchMap(() => replaceVersionsObservable('firebase-node', VERSIONS))
-    .do(() => {
+  return forkJoin(modules$).pipe(
+    switchMap(() => from(createTestUmd(globals))),
+    switchMap(() => from(copyNpmIgnore())),
+    switchMap(() => from(copyReadme())),
+    switchMap(() => from(copyDocs())),
+    switchMap(() => from(copyNodeFixes())),
+    switchMap(() => replaceVersionsObservable('firebase-node', VERSIONS)),
+    tap(() => {
       const coreStats = measure('core');
       const authStats = measure('auth');
       const dbStats = measure('database');
@@ -375,7 +375,7 @@ function buildLibrary(globals) {
       database-deprecated.umd.js - ${dbdepStats.size}, ${dbdepStats.gzip}
       `);
       verifyVersions();
-    });
+    }));
 }
 
 buildLibrary(GLOBALS).subscribe(
