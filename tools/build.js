@@ -1,6 +1,7 @@
 const { rollup } = require('rollup');
 const { spawn } = require('child_process');
-const { Observable } = require('rxjs');
+const { Observable, from, forkJoin } = require('rxjs');
+const { switchMap, switchMapTo, tap } = require('rxjs/operators');
 const { copy, readFileSync, writeFile, statSync } = require('fs-extra');
 const { prettySize } = require('pretty-size');
 const gzipSize = require('gzip-size');
@@ -9,50 +10,8 @@ const pkg = require(`${process.cwd()}/package.json`);
 
 // Rollup globals
 const GLOBALS = {
-  'rxjs': 'Rx',
-  'rxjs/Observable': 'Rx',
-  'rxjs/Subject': 'Rx',
-  'rxjs/Observer': 'Rx',
-  'rxjs/Subscription': 'Rx',
-  'rxjs/BehaviorSubject': 'Rx',
-  'rxjs/observable/merge': 'Rx.Observable',
-  'rxjs/operator/share': 'Rx.Observable.prototype',
-  'rxjs/operator/observeOn': 'Rx.Observable.prototype',
-  'rxjs/observable/of': 'Rx.Observable.prototype',
-  'rxjs/operator/combineLatest': 'Rx.Observable.prototype',
-  'rxjs/operator/merge': 'Rx.Observable.prototype',
-  'rxjs/operator/map': 'Rx.Observable.prototype',
-  'rxjs/operators': 'Rx.operators',
-  'rxjs/observable/of': 'Rx.Observable',
-  'rxjs/observable/forkJoin': 'Rx.Observable',
-  'rxjs/operator/auditTime': 'Rx.Observable.prototype',
-  'rxjs/operator/switchMap': 'Rx.Observable.prototype',
-  'rxjs/operator/do': 'Rx.Observable.prototype',
-  'rxjs/operator/skip': 'Rx.Observable.prototype',
-  'rxjs/operator/take': 'Rx.Observable.prototype',
-  'rxjs/operator/toArray': 'Rx.Observable.prototype',
-  'rxjs/operator/toPromise': 'Rx.Observable.prototype',
-  'rxjs/add/operator/catch': 'Rx.Observable.prototype',
-  'rxjs/add/operator/first': 'Rx.Observable.prototype',
-  'rxjs/add/operator/map': 'Rx.Observable.prototype',
-  'rxjs/add/operator/scan': 'Rx.Observable.prototype',
-  'rxjs/add/operator/skip': 'Rx.Observable.prototype',
-  'rxjs/add/operator/do': 'Rx.Observable.prototype',
-  'rxjs/add/operator/distinctUntilChanged': 'Rx.Observable.prototype',
-  'rxjs/add/operator/filter': 'Rx.Observable.prototype',
-  'rxjs/add/operator/skipUntil': 'Rx.Observable.prototype',
-  'rxjs/add/operator/skipWhile': 'Rx.Observable.prototype',
-  'rxjs/add/operator/withLatestFrom': 'Rx.Observable.prototype',
-  'rxjs/add/operator/switchMap': 'Rx.Observable.prototype',
-  'rxjs/add/observable/merge': 'Rx.Observable',
-  'rxjs/add/observable/of': 'Rx.Observable.prototype',
-  'rxjs/add/observable/fromPromise': 'Rx.Observable.prototype',
-  'rxjs/add/operator/delay': 'Rx.Observable',
-  'rxjs/add/operator/debounce': 'Rx.Observable',
-  'rxjs/add/operator/share': 'Rx.Observable',
-  'rxjs/observable/fromEvent': 'Rx.Observable',
-  'rxjs/observable/from': 'Rx.Observable',
-  'rxjs/operator': 'Rx.Observable.prototype',
+  'rxjs': 'rxjs',
+  'rxjs/operators': 'rxjs',
   '@angular/core': 'ng.core',
   '@angular/compiler': 'ng.compiler',
   '@angular/platform-browser': 'ng.platformBrowser',
@@ -68,7 +27,7 @@ const GLOBALS = {
   '@firebase/storage': 'firebase',
   '@firebase/util': 'firebase',
   '@firebase/webchannel-wrapper': 'firebase',
-  'rxjs/scheduler/queue': 'Rx.Scheduler',
+  'rxjs/scheduler/queue': 'rxjs.Scheduler',
   '@angular/core/testing': 'ng.core.testing',
   'angularfire2': 'angularfire2',
   'angularfire2/auth': 'angularfire2.auth',
@@ -180,7 +139,7 @@ function generateBundle(entry, { dest, globals, moduleName }) {
 
 function createFirebaseBundles(featurePaths, globals) {
   return Object.keys(featurePaths).map(feature => {
-    return generateBundle(featurePaths[feature], { 
+    return generateBundle(featurePaths[feature], {
       dest: `${process.cwd()}/dist/bundles/${feature}.js`,
       globals,
       moduleName: `firebase.${feature}`
@@ -323,10 +282,10 @@ function buildModule(name, globals) {
   const es2015$ = spawnObservable(NGC, TSC_ARGS(name));
   const esm$ = spawnObservable(NGC, TSC_ARGS(name, 'esm'));
   const test$ = spawnObservable(TSC, TSC_ARGS(name, 'test'));
-  return Observable
-    .forkJoin(es2015$, esm$, test$)
-    .switchMap(() => Observable.from(createUmd(name, globals)))
-    .switchMap(() => replaceVersionsObservable(name, VERSIONS));
+  return forkJoin(es2015$, esm$, test$).pipe(
+    switchMap(() => from(createUmd(name, globals))),
+    switchMap(() => replaceVersionsObservable(name, VERSIONS))
+  );
 }
 
 /**
@@ -340,26 +299,25 @@ function buildModules(globals) {
   const firestore$ = buildModule('firestore', globals);
   const storage$ = buildModule('storage', globals);
   const dbdep$ = buildModule('database-deprecated', globals);
-  return Observable
-    .forkJoin(core$, Observable.from(copyRootTest()))
-    .switchMapTo(auth$)
-    .switchMapTo(db$)
-    .switchMapTo(firestore$)
-    .switchMapTo(storage$)
-    .switchMapTo(dbdep$);
+  return forkJoin(core$, from(copyRootTest())).pipe(
+    switchMapTo(auth$),
+    switchMapTo(db$),
+    switchMapTo(firestore$),
+    switchMapTo(storage$),
+    switchMapTo(dbdep$)
+  );
 }
 
 function buildLibrary(globals) {
   const modules$ = buildModules(globals);
-  return Observable
-    .forkJoin(modules$)
-    .switchMap(() => Observable.from(createTestUmd(globals)))
-    .switchMap(() => Observable.from(copyNpmIgnore()))
-    .switchMap(() => Observable.from(copyReadme()))
-    .switchMap(() => Observable.from(copyDocs()))
-    .switchMap(() => Observable.from(copyNodeFixes()))
-    .switchMap(() => replaceVersionsObservable('firebase-node', VERSIONS))
-    .do(() => {
+  return forkJoin(modules$).pipe(
+    switchMap(() => from(createTestUmd(globals))),
+    switchMap(() => from(copyNpmIgnore())),
+    switchMap(() => from(copyReadme())),
+    switchMap(() => from(copyDocs())),
+    switchMap(() => from(copyNodeFixes())),
+    switchMap(() => replaceVersionsObservable('firebase-node', VERSIONS)),
+    tap(() => {
       const coreStats = measure('core');
       const authStats = measure('auth');
       const dbStats = measure('database');
@@ -375,7 +333,7 @@ function buildLibrary(globals) {
       database-deprecated.umd.js - ${dbdepStats.size}, ${dbdepStats.gzip}
       `);
       verifyVersions();
-    });
+    }));
 }
 
 buildLibrary(GLOBALS).subscribe(

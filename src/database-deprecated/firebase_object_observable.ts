@@ -1,7 +1,4 @@
-import { Observable } from 'rxjs/Observable';
-import { Operator } from 'rxjs/Operator';
-import { Subscriber } from 'rxjs/Subscriber';
-import { Subscription } from 'rxjs/Subscription';
+import { Observable ,  Operator ,  Subscriber ,  Subscription } from 'rxjs';
 import { Reference } from '@firebase/database-types';
 
 export class FirebaseObjectObservable<T> extends Observable<T> {

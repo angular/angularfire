@@ -1,7 +1,6 @@
 import { SettableMetadata, UploadMetadata, Reference, StringFormat } from '@firebase/storage-types';
 import { createUploadTask, AngularFireUploadTask } from './task';
-import { Observable } from 'rxjs/Observable';
-import { from } from 'rxjs/observable/from';
+import { Observable ,  from } from 'rxjs';
 import { FirebaseZoneScheduler } from 'angularfire2';
 
 export interface AngularFireStorageReference {

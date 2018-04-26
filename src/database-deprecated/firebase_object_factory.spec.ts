@@ -1,3 +1,5 @@
+
+import {filter} from 'rxjs/operators';
 import { FirebaseApp as FBApp } from '@firebase/app-types';
 import { Reference } from '@firebase/database-types';
 import { Subscription } from 'rxjs';
@@ -132,8 +134,8 @@ describe('FirebaseObjectFactory', () => {
       })
       .run(() => {
         // Creating a new observable so that the current zone is captured.
-        subscription = FirebaseObjectFactory(app.database().ref(`questions/${i}`))
-          .filter(d => d.$value === 'in-the-zone')
+        subscription = FirebaseObjectFactory(app.database().ref(`questions/${i}`)).pipe(
+          filter(d => d.$value === 'in-the-zone'))
           .subscribe(data => {
             expect(Zone.current.name).toBe('newZone');
             done();

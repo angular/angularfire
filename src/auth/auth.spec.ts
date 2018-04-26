@@ -1,12 +1,10 @@
 import { User } from '@firebase/auth-types';
 import { ReflectiveInjector, Provider } from '@angular/core';
-import { Observable } from 'rxjs/Observable'
-import { Subject } from 'rxjs/Subject'
-import { Observer } from 'rxjs/Observer';
+import { Observable ,  Subject ,  Observer } from 'rxjs'
 import { TestBed, inject } from '@angular/core/testing';
-import { _do } from 'rxjs/operator/do';
-import { take } from 'rxjs/operator/take';
-import { skip } from 'rxjs/operator/skip';
+
+
+
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule, FirebaseAppName } from 'angularfire2';
 import { AngularFireAuth, AngularFireAuthModule } from 'angularfire2/auth';
 import { COMMON_CONFIG } from './test-config';

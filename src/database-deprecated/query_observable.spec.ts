@@ -1,6 +1,4 @@
-import { Observable } from 'rxjs/Observable';
-import { Observer } from 'rxjs/Observer';
-import { Subject } from 'rxjs/Subject';
+import { Observable ,  Observer ,  Subject } from 'rxjs';
 import { Query, ScalarQuery } from './interfaces';
 import { getOrderObservables, observeQuery } from 'angularfire2/database-deprecated';
 

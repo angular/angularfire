@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { Reference, DataSnapshot, Query } from '@firebase/database-types';
 
 export interface FirebaseOperationCases {

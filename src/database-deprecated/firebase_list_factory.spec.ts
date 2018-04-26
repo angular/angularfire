@@ -1,3 +1,5 @@
+
+import {skip, filter} from 'rxjs/operators';
 import { DataSnapshot } from '@firebase/database-types';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule} from 'angularfire2';
 import { AngularFireDatabase, AngularFireDatabaseModule, FirebaseListObservable,
@@ -9,12 +11,12 @@ import * as utils from './utils';
 import { Query, AFUnwrappedDataSnapshot } from './interfaces';
 import { Subscription, Observable, Subject } from 'rxjs';
 import { COMMON_CONFIG } from './test-config';
-import { _do } from 'rxjs/operator/do';
-import { map } from 'rxjs/operator/map';
-import { skip } from 'rxjs/operator/skip';
-import { take } from 'rxjs/operator/take';
-import { toArray } from 'rxjs/operator/toArray';
-import { toPromise } from 'rxjs/operator/toPromise';
+
+
+
+
+
+
 
 const questionsPath = 'questions';
 
@@ -682,10 +684,10 @@ describe('FirebaseListFactory', () => {
       })
       .run(() => {
         // Creating a new observable so that the current zone is captured.
-        subscription = FirebaseListFactory(app.database().ref(`questions`))
-          .filter(d => d
+        subscription = FirebaseListFactory(app.database().ref(`questions`)).pipe(
+          filter(d => d
             .map((v: any) => v.$value)
-            .indexOf('in-the-zone') > -1)
+            .indexOf('in-the-zone') > -1))
           .subscribe(data => {
             expect(Zone.current.name).toBe('newZone');
             done();
@@ -709,8 +711,8 @@ describe('FirebaseListFactory', () => {
       let keyToRemove: string;
 
       afterEach((done: any) => {
-        subscription = questions
-          .skip(2)
+        subscription = questions.pipe(
+          skip(2))
           .take(1)
           .subscribe((items: any[]) => {
             expect(items.length).toBe(3);
