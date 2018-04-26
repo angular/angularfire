@@ -5,6 +5,7 @@ import * as utils from './utils';
 import { AFUnwrappedDataSnapshot } from './interfaces';
 import { FirebaseListObservable } from './firebase_list_observable';
 import { Observer } from 'rxjs';
+import { switchMap, map, observeOn } from 'rxjs/operators';
 
 import { observeQuery } from './query_observable';
 import { Query, FirebaseListFactoryOpts, DatabaseReference, DatabaseQuery, DatabaseSnapshot } from './interfaces';

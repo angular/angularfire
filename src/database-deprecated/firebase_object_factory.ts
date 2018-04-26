@@ -2,6 +2,7 @@ import { NgZone } from '@angular/core';
 import { FirebaseObjectObservable } from './firebase_object_observable';
 import { FirebaseZoneScheduler } from 'angularfire2';
 import { Observer } from 'rxjs';
+import { observeOn } from 'rxjs/operators';
 
 import { DataSnapshot } from '@firebase/database-types';
 import * as utils from './utils';

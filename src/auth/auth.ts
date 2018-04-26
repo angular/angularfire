@@ -58,7 +58,7 @@ export class AngularFireAuth {
           return { unsubscribe };
         })
       )
-    ).pipe(switchMap((user:User|null) => {
+    ).pipe(switchMap((user:User) => {
       return user ? observableFrom(user.getIdToken()) : observableOf(null)
     }));
 

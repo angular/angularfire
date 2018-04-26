@@ -2,6 +2,7 @@
 import {first} from 'rxjs/operators';
 import { InjectionToken, NgZone } from '@angular/core';
 import { Subscription ,  Observable ,  Subscriber } from 'rxjs';
+import { observeOn } from 'rxjs/operators';
 import { queue } from 'rxjs/scheduler/queue';
 
 import firebase from '@firebase/app';

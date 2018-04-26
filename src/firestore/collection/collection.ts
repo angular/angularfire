@@ -1,5 +1,5 @@
 
-import {filter, map} from 'rxjs/operators';
+import {filter, map, scan} from 'rxjs/operators';
 import { DocumentChangeType, CollectionReference, Query, DocumentReference } from '@firebase/firestore-types';
 import { Observable ,  Subscriber } from 'rxjs';
 import { fromCollectionRef } from '../observable/fromRef';
@@ -84,7 +84,7 @@ export class AngularFirestoreCollection<T> {
    * @param events
    */
   auditTrail(events?: DocumentChangeType[]): Observable<DocumentChangeAction[]> {
-    return this.stateChanges(events).scan((current, action) => [...current, ...action], []);
+    return this.stateChanges(events).pipe(scan((current, action) => [...current, ...action], []));
   }
 
   /**

@@ -17,7 +17,7 @@ export function createAuditTrail(query: DatabaseQuery, afDatabase: AngularFireDa
 
 export function auditTrail(query: DatabaseQuery, events?: ChildEvent[]): Observable<SnapshotAction[]> {
   const auditTrail$ = stateChanges(query, events).pipe(
-    scan((current, action) => [...current, action], []));
+    scan<SnapshotAction>((current, action) => [...current, action], []));
   return waitForLoaded(query, auditTrail$);
 }
 
