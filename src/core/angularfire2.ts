@@ -37,6 +37,6 @@ export class FirebaseZoneScheduler {
         return obs$.subscribe(subscriber);
       });
     });
-    return observeOn.call(outsideAngular, this);
+    return outsideAngular;
   }
 }
