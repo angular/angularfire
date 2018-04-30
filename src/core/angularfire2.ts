@@ -1,15 +1,11 @@
 import { InjectionToken, NgZone } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
-import { queue } from 'rxjs/scheduler/queue';
 
 import firebase from '@firebase/app';
 import { FirebaseApp, FirebaseOptions } from '@firebase/app-types';
 
 import 'zone.js';
 import 'rxjs/add/operator/first';
-import { Subscriber } from 'rxjs/Subscriber';
-import { observeOn } from 'rxjs/operator/observeOn';
 
 export const FirebaseAppName = new InjectionToken<string>('angularfire2.appName');
 export const FirebaseAppConfig = new InjectionToken<FirebaseOptions>('angularfire2.config');
@@ -19,9 +15,6 @@ export const RealtimeDatabaseURL = new InjectionToken<string>('angularfire2.real
 
 export class FirebaseZoneScheduler {
   constructor(public zone: NgZone) {}
-  schedule(...args: any[]): Subscription {
-    return <Subscription>this.zone.runGuarded(function() { return queue.schedule.apply(queue, args)});
-  }
   // TODO this is a hack, clean it up
   keepUnstableUntilFirst<T>(obs$: Observable<T>) {
     return new Observable<T>(subscriber => {
@@ -32,11 +25,14 @@ export class FirebaseZoneScheduler {
     });
   }
   runOutsideAngular<T>(obs$: Observable<T>): Observable<T> {
-    const outsideAngular = new Observable<T>(subscriber => {
+    return new Observable<T>(subscriber => {
       return this.zone.runOutsideAngular(() => {
-        return obs$.subscribe(subscriber);
+        return obs$.subscribe(
+          value => this.zone.run(() => subscriber.next(value)),
+          error => this.zone.run(() => subscriber.error(error)),
+          ()    => this.zone.run(() => subscriber.complete()),
+        );
       });
     });
-    return observeOn.call(outsideAngular, this);
   }
 }

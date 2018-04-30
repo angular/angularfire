@@ -10,7 +10,11 @@ import 'rxjs/add/operator/withLatestFrom';
 import 'rxjs/add/operator/map';
 
 export function createAuditTrail(query: DatabaseQuery, afDatabase: AngularFireDatabase) {
-  return (events?: ChildEvent[]) => afDatabase.scheduler.keepUnstableUntilFirst(auditTrail(query, events));
+  return (events?: ChildEvent[]) => afDatabase.scheduler.keepUnstableUntilFirst(
+    afDatabase.scheduler.runOutsideAngular(
+      auditTrail(query, events)
+    )
+  );
 }
 
 export function auditTrail(query: DatabaseQuery, events?: ChildEvent[]): Observable<SnapshotAction[]> {
