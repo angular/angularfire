@@ -187,7 +187,7 @@ function firebaseListObservable(ref: database.Reference | DatabaseQuery, {preser
   });
 
   // TODO: should be in the subscription zone instead
-  return observeOn.call(listObs, new FirebaseZoneScheduler(new NgZone({})));
+  return observeOn.call(listObs, new FirebaseZoneScheduler(new NgZone({}), {}));
 
 }
 

@@ -1,4 +1,4 @@
-import { Injectable, Inject, Optional, NgZone } from '@angular/core';
+import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
 import { FirebaseDatabase } from '@firebase/database-types';
 import { PathReference, DatabaseQuery, DatabaseReference, DatabaseSnapshot, ChildEvent, ListenEvent, QueryFn, AngularFireList, AngularFireObject } from './interfaces';
 import { getRef } from './utils';
@@ -17,9 +17,10 @@ export class AngularFireDatabase {
     @Inject(FirebaseAppConfig) config:FirebaseOptions,
     @Optional() @Inject(FirebaseAppName) name:string,
     @Optional() @Inject(RealtimeDatabaseURL) databaseURL:string,
+    @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
-    this.scheduler = new FirebaseZoneScheduler(zone);
+    this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.database = zone.runOutsideAngular(() => {
       const app = _firebaseAppFactory(config, name);
       return app.database(databaseURL || undefined);

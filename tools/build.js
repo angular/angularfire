@@ -54,6 +54,7 @@ const GLOBALS = {
   'rxjs/observable/from': 'Rx.Observable',
   'rxjs/operator': 'Rx.Observable.prototype',
   '@angular/core': 'ng.core',
+  '@angular/common': 'ng.common',
   '@angular/compiler': 'ng.compiler',
   '@angular/platform-browser': 'ng.platformBrowser',
   'firebase/auth': 'firebase',
