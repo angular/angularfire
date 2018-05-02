@@ -92,17 +92,13 @@ describe('fromRef', () => {
       const itemRef = ref(rando());
       itemRef.set(batch);
       const obs = fromRef(itemRef, 'child_added');
-      let count = 0;
       const sub = obs.subscribe(change => {
-        count = count + 1;
         const { type, payload } = change;
         expect(type).toEqual('child_added');
         expect(payload.val()).toEqual(batch[payload.key!]);
-        if (count === items.length) {
-          done();
-          sub.unsubscribe();
-          expect(sub.closed).toEqual(true);
-        }
+        sub.unsubscribe();
+        expect(sub.closed).toEqual(true);
+        done();
       });
     });
 

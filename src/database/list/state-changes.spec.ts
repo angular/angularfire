@@ -54,7 +54,7 @@ describe('stateChanges', () => {
 
   it('should listen to all events by default', (done) => {
 
-    const { changes } = prepareStateChanges({ skip: 2 });
+    const { changes } = prepareStateChanges();
     changes.subscribe(action => {
       expect(action.key).toEqual('2');
       expect(action.payload.val()).toEqual(items[items.length - 1]);
