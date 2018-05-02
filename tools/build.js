@@ -49,6 +49,7 @@ const GLOBALS = {
   'rxjs/add/observable/fromPromise': 'Rx.Observable.prototype',
   'rxjs/add/operator/delay': 'Rx.Observable',
   'rxjs/add/operator/debounce': 'Rx.Observable',
+  'rxjs/add/operator/debounceTime': 'Rx.Observable',
   'rxjs/add/operator/share': 'Rx.Observable',
   'rxjs/observable/fromEvent': 'Rx.Observable',
   'rxjs/observable/from': 'Rx.Observable',
@@ -180,7 +181,7 @@ function generateBundle(entry, { dest, globals, moduleName }) {
 
 function createFirebaseBundles(featurePaths, globals) {
   return Object.keys(featurePaths).map(feature => {
-    return generateBundle(featurePaths[feature], { 
+    return generateBundle(featurePaths[feature], {
       dest: `${process.cwd()}/dist/bundles/${feature}.js`,
       globals,
       moduleName: `firebase.${feature}`

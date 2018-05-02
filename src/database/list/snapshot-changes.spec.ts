@@ -118,9 +118,7 @@ describe('snapshotChanges', () => {
   });
 
   it('should handle dynamic queries that return empty sets', done => {
-    const ITEMS = 10;
     let count = 0;
-    let firstIndex = 0;
     let namefilter$ = new BehaviorSubject<number|null>(null);
     const aref = createRef(rando());
     aref.set(batch);
@@ -135,7 +133,7 @@ describe('snapshotChanges', () => {
         namefilter$.next(-1);
       }
       // on the second round, we should have filtered out everything
-      if(count === 2) {
+      else if(count === 2) {
         expect(Object.keys(data).length).toEqual(0);
       }
     }).add(done);

@@ -57,7 +57,7 @@ describe('auditTrail', () => {
     const { changes } = prepareAuditTrail();
     changes.subscribe(actions => {
       const data = actions.map(a => a.payload.val());
-      expect(data).toEqual(items);
+      expect(data).toEqual([items[items.length - 1]]);
       done();
     });
 

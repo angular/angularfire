@@ -1,9 +1,7 @@
 import { DatabaseQuery, DatabaseSnapshot, ListenEvent, AngularFireAction } from '../interfaces';
 import { Observable } from 'rxjs/Observable';
-import { observeOn } from 'rxjs/operator/observeOn';
-import { FirebaseZoneScheduler } from 'angularfire2';
 import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/delay';
+import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/share';
 
 interface SnapshotPrevKey {
@@ -37,6 +35,6 @@ export function fromRef(ref: DatabaseQuery, event: ListenEvent, listenType = 'on
   // Ensures subscribe on observable is async. This handles
   // a quirk in the SDK where on/once callbacks can happen
   // synchronously.
-  .delay(0)
+  .debounceTime(0)
   .share();
 }
