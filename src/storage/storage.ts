@@ -1,4 +1,4 @@
-import { Injectable, Inject, Optional, InjectionToken, NgZone } from '@angular/core';
+import { Injectable, Inject, Optional, InjectionToken, NgZone, PLATFORM_ID } from '@angular/core';
 import { FirebaseStorage, UploadMetadata } from '@firebase/storage-types';
 import { createStorageRef, AngularFireStorageReference } from './ref';
 import { createUploadTask, AngularFireUploadTask } from './task';
@@ -24,9 +24,10 @@ export class AngularFireStorage {
     @Inject(FirebaseAppConfig) config:FirebaseOptions,
     @Optional() @Inject(FirebaseAppName) name:string,
     @Optional() @Inject(StorageBucket) storageBucket:string,
+    @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
-    this.scheduler = new FirebaseZoneScheduler(zone);
+    this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.storage = zone.runOutsideAngular(() => {
       const app = _firebaseAppFactory(config, name);
       return app.storage(storageBucket || undefined);

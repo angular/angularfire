@@ -1,6 +1,5 @@
 import { DatabaseQuery, DatabaseSnapshot, ListenEvent, AngularFireAction } from '../interfaces';
 import { Observable } from 'rxjs/Observable';
-import { observeOn } from 'rxjs/operator/observeOn';
 import { FirebaseZoneScheduler } from 'angularfire2';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/delay';
