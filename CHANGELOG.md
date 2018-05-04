@@ -1,3 +1,18 @@
+<a name="5.0.0-rc.7"></a>
+# [5.0.0-rc.7](https://github.com/angular/angularfire2/compare/5.0.0-rc.6...5.0.0-rc.7) (2018-05-04)
+
+### Bug Fixes
+
+* **afs:** workarounds for bugs in the Firebase JS SDK [#605](https://github.com/firebase/firebase-js-sdk/issues/605) and [#608](https://github.com/firebase/firebase-js-sdk/issues/608) ([#1540](https://github.com/angular/angularfire2/issues/1540)) ([14e78ec](https://github.com/angular/angularfire2/commit/14e78ec))
+* **app:** add automaticDataCollectionEnabled for compatability with Firebase JS SDK v4.13+ ([#1572](https://github.com/angular/angularfire2/issues/1572)) ([f2cf159](https://github.com/angular/angularfire2/commit/f2cf159))
+
+
+### Features
+
+* **firestore:** allow collection and doc from ref ([#1487](https://github.com/angular/angularfire2/issues/1487)) ([136f1e5](https://github.com/angular/angularfire2/commit/136f1e5)), closes [#1337](https://github.com/angular/angularfire2/issues/1337)
+* `runOutsideAngular` for Universal / service worker compatability and allow advanced configuration with DI ([#1454](https://github.com/angular/angularfire2/issues/1454)) ([e343f13](https://github.com/angular/angularfire2/commit/e343f13))
+
+
 <a name="5.0.0-rc.6"></a>
 # [5.0.0-rc.6](https://github.com/angular/angularfire2/compare/5.0.0-rc.4...v5.0.0-rc.6) (2018-01-26)
 

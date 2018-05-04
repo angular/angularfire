@@ -12,8 +12,6 @@ import { docChanges, sortedChanges } from './changes';
 import { AngularFirestoreDocument } from '../document/document';
 import { AngularFirestore } from '../firestore';
 
-import { observeOn } from 'rxjs/operator/observeOn';
-
 import 'rxjs/add/observable/of';
 
 export function validateEventsArray(events?: DocumentChangeType[]) {
@@ -70,11 +68,19 @@ export class AngularFirestoreCollection<T> {
    */
   stateChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction[]> {
     if(!events || events.length === 0) {
-      return docChanges(this.query);
+      return this.afs.scheduler.keepUnstableUntilFirst(
+        this.afs.scheduler.runOutsideAngular(
+          docChanges(this.query)
+        )
+      );
     }
-    return this.afs.scheduler.keepUnstableUntilFirst(docChanges(this.query)
+    return this.afs.scheduler.keepUnstableUntilFirst(
+        this.afs.scheduler.runOutsideAngular(
+          docChanges(this.query)
+        )
+      )
       .map(actions => actions.filter(change => events.indexOf(change.type) > -1))
-      .filter(changes =>  changes.length > 0));
+      .filter(changes =>  changes.length > 0);
   }
 
   /**

@@ -1,10 +1,12 @@
-import { InjectionToken, NgZone } from '@angular/core';
+import { InjectionToken, NgZone, PLATFORM_ID } from '@angular/core';
 import { FirebaseFirestore, CollectionReference, DocumentReference } from '@firebase/firestore-types';
 
 import { Observable } from 'rxjs/Observable';
 import { Subscriber } from 'rxjs/Subscriber';
 import { from } from 'rxjs/observable/from';
+import { of } from 'rxjs/observable/of';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/catch';
 
 import { FirebaseOptions } from '@firebase/app-types';
 import { Injectable, Inject, Optional } from '@angular/core';
@@ -110,19 +112,20 @@ export class AngularFirestore {
     @Inject(FirebaseAppConfig) config:FirebaseOptions,
     @Optional() @Inject(FirebaseAppName) name:string,
     @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean,
+    @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
-    this.scheduler = new FirebaseZoneScheduler(zone);
+    this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.firestore = zone.runOutsideAngular(() => {
       const app = _firebaseAppFactory(config, name);
       return app.firestore();
     });
 
-    this.persistenceEnabled$ = zone.runOutsideAngular(() => {
-      return shouldEnablePersistence ?
-        from(this.firestore.enablePersistence().then(() => true, () => false)) :
-        from(new Promise((res, rej) => { res(false); }));
-    });
+    this.persistenceEnabled$ = zone.runOutsideAngular(() =>
+        shouldEnablePersistence ? from(this.firestore.enablePersistence().then(() => true, () => false))
+                                : of(false)
+      )
+      .catch(() => of(false)); // https://github.com/firebase/firebase-js-sdk/issues/608
   }
 
   /**
