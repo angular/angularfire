@@ -22,5 +22,5 @@ export function FirebaseObjectFactory (
   }, ref);
 
   // TODO: should be in the subscription zone instead
-  return observeOn.call(objectObservable, new FirebaseZoneScheduler(new NgZone({})));
+  return observeOn.call(objectObservable, new FirebaseZoneScheduler(new NgZone({}), {}));
 }

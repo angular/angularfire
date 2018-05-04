@@ -8,7 +8,11 @@ import { DataSnapshot } from '@firebase/database-types';
 import { AngularFireDatabase } from '../database';
 
 export function createStateChanges(query: DatabaseQuery, afDatabase: AngularFireDatabase) {
-  return (events?: ChildEvent[]) => afDatabase.scheduler.keepUnstableUntilFirst(stateChanges(query, events));
+  return (events?: ChildEvent[]) => afDatabase.scheduler.keepUnstableUntilFirst(
+    afDatabase.scheduler.runOutsideAngular(
+      stateChanges(query, events)
+    )
+  );
 }
 
 export function stateChanges(query: DatabaseQuery, events?: ChildEvent[]) {
