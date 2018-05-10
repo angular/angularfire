@@ -8,7 +8,7 @@ import { observeOn } from 'rxjs/operator/observeOn';
 import firebase from '@firebase/app';
 import { FirebaseApp, FirebaseOptions } from '@firebase/app-types';
 
-import 'zone.js';
+import {} from 'zone.js';
 import 'rxjs/add/operator/first';
 
 export const FirebaseAppName = new InjectionToken<string>('angularfire2.appName');
