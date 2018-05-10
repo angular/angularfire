@@ -6,8 +6,8 @@ import { FirebaseListFactoryOpts, FirebaseObjectFactoryOpts, PathReference } fro
 import { FirebaseObjectFactory } from './firebase_object_factory';
 import { FirebaseObjectObservable } from './firebase_object_observable';
 import * as utils from './utils';
-import { FirebaseOptions } from '@firebase/app-types';
-import { FirebaseAppConfig, FirebaseAppName, RealtimeDatabaseURL, _firebaseAppFactory } from 'angularfire2';
+import { FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
+import { FirebaseOptionsToken, AppNameToken, DatabaseURLToken, FirebaseAppConfigToken, _firebaseAppFactory } from 'angularfire2';
 
 @Injectable()
 export class AngularFireDatabase {
@@ -18,13 +18,14 @@ export class AngularFireDatabase {
   database: FirebaseDatabase;
 
   constructor(
-    @Inject(FirebaseAppConfig) config:FirebaseOptions,
-    @Optional() @Inject(FirebaseAppName) name:string,
-    @Optional() @Inject(RealtimeDatabaseURL) databaseURL:string,
+    @Inject(FirebaseOptionsToken) options:FirebaseOptions,
+    @Optional() @Inject(FirebaseAppConfigToken) config:FirebaseAppConfig,
+    @Optional() @Inject(AppNameToken) name:string,
+    @Optional() @Inject(DatabaseURLToken) databaseURL:string,
     zone: NgZone
   ) {
     this.database = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(config, name);
+      const app = _firebaseAppFactory(options, name, config);
       return app.database(databaseURL || undefined);
     });
   }
@@ -41,4 +42,4 @@ export class AngularFireDatabase {
 
 }
 
-export { RealtimeDatabaseURL };
+export { DatabaseURLToken };
