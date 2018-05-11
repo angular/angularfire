@@ -5,6 +5,9 @@ import { FirebaseApp, FirebaseAppConfigToken, AngularFireModule, FirebaseAppName
 import { AngularFireStorageModule, AngularFireStorage, AngularFireUploadTask, StorageBucketToken } from 'angularfire2/storage';
 import { COMMON_CONFIG } from './test-config';
 
+import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/do';
+
 describe('AngularFireStorage', () => {
   let app: FirebaseApp;
   let afStorage: AngularFireStorage;
@@ -136,7 +139,7 @@ describe('AngularFireStorage w/options', () => {
       ],
       providers: [
         { provide: FirebaseAppNameToken,   useValue: FIREBASE_APP_NAME_TOO },
-        { provide: FirebaseAppConfigToken, useValue:  COMMON_CONFIG },
+        { provide: FirebaseAppConfigToken, useValue: COMMON_CONFIG },
         { provide: StorageBucketToken,     useValue: FIREBASE_STORAGE_BUCKET }
       ]
     });

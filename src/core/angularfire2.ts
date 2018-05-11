@@ -1,4 +1,4 @@
-import { InjectionToken, NgZone, Inject } from '@angular/core';
+import { InjectionToken, NgZone } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { queue } from 'rxjs/scheduler/queue';
@@ -7,15 +7,11 @@ import { observeOn } from 'rxjs/operator/observeOn';
 
 import { FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
 
-import {} from 'zone.js';
 import 'rxjs/add/operator/first';
 
 export const FirebaseAppNameToken = new InjectionToken<string|undefined>('angularfire2.app.name');
 export const FirebaseOptionsToken = new InjectionToken<FirebaseOptions>('angularfire2.app.options');
 export const FirebaseAppConfigToken = new InjectionToken<FirebaseAppConfig|undefined>('angularfire2.app.config');
-
-// Put in database.ts when we drop database-depreciated
-export const DatabaseURLToken = new InjectionToken<string>('angularfire2.database.url');
 
 export class FirebaseZoneScheduler {
   constructor(public zone: NgZone, private platformId: Object) {}

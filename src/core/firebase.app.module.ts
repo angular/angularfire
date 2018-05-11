@@ -5,6 +5,8 @@ import { FirebaseOptionsToken, FirebaseAppConfigToken, FirebaseAppNameToken } fr
 import firebase from '@firebase/app';
 import { FirebaseApp, FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
 
+export { FirebaseApp };
+
 export function _firebaseAppFactory(options: FirebaseOptions, name?: string, appConfig?: FirebaseAppConfig): FirebaseApp {
     const config = appConfig || {};
     if (name && config.name && config.name !== name) {
@@ -12,7 +14,7 @@ export function _firebaseAppFactory(options: FirebaseOptions, name?: string, app
     }
     config.name = name || config.name || '[DEFAULT]';
     const existingApp = firebase.apps.filter(app => app.name === config.name)[0];
-    return (existingApp || firebase.initializeApp(options, config)) as FirebaseApp;
+    return existingApp || firebase.initializeApp(options, config);
 }
 
 const FirebaseAppProvider = {

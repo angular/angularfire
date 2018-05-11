@@ -34,6 +34,7 @@ const GLOBALS = {
   'rxjs/operator/toPromise': 'Rx.Observable.prototype',
   'rxjs/add/operator/catch': 'Rx.Observable.prototype',
   'rxjs/add/operator/first': 'Rx.Observable.prototype',
+  'rxjs/add/operator/mergeMap': 'Rx.Observable.prototype',
   'rxjs/add/operator/map': 'Rx.Observable.prototype',
   'rxjs/add/operator/scan': 'Rx.Observable.prototype',
   'rxjs/add/operator/skip': 'Rx.Observable.prototype',

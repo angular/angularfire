@@ -1,14 +1,13 @@
-import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
+import { Injectable, Inject, InjectionToken, Optional, NgZone, PLATFORM_ID } from '@angular/core';
 import { FirebaseDatabase } from '@firebase/database-types';
 import { PathReference, DatabaseQuery, DatabaseReference, DatabaseSnapshot, ChildEvent, ListenEvent, QueryFn, AngularFireList, AngularFireObject } from './interfaces';
 import { getRef } from './utils';
-import { InjectionToken } from '@angular/core';
 import { FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
 import { createListReference } from './list/create-reference';
 import { createObjectReference } from './object/create-reference';
-import { FirebaseOptionsToken, FirebaseAppNameToken, DatabaseURLToken, FirebaseAppConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
+import { FirebaseOptionsToken, FirebaseAppNameToken, FirebaseAppConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
 
-import { firebase } from '@firebase/app';
+export const FirebaseDatabaseURLToken = new InjectionToken<string>('angularfire2.database.url');
 
 @Injectable()
 export class AngularFireDatabase {
@@ -19,7 +18,7 @@ export class AngularFireDatabase {
     @Inject(FirebaseOptionsToken) options:FirebaseOptions,
     @Optional() @Inject(FirebaseAppConfigToken) config:FirebaseAppConfig,
     @Optional() @Inject(FirebaseAppNameToken) name:string,
-    @Optional() @Inject(DatabaseURLToken) databaseURL:string,
+    @Optional() @Inject(FirebaseDatabaseURLToken) databaseURL:string,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
@@ -64,5 +63,3 @@ export {
   Action,
   SnapshotAction
 } from './interfaces';
-
-export { DatabaseURLToken };
