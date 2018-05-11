@@ -3,6 +3,8 @@ import { FirebaseOptions } from '@firebase/app-types';
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
 import { Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { of } from 'rxjs/observable/of';
+import { from } from 'rxjs/observable/from';
 
 import { FirebaseAppConfig, FirebaseAppName, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
 
@@ -54,7 +56,7 @@ export class AngularFireAuth {
         })
       )
     ).pipe(switchMap((user:User) => {
-      return user ? Observable.from(user.getIdToken()) : Observable.of(null)
+      return user ? from(user.getIdToken()) : of(null)
     }));    
   }
 
