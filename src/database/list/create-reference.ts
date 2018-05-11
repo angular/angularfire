@@ -5,6 +5,7 @@ import { createAuditTrail } from './audit-trail';
 import { createDataOperationMethod } from './data-operation';
 import { createRemoveMethod } from './remove';
 import { AngularFireDatabase } from '../database';
+import { map } from 'rxjs/operators';
 
 export function createListReference<T>(query: DatabaseQuery, afDatabase: AngularFireDatabase): AngularFireList<T> {
   return {
@@ -29,7 +30,9 @@ export function createListReference<T>(query: DatabaseQuery, afDatabase: Angular
         afDatabase.scheduler.runOutsideAngular(
           snapshotChanges$
         )
-      ).map(actions => actions.map(a => a.payload.val()));
+      ).pipe(
+        map(actions => actions.map(a => a.payload.val()))
+      );
     }
   }
 }
