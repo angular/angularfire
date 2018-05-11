@@ -3,7 +3,7 @@ import { Reference } from '@firebase/database-types';
 import { TestBed, inject, withModule, async } from '@angular/core/testing';
 import { ReflectiveInjector, Provider, PlatformRef, NgModule, Compiler, ApplicationRef, CompilerFactory } from '@angular/core';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { COMMON_CONFIG } from './test-config';
 import { BrowserModule } from '@angular/platform-browser';
 
