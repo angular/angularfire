@@ -1,4 +1,5 @@
 import { Observable } from 'rxjs'
+import { forkJoin } from 'rxjs/observable/forkJoin';
 import { map, mergeMap, tap } from 'rxjs/operators';
 import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule, FirebaseAppName } from 'angularfire2';
@@ -89,7 +90,7 @@ describe('AngularFireStorage', () => {
       const ref = afStorage.ref('af.json');
       const task = ref.put(blob);
       // Wait for the upload
-      const sub = Observable.forkJoin(task.snapshotChanges())
+      const sub = forkJoin(task.snapshotChanges())
         .pipe(
           // get the url download
           mergeMap(() => ref.getDownloadURL()),
@@ -108,7 +109,7 @@ describe('AngularFireStorage', () => {
       const ref = afStorage.ref('af.json');
       const task = ref.put(blob, { customMetadata: { blah: 'blah' } });
       // Wait for the upload
-      const sub = Observable.forkJoin(task.snapshotChanges())
+      const sub = forkJoin(task.snapshotChanges())
         .pipe(
           // get the metadata download
           mergeMap(() => ref.getMetadata()),
@@ -183,7 +184,7 @@ describe('AngularFireStorage w/options', () => {
       const ref = afStorage.ref('af.json');
       const task = ref.put(blob);
       // Wait for the upload
-      const sub = Observable.forkJoin(task.snapshotChanges())
+      const sub = forkJoin(task.snapshotChanges())
         .pipe(
           // get the url download
           mergeMap(() => ref.getDownloadURL()),
