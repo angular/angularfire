@@ -1,6 +1,6 @@
 import { SettableMetadata, UploadMetadata, Reference, StringFormat } from '@firebase/storage-types';
 import { createUploadTask, AngularFireUploadTask } from './task';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { from } from 'rxjs/observable/from';
 import { FirebaseZoneScheduler } from 'angularfire2';
 
@@ -31,9 +31,9 @@ export function createStorageRef(ref: Reference, scheduler: FirebaseZoneSchedule
         from(ref.getMetadata())
       )
     ),
-    delete: () => from(ref.delete()),
+    delete: () => Observable.from(ref.delete()),
     child: (path: string) => createStorageRef(ref.child(path), scheduler),
-    updateMetatdata: (meta: SettableMetadata) => from(ref.updateMetadata(meta)),
+    updateMetatdata: (meta: SettableMetadata) => Observable.from(ref.updateMetadata(meta)),
     put: (data: any, metadata?: UploadMetadata) => {
       const task = ref.put(data, metadata);
       return createUploadTask(task);
