@@ -23,6 +23,11 @@ export class AngularFireAuth {
   public readonly authState: Observable<User|null>;
 
   /**
+   * Observable of authentication state; including token refresh events
+   */
+  public readonly user: Observable<User|null>;
+
+  /**
    * Observable of the signed-in user's ID token; which includes sign-in, sign-out, and token refresh events
    */
   public readonly idToken: Observable<string|null>;
@@ -49,14 +54,16 @@ export class AngularFireAuth {
       )
     );
 
-    this.idToken = scheduler.keepUnstableUntilFirst(
+    this.user = scheduler.keepUnstableUntilFirst(
       scheduler.runOutsideAngular(
         new Observable(subscriber => {
           const unsubscribe = this.auth.onIdTokenChanged(subscriber);
           return { unsubscribe };
         })
       )
-    ).switchMap((user:User|null) => {
+    );
+
+    this.idToken = this.user.switchMap((user:User|null) => {
       return user ? Observable.fromPromise(user.getIdToken()) : Observable.of(null)
     });
 

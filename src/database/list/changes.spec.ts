@@ -1,5 +1,5 @@
 import { Reference } from '@firebase/database-types';
-import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2';
+import { FirebaseApp, FirebaseAppConfigToken, AngularFireModule } from 'angularfire2';
 import { AngularFireDatabase, AngularFireDatabaseModule, listChanges } from 'angularfire2/database';
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../test-config';
@@ -32,8 +32,8 @@ describe('listChanges', () => {
     inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {
       app = app_;
       db = _db;
-      app.database().goOffline();
-      ref = (path: string) => { app.database().goOffline(); return app.database().ref(path); };
+      app.database!().goOffline();
+      ref = (path: string) => { app.database!().goOffline(); return app.database!().ref(path); };
     })();
   });
 
@@ -109,7 +109,7 @@ describe('listChanges', () => {
         const data = changes.map(change => change.payload.val());
         expect(data.length).toEqual(items.length - 1);
       }).add(done);
-      app.database().goOnline();
+      app.database!().goOnline();
       aref.set(batch).then(() => {
         aref.child(items[0].key).remove();
       });
@@ -122,7 +122,7 @@ describe('listChanges', () => {
         const data = changes.map(change => change.payload.val());
         expect(data[1].name).toEqual('lol');
       }).add(done);
-      app.database().goOnline();
+      app.database!().goOnline();
       aref.set(batch).then(() => {
         aref.child(items[1].key).update({ name: 'lol'});
       });
@@ -137,7 +137,7 @@ describe('listChanges', () => {
         // the new result is now the last result
         expect(data[data.length - 1]).toEqual(items[0]);
       }).add(done);
-      app.database().goOnline();
+      app.database!().goOnline();
       aref.set(batch).then(() => {
         aref.child(items[0].key).setPriority('a', () => {});
       });

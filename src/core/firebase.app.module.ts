@@ -27,15 +27,15 @@ const FirebaseAppProvider = {
     providers: [ FirebaseAppProvider ],
 })
 export class AngularFireModule {
-    static initializeApp(options: FirebaseOptions, nameOrAppConfig?: string | FirebaseAppConfig) {
-        const name = nameOrAppConfig instanceof String && nameOrAppConfig || undefined
-        const config = nameOrAppConfig instanceof Object && nameOrAppConfig || undefined
+    static initializeApp(options: FirebaseOptions, appNameOrConfig?: string | FirebaseAppConfig) {
+        const name   = typeof appNameOrConfig === 'string' && appNameOrConfig || undefined
+        const config = typeof appNameOrConfig === 'object' && appNameOrConfig || undefined
         return {
             ngModule: AngularFireModule,
             providers: [
                 { provide: FirebaseOptionsToken,   useValue: options },
-                { provide: FirebaseAppNameToken,   useValue: name },
-                { provide: FirebaseAppConfigToken, useValue: config }
+                { provide: FirebaseAppNameToken,   useValue: name    },
+                { provide: FirebaseAppConfigToken, useValue: config  }
             ]
         }
     }

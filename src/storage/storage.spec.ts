@@ -62,13 +62,14 @@ describe('AngularFireStorage', () => {
       const data = { angular: "fire" };
       const blob = new Blob([JSON.stringify(data)], { type : 'application/json' });
       const ref = afStorage.ref('af.json');
-      const task = ref.put(blob);
-      const url$ = ref.getDownloadURL();
-      url$.subscribe(
-        url => { expect(url).toBeDefined(); },
-        e => { done.fail(); },
-        () => { ref.delete().subscribe(done, done.fail); }
-      );
+      const task = ref.put(blob).then(() => {
+        const url$ = ref.getDownloadURL();
+        url$.subscribe(
+          url => { expect(url).toBeDefined(); },
+          e => { done.fail(); },
+          () => { ref.delete().subscribe(done, done.fail); }
+        );
+      });
     });
 
     it('should resolve the task as a promise', (done) => {

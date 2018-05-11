@@ -1,16 +1,16 @@
-import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2';
+import { FirebaseApp, FirebaseAppConfigToken, AngularFireModule } from 'angularfire2';
 import { AngularFirestore } from '../firestore';
 import { AngularFirestoreModule } from '../firestore.module';
 import { AngularFirestoreDocument } from '../document/document';
 import { AngularFirestoreCollection } from './collection';
 import { QueryFn } from '../interfaces';
 
-import { FirebaseApp as FBApp } from '@firebase/app-types';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { of } from 'rxjs/observable/of';
 import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/operator/skip';
+import 'rxjs/add/operator/take';
 
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../test-config';
@@ -27,7 +27,7 @@ async function collectionHarness(afs: AngularFirestore, items: number, queryFn?:
 }
 
 describe('AngularFirestoreCollection', () => {
-  let app: FBApp;
+  let app: FirebaseApp;
   let afs: AngularFirestore;
   let sub: Subscription;
 
@@ -38,7 +38,7 @@ describe('AngularFirestoreCollection', () => {
         AngularFirestoreModule.enablePersistence()
       ]
     });
-    inject([FirebaseApp, AngularFirestore], (_app: FBApp, _afs: AngularFirestore) => {
+    inject([FirebaseApp, AngularFirestore], (_app: FirebaseApp, _afs: AngularFirestore) => {
       app = _app;
       afs = _afs;
     })();
