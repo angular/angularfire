@@ -1,9 +1,8 @@
 import { DocumentReference, SetOptions, DocumentSnapshot } from '@firebase/firestore-types';
-import { Observable } from 'rxjs/Observable';
-import { Subscriber } from 'rxjs/Subscriber';
+import { Observable, Subscriber } from 'rxjs';
 import { QueryFn, AssociatedReference, Action } from '../interfaces';
 import { fromDocRef } from '../observable/fromRef';
-import 'rxjs/add/operator/map';
+import { map } from 'rxjs/operators';
 
 import { Injectable } from '@angular/core';
 
@@ -90,8 +89,10 @@ export class AngularFirestoreDocument<T> {
    * Listen to unwrapped snapshot updates from the document.
    */
   valueChanges(): Observable<T|null> {
-    return this.snapshotChanges().map(action => {
-      return action.payload.exists ? action.payload.data() as T : null;
-    });
+    return this.snapshotChanges().pipe(
+      map(action => {
+        return action.payload.exists ? action.payload.data() as T : null;
+      })
+    );
   }
 }

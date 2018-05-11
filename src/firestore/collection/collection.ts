@@ -1,9 +1,7 @@
 import { DocumentChangeType, CollectionReference, Query, DocumentReference } from '@firebase/firestore-types';
-import { Observable } from 'rxjs/Observable';
-import { Subscriber } from 'rxjs/Subscriber';
+import { Observable, Subscriber } from 'rxjs';
 import { fromCollectionRef } from '../observable/fromRef';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/filter';
+import { map, filter } from 'rxjs/operators';
 
 import { Injectable } from '@angular/core';
 
@@ -11,8 +9,6 @@ import { QueryFn, AssociatedReference, DocumentChangeAction } from '../interface
 import { docChanges, sortedChanges } from './changes';
 import { AngularFirestoreDocument } from '../document/document';
 import { AngularFirestore } from '../firestore';
-
-import 'rxjs/add/observable/of';
 
 export function validateEventsArray(events?: DocumentChangeType[]) {
   if(!events || events!.length === 0) {
@@ -79,8 +75,10 @@ export class AngularFirestoreCollection<T> {
           docChanges(this.query)
         )
       )
-      .map(actions => actions.filter(change => events.indexOf(change.type) > -1))
-      .filter(changes =>  changes.length > 0);
+      .pipe(
+        map(actions => actions.filter(change => events.indexOf(change.type) > -1)),
+        filter(changes =>  changes.length > 0)
+      );
   }
 
   /**
@@ -111,7 +109,9 @@ export class AngularFirestoreCollection<T> {
     const fromCollectionRef$ = fromCollectionRef(this.query);
     const scheduled$ = this.afs.scheduler.runOutsideAngular(fromCollectionRef$);
     return this.afs.scheduler.keepUnstableUntilFirst(scheduled$)
-      .map(actions => actions.payload.docs.map(a => a.data()) as T[]);
+      .pipe(
+        map(actions => actions.payload.docs.map(a => a.data()) as T[])
+      );
   }
 
   /**
