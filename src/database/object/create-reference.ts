@@ -1,3 +1,4 @@
+import { map } from 'rxjs/operators';
 import { DatabaseQuery, AngularFireObject } from '../interfaces';
 import { createObjectSnapshotChanges } from './snapshot-changes';
 import { AngularFireDatabase } from '../database';
@@ -22,7 +23,9 @@ export function createObjectReference<T>(query: DatabaseQuery, afDatabase: Angul
         afDatabase.scheduler.runOutsideAngular(
           snapshotChanges$
         )
-      ).map(action => action.payload.exists() ? action.payload.val() as T : null)
+      ).pipe(
+        map(action => action.payload.exists() ? action.payload.val() as T : null)
+      )
     },
   }
 }
