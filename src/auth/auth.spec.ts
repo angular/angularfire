@@ -7,9 +7,11 @@ import { TestBed, inject } from '@angular/core/testing';
 import { _do } from 'rxjs/operator/do';
 import { take } from 'rxjs/operator/take';
 import { skip } from 'rxjs/operator/skip';
-import { FirebaseApp, FirebaseAppConfig, AngularFireModule, FirebaseAppName } from 'angularfire2';
+import { FirebaseApp, FirebaseAppConfigToken, AngularFireModule, FirebaseAppNameToken } from 'angularfire2';
 import { AngularFireAuth, AngularFireAuthModule } from 'angularfire2/auth';
 import { COMMON_CONFIG } from './test-config';
+
+import 'rxjs/add/observable/toCallback';
 
 function authTake(auth: Observable<any>, count: number): Observable<any> {
   return take.call(auth, 1);
@@ -111,13 +113,13 @@ describe('AngularFireAuth', () => {
     let count = 0;
 
     // Check that the first value is null and second is the auth user
-    const subs = afAuth.idToken.subscribe(user => {
+    const subs = afAuth.idToken.subscribe(idToken => {
       if (count === 0) {
-        expect(user).toBe(null!);
+        expect(idToken).toBe(null!);
         count = count + 1;
         mockAuthState.next(firebaseUser);
       } else {
-        expect(user).toEqual(firebaseUser);
+        expect(idToken).toEqual(firebaseUser);
         subs.unsubscribe();
         done();
       }
@@ -140,8 +142,8 @@ describe('AngularFireAuth with different app', () => {
         AngularFireAuthModule
       ],
       providers: [
-        { provide: FirebaseAppName, useValue: FIREBASE_APP_NAME_TOO },
-        { provide: FirebaseAppConfig, useValue:  COMMON_CONFIG }
+        { provide: FirebaseAppNameToken,   useValue: FIREBASE_APP_NAME_TOO },
+        { provide: FirebaseAppConfigToken, useValue: COMMON_CONFIG }
       ]
     });
     inject([FirebaseApp, AngularFireAuth], (app_: FirebaseApp, _afAuth: AngularFireAuth) => {

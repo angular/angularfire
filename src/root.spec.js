@@ -12,11 +12,3 @@ export * from './packages-dist/database/list/snapshot-changes.spec';
 export * from './packages-dist/database/list/state-changes.spec';
 export * from './packages-dist/database/list/audit-trail.spec';
 export * from './packages-dist/storage/storage.spec';
-
-// // Since this a deprecated API, we run on it on manual tests only
-// // It needs a network connection to run which makes it flaky on Travis
-// export * from './packages-dist/database-deprecated/firebase_list_factory.spec';
-// export * from './packages-dist/database-deprecated/firebase_object_factory.spec';
-// export * from './packages-dist/database-deprecated/firebase_list_observable.spec';
-// export * from './packages-dist/database-deprecated/firebase_object_observable.spec';
-// export * from './packages-dist/database-deprecated/query_observable.spec';

@@ -1,12 +1,13 @@
-import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
+import { Injectable, Inject, InjectionToken, Optional, NgZone, PLATFORM_ID } from '@angular/core';
 import { FirebaseDatabase } from '@firebase/database-types';
 import { PathReference, DatabaseQuery, DatabaseReference, DatabaseSnapshot, ChildEvent, ListenEvent, QueryFn, AngularFireList, AngularFireObject } from './interfaces';
 import { getRef } from './utils';
-import { InjectionToken } from '@angular/core';
-import { FirebaseOptions } from '@firebase/app-types';
+import { FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
 import { createListReference } from './list/create-reference';
 import { createObjectReference } from './object/create-reference';
-import { FirebaseAppConfig, FirebaseAppName, RealtimeDatabaseURL, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
+import { FirebaseOptionsToken, FirebaseAppNameToken, FirebaseAppConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
+
+export const FirebaseDatabaseURLToken = new InjectionToken<string>('angularfire2.database.url');
 
 @Injectable()
 export class AngularFireDatabase {
@@ -14,16 +15,17 @@ export class AngularFireDatabase {
   public readonly scheduler: FirebaseZoneScheduler;
 
   constructor(
-    @Inject(FirebaseAppConfig) config:FirebaseOptions,
-    @Optional() @Inject(FirebaseAppName) name:string,
-    @Optional() @Inject(RealtimeDatabaseURL) databaseURL:string,
+    @Inject(FirebaseOptionsToken) options:FirebaseOptions,
+    @Optional() @Inject(FirebaseAppConfigToken) config:FirebaseAppConfig,
+    @Optional() @Inject(FirebaseAppNameToken) name:string,
+    @Optional() @Inject(FirebaseDatabaseURLToken) databaseURL:string,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.database = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(config, name);
-      return app.database(databaseURL || undefined);
+      const app = _firebaseAppFactory(options, name, config);
+      return app.database!(databaseURL || undefined);
     });
   }
 
@@ -61,5 +63,3 @@ export {
   Action,
   SnapshotAction
 } from './interfaces';
-
-export { RealtimeDatabaseURL };

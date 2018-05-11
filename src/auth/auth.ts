@@ -1,9 +1,9 @@
 import { FirebaseAuth, User } from '@firebase/auth-types';
-import { FirebaseOptions } from '@firebase/app-types';
+import { FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
-import { FirebaseAppConfig, FirebaseAppName, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
+import { FirebaseOptionsToken, FirebaseAppNameToken, FirebaseAppConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
 
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/observable/of';
@@ -23,20 +23,26 @@ export class AngularFireAuth {
   public readonly authState: Observable<User|null>;
 
   /**
+   * Observable of authentication state; including token refresh events
+   */
+  public readonly user: Observable<User|null>;
+
+  /**
    * Observable of the signed-in user's ID token; which includes sign-in, sign-out, and token refresh events
    */
   public readonly idToken: Observable<string|null>;
 
   constructor(
-    @Inject(FirebaseAppConfig) config:FirebaseOptions,
-    @Optional() @Inject(FirebaseAppName) name:string,
+    @Inject(FirebaseOptionsToken) options:FirebaseOptions,
+    @Optional() @Inject(FirebaseAppConfigToken) config:FirebaseAppConfig,
+    @Optional() @Inject(FirebaseAppNameToken) name:string,
     @Inject(PLATFORM_ID) platformId: Object,
     private zone: NgZone
   ) {
     const scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.auth = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(config, name);
-      return app.auth();
+      const app = _firebaseAppFactory(options, name, config);
+      return app.auth!();
     });
 
     this.authState = scheduler.keepUnstableUntilFirst(
@@ -48,14 +54,16 @@ export class AngularFireAuth {
       )
     );
 
-    this.idToken = scheduler.keepUnstableUntilFirst(
+    this.user = scheduler.keepUnstableUntilFirst(
       scheduler.runOutsideAngular(
         new Observable(subscriber => {
           const unsubscribe = this.auth.onIdTokenChanged(subscriber);
           return { unsubscribe };
         })
       )
-    ).switchMap((user:User|null) => {
+    );
+
+    this.idToken = this.user.switchMap((user:User|null) => {
       return user ? Observable.fromPromise(user.getIdToken()) : Observable.of(null)
     });
 

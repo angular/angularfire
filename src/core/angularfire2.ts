@@ -5,17 +5,13 @@ import { queue } from 'rxjs/scheduler/queue';
 import { isPlatformServer } from '@angular/common';
 import { observeOn } from 'rxjs/operator/observeOn';
 
-import firebase from '@firebase/app';
-import { FirebaseApp, FirebaseOptions } from '@firebase/app-types';
+import { FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
 
-import {} from 'zone.js';
 import 'rxjs/add/operator/first';
 
-export const FirebaseAppName = new InjectionToken<string>('angularfire2.appName');
-export const FirebaseAppConfig = new InjectionToken<FirebaseOptions>('angularfire2.config');
-
-// Put in database.ts when we drop database-depreciated
-export const RealtimeDatabaseURL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
+export const FirebaseAppNameToken = new InjectionToken<string|undefined>('angularfire2.app.name');
+export const FirebaseOptionsToken = new InjectionToken<FirebaseOptions>('angularfire2.app.options');
+export const FirebaseAppConfigToken = new InjectionToken<FirebaseAppConfig|undefined>('angularfire2.app.config');
 
 export class FirebaseZoneScheduler {
   constructor(public zone: NgZone, private platformId: Object) {}

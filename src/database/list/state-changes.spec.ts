@@ -1,5 +1,5 @@
 import { Reference } from '@firebase/database-types';
-import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2';
+import { FirebaseApp, FirebaseAppConfigToken, AngularFireModule } from 'angularfire2';
 import { AngularFireDatabase, AngularFireDatabaseModule, stateChanges, ChildEvent } from 'angularfire2/database';
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../test-config';
@@ -32,8 +32,8 @@ describe('stateChanges', () => {
     inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {
       app = app_;
       db = _db;
-      app.database().goOffline();
-      createRef = (path: string) => { app.database().goOffline(); return app.database().ref(path); };
+      app.database!().goOffline();
+      createRef = (path: string) => { app.database!().goOffline(); return app.database!().ref(path); };
     })();
   });
 

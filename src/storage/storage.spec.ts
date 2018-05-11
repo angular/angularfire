@@ -1,9 +1,12 @@
 import { Observable } from 'rxjs/Observable'
 import { forkJoin } from 'rxjs/observable/forkJoin';
 import { TestBed, inject } from '@angular/core/testing';
-import { FirebaseApp, FirebaseAppConfig, AngularFireModule, FirebaseAppName } from 'angularfire2';
-import { AngularFireStorageModule, AngularFireStorage, AngularFireUploadTask, StorageBucket } from 'angularfire2/storage';
+import { FirebaseApp, FirebaseAppConfigToken, AngularFireModule, FirebaseAppNameToken } from 'angularfire2';
+import { AngularFireStorageModule, AngularFireStorage, AngularFireUploadTask, StorageBucketToken } from 'angularfire2/storage';
 import { COMMON_CONFIG } from './test-config';
+
+import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/do';
 
 describe('AngularFireStorage', () => {
   let app: FirebaseApp;
@@ -59,13 +62,14 @@ describe('AngularFireStorage', () => {
       const data = { angular: "fire" };
       const blob = new Blob([JSON.stringify(data)], { type : 'application/json' });
       const ref = afStorage.ref('af.json');
-      const task = ref.put(blob);
-      const url$ = task.downloadURL();
-      url$.subscribe(
-        url => { expect(url).toBeDefined(); },
-        e => { done.fail(); },
-        () => { ref.delete().subscribe(done, done.fail); }
-      );
+      const task = ref.put(blob).then(() => {
+        const url$ = ref.getDownloadURL();
+        url$.subscribe(
+          url => { expect(url).toBeDefined(); },
+          e => { done.fail(); },
+          () => { ref.delete().subscribe(done, done.fail); }
+        );
+      });
     });
 
     it('should resolve the task as a promise', (done) => {
@@ -135,9 +139,9 @@ describe('AngularFireStorage w/options', () => {
         AngularFireStorageModule
       ],
       providers: [
-        { provide: FirebaseAppName, useValue: FIREBASE_APP_NAME_TOO },
-        { provide: FirebaseAppConfig, useValue:  COMMON_CONFIG },
-        { provide: StorageBucket, useValue: FIREBASE_STORAGE_BUCKET }
+        { provide: FirebaseAppNameToken,   useValue: FIREBASE_APP_NAME_TOO },
+        { provide: FirebaseAppConfigToken, useValue: COMMON_CONFIG },
+        { provide: StorageBucketToken,     useValue: FIREBASE_STORAGE_BUCKET }
       ]
     });
     inject([FirebaseApp, AngularFireStorage], (app_: FirebaseApp, _storage: AngularFireStorage) => {
