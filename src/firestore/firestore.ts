@@ -3,7 +3,8 @@ import { FirebaseFirestore, CollectionReference, DocumentReference } from '@fire
 
 import { Observable, Subscriber } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-
+import { of } from 'rxjs/observable/of';
+import { from } from 'rxjs/observable/from';
 import { FirebaseOptions } from '@firebase/app-types';
 import { Injectable, Inject, Optional } from '@angular/core';
 
@@ -118,11 +119,11 @@ export class AngularFirestore {
     });
 
     this.persistenceEnabled$ = zone.runOutsideAngular(() =>
-        shouldEnablePersistence ? Observable.from(this.firestore.enablePersistence().then(() => true, () => false))
-                                : Observable.of(false)
+        shouldEnablePersistence ? from(this.firestore.enablePersistence().then(() => true, () => false))
+                                : of(false)
       )
       .pipe(
-        catchError(() => Observable.of(false))
+        catchError(() => of(false))
       ); // https://github.com/firebase/firebase-js-sdk/issues/608
   }
 
