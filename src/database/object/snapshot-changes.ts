@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { fromRef } from '../observable/fromRef';
 import { DatabaseQuery, AngularFireAction, SnapshotAction } from '../interfaces';
 import { DataSnapshot } from '@firebase/database-types';

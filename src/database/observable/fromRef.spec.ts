@@ -3,6 +3,7 @@ import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2'
 import { AngularFireDatabase, AngularFireDatabaseModule, fromRef } from 'angularfire2/database';
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../test-config';
+import { take } from 'rxjs/operators';
 
 // generate random string to test fidelity of naming
 const rando = () => (Math.random() + 1).toString(36).substring(7);
@@ -57,7 +58,7 @@ describe('fromRef', () => {
     const itemRef = ref(rando());
     itemRef.set({});
     const obs = fromRef(itemRef, 'value');
-    const sub = obs.take(1).subscribe(change => {
+    const sub = obs.pipe(take(1)).subscribe(change => {
       expect(change.payload.exists()).toEqual(false);
       expect(change.payload.val()).toEqual(null);
     }).add(done);

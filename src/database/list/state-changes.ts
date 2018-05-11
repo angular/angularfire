@@ -1,9 +1,7 @@
 import { DatabaseQuery, ChildEvent, AngularFireAction, SnapshotAction } from '../interfaces';
 import { fromRef } from '../observable/fromRef';
 import { validateEventsArray } from './utils';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/merge';
-import 'rxjs/add/operator/scan';
+import { Observable } from 'rxjs';
 import { DataSnapshot } from '@firebase/database-types';
 import { AngularFireDatabase } from '../database';
 
