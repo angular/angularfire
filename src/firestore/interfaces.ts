@@ -1,4 +1,4 @@
-import { Subscriber } from 'rxjs/Subscriber';
+import { Subscriber } from 'rxjs';
 import { DocumentChangeType, DocumentChange, CollectionReference, Query } from '@firebase/firestore-types';
 
 export interface DocumentChangeAction {
