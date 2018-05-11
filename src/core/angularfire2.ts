@@ -10,7 +10,7 @@ import { FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
 import {} from 'zone.js';
 import 'rxjs/add/operator/first';
 
-export const AppNameToken = new InjectionToken<string|undefined>('angularfire2.app.name');
+export const FirebaseAppNameToken = new InjectionToken<string|undefined>('angularfire2.app.name');
 export const FirebaseOptionsToken = new InjectionToken<FirebaseOptions>('angularfire2.app.options');
 export const FirebaseAppConfigToken = new InjectionToken<FirebaseAppConfig|undefined>('angularfire2.app.config');
 

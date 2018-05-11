@@ -14,8 +14,7 @@
       "angularfire2/auth": ["./auth"],
       "angularfire2/database": ["./database"],
       "angularfire2/firestore": ["./firestore"],
-      "angularfire2/storage": ["./storage"],
-      "angularfire2/database-deprecated": ["./database-deprecated"]
+      "angularfire2/storage": ["./storage"]
     },
     "rootDir": ".",
     "inlineSourceMap": true,

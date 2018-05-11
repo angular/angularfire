@@ -6,7 +6,9 @@ import { InjectionToken } from '@angular/core';
 import { FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
 import { createListReference } from './list/create-reference';
 import { createObjectReference } from './object/create-reference';
-import { FirebaseOptionsToken, AppNameToken, DatabaseURLToken, FirebaseAppConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
+import { FirebaseOptionsToken, FirebaseAppNameToken, DatabaseURLToken, FirebaseAppConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
+
+import { firebase } from '@firebase/app';
 
 @Injectable()
 export class AngularFireDatabase {
@@ -16,7 +18,7 @@ export class AngularFireDatabase {
   constructor(
     @Inject(FirebaseOptionsToken) options:FirebaseOptions,
     @Optional() @Inject(FirebaseAppConfigToken) config:FirebaseAppConfig,
-    @Optional() @Inject(AppNameToken) name:string,
+    @Optional() @Inject(FirebaseAppNameToken) name:string,
     @Optional() @Inject(DatabaseURLToken) databaseURL:string,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
@@ -24,7 +26,7 @@ export class AngularFireDatabase {
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.database = zone.runOutsideAngular(() => {
       const app = _firebaseAppFactory(options, name, config);
-      return app.database(databaseURL || undefined);
+      return app.database!(databaseURL || undefined);
     });
   }
 

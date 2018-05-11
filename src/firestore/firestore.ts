@@ -15,7 +15,7 @@ import { QueryFn, AssociatedReference } from './interfaces';
 import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 
-import { FirebaseOptionsToken, AppNameToken, FirebaseAppConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
+import { FirebaseOptionsToken, FirebaseAppNameToken, FirebaseAppConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
 
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
@@ -113,7 +113,7 @@ export class AngularFirestore {
   constructor(
     @Inject(FirebaseOptionsToken) options:FirebaseOptions,
     @Optional() @Inject(FirebaseAppConfigToken) config:FirebaseAppConfig,
-    @Optional() @Inject(AppNameToken) name:string,
+    @Optional() @Inject(FirebaseAppNameToken) name:string,
     @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean,
     @Optional() @Inject(SettingsToken) settings: Settings,
     @Inject(PLATFORM_ID) platformId: Object,
@@ -122,7 +122,7 @@ export class AngularFirestore {
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.firestore = zone.runOutsideAngular(() => {
       const app = _firebaseAppFactory(options, name, config);
-      const firestore = app.firestore();
+      const firestore = app.firestore!();
       firestore.settings(settings || DefaultFirestoreSettings);
       return firestore;
     });

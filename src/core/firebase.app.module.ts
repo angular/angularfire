@@ -1,31 +1,14 @@
 import { InjectionToken, NgZone, NgModule } from '@angular/core';
 
-import { FirebaseOptionsToken, FirebaseAppConfigToken, AppNameToken } from './angularfire2';
+import { FirebaseOptionsToken, FirebaseAppConfigToken, FirebaseAppNameToken } from './angularfire2';
 
 import firebase from '@firebase/app';
-import { FirebaseApp as _FirebaseApp, FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
-import { FirebaseAuth } from '@firebase/auth-types';
-import { FirebaseDatabase } from '@firebase/database-types';
-import { FirebaseMessaging } from '@firebase/messaging-types';
-import { FirebaseStorage } from '@firebase/storage-types';
-import { FirebaseFirestore } from '@firebase/firestore-types';
-
-export class FirebaseApp implements _FirebaseApp {
-    name: string;
-    automaticDataCollectionEnabled: boolean;
-    options: FirebaseOptions;
-    auth: () => FirebaseAuth;
-    database: (databaseURL?: string) => FirebaseDatabase;
-    messaging: () => FirebaseMessaging;
-    storage: (storageBucket?: string) => FirebaseStorage;
-    delete: () => Promise<void>;
-    firestore: () => FirebaseFirestore;
-}
+import { FirebaseApp, FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
 
 export function _firebaseAppFactory(options: FirebaseOptions, name?: string, appConfig?: FirebaseAppConfig): FirebaseApp {
     const config = appConfig || {};
     if (name && config.name && config.name !== name) {
-        console.warn('AppNameToken and FirebaseAppConfigToken.name don\'t match, AppNameToken takes precedence.');
+        console.warn('FirebaseAppNameToken and FirebaseAppConfigToken.name don\'t match, FirebaseAppNameToken takes precedence.');
     }
     config.name = name || config.name || '[DEFAULT]';
     const existingApp = firebase.apps.filter(app => app.name === config.name)[0];
@@ -35,7 +18,7 @@ export function _firebaseAppFactory(options: FirebaseOptions, name?: string, app
 const FirebaseAppProvider = {
     provide: FirebaseApp,
     useFactory: _firebaseAppFactory,
-    deps: [ FirebaseOptionsToken, AppNameToken, FirebaseAppConfigToken ]
+    deps: [ FirebaseOptionsToken, FirebaseAppNameToken, FirebaseAppConfigToken ]
 };
  
 @NgModule({
@@ -49,7 +32,7 @@ export class AngularFireModule {
             ngModule: AngularFireModule,
             providers: [
                 { provide: FirebaseOptionsToken,   useValue: options },
-                { provide: AppNameToken,           useValue: name },
+                { provide: FirebaseAppNameToken,   useValue: name },
                 { provide: FirebaseAppConfigToken, useValue: config }
             ]
         }
