@@ -1,7 +1,6 @@
 import { InjectionToken, NgZone } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
-import { Observable, Subscription } from 'rxjs';
-import { queue } from 'rxjs/scheduler/queue';
+import { Observable, Subscription, queueScheduler as queue } from 'rxjs';
 import { first } from 'rxjs/operators';
 
 import firebase from '@firebase/app';

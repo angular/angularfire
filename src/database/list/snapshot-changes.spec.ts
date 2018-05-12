@@ -54,7 +54,7 @@ describe('snapshotChanges', () => {
 
   it('should listen to all events by default', (done) => {
     const { snapChanges, ref } = prepareSnapshotChanges();
-    snapChanges.take(1).subscribe(actions => {
+    snapChanges.pipe(take(1)).subscribe(actions => {
       const data = actions.map(a => a.payload!.val());
       expect(data).toEqual(items);
     }).add(done);
