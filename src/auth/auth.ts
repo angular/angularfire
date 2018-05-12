@@ -1,10 +1,10 @@
 import { FirebaseAuth, User } from '@firebase/auth-types';
-import { FirebaseOptions } from '@firebase/app-types';
+import { FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
 import { Observable, of, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
-import { FirebaseAppConfig, FirebaseAppName, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
+import { FirebaseOptionsToken, FirebaseAppConfigToken, FirebaseAppNameToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
 
 
 @Injectable()
@@ -26,14 +26,15 @@ export class AngularFireAuth {
   public readonly idToken: Observable<string|null>;
 
   constructor(
-    @Inject(FirebaseAppConfig) config:FirebaseOptions,
-    @Optional() @Inject(FirebaseAppName) name:string,
+    @Inject(FirebaseOptionsToken) options:FirebaseOptions,
+    @Optional() @Inject(FirebaseAppConfigToken) config:FirebaseAppConfig,
+    @Optional() @Inject(FirebaseAppNameToken) name:string,
     @Inject(PLATFORM_ID) platformId: Object,
     private zone: NgZone
   ) {
     const scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.auth = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(config, name);
+      const app = _firebaseAppFactory(options, name, config);
       return app.auth();
     });
 

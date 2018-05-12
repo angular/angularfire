@@ -14,7 +14,7 @@ export function docChanges(query: Query): Observable<DocumentChangeAction[]> {
   return fromCollectionRef(query)
     .pipe(
       map(action =>
-        action.payload.docChanges
+        action.payload.docChanges()
           .map(change => ({ type: change.type, payload: change }))));
 }
 
@@ -25,7 +25,7 @@ export function docChanges(query: Query): Observable<DocumentChangeAction[]> {
 export function sortedChanges(query: Query, events: DocumentChangeType[]): Observable<DocumentChangeAction[]> {
   return fromCollectionRef(query)
     .pipe(
-      map(changes => changes.payload.docChanges),
+      map(changes => changes.payload.docChanges()),
       scan((current, changes) => combineChanges(current, changes, events), []),
       map(changes => changes.map(c => ({ type: c.type, payload: c }))));
 }
