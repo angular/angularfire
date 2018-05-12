@@ -15,6 +15,7 @@
       "angularfire2/database": ["./database"],
       "angularfire2/firestore": ["./firestore"],
       "angularfire2/storage": ["./storage"],
+      "angularfire2/messaging": ["./messaging"],
       "angularfire2/database-deprecated": ["./database-deprecated"]
     },
     "rootDir": ".",

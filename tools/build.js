@@ -77,6 +77,7 @@ const GLOBALS = {
   'angularfire2/database-deprecated': 'angularfire2.database_deprecated',
   'angularfire2/firestore': 'angularfire2.firestore',
   'angularfire2/storage': 'angularfire2.storage',
+  'angularfire2/messaging': 'angularfire2.messaging',
   'zone.js': 'Zone'
 };
 
@@ -88,6 +89,7 @@ const VERSIONS = {
   FIREBASE_FIRESTORE_VERSION: pkg.dependencies['@firebase/firestore'],
   FIREBASE_AUTH_VERSION: pkg.dependencies['@firebase/auth'],
   FIREBASE_STORAGE_VERSION: pkg.dependencies['@firebase/storage'],
+  FIREBASE_MESSAGING_VERSION: pkg.dependencies['@firebase/messaging'],
   RXJS_VERSION: pkg.dependencies['rxjs'],
   ZONEJS_VERSION: pkg.dependencies['zone.js'],
   ANGULARFIRE2_VERSION: pkg.version,
@@ -104,7 +106,8 @@ const MODULE_NAMES = {
   database: 'angularfire2.database',
   "database-deprecated": 'angularfire2.database_deprecated',
   firestore: 'angularfire2.firestore',
-  storage: 'angularfire2.storage'
+  storage: 'angularfire2.storage',
+  messaging: 'angularfire2.messaging'
 };
 
 const ENTRIES = {
@@ -113,7 +116,8 @@ const ENTRIES = {
   database: `${process.cwd()}/dist/packages-dist/database/index.js`,
   "database-deprecated": `${process.cwd()}/dist/packages-dist/database-deprecated/index.js`,
   firestore: `${process.cwd()}/dist/packages-dist/firestore/index.js`,
-  storage: `${process.cwd()}/dist/packages-dist/storage/index.js`
+  storage: `${process.cwd()}/dist/packages-dist/storage/index.js`,
+  messaging: `${process.cwd()}/dist/packages-dist/messaging/index.js`
 };
 
 const SRC_PKG_PATHS = {
@@ -123,7 +127,8 @@ const SRC_PKG_PATHS = {
   "database-deprecated": `${process.cwd()}/src/database-deprecated/package.json`,
   firestore: `${process.cwd()}/src/firestore/package.json`,
   "firebase-node": `${process.cwd()}/src/firebase-node/package.json`,
-  storage: `${process.cwd()}/src/storage/package.json`
+  storage: `${process.cwd()}/src/storage/package.json`,
+  messaging: `${process.cwd()}/src/messaging/package.json`,
 };
 
 const DEST_PKG_PATHS = {
@@ -133,7 +138,8 @@ const DEST_PKG_PATHS = {
   "database-deprecated": `${process.cwd()}/dist/packages-dist/database-deprecated/package.json`,
   firestore: `${process.cwd()}/dist/packages-dist/firestore/package.json`,
   "firebase-node": `${process.cwd()}/dist/packages-dist/firebase-node/package.json`,
-  storage: `${process.cwd()}/dist/packages-dist/storage/package.json`
+  storage: `${process.cwd()}/dist/packages-dist/storage/package.json`,
+  messaging: `${process.cwd()}/dist/packages-dist/messaging/package.json`,
 };
 
 const FIREBASE_FEATURE_MODULES = {
@@ -142,6 +148,7 @@ const FIREBASE_FEATURE_MODULES = {
   database: `${process.cwd()}/node_modules/@firebase/database/dist/esm/index.js`,
   firestore: `${process.cwd()}/node_modules/@firebase/firestore/dist/esm/index.js`,
   storage: `${process.cwd()}/node_modules/@firebase/storage/dist/esm/index.js`,
+  messaging: `${process.cwd()}/node_modules/@firebase/messaging/dist/esm/index.js`,
   util: `${process.cwd()}/node_modules/@firebase/util/dist/esm/index.js`,
 };
 
@@ -302,6 +309,7 @@ function getVersions() {
     getDestPackageFile('firestore'),
     getDestPackageFile('firebase-node'),
     getDestPackageFile('storage'),
+    getDestPackageFile('messaging'),
     getDestPackageFile('database-deprecated')
   ];
   return paths
@@ -340,6 +348,7 @@ function buildModules(globals) {
   const db$ = buildModule('database', globals);
   const firestore$ = buildModule('firestore', globals);
   const storage$ = buildModule('storage', globals);
+  const messaging$ = buildModule('messaging', globals);
   const dbdep$ = buildModule('database-deprecated', globals);
   return Observable
     .forkJoin(core$, Observable.from(copyRootTest()))
@@ -347,6 +356,7 @@ function buildModules(globals) {
     .switchMapTo(db$)
     .switchMapTo(firestore$)
     .switchMapTo(storage$)
+    .switchMapTo(messaging$)
     .switchMapTo(dbdep$);
 }
 
@@ -366,6 +376,7 @@ function buildLibrary(globals) {
       const dbStats = measure('database');
       const fsStats = measure('firestore');
       const storageStats = measure('storage');
+      const messagingStats = measure('messaging');
       const dbdepStats = measure('database-deprecated');
       console.log(`
       core.umd.js - ${coreStats.size}, ${coreStats.gzip}
@@ -373,6 +384,7 @@ function buildLibrary(globals) {
       database.umd.js - ${dbStats.size}, ${dbStats.gzip}
       firestore.umd.js - ${fsStats.size}, ${fsStats.gzip}
       storage.umd.js - ${storageStats.size}, ${storageStats.gzip}
+      messaging.umd.js - ${messagingStats.size}, ${messagingStats.gzip}
       database-deprecated.umd.js - ${dbdepStats.size}, ${dbdepStats.gzip}
       `);
       verifyVersions();
