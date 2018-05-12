@@ -1,5 +1,5 @@
 import { InjectionToken, NgZone, PLATFORM_ID } from '@angular/core';
-import { FirebaseFirestore, CollectionReference, DocumentReference } from '@firebase/firestore-types';
+import { FirebaseFirestore, CollectionReference, DocumentReference, Settings } from '@firebase/firestore-types';
 
 import { Observable, Subscriber } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
@@ -18,7 +18,9 @@ import { FirebaseAppConfigToken, FirebaseOptionsToken, FirebaseAppNameToken, _fi
  * The value of this token determines whether or not the firestore will have persistance enabled
  */
 export const EnablePersistenceToken = new InjectionToken<boolean>('angularfire2.enableFirestorePersistence');
+export const FirestoreSettingsToken = new InjectionToken<Settings>('angularfire2.firestore.settings');
 
+export const DefaultFirestoreSettings = {timestampsInSnapshots: true} as Settings;
 
 /**
  * A utility methods for associating a collection reference with
@@ -110,13 +112,16 @@ export class AngularFirestore {
     @Optional() @Inject(FirebaseAppConfigToken) config:FirebaseAppConfig,
     @Optional() @Inject(FirebaseAppNameToken) name:string,
     @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean,
+    @Optional() @Inject(FirestoreSettingsToken) settings: Settings,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.firestore = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(options, name, config);
-      return app.firestore();
+      const app = _firebaseAppFactory(config, name);
+      const firestore = app.firestore();
+      firestore.settings(settings || DefaultFirestoreSettings);
+      return firestore;
     });
 
     this.persistenceEnabled$ = zone.runOutsideAngular(() =>
