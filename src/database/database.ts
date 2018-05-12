@@ -3,10 +3,10 @@ import { FirebaseDatabase } from '@firebase/database-types';
 import { PathReference, DatabaseQuery, DatabaseReference, DatabaseSnapshot, ChildEvent, ListenEvent, QueryFn, AngularFireList, AngularFireObject } from './interfaces';
 import { getRef } from './utils';
 import { InjectionToken } from '@angular/core';
-import { FirebaseOptions } from '@firebase/app-types';
+import { FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
 import { createListReference } from './list/create-reference';
 import { createObjectReference } from './object/create-reference';
-import { FirebaseAppConfig, FirebaseAppName, RealtimeDatabaseURL, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
+import { FirebaseOptionsToken, FirebaseAppConfigToken, FirebaseAppNameToken, RealtimeDatabaseURL, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
 
 @Injectable()
 export class AngularFireDatabase {
@@ -14,15 +14,16 @@ export class AngularFireDatabase {
   public readonly scheduler: FirebaseZoneScheduler;
 
   constructor(
-    @Inject(FirebaseAppConfig) config:FirebaseOptions,
-    @Optional() @Inject(FirebaseAppName) name:string,
+    @Inject(FirebaseOptionsToken) options:FirebaseOptions,
+    @Optional() @Inject(FirebaseAppConfigToken) config:FirebaseAppConfig,
+    @Optional() @Inject(FirebaseAppNameToken) name:string,
     @Optional() @Inject(RealtimeDatabaseURL) databaseURL:string,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.database = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(config, name);
+      const app = _firebaseAppFactory(options, name, config);
       return app.database!(databaseURL || undefined);
     });
   }
