@@ -36,7 +36,7 @@ export class AngularFireAuth {
     const scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.auth = zone.runOutsideAngular(() => {
       const app = _firebaseAppFactory(config, name);
-      return app.auth();
+      return app.auth!();
     });
 
     this.authState = scheduler.keepUnstableUntilFirst(

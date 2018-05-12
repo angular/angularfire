@@ -115,7 +115,7 @@ export class AngularFirestore {
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.firestore = zone.runOutsideAngular(() => {
       const app = _firebaseAppFactory(config, name);
-      return app.firestore();
+      return app.firestore!();
     });
 
     this.persistenceEnabled$ = zone.runOutsideAngular(() =>

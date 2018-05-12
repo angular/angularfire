@@ -33,8 +33,8 @@ describe('snapshotChanges', () => {
     inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {
       app = app_;
       db = _db;
-      app.database().goOffline();
-      createRef = (path: string) => { app.database().goOffline(); return app.database().ref(path); };
+      app.database!().goOffline();
+      createRef = (path: string) => { app.database!().goOffline(); return app.database!().ref(path); };
     })();
   });
 
@@ -103,7 +103,7 @@ describe('snapshotChanges', () => {
       copy[0].name = name;
       expect(data).toEqual(copy);
     }).add(done);
-    app.database().goOnline();
+    app.database!().goOnline();
     ref.set(batch).then(() => {
       ref.child(items[0].key).update({ name })
     });

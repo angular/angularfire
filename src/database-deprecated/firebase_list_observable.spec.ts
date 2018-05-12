@@ -25,7 +25,7 @@ describe('FirebaseListObservable', () => {
     inject([FirebaseApp, AngularFireDatabase], (_app: FBApp, _db: AngularFireDatabase) => {
       app = _app;
       db = _db;
-      ref = app.database().ref();
+      ref = app.database!().ref();
       O = new FirebaseListObservable(ref, (observer:Observer<any>) => {
       });
     })();

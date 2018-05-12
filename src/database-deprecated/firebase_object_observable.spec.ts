@@ -24,7 +24,7 @@ describe('FirebaseObjectObservable', () => {
     inject([FirebaseApp, AngularFireDatabase], (_app: FBApp, _db: AngularFireDatabase) => {
       app = _app;
       db = _db;
-      ref = app.database().ref();
+      ref = app.database!().ref();
       O = new FirebaseObjectObservable((observer: Observer<any>) => {
       }, ref);
     })();

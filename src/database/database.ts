@@ -23,7 +23,7 @@ export class AngularFireDatabase {
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.database = zone.runOutsideAngular(() => {
       const app = _firebaseAppFactory(config, name);
-      return app.database(databaseURL || undefined);
+      return app.database!(databaseURL || undefined);
     });
   }
 
