@@ -5,10 +5,11 @@ import { queue } from 'rxjs/scheduler/queue';
 import { first } from 'rxjs/operators';
 
 import firebase from '@firebase/app';
-import { FirebaseApp, FirebaseOptions } from '@firebase/app-types';
+import { FirebaseApp, FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
 
-export const FirebaseAppName = new InjectionToken<string>('angularfire2.appName');
-export const FirebaseAppConfig = new InjectionToken<FirebaseOptions>('angularfire2.config');
+export const FirebaseAppNameToken = new InjectionToken<string|undefined>('angularfire2.app.name');
+export const FirebaseOptionsToken = new InjectionToken<FirebaseOptions>('angularfire2.app.options');
+export const FirebaseAppConfigToken = new InjectionToken<FirebaseAppConfig|undefined>('angularfire2.app.config');
 
 // Put in database.ts when we drop database-depreciated
 export const RealtimeDatabaseURL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
