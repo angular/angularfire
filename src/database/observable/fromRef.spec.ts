@@ -30,8 +30,8 @@ describe('fromRef', () => {
     });
     inject([FirebaseApp], (app_: FirebaseApp) => {
       app = app_;
-      app.database().goOffline();
-      ref = (path: string) => { app.database().goOffline(); return app.database().ref(path); };
+      app.database!().goOffline();
+      ref = (path: string) => { app.database!().goOffline(); return app.database!().ref(path); };
     })();
   });
 

@@ -32,8 +32,8 @@ describe('stateChanges', () => {
     inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {
       app = app_;
       db = _db;
-      app.database().goOffline();
-      createRef = (path: string) => { app.database().goOffline(); return app.database().ref(path); };
+      app.database!().goOffline();
+      createRef = (path: string) => { app.database!().goOffline(); return app.database!().ref(path); };
     })();
   });
 

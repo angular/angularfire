@@ -119,7 +119,7 @@ export class AngularFirestore {
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.firestore = zone.runOutsideAngular(() => {
       const app = _firebaseAppFactory(config, name);
-      const firestore = app.firestore();
+      const firestore = app.firestore!();
       firestore.settings(settings || DefaultFirestoreSettings);
       return firestore;
     });

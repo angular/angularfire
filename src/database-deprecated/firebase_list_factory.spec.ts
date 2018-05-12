@@ -88,7 +88,7 @@ describe('FirebaseListFactory', () => {
   describe('<constructor>', () => {
 
     it('should accept a Firebase db ref in the constructor', () => {
-      const list = FirebaseListFactory(app.database().ref(`questions`));
+      const list = FirebaseListFactory(app.database!().ref(`questions`));
       expect(list instanceof FirebaseListObservable).toBe(true);
     });
 
@@ -108,7 +108,7 @@ describe('FirebaseListFactory', () => {
       it('equalTo - should re-run a query when the observable value has emitted', (done: any) => {
 
         const subject = new Subject();
-        const observable = FirebaseListFactory(app.database().ref(questionsPath), {
+        const observable = FirebaseListFactory(app.database!().ref(questionsPath), {
           query: {
             orderByChild: 'height',
             equalTo: subject
@@ -121,7 +121,7 @@ describe('FirebaseListFactory', () => {
       it('startAt - should re-run a query when the observable value has emitted', (done: any) => {
 
         const subject = new Subject();
-        const observable = FirebaseListFactory(app.database().ref(questionsPath), {
+        const observable = FirebaseListFactory(app.database!().ref(questionsPath), {
           query: {
             orderByChild: 'height',
             startAt: subject
@@ -134,7 +134,7 @@ describe('FirebaseListFactory', () => {
       it('endAt - should re-run a query when the observable value has emitted', (done: any) => {
 
         const subject = new Subject();
-        const observable = FirebaseListFactory(app.database().ref(questionsPath), {
+        const observable = FirebaseListFactory(app.database!().ref(questionsPath), {
           query: {
             orderByChild: 'height',
             endAt: subject
@@ -146,7 +146,7 @@ describe('FirebaseListFactory', () => {
 
       it('should throw an error if limitToLast and limitToFirst are chained', () => {
 
-        const observable = FirebaseListFactory(app.database().ref(questionsPath), {
+        const observable = FirebaseListFactory(app.database!().ref(questionsPath), {
           query: {
             orderByChild: 'height',
             limitToFirst: 10,
@@ -158,7 +158,7 @@ describe('FirebaseListFactory', () => {
 
       it('should throw an error if startAt is used with equalTo', () => {
 
-        const observable = FirebaseListFactory(app.database().ref(questionsPath), {
+        const observable = FirebaseListFactory(app.database!().ref(questionsPath), {
           query: {
             orderByChild: 'height',
             equalTo: 10,
@@ -170,7 +170,7 @@ describe('FirebaseListFactory', () => {
 
       it('should throw an error if endAt is used with equalTo', () => {
 
-        const observable = FirebaseListFactory(app.database().ref(questionsPath), {
+        const observable = FirebaseListFactory(app.database!().ref(questionsPath), {
           query: {
             orderByChild: 'height',
             equalTo: 10,
@@ -182,7 +182,7 @@ describe('FirebaseListFactory', () => {
 
       it('should throw an error if startAt and endAt is used with equalTo', () => {
 
-        const observable = FirebaseListFactory(app.database().ref(questionsPath), {
+        const observable = FirebaseListFactory(app.database!().ref(questionsPath), {
           query: {
             orderByChild: 'height',
             equalTo: 10,
@@ -207,7 +207,7 @@ describe('FirebaseListFactory', () => {
       it('equalTo - should re-run a query when the observable value has emitted', (done: any) => {
 
         const subject = new Subject();
-        const observable = FirebaseListFactory(app.database().ref(questionsPath), {
+        const observable = FirebaseListFactory(app.database!().ref(questionsPath), {
           query: {
             orderByValue: true,
             equalTo: subject
@@ -220,7 +220,7 @@ describe('FirebaseListFactory', () => {
       it('startAt - should re-run a query when the observable value has emitted', (done: any) => {
 
         const subject = new Subject();
-        const observable = FirebaseListFactory(app.database().ref(questionsPath), {
+        const observable = FirebaseListFactory(app.database!().ref(questionsPath), {
           query: {
             orderByValue: true,
             startAt: subject
@@ -233,7 +233,7 @@ describe('FirebaseListFactory', () => {
       it('endAt - should re-run a query when the observable value has emitted', (done: any) => {
 
         const subject = new Subject();
-        const observable = FirebaseListFactory(app.database().ref(questionsPath), {
+        const observable = FirebaseListFactory(app.database!().ref(questionsPath), {
           query: {
             orderByValue: true,
             endAt: subject
@@ -257,7 +257,7 @@ describe('FirebaseListFactory', () => {
       it('equalTo - should re-run a query when the observable value has emitted', (done: any) => {
 
         const subject = new Subject();
-        const observable = FirebaseListFactory(app.database().ref(questionsPath), {
+        const observable = FirebaseListFactory(app.database!().ref(questionsPath), {
           query: {
             orderByKey: true,
             equalTo: subject
@@ -270,7 +270,7 @@ describe('FirebaseListFactory', () => {
       it('startAt - should re-run a query when the observable value has emitted', (done: any) => {
 
         const subject = new Subject();
-        const observable = FirebaseListFactory(app.database().ref(questionsPath), {
+        const observable = FirebaseListFactory(app.database!().ref(questionsPath), {
           query: {
             orderByKey: true,
             startAt: subject
@@ -283,7 +283,7 @@ describe('FirebaseListFactory', () => {
       it('endAt - should re-run a query when the observable value has emitted', (done: any) => {
 
         const subject = new Subject();
-        const observable = FirebaseListFactory(app.database().ref(questionsPath), {
+        const observable = FirebaseListFactory(app.database!().ref(questionsPath), {
           query: {
             orderByKey: true,
             endAt: subject
@@ -306,7 +306,7 @@ describe('FirebaseListFactory', () => {
       it('equalTo - should re-run a query when the observable value has emitted', (done: any) => {
 
         const subject = new Subject();
-        const observable = FirebaseListFactory(app.database().ref(questionsPath), {
+        const observable = FirebaseListFactory(app.database!().ref(questionsPath), {
           query: {
             orderByKey: true,
             equalTo: subject
@@ -319,7 +319,7 @@ describe('FirebaseListFactory', () => {
       it('startAt - should re-run a query when the observable value has emitted', (done: any) => {
 
         const subject = new Subject();
-        const observable = FirebaseListFactory(app.database().ref(questionsPath), {
+        const observable = FirebaseListFactory(app.database!().ref(questionsPath), {
           query: {
             orderByKey: true,
             startAt: subject
@@ -332,7 +332,7 @@ describe('FirebaseListFactory', () => {
       it('endAt - should re-run a query when the observable value has emitted', (done: any) => {
 
         const subject = new Subject();
-        const observable = FirebaseListFactory(app.database().ref(questionsPath), {
+        const observable = FirebaseListFactory(app.database!().ref(questionsPath), {
           query: {
             orderByKey: true,
             endAt: subject
@@ -348,7 +348,7 @@ describe('FirebaseListFactory', () => {
   describe('shape', () => {
 
     it('should have a a FirebaseListObservable shape when queried', () => {
-        const observable = FirebaseListFactory(app.database().ref(questionsPath), {
+        const observable = FirebaseListFactory(app.database!().ref(questionsPath), {
           query: {
             orderByChild: 'height',
             equalTo: '1'
@@ -378,9 +378,9 @@ describe('FirebaseListFactory', () => {
       val1 = { key: 'key1' };
       val2 = { key: 'key2' };
       val3 = { key: 'key3' };
-      app.database().ref().remove(done);
-      questions = FirebaseListFactory(app.database().ref(`questions`));
-      questionsSnapshotted = FirebaseListFactory(app.database().ref(`questionssnapshot`), { preserveSnapshot: true });
+      app.database!().ref().remove(done);
+      questions = FirebaseListFactory(app.database!().ref(`questions`));
+      questionsSnapshotted = FirebaseListFactory(app.database!().ref(`questionssnapshot`), { preserveSnapshot: true });
       ref = questions.$ref;
       refSnapshotted = questionsSnapshotted.$ref;
     });
@@ -576,7 +576,7 @@ describe('FirebaseListFactory', () => {
 
 
     it('should call off on all events when disposed', (done: any) => {
-      const questionRef = app.database().ref().child('questions');
+      const questionRef = app.database!().ref().child('questions');
       subscription = FirebaseListFactory(questionRef).subscribe(_ => {
         let firebaseSpy = spyOn(questionRef, 'off').and.callThrough();
         expect(firebaseSpy).not.toHaveBeenCalled();
@@ -682,7 +682,7 @@ describe('FirebaseListFactory', () => {
       })
       .run(() => {
         // Creating a new observable so that the current zone is captured.
-        subscription = FirebaseListFactory(app.database().ref(`questions`))
+        subscription = FirebaseListFactory(app.database!().ref(`questions`))
           .filter(d => d
             .map((v: any) => v.$value)
             .indexOf('in-the-zone') > -1)
@@ -745,7 +745,7 @@ describe('FirebaseListFactory', () => {
         })
         .then(() => {
 
-          let query1 = FirebaseListFactory(app.database().ref(`questions`), {
+          let query1 = FirebaseListFactory(app.database!().ref(`questions`), {
             query: {
               orderByChild: 'data',
               startAt: { value: 0 }
@@ -753,7 +753,7 @@ describe('FirebaseListFactory', () => {
           });
           let promise1 = toPromise.call(take.call(query1, 1));
 
-          let query2 = FirebaseListFactory(app.database().ref(`questions`), {
+          let query2 = FirebaseListFactory(app.database!().ref(`questions`), {
             query: {
               orderByChild: 'data',
               startAt: { value: 0, key: 'val2' }
@@ -783,7 +783,7 @@ describe('FirebaseListFactory', () => {
         })
         .then(() => {
 
-          let query1 = FirebaseListFactory(app.database().ref(`questions`), {
+          let query1 = FirebaseListFactory(app.database!().ref(`questions`), {
             query: {
               orderByChild: 'data',
               equalTo: { value: 0 }
@@ -791,7 +791,7 @@ describe('FirebaseListFactory', () => {
           });
           let promise1 = toPromise.call(take.call(query1, 1));
 
-          let query2 = FirebaseListFactory(app.database().ref(`questions`), {
+          let query2 = FirebaseListFactory(app.database!().ref(`questions`), {
             query: {
               orderByChild: 'data',
               equalTo: { value: 0, key: 'val2' }
@@ -821,7 +821,7 @@ describe('FirebaseListFactory', () => {
         })
         .then(() => {
 
-          let query1 = FirebaseListFactory(app.database().ref(`questions`), {
+          let query1 = FirebaseListFactory(app.database!().ref(`questions`), {
             query: {
               orderByChild: 'data',
               endAt: { value: 0 }
@@ -829,7 +829,7 @@ describe('FirebaseListFactory', () => {
           });
           let promise1 = toPromise.call(take.call(query1, 1));
 
-          let query2 = FirebaseListFactory(app.database().ref(`questions`), {
+          let query2 = FirebaseListFactory(app.database!().ref(`questions`), {
             query: {
               orderByChild: 'data',
               endAt: { value: 0, key: 'val2' }
@@ -859,7 +859,7 @@ describe('FirebaseListFactory', () => {
         .then(() => {
 
           let subject = new Subject<boolean>();
-          let query = FirebaseListFactory(app.database().ref(`questions`), {
+          let query = FirebaseListFactory(app.database!().ref(`questions`), {
             query: {
               orderByChild: 'even',
               equalTo: subject
