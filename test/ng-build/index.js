@@ -1,6 +1,6 @@
 const fs = require('fs');
 const { spawn, spawnSync } = require('child_process');
-const ng5Pkg = require(`${__dirname}/ng5/package.json`);
+const ng5Pkg = require(`${__dirname}/ng6/package.json`);
 const pkg = require('../../package.json');
 const shell = require('shelljs');
 
@@ -30,7 +30,7 @@ function buildVersion5() {
   });
   cmd.on('close', () => {
     try {
-      const dir = fs.readdirSync(__dirname + '/ng5/dist');
+      const dir = fs.readdirSync(__dirname + '/ng6/dist');
       console.log(dir);
       console.log(`------------ SUCCESS VERSION ${ng5Pkg.dependencies['@angular/core']} ------------`);
     } catch (e) {
