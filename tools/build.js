@@ -46,7 +46,6 @@ const GLOBALS = {
   'rxjs/add/operator/switchMap': 'Rx.Observable.prototype',
   'rxjs/add/observable/merge': 'Rx.Observable',
   'rxjs/add/observable/of': 'Rx.Observable.prototype',
-  'rxjs/add/observable/fromPromise': 'Rx.Observable.prototype',
   'rxjs/add/operator/delay': 'Rx.Observable',
   'rxjs/add/operator/debounce': 'Rx.Observable',
   'rxjs/add/operator/share': 'Rx.Observable',
