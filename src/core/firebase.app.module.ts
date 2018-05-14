@@ -1,4 +1,4 @@
-import { InjectionToken, NgZone, NgModule } from '@angular/core';
+import { InjectionToken, NgZone, NgModule, Optional } from '@angular/core';
 
 import { FirebaseOptionsToken, FirebaseAppNameToken, FirebaseAppConfigToken } from './angularfire2';
 
@@ -35,7 +35,11 @@ export function _firebaseAppFactory(options: FirebaseOptions, name?: string, app
 const FirebaseAppProvider = {
     provide: FirebaseApp,
     useFactory: _firebaseAppFactory,
-    deps: [ FirebaseOptionsToken, FirebaseAppNameToken, FirebaseAppConfigToken ]
+    deps: [
+        FirebaseOptionsToken,
+        [new Optional(), FirebaseAppNameToken],
+        [new Optional(), FirebaseAppConfigToken]
+    ]
 };
  
 @NgModule({
