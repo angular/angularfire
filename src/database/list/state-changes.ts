@@ -3,19 +3,11 @@ import { fromRef } from '../observable/fromRef';
 import { validateEventsArray } from './utils';
 import { Observable, merge } from 'rxjs';
 
-import { DataSnapshot } from '@firebase/database-types';
+import { DatabaseSnapshot } from '../interfaces';
 import { AngularFireDatabase } from '../database';
 
-export function createStateChanges(query: DatabaseQuery, afDatabase: AngularFireDatabase) {
-  return (events?: ChildEvent[]) => afDatabase.scheduler.keepUnstableUntilFirst(
-    afDatabase.scheduler.runOutsideAngular(
-      stateChanges(query, events)
-    )
-  );
-}
-
-export function stateChanges(query: DatabaseQuery, events?: ChildEvent[]) {
+export function stateChanges<T>(query: DatabaseQuery, events?: ChildEvent[]) {
   events = validateEventsArray(events)!;
-  const childEvent$ = events.map(event => fromRef(query, event));
+  const childEvent$ = events.map(event => fromRef<T>(query, event));
   return merge(...childEvent$);
 }
