@@ -1,5 +1,4 @@
-import { Observable } from 'rxjs'
-import { forkJoin } from 'rxjs/observable/forkJoin';
+import { Observable, forkJoin } from 'rxjs'
 import { map, mergeMap, tap } from 'rxjs/operators';
 import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, FirebaseOptionsToken, AngularFireModule, FirebaseAppNameToken } from 'angularfire2';
