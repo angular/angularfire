@@ -1,12 +1,9 @@
-import { InjectionToken, NgZone, PLATFORM_ID } from '@angular/core';
+import { InjectionToken, NgZone, PLATFORM_ID, Injectable, Inject, Optional } from '@angular/core';
 import { FirebaseFirestore, CollectionReference, DocumentReference, Settings } from '@firebase/firestore-types';
 
-import { Observable, Subscriber } from 'rxjs';
+import { Observable, Subscriber, of, from } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { of } from 'rxjs/observable/of';
-import { from } from 'rxjs/observable/from';
 import { FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
-import { Injectable, Inject, Optional } from '@angular/core';
 
 import { QueryFn, AssociatedReference } from './interfaces';
 import { AngularFirestoreDocument } from './document/document';
@@ -118,7 +115,7 @@ export class AngularFirestore {
   ) {
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.firestore = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(config, name);
+      const app = _firebaseAppFactory(options, name, config);
       const firestore = app.firestore();
       firestore.settings(settings || DefaultFirestoreSettings);
       return firestore;

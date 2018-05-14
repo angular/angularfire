@@ -1,1 +1,1 @@
-cd ng5 && ng build --prod
+cd ng6 && ng build --prod

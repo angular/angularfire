@@ -1,7 +1,5 @@
 import { fromRef } from '../observable/fromRef';
-import { Observable } from 'rxjs';
-import { of } from 'rxjs/observable/of';
-import { merge } from 'rxjs/observable/merge';
+import { Observable, of, merge } from 'rxjs';
 
 import { DatabaseQuery, ChildEvent, AngularFireAction, SnapshotAction } from '../interfaces';
 import { isNil } from '../utils';
