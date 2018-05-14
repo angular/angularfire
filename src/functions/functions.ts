@@ -1,8 +1,7 @@
 import { FirebaseFunctions } from '@firebase/functions-types';
 import { FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
-import { Observable } from 'rxjs';
-import { from } from 'rxjs/observable/from';
+import { Observable, from } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { FirebaseOptionsToken, FirebaseAppConfigToken, FirebaseAppNameToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';

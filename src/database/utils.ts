@@ -1,5 +1,4 @@
 import { Subscription, Scheduler } from 'rxjs';
-import { queue } from 'rxjs/scheduler/queue';
 import { PathReference, DatabaseReference, FirebaseOperation, FirebaseOperationCases } from './interfaces';
 import { FirebaseDatabase } from '@firebase/database-types';
 
