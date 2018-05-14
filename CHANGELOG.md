@@ -23,6 +23,11 @@
 * For consistency the `FirebaseAppName` Injection Token is now `FirebaseAppNameToken`
 * rxjs 5 is no longer supported, upgrade to 6 ([see the rxjs migration guide for more information](https://github.com/ReactiveX/rxjs/blob/master/MIGRATION.md))
 * Firebase JS SDK 4.x is no longer supported, upgrade to 5 ([see the changelog for more information](https://firebase.google.com/support/release-notes/js#version_500_may_8_2018))
+* To mirror a change in Firebase 5.x, `downloadURL` was removed from `AngularFireUploadTask`
+
+### Known issues
+
+* Some users may experience failures compiling AOT while using `AngularFireModule.initializeApp(...)`, a work-around is available ([see #1635](https://github.com/angular/angularfire2/issues/1635))
 
 <a name="5.0.0-rc.7"></a>
 # [5.0.0-rc.7](https://github.com/angular/angularfire2/compare/5.0.0-rc.6...5.0.0-rc.7) (2018-05-04)
