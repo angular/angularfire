@@ -10,7 +10,7 @@ The `AngularFirestoreCollection` service is a wrapper around the native Firestor
 ```ts
 import { Component } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 export interface Item { name: string; }
 
@@ -86,7 +86,7 @@ There are multiple ways of streaming collection data from Firestore.
 ```ts
 import { Component } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 export interface Item { id: string; name: string; }
 
@@ -135,8 +135,8 @@ export class AppComponent {
 ```ts
 import { Component } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/map';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export interface Shirt { name: string; price: number; }
 export interface ShirtId extends Shirt { id: string; }
@@ -159,13 +159,13 @@ export class AppComponent {
     // .snapshotChanges() returns a DocumentChangeAction[], which contains
     // a lot of information about "what happened" with each change. If you want to
     // get the data and the id use the map operator.
-    this.shirts = this.shirtCollection.snapshotChanges().map(actions => {
-      return actions.map(a => {
+    this.shirts = this.shirtCollection.snapshotChanges().pipe(
+      map(actions => actions.map(a => {
         const data = a.payload.doc.data() as Shirt;
         const id = a.payload.doc.id;
         return { id, ...data };
-      });
-    });
+      }))
+    );
   }
 }
 ```
@@ -181,7 +181,8 @@ export class AppComponent {
 ```ts
 import { Component } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export interface AccountDeposit { description: string; amount: number; }
 export interface AccountDepoistId extends AccountDeposit { id: string; }
@@ -201,14 +202,13 @@ export class AppComponent {
   deposits: Observable<AccountDepositId[]>;
   constructor(private readonly afs: AngularFirestore) {
     this.depositCollection = afs.collection<AccountDeposit>('deposits');
-    this.deposits = this.depositCollection.stateChanges(['added'])
-      .map(actions => {
-        return actions.map(a => {
-          const data = a.payload.doc.data() as AccountDeposit;
-          const id = a.payload.doc.id;
-          return { id, ...data };
-        })
-      });
+    this.deposits = this.depositCollection.stateChanges(['added']).pipe(
+      map(actions => actions.map(a => {
+        const data = a.payload.doc.data() as AccountDeposit;
+        const id = a.payload.doc.id;
+        return { id, ...data };
+      }))
+    );
   }
 }
 ```
@@ -224,7 +224,8 @@ export class AppComponent {
 ```ts
 import { Component } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export interface AccountLogItem { description: string; amount: number; }
 export interface AccountLogItemId extends AccountLogItem { id: string; }
@@ -244,14 +245,13 @@ export class AppComponent {
   accountLogs: Observable<AccountLogItemId[]>;
   constructor(private readonly afs: AngularFirestore) {
     this.accountLogCollection = afs.collection<AccountLogItem>('accountLog');
-    this.accountLogs = this.accountLogCollection.auditTrail()
-      .map(actions => {
-        return actions.map(a => {
-          const data = a.payload.doc.data() as AccountLogItem;
-          const id = a.payload.doc.id;
-          return { id, ...data };
-        })
-      });
+    this.accountLogs = this.accountLogCollection.auditTrail().pipe(
+      map(actions => actions.map(a => {
+        const data = a.payload.doc.data() as AccountLogItem;
+        const id = a.payload.doc.id;
+        return { id, ...data };
+      }))
+    );
   }
 }
 ```
@@ -272,7 +272,7 @@ There are three `DocumentChangeType`s in Firestore: `added`, `removed`, and `mod
 ```ts
 import { Component } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-root',

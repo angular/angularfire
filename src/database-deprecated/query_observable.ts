@@ -1,11 +1,5 @@
-import { Observable } from 'rxjs/Observable';
-import { of as observableOf } from  'rxjs/observable/of';
-import { Operator } from 'rxjs/Operator';
-import { Observer } from 'rxjs/Observer';
-import { combineLatest } from 'rxjs/operator/combineLatest';
-import { merge } from 'rxjs/operator/merge';
-import { map } from 'rxjs/operator/map';
-import { auditTime } from 'rxjs/operator/auditTime';
+import { Observable, of as observableOf, Operator, Observer } from 'rxjs';
+import { auditTime, combineLatest, merge, map } from 'rxjs/operators';
 import { Query, ScalarQuery, OrderByOptions, OrderBySelection, LimitToOptions, LimitToSelection, Primitive } from './interfaces';
 import { hasKey, isNil } from './utils';
 
