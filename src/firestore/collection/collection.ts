@@ -5,7 +5,7 @@ import { map, filter } from 'rxjs/operators';
 
 import { Injectable } from '@angular/core';
 
-import { QueryFn, AssociatedReference, DocumentChangeAction } from '../interfaces';
+import { QueryFn, AssociatedReference, DocumentChangeAction, DocumentChange } from '../interfaces';
 import { docChanges, sortedChanges } from './changes';
 import { AngularFirestoreDocument } from '../document/document';
 import { AngularFirestore } from '../firestore';
@@ -62,17 +62,17 @@ export class AngularFirestoreCollection<T> {
    * your own data structure.
    * @param events
    */
-  stateChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction[]> {
+  stateChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction<T>[]> {
     if(!events || events.length === 0) {
       return this.afs.scheduler.keepUnstableUntilFirst(
         this.afs.scheduler.runOutsideAngular(
-          docChanges(this.query)
+          docChanges<T>(this.query)
         )
       );
     }
     return this.afs.scheduler.keepUnstableUntilFirst(
         this.afs.scheduler.runOutsideAngular(
-          docChanges(this.query)
+          docChanges<T>(this.query)
         )
       )
       .pipe(
@@ -86,7 +86,7 @@ export class AngularFirestoreCollection<T> {
    * but it collects each event in an array over time.
    * @param events
    */
-  auditTrail(events?: DocumentChangeType[]): Observable<DocumentChangeAction[]> {
+  auditTrail(events?: DocumentChangeType[]): Observable<DocumentChangeAction<T>[]> {
     return this.stateChanges(events).scan((current, action) => [...current, ...action], []);
   }
 
@@ -95,9 +95,9 @@ export class AngularFirestoreCollection<T> {
    * query order.
    * @param events
    */
-  snapshotChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction[]> {
+  snapshotChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction<T>[]> {
     const validatedEvents = validateEventsArray(events);
-    const sortedChanges$ = sortedChanges(this.query, validatedEvents);
+    const sortedChanges$ = sortedChanges<T>(this.query, validatedEvents);
     const scheduledSortedChanges$ = this.afs.scheduler.runOutsideAngular(sortedChanges$);
     return this.afs.scheduler.keepUnstableUntilFirst(scheduledSortedChanges$);
   }

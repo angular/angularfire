@@ -1,9 +1,21 @@
 import { Subscriber } from 'rxjs';
-import { DocumentChangeType, DocumentChange, CollectionReference, Query } from '@firebase/firestore-types';
+import { DocumentChangeType, DocumentSnapshot as _DocumentSnapshot, SnapshotOptions, QueryDocumentSnapshot as _QueryDocumentSnapshot, DocumentChange as _DocumentChange, CollectionReference, Query } from '@firebase/firestore-types';
 
-export interface DocumentChangeAction {
+export interface DocumentSnapshot<T> extends _DocumentSnapshot {
+  data(options?: SnapshotOptions): T | undefined;
+}
+
+export interface QueryDocumentSnapshot<T> extends _QueryDocumentSnapshot {
+  data(options?: SnapshotOptions): T;
+}
+
+export interface DocumentChange<T> extends _DocumentChange {
+  readonly doc: QueryDocumentSnapshot<T>;
+}
+
+export interface DocumentChangeAction<T> {
   type: DocumentChangeType;
-  payload: DocumentChange;
+  payload: DocumentChange<T>;
 }
 
 export interface Action<T> {

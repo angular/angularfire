@@ -1,6 +1,6 @@
-import { DocumentReference, SetOptions, DocumentSnapshot } from '@firebase/firestore-types';
+import { DocumentReference, SetOptions } from '@firebase/firestore-types';
 import { Observable, Subscriber } from 'rxjs';
-import { QueryFn, AssociatedReference, Action } from '../interfaces';
+import { QueryFn, AssociatedReference, Action, DocumentSnapshot } from '../interfaces';
 import { fromDocRef } from '../observable/fromRef';
 import { map } from 'rxjs/operators';
 
@@ -70,17 +70,17 @@ export class AngularFirestoreDocument<T> {
    * @param path
    * @param queryFn
    */
-  collection<T>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<T> {
+  collection<R>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<R> {
     const collectionRef = this.ref.collection(path);
     const { ref, query } = associateQuery(collectionRef, queryFn);
-    return new AngularFirestoreCollection<T>(ref, query, this.afs);
+    return new AngularFirestoreCollection<R>(ref, query, this.afs);
   }
 
   /**
    * Listen to snapshot updates from the document.
    */
-  snapshotChanges(): Observable<Action<DocumentSnapshot>> {
-    const fromDocRef$ = fromDocRef(this.ref);
+  snapshotChanges(): Observable<Action<DocumentSnapshot<T>>> {
+    const fromDocRef$ = fromDocRef<T>(this.ref);
     const scheduledFromDocRef$ = this.afs.scheduler.runOutsideAngular(fromDocRef$);
     return this.afs.scheduler.keepUnstableUntilFirst(scheduledFromDocRef$);
   }

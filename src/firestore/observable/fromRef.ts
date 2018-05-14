@@ -1,6 +1,6 @@
-import { DocumentReference, Query, QuerySnapshot, DocumentSnapshot } from '@firebase/firestore-types';
+import { DocumentReference, Query, QuerySnapshot } from '@firebase/firestore-types';
 import { Observable, Subscriber } from 'rxjs';
-import { Action, Reference } from '../interfaces';
+import { Action, Reference, DocumentSnapshot } from '../interfaces';
 import { map, share } from 'rxjs/operators';
 
 function _fromRef<T, R>(ref: Reference<T>): Observable<R> {
@@ -14,8 +14,8 @@ export function fromRef<R>(ref: DocumentReference | Query) {
   return _fromRef<typeof ref, R>(ref).pipe(share());
 }
 
-export function fromDocRef(ref: DocumentReference): Observable<Action<DocumentSnapshot>>{
-  return fromRef<DocumentSnapshot>(ref)
+export function fromDocRef<T>(ref: DocumentReference): Observable<Action<DocumentSnapshot<T>>>{
+  return fromRef<DocumentSnapshot<T>>(ref)
     .pipe(
       map(payload => ({ payload, type: 'value' }))
     );
