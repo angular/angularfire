@@ -8,7 +8,7 @@ import { isNil } from '../utils';
 
 import { switchMap, distinctUntilChanged, scan } from 'rxjs/operators';
 
-export function listChanges<T>(ref: DatabaseQuery, events: ChildEvent[]): Observable<SnapshotAction<T>[]> {
+export function listChanges<T=any>(ref: DatabaseQuery, events: ChildEvent[]): Observable<SnapshotAction<T>[]> {
   return fromRef(ref, 'value', 'once').pipe(
     switchMap(snapshotAction => {
       const childEvent$ = [of(snapshotAction)];

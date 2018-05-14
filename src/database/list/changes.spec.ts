@@ -66,7 +66,7 @@ describe('listChanges', () => {
 
     it('should stream in order events', (done) => {
       const aref = ref(rando());
-      const obs = listChanges<any>(aref.orderByChild('name'), ['child_added']);
+      const obs = listChanges(aref.orderByChild('name'), ['child_added']);
       const sub = obs.pipe(take(1)).subscribe(changes => {
         const names = changes.map(change => change.payload.val().name);
         expect(names[0]).toEqual('one');
@@ -78,7 +78,7 @@ describe('listChanges', () => {
 
     it('should stream in order events w/child_added', (done) => {
       const aref = ref(rando());
-      const obs = listChanges<any>(aref.orderByChild('name'), ['child_added']);
+      const obs = listChanges(aref.orderByChild('name'), ['child_added']);
       const sub = obs.pipe(skip(1),take(1)).subscribe(changes => {
         const names = changes.map(change => change.payload.val().name);
         expect(names[0]).toEqual('anotha one');
@@ -92,7 +92,7 @@ describe('listChanges', () => {
 
     it('should stream events filtering', (done) => {
       const aref = ref(rando());
-      const obs = listChanges<any>(aref.orderByChild('name').equalTo('zero'), ['child_added']);
+      const obs = listChanges(aref.orderByChild('name').equalTo('zero'), ['child_added']);
       obs.pipe(skip(1),take(1)).subscribe(changes => {
         const names = changes.map(change => change.payload.val().name);
         expect(names[0]).toEqual('zero');
@@ -117,7 +117,7 @@ describe('listChanges', () => {
 
     it('should process a new child_changed event', (done) => {
       const aref = ref(rando());
-      const obs = listChanges<any>(aref, ['child_added','child_changed'])
+      const obs = listChanges(aref, ['child_added','child_changed'])
       const sub = obs.pipe(skip(1),take(1)).subscribe(changes => {
         const data = changes.map(change => change.payload.val());
         expect(data[1].name).toEqual('lol');
