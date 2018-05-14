@@ -5,6 +5,7 @@ import { createAuditTrail } from './audit-trail';
 import { createDataOperationMethod } from './data-operation';
 import { createRemoveMethod } from './remove';
 import { AngularFireDatabase } from '../database';
+import { map } from 'rxjs/operators';
 
 export function createListReference<T>(query: DatabaseQuery, afDatabase: AngularFireDatabase): AngularFireList<T> {
   return {
@@ -15,14 +16,23 @@ export function createListReference<T>(query: DatabaseQuery, afDatabase: Angular
     remove: createRemoveMethod(query.ref),
     snapshotChanges(events?: ChildEvent[]) {
       const snapshotChanges$ = snapshotChanges(query, events);
-      return afDatabase.scheduler.keepUnstableUntilFirst(snapshotChanges$);
+      return afDatabase.scheduler.keepUnstableUntilFirst(
+        afDatabase.scheduler.runOutsideAngular(
+          snapshotChanges$
+        )
+      );
     },
     stateChanges: createStateChanges(query, afDatabase),
     auditTrail: createAuditTrail(query, afDatabase),
     valueChanges<T>(events?: ChildEvent[]) { 
       const snapshotChanges$ = snapshotChanges(query, events);
-      return afDatabase.scheduler.keepUnstableUntilFirst(snapshotChanges$)
-        .map(actions => actions.map(a => a.payload.val())); 
+      return afDatabase.scheduler.keepUnstableUntilFirst(
+        afDatabase.scheduler.runOutsideAngular(
+          snapshotChanges$
+        )
+      ).pipe(
+        map(actions => actions.map(a => a.payload.val()))
+      );
     }
   }
 }

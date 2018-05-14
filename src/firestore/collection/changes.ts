@@ -1,9 +1,7 @@
 import { fromCollectionRef } from '../observable/fromRef';
 import { Query, DocumentChangeType, DocumentChange } from '@firebase/firestore-types';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/scan';
+import { Observable } from 'rxjs';
+import { map, filter, scan } from 'rxjs/operators';
 
 import { DocumentChangeAction, Action } from '../interfaces';
 
@@ -14,9 +12,10 @@ import { DocumentChangeAction, Action } from '../interfaces';
  */
 export function docChanges(query: Query): Observable<DocumentChangeAction[]> {
   return fromCollectionRef(query)
-    .map(action =>
-      action.payload.docChanges
-        .map(change => ({ type: change.type, payload: change })));
+    .pipe(
+      map(action =>
+        action.payload.docChanges()
+          .map(change => ({ type: change.type, payload: change }))));
 }
 
 /**
@@ -25,9 +24,10 @@ export function docChanges(query: Query): Observable<DocumentChangeAction[]> {
  */
 export function sortedChanges(query: Query, events: DocumentChangeType[]): Observable<DocumentChangeAction[]> {
   return fromCollectionRef(query)
-    .map(changes => changes.payload.docChanges)
-    .scan((current, changes) => combineChanges(current, changes, events), [])
-    .map(changes => changes.map(c => ({ type: c.type, payload: c })));
+    .pipe(
+      map(changes => changes.payload.docChanges()),
+      scan((current, changes) => combineChanges(current, changes, events), []),
+      map(changes => changes.map(c => ({ type: c.type, payload: c }))));
 }
 
 /**

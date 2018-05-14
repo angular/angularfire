@@ -1,11 +1,10 @@
-import { FirebaseApp, FirebaseAppConfig, AngularFireModule, FirebaseAppName } from 'angularfire2';
+import { FirebaseApp, FirebaseOptionsToken, AngularFireModule, FirebaseAppNameToken } from 'angularfire2';
 import { AngularFirestore } from './firestore';
 import { AngularFirestoreModule } from './firestore.module';
 import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 
-import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
+import { Observable, Subscription } from 'rxjs';
 
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from './test-config';
@@ -33,8 +32,9 @@ describe('AngularFirestore', () => {
     })();
   });
 
-  afterEach(async (done) => {
-    await app.delete();
+  afterEach(done => {
+    // can't await here https://github.com/firebase/firebase-js-sdk/issues/605
+    app.delete();
     done();
   });
 
@@ -105,8 +105,8 @@ describe('AngularFirestore with different app', () => {
         AngularFirestoreModule
       ],
       providers: [
-        { provide: FirebaseAppName, useValue: FIREBASE_APP_NAME_TOO },
-        { provide: FirebaseAppConfig, useValue:  COMMON_CONFIG }
+        { provide: FirebaseAppNameToken, useValue: FIREBASE_APP_NAME_TOO },
+        { provide: FirebaseOptionsToken, useValue: COMMON_CONFIG }
       ]
     });
     inject([FirebaseApp, AngularFirestore], (app_: FirebaseApp, _afs: AngularFirestore) => {

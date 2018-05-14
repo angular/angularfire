@@ -1,25 +1,26 @@
-import { InjectionToken, NgZone } from '@angular/core';
-import { FirebaseFirestore, CollectionReference, DocumentReference } from '@firebase/firestore-types';
+import { InjectionToken, NgZone, PLATFORM_ID } from '@angular/core';
+import { FirebaseFirestore, CollectionReference, DocumentReference, Settings } from '@firebase/firestore-types';
 
-import { Observable } from 'rxjs/Observable';
-import { Subscriber } from 'rxjs/Subscriber';
+import { Observable, Subscriber } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import { of } from 'rxjs/observable/of';
 import { from } from 'rxjs/observable/from';
-import 'rxjs/add/operator/map';
-
-import { FirebaseOptions } from '@firebase/app-types';
+import { FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
 import { Injectable, Inject, Optional } from '@angular/core';
 
 import { QueryFn, AssociatedReference } from './interfaces';
 import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 
-import { FirebaseAppConfig, FirebaseAppName, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
+import { FirebaseAppConfigToken, FirebaseOptionsToken, FirebaseAppNameToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
 
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
  */
 export const EnablePersistenceToken = new InjectionToken<boolean>('angularfire2.enableFirestorePersistence');
+export const FirestoreSettingsToken = new InjectionToken<Settings>('angularfire2.firestore.settings');
 
+export const DefaultFirestoreSettings = {timestampsInSnapshots: true} as Settings;
 
 /**
  * A utility methods for associating a collection reference with
@@ -107,22 +108,29 @@ export class AngularFirestore {
    * @param app
    */
   constructor(
-    @Inject(FirebaseAppConfig) config:FirebaseOptions,
-    @Optional() @Inject(FirebaseAppName) name:string,
+    @Inject(FirebaseOptionsToken) options:FirebaseOptions,
+    @Optional() @Inject(FirebaseAppConfigToken) config:FirebaseAppConfig,
+    @Optional() @Inject(FirebaseAppNameToken) name:string,
     @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean,
+    @Optional() @Inject(FirestoreSettingsToken) settings: Settings,
+    @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
-    this.scheduler = new FirebaseZoneScheduler(zone);
+    this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.firestore = zone.runOutsideAngular(() => {
       const app = _firebaseAppFactory(config, name);
-      return app.firestore();
+      const firestore = app.firestore();
+      firestore.settings(settings || DefaultFirestoreSettings);
+      return firestore;
     });
 
-    this.persistenceEnabled$ = zone.runOutsideAngular(() => {
-      return shouldEnablePersistence ?
-        from(this.firestore.enablePersistence().then(() => true, () => false)) :
-        from(new Promise((res, rej) => { res(false); }));
-    });
+    this.persistenceEnabled$ = zone.runOutsideAngular(() =>
+        shouldEnablePersistence ? from(this.firestore.enablePersistence().then(() => true, () => false))
+                                : of(false)
+      )
+      .pipe(
+        catchError(() => of(false))
+      ); // https://github.com/firebase/firebase-js-sdk/issues/608
   }
 
   /**
