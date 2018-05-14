@@ -4,12 +4,10 @@ import { FirebaseZoneScheduler } from 'angularfire2';
 import * as utils from './utils';
 import { AFUnwrappedDataSnapshot } from './interfaces';
 import { FirebaseListObservable } from './firebase_list_observable';
-import { Observer } from 'rxjs/Observer';
-import { observeOn } from 'rxjs/operator/observeOn';
+import { Observer } from 'rxjs';
+import { observeOn, switchMap, map } from 'rxjs/operators';
 import { observeQuery } from './query_observable';
 import { Query, FirebaseListFactoryOpts, DatabaseReference, DatabaseQuery, DatabaseSnapshot } from './interfaces';
-import { switchMap } from 'rxjs/operator/switchMap';
-import { map } from 'rxjs/operator/map';
 
 export function FirebaseListFactory (
   ref: DatabaseReference,

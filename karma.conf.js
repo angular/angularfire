@@ -20,7 +20,7 @@ module.exports = function(config) {
       'node_modules/zone.js/dist/async-test.js',
       'node_modules/zone.js/dist/fake-async-test.js',
 
-      'node_modules/rxjs/bundles/Rx.{js,map}',
+      'node_modules/rxjs/bundles/rxjs.umd.{js,map}',
 
       ...getAngularFiles(['core','common','compiler','platform-browser','platform-browser-dynamic']),
 

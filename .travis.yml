@@ -43,3 +43,5 @@ script:
   - ./node_modules/.bin/karma start --single-run --browsers ChromeHeadlessTravis --reporters mocha
   # Run integration test to make sure our typings are correct for user-land.
   - node tools/run-typings-test.js
+  # Run the ng6 build test
+  - cd test/ng-build/ng6 && yarn && yarn build:prod
