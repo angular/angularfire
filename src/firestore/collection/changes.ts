@@ -10,24 +10,24 @@ import { DocumentChangeAction, Action } from '../interfaces';
  * order of occurence.
  * @param query
  */
-export function docChanges(query: Query): Observable<DocumentChangeAction[]> {
+export function docChanges<T>(query: Query): Observable<DocumentChangeAction<T>[]> {
   return fromCollectionRef(query)
     .pipe(
       map(action =>
         action.payload.docChanges()
-          .map(change => ({ type: change.type, payload: change }))));
+          .map(change => ({ type: change.type, payload: change } as DocumentChangeAction<T>))));
 }
 
 /**
  * Return a stream of document changes on a query. These results are in sort order.
  * @param query
  */
-export function sortedChanges(query: Query, events: DocumentChangeType[]): Observable<DocumentChangeAction[]> {
+export function sortedChanges<T>(query: Query, events: DocumentChangeType[]): Observable<DocumentChangeAction<T>[]> {
   return fromCollectionRef(query)
     .pipe(
       map(changes => changes.payload.docChanges()),
       scan((current, changes) => combineChanges(current, changes, events), []),
-      map(changes => changes.map(c => ({ type: c.type, payload: c }))));
+      map(changes => changes.map(c => ({ type: c.type, payload: c } as DocumentChangeAction<T>))));
 }
 
 /**

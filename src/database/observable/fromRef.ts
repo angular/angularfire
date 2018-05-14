@@ -3,8 +3,8 @@ import { Observable } from 'rxjs';
 import { FirebaseZoneScheduler } from 'angularfire2';
 import { map, delay, share } from 'rxjs/operators';
 
-interface SnapshotPrevKey {
-  snapshot: DatabaseSnapshot;
+interface SnapshotPrevKey<T> {
+  snapshot: DatabaseSnapshot<T>;
   prevKey: string | null | undefined;
 }
 
@@ -13,8 +13,8 @@ interface SnapshotPrevKey {
  * @param ref Database Reference
  * @param event Listen event type ('value', 'added', 'changed', 'removed', 'moved')
  */
-export function fromRef(ref: DatabaseQuery, event: ListenEvent, listenType = 'on'): Observable<AngularFireAction<DatabaseSnapshot>> {
-  return new Observable<SnapshotPrevKey>(subscriber => {
+export function fromRef<T>(ref: DatabaseQuery, event: ListenEvent, listenType = 'on'): Observable<AngularFireAction<DatabaseSnapshot<T>>> {
+  return new Observable<SnapshotPrevKey<T>>(subscriber => {
     const fn = ref[listenType](event, (snapshot, prevKey) => {
       subscriber.next({ snapshot, prevKey });
       if (listenType == 'once') { subscriber.complete(); }
@@ -25,7 +25,7 @@ export function fromRef(ref: DatabaseQuery, event: ListenEvent, listenType = 'on
       return { unsubscribe() { } };
     }
   }).pipe(
-    map((payload: SnapshotPrevKey) =>  {
+    map(payload =>  {
       const { snapshot, prevKey } = payload;
       let key: string | null = null;
       if (snapshot.exists()) { key = snapshot.key; }
