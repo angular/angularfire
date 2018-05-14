@@ -7,20 +7,12 @@ import { AngularFireDatabase } from '../database';
 
 import { skipWhile, withLatestFrom, map, scan } from 'rxjs/operators';
 
-export function createAuditTrail(query: DatabaseQuery, afDatabase: AngularFireDatabase) {
-  return (events?: ChildEvent[]) => afDatabase.scheduler.keepUnstableUntilFirst(
-    afDatabase.scheduler.runOutsideAngular(
-      auditTrail(query, events)
-    )
-  );
-}
-
-export function auditTrail(query: DatabaseQuery, events?: ChildEvent[]): Observable<SnapshotAction[]> {
-  const auditTrail$ = stateChanges(query, events)
+export function auditTrail<T>(query: DatabaseQuery, events?: ChildEvent[]): Observable<SnapshotAction<T>[]> {
+  const auditTrail$ = stateChanges<T>(query, events)
     .pipe(
-      scan<SnapshotAction>((current, action) => [...current, action], [])
+      scan<SnapshotAction<T>>((current, action) => [...current, action], [])
     );
-  return waitForLoaded(query, auditTrail$);
+  return waitForLoaded<T>(query, auditTrail$);
 }
 
 interface LoadedMetadata {
@@ -28,11 +20,11 @@ interface LoadedMetadata {
   lastKeyToLoad: any;
 }
 
-function loadedData(query: DatabaseQuery): Observable<LoadedMetadata> {
+function loadedData<T>(query: DatabaseQuery): Observable<LoadedMetadata> {
   // Create an observable of loaded values to retrieve the
   // known dataset. This will allow us to know what key to
   // emit the "whole" array at when listening for child events.
-  return fromRef(query, 'value')
+  return fromRef<T>(query, 'value')
   .pipe(
     map(data => {
       // Store the last key in the data set
@@ -47,8 +39,8 @@ function loadedData(query: DatabaseQuery): Observable<LoadedMetadata> {
   );
 }
 
-function waitForLoaded(query: DatabaseQuery, action$: Observable<SnapshotAction[]>) {
-  const loaded$ = loadedData(query);
+function waitForLoaded<T>(query: DatabaseQuery, action$: Observable<SnapshotAction<T>[]>) {
+  const loaded$ = loadedData<T>(query);
   return loaded$
     .pipe(
       withLatestFrom(action$),

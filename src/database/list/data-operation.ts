@@ -7,7 +7,7 @@ export function createDataOperationMethod<T>(ref: DatabaseReference, operation: 
     return checkOperationCases(item, {
       stringCase: () => ref.child(<string>item)[operation](value),
       firebaseCase: () => (<DatabaseReference>item)[operation](value),
-      snapshotCase: () => (<DatabaseSnapshot>item).ref[operation](value)
+      snapshotCase: () => (<DatabaseSnapshot<T>>item).ref[operation](value)
     });
   }
 }

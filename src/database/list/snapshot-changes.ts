@@ -3,7 +3,7 @@ import { listChanges } from './changes';
 import { DatabaseQuery, ChildEvent, SnapshotAction } from '../interfaces';
 import { validateEventsArray } from './utils';
 
-export function snapshotChanges(query: DatabaseQuery, events?: ChildEvent[]): Observable<SnapshotAction[]> {
+export function snapshotChanges<T>(query: DatabaseQuery, events?: ChildEvent[]): Observable<SnapshotAction<T>[]> {
   events = validateEventsArray(events);
-  return listChanges(query, events!);
+  return listChanges<T>(query, events!);
 }

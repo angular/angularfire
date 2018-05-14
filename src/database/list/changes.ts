@@ -6,7 +6,7 @@ import { isNil } from '../utils';
 
 import { switchMap, distinctUntilChanged, scan } from 'rxjs/operators';
 
-export function listChanges<T>(ref: DatabaseQuery, events: ChildEvent[]): Observable<SnapshotAction[]> {
+export function listChanges<T=any>(ref: DatabaseQuery, events: ChildEvent[]): Observable<SnapshotAction<T>[]> {
   return fromRef(ref, 'value', 'once').pipe(
     switchMap(snapshotAction => {
       const childEvent$ = [of(snapshotAction)];
@@ -17,7 +17,7 @@ export function listChanges<T>(ref: DatabaseQuery, events: ChildEvent[]): Observ
   );
 }
 
-function positionFor(changes: SnapshotAction[], key) {
+function positionFor<T>(changes: SnapshotAction<T>[], key) {
   const len = changes.length;
   for(let i=0; i<len; i++) {
     if(changes[i].payload.key === key) {
@@ -27,7 +27,7 @@ function positionFor(changes: SnapshotAction[], key) {
   return -1;
 }
 
-function positionAfter(changes: SnapshotAction[], prevKey?: string) {
+function positionAfter<T>(changes: SnapshotAction<T>[], prevKey?: string) {
   if(isNil(prevKey)) { 
     return 0; 
   } else {
