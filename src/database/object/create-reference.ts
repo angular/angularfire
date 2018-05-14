@@ -7,7 +7,7 @@ export function createObjectReference<T>(query: DatabaseQuery, afDatabase: Angul
   return {
     query,
     snapshotChanges<T>() {
-      const snapshotChanges$ = createObjectSnapshotChanges(query)();
+      const snapshotChanges$ = createObjectSnapshotChanges<T>(query)();
       return afDatabase.scheduler.keepUnstableUntilFirst(
         afDatabase.scheduler.runOutsideAngular(
           snapshotChanges$

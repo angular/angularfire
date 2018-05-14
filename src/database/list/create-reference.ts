@@ -1,7 +1,7 @@
 import { DatabaseQuery, AngularFireList, ChildEvent } from '../interfaces';
 import { snapshotChanges } from './snapshot-changes';
-import { createStateChanges } from './state-changes';
-import { createAuditTrail } from './audit-trail';
+import { stateChanges } from './state-changes';
+import { auditTrail } from './audit-trail';
 import { createDataOperationMethod } from './data-operation';
 import { createRemoveMethod } from './remove';
 import { AngularFireDatabase } from '../database';
@@ -15,23 +15,37 @@ export function createListReference<T>(query: DatabaseQuery, afDatabase: Angular
     push: (data: T) => query.ref.push(data),
     remove: createRemoveMethod(query.ref),
     snapshotChanges(events?: ChildEvent[]) {
-      const snapshotChanges$ = snapshotChanges(query, events);
+      const snapshotChanges$ = snapshotChanges<T>(query, events);
       return afDatabase.scheduler.keepUnstableUntilFirst(
         afDatabase.scheduler.runOutsideAngular(
           snapshotChanges$
         )
       );
     },
-    stateChanges: createStateChanges(query, afDatabase),
-    auditTrail: createAuditTrail(query, afDatabase),
-    valueChanges<T>(events?: ChildEvent[]) { 
-      const snapshotChanges$ = snapshotChanges(query, events);
+    stateChanges(events?: ChildEvent[]) {
+      const stateChanges$ = stateChanges<T>(query, events);
+      return afDatabase.scheduler.keepUnstableUntilFirst(
+        afDatabase.scheduler.runOutsideAngular(
+          stateChanges$
+        )
+      );
+    },
+    auditTrail(events?: ChildEvent[]) {
+      const auditTrail$ = auditTrail<T>(query, events)
+      return afDatabase.scheduler.keepUnstableUntilFirst(
+        afDatabase.scheduler.runOutsideAngular(
+          auditTrail$
+        )
+      );
+    },
+    valueChanges(events?: ChildEvent[]) {
+      const snapshotChanges$ = snapshotChanges<T>(query, events);
       return afDatabase.scheduler.keepUnstableUntilFirst(
         afDatabase.scheduler.runOutsideAngular(
           snapshotChanges$
         )
       ).pipe(
-        map(actions => actions.map(a => a.payload.val()))
+        map(actions => actions.map(a => a.payload.val() as T))
       );
     }
   }

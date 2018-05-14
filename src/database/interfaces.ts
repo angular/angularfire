@@ -6,9 +6,9 @@ export type FirebaseOperation = string | Reference | DataSnapshot;
 export interface AngularFireList<T> {
   query: DatabaseQuery;
   valueChanges(events?: ChildEvent[]): Observable<T[]>;
-  snapshotChanges(events?: ChildEvent[]): Observable<SnapshotAction[]>;
-  stateChanges(events?: ChildEvent[]): Observable<SnapshotAction>;
-  auditTrail(events?: ChildEvent[]): Observable<SnapshotAction[]>;
+  snapshotChanges(events?: ChildEvent[]): Observable<SnapshotAction<T>[]>;
+  stateChanges(events?: ChildEvent[]): Observable<SnapshotAction<T>>;
+  auditTrail(events?: ChildEvent[]): Observable<SnapshotAction<T>[]>;
   update(item: FirebaseOperation, data: T): Promise<void>;
   set(item: FirebaseOperation, data: T): Promise<void>;
   push(data: T): ThenableReference;
@@ -18,7 +18,7 @@ export interface AngularFireList<T> {
 export interface AngularFireObject<T> {
   query: DatabaseQuery;
   valueChanges(): Observable<T | null>;
-  snapshotChanges(): Observable<SnapshotAction>;
+  snapshotChanges(): Observable<SnapshotAction<T>>;
   update(data: Partial<T>): Promise<void>;
   set(data: T): Promise<void>;
   remove(): Promise<void>;
@@ -45,11 +45,24 @@ export interface AngularFireAction<T> extends Action<T> {
   key: string | null;
 }
 
-export type SnapshotAction = AngularFireAction<DatabaseSnapshot>;
+export type SnapshotAction<T> = AngularFireAction<DatabaseSnapshot<T>>;
 
 export type Primitive = number | string | boolean;
 
-export type DatabaseSnapshot = DataSnapshot;
+export interface DatabaseSnapshotExists<T> extends DataSnapshot {
+  exists(): true;
+  val(): T;
+  forEach(action: (a: DatabaseSnapshot<T>) => boolean): boolean;
+}
+
+export interface DatabaseSnapshotDoesNotExist<T> extends DataSnapshot {
+  exists(): false;
+  val(): null;
+  forEach(action: (a: DatabaseSnapshot<T>) => boolean): boolean;
+}
+
+export type DatabaseSnapshot<T> = DatabaseSnapshotExists<T> | DatabaseSnapshotDoesNotExist<T>;
+
 export type DatabaseReference = Reference;
 export type DatabaseQuery = Query;
 export type QueryReference = DatabaseReference | DatabaseQuery;
