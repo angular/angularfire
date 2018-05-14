@@ -1,6 +1,6 @@
 # 5. Getting started with Firebase Authentication
 
-`AngularFireAuth.authState` provides you an `Observable<firebase.User>` to monitor your application's authentication State.
+`AngularFireAuth.user` provides you an `Observable<User|null>` to monitor your application's authentication State.
 
 `AngularFireAuth.auth` returns an initialized
 `firebase.auth.Auth` instance, allowing you to log users in, out, etc. [See
@@ -11,12 +11,12 @@ the Firebase docs for more information on what methods are available.](https://f
 ```ts
 import { Component } from '@angular/core';
 import { AngularFireAuth } from 'angularfire2/auth';
-import * as firebase from 'firebase/app';
+import { firebase } from '@firebase/app';
 
 @Component({
   selector: 'app-root',
   template: `
-    <div *ngIf="afAuth.authState | async as user; else showLogin">
+    <div *ngIf="afAuth.user | async as user; else showLogin">
       <h1>Hello {{ user.displayName }}!</h1>
       <button (click)="logout()">Logout</button>
     </div>
