@@ -53,7 +53,7 @@ Update `/src/app/app.component.ts` to import `AngularFireList` from angularfire2
 ```ts
 import { Component } from '@angular/core';
 import { AngularFireDatabase } from 'angularfire2/database';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -203,8 +203,8 @@ itemsRef.remove();
 ```ts
 import { Component } from '@angular/core';
 import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/map';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -227,9 +227,11 @@ export class AppComponent {
   constructor(db: AngularFireDatabase) {
     this.itemsRef = db.list('messages');
     // Use snapshotChanges().map() to store the key
-    this.items = this.itemsRef.snapshotChanges().map(changes => {
-      return changes.map(c => ({ key: c.payload.key, ...c.payload.val() }));
-    });
+    this.items = this.itemsRef.snapshotChanges().pipe(
+      map(changes => 
+        changes.map(c => ({ key: c.payload.key, ...c.payload.val() }))
+      )
+    );
   }
   addItem(newName: string) {
     this.itemsRef.push({ text: newName });

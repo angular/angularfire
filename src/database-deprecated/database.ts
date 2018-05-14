@@ -25,7 +25,7 @@ export class AngularFireDatabase {
     zone: NgZone
   ) {
     this.database = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(config, name);
+      const app = _firebaseAppFactory(options, name, config);
       return app.database(databaseURL || undefined);
     });
   }

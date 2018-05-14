@@ -1,6 +1,6 @@
 {
   "name": "angularfire2",
-  "version": "5.0.0-rc.7",
+  "version": "5.0.0-rc.8",
   "description": "The official library of Firebase and Angular.",
   "private": true,
   "scripts": {
@@ -29,11 +29,11 @@
   },
   "homepage": "https://github.com/angular/angularfire2#readme",
   "dependencies": {
-    "@angular/common": "^5.0.0",
-    "@angular/compiler": "^5.0.0",
-    "@angular/core": "^5.0.0",
-    "@angular/platform-browser": "^5.0.0",
-    "@angular/platform-browser-dynamic": "^5.0.0",
+    "@angular/common": "^6.0.0",
+    "@angular/compiler": "^6.0.0",
+    "@angular/core": "^6.0.0",
+    "@angular/platform-browser": "^6.0.0",
+    "@angular/platform-browser-dynamic": "^6.0.0",
     "@firebase/app": "^0.3.1",
     "@firebase/app-types": "^0.3.1",
     "@firebase/auth": "^0.5.2",
@@ -47,15 +47,15 @@
     "@firebase/storage-types": "^0.2.2",
     "bufferutil": "^3.0.3",
     "firebase": "^5.0.2",
-    "rxjs": "^5.5.4",
+    "rxjs": "^6.0.0",
     "utf-8-validate": "^4.0.0",
     "ws": "^3.3.2",
     "xmlhttprequest": "^1.8.0",
     "zone.js": "^0.8.0"
   },
   "devDependencies": {
-    "@angular/compiler-cli": "^5.0.0",
-    "@angular/platform-server": "^5.0.0",
+    "@angular/compiler-cli": "^6.0.0",
+    "@angular/platform-server": "^6.0.0",
     "@types/jasmine": "^2.5.36",
     "@types/request": "0.0.30",
     "concurrently": "^2.2.0",
@@ -90,7 +90,7 @@
     "systemjs": "^0.19.16",
     "systemjs-builder": "^0.15.7",
     "traceur": "0.0.96",
-    "typescript": ">=2.4.2 <2.5"
+    "typescript": ">=2.7.2 <2.8.0"
   },
   "typings": "index.d.ts"
 }
