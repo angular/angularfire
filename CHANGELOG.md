@@ -1,3 +1,29 @@
+<a name="5.0.0-rc.8"></a>
+# [5.0.0-rc.8](https://github.com/angular/angularfire2/compare/5.0.0-rc.7...5.0.0-rc.8) (2018-05-12)
+
+### Bug Fixes
+
+* Zone was already loaded, type is implied ([#1631](https://github.com/angular/angularfire2/issues/1631)) ([7d2fd53](https://github.com/angular/angularfire2/commit/7d2fd53)), closes [#1599](https://github.com/angular/angularfire2/issues/1599)
+
+### Features
+
+* Supporting Angular and rxjs 6 ([dd4a36c](https://github.com/angular/angularfire2/commit/dd4a36c))
+* Support Firebase JS SDK 5.0 ([#1628](https://github.com/angular/angularfire2/issues/1628)) ([b99bfa3](https://github.com/angular/angularfire2/commit/b99bfa3))
+* Support FirebaseAppConfig, clean up injection tokens ([#1627](https://github.com/angular/angularfire2/issues/1627)) ([57906bd](https://github.com/angular/angularfire2/commit/57906bd))
+* **firestore:** Support Firestore Settings, timestampsInSnapshots default to true ([#1629](https://github.com/angular/angularfire2/issues/1629)) ([570c0a7](https://github.com/angular/angularfire2/commit/570c0a7))
+* **auth:** Update to rxjs pipeable operators ([#1621](https://github.com/angular/angularfire2/issues/1621)) ([0c3b215](https://github.com/angular/angularfire2/commit/0c3b215))
+* **core:** Update to rxjs pipeable operators ([#1620](https://github.com/angular/angularfire2/issues/1620)) ([3fbbb7d](https://github.com/angular/angularfire2/commit/3fbbb7d))
+* **database:** Update to rxjs pipeable operators ([#1622](https://github.com/angular/angularfire2/issues/1622)) ([5c3681d](https://github.com/angular/angularfire2/commit/5c3681d))
+* **firestore:** Update to rxjs pipeable operators ([#1623](https://github.com/angular/angularfire2/issues/1623)) ([97b26e3](https://github.com/angular/angularfire2/commit/97b26e3))
+* **storage:** Update to rxjs pipeable operators ([#1624](https://github.com/angular/angularfire2/issues/1624)) ([014be21](https://github.com/angular/angularfire2/commit/014be21))
+
+### Breaking changes
+
+* Due to the addition of a conflicting `FirebaseAppConfig` interface in Firebase 4.13 we've now changed our `FirebaseAppConfig` Injection Token to be `FirebaseOptionsToken`
+* For consistency the `FirebaseAppName` Injection Token is now `FirebaseAppNameToken`
+* rxjs 5 is no longer supported, upgrade to 6 ([see the rxjs migration guide for more information](https://github.com/ReactiveX/rxjs/blob/master/MIGRATION.md))
+* Firebase JS SDK 4.x is no longer supported, upgrade to 5 ([see the changelog for more information](https://firebase.google.com/support/release-notes/js#version_500_may_8_2018))
+
 <a name="5.0.0-rc.7"></a>
 # [5.0.0-rc.7](https://github.com/angular/angularfire2/compare/5.0.0-rc.6...5.0.0-rc.7) (2018-05-04)
 

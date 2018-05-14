@@ -59,8 +59,10 @@ When we call [`switchMap` on the Subject](https://www.learnrxjs.io/operators/tra
 
 ```ts
 const size$ = new Subject<string>();
-const queryObservable = size$.switchMap(size =>
-  afs.collection('items', ref => ref.where('size', '==', size)).valueChanges();
+const queryObservable = size$.pipe(
+  switchMap(size => 
+    afs.collection('items', ref => ref.where('size', '==', size)).valueChanges()
+  )
 );
 
 // subscribe to changes
@@ -82,10 +84,8 @@ size$.next('small');
 ```ts
 import { Component } from '@angular/core';
 import { AngularFirestore } from 'angularfire2/firestore';
-import { Observable } from 'rxjs/Observable';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import 'rxjs/add/operator/switchMap';
-import 'rxjs/add/observable/combineLatest';
+import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 export interface Item {
   text: string;
@@ -133,16 +133,18 @@ export class AppComponent {
   constructor(afs: AngularFirestore) {
     this.sizeFilter$ = new BehaviorSubject(null);
     this.colorFilter$ = new BehaviorSubject(null);
-    this.items$ = Observable.combineLatest(
+    this.items$ = combineLatest(
       this.sizeFilter$,
       this.colorFilter$
-    ).switchMap(([size, color]) => 
-      afs.collection('items', ref => {
-        let query : firebase.firestore.CollectionReference | firebase.firestore.Query = ref;
-        if (size) { query = query.where('size', '==', size) };
-        if (color) { query = query.where('color', '==', color) };
-        return query;
-      }).valueChanges()
+    ).pipe(
+      switchMap(([size, color]) => 
+        afs.collection('items', ref => {
+          let query : firebase.firestore.CollectionReference | firebase.firestore.Query = ref;
+          if (size) { query = query.where('size', '==', size) };
+          if (color) { query = query.where('color', '==', color) };
+          return query;
+        }).valueChanges()
+      )
     );
   }
   filterBySize(size: string|null) {
