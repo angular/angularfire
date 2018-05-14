@@ -1,10 +1,8 @@
 import { FirebaseAuth, User, IdTokenResult } from '@firebase/auth-types';
 import { FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { of } from 'rxjs/observable/of';
-import { from } from 'rxjs/observable/from';
 
 import { FirebaseOptionsToken, FirebaseAppConfigToken, FirebaseAppNameToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
 
