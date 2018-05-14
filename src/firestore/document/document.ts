@@ -1,4 +1,4 @@
-import { DocumentReference, SetOptions } from '@firebase/firestore-types';
+import { DocumentReference, SetOptions, DocumentData } from '@firebase/firestore-types';
 import { Observable, Subscriber } from 'rxjs';
 import { QueryFn, AssociatedReference, Action, DocumentSnapshot } from '../interfaces';
 import { fromDocRef } from '../observable/fromRef';
@@ -31,7 +31,7 @@ import { AngularFirestoreCollection } from '../collection/collection';
  * // OR! Transform using Observable.from() and the data is unwrapped for you
  * Observable.from(fakeStock).subscribe(value => console.log(value));
  */
-export class AngularFirestoreDocument<T> {
+export class AngularFirestoreDocument<T=DocumentData> {
 
   /**
    * The contstuctor takes in a DocumentReference to provide wrapper methods
@@ -88,10 +88,10 @@ export class AngularFirestoreDocument<T> {
   /**
    * Listen to unwrapped snapshot updates from the document.
    */
-  valueChanges(): Observable<T|null> {
+  valueChanges(): Observable<T|undefined> {
     return this.snapshotChanges().pipe(
       map(action => {
-        return action.payload.exists ? action.payload.data() as T : null;
+        return action.payload.data();
       })
     );
   }

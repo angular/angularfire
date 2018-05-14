@@ -1,4 +1,4 @@
-import { DocumentChangeType, CollectionReference, Query, DocumentReference } from '@firebase/firestore-types';
+import { DocumentChangeType, CollectionReference, Query, DocumentReference, DocumentData } from '@firebase/firestore-types';
 import { Observable, Subscriber } from 'rxjs';
 import { fromCollectionRef } from '../observable/fromRef';
 import { map, filter } from 'rxjs/operators';
@@ -40,7 +40,7 @@ export function validateEventsArray(events?: DocumentChangeType[]) {
  * // Subscribe to changes as snapshots. This provides you data updates as well as delta updates.
  * fakeStock.valueChanges().subscribe(value => console.log(value));
  */
-export class AngularFirestoreCollection<T> {
+export class AngularFirestoreCollection<T=DocumentData> {
   /**
    * The constructor takes in a CollectionReference and Query to provide wrapper methods
    * for data operations and data streaming.
@@ -106,11 +106,11 @@ export class AngularFirestoreCollection<T> {
    * Listen to all documents in the collection and its possible query as an Observable.
    */
   valueChanges(): Observable<T[]> {
-    const fromCollectionRef$ = fromCollectionRef(this.query);
+    const fromCollectionRef$ = fromCollectionRef<T>(this.query);
     const scheduled$ = this.afs.scheduler.runOutsideAngular(fromCollectionRef$);
     return this.afs.scheduler.keepUnstableUntilFirst(scheduled$)
       .pipe(
-        map(actions => actions.payload.docs.map(a => a.data()) as T[])
+        map(actions => actions.payload.docs.map(a => a.data()))
       );
   }
 
