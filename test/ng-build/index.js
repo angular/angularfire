@@ -11,7 +11,7 @@ function packageAngularFire() {
   const res = spawnSync('sh', ['pack.sh']);
   console.log(`------------ FINISHED PACKAGING VERSION ${PACKAGED_VERSION} ------------`);
   console.log(`------------ INSTALLING VERSION ${PACKAGED_VERSION} ------------`);
-  if (shell.exec(`cd ng5 && yarn i firebase ../${PACKAGED_VERSION}`).code !== 0) {
+  if (shell.exec(`cd ng5 && yarn add firebase ../${PACKAGED_VERSION}`).code !== 0) {
     shell.echo('Error');
     shell.exit(1);
   }
