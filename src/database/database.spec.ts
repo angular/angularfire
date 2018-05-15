@@ -1,4 +1,4 @@
-import { FirebaseApp, AngularFireModule, FirebaseOptionsToken, FirebaseAppNameToken } from 'angularfire2';
+import { FirebaseApp, AngularFireModule, FirebaseOptionsToken, FirebaseNameOrConfigToken } from 'angularfire2';
 import { AngularFireDatabase, AngularFireDatabaseModule, RealtimeDatabaseURL } from 'angularfire2/database';
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from './test-config';
@@ -42,7 +42,7 @@ describe('AngularFireDatabase', () => {
     });
 
     it('should accept a Firebase App in the constructor', () => {
-      const __db = new AngularFireDatabase(app.options, undefined!, app.name, undefined!, {}, zone);
+      const __db = new AngularFireDatabase(app.options, app.name, undefined!, {}, zone);
       expect(__db instanceof AngularFireDatabase).toEqual(true);
     });
 
@@ -69,7 +69,7 @@ describe('AngularFireDatabase w/options', () => {
         AngularFireDatabaseModule
       ],
       providers: [
-        { provide: FirebaseAppNameToken, useValue: FIREBASE_APP_NAME_TOO },
+        { provide: FirebaseNameOrConfigToken, useValue: FIREBASE_APP_NAME_TOO },
         { provide: FirebaseOptionsToken, useValue: COMMON_CONFIG },
         { provide: RealtimeDatabaseURL,  useValue: FIREBASE_DB_NAME }
       ]

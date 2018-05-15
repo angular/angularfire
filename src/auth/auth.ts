@@ -1,10 +1,10 @@
-import { FirebaseAuth, User } from '@firebase/auth-types';
+import { FirebaseAuth, User, IdTokenResult } from '@firebase/auth-types';
 import { FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
 import { Observable, of, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
-import { FirebaseOptionsToken, FirebaseAppConfigToken, FirebaseAppNameToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
+import { FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
 
 
 @Injectable()
@@ -16,25 +16,36 @@ export class AngularFireAuth {
   public readonly auth: FirebaseAuth;
 
   /**
-   * Observable of authentication state; as of 4.0 this is only triggered via sign-in/out
+   * Observable of authentication state; as of Firebase 4.0 this is only triggered via sign-in/out
    */
   public readonly authState: Observable<User|null>;
 
   /**
-   * Observable of the signed-in user's ID token; which includes sign-in, sign-out, and token refresh events
+   * Observable of the currently signed-in user's JWT token used to identify the user to a Firebase service (or null).
    */
   public readonly idToken: Observable<string|null>;
 
+  /**
+   * Observable of the currently signed-in user (or null).
+   */
+  public readonly user: Observable<User|null>;
+
+  /**
+   * Observable of the currently signed-in user's IdTokenResult object which contains the ID token JWT string and other
+   * helper properties for getting different data associated with the token as well as all the decoded payload claims
+   * (or null).
+   */
+  public readonly idTokenResult: Observable<IdTokenResult|null>;
+
   constructor(
     @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Optional() @Inject(FirebaseAppConfigToken) config:FirebaseAppConfig,
-    @Optional() @Inject(FirebaseAppNameToken) name:string,
+    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|undefined,
     @Inject(PLATFORM_ID) platformId: Object,
     private zone: NgZone
   ) {
     const scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.auth = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(options, name, config);
+      const app = _firebaseAppFactory(options, nameOrConfig);
       return app.auth();
     });
 
@@ -47,16 +58,22 @@ export class AngularFireAuth {
       )
     );
 
-    this.idToken = scheduler.keepUnstableUntilFirst(
+    this.user = scheduler.keepUnstableUntilFirst(
       scheduler.runOutsideAngular(
         new Observable(subscriber => {
           const unsubscribe = this.auth.onIdTokenChanged(subscriber);
           return { unsubscribe };
         })
       )
-    ).pipe(switchMap((user:User) => {
+    );
+
+    this.idToken = this.user.pipe(switchMap(user => {
       return user ? from(user.getIdToken()) : of(null)
-    }));    
+    }));
+
+    this.idTokenResult = this.user.pipe(switchMap(user => {
+      return user ? from(user.getIdTokenResult()) : of(null)
+    }));
   }
 
 }

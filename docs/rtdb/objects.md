@@ -17,7 +17,7 @@ If you've followed the earlier step "Installation and Setup"  your `/src/app/app
 ```ts
 import { Component } from '@angular/core';
 import { AngularFireDatabase } from 'angularfire2/database';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -49,7 +49,7 @@ Then in your template, you can use the `async` pipe to unwrap the binding.
 ```ts
 import { Component } from '@angular/core';
 import { AngularFireDatabase } from 'angularfire2/database';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -125,7 +125,7 @@ itemRef.remove();
 ```ts
 import { Component } from '@angular/core';
 import { AngularFireDatabase, AngularFireObject } from 'angularfire2/database';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-root',
