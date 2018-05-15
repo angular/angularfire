@@ -4,7 +4,7 @@ import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core
 import { Observable, from } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { FirebaseOptionsToken, FirebaseAppConfigToken, FirebaseAppNameToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
+import { FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
 
 @Injectable()
 export class AngularFireFunctions {
@@ -18,21 +18,20 @@ export class AngularFireFunctions {
 
   constructor(
     @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Optional() @Inject(FirebaseAppConfigToken) config:FirebaseAppConfig,
-    @Optional() @Inject(FirebaseAppNameToken) name:string,
+    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|undefined,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     
     this.functions = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(options, name, config);
+      const app = _firebaseAppFactory(options, nameOrConfig);
       return app.functions();
     });
 
   }
 
-  public httpsCallable<T, R>(name: string) {
+  public httpsCallable<T=any, R=any>(name: string) {
     const callable = this.functions.httpsCallable(name);
     return (data: T) => {
       const callable$ = from(callable(data));
