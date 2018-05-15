@@ -1,6 +1,6 @@
 import { ReflectiveInjector, Provider } from '@angular/core';
 import { TestBed, inject } from '@angular/core/testing';
-import { FirebaseApp, FirebaseOptionsToken, AngularFireModule, FirebaseAppNameToken } from 'angularfire2';
+import { FirebaseApp, FirebaseOptionsToken, AngularFireModule, FirebaseNameOrConfigToken } from 'angularfire2';
 import { AngularFireFunctions, AngularFireFunctionsModule } from 'angularfire2/functions';
 import { COMMON_CONFIG } from './test-config';
 
@@ -49,7 +49,7 @@ describe('AngularFireFunctions with different app', () => {
         AngularFireFunctionsModule
       ],
       providers: [
-        { provide: FirebaseAppNameToken, useValue: FIREBASE_APP_NAME_TOO },
+        { provide: FirebaseNameOrConfigToken, useValue: FIREBASE_APP_NAME_TOO },
         { provide: FirebaseOptionsToken, useValue: COMMON_CONFIG }
       ]
     });
