@@ -2,7 +2,7 @@ import { User } from '@firebase/auth-types';
 import { ReflectiveInjector, Provider } from '@angular/core';
 import { Observable, Subject } from 'rxjs'
 import { TestBed, inject } from '@angular/core/testing';
-import { FirebaseApp, FirebaseOptionsToken, AngularFireModule, FirebaseAppNameToken } from 'angularfire2';
+import { FirebaseApp, FirebaseOptionsToken, AngularFireModule, FirebaseNameOrConfigToken } from 'angularfire2';
 import { AngularFireAuth, AngularFireAuthModule } from 'angularfire2/auth';
 import { COMMON_CONFIG } from './test-config';
 import { take, skip } from 'rxjs/operators';
@@ -136,7 +136,7 @@ describe('AngularFireAuth with different app', () => {
         AngularFireAuthModule
       ],
       providers: [
-        { provide: FirebaseAppNameToken, useValue: FIREBASE_APP_NAME_TOO },
+        { provide: FirebaseNameOrConfigToken, useValue: FIREBASE_APP_NAME_TOO },
         { provide: FirebaseOptionsToken, useValue: COMMON_CONFIG }
       ]
     });
