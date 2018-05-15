@@ -1,6 +1,6 @@
 const fs = require('fs');
 const { spawn, spawnSync } = require('child_process');
-const ng5Pkg = require(`${__dirname}/ng5/package.json`);
+const ng5Pkg = require(`${__dirname}/ng6/package.json`);
 const pkg = require('../../package.json');
 const shell = require('shelljs');
 
@@ -11,7 +11,7 @@ function packageAngularFire() {
   const res = spawnSync('sh', ['pack.sh']);
   console.log(`------------ FINISHED PACKAGING VERSION ${PACKAGED_VERSION} ------------`);
   console.log(`------------ INSTALLING VERSION ${PACKAGED_VERSION} ------------`);
-  if (shell.exec(`cd ng5 && npm i firebase ../${PACKAGED_VERSION}`).code !== 0) {
+  if (shell.exec(`cd ng5 && yarn add firebase ../${PACKAGED_VERSION}`).code !== 0) {
     shell.echo('Error');
     shell.exit(1);
   }
@@ -30,7 +30,7 @@ function buildVersion5() {
   });
   cmd.on('close', () => {
     try {
-      const dir = fs.readdirSync(__dirname + '/ng5/dist');
+      const dir = fs.readdirSync(__dirname + '/ng6/dist');
       console.log(dir);
       console.log(`------------ SUCCESS VERSION ${ng5Pkg.dependencies['@angular/core']} ------------`);
     } catch (e) {

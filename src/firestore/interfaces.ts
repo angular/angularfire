@@ -1,9 +1,34 @@
 import { Subscriber } from 'rxjs';
-import { DocumentChangeType, DocumentChange, CollectionReference, Query } from '@firebase/firestore-types';
+import { DocumentChangeType, QuerySnapshot as _QuerySnapshot, FieldPath, DocumentSnapshot as _DocumentSnapshot, SnapshotOptions, QueryDocumentSnapshot as _QueryDocumentSnapshot, DocumentChange as _DocumentChange, CollectionReference, Query } from '@firebase/firestore-types';
 
-export interface DocumentChangeAction {
+export interface DocumentSnapshotExists<T> extends _DocumentSnapshot {
+  readonly exists: true;
+  data(options?: SnapshotOptions): T;
+}
+
+export interface DocumentSnapshotDoesNotExist extends _DocumentSnapshot {
+  readonly exists: false;
+  data(options?: SnapshotOptions): undefined;
+  get(fieldPath: string | FieldPath, options?: SnapshotOptions): undefined;
+}
+
+export type DocumentSnapshot<T> = DocumentSnapshotExists<T> | DocumentSnapshotDoesNotExist;
+
+export interface QueryDocumentSnapshot<T> extends _QueryDocumentSnapshot {
+  data(options?: SnapshotOptions): T;
+}
+
+export interface QuerySnapshot<T> extends _QuerySnapshot {
+  readonly docs: QueryDocumentSnapshot<T>[];
+}
+
+export interface DocumentChange<T> extends _DocumentChange {
+  readonly doc: QueryDocumentSnapshot<T>;
+}
+
+export interface DocumentChangeAction<T> {
   type: DocumentChangeType;
-  payload: DocumentChange;
+  payload: DocumentChange<T>;
 }
 
 export interface Action<T> {
