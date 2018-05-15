@@ -283,7 +283,7 @@ amdefine@>=0.0.4:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/amdefine/-/amdefine-1.0.1.tgz#4a5282ac164729e93619bcfd3ad151f817ce91f5"
 
-"angularfire2@file:../../../dist/packages-dist":
+angularfire2@../../../dist/packages-dist:
   version "5.0.0-rc.8"
 
 ansi-html@0.0.7:
