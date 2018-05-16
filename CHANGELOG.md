@@ -18,7 +18,7 @@
 
 ### Breaking change
 
-* To deal with the initializeApp no being able to be used in AOT ([#1635](https://github.com/angular/angularfire2/issues/1635)) we removed `FirebaseAppConfigToken` and `FirebaseAppNameToken` and replaced them with a new `FirebaseNameOrConfigToken` which accepts either an app name string or a `FirebaseAppConfig` object. ([#1654](https://github.com/angular/angularfire2/issues/1654)) ([513565a](https://github.com/angular/angularfire2/commit/513565a))
+* To deal with the initializeApp not being able to be used in AOT ([#1635](https://github.com/angular/angularfire2/issues/1635)) we removed `FirebaseAppConfigToken` and `FirebaseAppNameToken` and replaced them with a new `FirebaseNameOrConfigToken` which accepts either an app name string or a `FirebaseAppConfig` object. ([#1654](https://github.com/angular/angularfire2/issues/1654)) ([513565a](https://github.com/angular/angularfire2/commit/513565a))
 
 
 <a name="5.0.0-rc.8"></a>
