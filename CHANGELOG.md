@@ -6,7 +6,7 @@
 
 * **core:** allow initializeApp to be used with AOT ([#1654](https://github.com/angular/angularfire2/issues/1654)) ([513565a](https://github.com/angular/angularfire2/commit/513565a))
 * **core:** Allow name + config deps to be optional ([#1641](https://github.com/angular/angularfire2/issues/1641)) ([a6af604](https://github.com/angular/angularfire2/commit/a6af604))
-* **firestore:** Fixed a bug where Firestore sub-collections were inheriting the type of the doc by default, if no type is set they will default to `DocumentData` ([#1644](https://github.com/angular/angularfire2/issues/1644)) ([dff8ddf](https://github.com/angular/angularfire2/commit/dff8ddf))
+* **firestore:** Fixed a bug where Firestore sub-collections were inheriting the type of the doc by default ([#1644](https://github.com/angular/angularfire2/issues/1644)) ([dff8ddf](https://github.com/angular/angularfire2/commit/dff8ddf))
 
 
 ### Features
