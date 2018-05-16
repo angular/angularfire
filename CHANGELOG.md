@@ -6,6 +6,7 @@
 
 * **core:** allow initializeApp to be used with AOT ([#1654](https://github.com/angular/angularfire2/issues/1654)) ([513565a](https://github.com/angular/angularfire2/commit/513565a))
 * **core:** Allow name + config deps to be optional ([#1641](https://github.com/angular/angularfire2/issues/1641)) ([a6af604](https://github.com/angular/angularfire2/commit/a6af604))
+* **firestore:** Fixed a bug where Firestore sub-collections were inheriting the type of the doc by default, if no type is set they will default to `DocumentData` ([#1644](https://github.com/angular/angularfire2/issues/1644)) ([dff8ddf](https://github.com/angular/angularfire2/commit/dff8ddf))
 
 
 ### Features
@@ -19,6 +20,8 @@
 ### Breaking change
 
 * To deal with the initializeApp not being able to be used in AOT ([#1635](https://github.com/angular/angularfire2/issues/1635)) we removed `FirebaseAppConfigToken` and `FirebaseAppNameToken` and replaced them with a new `FirebaseNameOrConfigToken` which accepts either an app name string or a `FirebaseAppConfig` object. ([#1654](https://github.com/angular/angularfire2/issues/1654)) ([513565a](https://github.com/angular/angularfire2/commit/513565a))
+* **firestore:** If you do not specify a type to Document or Collection the default is now `DocumentData` ([#1644](https://github.com/angular/angularfire2/issues/1644)) ([dff8ddf](https://github.com/angular/angularfire2/commit/dff8ddf))
+
 
 
 <a name="5.0.0-rc.8"></a>
