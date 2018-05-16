@@ -3,12 +3,11 @@ import { isPlatformServer } from '@angular/common';
 import { Observable, Subscription, queueScheduler as queue } from 'rxjs';
 import { first } from 'rxjs/operators';
 
-import firebase from '@firebase/app';
+import { firebase } from '@firebase/app';
 import { FirebaseApp, FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
 
-export const FirebaseAppNameToken = new InjectionToken<string|undefined>('angularfire2.app.name');
 export const FirebaseOptionsToken = new InjectionToken<FirebaseOptions>('angularfire2.app.options');
-export const FirebaseAppConfigToken = new InjectionToken<FirebaseAppConfig|undefined>('angularfire2.app.config');
+export const FirebaseNameOrConfigToken = new InjectionToken<string|FirebaseAppConfig|undefined>('angularfire2.app.nameOrConfig')
 
 // Put in database.ts when we drop database-depreciated
 export const RealtimeDatabaseURL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
