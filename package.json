@@ -42,6 +42,8 @@
     "@firebase/database-types": "^0.3.1",
     "@firebase/firestore": "^0.5.2",
     "@firebase/firestore-types": "^0.4.1",
+    "@firebase/functions": "^0.2.2",
+    "@firebase/functions-types": "^0.1.2",
     "@firebase/messaging-types": "^0.2.2",
     "@firebase/storage": "^0.2.2",
     "@firebase/storage-types": "^0.2.2",

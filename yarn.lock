@@ -101,11 +101,11 @@
     grpc "1.10.1"
     tslib "1.9.0"
 
-"@firebase/functions-types@0.1.2":
+"@firebase/functions-types@0.1.2", "@firebase/functions-types@^0.1.2":
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/@firebase/functions-types/-/functions-types-0.1.2.tgz#f291b2945218a97d9ab0e20f2fdec2cef6f90f94"
 
-"@firebase/functions@0.2.2":
+"@firebase/functions@0.2.2", "@firebase/functions@^0.2.2":
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/@firebase/functions/-/functions-0.2.2.tgz#fd919deede5ec48870ecf751e4300066fc9424dc"
   dependencies:
