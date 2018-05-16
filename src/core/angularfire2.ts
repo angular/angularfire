@@ -3,7 +3,7 @@ import { isPlatformServer } from '@angular/common';
 import { Observable, Subscription, queueScheduler as queue } from 'rxjs';
 import { first } from 'rxjs/operators';
 
-import firebase from '@firebase/app';
+import { firebase } from '@firebase/app';
 import { FirebaseApp, FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
 
 export const FirebaseOptionsToken = new InjectionToken<FirebaseOptions>('angularfire2.app.options');
