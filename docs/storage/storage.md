@@ -130,11 +130,15 @@ An `AngularFireUploadTask` has methods for observing upload percentage as well a
 | ---------|--------------------|
 | `snapshotChanges(): Observable<FirebaseStorage.UploadTaskSnapshot>` | Emits the raw `UploadTaskSnapshot` as the file upload progresses. |
 | `percentageChanges(): Observable<number>` | Emits the upload completion percentage. |
-| `getDownloadURL(): Observable<string>` | Emits the download url when available |
+| `getDownloadURL(): Observable<any>` | Emits the download url when available |
 
 #### Example Usage
 
+The method `getDownloadURL()` doesn't rely on the task anymore, hence, in order to get the url we should use the finalize method from RxJS on top of the storage ref.
+
 ```ts
+import { finalize } from 'rxjs/operators';
+
 @Component({
   selector: 'app-root',
   template: `
@@ -156,7 +160,10 @@ export class AppComponent {
     // observe percentage changes
     this.uploadPercent = task.percentageChanges();
     // get notified when the download URL is available
-    this.downloadURL = fileRef.getDownloadURL();
+    task.snapshotChanges().pipe(
+        finalize(() => this.downloadURL = fileRef.getDownloadURL() )
+     )
+    .subscribe()
   }
 }
 ```
