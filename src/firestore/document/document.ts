@@ -70,7 +70,7 @@ export class AngularFirestoreDocument<T=DocumentData> {
    * @param path
    * @param queryFn
    */
-  collection<R>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<R> {
+  collection<R=DocumentData>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<R> {
     const collectionRef = this.ref.collection(path);
     const { ref, query } = associateQuery(collectionRef, queryFn);
     return new AngularFirestoreCollection<R>(ref, query, this.afs);
