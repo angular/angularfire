@@ -1,3 +1,29 @@
+<a name="5.0.0-rc.9"></a>
+# [5.0.0-rc.9](https://github.com/angular/angularfire2/compare/5.0.0-rc.8...5.0.0-rc.9) (2018-05-16)
+
+
+### Bug Fixes
+
+* **core:** allow initializeApp to be used with AOT ([#1654](https://github.com/angular/angularfire2/issues/1654)) ([513565a](https://github.com/angular/angularfire2/commit/513565a))
+* **core:** Allow name + config deps to be optional ([#1641](https://github.com/angular/angularfire2/issues/1641)) ([a6af604](https://github.com/angular/angularfire2/commit/a6af604))
+* **firestore:** Fixed a bug where Firestore sub-collections were inheriting the type of the doc by default ([#1644](https://github.com/angular/angularfire2/issues/1644)) ([dff8ddf](https://github.com/angular/angularfire2/commit/dff8ddf))
+
+
+### Features
+
+* **auth:** Adding user and idTokenResult Observables to AngularFireAuth ([#1642](https://github.com/angular/angularfire2/issues/1642)) ([31045a9](https://github.com/angular/angularfire2/commit/31045a9))
+* **functions:** Adding AngularFireFunctions with httpCallable ([#1532](https://github.com/angular/angularfire2/issues/1532)) ([26f3f5f](https://github.com/angular/angularfire2/commit/26f3f5f))
+* **firestore:** types for collection, audit trail, state, and snapshot changes ([#1644](https://github.com/angular/angularfire2/issues/1644)) ([dff8ddf](https://github.com/angular/angularfire2/commit/dff8ddf))
+* **rtdb:** types for collection, audit trail, snapshot, and state changes ([#1643](https://github.com/angular/angularfire2/issues/1643)) ([2c2fe02](https://github.com/angular/angularfire2/commit/2c2fe02))
+
+
+### Breaking change
+
+* To deal with the initializeApp not being able to be used in AOT ([#1635](https://github.com/angular/angularfire2/issues/1635)) we removed `FirebaseAppConfigToken` and `FirebaseAppNameToken` and replaced them with a new `FirebaseNameOrConfigToken` which accepts either an app name string or a `FirebaseAppConfig` object. ([#1654](https://github.com/angular/angularfire2/issues/1654)) ([513565a](https://github.com/angular/angularfire2/commit/513565a))
+* **firestore:** If you do not specify a type to Document or Collection the default is now `DocumentData` ([#1644](https://github.com/angular/angularfire2/issues/1644)) ([dff8ddf](https://github.com/angular/angularfire2/commit/dff8ddf))
+
+
+
 <a name="5.0.0-rc.8"></a>
 # [5.0.0-rc.8](https://github.com/angular/angularfire2/compare/5.0.0-rc.7...5.0.0-rc.8) (2018-05-12)
 
