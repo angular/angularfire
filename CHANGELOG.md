@@ -1,3 +1,15 @@
+<a name="5.0.0-rc.10"></a>
+# [5.0.0-rc.10](https://github.com/angular/angularfire2/compare/5.0.0-rc.9...5.0.0-rc.10) (2018-05-22)
+
+### Bug Fixes
+
+* **firestore:** the type passed to `AngularFirestoreCollection` from a document's sub-collection will now default to `DocumentData`, rather than `any`, if no type is specified ([#1662](https://github.com/angular/angularfire2/issues/1662)) ([2c2fe02](https://github.com/angular/angularfire2/commit/97c8656))
+
+### Breaking change
+
+* **core:** AngularFire now depends only on the `firebase` NPM library, rather than `@firebase/*` and `@firebase/*-types`; this should simplify issues around keeping types in-sync and conflicts between package versions ([#1677](https://github.com/angular/angularfire2/issues/1677)) ([2c2fe02](https://github.com/angular/angularfire2/commit/53ad0d8))
+
+
 <a name="5.0.0-rc.9"></a>
 # [5.0.0-rc.9](https://github.com/angular/angularfire2/compare/5.0.0-rc.8...5.0.0-rc.9) (2018-05-16)
 
