@@ -1,6 +1,6 @@
 {
   "name": "angularfire2",
-  "version": "5.0.0-rc.9",
+  "version": "5.0.0-rc.10",
   "description": "The official library of Firebase and Angular.",
   "private": true,
   "scripts": {
