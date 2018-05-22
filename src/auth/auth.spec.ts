@@ -1,4 +1,4 @@
-import { User } from '@firebase/auth-types';
+import { User } from 'firebase/app';
 import { ReflectiveInjector, Provider } from '@angular/core';
 import { Observable, Subject } from 'rxjs'
 import { TestBed, inject } from '@angular/core/testing';

@@ -1,10 +1,9 @@
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule} from 'angularfire2';
 import { AngularFireDatabase, AngularFireDatabaseModule, FirebaseListObservable, FirebaseObjectFactory } from 'angularfire2/database-deprecated';
-import { Observer } from 'rxjs/Observer';
-import { map } from 'rxjs/operator/map';
-import { FirebaseApp as FBApp } from '@firebase/app-types';
-import { DataSnapshot, Reference } from '@firebase/database-types';
+import { Observer } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { unwrapMapFn } from './utils';
+import { DataSnapshot, Reference } from './interfaces';
 
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from './test-config';
@@ -12,7 +11,7 @@ import { COMMON_CONFIG } from './test-config';
 describe('FirebaseListObservable', () => {
   let O: FirebaseListObservable<any>;
   let ref: Reference;
-  let app: FBApp;
+  let app: FirebaseApp;
   let db: AngularFireDatabase;
 
   beforeEach(() => {
@@ -22,7 +21,7 @@ describe('FirebaseListObservable', () => {
         AngularFireDatabaseModule
       ]
     });
-    inject([FirebaseApp, AngularFireDatabase], (_app: FBApp, _db: AngularFireDatabase) => {
+    inject([FirebaseApp, AngularFireDatabase], (_app: FirebaseApp, _db: AngularFireDatabase) => {
       app = _app;
       db = _db;
       ref = app.database().ref();

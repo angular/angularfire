@@ -1,12 +1,24 @@
 import { Subscriber } from 'rxjs';
-import { DocumentChangeType, QuerySnapshot as _QuerySnapshot, FieldPath, DocumentSnapshot as _DocumentSnapshot, SnapshotOptions, QueryDocumentSnapshot as _QueryDocumentSnapshot, DocumentChange as _DocumentChange, CollectionReference, Query } from '@firebase/firestore-types';
+import { firestore } from 'firebase/app';
 
-export interface DocumentSnapshotExists<T> extends _DocumentSnapshot {
+export type Settings =  firestore.Settings;
+export type CollectionReference = firestore.CollectionReference;
+export type DocumentReference = firestore.DocumentReference;
+
+export type DocumentChangeType = firestore.DocumentChangeType;
+export type SnapshotOptions = firestore.SnapshotOptions;
+export type FieldPath = firestore.FieldPath;
+export type Query = firestore.Query;
+
+export type SetOptions = firestore.SetOptions;
+export type DocumentData = firestore.DocumentData;
+
+export interface DocumentSnapshotExists<T> extends firestore.DocumentSnapshot {
   readonly exists: true;
   data(options?: SnapshotOptions): T;
 }
 
-export interface DocumentSnapshotDoesNotExist extends _DocumentSnapshot {
+export interface DocumentSnapshotDoesNotExist extends firestore.DocumentSnapshot {
   readonly exists: false;
   data(options?: SnapshotOptions): undefined;
   get(fieldPath: string | FieldPath, options?: SnapshotOptions): undefined;
@@ -14,15 +26,15 @@ export interface DocumentSnapshotDoesNotExist extends _DocumentSnapshot {
 
 export type DocumentSnapshot<T> = DocumentSnapshotExists<T> | DocumentSnapshotDoesNotExist;
 
-export interface QueryDocumentSnapshot<T> extends _QueryDocumentSnapshot {
+export interface QueryDocumentSnapshot<T> extends firestore.QueryDocumentSnapshot {
   data(options?: SnapshotOptions): T;
 }
 
-export interface QuerySnapshot<T> extends _QuerySnapshot {
+export interface QuerySnapshot<T> extends firestore.QuerySnapshot {
   readonly docs: QueryDocumentSnapshot<T>[];
 }
 
-export interface DocumentChange<T> extends _DocumentChange {
+export interface DocumentChange<T> extends firestore.DocumentChange {
   readonly doc: QueryDocumentSnapshot<T>;
 }
 

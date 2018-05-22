@@ -2,8 +2,6 @@ import { FirebaseApp, AngularFireModule } from 'angularfire2';
 import { AngularFirestore } from '../firestore';
 import { AngularFirestoreModule } from '../firestore.module';
 import { AngularFirestoreDocument } from '../document/document';
-
-import { FirebaseApp as FBApp } from '@firebase/app-types';
 import { Observable, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 
@@ -13,7 +11,7 @@ import { COMMON_CONFIG } from '../test-config';
 import { Stock, randomName, FAKE_STOCK_DATA } from '../utils.spec';
 
 describe('AngularFirestoreDocument', () => {
-  let app: FBApp;
+  let app: FirebaseApp;
   let afs: AngularFirestore;
   let sub: Subscription;
 
@@ -24,7 +22,7 @@ describe('AngularFirestoreDocument', () => {
         AngularFirestoreModule.enablePersistence()
       ]
     });
-    inject([FirebaseApp, AngularFirestore], (_app: FBApp, _afs: AngularFirestore) => {
+    inject([FirebaseApp, AngularFirestore], (_app: FirebaseApp, _afs: AngularFirestore) => {
       app = _app;
       afs = _afs;
     })();

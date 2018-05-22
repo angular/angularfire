@@ -1,6 +1,7 @@
 import { InjectionToken, ModuleWithProviders, NgModule } from '@angular/core';
 import { AngularFirestore, EnablePersistenceToken } from './firestore';
-import '@firebase/firestore';
+
+import 'firebase/firestore';
 
 @NgModule({
   providers: [ AngularFirestore ]

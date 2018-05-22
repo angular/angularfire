@@ -1,6 +1,5 @@
-import { DocumentReference, SetOptions, DocumentData } from '@firebase/firestore-types';
 import { Observable, Subscriber } from 'rxjs';
-import { QueryFn, AssociatedReference, Action, DocumentSnapshot } from '../interfaces';
+import { DocumentReference, SetOptions, DocumentData, QueryFn, AssociatedReference, Action, DocumentSnapshot } from '../interfaces';
 import { fromDocRef } from '../observable/fromRef';
 import { map } from 'rxjs/operators';
 

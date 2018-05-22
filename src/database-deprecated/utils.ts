@@ -1,6 +1,6 @@
-import { DataSnapshot, FirebaseDatabase } from '@firebase/database-types';
 import { Subscription, Scheduler, queueScheduler as queue } from 'rxjs';
-import { AFUnwrappedDataSnapshot, PathReference, DatabaseReference } from './interfaces';
+import { DataSnapshot, AFUnwrappedDataSnapshot, PathReference, DatabaseReference } from './interfaces';
+import { FirebaseDatabase } from 'angularfire2';
 
 const REGEX_ABSOLUTE_URL = /^[a-z]+:\/\/.*/;
 

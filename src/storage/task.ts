@@ -1,4 +1,4 @@
-import { UploadTaskSnapshot, UploadTask } from '@firebase/storage-types';
+import { UploadTaskSnapshot, UploadTask } from './interfaces';
 import { fromTask } from './observable/fromTask';
 import { Observable, from } from 'rxjs';
 import { map, filter } from 'rxjs/operators';

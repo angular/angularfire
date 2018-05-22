@@ -1,9 +1,8 @@
 import { fromCollectionRef } from '../observable/fromRef';
-import { Query, DocumentChangeType, DocumentChange } from '@firebase/firestore-types';
 import { Observable } from 'rxjs';
 import { map, filter, scan } from 'rxjs/operators';
 
-import { DocumentChangeAction, Action } from '../interfaces';
+import { Query, DocumentChangeType, DocumentChange, DocumentChangeAction, Action } from '../interfaces';
 
 /**
  * Return a stream of document changes on a query. These results are not in sort order but in
@@ -37,7 +36,7 @@ export function sortedChanges<T>(query: Query, events: DocumentChangeType[]): Ob
  * @param changes
  * @param events
  */
-export function combineChanges(current: DocumentChange[], changes: DocumentChange[], events: DocumentChangeType[]) {
+export function combineChanges<T>(current: DocumentChange<T>[], changes: DocumentChange<T>[], events: DocumentChangeType[]) {
   changes.forEach(change => {
     // skip unwanted change types
     if(events.indexOf(change.type) > -1) {
@@ -52,7 +51,7 @@ export function combineChanges(current: DocumentChange[], changes: DocumentChang
  * @param combined
  * @param change
  */
-export function combineChange(combined: DocumentChange[], change: DocumentChange): DocumentChange[] {
+export function combineChange<T>(combined: DocumentChange<T>[], change: DocumentChange<T>): DocumentChange<T>[] {
   switch(change.type) {
     case 'added':
       if (combined[change.newIndex] && combined[change.newIndex].doc.id == change.doc.id) {

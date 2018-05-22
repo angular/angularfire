@@ -13,35 +13,29 @@ const GLOBALS = {
   'rxjs': 'rxjs',
   'rxjs/operators': 'rxjs.operators',
   '@angular/common': 'ng.common',
-  '@angular/compiler': 'ng.compiler',
   '@angular/core': 'ng.core',
   '@angular/core/testing': 'ng.core.testing',
   '@angular/platform-browser': 'ng.platformBrowser',
-  '@firebase/app': 'firebase',
-  '@firebase/auth': 'firebase',
-  '@firebase/database': 'firebase',
-  '@firebase/firestore': 'firebase',
-  '@firebase/functions': 'firebase',
-  '@firebase/storage': 'firebase',
+  'firebase': 'firebase',
+  'firebase/app': 'firebase',
+  'firebase/auth': 'firebase',
+  'firebase/database': 'firebase',
+  'firebase/firestore': 'firebase',
+  'firebase/functions': 'firebase',
+  'firebase/storage': 'firebase',
   'angularfire2': 'angularfire2',
   'angularfire2/auth': 'angularfire2.auth',
   'angularfire2/database': 'angularfire2.database',
   'angularfire2/database-deprecated': 'angularfire2.database_deprecated',
   'angularfire2/firestore': 'angularfire2.firestore',
   'angularfire2/functions': 'angularfire2.functions',
-  'angularfire2/storage': 'angularfire2.storage',
-  'zone.js': 'Zone'
+  'angularfire2/storage': 'angularfire2.storage'
 };
 
 // Map of dependency versions across all packages
 const VERSIONS = {
   ANGULAR_VERSION: pkg.dependencies['@angular/core'],
-  FIREBASE_APP_VERSION: pkg.dependencies['@firebase/app'],
-  FIREBASE_AUTH_VERSION: pkg.dependencies['@firebase/auth'],
-  FIREBASE_DATABASE_VERSION: pkg.dependencies['@firebase/database'],
-  FIREBASE_FIRESTORE_VERSION: pkg.dependencies['@firebase/firestore'],
-  FIREBASE_FUNCTIONS_VERSION: pkg.dependencies['@firebase/functions'],
-  FIREBASE_STORAGE_VERSION: pkg.dependencies['@firebase/storage'],
+  FIREBASE_VERSION: pkg.dependencies['firebase'],
   RXJS_VERSION: pkg.dependencies['rxjs'],
   ZONEJS_VERSION: pkg.dependencies['zone.js'],
   ANGULARFIRE2_VERSION: pkg.version,
@@ -92,16 +86,6 @@ const DEST_PKG_PATHS = {
   "firebase-node": `${process.cwd()}/dist/packages-dist/firebase-node/package.json`,
   functions: `${process.cwd()}/dist/packages-dist/functions/package.json`,
   storage: `${process.cwd()}/dist/packages-dist/storage/package.json`
-};
-
-const FIREBASE_FEATURE_MODULES = {
-  app: `${process.cwd()}/node_modules/@firebase/app/dist/esm/index.js`,
-  auth: `${process.cwd()}/node_modules/@firebase/auth/dist/auth.js`,
-  database: `${process.cwd()}/node_modules/@firebase/database/dist/esm/index.js`,
-  firestore: `${process.cwd()}/node_modules/@firebase/firestore/dist/esm/index.js`,
-  functions: `${process.cwd()}/node_modules/@firebase/functions/dist/esm/index.js`,
-  storage: `${process.cwd()}/node_modules/@firebase/storage/dist/esm/index.js`,
-  util: `${process.cwd()}/node_modules/@firebase/util/dist/esm/index.js`,
 };
 
 // Constants for running typescript commands
