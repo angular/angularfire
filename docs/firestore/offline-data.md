@@ -4,9 +4,9 @@
 
 **Offline persistence is an experimental feature that is supported only by the Chrome, Safari, and Firefox web browsers.** If a user opens multiple browser tabs that point to the same Cloud Firestore database, and offline persistence is enabled, Cloud Firestore will work correctly only in the first tab.
 
-## Enable Offline Data in AngularFirestore
+## Enable Offline Data in [`AngularFirestore`](../reference/classes/angularfirestore.md)
 
-To enable offline persistence in your AngularFire application, call `enablePersistence()` when you are importing `AngularFirestoreModule` into your `@NgModule`:
+To enable offline persistence in your AngularFire application, call [`enablePersistence()`](../reference/classes/angularfirestoremodule.md#enablepersistence) when you are importing [`AngularFirestoreModule`](../reference/classes/angularfirestoremodule.md) into your `@NgModule`:
 
 ```ts
 import { BrowserModule } from '@angular/platform-browser';
