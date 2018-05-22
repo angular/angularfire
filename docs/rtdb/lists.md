@@ -129,7 +129,7 @@ The table below highlights some of the common methods on the [`AngularFireList`]
 | method   |                    | 
 | ---------|--------------------| 
 | [`push(value: T)`](../reference/interfaces/angularfirelist.md#push) | Creates a new record on the list, using the Realtime Database's push-ids. | 
-| [`update(keyRefOrSnap: string, value: T)`](../reference/interfaces/angularfirelist.md#update) | Firebase | AFUnwrappedSnapshot, value: Object) | Updates an existing item in the array. Accepts a key, database reference, or an unwrapped snapshot. |
+| [`update(keyRefOrSnap: string, value: T)`](../reference/interfaces/angularfirelist.md#update) | Updates an existing item in the array. Accepts a key, database reference, or an unwrapped snapshot. |
 | [`remove(key: string?)`](../reference/interfaces/angularfirelist.md#remove) | Deletes the item by key. If no parameter is provided, the entire list will be deleted. |
 
 ## Returning promises
