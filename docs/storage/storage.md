@@ -1,10 +1,10 @@
-# AngularFireStorage
+# Getting started with Cloud Storage
 
 > Cloud Storage is designed to help you quickly and easily store and serve user-generated content, such as photos and videos.
 
 ### Import the NgModule
 
-Cloud Storage for AngularFire is contained in the `angularfire2/storage` module namespace. Import the `AngularFireStorageModule` in your `NgModule`. This sets up the `AngularFireStorage` service for dependency injection.
+Cloud Storage for AngularFire is contained in the `angularfire2/storage` module namespace. Import the [`AngularFireStorageModule`](../reference/classes/angularfirestoragemodule.md) in your `NgModule`. This sets up the [`AngularFireStorage`](../reference/classes/angularfirestorage.md) service for dependency injection.
 
 ```ts
 import { BrowserModule } from '@angular/platform-browser';
@@ -26,9 +26,9 @@ import { environment } from '../environments/environment';
 export class AppModule {}
 ```
 
-### Injecting the AngularFireStorage service
+### Injecting the [`AngularFireStorage`](../reference/classes/angularfirestorage.md) service
 
-Once the `AngularFireStorageModule` is registered you can inject the `AngularFireStorage` service.
+Once the [`AngularFireStorageModule`](../reference/classes/angularfirestoragemodule.md) is registered you can inject the [`AngularFireStorage`](../reference/classes/angularfirestorage.md) service.
 
 ```ts
 import { Component } from '@angular/core';
@@ -50,9 +50,9 @@ There are three options for uploading files.
 
 | method   |                    |
 | ---------|--------------------|
-| `put(data: Blob, metadata?: storage.UploadMetadata): AngularFireUploadTask` | Starts the upload of the blob to the storage reference's path. Returns an `AngularFireUploadTask` for upload monitoring. |
-| `putString(data: string, format?: StringFormat, metadata?: UploadMetadata): AngularFireUploadTask` | Updates an existing item in the array. Accepts a key, database reference, or an unwrapped snapshot. |
-| `upload(path: string, data: StringFormat, metadata?: UploadMetadata): AngularFireUploadTask` | Upload or update a new file to the storage reference's path. Returns an `AngularFireUploadTask` for upload monitoring. |
+| [`put(data: Blob, metadata?: storage.UploadMetadata): AngularFireUploadTask`](../reference/interfaces/angularfirestoragereference.md#put) | Starts the upload of the blob to the storage reference's path. Returns an `AngularFireUploadTask` for upload monitoring. |
+| [`putString(data: string, format?: StringFormat, metadata?: UploadMetadata): AngularFireUploadTask`](../reference/interfaces/angularfirestoragereference.md#putstring) | Updates an existing item in the array. Accepts a key, database reference, or an unwrapped snapshot. |
+| [`upload(path: string, data: StringFormat, metadata?: UploadMetadata): AngularFireUploadTask`](../reference/classes/angularfirestorage.md#upload) | Upload or update a new file to the storage reference's path. Returns an `AngularFireUploadTask` for upload monitoring. |
 
 #### Uploading blobs with put
 
@@ -124,17 +124,17 @@ export class AppComponent {
 
 ### Monitoring upload percentage
 
-An `AngularFireUploadTask` has methods for observing upload percentage as well as the final download URL.
+An [`AngularFireUploadTask`](../reference/interfaces/angularfireuploadtask.md) has methods for observing upload percentage as well as the final download URL.
 
 | method   |                    |
 | ---------|--------------------|
-| `snapshotChanges(): Observable<FirebaseStorage.UploadTaskSnapshot>` | Emits the raw `UploadTaskSnapshot` as the file upload progresses. |
-| `percentageChanges(): Observable<number>` | Emits the upload completion percentage. |
-| `getDownloadURL(): Observable<any>` | Emits the download url when available |
+| [`snapshotChanges(): Observable<FirebaseStorage.UploadTaskSnapshot>`](../reference/interfaces/angularfireuploadtask.md#snapshotChanges) | Emits the raw `UploadTaskSnapshot` as the file upload progresses. |
+| [`percentageChanges(): Observable<number>`](../reference/interfaces/angularfireuploadtask.md#percentagechanges) | Emits the upload completion percentage. |
+| [`getDownloadURL(): Observable<any>`](../reference/interfaces/angularfirestoragereference.md#getdownloadurl) | Emits the download url when available |
 
 #### Example Usage
 
-The method `getDownloadURL()` doesn't rely on the task anymore, hence, in order to get the url we should use the finalize method from RxJS on top of the storage ref.
+The method [`getDownloadURL()`](../reference/interfaces/angularfirestoragereference.md#getdownloadurl) is on the [`AngularFireStorageReference`](../reference/interfaces/angularfirestoragereference.md) but isn't available until the upload is complete,to get this we should can utilize the rxjs `finalize` operator:
 
 ```ts
 import { finalize } from 'rxjs/operators';
@@ -170,7 +170,7 @@ export class AppComponent {
 
 ### Downloading Files
 
-To download a file you'll need to create a reference and call the `getDownloadURL()` method on an `AngularFireStorageReference`.
+To download a file you'll need to create a reference and call the [`getDownloadURL()`](../reference/interfaces/angularfirestoragereference.md#getdownloadurl) method on an [`AngularFireStorageReference`](../reference/interfaces/angularfirestoragereference.md).
 
 ```ts
 @Component({
