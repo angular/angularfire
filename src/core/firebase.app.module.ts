@@ -1,22 +1,28 @@
 import { InjectionToken, NgZone, NgModule, Optional } from '@angular/core';
+import { app, auth, apps, database, firestore, functions, initializeApp, messaging, storage } from 'firebase/app';
 
-import { FirebaseOptionsToken, FirebaseNameOrConfigToken } from './angularfire2';
+// Public types don't expose FirebaseOptions or FirebaseAppConfig
+export type FirebaseOptions = {[key:string]: any};
+export type FirebaseAppConfig = {[key:string]: any};
 
-import firebase from '@firebase/app';
-import { FirebaseApp as _FirebaseApp, FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
-import { FirebaseAuth } from '@firebase/auth-types';
-import { FirebaseDatabase } from '@firebase/database-types';
-import { FirebaseMessaging } from '@firebase/messaging-types';
-import { FirebaseStorage } from '@firebase/storage-types';
-import { FirebaseFirestore } from '@firebase/firestore-types';
-import { FirebaseFunctions } from '@firebase/functions-types';
+export const FirebaseOptionsToken = new InjectionToken<FirebaseOptions>('angularfire2.app.options');
+export const FirebaseNameOrConfigToken = new InjectionToken<string|FirebaseAppConfig|undefined>('angularfire2.app.nameOrConfig')
 
-export class FirebaseApp implements _FirebaseApp {
+export type FirebaseDatabase = database.Database;
+export type FirebaseAuth = auth.Auth;
+export type FirebaseMessaging = messaging.Messaging;
+export type FirebaseStorage = storage.Storage;
+export type FirebaseFirestore = firestore.Firestore;
+export type FirebaseFunctions = functions.Functions;
+
+export class FirebaseApp implements app.App {
     name: string;
-    automaticDataCollectionEnabled: boolean;
     options: {};
     auth: () => FirebaseAuth;
+    // app.App database() doesn't take a databaseURL arg in the public types?
     database: (databaseURL?: string) => FirebaseDatabase;
+    // automaticDataCollectionEnabled is now private? _automaticDataCollectionEnabled?
+    // automaticDataCollectionEnabled: true,
     messaging: () => FirebaseMessaging;
     storage: (storageBucket?: string) => FirebaseStorage;
     delete: () => Promise<void>;
@@ -28,8 +34,9 @@ export function _firebaseAppFactory(options: FirebaseOptions, nameOrConfig?: str
     const name = typeof nameOrConfig === 'string' && nameOrConfig || '[DEFAULT]';
     const config = typeof nameOrConfig === 'object' && nameOrConfig || {};
     config.name = config.name || name;
-    const existingApp = firebase.apps.filter(app => app.name === config.name)[0];
-    return (existingApp || firebase.initializeApp(options, config)) as FirebaseApp;
+    const existingApp = apps.filter(app => app && app.name === config.name)[0];
+    // We support FirebaseConfig, initializeApp's public type only accepts string; need to cast as any
+    return (existingApp || (initializeApp as any)(options, config)) as FirebaseApp;
 }
 
 const FirebaseAppProvider = {

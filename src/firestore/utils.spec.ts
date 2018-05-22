@@ -1,4 +1,4 @@
-import { FirebaseFirestore, CollectionReference } from '@firebase/firestore-types';
+import { FirebaseFirestore, CollectionReference } from 'firebase/firestore-types';
 import { AngularFirestoreCollection } from './collection/collection';
 
 export interface Stock {

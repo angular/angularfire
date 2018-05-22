@@ -25,7 +25,12 @@ module.exports = function(config) {
       ...getAngularFiles(['core','common','compiler','platform-browser','platform-browser-dynamic']),
 
       'karma-test-shim.js',
-      'node_modules/firebase/firebase.js',
+      'node_modules/firebase/firebase-app.js',
+      'node_modules/firebase/firebase-auth.js',
+      'node_modules/firebase/firebase-database.js',
+      'node_modules/firebase/firebase-firestore.js',
+      'node_modules/firebase/firebase-functions.js',
+      'node_modules/firebase/firebase-storage.js',
       'dist/packages-dist/bundles/core.umd.{js,map}',
       'dist/packages-dist/bundles/auth.umd.{js,map}',
       'dist/packages-dist/bundles/database.umd.{js,map}',

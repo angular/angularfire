@@ -4,8 +4,6 @@ import { AngularFirestoreModule } from '../firestore.module';
 import { AngularFirestoreDocument } from '../document/document';
 import { AngularFirestoreCollection } from './collection';
 import { QueryFn } from '../interfaces';
-
-import { FirebaseApp as FBApp } from '@firebase/app-types';
 import { Observable, BehaviorSubject, Subscription } from 'rxjs';
 import { skip, take, switchMap } from 'rxjs/operators';
 
@@ -24,7 +22,7 @@ async function collectionHarness(afs: AngularFirestore, items: number, queryFn?:
 }
 
 describe('AngularFirestoreCollection', () => {
-  let app: FBApp;
+  let app: FirebaseApp;
   let afs: AngularFirestore;
   let sub: Subscription;
 
@@ -35,7 +33,7 @@ describe('AngularFirestoreCollection', () => {
         AngularFirestoreModule.enablePersistence()
       ]
     });
-    inject([FirebaseApp, AngularFirestore], (_app: FBApp, _afs: AngularFirestore) => {
+    inject([FirebaseApp, AngularFirestore], (_app: FirebaseApp, _afs: AngularFirestore) => {
       app = _app;
       afs = _afs;
     })();
