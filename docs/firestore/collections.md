@@ -39,7 +39,7 @@ export class AppComponent {
 
 The [`AngularFirestoreCollection`](../reference/classes/angularfirestorecollection.md) is a service you use to create streams of the collection and perform data operations on the underyling collection.
 
-### The `DocumentChangeAction` type
+### The [`DocumentChangeAction`](../reference/interfaces/documentchangeaction.md) type
 
 With the exception of the [`valueChanges()`](../reference/classes/angularfirestorecollection.md#valuechanges), each streaming method returns an Observable of [`DocumentChangeAction[]`](../reference/interfaces/documentchangeaction.md).
 
@@ -123,7 +123,7 @@ export class AppComponent {
 ```
 
 ### [`snapshotChanges()`](../reference/classes/angularfirestorecollection.md#snapshotchanges)
-**What is it?** - The current state of your collection. Returns an Observable of data as a synchronized array of `DocumentChangeAction[]`. 
+**What is it?** - The current state of your collection. Returns an Observable of data as a synchronized array of [`DocumentChangeAction[]`](../reference/interfaces/documentchangeaction.md). 
 
 **Why would you use it?** - When you need a list of data but also want to keep around metadata. Metadata provides you the underyling [`DocumentReference`](../reference/README.md#documentreference), document id, and array index of the single document. Having the document's id around makes it easier to use data manipulation methods. This method gives you more horsepower with other Angular integrations such as ngrx, forms, and animations due to the `type` property. The `type` property on each [`DocumentChangeAction`](../reference/interfaces/documentchangeaction.md) is useful for ngrx reducers, form states, and animation states.
 
@@ -258,7 +258,7 @@ export class AppComponent {
 
 ### Limiting events
 
-There are three [`DocumentChangeType`s](../reference/README.md#documentchangetype) in Firestore: `added`, `removed`, and `modified`. Each streaming method listens to all three by default. However, you may only be intrested in one of these events. You can specify which events you'd like to use through the first parameter of each method:
+There are three [`DocumentChangeTypes`](../reference/README.md#documentchangetype) in Firestore: `added`, `removed`, and `modified`. Each streaming method listens to all three by default. However, you may only be intrested in one of these events. You can specify which events you'd like to use through the first parameter of each method:
 
 #### Basic sample
 ```ts

@@ -38,6 +38,9 @@ export class AppComponent {
 }
 ```
 
+### [Next Step: Getting started with Cloud Storage](../storage/storage.md)
+
+
 ## Cordova
 
 Learn how to [setup Firebase Authentication with Cordova](https://firebase.google.com/docs/auth/web/cordova) in the Firebase Guides.

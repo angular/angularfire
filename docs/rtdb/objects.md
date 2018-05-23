@@ -69,7 +69,7 @@ export class AppComponent {
 
 ### API Summary
 
-The table below highlights some of the common methods on the [`AngularFireObject`](../reference/interfaces/angularfireobject.md.
+The table below highlights some of the common methods on the [`AngularFireObject`](../reference/interfaces/angularfireobject.md).
 
 | method   |                    | 
 | ---------|--------------------| 
