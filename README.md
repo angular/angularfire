@@ -22,6 +22,8 @@ Status: Release candidate
 
 [Upgrading to v5.0? Check out our guide.](docs/version-5-upgrade.md)
 
+[API Reference](docs/reference/README.md)
+
 **Having troubles?** Get help on the [Firebase Mailing List](https://groups.google.com/forum/#!forum/firebase-talk) (offically supported), the [Firebase Community Slack](https://firebase.community/) (look for the `#angularfire2` room), [Gitter](https://gitter.im/angular/angularfire2), or [Stack Overflow](https://stackoverflow.com/questions/tagged/angularfire2).
 
 ## Install
@@ -67,7 +69,7 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 
 #### Cloud Firestore
 
-> `AngularFirestore` allows you to work with Cloud Firestore, the new flagship database for mobile app development. It improves on the successes of Realtime Database with a new, more intuitive data model. Cloud Firestore also features richer, faster queries and scales better than Realtime Database.
+> [`AngularFirestore`](docs/reference/classes/angularfirestore.md) allows you to work with Cloud Firestore, the new flagship database for mobile app development. It improves on the successes of Realtime Database with a new, more intuitive data model. Cloud Firestore also features richer, faster queries and scales better than Realtime Database.
 
 - [Documents](docs/firestore/documents.md)
 - [Collections](docs/firestore/collections.md)
@@ -76,7 +78,7 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 
 #### Realtime Database
 
-> `AngularFireDatabase` allows you to work with the Realtime Database, Firebase's original database. It's an efficient, low-latency solution for mobile apps that require synced states across clients in realtime.
+> [`AngularFireDatabase`](docs/reference/classes/angularfiredatabase.md) allows you to work with the Realtime Database, Firebase's original database. It's an efficient, low-latency solution for mobile apps that require synced states across clients in realtime.
 
 - [Objects](docs/rtdb/objects.md)
 - [Lists](docs/rtdb/lists.md)
@@ -84,10 +86,19 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 
 ### Authenticate users
 
+> [`AngularFireAuth`](docs/reference/classes/angularfireauth.md) allows you to utilize Firebase Authentication; a drop-in authentication solution providing email &amp; password, federated identity (Google, Facebook, Twitter, and GitHub), phone number, anonymous authentication, and integration with your own custom/existing sign-in system via the Firebase Authentication SDK.
+
 - [Getting started with Firebase Authentication](docs/auth/getting-started.md)
 
-## Upload files
+### Upload files to Cloud Storage
+
+> [`AngularFireStorage`](docs/reference/classes/angularfirestorage.md) allows you to store and serve user-generated content, such as photos or videos.
+
 - [Getting started with Cloud Storage](docs/storage/storage.md)
+
+### Call Cloud Functions directly
+
+> [`AngularFireFunctions`](docs/reference/classes/angularfirefunctions.md) allows you to call Cloud Functions directly from your Angular app.
 
 ### Deploy to Firebase Hosting
 

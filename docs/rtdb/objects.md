@@ -1,16 +1,16 @@
 # 2. Retrieving data as objects
 
-> The `AngularFireObject` is a service for manipulating and streaming object data.
+> The [`AngularFireObject`](../reference/interfaces/angularfireobject.md) is a service for manipulating and streaming object data.
 
-The `AngularFireObject` service is not created by itself, but through the `AngularFireDatabase` service. 
+The [`AngularFireObject`](../reference/interfaces/angularfireobject.md) service is not created by itself, but through the [`AngularFireDatabase`](../reference/classes/angularfiredatabase.md) service. 
 
 The guide below demonstrates how to retrieve, save, and remove data as objects.
 
-## Injecting the AngularFireDatabase service
+## Injecting the [`AngularFireDatabase`](../reference/classes/angularfiredatabase.md) service
 
 **Make sure you have bootstrapped your application for AngularFire. See the Installation guide for bootstrap setup.**
 
-`AngularFireDatabase` is a service which can be injected through the constructor of your Angular component or `@Injectable()` service.
+[`AngularFireDatabase`](../reference/classes/angularfiredatabase.md) is a service which can be injected through the constructor of your Angular component or `@Injectable()` service.
 
 If you've followed the earlier step "Installation and Setup"  your `/src/app/app.component.ts` should look like below. 
 
@@ -69,13 +69,13 @@ export class AppComponent {
 
 ### API Summary
 
-The table below highlights some of the common methods on the `AngularFireObject`.
+The table below highlights some of the common methods on the [`AngularFireObject`](../reference/interfaces/angularfireobject.md).
 
 | method   |                    | 
 | ---------|--------------------| 
-| `set(value: T)`      | Replaces the current value in the database with the new value specified as the parameter. This is called a **destructive** update, because it deletes everything currently in place and saves the new value. | 
-| `update(value: T)`   | Updates the current value with in the database with the new value specified as the parameter. This is called a **non-destructive** update, because it only updates the values specified. |
-| `remove()`   | Deletes all data present at that location. Same as calling `set(null)`. |
+| [`set(value: T)`](../reference/interfaces/angularfireobject.md#set)      | Replaces the current value in the database with the new value specified as the parameter. This is called a **destructive** update, because it deletes everything currently in place and saves the new value. | 
+| [`update(value: T)`](../reference/interfaces/angularfireobject.md#update)   | Updates the current value with in the database with the new value specified as the parameter. This is called a **non-destructive** update, because it only updates the values specified. |
+| [`remove()`](../reference/interfaces/angularfireobject.md#remove)   | Deletes all data present at that location. Same as calling [`set(null)`](../reference/interfaces/angularfireobject.md#set). |
 
 ## Returning promises
 Each data operation method in the table above returns a promise. However,
@@ -93,7 +93,7 @@ promise
 
 ### Saving data
 
-Use the `set()` method for **destructive updates**.
+Use the [`set()`](../reference/interfaces/angularfireobject.md#set) method for **destructive updates**.
 
 ```ts
 const itemRef = db.object('item');
@@ -102,7 +102,7 @@ itemRef.set({ name: 'new name!'});
 
 ### Updating data
 
-Use the `update()` method for **non-destructive updates**.
+Use the [`update()`](../reference/interfaces/angularfireobject.md#update) method for **non-destructive updates**.
 
 ```ts
 const itemRef = db.object('item');
@@ -110,10 +110,10 @@ itemRef.update({ age: newAge });
 ```
 
 **Only objects are allowed for updates, not primitives**. This is because
-using an update with a primitive is the exact same as doing a `.set()` with a primitive.
+using an update with a primitive is the exact same as doing a [`.set()`](../reference/interfaces/angularfireobject.md#set) with a primitive.
 
 ### Deleting data
-Use the `remove()` method to remove data at the object's location.
+Use the [`remove()`](../reference/interfaces/angularfireobject.md#remove) method to remove data at the object's location.
 
 ```ts
 const itemRef = db.object('item');
@@ -159,7 +159,7 @@ export class AppComponent {
 ```
 
 ## Retrieving the snapshot
-AngularFire `valueChanges()` unwraps the Firebase DataSnapshot by default, but you can get the data as the original snapshot by using the `snapshotChanges()` option.
+AngularFire [`valueChanges()`](../reference/interfaces/angularfireobject.md#valuechanges) unwraps the Firebase DataSnapshot by default, but you can get the data as the original snapshot by using the [`snapshotChanges()`](../reference/interfaces/angularfireobject.md#snapshotchanges) option.
 
 ```ts
 this.itemRef = db.object('item');
@@ -172,6 +172,6 @@ this.itemRef.snapshotChanges().subscribe(action => {
 
 ## Querying?
 
-Because `AngularFireObject` synchronizes objects from the realtime database, sorting will have no effect for queries that are not also limited by a range. For example, when paginating you would provide a query with a sort and filter. Both the sort operation and the filter operation affect which subset of the data is returned by the query; however, because the resulting object is simply json, the sort order will not be preseved locally. Hence, for operations that require sorting, you are probably looking for a [list](lists.md)
+Because [`AngularFireObject`](../reference/interfaces/angularfireobject.md) synchronizes objects from the realtime database, sorting will have no effect for queries that are not also limited by a range. For example, when paginating you would provide a query with a sort and filter. Both the sort operation and the filter operation affect which subset of the data is returned by the query; however, because the resulting object is simply json, the sort order will not be preseved locally. Hence, for operations that require sorting, you are probably looking for a [list](lists.md)
 
 ### [Next Step: Retrieving data as lists](lists.md)
