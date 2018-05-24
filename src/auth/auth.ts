@@ -1,11 +1,11 @@
-import { FirebaseAuth, User, IdTokenResult } from '@firebase/auth-types';
-import { FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
 import { Observable, of, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { FirebaseAppConfig, FirebaseOptions } from 'angularfire2';
 
-import { FirebaseOptionsToken, FirebaseAppConfigToken, FirebaseAppNameToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
+import { User, auth } from 'firebase/app';
 
+import { FirebaseAuth, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
 
 @Injectable()
 export class AngularFireAuth {
@@ -35,18 +35,17 @@ export class AngularFireAuth {
    * helper properties for getting different data associated with the token as well as all the decoded payload claims
    * (or null).
    */
-  public readonly idTokenResult: Observable<IdTokenResult|null>;
+  public readonly idTokenResult: Observable<auth.IdTokenResult|null>;
 
   constructor(
     @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Optional() @Inject(FirebaseAppConfigToken) config:FirebaseAppConfig,
-    @Optional() @Inject(FirebaseAppNameToken) name:string,
+    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|undefined,
     @Inject(PLATFORM_ID) platformId: Object,
     private zone: NgZone
   ) {
     const scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.auth = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(options, name, config);
+      const app = _firebaseAppFactory(options, nameOrConfig);
       return app.auth();
     });
 

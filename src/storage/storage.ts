@@ -1,10 +1,10 @@
 import { Injectable, Inject, Optional, InjectionToken, NgZone, PLATFORM_ID } from '@angular/core';
-import { FirebaseStorage, UploadMetadata } from '@firebase/storage-types';
 import { createStorageRef, AngularFireStorageReference } from './ref';
 import { createUploadTask, AngularFireUploadTask } from './task';
 import { Observable } from 'rxjs';
-import { FirebaseAppConfigToken, FirebaseOptionsToken, FirebaseAppNameToken, FirebaseZoneScheduler, _firebaseAppFactory } from 'angularfire2';
-import { FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
+import { FirebaseStorage, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, FirebaseZoneScheduler, _firebaseAppFactory } from 'angularfire2';
+
+import { UploadMetadata } from './interfaces';
 
 export const StorageBucket = new InjectionToken<string>('angularfire2.storageBucket');
 
@@ -22,15 +22,14 @@ export class AngularFireStorage {
 
   constructor(
     @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Optional() @Inject(FirebaseAppConfigToken) config:FirebaseAppConfig,
-    @Optional() @Inject(FirebaseAppNameToken) name:string,
+    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|undefined,
     @Optional() @Inject(StorageBucket) storageBucket:string,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.storage = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(options, name, config);
+      const app = _firebaseAppFactory(options, nameOrConfig);
       return app.storage(storageBucket || undefined);
     });
   }

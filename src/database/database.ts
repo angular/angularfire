@@ -1,12 +1,10 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
-import { FirebaseDatabase } from '@firebase/database-types';
-import { PathReference, DatabaseQuery, DatabaseReference, DatabaseSnapshot, ChildEvent, ListenEvent, QueryFn, AngularFireList, AngularFireObject } from './interfaces';
+import { DatabaseQuery, PathReference, DatabaseSnapshot, ChildEvent, ListenEvent, QueryFn, AngularFireList, AngularFireObject } from './interfaces';
 import { getRef } from './utils';
 import { InjectionToken } from '@angular/core';
-import { FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
 import { createListReference } from './list/create-reference';
 import { createObjectReference } from './object/create-reference';
-import { FirebaseOptionsToken, FirebaseAppConfigToken, FirebaseAppNameToken, RealtimeDatabaseURL, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
+import { FirebaseDatabase, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, RealtimeDatabaseURL, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
 
 @Injectable()
 export class AngularFireDatabase {
@@ -15,15 +13,14 @@ export class AngularFireDatabase {
 
   constructor(
     @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Optional() @Inject(FirebaseAppConfigToken) config:FirebaseAppConfig,
-    @Optional() @Inject(FirebaseAppNameToken) name:string,
+    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|undefined,
     @Optional() @Inject(RealtimeDatabaseURL) databaseURL:string,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.database = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(options, name, config);
+      const app = _firebaseAppFactory(options, nameOrConfig);
       return app.database(databaseURL || undefined);
     });
   }
@@ -50,8 +47,6 @@ export class AngularFireDatabase {
 
 export {
   PathReference,
-  DatabaseQuery,
-  DatabaseReference,
   DatabaseSnapshot,
   ChildEvent,
   ListenEvent,

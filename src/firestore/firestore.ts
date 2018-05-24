@@ -1,15 +1,14 @@
 import { InjectionToken, NgZone, PLATFORM_ID, Injectable, Inject, Optional } from '@angular/core';
-import { FirebaseFirestore, CollectionReference, DocumentReference, Settings } from '@firebase/firestore-types';
 
 import { Observable, Subscriber, of, from } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
+import { firestore } from 'firebase/app';
 
-import { QueryFn, AssociatedReference } from './interfaces';
+import { Settings, CollectionReference, DocumentReference, QueryFn, AssociatedReference } from './interfaces';
 import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 
-import { FirebaseAppConfigToken, FirebaseOptionsToken, FirebaseAppNameToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
+import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
 
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
@@ -106,8 +105,7 @@ export class AngularFirestore {
    */
   constructor(
     @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Optional() @Inject(FirebaseAppConfigToken) config:FirebaseAppConfig,
-    @Optional() @Inject(FirebaseAppNameToken) name:string,
+    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|undefined,
     @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean,
     @Optional() @Inject(FirestoreSettingsToken) settings: Settings,
     @Inject(PLATFORM_ID) platformId: Object,
@@ -115,7 +113,7 @@ export class AngularFirestore {
   ) {
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.firestore = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(options, name, config);
+      const app = _firebaseAppFactory(options, nameOrConfig);
       const firestore = app.firestore();
       firestore.settings(settings || DefaultFirestoreSettings);
       return firestore;

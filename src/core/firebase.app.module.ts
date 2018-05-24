@@ -1,35 +1,42 @@
 import { InjectionToken, NgZone, NgModule, Optional } from '@angular/core';
+import { app, auth, apps, database, firestore, functions, initializeApp, messaging, storage } from 'firebase/app';
 
-import { FirebaseOptionsToken, FirebaseAppNameToken, FirebaseAppConfigToken } from './angularfire2';
+// Public types don't expose FirebaseOptions or FirebaseAppConfig
+export type FirebaseOptions = {[key:string]: any};
+export type FirebaseAppConfig = {[key:string]: any};
 
-import firebase from '@firebase/app';
-import { FirebaseApp as _FirebaseApp, FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
-import { FirebaseAuth } from '@firebase/auth-types';
-import { FirebaseDatabase } from '@firebase/database-types';
-import { FirebaseMessaging } from '@firebase/messaging-types';
-import { FirebaseStorage } from '@firebase/storage-types';
-import { FirebaseFirestore } from '@firebase/firestore-types';
+export const FirebaseOptionsToken = new InjectionToken<FirebaseOptions>('angularfire2.app.options');
+export const FirebaseNameOrConfigToken = new InjectionToken<string|FirebaseAppConfig|undefined>('angularfire2.app.nameOrConfig')
 
-export class FirebaseApp implements _FirebaseApp {
+export type FirebaseDatabase = database.Database;
+export type FirebaseAuth = auth.Auth;
+export type FirebaseMessaging = messaging.Messaging;
+export type FirebaseStorage = storage.Storage;
+export type FirebaseFirestore = firestore.Firestore;
+export type FirebaseFunctions = functions.Functions;
+
+export class FirebaseApp implements app.App {
     name: string;
-    automaticDataCollectionEnabled: boolean;
     options: {};
     auth: () => FirebaseAuth;
+    // app.App database() doesn't take a databaseURL arg in the public types?
     database: (databaseURL?: string) => FirebaseDatabase;
+    // automaticDataCollectionEnabled is now private? _automaticDataCollectionEnabled?
+    // automaticDataCollectionEnabled: true,
     messaging: () => FirebaseMessaging;
     storage: (storageBucket?: string) => FirebaseStorage;
     delete: () => Promise<void>;
     firestore: () => FirebaseFirestore;
+    functions: () => FirebaseFunctions;
 }
 
-export function _firebaseAppFactory(options: FirebaseOptions, name?: string, appConfig?: FirebaseAppConfig): FirebaseApp {
-    const config = appConfig || {};
-    if (name && config.name && config.name !== name) {
-        console.warn('FirebaseAppNameToken and FirebaseAppConfigToken.name don\'t match, FirebaseAppNameToken takes precedence.');
-    }
-    config.name = name || config.name || '[DEFAULT]';
-    const existingApp = firebase.apps.filter(app => app.name === config.name)[0];
-    return (existingApp || firebase.initializeApp(options, config)) as FirebaseApp;
+export function _firebaseAppFactory(options: FirebaseOptions, nameOrConfig?: string | FirebaseAppConfig) {
+    const name = typeof nameOrConfig === 'string' && nameOrConfig || '[DEFAULT]';
+    const config = typeof nameOrConfig === 'object' && nameOrConfig || {};
+    config.name = config.name || name;
+    const existingApp = apps.filter(app => app && app.name === config.name)[0];
+    // We support FirebaseConfig, initializeApp's public type only accepts string; need to cast as any
+    return (existingApp || (initializeApp as any)(options, config)) as FirebaseApp;
 }
 
 const FirebaseAppProvider = {
@@ -37,8 +44,7 @@ const FirebaseAppProvider = {
     useFactory: _firebaseAppFactory,
     deps: [
         FirebaseOptionsToken,
-        [new Optional(), FirebaseAppNameToken],
-        [new Optional(), FirebaseAppConfigToken]
+        [new Optional(), FirebaseNameOrConfigToken]
     ]
 };
  
@@ -46,15 +52,12 @@ const FirebaseAppProvider = {
     providers: [ FirebaseAppProvider ],
 })
 export class AngularFireModule {
-    static initializeApp(options: FirebaseOptions, appNameOrConfig?: string | FirebaseAppConfig) {
-        const name   = typeof appNameOrConfig === 'string' && appNameOrConfig || undefined
-        const config = typeof appNameOrConfig === 'object' && appNameOrConfig || undefined
+    static initializeApp(options: FirebaseOptions, nameOrConfig?: string | FirebaseAppConfig) {
         return {
             ngModule: AngularFireModule,
             providers: [
-                { provide: FirebaseOptionsToken,   useValue: options },
-                { provide: FirebaseAppNameToken,   useValue: name    },
-                { provide: FirebaseAppConfigToken, useValue: config  }
+                { provide: FirebaseOptionsToken, useValue: options },
+                { provide: FirebaseNameOrConfigToken, useValue: nameOrConfig }
             ]
         }
     }

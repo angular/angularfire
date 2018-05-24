@@ -1,5 +1,4 @@
 import { NgZone } from '@angular/core';
-import * as database from '@firebase/database-types';
 import { FirebaseZoneScheduler } from 'angularfire2';
 import * as utils from './utils';
 import { AFUnwrappedDataSnapshot } from './interfaces';
@@ -7,7 +6,7 @@ import { FirebaseListObservable } from './firebase_list_observable';
 import { Observer } from 'rxjs';
 import { observeOn, switchMap, map } from 'rxjs/operators';
 import { observeQuery } from './query_observable';
-import { Query, FirebaseListFactoryOpts, DatabaseReference, DatabaseQuery, DatabaseSnapshot } from './interfaces';
+import { Reference, Query, FirebaseListFactoryOpts, DatabaseReference, DatabaseQuery, DatabaseSnapshot } from './interfaces';
 
 export function FirebaseListFactory (
   ref: DatabaseReference,
@@ -90,7 +89,7 @@ export function FirebaseListFactory (
       }
 
       return queried;
-    }), (queryRef: database.Reference, ix: number) => {
+    }), (queryRef: Reference, ix: number) => {
       return firebaseListObservable(queryRef, { preserveSnapshot });
     })
     .subscribe(subscriber);
@@ -106,7 +105,7 @@ export function FirebaseListFactory (
  * asynchonous. It creates a initial array from a promise of ref.once('value'), and then starts
  * listening to child events. When the initial array is loaded, the observable starts emitting values.
  */
-function firebaseListObservable(ref: database.Reference | DatabaseQuery, {preserveSnapshot}: FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
+function firebaseListObservable(ref: Reference | DatabaseQuery, {preserveSnapshot}: FirebaseListFactoryOpts = {}): FirebaseListObservable<any> {
 
   const toValue = preserveSnapshot ? (snapshot => snapshot) : utils.unwrapMapFn;
   const toKey = preserveSnapshot ? (value => value.key) : (value => value.$key);

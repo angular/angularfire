@@ -1,4 +1,3 @@
-import { FirebaseDatabase } from '@firebase/database-types';
 import { Inject, Injectable, Optional, NgZone } from '@angular/core';
 import { FirebaseListFactory } from './firebase_list_factory';
 import { FirebaseListObservable } from './firebase_list_observable';
@@ -6,8 +5,7 @@ import { FirebaseListFactoryOpts, FirebaseObjectFactoryOpts, PathReference } fro
 import { FirebaseObjectFactory } from './firebase_object_factory';
 import { FirebaseObjectObservable } from './firebase_object_observable';
 import * as utils from './utils';
-import { FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
-import { FirebaseAppConfigToken, FirebaseOptionsToken, FirebaseAppNameToken, RealtimeDatabaseURL, _firebaseAppFactory } from 'angularfire2';
+import { FirebaseDatabase, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, RealtimeDatabaseURL, _firebaseAppFactory } from 'angularfire2';
 
 @Injectable()
 export class AngularFireDatabase {
@@ -19,13 +17,12 @@ export class AngularFireDatabase {
 
   constructor(
     @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Inject(FirebaseAppConfigToken) config:FirebaseAppConfig,
-    @Optional() @Inject(FirebaseAppNameToken) name:string,
+    @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|undefined,
     @Optional() @Inject(RealtimeDatabaseURL) databaseURL:string,
     zone: NgZone
   ) {
     this.database = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(options, name, config);
+      const app = _firebaseAppFactory(options, nameOrConfig);
       return app.database(databaseURL || undefined);
     });
   }

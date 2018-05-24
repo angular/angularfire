@@ -1,7 +1,7 @@
-import { Reference, DataSnapshot, ThenableReference, Query } from '@firebase/database-types';
 import { Observable } from 'rxjs';
+import { database } from 'firebase/app';
 
-export type FirebaseOperation = string | Reference | DataSnapshot;
+export type FirebaseOperation = string | database.Reference | database.DataSnapshot;
 
 export interface AngularFireList<T> {
   query: DatabaseQuery;
@@ -11,7 +11,7 @@ export interface AngularFireList<T> {
   auditTrail(events?: ChildEvent[]): Observable<SnapshotAction<T>[]>;
   update(item: FirebaseOperation, data: T): Promise<void>;
   set(item: FirebaseOperation, data: T): Promise<void>;
-  push(data: T): ThenableReference;
+  push(data: T): database.ThenableReference;
   remove(item?: FirebaseOperation): Promise<void>;
 }
 
@@ -49,13 +49,13 @@ export type SnapshotAction<T> = AngularFireAction<DatabaseSnapshot<T>>;
 
 export type Primitive = number | string | boolean;
 
-export interface DatabaseSnapshotExists<T> extends DataSnapshot {
+export interface DatabaseSnapshotExists<T> extends database.DataSnapshot {
   exists(): true;
   val(): T;
   forEach(action: (a: DatabaseSnapshot<T>) => boolean): boolean;
 }
 
-export interface DatabaseSnapshotDoesNotExist<T> extends DataSnapshot {
+export interface DatabaseSnapshotDoesNotExist<T> extends database.DataSnapshot {
   exists(): false;
   val(): null;
   forEach(action: (a: DatabaseSnapshot<T>) => boolean): boolean;
@@ -63,7 +63,8 @@ export interface DatabaseSnapshotDoesNotExist<T> extends DataSnapshot {
 
 export type DatabaseSnapshot<T> = DatabaseSnapshotExists<T> | DatabaseSnapshotDoesNotExist<T>;
 
-export type DatabaseReference = Reference;
-export type DatabaseQuery = Query;
+export type DatabaseReference = database.Reference;
+export type DatabaseQuery = database.Query;
+export type DataSnapshot = database.DataSnapshot;
 export type QueryReference = DatabaseReference | DatabaseQuery;
 export type PathReference = QueryReference | string;

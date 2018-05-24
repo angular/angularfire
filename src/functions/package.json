@@ -1,8 +1,8 @@
 {
-  "name": "angularfire2/auth",
+  "name": "angularfire2/functions",
   "version": "ANGULARFIRE2_VERSION",
-  "description": "The auth module",
-  "main": "../bundles/auth.umd.js",
+  "description": "The functions module",
+  "main": "../bundles/functions.umd.js",
   "module": "index.js",
   "es2015": "./es2015/index.js",
   "keywords": [
