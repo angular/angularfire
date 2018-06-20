@@ -1,4 +1,4 @@
-import { Reference } from 'firebase/database-types';
+import { database } from 'firebase';
 import { FirebaseApp, AngularFireModule } from 'angularfire2';
 import { AngularFireDatabase, AngularFireDatabaseModule, listChanges } from 'angularfire2/database';
 import { TestBed, inject } from '@angular/core/testing';
@@ -12,7 +12,7 @@ const FIREBASE_APP_NAME = rando();
 describe('listChanges', () => {
   let app: FirebaseApp;
   let db: AngularFireDatabase;
-  let ref: (path: string) => Reference;
+  let ref: (path: string) => database.Reference;
   let batch = {};
   const items = [{ name: 'zero' }, { name: 'one' }, { name: 'two' }].map((item, i) => ( { key: i.toString(), ...item } ));
   Object.keys(items).forEach(function (key, i) {
