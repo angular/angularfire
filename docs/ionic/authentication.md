@@ -1,26 +1,29 @@
-# STEP 1: install this plugin: 
+# Step 1: install this plugin: 
 ```
-1) ionic cordova plugin add cordova-universal-links-plugin
-2) ionic cordova plugin add cordova-plugin-buildinfo
-3) ionic cordova plugin add cordova-plugin-browsertab
-4) ionic cordova plugin add cordova-plugin-inappbrowser
-5) ionic cordova plugin add cordova-plugin-customurlscheme (for ios)
+ionic cordova plugin add cordova-universal-links-plugin
+ionic cordova plugin add cordova-plugin-buildinfo
+ionic cordova plugin add cordova-plugin-browsertab
+ionic cordova plugin add cordova-plugin-inappbrowser
+(for ios)
+ionic cordova plugin add cordova-plugin-customurlscheme 
 ```
 
-# STEP 2: Add Firebase to your Ionic
+# Step 2: Add Firebase to your Ionic
 
-  STEP 2.1:  [setup firebase to angular project] 
-  (https://github.com/angular/angularfire2/blob/master/docs/install-and-setup.md)
+ **[Setup firebase to angular project](https://github.com/angular/angularfire2/blob/master/docs/install-and-setup.md)**
 
-  STEP 2.2: To set up an Android app, go to [Firebase Console](https://console.firebase.google.com/) then 
-  Click **Add Firebase to your Android app** and follow the setup steps.
+ **To set up in an Android app** 
+ Go to [Firebase console](https://console.firebase.google.com/) then click **Add Firebase to your Android app** and follow the setup steps.
 
-# STEP 3: Set up Firebase Authentication for Cordova ( sumary from [firebase instruction](https://firebase.google.com/docs/auth/web/cordova))
 
- STEP 3.1: In the Firebase console, open the **Dynamic Links** section at bottom left panel, setup by they instruction
+# Step 3: Set up Firebase Authentication for Cordova ( summary from [firebase instruction](https://firebase.google.com/docs/auth/web/cordova))
 
- STEP 3.2: add this to config.xml at root level of project:
-```
+ **Setup Dynamic Link**
+ In the Firebase console, open the **Dynamic Links** section at bottom left panel, setup by their instruction
+
+ **Add dynamic link**
+ *Add this to config.xml at root level of project:*
+```xml
      <universal-links>
         <!-- this is dynamic link created in firebase -->
         <host name="zm4e4.app.goo.gl" scheme="https" />
@@ -33,18 +36,19 @@
     <preference name="AndroidLaunchMode" value="singleTask" />
 ```
 
-  STEP 3.3: make sure your `<widget id="com.yourandroid.id" ... >` the same with android app's id you 
-  added in firebase at STEP 2.2.
+  *Make sure your `<widget id="com.yourandroid.id" ... >` the same with android app's id you 
+  added in firebase*
 
-# STEP 4: add login code:
-at login.service.ts add this function: 
-```
+# Step 4: Add login code:
+at `login.service.ts` add this function: 
+```ts
+
 import { AngularFireAuth } from 'angularfire2/auth';
 import * as firebase from 'firebase/app';
 import AuthProvider = firebase.auth.AuthProvider;
 
 export class AuthService {
-        private user: firebase.User;
+    private user: firebase.User;
 	constructor(public afAuth: AngularFireAuth) {
 		afAuth.authState.subscribe(user => {
 			this.user = user;
@@ -61,7 +65,7 @@ export class AuthService {
 		return this.oauthSignIn(new firebase.auth.GoogleAuthProvider());
 	}
 
-        private oauthSignIn(provider: AuthProvider) {
+  private oauthSignIn(provider: AuthProvider) {
 		if (!(<any>window).cordova) {
 			return this.afAuth.auth.signInWithPopup(provider);
 		} else {
@@ -84,9 +88,9 @@ export class AuthService {
 }
 ```
 
-# Problem 1: 
+# Common problems
 
-if you got error when build code like this:
+If you got error when build code like this:
 `UnhandledPromiseRejectionWarning: Unhandled promise rejection (rejection id: 1): TypeError: Cannot read property 'manifest' of undefined`
 
 Please, using this fix from [issue](https://github.com/nordnet/cordova-universal-links-plugin/issues/134):
