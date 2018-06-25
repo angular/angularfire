@@ -10,10 +10,13 @@ ionic cordova plugin add cordova-plugin-customurlscheme
 
 # Step 2: Add Firebase to your Ionic
 
- **[Setup firebase to angular project](https://github.com/angular/angularfire2/blob/master/docs/install-and-setup.md)**
+ **Install firebase to angular project**
+
+Follow [this tutorial](https://github.com/angular/angularfire2/blob/master/docs/install-and-setup.md) to make a basic setup for your Ionic project.
 
  **To set up in an Android app** 
- Go to [Firebase console](https://console.firebase.google.com/) then click **Add Firebase to your Android app** and follow the setup steps.
+
+Go to [Firebase console](https://console.firebase.google.com/) then click **Add Firebase to your Android app** and follow the setup steps.
 
 
 # Step 3: Set up Firebase Authentication for Cordova ( summary from [firebase instruction](https://firebase.google.com/docs/auth/web/cordova))
