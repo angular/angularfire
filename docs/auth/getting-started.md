@@ -11,7 +11,7 @@ the Firebase docs for more information on what methods are available.](https://f
 ```ts
 import { Component } from '@angular/core';
 import { AngularFireAuth } from 'angularfire2/auth';
-import { auth } from 'firebase/app';
+import { auth } from 'firebase';
 
 @Component({
   selector: 'app-root',
