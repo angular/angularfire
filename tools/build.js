@@ -20,6 +20,7 @@ const GLOBALS = {
   'firebase/app': 'firebase',
   'firebase/auth': 'firebase',
   'firebase/database': 'firebase',
+  'firebase/messaging': 'firebase',
   'firebase/firestore': 'firebase',
   'firebase/functions': 'firebase',
   'firebase/storage': 'firebase',
