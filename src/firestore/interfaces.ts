@@ -48,9 +48,7 @@ export interface Action<T> {
   payload: T;
 };
 
-export interface Reference<T> {
-  onSnapshot: (sub: Subscriber<any>) => any;
-}
+export interface Reference<T> extends Query { }
 
 // A convience type for making a query.
 // Example: const query = (ref) => ref.where('name', == 'david');

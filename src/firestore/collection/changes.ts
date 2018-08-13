@@ -1,6 +1,7 @@
 import { fromCollectionRef } from '../observable/fromRef';
 import { Observable } from 'rxjs';
-import { map, filter, scan } from 'rxjs/operators';
+import { map, scan } from 'rxjs/operators';
+import { firestore } from 'firebase';
 
 import { Query, DocumentChangeType, DocumentChange, DocumentChangeAction, Action } from '../interfaces';
 
@@ -9,8 +10,8 @@ import { Query, DocumentChangeType, DocumentChange, DocumentChangeAction, Action
  * order of occurence.
  * @param query
  */
-export function docChanges<T>(query: Query): Observable<DocumentChangeAction<T>[]> {
-  return fromCollectionRef(query)
+export function docChanges<T>(query: Query, options?: firestore.SnapshotListenOptions): Observable<DocumentChangeAction<T>[]> {
+  return fromCollectionRef(query, options)
     .pipe(
       map(action =>
         action.payload.docChanges()
@@ -21,8 +22,8 @@ export function docChanges<T>(query: Query): Observable<DocumentChangeAction<T>[
  * Return a stream of document changes on a query. These results are in sort order.
  * @param query
  */
-export function sortedChanges<T>(query: Query, events: DocumentChangeType[]): Observable<DocumentChangeAction<T>[]> {
-  return fromCollectionRef(query)
+export function sortedChanges<T>(query: Query, events: DocumentChangeType[], options?: firestore.SnapshotListenOptions): Observable<DocumentChangeAction<T>[]> {
+  return fromCollectionRef(query, options)
     .pipe(
       map(changes => changes.payload.docChanges()),
       scan((current, changes) => combineChanges(current, changes, events), []),
