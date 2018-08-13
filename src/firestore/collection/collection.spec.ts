@@ -203,6 +203,7 @@ describe('AngularFirestoreCollection', () => {
           deleteThemAll(names, ref).then(done).catch(done.fail);
         }
       });
+
     });
 
     it('should be able to filter snapshotChanges() types - modified', async (done) => {
@@ -284,6 +285,17 @@ describe('AngularFirestoreCollection', () => {
       });
 
       delayDelete(stocks, names[0], 400);
+    });
+
+    it('should work with snapshot listener options', async (done: any) => {
+      const ITEMS = 4;
+      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      debugger;
+      const sub = stocks.snapshotChanges({ includeMetadataChanges: true }).subscribe(actions => {
+        sub.unsubscribe();
+        debugger;
+        done();
+      });
     });
 
   });

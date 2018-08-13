@@ -3,8 +3,6 @@ import { DocumentReference, SetOptions, DocumentData, QueryFn, AssociatedReferen
 import { fromDocRef } from '../observable/fromRef';
 import { map } from 'rxjs/operators';
 
-import { Injectable } from '@angular/core';
-
 import { AngularFirestore, associateQuery } from '../firestore';
 import { AngularFirestoreCollection } from '../collection/collection';
 
@@ -78,7 +76,7 @@ export class AngularFirestoreDocument<T=DocumentData> {
   /**
    * Listen to snapshot updates from the document.
    */
-  snapshotChanges(): Observable<Action<DocumentSnapshot<T>>> {
+  snapshotChanges(): Observable<DocumentSnapshot<T>> {
     const fromDocRef$ = fromDocRef<T>(this.ref);
     const scheduledFromDocRef$ = this.afs.scheduler.runOutsideAngular(fromDocRef$);
     return this.afs.scheduler.keepUnstableUntilFirst(scheduledFromDocRef$);
@@ -89,9 +87,7 @@ export class AngularFirestoreDocument<T=DocumentData> {
    */
   valueChanges(): Observable<T|undefined> {
     return this.snapshotChanges().pipe(
-      map(action => {
-        return action.payload.data();
-      })
+      map(snap => snap.data())
     );
   }
 }

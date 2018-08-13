@@ -2,7 +2,7 @@ import { FirebaseApp, AngularFireModule } from 'angularfire2';
 import { AngularFirestore } from '../firestore';
 import { AngularFirestoreModule } from '../firestore.module';
 import { AngularFirestoreDocument } from '../document/document';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 
 import { TestBed, inject } from '@angular/core/testing';
@@ -40,10 +40,10 @@ describe('AngularFirestoreDocument', () => {
     await stock.set(FAKE_STOCK_DATA);
     const sub = stock
       .snapshotChanges()
-      .subscribe(async a => {
+      .subscribe(a => {
         sub.unsubscribe();
-        if (a.payload.exists) {
-          expect(a.payload.data()).toEqual(FAKE_STOCK_DATA);
+        if (a.exists) {
+          expect(a.data()).toEqual(FAKE_STOCK_DATA);
           stock.delete().then(done).catch(done.fail);
         }
       });
