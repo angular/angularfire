@@ -1,5 +1,6 @@
 import { InjectionToken, NgZone, NgModule, Optional } from '@angular/core';
-import { app, auth, apps, database, firestore, functions, initializeApp, messaging, storage } from 'firebase/app';
+import { app, auth, database, firestore, functions, messaging, storage } from 'firebase';
+import * as firebase from 'firebase/app';
 
 // Public types don't expose FirebaseOptions or FirebaseAppConfig
 export type FirebaseOptions = {[key:string]: any};
@@ -34,9 +35,9 @@ export function _firebaseAppFactory(options: FirebaseOptions, nameOrConfig?: str
     const name = typeof nameOrConfig === 'string' && nameOrConfig || '[DEFAULT]';
     const config = typeof nameOrConfig === 'object' && nameOrConfig || {};
     config.name = config.name || name;
-    const existingApp = apps.filter(app => app && app.name === config.name)[0];
+    const existingApp = firebase.apps.filter(app => app && app.name === config.name)[0];
     // We support FirebaseConfig, initializeApp's public type only accepts string; need to cast as any
-    return (existingApp || (initializeApp as any)(options, config)) as FirebaseApp;
+    return (existingApp || firebase.initializeApp(options, <any>config)) as FirebaseApp;
 }
 
 const FirebaseAppProvider = {

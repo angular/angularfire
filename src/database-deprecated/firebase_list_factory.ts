@@ -127,7 +127,7 @@ function firebaseListObservable(ref: Reference | DatabaseQuery, {preserveSnapsho
         snap.forEach((child: any) => {
           lastLoadedKey = child.key;
         });
-        if (array.find((child: any) => toKey(child) === lastLoadedKey)) {
+        if ((<any>array).find((child: any) => toKey(child) === lastLoadedKey)) {
           hasLoaded = true;
           obs.next(array);
         }
@@ -177,7 +177,7 @@ function firebaseListObservable(ref: Reference | DatabaseQuery, {preserveSnapsho
       // The Firebase SDK requires the reference, event name, and callback to
       // properly unsubscribe, otherwise it can affect other subscriptions.
       handles.forEach(item => {
-        ref.off(item.event, item.handle);
+        ref.off(item.event as any, item.handle);
       });
     };
 

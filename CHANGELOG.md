@@ -1,3 +1,11 @@
+<a name="5.0.0-rc.11"></a>
+# [5.0.0-rc.11](https://github.com/angular/angularfire2/compare/5.0.0-rc.10...5.0.0-rc.11) (2018-06-13)
+
+### Bug Fixes
+
+* Fixed SSR compilation and misc. typing issues ([#1729](https://github.com/angular/angularfire2/issues/1729)) ([eed5802](https://github.com/angular/angularfire2/commit/eed5802))
+
+
 <a name="5.0.0-rc.10"></a>
 # [5.0.0-rc.10](https://github.com/angular/angularfire2/compare/5.0.0-rc.9...5.0.0-rc.10) (2018-05-22)
 

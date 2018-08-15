@@ -5,7 +5,7 @@ If you know the [Firestore query API](https://firebase.google.com/docs/reference
 
 ## Creating a query with primitive/scalar values
 
-Queries are created by building on the [`firebase.firestore.Reference`](https://firebase.google.com/docs/reference/js/firebase.firestore.Reference).
+Queries are created by building on the [`firebase.firestore.CollectionReference`](https://firebase.google.com/docs/reference/js/firebase.firestore.CollectionReference).
 
 ```ts
 afs.collection('items', ref => ref.where('size', '==', 'large'))
