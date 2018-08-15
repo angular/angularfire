@@ -68,6 +68,7 @@ interface DocumentSnapshot {
 There are multiple ways of streaming collection data from Firestore.
 
 ### `valueChanges()`
+
 **What is it?** - Returns an Observable of document data. All Snapshot metadata is stripped. This method provides only the data.
 
 **Why would you use it?** - When you just need the object data. No document metadata is attached which makes it simple to render to a view.
@@ -75,6 +76,7 @@ There are multiple ways of streaming collection data from Firestore.
 **When would you not use it?** - When you need the `id` of the document to use data manipulation methods. This method assumes you either are saving the `id` to the document data or using a "readonly" approach.
 
 ### `snapshotChanges()`
+
 **What is it?** - Returns an Observable of data as a `DocumentChangeAction`. 
 
 **Why would you use it?** - When you need the document data but also want to keep around metadata. This metadata provides you the underyling `DocumentReference` and document id. Having the document's id around makes it easier to use data manipulation methods. This method gives you more horsepower with other Angular integrations such as ngrx, forms, and animations due to the `type` property. The `type` property on each `DocumentChangeAction` is useful for ngrx reducers, form states, and animation states.
