@@ -2,7 +2,7 @@
 
 > Cloud Storage is designed to help you quickly and easily store and serve user-generated content, such as photos and videos.
 
-### Import the NgModule
+### Import the `NgModule`
 
 Cloud Storage for AngularFire is contained in the `angularfire2/storage` module namespace. Import the `AngularFireStorageModule` in your `NgModule`. This sets up the `AngularFireStorage` service for dependency injection.
 
@@ -53,6 +53,8 @@ There are three options for uploading files.
 | `put(data: Blob, metadata?: storage.UploadMetadata): AngularFireUploadTask` | Starts the upload of the blob to the storage reference's path. Returns an `AngularFireUploadTask` for upload monitoring. |
 | `putString(data: string, format?: StringFormat, metadata?: UploadMetadata): AngularFireUploadTask` | Updates an existing item in the array. Accepts a key, database reference, or an unwrapped snapshot. |
 | `upload(path: string, data: StringFormat, metadata?: UploadMetadata): AngularFireUploadTask` | Upload or update a new file to the storage reference's path. Returns an `AngularFireUploadTask` for upload monitoring. |
+
+### Examples
 
 #### Uploading blobs with put
 
@@ -189,6 +191,8 @@ export class AppComponent {
 ### Managing Metadata
 
 Cloud Storage for Firebase allows you to upload and download metadata associated with files. This is useful because you can store important metadata and download it without needing to download the entire file.
+
+### Examples
 
 #### Downloading metadata
 

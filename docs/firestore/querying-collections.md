@@ -11,7 +11,7 @@ Queries are created by building on the [`firebase.firestore.CollectionReference`
 afs.collection('items', ref => ref.where('size', '==', 'large'))
 ```
 
-**Query Options:**
+### Query options
 
 | method   | purpose            |
 | ---------|--------------------|
@@ -77,7 +77,7 @@ size$.next('large');
 size$.next('small');
 ```
 
-**Example app:**
+### Example app
  
 [See this example in action on StackBlitz](https://stackblitz.com/edit/angularfire-db-api-fbad9p).
 
@@ -156,9 +156,9 @@ export class AppComponent {
 }
 ```
 
-**To run the above example as is, you need to have sample data in you firebase database with the following structure:**
- 
- ```json
+**To run the above example as is, you need to have sample data in your Firebase database with the following structure:**
+
+```json
 {
   "items": {
     "a" : {
@@ -178,6 +178,6 @@ export class AppComponent {
     }
   }
 }
- ```
+```
 
 ### [Next Step: Getting started with Firebase Authentication](../auth/getting-started.md)
