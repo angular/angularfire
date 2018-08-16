@@ -203,6 +203,7 @@ describe('AngularFirestoreCollection', () => {
           deleteThemAll(names, ref).then(done).catch(done.fail);
         }
       });
+
     });
 
     it('should be able to filter snapshotChanges() types - modified', async (done) => {
@@ -274,7 +275,7 @@ describe('AngularFirestoreCollection', () => {
       const ITEMS = 10;
       const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
 
-      const sub = stocks.snapshotChanges(['added', 'removed']).pipe(skip(1)).subscribe(data => {
+      const sub = stocks.snapshotChanges(['added', 'removed'], { includeMetadataChanges: true }).pipe(skip(1)).subscribe(data => {
         sub.unsubscribe();
         const change = data.filter(x => x.payload.doc.id === names[0]);
         expect(data.length).toEqual(ITEMS - 1);
@@ -284,6 +285,30 @@ describe('AngularFirestoreCollection', () => {
       });
 
       delayDelete(stocks, names[0], 400);
+    });
+
+    it('should listen to all snapshotChanges() by default with listener options', async (done) => {
+      const ITEMS = 10;
+      let count = 0;
+      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const sub = stocks.snapshotChanges({ includeMetadataChanges: true }).subscribe(data => {
+        const ids = data.map(d => d.payload.doc.id);
+        count = count + 1;
+        // the first time should all be 'added'
+        if(count === 1) {
+          // make an update
+          stocks.doc(names[0]).update({ price: 2});
+        }
+        // on the second round, make sure the array is still the same
+        // length but the updated item is now modified
+        if(count === 2) {
+          expect(data.length).toEqual(ITEMS);
+          const change = data.filter(x => x.payload.doc.id === names[0])[0];
+          expect(change.type).toEqual('modified');
+          sub.unsubscribe();
+          deleteThemAll(names, ref).then(done).catch(done.fail);
+        }
+      });
     });
 
   });
@@ -346,7 +371,7 @@ describe('AngularFirestoreCollection', () => {
     it('should handle multiple subscriptions (warm)', async (done: any) => {
       const ITEMS = 4;
       const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
-      const changes = stocks.stateChanges();
+      const changes = stocks.stateChanges({ includeMetadataChanges: true });
       changes.pipe(take(1)).subscribe(() => {}).add(() => {
         const sub = changes.pipe(take(1)).subscribe(data => {
           expect(data.length).toEqual(ITEMS);
@@ -361,7 +386,7 @@ describe('AngularFirestoreCollection', () => {
       let count = 0;
       const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
 
-      const sub = stocks.stateChanges(['modified']).subscribe(data => {
+      const sub = stocks.stateChanges(['modified'], { includeMetadataChanges: true }).subscribe(data => {
         sub.unsubscribe();
         expect(data.length).toEqual(1);
         expect(data[0].payload.doc.data().price).toEqual(2);
@@ -431,7 +456,7 @@ describe('AngularFirestoreCollection', () => {
       const ITEMS = 10;
       const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
 
-      const sub = stocks.auditTrail(['removed']).subscribe(data => {
+      const sub = stocks.auditTrail(['removed'], { includeMetadataChanges: true }).subscribe(data => {
         sub.unsubscribe();
         expect(data.length).toEqual(1);
         expect(data[0].type).toEqual('removed');
