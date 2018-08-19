@@ -301,7 +301,7 @@ function buildModules(globals) {
     switchMapTo(functions$),
     switchMapTo(storage$),
     switchMapTo(messaging$),
-    switchMapTo(dbdep$),
+    switchMapTo(dbdep$)
   );
 }
 
