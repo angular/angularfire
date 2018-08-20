@@ -1,8 +1,7 @@
-import { Observable, Subscriber } from 'rxjs';
+import { Observable, from } from 'rxjs';
 import { fromCollectionRef } from '../observable/fromRef';
 import { map, filter, scan } from 'rxjs/operators';
-
-import { Injectable } from '@angular/core';
+import { firestore } from 'firebase/app';
 
 import { DocumentChangeType, CollectionReference, Query, DocumentReference, DocumentData, QueryFn, AssociatedReference, DocumentChangeAction, DocumentChange } from '../interfaces';
 import { docChanges, sortedChanges } from './changes';
@@ -111,6 +110,14 @@ export class AngularFirestoreCollection<T=DocumentData> {
       .pipe(
         map(actions => actions.payload.docs.map(a => a.data()))
       );
+  }
+
+  /**
+   * Retrieve the results of the query once. 
+   * @param options 
+   */
+  get(options: firestore.GetOptions) {
+    return from(this.query.get(options));
   }
 
   /**
