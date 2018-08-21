@@ -8,9 +8,9 @@ Queries are created by building on the [`firebase.database.Reference`](https://f
 db.list('/items', ref => ref.orderByChild('size').equalTo('large'))
 ```
 
-**Query Options:**
+### Query options
 
-| method   | purpose            |
+| Method   | Purpose            |
 | ---------|--------------------|
 | `orderByChild` | Specify a child to order by. |
 | `orderByKey` | Boolean to order by Firebase Database keys. |

@@ -86,8 +86,11 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 
 - [Getting started with Firebase Authentication](docs/auth/getting-started.md)
 
-## Upload files
+### Upload files
 - [Getting started with Cloud Storage](docs/storage/storage.md)
+
+### Universal
+- [Server-side Rendering with Universal](docs/server-side-rendering.md)
 
 ### Deploy to Firebase Hosting
 

@@ -2,11 +2,11 @@
 
 > The `AngularFireObject` is a service for manipulating and streaming object data.
 
-The `AngularFireObject` service is not created by itself, but through the `AngularFireDatabase` service. 
+The `AngularFireObject` service is not created by itself, but through the `AngularFireDatabase` service.
 
 The guide below demonstrates how to retrieve, save, and remove data as objects.
 
-## Injecting the AngularFireDatabase service
+## Injecting the `AngularFireDatabase` service
 
 **Make sure you have bootstrapped your application for AngularFire. See the Installation guide for bootstrap setup.**
 
@@ -78,6 +78,7 @@ The table below highlights some of the common methods on the `AngularFireObject`
 | `remove()`   | Deletes all data present at that location. Same as calling `set(null)`. |
 
 ## Returning promises
+
 Each data operation method in the table above returns a promise. However,
 you should rarely need to use the completion promise to indicate success, 
 because the realtime database keeps the object in sync. 
@@ -113,6 +114,7 @@ itemRef.update({ age: newAge });
 using an update with a primitive is the exact same as doing a `.set()` with a primitive.
 
 ### Deleting data
+
 Use the `remove()` method to remove data at the object's location.
 
 ```ts
@@ -159,6 +161,7 @@ export class AppComponent {
 ```
 
 ## Retrieving the snapshot
+
 AngularFire `valueChanges()` unwraps the Firebase DataSnapshot by default, but you can get the data as the original snapshot by using the `snapshotChanges()` option.
 
 ```ts
