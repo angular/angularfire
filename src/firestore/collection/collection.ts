@@ -114,6 +114,21 @@ export class AngularFirestoreCollection<T=DocumentData> {
   }
 
   /**
+   * Listen to all documents in the collection and its possible query as an Observable.
+   */
+  keyValueChanges(): Observable<{[key:string]: T}> {
+    const fromCollectionRef$ = fromCollectionRef<T>(this.query);
+    const scheduled$ = this.afs.scheduler.runOutsideAngular(fromCollectionRef$);
+    return this.afs.scheduler.keepUnstableUntilFirst(scheduled$)
+      .pipe(
+        map(actions => actions.payload.docs.reduce((versions, action) => {
+          versions[action.id] = action.data();
+          return versions;
+        }, {}))
+      );
+  }
+
+  /**
    * Add data to a collection reference.
    *
    * Note: Data operation methods are done on the reference not the query. This means
