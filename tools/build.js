@@ -115,15 +115,15 @@ function spawnObservable(command, args) {
   });
 }
 
-function generateBundle(entry, { dest, globals, moduleName }) {
-  return rollup({ entry }).then(bundle => {
+function generateBundle(input, { file, globals, name }) {
+  return rollup({ input }).then(bundle => {
     return bundle.write({
       format: 'umd',
       external: Object.keys(globals),
       plugins: [resolve()],
-      dest,
+      file,
       globals,
-      moduleName,
+      name,
     });
   });
 }
@@ -131,9 +131,9 @@ function generateBundle(entry, { dest, globals, moduleName }) {
 function createFirebaseBundles(featurePaths, globals) {
   return Object.keys(featurePaths).map(feature => {
     return generateBundle(featurePaths[feature], {
-      dest: `${process.cwd()}/dist/bundles/${feature}.js`,
+      file: `${process.cwd()}/dist/bundles/${feature}.js`,
       globals,
-      moduleName: `firebase.${feature}`
+      name: `firebase.${feature}`
     });
   });
 }
@@ -148,9 +148,9 @@ function createUmd(name, globals) {
   const moduleName = MODULE_NAMES[name];
   const entry = ENTRIES[name];
   return generateBundle(entry, {
-    dest: `${process.cwd()}/dist/packages-dist/bundles/${name}.umd.js`,
+    file: `${process.cwd()}/dist/packages-dist/bundles/${name}.umd.js`,
     globals,
-    moduleName
+    name: moduleName
   });
 }
 
@@ -158,9 +158,9 @@ function createTestUmd(globals) {
   const entry = `${process.cwd()}/dist/root.spec.js`;
   const moduleName = 'angularfire2.test';
   return generateBundle(entry, {
-    dest: `${process.cwd()}/dist/packages-dist/bundles/test.umd.js`,
+    file: `${process.cwd()}/dist/packages-dist/bundles/test.umd.js`,
     globals,
-    moduleName
+    name: moduleName
   });
 }
 
