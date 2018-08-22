@@ -1,10 +1,10 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
 import { Observable, from } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 
 import { FirebaseOptions, FirebaseAppConfig } from 'angularfire2';
 
-import { FirebaseFunctions, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
+import { FirebaseFunctions, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, runOutsideAngular } from 'angularfire2';
 
 @Injectable()
 export class AngularFireFunctions {
@@ -12,9 +12,9 @@ export class AngularFireFunctions {
   /**
    * Firebase Functions instance
    */
-  public readonly functions: FirebaseFunctions;
+  public readonly functions: Observable<FirebaseFunctions>;
 
-  public readonly scheduler: FirebaseZoneScheduler;
+  public httpsCallable: <T=any, R=any>(name:string) => (data: T) => Observable<T>;
 
   constructor(
     @Inject(FirebaseOptionsToken) options:FirebaseOptions,
@@ -22,25 +22,23 @@ export class AngularFireFunctions {
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
-    this.scheduler = new FirebaseZoneScheduler(zone, platformId);
-    
-    this.functions = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(options, nameOrConfig);
-      return app.functions();
-    });
 
-  }
+    // @ts-ignore
+    const requireFunctions = from(import('firebase/functions'));
 
-  public httpsCallable<T=any, R=any>(name: string) {
-    const callable = this.functions.httpsCallable(name);
-    return (data: T) => {
-      const callable$ = from(callable(data));
-      return this.scheduler.runOutsideAngular(
-        callable$.pipe(
-          map(r => r.data as R)
-        )
-      )
-    }
+    this.functions = requireFunctions.pipe(
+      map(() => _firebaseAppFactory(options, nameOrConfig)),
+      map(app => app.functions()),
+      runOutsideAngular(zone)
+    );
+
+    this.httpsCallable = name => data => this.functions.pipe(
+      map(functions => functions.httpsCallable(name)),
+      switchMap(callable => callable(data)),
+      map(response => response.data),
+      runOutsideAngular(zone)
+    )
+
   }
 
 }
