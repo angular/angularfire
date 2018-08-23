@@ -18,7 +18,7 @@ export class FirebaseZoneScheduler {
         const task = Zone.current.scheduleMacroTask('firebaseZoneBlock', noop, {}, noop, noop);
         obs$.subscribe(
           next => {
-            task.invoke();
+            if (task.state === 'scheduled') { task.invoke() };
             subscriber.next(next);
           },
           error => {
