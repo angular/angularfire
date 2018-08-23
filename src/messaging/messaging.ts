@@ -25,7 +25,8 @@ export class AngularFireMessaging {
 
     if (isPlatformBrowser(platformId)) {
 
-      const requireMessaging = from(require('firebase/messaging'));
+      // @ts-ignore
+      const requireMessaging = from(import('firebase/messaging'));
 
       this.messaging = requireMessaging.pipe(
         map(() => _firebaseAppFactory(options, nameOrConfig)),
