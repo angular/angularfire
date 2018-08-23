@@ -1,7 +1,6 @@
 import { InjectionToken, NgZone } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
 import { Observable, Subscription, queueScheduler as queue } from 'rxjs';
-import { first } from 'rxjs/operators';
 
 // Put in database.ts when we drop database-depreciated
 export const RealtimeDatabaseURL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
@@ -17,8 +16,20 @@ export class FirebaseZoneScheduler {
       return new Observable<T>(subscriber => {
         const noop = () => {};
         const task = Zone.current.scheduleMacroTask('firebaseZoneBlock', noop, {}, noop, noop);
-        obs$.pipe(first()).subscribe(() => this.zone.runOutsideAngular(() => task.invoke()));
-        return obs$.subscribe(subscriber);
+        obs$.subscribe(
+          next => {
+            if (task.state === 'scheduled') { task.invoke() };
+            subscriber.next(next);
+          },
+          error => {
+            if (task.state === 'scheduled') { task.invoke() }
+            subscriber.error(error);
+          },
+          () => {
+            if (task.state === 'scheduled') { task.invoke() }
+            subscriber.complete();
+          }
+        );
       });
     } else {
       return obs$;
