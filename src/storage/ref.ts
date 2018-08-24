@@ -22,12 +22,12 @@ export function createStorageRef(ref: Reference, scheduler: FirebaseZoneSchedule
   return {
     getDownloadURL: () => scheduler.keepUnstableUntilFirst(
       scheduler.runOutsideAngular(
-        from(ref.getDownloadURL())
+        from(scheduler.zone.runOutsideAngular(() => ref.getDownloadURL()))
       )
     ),
     getMetadata: () => scheduler.keepUnstableUntilFirst(
       scheduler.runOutsideAngular(
-        from(ref.getMetadata())
+        from(scheduler.zone.runOutsideAngular(() => ref.getMetadata()))
       )
     ),
     delete: () => from(ref.delete()),
