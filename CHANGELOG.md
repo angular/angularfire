@@ -1,3 +1,20 @@
+<a name="5.0.0-rc.12"></a>
+# [5.0.0-rc.12](https://github.com/angular/angularfire2/compare/5.0.0-rc.11...5.0.0-rc.12) (2018-08-24)
+
+### Bug Fixes
+
+* **afs:** Gracefully handle duplicate emissions on modified/deleted ([#1825](https://github.com/angular/angularfire2/issues/1825)) ([76ff6c1](https://github.com/angular/angularfire2/commit/76ff6c1))
+* **core:** If an AngularFire observable was empty or threw, it could block Universal rendering ([#1832](https://github.com/angular/angularfire2/issues/1832)) ([36a8ff8](https://github.com/angular/angularfire2/commit/36a8ff8))
+* **core:** Fix for the Firebase ES export problems in Node ([#1821](https://github.com/angular/angularfire2/issues/1821)) ([f1014ee](https://github.com/angular/angularfire2/commit/f1014ee))
+* **storage:** Fix for zone issues on downloadURL and metadata, which blocked Universal rendering ([#1835](https://github.com/angular/angularfire2/issues/1835)) ([441607a](https://github.com/angular/angularfire2/commit/441607a))
+
+
+### Features
+
+* **firestore:** Added a `get` Observable ([#1824](https://github.com/angular/angularfire2/issues/1824)) ([9f34be8](https://github.com/angular/angularfire2/commit/9f34be8))
+* **messaging:** Introducing AngularFireMessaing ([#1749](https://github.com/angular/angularfire2/issues/1749)) ([26f7613](https://github.com/angular/angularfire2/commit/26f7613))
+
+
 <a name="5.0.0-rc.11"></a>
 # [5.0.0-rc.11](https://github.com/angular/angularfire2/compare/5.0.0-rc.10...5.0.0-rc.11) (2018-06-13)
 
