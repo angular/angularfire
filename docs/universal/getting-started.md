@@ -1,11 +1,11 @@
-# Server-side Rendering with Universal
+# Getting started with Angularfire and Universal
 
 Server-side rendering (SSR) is the process of converting a JavaScript app to plain HTML at request-time, allowing search engine crawlers and linkbots to understand page content reliably. 
 
 ## 0. Prerequisites
 
 - @angular/cli >= v6.0
-- angularfire2 >= v5.0.0-rc.7
+- angularfire2 >= v5.0.0-rc.12
 
 ## 1. Generate the Angular Universal Server Module
 
@@ -20,18 +20,19 @@ ng generate universal --client-project <your-project>
 [ExpressJS](https://expressjs.com/) is a lightweight web framework that can serve http requests in Node. First, install the dev dependencies:
 
 ```
-npm install --save-dev express webpack-cli ts-loader ws xmlhttprequest
+npm install --save-dev @nguniversal/express-engine @nguniversal/module-map-ngfactory-loader express webpack-cli ts-loader ws xhr2
 ```
 
-Create a file called `server.ts` in the root of you project.
+Create a file called `server.ts` in the root of you project, replacing `YOUR_PROJECT_NAME` with the name of your project.
 
 ```ts
 // These are important and needed before anything else
 import 'zone.js/dist/zone-node';
 import 'reflect-metadata';
 
-import { renderModuleFactory } from '@angular/platform-server';
 import { enableProdMode } from '@angular/core';
+import { ngExpressEngine } from '@nguniversal/express-engine';
+import { provideModuleMap } from '@nguniversal/module-map-ngfactory-loader';
 
 import * as express from 'express';
 import { join } from 'path';
@@ -39,8 +40,7 @@ import { readFileSync } from 'fs';
 
 // Required for Firebase
 (global as any).WebSocket = require('ws');
-(global as any).XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
-
+(global as any).XMLHttpRequest = require('xhr2');
 
 // Faster renders in prod mode
 enableProdMode();
@@ -48,23 +48,20 @@ enableProdMode();
 // Express server
 const app = express();
 
-const PORT = process.env.PORT || 4000;
 const DIST_FOLDER = join(process.cwd(), 'dist');
 const APP_NAME = 'YOUR_PROJECT_NAME';
 
-const { AppServerModuleNgFactory } = require(`./dist/${APP_NAME}-server/main`);
+const { AppServerModuleNgFactory, LAZY_MODULE_MAP } = require(`./dist/${APP_NAME}-server/main`);
 
 // index.html template
 const template = readFileSync(join(DIST_FOLDER, APP_NAME, 'index.html')).toString();
 
-app.engine('html', (_, options, callback) => {
-  renderModuleFactory(AppServerModuleNgFactory, {
-    document: template,
-    url: options.req.url,
-  }).then(html => {
-    callback(null, html);
-  });
-});
+app.engine('html', ngExpressEngine({
+  bootstrap: AppServerModuleNgFactory,
+  providers: [
+    provideModuleMap(LAZY_MODULE_MAP)
+  ]
+}));
 
 app.set('view engine', 'html');
 app.set('views', join(DIST_FOLDER, APP_NAME));
@@ -77,6 +74,8 @@ app.get('*', (req, res) => {
     res.render(join(DIST_FOLDER, APP_NAME, 'index.html'), { req });
 });
 
+const PORT = process.env.PORT || 4000;
+
 // Start up the Node server
 app.listen(PORT, () => {
   console.log(`Node server listening on http://localhost:${PORT}`);
@@ -85,7 +84,7 @@ app.listen(PORT, () => {
 
 ## 3. Add a Webpack Config for the Express Server
 
-Create a new file named `webpack.server.config.js` to bundle the express app from previous step. 
+Create a new file named `webpack.server.config.js` to bundle the express app from previous step, replacing `YOUR_PROJECT_NAME` with the name of your project.
 
 
 ```js
@@ -99,9 +98,13 @@ module.exports = {
   resolve: { extensions: ['.js', '.ts'] },
   mode: 'development',
   target: 'node',
-  externals: [/(node_modules|main\..*\.js)/],
+  externals: [
+    /^firebase/
+  ],
   output: {
-    path: path.join(__dirname, `dist/${APP_NAME}`),
+    path: path.join(__dirname, `dist/${APP_NAME}-webpack`),
+    library: 'app',
+    libraryTarget: 'umd',
     filename: '[name].js'
   },
   module: {
@@ -126,7 +129,7 @@ module.exports = {
 
 ## 4.0 Build Scripts
 
-Update your `package.json` with the following build scripts. 
+Update your `package.json` with the following build scripts, replacing `YOUR_PROJECT_NAME` with the name of your project.
 
 ```js
 "scripts": {
