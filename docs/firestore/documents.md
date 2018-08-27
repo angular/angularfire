@@ -12,6 +12,8 @@ import { Component } from '@angular/core';
 import { AngularFirestore, AngularFirestoreDocument } from 'angularfire2/firestore';
 import { Observable } from 'rxjs';
 
+export interface Item { name: string; }
+
 @Component({
   selector: 'app-root',
   template: `
