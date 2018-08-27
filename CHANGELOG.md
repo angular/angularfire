@@ -12,7 +12,7 @@
 ### Features
 
 * **firestore:** Added a `get` Observable ([#1824](https://github.com/angular/angularfire2/issues/1824)) ([9f34be8](https://github.com/angular/angularfire2/commit/9f34be8))
-* **messaging:** Introducing AngularFireMessaing ([#1749](https://github.com/angular/angularfire2/issues/1749)) ([26f7613](https://github.com/angular/angularfire2/commit/26f7613))
+* **messaging:** Introducing AngularFireMessaging ([#1749](https://github.com/angular/angularfire2/issues/1749)) ([26f7613](https://github.com/angular/angularfire2/commit/26f7613))
 
 
 <a name="5.0.0-rc.11"></a>
