@@ -11,7 +11,7 @@ Status: Release candidate
 
 - **Observable based** - Use the power of RxJS, Angular, and Firebase.
 - **Real-time bindings** - Synchronize data in real-time.
-- **Authentication** - Log users in with a variety of providers and monitor authentication state in real-time.
+- **Authentication** - Log users in with a variety of providers and monitor authentication state.
 - **Offline Data** - Store data offline automatically with AngularFirestore.
 - **ngrx friendly** - Integrate with ngrx using AngularFire's action based APIs.
 
