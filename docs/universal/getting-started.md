@@ -151,5 +151,3 @@ Update your `package.json` with the following build scripts, replacing `YOUR_PRO
 Test your app locally by running `npm run build && npm run serve:ssr`. 
 
 ### [Next Step: Deploying your Universal application on Cloud Functions for Firebase](cloud-functions.md)
-
-*Or if you're only insterested in pre-rendering, skip to [**Prerendering your Universal application for Firebase Hosting**](prerendering.md)*

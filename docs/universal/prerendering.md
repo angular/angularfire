@@ -63,3 +63,7 @@ Let's make some modifications to our `package.json`, to prerender your content:
   "prerender:ssr": "PRERENDER=1 node dist/YOUR_PROJECT_NAME-webpack/server.js",
 },
 ```
+
+Now when you run `npm run build` you should see prerendered content in your `/public` directory, ready for deployment on Firebase Hosting.
+
+`firebase serve`, `firebase deploy`
