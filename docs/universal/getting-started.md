@@ -75,7 +75,7 @@ app.get('*', (req, res) => {
 });
 
 // If we're not in the Cloud Functions environment, spin up a Node server
-if (!CLOUD_FUNCTIONS) {
+if (!process.env.FUNCTION_NAME) {
   const PORT = process.env.PORT || 4000;
   app.listen(PORT, () => {
     console.log(`Node server listening on http://localhost:${PORT}`);
@@ -141,20 +141,14 @@ Update your `package.json` with the following build scripts, replacing `YOUR_PRO
 ```js
 "scripts": {
   // ... omitted
-  "build:ssr": "ng build --prod && ng run YOUR_PROJECT_NAME:server",
-  "serve:ssr": "node dist/YOUR_PROJECT_NAME/server.js"
+  "build": "ng build && npm run build:ssr",
+  "build:ssr": "ng run YOUR_PROJECT_NAME:server && npm run webpack:ssr",
+  "webpack:ssr": "webpack --config webpack.server.config.js",
+  "serve:ssr": "node dist/YOUR_PROJECT_NAME-webpack/server.js"
 },
 ```
 
-Test your app locally by running `npm run build:ssr && npm run serve:ssr`. 
-
-At this point we could deploy our ExpressJS server to [App Engine Flex](https://cloud.google.com/appengine/docs/flexible/) (Note: This is a paid service based on resource allocation).
-
-1. Install [gcloud CLI tools](https://cloud.google.com/sdk/gcloud/) and authenticate. 
-2. Change the start script in package.json to `"start": "npm run serve:ssr"`
-2. Run `gcloud app deploy` and you're on the cloud. 
-
-But we have another option, deploying the application to Firebase's serverless environment: [Cloud Functions for Firebase](https://firebase.google.com/docs/functions/).
+Test your app locally by running `npm run build && npm run serve:ssr`. 
 
 ### [Next Step: Deploying your Universal application on Cloud Functions for Firebase](cloud-functions.md)
 
