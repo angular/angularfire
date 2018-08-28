@@ -19,11 +19,11 @@ ng generate universal --client-project <your-project>
 
 [ExpressJS](https://expressjs.com/) is a lightweight web framework that can serve http requests in Node. First, install the dev dependencies:
 
-```
+```bash
 npm install --save-dev @nguniversal/express-engine @nguniversal/module-map-ngfactory-loader express webpack-cli ts-loader ws xhr2
 ```
 
-Create a file called `server.ts` in the root of you project, replacing `YOUR_PROJECT_NAME` with the name of your project.
+Create a file called `server.ts` in the root of you project.
 
 ```ts
 // These are important and needed before anything else
@@ -38,18 +38,18 @@ import * as express from 'express';
 import { join } from 'path';
 import { readFileSync } from 'fs';
 
-// Required for Firebase
+// Polyfills required for Firebase
 (global as any).WebSocket = require('ws');
 (global as any).XMLHttpRequest = require('xhr2');
 
 // Faster renders in prod mode
 enableProdMode();
 
-// Express server
-const app = express();
+// Export our express server
+export const app = express();
 
 const DIST_FOLDER = join(process.cwd(), 'dist');
-const APP_NAME = 'YOUR_PROJECT_NAME';
+const APP_NAME = 'YOUR_PROJECT_NAME'; // TODO: replace me!
 
 const { AppServerModuleNgFactory, LAZY_MODULE_MAP } = require(`./dist/${APP_NAME}-server/main`);
 
@@ -74,24 +74,25 @@ app.get('*', (req, res) => {
     res.render(join(DIST_FOLDER, APP_NAME, 'index.html'), { req });
 });
 
-const PORT = process.env.PORT || 4000;
-
-// Start up the Node server
-app.listen(PORT, () => {
-  console.log(`Node server listening on http://localhost:${PORT}`);
-});
+// If we're not in the Cloud Functions environment, spin up a Node server
+if (!CLOUD_FUNCTIONS) {
+  const PORT = process.env.PORT || 4000;
+  app.listen(PORT, () => {
+    console.log(`Node server listening on http://localhost:${PORT}`);
+  });
+}
 ```
 
 ## 3. Add a Webpack Config for the Express Server
 
-Create a new file named `webpack.server.config.js` to bundle the express app from previous step, replacing `YOUR_PROJECT_NAME` with the name of your project.
+Create a new file named `webpack.server.config.js` to bundle the express app from previous step.
 
 
 ```js
 const path = require('path');
 const webpack = require('webpack');
 
-const APP_NAME = 'YOUR_PROJECT_NAME';
+const APP_NAME = 'YOUR_PROJECT_NAME'; // TODO: replace me!
 
 module.exports = {
   entry: {  server: './server.ts' },
@@ -99,9 +100,15 @@ module.exports = {
   mode: 'development',
   target: 'node',
   externals: [
+    /* Firebase has some troubles being webpacked when in
+       in the Node environment, let's skip it.
+       Note: you may need to exclude other dependencies depending
+       on your project. */
     /^firebase/
   ],
   output: {
+    // Export a UMD of the webpacked server.ts & deps, for
+    // rendering in Cloud Functions
     path: path.join(__dirname, `dist/${APP_NAME}-webpack`),
     library: 'app',
     libraryTarget: 'umd',
@@ -134,24 +141,21 @@ Update your `package.json` with the following build scripts, replacing `YOUR_PRO
 ```js
 "scripts": {
   // ... omitted
-  "build:ssr": "ng build --prod && ng run YOUR_PROJECT_NAME:server && npm run webpack:ssr",
-  "serve:ssr": "node dist/YOUR_PROJECT_NAME/server.js",
-  "webpack:ssr": "webpack --config webpack.server.config.js"
+  "build:ssr": "ng build --prod && ng run YOUR_PROJECT_NAME:server",
+  "serve:ssr": "node dist/YOUR_PROJECT_NAME/server.js"
 },
 ```
 
 Test your app locally by running `npm run build:ssr && npm run serve:ssr`. 
 
-## 5.0 Deployment
-
-With an existing Firebase project, you can easily deploy your ExpressJS server to [App Engine Flex](https://cloud.google.com/appengine/docs/flexible/) (Note: This is a paid service based on resource allocation).
-
+At this point we could deploy our ExpressJS server to [App Engine Flex](https://cloud.google.com/appengine/docs/flexible/) (Note: This is a paid service based on resource allocation).
 
 1. Install [gcloud CLI tools](https://cloud.google.com/sdk/gcloud/) and authenticate. 
 2. Change the start script in package.json to `"start": "npm run serve:ssr"`
 2. Run `gcloud app deploy` and you're on the cloud. 
 
-## Additional Resources
+But we have another option, deploying the application to Firebase's serverless environment: [Cloud Functions for Firebase](https://firebase.google.com/docs/functions/).
 
-- [Universal Starter Template](https://github.com/angular/universal-starter)
-- [AngularFirebase SSR Videos](https://angularfirebase.com/tag/ssr/)
+### [Next Step: Deploying your Universal application on Cloud Functions for Firebase](cloud-functions.md)
+
+*Or if you're only insterested in pre-rendering, skip to [**Prerendering your Universal application for Firebase Hosting**](prerendering.md)*

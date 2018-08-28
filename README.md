@@ -91,32 +91,19 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 
 ### Deploying your application
 
-#### Static hosting on Firebase
+#### Client-side rendering
 
 > Firebase Hosting is production-grade web content hosting for developers. With Hosting, you can quickly and easily deploy web apps and static content to a global content delivery network (CDN) with a single command.
 
 - [Deploy your Angular application with Firebase Hosting](docs/deploying-angularfire-to-firebase.md)
 
-#### Angular Universal
+#### Server-side rendering
 
 > Angular Universal is a technology that allows you to run your Angular application on a server; this allows you to generate your HTML with a process called server-side rendering (SSR). Angularfire is compatible with server-side rendering; allowing you to take advantage of the performance gains and SEO granted by the technology.
 
-- [Getting started with Angularfire and Universal](docs/universal/getting-started.md)
-
-You have two options for deploying your Universal application, on-demand or pre-rendered (or a combination thereof):
-
-##### Render your application on-demand in response to HTTP requests
-
-> Server-side rendered pages can be generated on the server in response to a request from a web browser.
-
+- [Getting started with Angular Universal](docs/universal/getting-started.md)
 - [Deploying your Universal application on Cloud Functions for Firebase](docs/universal/cloud-functions.md)
-- [Proxy Firebase Hosting to Cloud Functions for Firebase](docs/universal/hosting-proxy.md)
-
-#### Pre-rendering your application to serve statically
-
-> Server-side rendered pages can also be pre-generated and rendered statically on hosting. This allows you to avoid the costs and complexity of spinning up servers in response to requests, while maintaining most of the benefits. It is often preferable if you don't have a lot of dynamic content or it changes infrequently.
-
-- [Prerendering your Universal application and deploying on Firebase Hosting](docs/universal/prerendering.md)
+- [Prerendering your Universal application for Firebase Hosting](docs/universal/prerendering.md)
 
 ### Ionic
 
