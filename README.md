@@ -91,19 +91,17 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 
 ### Deploying your application
 
-#### Client-side rendering
-
 > Firebase Hosting is production-grade web content hosting for developers. With Hosting, you can quickly and easily deploy web apps and static content to a global content delivery network (CDN) with a single command.
 
-- [Deploy your Angular application with Firebase Hosting](docs/deploying-angularfire-to-firebase.md)
+- [Deploy your Angular application on Firebase Hosting](docs/deploying-angularfire-to-firebase.md)
 
 #### Server-side rendering
 
-> Angular Universal is a technology that allows you to run your Angular application on a server; this allows you to generate your HTML with a process called server-side rendering (SSR). Angularfire is compatible with server-side rendering; allowing you to take advantage of the performance gains and SEO granted by the technology.
+> Angular Universal is a technology that allows you to run your Angular application on a server. This allows you to generate your HTML in a process called server-side rendering (SSR). Angularfire is compatible with server-side rendering; allowing you to take advantage of the Search Engine Optimization, link previews, the performance gains granted by the technology, and more. [Learn more about Angular Universal](https://angular.io/guide/universal).
 
 - [Getting started with Angular Universal](docs/universal/getting-started.md)
 - [Deploying your Universal application on Cloud Functions for Firebase](docs/universal/cloud-functions.md)
-- [Prerendering your Universal application for Firebase Hosting](docs/universal/prerendering.md)
+- [Prerendering your Universal application](docs/universal/prerendering.md)
 
 ### Ionic
 

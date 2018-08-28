@@ -64,7 +64,7 @@ We can now run `npm run build`, `firebase serve` and `firebase deploy`.
 
 Something, something, cache-control...
 
-### [Optional Next Step: Prerendering your Universal application for Firebase Hosting](prerendering.md)
+### [Next Step: Prerendering your Universal application](prerendering.md)
 
 ## Additional Resources
 

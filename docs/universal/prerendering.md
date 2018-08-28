@@ -1,4 +1,4 @@
-# Prerendering your Universal application for Firebase Hosting
+# Prerendering your Universal application
 
 `static.paths.js`:
 
@@ -31,15 +31,15 @@ if (process.env.PRERENDER) {
             document: template,
             url: route,
             extraProviders: [
-            provideModuleMap(LAZY_MODULE_MAP)
+                provideModuleMap(LAZY_MODULE_MAP)
             ]
         }).then(html => [route, html])
         )
     ).then(results => {
         results.forEach(([route, html]) => {
-        const fullPath = join('./public', route);
-        if (!existsSync(fullPath)) { mkdirSync(fullPath); }
-        writeFileSync(join(fullPath, 'index.html'), html);
+            const fullPath = join('./public', route);
+            if (!existsSync(fullPath)) { mkdirSync(fullPath); }
+            writeFileSync(join(fullPath, 'index.html'), html);
         });
         process.exit();
     });
