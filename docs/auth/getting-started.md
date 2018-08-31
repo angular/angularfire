@@ -11,7 +11,7 @@ the Firebase docs for more information on what methods are available.](https://f
 ```ts
 import { Component } from '@angular/core';
 import { AngularFireAuth } from 'angularfire2/auth';
-import { auth } from 'firebase';
+import firebase from 'firebase/app';
 
 @Component({
   selector: 'app-root',
@@ -30,7 +30,7 @@ export class AppComponent {
   constructor(public afAuth: AngularFireAuth) {
   }
   login() {
-    this.afAuth.auth.signInWithPopup(new auth.GoogleAuthProvider());
+    this.afAuth.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
   }
   logout() {
     this.afAuth.auth.signOut();
