@@ -1,6 +1,6 @@
 import { InjectionToken, NgZone, NgModule, Optional } from '@angular/core';
 import { app, auth, database, firestore, functions, messaging, storage } from 'firebase';
-// @ts-ignore
+// @ts-ignore (No default export https://github.com/firebase/firebase-js-sdk/pull/1184)
 import firebase from 'firebase/app';
 
 // Public types don't expose FirebaseOptions or FirebaseAppConfig
