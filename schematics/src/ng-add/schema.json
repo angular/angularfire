@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "id": "SchematicsAngularFire",
+  "title": "Adds AngularFire to a project",
+  "type": "object",
+  "properties": {
+    "module": {
+      "type": "string",
+      "default": "app",
+      "description": "Allows specification of the declaring module.",
+      "alias": "m",
+      "subtype": "filepath"
+    },
+    "path": {
+      "type": "string",
+      "format": "path",
+      "description": "The path to the directory that contains the declaring module.",
+      "visible": false
+    },
+    "firebaseApp": {
+      "type": "string",
+      "description": "A custom FirebaseApp name.",
+      "alias": "f"
+    },
+    "all": {
+      "type": "boolean",
+      "description": "Add all AngularFire modules (auth, db, storage).",
+      "alias": "a",
+      "default": false
+    }
+  },
+  "required": []
+}
