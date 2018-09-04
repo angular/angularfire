@@ -3,8 +3,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "angularfire2": ["../../dist/packages-dist"],
-      "angularfire2/database-deprecated": ["../../dist/packages-dist/database-deprecated"]
+      "@angular/fire": ["../../dist/packages-dist"],
+      "@angular/fire/database-deprecated": ["../../dist/packages-dist/database-deprecated"]
     }
   },
   "files": [

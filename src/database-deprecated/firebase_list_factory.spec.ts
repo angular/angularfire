@@ -1,9 +1,9 @@
 import { DataSnapshot } from '@firebase/database-types';
-import { FirebaseApp, FirebaseAppConfig, AngularFireModule} from 'angularfire2';
+import { FirebaseApp, FirebaseAppConfig, AngularFireModule} from '@angular/fire';
 import { AngularFireDatabase, AngularFireDatabaseModule, FirebaseListObservable,
   FirebaseListFactory, onChildAdded, onChildChanged, onChildRemoved, onChildUpdated,
   FirebaseObjectFactory
-} from 'angularfire2/database-deprecated';
+} from '@angular/fire/database-deprecated';
 import { TestBed, inject } from '@angular/core/testing';
 import * as utils from './utils';
 import { Query, AFUnwrappedDataSnapshot } from './interfaces';

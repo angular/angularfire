@@ -2,9 +2,9 @@ import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core
 import { Observable, from } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { FirebaseOptions, FirebaseAppConfig } from 'angularfire2';
+import { FirebaseOptions, FirebaseAppConfig } from '@angular/fire';
 
-import { FirebaseFunctions, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
+import { FirebaseFunctions, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
 
 @Injectable()
 export class AngularFireFunctions {

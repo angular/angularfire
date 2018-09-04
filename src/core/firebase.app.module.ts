@@ -38,7 +38,7 @@ export function _firebaseAppFactory(options: FirebaseOptions, nameOrConfig?: str
     config.name = config.name || name;
     const existingApp = firebase.apps.filter(app => app && app.name === config.name)[0];
     // We support FirebaseConfig, initializeApp's public type only accepts string; need to cast as any
-    return (existingApp || firebase.initializeApp(options, config)) as FirebaseApp;
+    return (existingApp || firebase.initializeApp(options, config as any)) as FirebaseApp;
 }
 
 const FirebaseAppProvider = {

@@ -1,5 +1,5 @@
 {
-    "name": "angularfire2",
+    "name": "@angular/fire",
     "version": "ANGULARFIRE2_VERSION",
     "description": "Fixes for Node.js",
     "main": "index.js",

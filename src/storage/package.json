@@ -1,5 +1,5 @@
 {
-  "name": "angularfire2/storage",
+  "name": "@angular/fire/storage",
   "version": "ANGULARFIRE2_VERSION",
   "description": "The storage module",
   "main": "../bundles/storage.umd.js",
@@ -17,7 +17,7 @@
   "author": "angular,firebase",
   "license": "MIT",
   "peerDependencies": {
-    "angularfire2": "ANGULARFIRE2_VERSION",
+    "@angular/fire": "ANGULARFIRE2_VERSION",
     "@angular/common": "ANGULAR_VERSION",
     "@angular/core": "ANGULAR_VERSION",
     "@angular/platform-browser": "ANGULAR_VERSION",

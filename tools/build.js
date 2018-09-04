@@ -24,14 +24,14 @@ const GLOBALS = {
   'firebase/firestore': 'firebase',
   'firebase/functions': 'firebase',
   'firebase/storage': 'firebase',
-  'angularfire2': 'angularfire2',
-  'angularfire2/auth': 'angularfire2.auth',
-  'angularfire2/database': 'angularfire2.database',
-  'angularfire2/database-deprecated': 'angularfire2.database_deprecated',
-  'angularfire2/firestore': 'angularfire2.firestore',
-  'angularfire2/functions': 'angularfire2.functions',
-  'angularfire2/storage': 'angularfire2.storage',
-  'angularfire2/messaging': 'angularfire2.messaging',
+  '@angular/fire': 'angularfire2',
+  '@angular/fire/auth': 'angularfire2.auth',
+  '@angular/fire/database': 'angularfire2.database',
+  '@angular/fire/database-deprecated': 'angularfire2.database_deprecated',
+  '@angular/fire/firestore': 'angularfire2.firestore',
+  '@angular/fire/functions': 'angularfire2.functions',
+  '@angular/fire/storage': 'angularfire2.storage',
+  '@angular/fire/messaging': 'angularfire2.messaging',
 };
 
 // Map of dependency versions across all packages
