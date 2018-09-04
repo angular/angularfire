@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "angularfire2": "file:{{ANGULARFIRE_VERSION}}",
+    "@angular/firebase": "file:{{ANGULARFIRE_VERSION}}",
     "firebase": "{{FIREBASE_VERSION}}",
     "@angular/common": "{{ANGULAR_VERSION}}",
     "@angular/compiler": "{{ANGULAR_VERSION}}",
