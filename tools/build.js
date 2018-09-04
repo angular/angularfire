@@ -43,9 +43,9 @@ const VERSIONS = {
   ANGULARFIRE2_VERSION: pkg.version,
   FIRESTORE_VERSION: pkg.dependencies['firestore'],
   WS_VERSION: pkg.dependencies['ws'],
-  BUFFERUTIL_VERSION: pkg.dependencies['bufferutil'],
-  UTF_8_VALIDATE_VERSION: pkg.dependencies['utf-8-validate'],
-  XMLHTTPREQUEST_VERSION: pkg.dependencies['xmlhttprequest']
+  BUFFERUTIL_VERSION: pkg.optionalDependencies['bufferutil'],
+  UTF_8_VALIDATE_VERSION: pkg.optionalDependencies['utf-8-validate'],
+  XHR2_VERSION: pkg.dependencies['xhr2']
 };
 
 const MODULE_NAMES = {

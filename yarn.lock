@@ -810,7 +810,7 @@ bufferutil@1.2.x:
     bindings "1.2.x"
     nan "^2.0.5"
 
-bufferutil@^3.0.3:
+bufferutil@~3.0.0:
   version "3.0.5"
   resolved "https://registry.yarnpkg.com/bufferutil/-/bufferutil-3.0.5.tgz#8abfc3b6da7aca6a13268b3f2482f0c7aa05fffb"
   dependencies:
@@ -5575,7 +5575,7 @@ utf-8-validate@1.2.x:
     bindings "~1.2.1"
     nan "~2.4.0"
 
-utf-8-validate@^4.0.0:
+utf-8-validate@~4.0.0:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/utf-8-validate/-/utf-8-validate-4.0.2.tgz#deadcedfbf5ec535e3c72874e9ddc0663c139691"
   dependencies:
@@ -5797,7 +5797,7 @@ xmlhttprequest-ssl@~1.5.4:
   version "1.5.5"
   resolved "https://registry.yarnpkg.com/xmlhttprequest-ssl/-/xmlhttprequest-ssl-1.5.5.tgz#c2876b06168aadc40e57d97e81191ac8f4398b3e"
 
-xmlhttprequest@1.8.0, xmlhttprequest@^1.8.0:
+xmlhttprequest@1.8.0:
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/xmlhttprequest/-/xmlhttprequest-1.8.0.tgz#67fe075c5c24fef39f9d65f5f7b7fe75171968fc"
 
