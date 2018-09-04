@@ -116,16 +116,25 @@ function spawnObservable(command, args) {
 }
 
 function generateBundle(input, { file, globals, name }) {
-  return rollup({ input }).then(bundle => {
-    return bundle.write({
+  return rollup({
+    input,
+    external: Object.keys(globals),
+    plugins: [resolve()],
+    onwarn: warning => {
+      // Supress Typescript this warning
+      // https://github.com/rollup/rollup/wiki/Troubleshooting#this-is-undefined
+      if (warning.code !== 'THIS_IS_UNDEFINED') {
+        console.log(warning.message);
+      }
+    }
+  }).then(bundle =>
+    bundle.write({
       format: 'umd',
-      external: Object.keys(globals),
-      plugins: [resolve()],
       file,
       globals,
       name,
-    });
-  });
+    })
+  );
 }
 
 function createFirebaseBundles(featurePaths, globals) {
