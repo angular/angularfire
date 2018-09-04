@@ -1,5 +1,5 @@
 import { Subscriber } from 'rxjs';
-import { firestore } from 'firebase';
+import { firestore } from 'firebase/app';
 
 export type Settings =  firestore.Settings;
 export type CollectionReference = firestore.CollectionReference;

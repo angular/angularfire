@@ -3,7 +3,7 @@ import { Observable, of, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { FirebaseAppConfig, FirebaseOptions } from 'angularfire2';
 
-import { User, auth } from 'firebase';
+import { User, auth } from 'firebase/app';
 
 import { FirebaseAuth, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
 
