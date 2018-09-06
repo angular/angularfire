@@ -7,7 +7,7 @@ import { DocumentChangeType, CollectionReference, Query, DocumentReference, Docu
 import { docChanges, sortedChanges } from './changes';
 import { AngularFirestoreDocument } from '../document/document';
 import { AngularFirestore } from '../firestore';
-import { runInZone } from 'angularfire2';
+import { runInZone } from '@angular/fire';
 
 export function validateEventsArray(events?: DocumentChangeType[]) {
   if(!events || events!.length === 0) {

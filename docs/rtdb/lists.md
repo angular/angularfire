@@ -17,7 +17,7 @@ Replace your  `/src/app/app.component.ts` from previous step to look like below.
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireDatabase } from 'angularfire2/database';
+import { AngularFireDatabase } from '@angular/fire/database';
 
 @Component({
   selector: 'app-root',
@@ -46,11 +46,11 @@ To get the list in realtime, create a list binding as a property of your compone
 
 Then in your template, you can use the `async` pipe to unwrap the binding.
 
-Update `/src/app/app.component.ts` to import `AngularFireList` from angularfire2 and iterate thru the list once data is retrieved. Also note the change in attribute `templateUrl` to inline `template` below.
+Update `/src/app/app.component.ts` to import `AngularFireList` from `@angular/fire` and iterate thru the list once data is retrieved. Also note the change in attribute `templateUrl` to inline `template` below.
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireDatabase } from 'angularfire2/database';
+import { AngularFireDatabase } from '@angular/fire/database';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -206,7 +206,7 @@ itemsRef.remove();
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
+import { AngularFireDatabase, AngularFireList } from '@angular/fire/database';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 

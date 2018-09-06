@@ -1,7 +1,7 @@
 import { ReflectiveInjector, Provider } from '@angular/core';
 import { TestBed, inject } from '@angular/core/testing';
-import { FirebaseApp, FirebaseOptionsToken, AngularFireModule, FirebaseNameOrConfigToken } from 'angularfire2';
-import { AngularFireFunctions, AngularFireFunctionsModule } from 'angularfire2/functions';
+import { FirebaseApp, FirebaseOptionsToken, AngularFireModule, FirebaseNameOrConfigToken } from '@angular/fire';
+import { AngularFireFunctions, AngularFireFunctionsModule } from '@angular/fire/functions';
 import { COMMON_CONFIG } from './test-config';
 
 describe('AngularFireFunctions', () => {

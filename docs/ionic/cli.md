@@ -36,7 +36,7 @@ Your default browser should start up and display a working Ionic app.
 ### 3. Install AngularFire 2 and Firebase
 
 ```bash
-npm install angularfire2 firebase --save
+npm install @angular/fire firebase --save
 ```
 
 Now that you have a new project setup, install AngularFire and Firebase from npm.
@@ -69,7 +69,7 @@ import { NgModule } from '@angular/core';
 import { IonicApp, IonicModule } from 'ionic-angular';
 import { MyApp } from './app.component';
 
-import { AngularFireModule } from 'angularfire2';
+import { AngularFireModule } from '@angular/fire';
 import { firebaseConfig } from '../environment';
 
 @NgModule({
@@ -122,10 +122,10 @@ import { NgModule } from '@angular/core';
 import { IonicApp, IonicModule } from 'ionic-angular';
 import { MyApp } from './app.component';
 
-import { AngularFireModule } from 'angularfire2';
+import { AngularFireModule } from '@angular/fire';
 import { firebaseConfig } from '../environment';
-import { AngularFireDatabaseModule } from 'angularfire2/database';
-import { AngularFireAuthModule } from 'angularfire2/auth';
+import { AngularFireDatabaseModule } from '@angular/fire/database';
+import { AngularFireAuthModule } from '@angular/fire/auth';
 
 
 @NgModule({
@@ -149,7 +149,7 @@ Open `/src/pages/home/home.ts`, and start to import `AngularFireDatabase` and `F
 ```ts
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
-import { AngularFireDatabase } from 'angularfire2/database';
+import { AngularFireDatabase } from '@angular/fire/database';
 import { Observable } from 'rxjs/Observable';
 
 @Component({
@@ -173,7 +173,7 @@ In `/src/pages/home/home.ts`:
 ```ts
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
-import { AngularFireDatabase } from 'angularfire2/database';
+import { AngularFireDatabase } from '@angular/fire/database';
 import { Observable } from 'rxjs/Observable';
 
 @Component({
