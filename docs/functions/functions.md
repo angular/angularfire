@@ -39,7 +39,7 @@ import { AngularFireFunctions } from '@angular/fire/functions';
   template: ``
 })
 export class AppComponent {
-  constructor(private fns: AngularFireFunctions { }
+  constructor(private fns: AngularFireFunctions { })
 }
 ```
 
