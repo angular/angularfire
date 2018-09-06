@@ -3,10 +3,11 @@ import { fromCollectionRef } from '../observable/fromRef';
 import { map, filter, scan } from 'rxjs/operators';
 import { firestore } from 'firebase';
 
-import { DocumentChangeType, CollectionReference, Query, DocumentReference, DocumentData, QueryFn, AssociatedReference, DocumentChangeAction, DocumentChange } from '../interfaces';
+import { DocumentChangeType, CollectionReference, Query, DocumentReference, DocumentData, DocumentChangeAction } from '../interfaces';
 import { docChanges, sortedChanges } from './changes';
 import { AngularFirestoreDocument } from '../document/document';
 import { AngularFirestore } from '../firestore';
+import { runInZone } from 'angularfire2';
 
 export function validateEventsArray(events?: DocumentChangeType[]) {
   if(!events || events!.length === 0) {
@@ -116,8 +117,10 @@ export class AngularFirestoreCollection<T=DocumentData> {
    * Retrieve the results of the query once. 
    * @param options 
    */
-  get(options: firestore.GetOptions) {
-    return from(this.query.get(options));
+  get(options?: firestore.GetOptions) {
+    return from(this.query.get(options)).pipe(
+      runInZone(this.afs.scheduler.zone)
+    );
   }
 
   /**
