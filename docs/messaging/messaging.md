@@ -1,6 +1,6 @@
 # AngularFireMessaging
 
-> The FCM JavaScript API lets you receive notification messages in web apps running in browsers that support the Push API. support.
+> The FCM JavaScript API lets you receive notification messages in web apps running in browsers that support the Push API.
 
 ### AngularFireMessaging is not compatible with the Angular Service Worker
 
