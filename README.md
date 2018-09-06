@@ -18,6 +18,7 @@ Status: Release candidate
 - **Manage binary data** - Upload, download, and delete binary files like images, videos, and other blobs.
 - **Call server code** - Directly call serverless Cloud Functions with user context automatically passed.
 - **Push notifications** - Register and listen for push notifications
+- **Modular** - Include only what's needed. No AngularFire package is above 3kb with most under 2kb (gzipped).
 
 #### Quick links
 [Contributing](CONTRIBUTING.md)
