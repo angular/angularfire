@@ -1,5 +1,4 @@
 import { User } from 'firebase';
-import { ReflectiveInjector, Provider } from '@angular/core';
 import { Observable, Subject } from 'rxjs'
 import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, FirebaseOptionsToken, AngularFireModule, FirebaseNameOrConfigToken } from '@angular/fire';

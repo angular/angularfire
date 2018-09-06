@@ -2,7 +2,6 @@ import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core
 import { Observable, of, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { FirebaseAppConfig, FirebaseOptions } from '@angular/fire';
-
 import { User, auth } from 'firebase';
 
 import { FirebaseAuth, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
