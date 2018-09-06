@@ -1,6 +1,6 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { messaging } from 'firebase/app';
+import { messaging } from 'firebase';
 import { Observable, empty, from, of, throwError } from 'rxjs';
 import { mergeMap, catchError, map, switchMap, concat, defaultIfEmpty } from 'rxjs/operators';
 import { FirebaseOptions, FirebaseAppConfig, runOutsideAngular } from 'angularfire2';

@@ -1,11 +1,10 @@
-
 import { TestBed, inject } from '@angular/core/testing';
 import { PlatformRef, NgModule, CompilerFactory } from '@angular/core';
 import { FirebaseApp, AngularFireModule } from 'angularfire2';
 import { Subscription } from 'rxjs';
 import { COMMON_CONFIG } from './test-config';
 import { BrowserModule } from '@angular/platform-browser';
-import { database } from 'firebase/app';
+import { database } from 'firebase';
 
 describe('angularfire', () => {
   let subscription:Subscription;

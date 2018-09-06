@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { database } from 'firebase/app';
+import { database } from 'firebase';
 
 export type Reference = database.Reference;
 export type DataSnapshot = database.DataSnapshot;

@@ -1,4 +1,4 @@
-import { User } from 'firebase/app';
+import { User } from 'firebase';
 import { Observable, Subject } from 'rxjs'
 import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, FirebaseOptionsToken, AngularFireModule, FirebaseNameOrConfigToken } from 'angularfire2';
