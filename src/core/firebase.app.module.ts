@@ -39,7 +39,7 @@ export function _firebaseAppFactory(options: FirebaseOptions, nameOrConfig?: str
     // Added any due to some inconsistency between @firebase/app and firebase types
     const existingApp = firebase.apps.filter(app => app && app.name === config.name)[0] as any;
     // We support FirebaseConfig, initializeApp's public type only accepts string; need to cast as any
-    // Should be solved with https://github.com/firebase/firebase-js-sdk/pull/1206
+    // Could be solved with https://github.com/firebase/firebase-js-sdk/pull/1206
     return (existingApp || firebase.initializeApp(options, config as any)) as FirebaseApp;
 }
 

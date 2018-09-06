@@ -1,3 +1,22 @@
+<a name="5.0.0"></a>
+# [5.0.0](https://github.com/angular/angularfire2/compare/5.0.0-rc.12...5.0.0) (2018-09-04)
+
+
+### Bug Fixes
+
+* **firestore:** Better handle enablePersistence failures, esp. for Universal ([#1850](https://github.com/angular/angularfire2/issues/1850)) ([334ba7b](https://github.com/angular/angularfire2/commit/334ba7b))
+* **firestore:** Add document `get()`, the options argument for `get()` should be optional, and subscriptions to `get()` should be run in the Angular Zone([#1849](https://github.com/angular/angularfire2/issues/1849)) ([185943f](https://github.com/angular/angularfire2/commit/185943f))
+
+
+### Breaking changes
+
+5.0 is now final and we're published under `@angular/fire`.
+
+```bash
+npm i --save firebase @angular/fire
+```
+
+
 <a name="5.0.0-rc.12"></a>
 # [5.0.0-rc.12](https://github.com/angular/angularfire2/compare/5.0.0-rc.11...5.0.0-rc.12) (2018-08-24)
 

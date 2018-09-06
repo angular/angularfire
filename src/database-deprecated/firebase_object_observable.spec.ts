@@ -1,7 +1,7 @@
 import { TestBed, inject } from '@angular/core/testing';
-import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from 'angularfire2';
+import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from '@angular/fire';
 import { COMMON_CONFIG } from './test-config';
-import { AngularFireDatabase, AngularFireDatabaseModule, FirebaseObjectObservable } from 'angularfire2/database-deprecated';
+import { AngularFireDatabase, AngularFireDatabaseModule, FirebaseObjectObservable } from '@angular/fire/database-deprecated';
 import { Observer } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Reference } from './interfaces';

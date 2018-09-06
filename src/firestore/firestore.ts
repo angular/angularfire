@@ -8,7 +8,7 @@ import { Settings, CollectionReference, DocumentReference, QueryFn, AssociatedRe
 import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 
-import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
+import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
 import { isPlatformBrowser } from '@angular/common';
 
 /**
@@ -47,7 +47,7 @@ export function associateQuery(collectionRef: CollectionReference, queryFn = ref
  * Example:
  *
  * import { Component } from '@angular/core';
- * import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from 'angularfire2/firestore';
+ * import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
  * import { Observable } from 'rxjs/Observable';
  * import { from } from 'rxjs/observable/from';
  *

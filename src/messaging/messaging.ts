@@ -3,8 +3,8 @@ import { isPlatformBrowser } from '@angular/common';
 import { messaging } from 'firebase';
 import { Observable, empty, from, of, throwError } from 'rxjs';
 import { mergeMap, catchError, map, switchMap, concat, defaultIfEmpty } from 'rxjs/operators';
-import { FirebaseOptions, FirebaseAppConfig, runOutsideAngular } from 'angularfire2';
-import { FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
+import { FirebaseOptions, FirebaseAppConfig, runOutsideAngular } from '@angular/fire';
+import { FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
 
 @Injectable()
 export class AngularFireMessaging {

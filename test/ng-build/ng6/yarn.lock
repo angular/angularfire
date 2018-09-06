@@ -140,6 +140,9 @@
   dependencies:
     tslib "^1.9.0"
 
+"@angular/fire@../../../dist/packages-dist":
+  version "5.0.0"
+
 "@angular/forms@6.0.1":
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/@angular/forms/-/forms-6.0.1.tgz#8ac4fbcd857a53613e8bcd58127e137d5ff0c98f"
@@ -282,9 +285,6 @@ align-text@^0.1.1, align-text@^0.1.3:
 amdefine@>=0.0.4:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/amdefine/-/amdefine-1.0.1.tgz#4a5282ac164729e93619bcfd3ad151f817ce91f5"
-
-angularfire2@../../../dist/packages-dist:
-  version "5.0.0-rc.8"
 
 ansi-html@0.0.7:
   version "0.0.7"

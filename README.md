@@ -5,8 +5,6 @@
 
 [![Build Status](https://travis-ci.org/angular/angularfire2.svg?branch=master)](https://travis-ci.org/angular/angularfire2) [![Join the chat at https://gitter.im/angular/angularfire2](https://badges.gitter.im/angular/angularfire2.svg)](https://gitter.im/angular/angularfire2?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Status: Release candidate
-
 ## What is AngularFire?
 
 - **Observable based** - Use the power of RxJS, Angular, and Firebase.
@@ -32,14 +30,14 @@ Status: Release candidate
 ## Install
 
 ```bash
-npm install firebase angularfire2 --save
+npm install firebase @angular/fire --save
 ```
 
 ## Example use:
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFirestore } from 'angularfire2/firestore';
+import { AngularFirestore } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 
 @Component({

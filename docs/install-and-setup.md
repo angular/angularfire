@@ -31,7 +31,7 @@ You should see a message on the page that says *App works!*
 ### 3. Install AngularFire and Firebase
 
 ```bash
-npm install angularfire2 firebase --save
+npm install @angular/fire firebase --save
 ```
 
 Now that you have a new project setup, install AngularFire and Firebase from npm.
@@ -62,7 +62,7 @@ Open `/src/app/app.module.ts`, inject the Firebase providers, and specify your F
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
-import { AngularFireModule } from 'angularfire2';
+import { AngularFireModule } from '@angular/fire';
 import { environment } from '../environments/environment';
 
 @NgModule({
@@ -110,10 +110,10 @@ For example if your application was using both Firebase authentication and the F
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
-import { AngularFireModule } from 'angularfire2';
-import { AngularFirestoreModule } from 'angularfire2/firestore';
-import { AngularFireStorageModule } from 'angularfire2/storage';
-import { AngularFireAuthModule } from 'angularfire2/auth';
+import { AngularFireModule } from '@angular/fire';
+import { AngularFirestoreModule } from '@angular/fire/firestore';
+import { AngularFireStorageModule } from '@angular/fire/storage';
+import { AngularFireAuthModule } from '@angular/fire/auth';
 import { environment } from '../environments/environment';
 
 @NgModule({
@@ -136,7 +136,7 @@ Open `/src/app/app.component.ts`, and make sure to modify/delete any tests to ge
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFirestore } from 'angularfire2/firestore';
+import { AngularFirestore } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-root',
@@ -156,7 +156,7 @@ In `/src/app/app.component.ts`:
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFirestore } from 'angularfire2/firestore';
+import { AngularFirestore } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 
 @Component({

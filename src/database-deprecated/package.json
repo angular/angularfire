@@ -1,5 +1,5 @@
 {
-  "name": "angularfire2/database-deprecated",
+  "name": "@angular/fire/database-deprecated",
   "version": "ANGULARFIRE2_VERSION",
   "description": "The database module",
   "main": "../bundles/database.umd.js",
@@ -17,7 +17,7 @@
   "author": "angular,firebase",
   "license": "MIT",
   "peerDependencies": {
-    "angularfire2": "ANGULARFIRE2_VERSION",
+    "@angular/fire": "ANGULARFIRE2_VERSION",
     "@angular/common": "ANGULAR_VERSION",
     "@angular/core": "ANGULAR_VERSION",
     "@angular/platform-browser": "ANGULAR_VERSION",
