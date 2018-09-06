@@ -11,7 +11,12 @@
 - **Realtime bindings** - Synchronize data in realtime.
 - **Authentication** - Log users in with a variety of providers and monitor authentication state in realtime.
 - **Offline Data** - Store data offline automatically with AngularFirestore.
+- **Server-side Render** - Generate static HTML to boost perceived performance or create static sites.
 - **ngrx friendly** - Integrate with ngrx using AngularFire's action based APIs.
+- **Manage binary data** - Upload, download, and delete binary files like images, videos, and other blobs.
+- **Call server code** - Directly call serverless Cloud Functions with user context automatically passed.
+- **Push notifications** - Register and listen for push notifications
+- **Modular** - Include only what's needed. No AngularFire package is above 3kb with most under 2kb (gzipped).
 
 #### Quick links
 [Contributing](CONTRIBUTING.md)
@@ -90,8 +95,13 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 ### Universal
 - [Server-side Rendering with Universal](docs/server-side-rendering.md)
 
-### Deploy to Firebase Hosting
+### Send push notifications
+- [Getting started with Firebase Messaging](docs/messaging/messaging.md)
 
+### Directly call Cloud Functions
+- [Getting started with Callable Functions](docs/functions/functions.md)
+
+### Deploy to Firebase Hosting
 - [Deploying AngularFire to Firebase Hosting](docs/deploying-angularfire-to-firebase.md)
 
 ### Ionic
