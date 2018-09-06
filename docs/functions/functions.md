@@ -39,7 +39,7 @@ import { AngularFireFunctions } from '@angular/fire/functions';
   template: ``
 })
 export class AppComponent {
-  constructor(private fns: AngularFireFunctions { })
+  constructor(private fns: AngularFireFunctions) { }
 }
 ```
 
@@ -57,9 +57,7 @@ import { AngularFireStorage } from '@angular/fire/functions';
 
 @Component({
   selector: 'app-root',
-  template: `
-  { data$ } | async
-  `
+  template: `{ data$  | async }`
 })
 export class AppComponent {
   constructor(private fns: AngularFireFunctions) { 
@@ -69,4 +67,4 @@ export class AppComponent {
 }
 ```
 
-Notice that calling `httpsCallable()` does not initiate the request. It creates a reusable function that is called to initiate the request.
+Notice that calling `httpsCallable()` does not initiate the request. It creates a function, which when called creates an Observable, subscribe or convert it to a Promise to initiate the request.
