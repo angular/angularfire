@@ -92,8 +92,10 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 ### Universal
 - [Server-side Rendering with Universal](docs/server-side-rendering.md)
 
-### Deploy to Firebase Hosting
+### Functions
+- [Getting started with Callable Functions](docs/functions/functions.md)
 
+### Deploy to Firebase Hosting
 - [Deploying AngularFire to Firebase Hosting](docs/deploying-angularfire-to-firebase.md)
 
 ### Ionic
