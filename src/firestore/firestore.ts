@@ -2,7 +2,7 @@ import { InjectionToken, NgZone, PLATFORM_ID, Injectable, Inject, Optional } fro
 
 import { Observable, of, from } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { firestore } from 'firebase/app';
+import { firestore } from 'firebase';
 
 import { Settings, CollectionReference, DocumentReference, QueryFn, AssociatedReference } from './interfaces';
 import { AngularFirestoreDocument } from './document/document';

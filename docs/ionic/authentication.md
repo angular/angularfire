@@ -47,7 +47,7 @@ at `login.service.ts` add this function:
 ```ts
 
 import { AngularFireAuth } from 'angularfire2/auth';
-import * as firebase from 'firebase/app';
+import firebase from 'firebase/app';
 import AuthProvider = firebase.auth.AuthProvider;
 
 export class AuthService {
