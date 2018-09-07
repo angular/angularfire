@@ -57,7 +57,7 @@ if (process.env.PRERENDER) {
 }
 ```
 
-Now if the `PRERENDER` environment variable is passed any value, instead of serving your application it will iterate over the paths in `static.paths.js`, render then, and then write them to your `public` directory.  *You could always make this a seperate script.*
+Now if the `PRERENDER` environment variable is passed any value, instead of serving your application it will iterate over the paths in `static.paths.js`, render them, and write them to your `public` directory.  *You could always make this a seperate script.*
 
 Finally make some modifications to your `package.json`, to prerender your content when you build:
 
