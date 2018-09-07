@@ -5,7 +5,7 @@ Server-side rendering (SSR) is the process of converting a JavaScript app to pla
 ## 0. Prerequisites
 
 - @angular/cli >= v6.0
-- angularfire2 >= v5.0.0-rc.12
+- @angular/fire >= v5.0.0
 
 ## 1. Generate the Angular Universal Server Module
 
