@@ -1,0 +1,1 @@
+This package has moved, we're now at [@angular/fire](https://www.npmjs.com/package/@angular/fire).
