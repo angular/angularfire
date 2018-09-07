@@ -1,4 +1,4 @@
-import { FirebaseApp, AngularFireModule } from 'angularfire2';
+import { FirebaseApp, AngularFireModule } from '@angular/fire';
 import { AngularFirestore } from '../firestore';
 import { AngularFirestoreModule } from '../firestore.module';
 import { AngularFirestoreDocument } from '../document/document';

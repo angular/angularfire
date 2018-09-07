@@ -1,7 +1,6 @@
-
-import { TestBed, inject, withModule, async } from '@angular/core/testing';
-import { ReflectiveInjector, Provider, PlatformRef, NgModule, Compiler, ApplicationRef, CompilerFactory } from '@angular/core';
-import { FirebaseApp, AngularFireModule } from 'angularfire2';
+import { TestBed, inject } from '@angular/core/testing';
+import { PlatformRef, NgModule, CompilerFactory } from '@angular/core';
+import { FirebaseApp, AngularFireModule } from '@angular/fire';
 import { Subscription } from 'rxjs';
 import { COMMON_CONFIG } from './test-config';
 import { BrowserModule } from '@angular/platform-browser';

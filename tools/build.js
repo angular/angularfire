@@ -24,14 +24,14 @@ const GLOBALS = {
   'firebase/firestore': 'firebase',
   'firebase/functions': 'firebase',
   'firebase/storage': 'firebase',
-  'angularfire2': 'angularfire2',
-  'angularfire2/auth': 'angularfire2.auth',
-  'angularfire2/database': 'angularfire2.database',
-  'angularfire2/database-deprecated': 'angularfire2.database_deprecated',
-  'angularfire2/firestore': 'angularfire2.firestore',
-  'angularfire2/functions': 'angularfire2.functions',
-  'angularfire2/storage': 'angularfire2.storage',
-  'angularfire2/messaging': 'angularfire2.messaging',
+  '@angular/fire': 'angularfire2',
+  '@angular/fire/auth': 'angularfire2.auth',
+  '@angular/fire/database': 'angularfire2.database',
+  '@angular/fire/database-deprecated': 'angularfire2.database_deprecated',
+  '@angular/fire/firestore': 'angularfire2.firestore',
+  '@angular/fire/functions': 'angularfire2.functions',
+  '@angular/fire/storage': 'angularfire2.storage',
+  '@angular/fire/messaging': 'angularfire2.messaging',
 };
 
 // Map of dependency versions across all packages
@@ -43,9 +43,9 @@ const VERSIONS = {
   ANGULARFIRE2_VERSION: pkg.version,
   FIRESTORE_VERSION: pkg.dependencies['firestore'],
   WS_VERSION: pkg.dependencies['ws'],
-  BUFFERUTIL_VERSION: pkg.dependencies['bufferutil'],
-  UTF_8_VALIDATE_VERSION: pkg.dependencies['utf-8-validate'],
-  XMLHTTPREQUEST_VERSION: pkg.dependencies['xmlhttprequest']
+  BUFFERUTIL_VERSION: pkg.optionalDependencies['bufferutil'],
+  UTF_8_VALIDATE_VERSION: pkg.optionalDependencies['utf-8-validate'],
+  XHR2_VERSION: pkg.dependencies['xhr2']
 };
 
 const MODULE_NAMES = {
@@ -116,16 +116,25 @@ function spawnObservable(command, args) {
 }
 
 function generateBundle(input, { file, globals, name }) {
-  return rollup({ input }).then(bundle => {
-    return bundle.write({
+  return rollup({
+    input,
+    external: Object.keys(globals),
+    plugins: [resolve()],
+    onwarn: warning => {
+      // Supress Typescript this warning
+      // https://github.com/rollup/rollup/wiki/Troubleshooting#this-is-undefined
+      if (warning.code !== 'THIS_IS_UNDEFINED') {
+        console.log(warning.message);
+      }
+    }
+  }).then(bundle =>
+    bundle.write({
       format: 'umd',
-      external: Object.keys(globals),
-      plugins: [resolve()],
       file,
       globals,
       name,
-    });
-  });
+    })
+  );
 }
 
 function createFirebaseBundles(featurePaths, globals) {

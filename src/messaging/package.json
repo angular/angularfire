@@ -1,5 +1,5 @@
 {
-  "name": "angularfire2/messaging",
+  "name": "@angular/fire/messaging",
   "version": "ANGULARFIRE2_VERSION",
   "description": "The messaging module",
   "main": "../bundles/messaging.umd.js",
@@ -17,7 +17,7 @@
   "author": "angular,firebase",
   "license": "MIT",
   "peerDependencies": {
-    "angularfire2": "ANGULARFIRE2_VERSION",
+    "@angular/fire": "ANGULARFIRE2_VERSION",
     "@angular/common": "ANGULAR_VERSION",
     "@angular/core": "ANGULAR_VERSION",
     "@angular/platform-browser": "ANGULAR_VERSION",

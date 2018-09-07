@@ -36,7 +36,7 @@ In 4.0 we've reduced the complexity of the auth module by providing only [`fireb
 ```typescript
 import { AngularFireAuth } from 'angularfire2/auth';
 // Do not import from 'firebase' as you'd lose the tree shaking benefits
-import * as firebase from 'firebase/app';
+import firebase from 'firebase/app';
 ...
 
 user: Observable<firebase.User>;
@@ -75,7 +75,7 @@ import { AngularFireAuthModule, AngularFireAuth } from 'angularfire2/auth';
 import { environment } from '../environments/environment';
 
 // Do not import from 'firebase' as you'd lose the tree shaking benefits
-import * as firebase from 'firebase/app';
+import firebase from 'firebase/app';
 
 
 @NgModule({

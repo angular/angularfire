@@ -8,7 +8,8 @@ import { Settings, CollectionReference, DocumentReference, QueryFn, AssociatedRe
 import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 
-import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from 'angularfire2';
+import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
+import { isPlatformBrowser } from '@angular/common';
 
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
@@ -46,7 +47,7 @@ export function associateQuery(collectionRef: CollectionReference, queryFn = ref
  * Example:
  *
  * import { Component } from '@angular/core';
- * import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from 'angularfire2/firestore';
+ * import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
  * import { Observable } from 'rxjs/Observable';
  * import { from } from 'rxjs/observable/from';
  *
@@ -119,13 +120,20 @@ export class AngularFirestore {
       return firestore;
     });
 
-    this.persistenceEnabled$ = zone.runOutsideAngular(() =>
-        shouldEnablePersistence ? from(this.firestore.enablePersistence().then(() => true, () => false))
-                                : of(false)
-      )
-      .pipe(
-        catchError(() => of(false))
-      ); // https://github.com/firebase/firebase-js-sdk/issues/608
+    if (shouldEnablePersistence && isPlatformBrowser(platformId)) {
+      // We need to try/catch here because not all enablePersistence() failures are caught
+      // https://github.com/firebase/firebase-js-sdk/issues/608
+      const enablePersistence = () => {
+        try {
+          return from(this.firestore.enablePersistence().then(() => true, () => false));
+        } catch(e) {
+          return of(false);
+        }
+      };
+      this.persistenceEnabled$ = zone.runOutsideAngular(enablePersistence);
+    } else {
+      this.persistenceEnabled$ = of(false);
+    }
   }
 
   /**

@@ -1,6 +1,6 @@
 import { database } from 'firebase';
-import { FirebaseApp, AngularFireModule } from 'angularfire2';
-import { AngularFireDatabase, AngularFireDatabaseModule, listChanges } from 'angularfire2/database';
+import { FirebaseApp, AngularFireModule } from '@angular/fire';
+import { AngularFireDatabase, AngularFireDatabaseModule, listChanges } from '@angular/fire/database';
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../test-config';
 import { skip, take } from 'rxjs/operators';

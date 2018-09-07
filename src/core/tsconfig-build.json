@@ -25,6 +25,6 @@
     "strictMetadataEmit": true,
     "enableSummariesForJit": true,
     "flatModuleOutFile": "index.js",
-    "flatModuleId": "angularfire2"
+    "flatModuleId": "@angular/fire"
   }
 }

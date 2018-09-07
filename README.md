@@ -5,15 +5,18 @@
 
 [![Build Status](https://travis-ci.org/angular/angularfire2.svg?branch=master)](https://travis-ci.org/angular/angularfire2) [![Join the chat at https://gitter.im/angular/angularfire2](https://badges.gitter.im/angular/angularfire2.svg)](https://gitter.im/angular/angularfire2?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Status: Release candidate
-
 ## What is AngularFire?
 
 - **Observable based** - Use the power of RxJS, Angular, and Firebase.
 - **Real-time bindings** - Synchronize data in real-time.
 - **Authentication** - Log users in with a variety of providers and monitor authentication state.
 - **Offline Data** - Store data offline automatically with AngularFirestore.
+- **Server-side Render** - Generate static HTML to boost perceived performance or create static sites.
 - **ngrx friendly** - Integrate with ngrx using AngularFire's action based APIs.
+- **Manage binary data** - Upload, download, and delete binary files like images, videos, and other blobs.
+- **Call server code** - Directly call serverless Cloud Functions with user context automatically passed.
+- **Push notifications** - Register and listen for push notifications
+- **Modular** - Include only what's needed. No AngularFire package is above 3kb with most under 2kb (gzipped).
 
 #### Quick links
 [Contributing](CONTRIBUTING.md)
@@ -27,14 +30,14 @@ Status: Release candidate
 ## Install
 
 ```bash
-npm install firebase angularfire2 --save
+npm install firebase @angular/fire --save
 ```
 
 ## Example use:
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFirestore } from 'angularfire2/firestore';
+import { AngularFirestore } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -88,6 +91,12 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 
 ### Upload files
 - [Getting started with Cloud Storage](docs/storage/storage.md)
+
+### Send push notifications
+- [Getting started with Firebase Messaging](docs/messaging/messaging.md)
+
+### Directly call Cloud Functions
+- [Getting started with Callable Functions](docs/functions/functions.md)
 
 ### Deploying your application
 

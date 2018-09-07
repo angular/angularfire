@@ -1,12 +1,12 @@
-import { Observable, Subscriber } from 'rxjs';
-import { DocumentReference, SetOptions, DocumentData, QueryFn, AssociatedReference, Action, DocumentSnapshot } from '../interfaces';
+import { Observable, from } from 'rxjs';
+import { DocumentReference, SetOptions, DocumentData, QueryFn, Action, DocumentSnapshot } from '../interfaces';
 import { fromDocRef } from '../observable/fromRef';
 import { map } from 'rxjs/operators';
 
-import { Injectable } from '@angular/core';
-
 import { AngularFirestore, associateQuery } from '../firestore';
 import { AngularFirestoreCollection } from '../collection/collection';
+import { firestore } from 'firebase';
+import { runInZone } from '@angular/fire';
 
 /**
  * AngularFirestoreDocument service
@@ -92,6 +92,16 @@ export class AngularFirestoreDocument<T=DocumentData> {
       map(action => {
         return action.payload.data();
       })
+    );
+  }
+
+  /**
+   * Retrieve the document once.
+   * @param options
+   */
+  get(options?: firestore.GetOptions) {
+    return from(this.ref.get(options)).pipe(
+      runInZone(this.afs.scheduler.zone)
     );
   }
 }

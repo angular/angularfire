@@ -5,7 +5,7 @@ import { FirebaseListFactoryOpts, FirebaseObjectFactoryOpts, PathReference } fro
 import { FirebaseObjectFactory } from './firebase_object_factory';
 import { FirebaseObjectObservable } from './firebase_object_observable';
 import * as utils from './utils';
-import { FirebaseDatabase, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, RealtimeDatabaseURL, _firebaseAppFactory } from 'angularfire2';
+import { FirebaseDatabase, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, RealtimeDatabaseURL, _firebaseAppFactory } from '@angular/fire';
 
 @Injectable()
 export class AngularFireDatabase {

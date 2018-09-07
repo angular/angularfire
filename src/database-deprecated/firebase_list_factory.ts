@@ -1,5 +1,5 @@
 import { NgZone } from '@angular/core';
-import { FirebaseZoneScheduler } from 'angularfire2';
+import { FirebaseZoneScheduler } from '@angular/fire';
 import * as utils from './utils';
 import { AFUnwrappedDataSnapshot } from './interfaces';
 import { FirebaseListObservable } from './firebase_list_observable';
