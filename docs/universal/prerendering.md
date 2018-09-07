@@ -1,21 +1,24 @@
 # Prerendering your Universal application
 
-`static.paths.js`:
+Prerendering a Universal application allows us to generate the HTML before the user requests it; increasing performance and decreasing cost. Let's configure your application to prerender and staticly serve it's most commonly accessed routes on Firebase Hosting.
+
+First create a `static.paths.js` in your project root, which lists the URLs you'd want to prerender:
 
 ```js
 export default [
     '/',
     '/another_path',
-    '/yet_another_path',
-    // ... etc.
+    '/yet_another_path'
 ];
 ```
+
+Let's install `mkdir-recursive` to make the next step a little easier:
 
 ```bash
 npm i --save-dev mkdir-recursive
 ```
 
-Add the following to your `server.ts`:
+Now replace the listener in your `server.ts` with the following:
 
 ```ts
 import { readFileSync, writeFileSync, existsSync } from 'fs';
@@ -27,13 +30,13 @@ if (process.env.PRERENDER) {
     const routes = require('./static.paths').default;
     Promise.all(
         routes.map(route =>
-        renderModuleFactory(AppServerModuleNgFactory, {
-            document: template,
-            url: route,
-            extraProviders: [
-                provideModuleMap(LAZY_MODULE_MAP)
-            ]
-        }).then(html => [route, html])
+            renderModuleFactory(AppServerModuleNgFactory, {
+                document: template,
+                url: route,
+                extraProviders: [
+                    provideModuleMap(LAZY_MODULE_MAP)
+                ]
+            }).then(html => [route, html])
         )
     ).then(results => {
         results.forEach(([route, html]) => {
@@ -54,7 +57,9 @@ if (process.env.PRERENDER) {
 }
 ```
 
-Let's make some modifications to our `package.json`, to prerender your content:
+Now if the `PRERENDER` environment variable is passed any value, instead of serving your application it will iterate over the paths in `static.paths.js`, render then, and then write them to your `public` directory.  *You could always make this a seperate script.*
+
+Finally make some modifications to your `package.json`, to prerender your content when you build:
 
 ```js
 "scripts": {
@@ -64,6 +69,4 @@ Let's make some modifications to our `package.json`, to prerender your content:
 },
 ```
 
-Now when you run `npm run build` you should see prerendered content in your `/public` directory, ready for deployment on Firebase Hosting.
-
-`firebase serve`, `firebase deploy`
+Now when you run `npm run build` the prerendered content should be available in your `/public` directory, ready for deployment on Firebase Hosting.
