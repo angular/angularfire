@@ -1,1 +1,1 @@
-export * from '@angular/fire/storage';
+export * from '@angular/fire';
