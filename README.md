@@ -8,7 +8,7 @@
 ## What is AngularFire?
 
 - **Observable based** - Use the power of RxJS, Angular, and Firebase.
-- **Real-time bindings** - Synchronize data in real-time.
+- **Realtime bindings** - Synchronize data in realtime.
 - **Authentication** - Log users in with a variety of providers and monitor authentication state.
 - **Offline Data** - Store data offline automatically with AngularFirestore.
 - **Server-side Render** - Generate static HTML to boost perceived performance or create static sites.
@@ -79,7 +79,7 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 
 #### Realtime Database
 
-> `AngularFireDatabase` allows you to work with the Realtime Database, Firebase's original database. It's an efficient, low-latency solution for mobile apps that require synced states across clients in real-time.
+> `AngularFireDatabase` allows you to work with the Realtime Database, Firebase's original database. It's an efficient, low-latency solution for mobile apps that require synced states across clients in realtime.
 
 - [Objects](docs/rtdb/objects.md)
 - [Lists](docs/rtdb/lists.md)
