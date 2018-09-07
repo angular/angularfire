@@ -141,7 +141,7 @@ Test your app locally by running `npm run build:ssr && npm run serve:ssr`.
 
 ## 5.0 Deployment
 
-With an existing Firebase project, you can easily deploy your ExpressJS server to [App Engine Flex](https://cloud.google.com/appengine/docs/flexible/) (Note: This is a paid service based on resource allocation).
+With an existing Firebase project, you can easily deploy your ExpressJS server to [App Engine](https://cloud.google.com/appengine/docs/standard/).
 
 
 1. Install [gcloud CLI tools](https://cloud.google.com/sdk/gcloud/) and authenticate. 
