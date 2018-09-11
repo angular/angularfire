@@ -9,7 +9,7 @@
 
 - **Observable based** - Use the power of RxJS, Angular, and Firebase.
 - **Realtime bindings** - Synchronize data in realtime.
-- **Authentication** - Log users in with a variety of providers and monitor authentication state in realtime.
+- **Authentication** - Log users in with a variety of providers and monitor authentication state.
 - **Offline Data** - Store data offline automatically with AngularFirestore.
 - **Server-side Render** - Generate static HTML to boost perceived performance or create static sites.
 - **ngrx friendly** - Integrate with ngrx using AngularFire's action based APIs.
@@ -25,7 +25,7 @@
 
 [Upgrading to v5.0? Check out our guide.](docs/version-5-upgrade.md)
 
-**Having troubles?** Get help on the [Firebase Mailing List](https://groups.google.com/forum/#!forum/firebase-talk) (offically supported), the [Firebase Community Slack](https://firebase.community/) (look for the `#angularfire2` room), [Gitter](https://gitter.im/angular/angularfire2), or [Stack Overflow](https://stackoverflow.com/questions/tagged/angularfire2).
+**Having troubles?** Get help on the [Firebase Mailing List](https://groups.google.com/forum/#!forum/firebase-talk) (officially supported), the [Firebase Community Slack](https://firebase.community/) (look for the `#angularfire2` room), [Gitter](https://gitter.im/angular/angularfire2), or [Stack Overflow](https://stackoverflow.com/questions/tagged/angularfire2).
 
 ## Install
 
@@ -92,17 +92,25 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 ### Upload files
 - [Getting started with Cloud Storage](docs/storage/storage.md)
 
-### Universal
-- [Server-side Rendering with Universal](docs/server-side-rendering.md)
-
 ### Send push notifications
 - [Getting started with Firebase Messaging](docs/messaging/messaging.md)
 
 ### Directly call Cloud Functions
 - [Getting started with Callable Functions](docs/functions/functions.md)
 
-### Deploy to Firebase Hosting
-- [Deploying AngularFire to Firebase Hosting](docs/deploying-angularfire-to-firebase.md)
+### Deploying your application
+
+> Firebase Hosting is production-grade web content hosting for developers. With Hosting, you can quickly and easily deploy web apps and static content to a global content delivery network (CDN) with a single command.
+
+- [Deploy your Angular application on Firebase Hosting](docs/deploying-angularfire-to-firebase.md)
+
+#### Server-side rendering
+
+> Angular Universal is a technology that allows you to run your Angular application on a server. This allows you to generate your HTML in a process called server-side rendering (SSR). Angularfire is compatible with server-side rendering; allowing you to take advantage of the Search Engine Optimization, link previews, the performance gains granted by the technology, and more. [Learn more about Angular Universal](https://angular.io/guide/universal).
+
+- [Getting started with Angular Universal](docs/universal/getting-started.md)
+- [Deploying your Universal application on Cloud Functions for Firebase](docs/universal/cloud-functions.md)
+- [Prerendering your Universal application](docs/universal/prerendering.md)
 
 ### Ionic
 
