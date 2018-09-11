@@ -1,4 +1,4 @@
-# Getting started with Angularfire and Universal
+# Getting started with AngularFire and Universal
 
 Server-side rendering (SSR) is the process of converting a JavaScript app to plain HTML at request-time, allowing search engine crawlers and linkbots to understand page content reliably. 
 
