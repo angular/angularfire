@@ -8,7 +8,9 @@
   "keywords": [
     "angular",
     "firebase",
-    "rxjs"
+    "rxjs",
+    "angularfire",
+    "angularfire2"
   ],
   "repository": {
     "type": "git",
