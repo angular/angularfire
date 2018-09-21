@@ -1,3 +1,11 @@
+<a name="5.0.2"></a>
+## [5.0.2](https://github.com/angular/angularfire2/compare/5.0.1...5.0.2) (2018-09-21)
+
+### Bug Fixes
+
+* **messaging:** Fix for the binding issue and onTokenRefresh for Messaging ([e170da1](https://github.com/angular/angularfire2/commit/e170da1))
+
+
 <a name="5.0.1"></a>
 # [5.0.1](https://github.com/angular/angularfire2/compare/5.0.0...5.0.1) (2018-09-07)
 
