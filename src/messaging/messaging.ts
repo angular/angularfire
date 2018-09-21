@@ -14,7 +14,7 @@ export class AngularFireMessaging {
   tokenChanges: Observable<string|null>;
   messages: Observable<{}>;
   requestToken: Observable<string|null>;
-  deleteToken: (string) => Observable<boolean>;
+  deleteToken: (token: string) => Observable<boolean>;
 
   constructor(
     @Inject(FirebaseOptionsToken) options:FirebaseOptions,
