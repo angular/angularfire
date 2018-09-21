@@ -1,7 +1,7 @@
 {
   "name": "@angular/fire",
   "version": "ANGULARFIRE2_VERSION",
-  "description": "The core module",
+  "description": "The official library for Firebase and Angular",
   "main": "./bundles/core.umd.js",
   "module": "index.js",
   "es2015": "es2015/index.js",
