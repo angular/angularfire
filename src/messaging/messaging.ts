@@ -53,7 +53,9 @@ export class AngularFireMessaging {
     );
 
     const tokenChanges = this.messaging.pipe(
-      switchMap(messaging => new Observable(messaging.onTokenRefresh)),
+      switchMap(messaging => new Observable(messaging.onTokenRefresh.bind(messaging)).pipe(
+        switchMap(() => messaging.getToken())
+      )),
       runOutsideAngular(zone)
     );
 
@@ -62,7 +64,7 @@ export class AngularFireMessaging {
     );
 
     this.messages = this.messaging.pipe(
-      switchMap(messaging => new Observable(messaging.onMessage)),
+      switchMap(messaging => new Observable(messaging.onMessage.bind(messaging))),
       runOutsideAngular(zone)
     );
 
