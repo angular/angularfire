@@ -1,3 +1,19 @@
+<a name="5.0.2"></a>
+## [5.0.2](https://github.com/angular/angularfire2/compare/5.0.1...5.0.2) (2018-09-21)
+
+### Bug Fixes
+
+* **messaging:** Fix for the binding issue and onTokenRefresh for Messaging ([e170da1](https://github.com/angular/angularfire2/commit/e170da1))
+
+
+<a name="5.0.1"></a>
+# [5.0.1](https://github.com/angular/angularfire2/compare/5.0.0...5.0.1) (2018-09-07)
+
+Version 5.0.1 has been released for the deprecated `angularfire2` NPM library; this simply re-exports everything from `@angular/fire`; allowing you to use either `angularfire2` or `@angular/fire` in your imports and `package.json`.
+
+It will have it's dependency pinned to the corresponding minor and will be released alongside future `@angular/fire` releases for the rest of the 5.x series.
+
+
 <a name="5.0.0"></a>
 # [5.0.0](https://github.com/angular/angularfire2/compare/5.0.0-rc.12...5.0.0) (2018-09-04)
 

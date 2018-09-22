@@ -15,7 +15,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { AngularFireModule } from '@angular/fire';
-import { AngularFireStorageModule } from '@angular/fire/messaging';
+import { AngularFireMessagingModule } from '@angular/fire/messaging';
 import { environment } from '../environments/environment';
 
 @NgModule({
