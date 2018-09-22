@@ -53,7 +53,7 @@ AngularFireFunctions is super easy. You create a function on the server side and
 ```ts
 
 import { Component } from '@angular/core';
-import { AngularFireStorage } from '@angular/fire/functions';
+import { AngularFireFunctions } from '@angular/fire/functions';
 
 @Component({
   selector: 'app-root',
