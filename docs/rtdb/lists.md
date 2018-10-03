@@ -46,7 +46,7 @@ To get the list in realtime, create a list binding as a property of your compone
 
 Then in your template, you can use the `async` pipe to unwrap the binding.
 
-Update `/src/app/app.component.ts` to import `AngularFireList` from `@angular/fire` and iterate thru the list once data is retrieved. Also note the change in attribute `templateUrl` to inline `template` below.
+Update `/src/app/app.component.ts` to import `AngularFireList` from `@angular/fire` and iterate through the list once data is retrieved. Also note the change in attribute `templateUrl` to inline `template` below.
 
 ```ts
 import { Component } from '@angular/core';
