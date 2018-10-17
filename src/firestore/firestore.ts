@@ -9,6 +9,8 @@ import { AngularFirestoreCollection } from './collection/collection';
 import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
 import { isPlatformBrowser } from '@angular/common';
 
+import { firestore } from 'firebase/app';
+
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
  */
