@@ -7,7 +7,7 @@ Make sure to add your production firebase configuraiton to the src/environments/
 
 ```bash
 # build the angular project, creates a dist folder in your directory
-ng build -prod
+ng build --prod
 ```
 
 ### 1. Initializing a Firebase project
