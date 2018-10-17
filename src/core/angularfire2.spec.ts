@@ -4,7 +4,7 @@ import { FirebaseApp, AngularFireModule } from '@angular/fire';
 import { Subscription } from 'rxjs';
 import { COMMON_CONFIG } from './test-config';
 import { BrowserModule } from '@angular/platform-browser';
-import { database } from 'firebase';
+import { database } from 'firebase/app';
 
 describe('angularfire', () => {
   let subscription:Subscription;
