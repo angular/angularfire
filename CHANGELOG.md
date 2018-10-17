@@ -1,3 +1,11 @@
+<a name="5.1.0"></a>
+# [5.1.0](https://github.com/angular/angularfire2/compare/5.0.0-rc.12...5.1.0) (2018-10-17)
+
+### Features
+
+* **afs:** Support Firebase 5.5 and Firestore PersistenceSettings ([a9cf1ca](https://github.com/angular/angularfire2/commit/a9cf1ca))
+
+
 <a name="5.0.2"></a>
 ## [5.0.2](https://github.com/angular/angularfire2/compare/5.0.1...5.0.2) (2018-09-21)
 
