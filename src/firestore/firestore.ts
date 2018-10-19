@@ -109,10 +109,10 @@ export class AngularFirestore {
     @Inject(FirebaseOptionsToken) options:FirebaseOptions,
     @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|undefined,
     @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean,
-    @Optional() @Inject(PersistenceSettingsToken) persistenceSettings: PersistenceSettings|undefined,
     @Optional() @Inject(FirestoreSettingsToken) settings: Settings,
     @Inject(PLATFORM_ID) platformId: Object,
-    zone: NgZone
+    zone: NgZone,
+    @Optional() @Inject(PersistenceSettingsToken) persistenceSettings: PersistenceSettings|undefined,
   ) {
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.firestore = zone.runOutsideAngular(() => {
