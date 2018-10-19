@@ -1,7 +1,7 @@
 import { ReflectiveInjector, Provider } from '@angular/core';
 import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, FirebaseOptionsToken, AngularFireModule, FirebaseNameOrConfigToken } from '@angular/fire';
-import { AngularFireFunctions, AngularFireFunctionsModule } from '@angular/fire/functions';
+import { AngularFireFunctions, AngularFireFunctionsModule, FunctionsRegionToken } from '@angular/fire/functions';
 import { COMMON_CONFIG } from './test-config';
 
 describe('AngularFireFunctions', () => {
@@ -50,7 +50,8 @@ describe('AngularFireFunctions with different app', () => {
       ],
       providers: [
         { provide: FirebaseNameOrConfigToken, useValue: FIREBASE_APP_NAME_TOO },
-        { provide: FirebaseOptionsToken, useValue: COMMON_CONFIG }
+        { provide: FirebaseOptionsToken, useValue: COMMON_CONFIG },
+        { provide: FunctionsRegionToken, useValue: 'asia-northeast1' },
       ]
     });
     inject([FirebaseApp, AngularFireFunctions], (app_: FirebaseApp, _fns: AngularFireFunctions) => {
@@ -68,6 +69,10 @@ describe('AngularFireFunctions with different app', () => {
 
     it('should be an AngularFireAuth type', () => {
       expect(afFns instanceof AngularFireFunctions).toEqual(true);
+    });
+
+    it('should have the Firebase Functions instance', () => {
+      expect(afFns.functions).toBeDefined();
     });
 
   });

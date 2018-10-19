@@ -1,10 +1,10 @@
 import { Subscriber } from 'rxjs';
-import { firestore } from 'firebase';
+import { firestore } from 'firebase/app';
 
 export type Settings =  firestore.Settings;
 export type CollectionReference = firestore.CollectionReference;
 export type DocumentReference = firestore.DocumentReference;
-
+export type PersistenceSettings = firestore.PersistenceSettings;
 export type DocumentChangeType = firestore.DocumentChangeType;
 export type SnapshotOptions = firestore.SnapshotOptions;
 export type FieldPath = firestore.FieldPath;

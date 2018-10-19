@@ -1,20 +1,21 @@
 import { InjectionToken, NgZone, PLATFORM_ID, Injectable, Inject, Optional } from '@angular/core';
 
 import { Observable, of, from } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { firestore } from 'firebase';
 
-import { Settings, CollectionReference, DocumentReference, QueryFn, AssociatedReference } from './interfaces';
+import { Settings, PersistenceSettings, CollectionReference, DocumentReference, QueryFn, AssociatedReference } from './interfaces';
 import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 
 import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
 import { isPlatformBrowser } from '@angular/common';
 
+import { firestore } from 'firebase/app';
+
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
  */
 export const EnablePersistenceToken = new InjectionToken<boolean>('angularfire2.enableFirestorePersistence');
+export const PersistenceSettingsToken = new InjectionToken<PersistenceSettings|undefined>('angularfire2.firestore.persistenceSettings');
 export const FirestoreSettingsToken = new InjectionToken<Settings>('angularfire2.firestore.settings');
 
 export const DefaultFirestoreSettings = {timestampsInSnapshots: true} as Settings;
@@ -110,7 +111,8 @@ export class AngularFirestore {
     @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean,
     @Optional() @Inject(FirestoreSettingsToken) settings: Settings,
     @Inject(PLATFORM_ID) platformId: Object,
-    zone: NgZone
+    zone: NgZone,
+    @Optional() @Inject(PersistenceSettingsToken) persistenceSettings: PersistenceSettings|undefined,
   ) {
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.firestore = zone.runOutsideAngular(() => {
@@ -125,7 +127,7 @@ export class AngularFirestore {
       // https://github.com/firebase/firebase-js-sdk/issues/608
       const enablePersistence = () => {
         try {
-          return from(this.firestore.enablePersistence().then(() => true, () => false));
+          return from(this.firestore.enablePersistence(persistenceSettings).then(() => true, () => false));
         } catch(e) {
           return of(false);
         }

@@ -1,4 +1,4 @@
-import { database } from 'firebase';
+import { database } from 'firebase/app';
 import { FirebaseApp, AngularFireModule } from '@angular/fire';
 import { AngularFireDatabase, AngularFireDatabaseModule, listChanges } from '@angular/fire/database';
 import { TestBed, inject } from '@angular/core/testing';

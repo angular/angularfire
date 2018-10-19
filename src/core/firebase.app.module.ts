@@ -1,7 +1,7 @@
 import { InjectionToken, NgModule, Optional } from '@angular/core';
-import {app, auth, database, firestore, functions, messaging, storage } from 'firebase';
+import { app, auth, database, firestore, functions, messaging, storage } from 'firebase/app';
 // @ts-ignore (https://github.com/firebase/firebase-js-sdk/pull/1206)
-import firebase from 'firebase/app';
+import firebase from 'firebase/app'; // once fixed can pull in as "default as firebase" above
 
 // Public types don't expose FirebaseOptions or FirebaseAppConfig
 export type FirebaseOptions = {[key:string]: any};
@@ -17,6 +17,8 @@ export type FirebaseStorage = storage.Storage;
 export type FirebaseFirestore = firestore.Firestore;
 export type FirebaseFunctions = functions.Functions;
 
+// Have to implement as we need to return a class from the provider, we should consider exporting
+// this in the firebase/app types as this is our highest risk of breaks
 export class FirebaseApp implements app.App {
     name: string;
     options: {};
@@ -29,7 +31,7 @@ export class FirebaseApp implements app.App {
     storage: (storageBucket?: string) => FirebaseStorage;
     delete: () => Promise<void>;
     firestore: () => FirebaseFirestore;
-    functions: () => FirebaseFunctions;
+    functions: (region?: string) => FirebaseFunctions;
 }
 
 export function _firebaseAppFactory(options: FirebaseOptions, nameOrConfig?: string | FirebaseAppConfig) {
