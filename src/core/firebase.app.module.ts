@@ -31,7 +31,7 @@ export class FirebaseApp implements app.App {
     storage: (storageBucket?: string) => FirebaseStorage;
     delete: () => Promise<void>;
     firestore: () => FirebaseFirestore;
-    functions: () => FirebaseFunctions;
+    functions: (region?: string) => FirebaseFunctions;
 }
 
 export function _firebaseAppFactory(options: FirebaseOptions, nameOrConfig?: string | FirebaseAppConfig) {
