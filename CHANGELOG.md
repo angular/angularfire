@@ -1,3 +1,10 @@
+<a name="6.0.0"></a>
+# [6.0.0](https://github.com/angular/angularfire2/compare/5.1.0...6.0.0) (2018-10-19)
+
+### Breaking changes
+
+Now built for Angular 7.
+
 <a name="5.0.2"></a>
 ## [5.0.2](https://github.com/angular/angularfire2/compare/5.0.1...5.0.2) (2018-09-21)
 
