@@ -1,3 +1,5 @@
+# Upgrading to AngularFire2 4.0
+
 AngularFire2 4.0 is a refactor of the AngularFire2 package which implements
 @NgModule, simplifies authentication, and better supports Angular 4.
 
