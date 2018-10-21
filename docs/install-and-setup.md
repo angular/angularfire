@@ -4,7 +4,7 @@
 
 ### 0. Prerequisites
 
-AngularFire provides multiple module formats for different types of builds. The guide is based off the Angular CLI. It is possible to do a manual setup with Webpack or a SystemJS build as well.
+AngularFire provides multiple module formats for different types of builds. The guide is based on the Angular CLI. It is possible to do a manual setup with Webpack or a SystemJS build as well.
 
 ```bash
 npm install @angular/cli
