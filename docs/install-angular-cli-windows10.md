@@ -1,6 +1,6 @@
 # Installing Angular CLI on Windows 10
 
-> There had been installation issues of `@angular/cli` on Windows 10 system. Most of the time these errors are related to Python dependecies and node-gyp.
+> There had been installation issues of `@angular/cli` on Windows 10 system. Most of the time these errors are related to Python dependencies and node-gyp.
 
 Something as below :
 

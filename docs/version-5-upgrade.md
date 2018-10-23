@@ -4,7 +4,7 @@ AngularFire 5.0 is a refactor of the `AngularFireDatabase` module. It removes th
 
 ## Updating `FirebaseListObservable` to `AngularFireList<T>`
 
-Rather than `.list()` returning a `FirebaseListObservable`, it now returns an `AngularFireList<T>`. This service contains methods that allow you manipulate and stream data.
+Rather than `.list()` returning a `FirebaseListObservable`, it now returns an `AngularFireList<T>`. This service contains methods that allow you to manipulate and stream data.
 
 In the case of streaming back data, you now call one of the observable methods on `AngularFireList`.
 
