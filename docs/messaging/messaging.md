@@ -8,7 +8,7 @@ If you are using the Angular Service Worker, you are not currently able to use A
 
 ### Import the `NgModule`
 
-Cloud Storage for AngularFire is contained in the `@angular/fire/messaging` module namespace. Import the `AngularFireMessagingModule` in your `NgModule`. This sets up the `AngularFireMessaging` service for dependency injection.
+Push Notifications for AngularFire is contained in the `@angular/fire/messaging` module namespace. Import the `AngularFireMessagingModule` in your `NgModule`. This sets up the `AngularFireMessaging` service for dependency injection.
 
 ```ts
 import { BrowserModule } from '@angular/platform-browser';
