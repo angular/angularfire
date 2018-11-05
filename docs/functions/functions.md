@@ -26,6 +26,29 @@ import { environment } from '../environments/environment';
 export class AppModule {}
 ```
 
+### Configure the Function region with the FunctionsRegionToken Injection Token
+
+Allow configuration of Function region with the `FunctionsRegionToken` Injection Token by adding it to the `providers` section of your `NgModule`. The default is `us-central1`.
+
+```ts
+import { NgModule } from '@angular/core';
+import { AngularFireFunctionsModule, FunctionsRegionToken } from '@angular/fire/functions';
+
+@NgModule({
+  imports: [
+    ...
+    AngularFireFunctionsModule,
+    ...
+  ],
+  ...
+  providers: [
+   { provide: FunctionsRegionToken, useValue: 'asia-northeast1' }
+  ]
+})
+export class AppModule {}
+
+```
+
 ### Injecting the AngularFireFunctions service
 
 Once the `AngularFireFunctionsModule` is registered you can inject the `AngularFireFunctions` service.
@@ -47,8 +70,8 @@ export class AppComponent {
 
 AngularFireFunctions is super easy. You create a function on the server side and then "call" it by its name with the client library. 
 
-| method   |                    |
-| ---------|--------------------|
+| method                                   |                                                                                                                           |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | `httpCallable(name: string): (data: T) ` | Creates a callable function based on a function name. Returns a function that can create the observable of the http call. |
 ```ts
 
