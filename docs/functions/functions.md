@@ -70,8 +70,8 @@ export class AppComponent {
 
 AngularFireFunctions is super easy. You create a function on the server side and then "call" it by its name with the client library. 
 
-| method                                   |                                                                                                                           |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| method   |                    |
+| ---------|--------------------|
 | `httpCallable(name: string): (data: T) ` | Creates a callable function based on a function name. Returns a function that can create the observable of the http call. |
 ```ts
 
