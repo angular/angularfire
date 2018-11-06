@@ -26,6 +26,29 @@ import { environment } from '../environments/environment';
 export class AppModule {}
 ```
 
+### Configure the Function region with the FunctionsRegionToken Injection Token
+
+Allow configuration of Function region with the `FunctionsRegionToken` Injection Token by adding it to the `providers` section of your `NgModule`. The default is `us-central1`.
+
+```ts
+import { NgModule } from '@angular/core';
+import { AngularFireFunctionsModule, FunctionsRegionToken } from '@angular/fire/functions';
+
+@NgModule({
+  imports: [
+    ...
+    AngularFireFunctionsModule,
+    ...
+  ],
+  ...
+  providers: [
+   { provide: FunctionsRegionToken, useValue: 'asia-northeast1' }
+  ]
+})
+export class AppModule {}
+
+```
+
 ### Injecting the AngularFireFunctions service
 
 Once the `AngularFireFunctionsModule` is registered you can inject the `AngularFireFunctions` service.
