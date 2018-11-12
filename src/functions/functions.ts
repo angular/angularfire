@@ -5,7 +5,6 @@ import { FirebaseOptions, FirebaseAppConfig } from '@angular/fire';
 import { FirebaseFunctions, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
 
 export const FunctionsRegionToken = new InjectionToken<string>('angularfire2.functions.region');
-export const FunctionsDefaultRegion = 'us-central1';
 
 @Injectable()
 export class AngularFireFunctions {
@@ -28,7 +27,7 @@ export class AngularFireFunctions {
     
     this.functions = zone.runOutsideAngular(() => {
       const app = _firebaseAppFactory(options, nameOrConfig);
-      return app.functions(region || FunctionsDefaultRegion);
+      return app.functions(region || undefined);
     });
 
   }
