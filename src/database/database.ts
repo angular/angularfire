@@ -14,7 +14,7 @@ export class AngularFireDatabase {
   constructor(
     @Inject(FirebaseOptionsToken) options:FirebaseOptions,
     @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|null,
-    @Optional() @Inject(RealtimeDatabaseURL) databaseURL:string,
+    @Optional() @Inject(RealtimeDatabaseURL) databaseURL:string|null,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {

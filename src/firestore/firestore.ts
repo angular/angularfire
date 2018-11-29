@@ -108,8 +108,8 @@ export class AngularFirestore {
   constructor(
     @Inject(FirebaseOptionsToken) options:FirebaseOptions,
     @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|null,
-    @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean,
-    @Optional() @Inject(FirestoreSettingsToken) settings: Settings,
+    @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean|null,
+    @Optional() @Inject(FirestoreSettingsToken) settings: Settings|null,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
     @Optional() @Inject(PersistenceSettingsToken) persistenceSettings: PersistenceSettings|null
