@@ -12,12 +12,10 @@
     "angularfire",
     "angularfire2"
   ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/angular/angularfire2.git"
-  },
+  "repository": "github:angular/angularfire2",
   "author": "angular,firebase",
   "license": "MIT",
+  "homepage": "https://firebaseopensource.com/projects/angular/angularfire2",
   "peerDependencies": {
     "@angular/common": "ANGULAR_VERSION",
     "@angular/core": "ANGULAR_VERSION",

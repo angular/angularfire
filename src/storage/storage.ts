@@ -22,8 +22,8 @@ export class AngularFireStorage {
 
   constructor(
     @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|undefined,
-    @Optional() @Inject(StorageBucket) storageBucket:string,
+    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|null,
+    @Optional() @Inject(StorageBucket) storageBucket:string|null,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
