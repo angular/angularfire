@@ -5,7 +5,7 @@ import { FirebaseOptions, FirebaseAppConfig } from '@angular/fire';
 import { FirebaseFunctions, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
 
 export const FunctionsRegionToken = new InjectionToken<string>('angularfire2.functions.region');
-export const FunctionsEmulatorOrigin = new InjectionToken<string>('angularfire2.functions.emulatorOrigin');
+export const FunctionsEmulatorOriginToken = new InjectionToken<string>('angularfire2.functions.emulatorOrigin');
 
 @Injectable()
 export class AngularFireFunctions {
@@ -23,7 +23,7 @@ export class AngularFireFunctions {
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
     @Optional() @Inject(FunctionsRegionToken) region:string|null,
-    @Optional() @Inject(FunctionsEmulatorOrigin) emulatorOrigin:string|null
+    @Optional() @Inject(FunctionsEmulatorOriginToken) emulatorOrigin:string|null
   ) {
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     

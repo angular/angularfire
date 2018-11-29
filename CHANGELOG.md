@@ -1,3 +1,26 @@
+<a name="5.2.0"></a>
+# [5.2.0](https://github.com/angular/angularfire2/compare/5.1.1...5.2.0) (2018-11-29)
+
+
+### Bug Fixes
+
+* **core:** Shore up `@Optional` types in constructors ([9669ccf](https://github.com/angular/angularfire2/commit/9669ccf))
+
+### Features
+
+* **functions:** Allow Cloud Functions emulator use via `FunctionsEmulatorOriginToken` ([9669ccf](https://github.com/angular/angularfire2/commit/9669ccf))
+* **firestore:** Allow enabling of persistence in non-server platforms, rather than browser-only ([9669ccf](https://github.com/angular/angularfire2/commit/9669ccf))
+* **messaging:** Allow use in non-server platforms, rather than browser-only ([9669ccf](https://github.com/angular/angularfire2/commit/9669ccf))
+
+<a name="5.1.1"></a>
+# [5.2.0](https://github.com/angular/angularfire2/compare/5.1...5.1.1) (2018-11-29)
+
+
+### Bug Fixes
+
+* **functions:** Fix the default Functions region bug ([#1945](https://github.com/angular/angularfire2/issues/1945)) ([75f3dae](https://github.com/angular/angularfire2/commit/75f3dae))
+
+
 <a name="5.1.0"></a>
 # [5.1.0](https://github.com/angular/angularfire2/compare/5.0.0-rc.12...5.1.0) (2018-10-17)
 
