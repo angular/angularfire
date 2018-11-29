@@ -1,7 +1,7 @@
 import { ReflectiveInjector, Provider } from '@angular/core';
 import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, FirebaseOptionsToken, AngularFireModule, FirebaseNameOrConfigToken } from '@angular/fire';
-import { AngularFireFunctions, AngularFireFunctionsModule, FunctionsRegionToken, FunctionsEmulatorOrigin } from '@angular/fire/functions';
+import { AngularFireFunctions, AngularFireFunctionsModule, FunctionsRegionToken, FunctionsEmulatorOriginToken } from '@angular/fire/functions';
 import { COMMON_CONFIG } from './test-config';
 
 describe('AngularFireFunctions', () => {
@@ -55,7 +55,7 @@ describe('AngularFireFunctions with different app', () => {
         { provide: FirebaseNameOrConfigToken, useValue: FIREBASE_APP_NAME_TOO },
         { provide: FirebaseOptionsToken, useValue: COMMON_CONFIG },
         { provide: FunctionsRegionToken, useValue: 'asia-northeast1' },
-        { provide: FunctionsEmulatorOrigin, useValue: 'http://localhost:9999' },
+        { provide: FunctionsEmulatorOriginToken, useValue: 'http://localhost:9999' },
       ]
     });
     inject([FirebaseApp, AngularFireFunctions], (app_: FirebaseApp, _fns: AngularFireFunctions) => {
