@@ -26,6 +26,20 @@ import { environment } from '../environments/environment';
 export class AppModule {}
 ```
 
+The `StorageBucket` injection token can be used to customise the storage bucket.
+
+```ts
+import {AngularFireStorageModule, StorageBucket} from '@angular/fire/storage';
+
+@NgModule({
+  providers: [
+    { provide: StorageBucket, useValue: 'my-bucket-name' }
+  ],
+  ...
+})
+export class AppModule {}
+```
+
 ### Injecting the AngularFireStorage service
 
 Once the `AngularFireStorageModule` is registered you can inject the `AngularFireStorage` service.
