@@ -35,6 +35,7 @@
     "@angular/core": ">=6.0.0 <8",
     "@angular/platform-browser": ">=6.0.0 <8",
     "@angular/platform-browser-dynamic": ">=6.0.0 <8",
+    "@angular/router": ">=6.0.0 <8",
     "firebase": "^5.5.0",
     "rxjs": "^6.0.0",
     "ws": "^3.3.2",
