@@ -63,6 +63,7 @@ export class MyApp {
 ### Getting started
 
 - [Installation & Setup](docs/install-and-setup.md)
+- [Advanced configuration using Dependency Providers](docs/dependency-providers.md)
 
 ### Interacting with your database(s)
 
@@ -76,6 +77,7 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 - [Collections](docs/firestore/collections.md)
 - [Querying Collections](docs/firestore/querying-collections.md)
 - [Offline data](docs/firestore/offline-data.md)
+- [Configure persistence and more using DI](docs/firestore/configuration.md)
 
 #### Realtime Database
 
@@ -84,19 +86,25 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 - [Objects](docs/rtdb/objects.md)
 - [Lists](docs/rtdb/lists.md)
 - [Querying lists](docs/rtdb/querying-lists.md)
+- [Connect to different Realtime Database instances using DI](docs/rtdb/configuration.md)
 
 ### Authenticate users
 
 - [Getting started with Firebase Authentication](docs/auth/getting-started.md)
 
 ### Upload files
+
 - [Getting started with Cloud Storage](docs/storage/storage.md)
+- [Point to different Cloud Storage buckets using DI](docs/storage/configuration.md)
 
 ### Send push notifications
+
 - [Getting started with Firebase Messaging](docs/messaging/messaging.md)
 
 ### Directly call Cloud Functions
+
 - [Getting started with Callable Functions](docs/functions/functions.md)
+- [Configure callable functions using DI](docs/functions/configuration.md)
 
 ### Deploying your application
 
