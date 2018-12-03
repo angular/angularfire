@@ -6,27 +6,13 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { auth } from 'firebase/app';
 
 export interface AngularFireAuthGuardOptions {
-    check?: (next: ActivatedRouteSnapshot, state: RouterStateSnapshot) => (idTokenResult: auth.IdTokenResult | null) => Observable<boolean>
-    redirect?: any[]
+    authorizationCheck?: (next: ActivatedRouteSnapshot, state: RouterStateSnapshot) => (idTokenResult: auth.IdTokenResult | null) => Observable<boolean>
+    redirectUnauthorizedTo?: any[]
 };
 
-/*
-export const loggedInRedirectToItems : AngularFireAuthGuardOptions = {
-    check: () => idTokenResult => of(!idTokenResult),
-    redirect: ['items']
-}
-
-export const redirectToLogin : AngularFireAuthGuardOptions = {
-    redirect: ['login']
-}
-
-export const adminCanActivate : AngularFireAuthGuardOptions = {
-    check: () => idTokenResult => of(!!idTokenResult && idTokenResult.claims.admin == true)
-}
-
-export const adminOfProjectCanActivate : AngularFireAuthGuardOptions = {
-    check: (next) => idTokenResult => of(!!idTokenResult && idTokenResult.claims[`project-${next.params.id}`] == 'admin')
-}*/
+export const routeHelper = (data: AngularFireAuthGuardOptions) => ({
+    canActivate: [ AngularFireAuthGuard ], data
+});
 
 @Injectable()
 export class AngularFireAuthGuard implements CanActivate {
@@ -34,12 +20,13 @@ export class AngularFireAuthGuard implements CanActivate {
   }
   canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     const options : AngularFireAuthGuardOptions = next.data.canActivate || {};
+    const redirect = options.redirectUnauthorizedTo && this.router.createUrlTree(options.redirectUnauthorizedTo);
     const user = this.afAuth.user.pipe(take(1));
     var canActivate: Observable<boolean>;
-    if (options.check) {
+    if (options.authorizationCheck) {
         canActivate = user.pipe(
             switchMap(user => user && user.getIdTokenResult() || of(null)),
-            switchMap(options.check(next, state)),
+            switchMap(options.authorizationCheck(next, state)),
         );
     } else {
         canActivate = user.pipe(
@@ -47,11 +34,7 @@ export class AngularFireAuthGuard implements CanActivate {
         )
     }
     return canActivate.pipe(
-        tap(canActivate => {
-            if (!canActivate && options.redirect) {
-                this.router.navigate(options.redirect);
-            }
-        })
+        map(canActivate => canActivate || redirect || false)
     );
   }
 }
