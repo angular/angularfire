@@ -11,22 +11,39 @@ export const routes: Routes = [
 ]
 ```
 
-## Advanced examples
+## Using our helpers for common tests
+
+```ts
+import { hasClaim, redirectUnauthorizedTo } from '@angular/fire/auth-guard';
+
+const adminOnly = hasClaim('admin');
+const redirectUnauthorizedToLogin = redirectUnauthorizedTo(['login']);
+const redirectLoggedInToItems = redirectLoggedInTo(['items']);
+
+export const routes: Routes = [
+    { path: '',      component: AppComponent },
+    { path: 'login', component: LoginComponent,    ...redirectLoggedInToItems },
+    { path: 'items', component: ItemListComponent, ...redirectUnauthorizedToLogin },
+    { path: 'admin', component: AdminComponent,    ...adminOnly }
+];
+```
+
+## Configure the auth guard from scratch
 
 ```ts
 import { AngularFireAuthGuard } from '@angular/fire/auth-guard';
 
-const redirectToLogin : AngularFireAuthGuardOptions = {
+const redirectUnauthorizedToLogin : AngularFireAuthGuardOptions = {
     redirectUnauthorizedTo: ['login']
 }
 
-const loggedInRedirectToItems : AngularFireAuthGuardOptions = {
+const redirectLoggedInToItems : AngularFireAuthGuardOptions = {
     authorizationCheck: () => idTokenResult => of(!idTokenResult),
     redirectUnauthorizedTo: ['items']
 }
 
 const adminOnly : AngularFireAuthGuardOptions = {
-    authorizationCheck: () => idTokenResult => of(!!idTokenResult && idTokenResult.claims.admin == true)
+    authorizationCheck: () => idTokenResult => of(!!idTokenResult && idTokenResult.claims.hasOwnProperty('admin'))
 }
 
 const adminOfProjectOnly : AngularFireAuthGuardOptions = {
@@ -35,8 +52,8 @@ const adminOfProjectOnly : AngularFireAuthGuardOptions = {
 
 export const routes: Routes = [
     { path: '',      component: AppComponent },
-    { path: 'items', component: ItemListComponent, canActivate: [AngularFireAuthGuard], data: redirectToLogin },
-    { path: 'login', component: LoginComponent,    canActivate: [AngularFireAuthGuard], data: loggedInRedirectToItems },
+    { path: 'items', component: ItemListComponent, canActivate: [AngularFireAuthGuard], data: redirectUnauthorizedToLogin },
+    { path: 'login', component: LoginComponent,    canActivate: [AngularFireAuthGuard], data: redirectLoggedInToItems },
     { path: 'admin', component: AdminComponent,    canActivate: [AngularFireAuthGuard], data: adminOnly },
     { path: 'p/:id', component: ProjectComponent,  canActivate: [AngularFireAuthGuard], data: adminOfProjectOnly },
 ]
@@ -47,25 +64,25 @@ export const routes: Routes = [
 ```ts
 import { AngularFireAuthGuard, routeHelper } from '@angular/fire/auth-guard';
 
-const redirectToLogin = routeHelper({ redirectUnauthorizedTo: ['login'] });;
+const redirectUnauthorizedToLogin = routeHelper({ redirectUnauthorizedTo: ['login'] });;
 
-const loggedInRedirectToItems = routeHelper({
+const redirectLoggedInToItems = routeHelper({
     authorizationCheck: () => idTokenResult => of(!idTokenResult),
     redirectUnauthorizedTo: ['items']
 });
 
 const adminOnly = routeHelper({
-    authorizationCheck: () => idTokenResult => of(!!idTokenResult && idTokenResult.claims.admin == true)
+    authorizationCheck: () => idTokenResult => of(!!idTokenResult && idTokenResult.claims.hasOwnProperty('admin'))
 });
 
 const adminOfProjectOnly = routeHelper({
-    authorizationCheck: (next) => idTokenResult => of(!!idTokenResult && idTokenResult.claims[`project-${next.params.id}`] == 'admin')
+    authorizationCheck: (next) => idTokenResult => of(!!idTokenResult && idTokenResult.claims[`project-${next.params.id}`] === 'admin')
 });
 
 export const routes: Routes = [
     { path: '',      component: AppComponent },
-    { path: 'items', component: ItemListComponent, ...redirectToLogin },
-    { path: 'login', component: LoginComponent,    ...loggedInRedirectToItems },
+    { path: 'items', component: ItemListComponent, ...redirectUnauthorizedToLogin },
+    { path: 'login', component: LoginComponent,    ...redirectLoggedInToItems },
     { path: 'admin', component: AdminComponent,    ...adminOnly },
     { path: 'p/:id', component: ProjectComponent,  ...adminOfProjectOnly },
 ]
