@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "module": "es2015",
+    "target": "es2015",
+    "noImplicitAny": false,
+    "outDir": "../../dist/packages-dist/server-auth/es2015",
+    "rootDir": ".",
+    "sourceMap": true,
+    "inlineSources": true,
+    "declaration": false,
+    "removeComments": true,
+    "strictNullChecks": true,
+    "lib": ["es2015", "dom", "es2015.promise", "es2015.collection", "es2015.iterable"],
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "paths": {
+      "@angular/fire": ["../../dist/packages-dist"],
+      "@angular/fire/auth": ["../../dist/packages-dist/auth"]
+    }
+  },
+  "files": [
+    "index.ts",
+    "../../node_modules/zone.js/dist/zone.js.d.ts"
+  ],
+  "angularCompilerOptions": {
+    "skipTemplateCodegen": true,
+    "strictMetadataEmit": true,
+    "enableSummariesForJit": false
+  }
+}
+

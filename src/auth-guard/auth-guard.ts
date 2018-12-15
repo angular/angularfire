@@ -1,60 +1,40 @@
-import { Injectable } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router, NavigationExtras } from '@angular/router';
-import { Observable, of } from 'rxjs';
-import { take, map, switchMap, tap } from 'rxjs/operators'
+import { Injectable, InjectionToken } from '@angular/core';
+import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Router } from '@angular/router';
+import { Observable, of, pipe, UnaryFunction } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators'
+import { User, auth } from 'firebase/app';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { auth } from 'firebase/app';
 
-export interface AngularFireAuthGuardOptions {
-    authorizationCheck?: (next: ActivatedRouteSnapshot, state: RouterStateSnapshot) => (idTokenResult: auth.IdTokenResult | null) => Observable<boolean>
-    redirectUnauthorizedTo?: any[],
-    redirectNavigationExtras?: NavigationExtras
-};
+export const EnableRouterGuardListeners = new InjectionToken<boolean>('angularfire2.enableRouterGuardListeners');
+
+export type UserAndRouterState = [User|null, ActivatedRouteSnapshot, RouterStateSnapshot];
+export type AuthPipe = UnaryFunction<Observable<UserAndRouterState>, Observable<boolean|any[]>>;
 
 @Injectable()
 export class AngularFireAuthGuard implements CanActivate {
-  constructor(private afAuth: AngularFireAuth, private router: Router) {
-  }
+
+  constructor(private afAuth: AngularFireAuth, private router: Router) {}
+
   canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-    const options : AngularFireAuthGuardOptions = next.data.canActivate || {};
-    const redirect = options.redirectUnauthorizedTo && this.router.createUrlTree(options.redirectUnauthorizedTo, options.redirectNavigationExtras);
-    const user = this.afAuth.user.pipe(take(1));
-    var canActivate: Observable<boolean>;
-    if (options.authorizationCheck) {
-        canActivate = user.pipe(
-            switchMap(user => user && user.getIdTokenResult() || of(null)),
-            switchMap(options.authorizationCheck(next, state)),
-        );
-    } else {
-        canActivate = user.pipe(
-            map(user => !!user)
-        )
-    }
-    return canActivate.pipe(
-        map(canActivate => canActivate || redirect || false)
+    const authPipe: AuthPipe = next.data.angularFireAuthPipe || loggedIn;
+    return this.afAuth.user.pipe(
+        map(user => [user, next, state]),
+        authPipe,
+        map(canActivate => typeof canActivate == "boolean" ? canActivate : this.router.createUrlTree(canActivate))
     );
   }
+
 }
 
-export const routeHelper = (data: AngularFireAuthGuardOptions) => ({
-    canActivate: [ AngularFireAuthGuard ], data
+export const canActivate = (angularFireAuthPipe: AuthPipe) => ({
+    canActivate: [ AngularFireAuthGuard ], data: { angularFireAuthPipe }
 });
 
-export const hasClaim = (claim: string, redirect?: any[]) => routeHelper({
-    authorizationCheck: () => idTokenResult => of(!!idTokenResult && idTokenResult.claims.hasOwnProperty(claim)),
-    redirectUnauthorizedTo: redirect
-});
-
-export const claimEquals = (claim: string, value: any, redirect?: any[]) => routeHelper({
-    authorizationCheck: () => idTokenResult => of(!!idTokenResult && idTokenResult.claims[claim] === value),
-    redirectUnauthorizedTo: redirect
-});
-
-export const redirectUnauthorizedTo = (redirect: any[]) => routeHelper({
-    redirectUnauthorizedTo: redirect
-});
-
-export const redirectLoggedInTo = (redirect: any[]) =>  routeHelper({
-    authorizationCheck: () => idTokenResult => of(!idTokenResult),
-    redirectUnauthorizedTo: redirect
-});
+export const loggedIn = map(([user]:UserAndRouterState) => !!user);
+export const isNotAnonymous = map(([user]:UserAndRouterState) => !!user && !user.isAnonymous);
+export const idTokenResult = switchMap(([user]:UserAndRouterState) => user ? user.getIdTokenResult() : of(null));
+export const emailVerified = map(([user]:UserAndRouterState) => !!user && user.emailVerified);
+export const customClaims = pipe(idTokenResult, map(idTokenResult => !!idTokenResult ? idTokenResult.claims : []));
+export const hasCustomClaim = (claim:string) => pipe(customClaims, map(claims =>  claims.hasOwnProperty(claim)));
+export const redirectUnauthorizedTo = (redirect: any[]) => pipe(loggedIn, map(loggedIn => loggedIn || redirect));
+export const redirectLoggedInTo = (redirect: any[]) =>  pipe(loggedIn, map(loggedIn => loggedIn && redirect || true));
