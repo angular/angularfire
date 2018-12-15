@@ -19,12 +19,14 @@ import { AngularFireAuthGuard, hasCustomClaim, redirectUnauthorizedTo, redirectL
 const adminOnly = hasCustomClaim('admin');
 const redirectUnauthorizedToLogin = redirectUnauthorizedTo(['login']);
 const redirectLoggedInToItems = redirectLoggedInTo(['items']);
+const belongsToAccount = (next) => hasCustomClaim(`account-${next.params.id}`);
 
 export const routes: Routes = [
     { path: '',      component: AppComponent },
-    { path: 'login', component: LoginComponent,    canActivate: [AngularFireAuthGuard], data: { angularFireAuthPipe: redirectLoggedInToItems }},
-    { path: 'items', component: ItemListComponent, canActivate: [AngularFireAuthGuard], data: { angularFireAuthPipe: redirectUnauthorizedToLogin },
-    { path: 'admin', component: AdminComponent,    canActivate: [AngularFireAuthGuard], data: { angularFireAuthPipe: adminOnly }}
+    { path: 'login', component: LoginComponent,        canActivate: [AngularFireAuthGuard], data: { authGuardPipe: redirectLoggedInToItems }},
+    { path: 'items', component: ItemListComponent,     canActivate: [AngularFireAuthGuard], data: { authGuardPipe: redirectUnauthorizedToLogin },
+    { path: 'admin', component: AdminComponent,        canActivate: [AngularFireAuthGuard], data: { authGuardPipe: adminOnly }},
+    { path: 'accounts/:id', component: AdminComponent, canActivate: [AngularFireAuthGuard], data: { authGuardPipe: belongsToAccount }}
 ];
 ```
 
@@ -34,10 +36,11 @@ export const routes: Routes = [
 import { canActivate } from '@angular/fire/auth-guard';
 
 export const routes: Routes = [
-    { path: '',      component: AppComponent },
-    { path: 'login', component: LoginComponent,    ...canActivate(redirectLoggedInToItems) },
-    { path: 'items', component: ItemListComponent, ...canActivate(redirectUnauthorizedToLogin) },
-    { path: 'admin', component: AdminComponent,    ...canActivate(adminOnly) }
+    { path: '',             component: AppComponent },
+    { path: 'login',        component: LoginComponent,    ...canActivate(redirectLoggedInToItems) },
+    { path: 'items',        component: ItemListComponent, ...canActivate(redirectUnauthorizedToLogin) },
+    { path: 'admin',        component: AdminComponent,    ...canActivate(adminOnly) },
+    { path: 'accounts/:id', component: AdminComponent,    ...canActivate(belongsToAccount) }
 ];
 ```
 
@@ -49,12 +52,7 @@ import { map, switchMap } from 'rxjs/operators';
 import { customClaims } from '@angular/fire/auth-guard';
 
 const editorOnly = pipe(customClaims, map(claims => claims.role === "editor"));
-
-const redirectToProfileEdit = map(([user]) => !!user && ['profiles', user.uid, 'edit']);
-
-const accountAdmin = switchMap(([user, next]) => 
-    user ? user.getIdTokenResult().then(idTokenResult => {
-        idTokenResult.claims[`account-${next.params.accountId}-role`] === "admin"
-    }) : of(false)
-)
+const redirectToProfileEditOrLogin = map(user => user ? ['profiles', user.uid, 'edit'] : ['login']);
+const onlyAllowSelf = (next) => map(user => !!user && next.params.userId === user.uid);
+const accountAdmin = (next) => pipe(customClaims, map(claims => claims[`account-${next.params.accountId}-role`] === "admin"));
 ```
