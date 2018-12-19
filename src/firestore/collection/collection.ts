@@ -104,12 +104,18 @@ export class AngularFirestoreCollection<T=DocumentData> {
   /**
    * Listen to all documents in the collection and its possible query as an Observable.
    */
-  valueChanges(): Observable<T[]> {
+  valueChanges(idField?: string): Observable<T[]> {
     const fromCollectionRef$ = fromCollectionRef<T>(this.query);
     const scheduled$ = this.afs.scheduler.runOutsideAngular(fromCollectionRef$);
     return this.afs.scheduler.keepUnstableUntilFirst(scheduled$)
       .pipe(
-        map(actions => actions.payload.docs.map(a => a.data()))
+        map(actions => actions.payload.docs.map(a => { 
+            return { 
+              ...a.data() as Object, 
+              ...(idField ? { [idField]: a.id } : null) 
+            } as T;
+          })
+        )
       );
   }
 

@@ -73,9 +73,9 @@ interface DocumentSnapshot {
 
 There are multiple ways of streaming collection data from Firestore. 
 
-### `valueChanges()`
+### `valueChanges(idField?: string)`
 
-**What is it?** - The current state of your collection. Returns an Observable of data as a synchronized array of JSON objects. All Snapshot metadata is stripped and just the method provides only the data.
+**What is it?** - The current state of your collection. Returns an Observable of data as a synchronized array of JSON objects. All Snapshot metadata is stripped and just the method provides only the data. Optionally, you can pass an `idField` string to include the document ID.  
 
 **Why would you use it?** - When you just need a list of data. No document metadata is attached to the resulting array which makes it simple to render to a view.
 
