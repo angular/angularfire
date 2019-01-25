@@ -79,7 +79,7 @@ There are multiple ways of streaming collection data from Firestore.
 
 **Why would you use it?** - When you just need a list of data. No document metadata is attached to the resulting array which makes it simple to render to a view.
 
-**When would you not use it?** - When you need a more complex data structure than an array or you need the `id` of each document to use data manipulation methods. This method assumes you either are saving the `id` to the document data or using a "readonly" approach.
+**When would you not use it?** - When you need a more complex data structure than an array.
 
 **Best practices** - Use this method to display data on a page. It's simple but effective. Use `.snapshotChanges()` once your needs become more complex.
 
