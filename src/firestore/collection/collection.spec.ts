@@ -73,7 +73,7 @@ describe('AngularFirestoreCollection', () => {
       const ITEMS = 1;
       const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
       const idField = 'myCustomID';
-      const sub = stocks.valueChanges(idField).subscribe(data => {
+      const sub = stocks.valueChanges({idField}).subscribe(data => {
         sub.unsubscribe();
         const stock = data[0];
         expect(stock[idField]).toBeDefined();
