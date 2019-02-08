@@ -18,7 +18,7 @@ export const EnablePersistenceToken = new InjectionToken<boolean>('angularfire2.
 export const PersistenceSettingsToken = new InjectionToken<PersistenceSettings|undefined>('angularfire2.firestore.persistenceSettings');
 export const FirestoreSettingsToken = new InjectionToken<Settings>('angularfire2.firestore.settings');
 
-export const DefaultFirestoreSettings = {timestampsInSnapshots: true} as Settings;
+export const DefaultFirestoreSettings = {} as Settings;
 
 /**
  * A utility methods for associating a collection reference with
