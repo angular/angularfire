@@ -1,4 +1,5 @@
-import { InjectionToken, NgZone, PLATFORM_ID, Injectable, Inject, Optional } from '@angular/core';
+import { ApplicationRef, InjectionToken, NgZone, PLATFORM_ID, Injectable, Inject, Optional } from '@angular/core';
+import { TransferState } from '@angular/platform-browser';
 
 import { Observable, of, from } from 'rxjs';
 
@@ -10,6 +11,7 @@ import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsT
 import { isPlatformBrowser } from '@angular/common';
 
 import { firestore } from 'firebase/app';
+import { addStateTransferCapabilities } from './state-transfer';
 
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
@@ -17,6 +19,7 @@ import { firestore } from 'firebase/app';
 export const EnablePersistenceToken = new InjectionToken<boolean>('angularfire2.enableFirestorePersistence');
 export const PersistenceSettingsToken = new InjectionToken<PersistenceSettings|undefined>('angularfire2.firestore.persistenceSettings');
 export const FirestoreSettingsToken = new InjectionToken<Settings>('angularfire2.firestore.settings');
+export const EnableStateTransferToken = new InjectionToken<boolean>('angularfire2.firestore.enableStateTransfer');
 
 export const DefaultFirestoreSettings = {timestampsInSnapshots: true} as Settings;
 
@@ -108,11 +111,14 @@ export class AngularFirestore {
   constructor(
     @Inject(FirebaseOptionsToken) options:FirebaseOptions,
     @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|undefined,
-    @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean,
-    @Optional() @Inject(FirestoreSettingsToken) settings: Settings,
+    @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean|undefined,
+    @Optional() @Inject(FirestoreSettingsToken) settings: Settings|undefined,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
     @Optional() @Inject(PersistenceSettingsToken) persistenceSettings: PersistenceSettings|undefined,
+    @Optional() @Inject(EnableStateTransferToken) private stateTransferEnabled: boolean|undefined,
+    private transferState: TransferState,
+    private appRef: ApplicationRef
   ) {
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.firestore = zone.runOutsideAngular(() => {
@@ -155,6 +161,7 @@ export class AngularFirestore {
       collectionRef = pathOrRef;
     }
     const { ref, query } = associateQuery(collectionRef, queryFn);
+    if (this.stateTransferEnabled) { addStateTransferCapabilities(ref, this.transferState, this.appRef); }
     return new AngularFirestoreCollection<T>(ref, query, this);
   }
 
@@ -174,6 +181,7 @@ export class AngularFirestore {
     } else {
       ref = pathOrRef;
     }
+    if (this.stateTransferEnabled) { addStateTransferCapabilities(ref, this.transferState, this.appRef); }
     return new AngularFirestoreDocument<T>(ref, this);
   }
 
