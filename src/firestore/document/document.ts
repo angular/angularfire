@@ -1,12 +1,14 @@
 import { Observable, from } from 'rxjs';
 import { DocumentReference, SetOptions, DocumentData, QueryFn, Action, DocumentSnapshot } from '../interfaces';
 import { fromDocRef } from '../observable/fromRef';
-import { map } from 'rxjs/operators';
+import { map, take, tap } from 'rxjs/operators';
 
 import { AngularFirestore, associateQuery } from '../firestore';
 import { AngularFirestoreCollection } from '../collection/collection';
 import { firestore } from 'firebase/app';
 import { runInZone } from '@angular/fire';
+
+import { isPlatformServer } from '@angular/common';
 
 /**
  * AngularFirestoreDocument service
@@ -81,7 +83,9 @@ export class AngularFirestoreDocument<T=DocumentData> {
   snapshotChanges(): Observable<Action<DocumentSnapshot<T>>> {
     const fromDocRef$ = fromDocRef<T>(this.ref);
     const scheduledFromDocRef$ = this.afs.scheduler.runOutsideAngular(fromDocRef$);
-    return this.afs.scheduler.keepUnstableUntilFirst(scheduledFromDocRef$);
+    return this.afs.scheduler.keepUnstableUntilFirst(scheduledFromDocRef$).pipe(
+      isPlatformServer(this.afs.platformId) ? take(1) : tap(),
+    );
   }
 
   /**

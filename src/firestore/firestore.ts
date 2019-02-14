@@ -10,7 +10,7 @@ import { AngularFirestoreCollection } from './collection/collection';
 import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
 import { isPlatformBrowser } from '@angular/common';
 
-import { firestore } from 'firebase/app';
+import { firestore, SDK_VERSION } from 'firebase/app';
 import { addStateTransferCapabilities } from './state-transfer';
 
 /**
@@ -21,7 +21,8 @@ export const PersistenceSettingsToken = new InjectionToken<PersistenceSettings|u
 export const FirestoreSettingsToken = new InjectionToken<Settings>('angularfire2.firestore.settings');
 export const EnableStateTransferToken = new InjectionToken<boolean>('angularfire2.firestore.enableStateTransfer');
 
-export const DefaultFirestoreSettings = {timestampsInSnapshots: true} as Settings;
+// {timestampsInSnapshots: true} was depreciated in 5.8.0
+export const DefaultFirestoreSettings = (parseFloat(SDK_VERSION) > 5.8 ? {timestampsInSnapshots: true} : {}) as Settings;
 
 /**
  * A utility methods for associating a collection reference with
@@ -113,11 +114,11 @@ export class AngularFirestore {
     @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|undefined,
     @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean|undefined,
     @Optional() @Inject(FirestoreSettingsToken) settings: Settings|undefined,
-    @Inject(PLATFORM_ID) platformId: Object,
+    @Inject(PLATFORM_ID) public platformId: Object,
     zone: NgZone,
     @Optional() @Inject(PersistenceSettingsToken) persistenceSettings: PersistenceSettings|undefined,
     @Optional() @Inject(EnableStateTransferToken) private stateTransferEnabled: boolean|undefined,
-    private transferState: TransferState,
+    @Optional() private transferState: TransferState|undefined, // TODO make optional
     private appRef: ApplicationRef
   ) {
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
@@ -161,7 +162,7 @@ export class AngularFirestore {
       collectionRef = pathOrRef;
     }
     const { ref, query } = associateQuery(collectionRef, queryFn);
-    if (this.stateTransferEnabled) { addStateTransferCapabilities(ref, this.transferState, this.appRef); }
+    if (this.stateTransferEnabled && this.transferState) { addStateTransferCapabilities(ref, this.transferState, this.appRef, this.platformId); }
     return new AngularFirestoreCollection<T>(ref, query, this);
   }
 
@@ -181,7 +182,7 @@ export class AngularFirestore {
     } else {
       ref = pathOrRef;
     }
-    if (this.stateTransferEnabled) { addStateTransferCapabilities(ref, this.transferState, this.appRef); }
+    if (this.stateTransferEnabled && this.transferState) { addStateTransferCapabilities(ref, this.transferState, this.appRef, this.platformId); }
     return new AngularFirestoreDocument<T>(ref, this);
   }
 
