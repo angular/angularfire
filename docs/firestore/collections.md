@@ -176,7 +176,7 @@ export class AppComponent {
 
 ### `stateChanges()`
 
-**What is it?** - Returns an Observable of the most recent changes as a `DocumentChangeAction[]`. On initial subscription, all relevant documents are returned as `'added'` `DocumentChangeAction` objects. At the moment, there is no way to *just* subscribe to document changes and not also return all relevant documents on initial subscription.
+**What is it?** - Returns an Observable of the most recent changes as a `DocumentChangeAction[]`. On initial subscription, all relevant documents are returned as `'added'` `DocumentChangeAction` objects. At the moment, there is no way to *just* subscribe to document changes and not also return all relevant documents on initial subscription (though one way to "fake" this functionality is to add an `updatedAt` timestamp to your documents and then subscribe to `stateChanges()` where `updatedAt > now`).
 
 **Why would you use it?** - The above methods return a synchronized array sorted in query order. `stateChanges()` emits changes as they occur rather than syncing the query order. This works well for ngrx integrations as you can build your own data structure in your reducer methods.
 
