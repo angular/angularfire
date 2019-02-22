@@ -1,5 +1,5 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformServer } from '@angular/common';
 import { messaging } from 'firebase/app';
 import { Observable, empty, from, of, throwError } from 'rxjs';
 import { mergeMap, catchError, map, switchMap, concat, defaultIfEmpty } from 'rxjs/operators';
@@ -23,7 +23,7 @@ export class AngularFireMessaging {
     zone: NgZone
   ) {
 
-    if (isPlatformBrowser(platformId)) {
+    if (!isPlatformServer(platformId)) {
 
       // @ts-ignore
       const requireMessaging = from(import('firebase/messaging'));
