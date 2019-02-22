@@ -7,7 +7,7 @@ import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 
 import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformServer } from '@angular/common';
 
 import { firestore } from 'firebase/app';
 
@@ -122,7 +122,7 @@ export class AngularFirestore {
       return firestore;
     });
 
-    if (shouldEnablePersistence && isPlatformBrowser(platformId)) {
+    if (shouldEnablePersistence && !isPlatformServer(platformId)) {
       // We need to try/catch here because not all enablePersistence() failures are caught
       // https://github.com/firebase/firebase-js-sdk/issues/608
       const enablePersistence = () => {
