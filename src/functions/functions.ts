@@ -18,10 +18,10 @@ export class AngularFireFunctions {
 
   constructor(
     @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|undefined,
+    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|null|undefined,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
-    @Optional() @Inject(FunctionsRegionToken) region:string|undefined
+    @Optional() @Inject(FunctionsRegionToken) region:string|null
   ) {
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     
