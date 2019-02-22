@@ -1,4 +1,4 @@
-# Disallow unauthorized users with Router Guards
+# Route users with AngularFire guards
 
 ## Basic example
 

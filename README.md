@@ -88,7 +88,7 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 ### Authenticate users
 
 - [Getting started with Firebase Authentication](docs/auth/getting-started.md)
-- [Disallow unauthorized users with Router Guards](docs/auth/router-gaurds.md)
+- [Route users with AngularFire guards](docs/auth/router-guards.md)
 
 ### Upload files
 
