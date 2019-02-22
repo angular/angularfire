@@ -19,7 +19,7 @@ export class AngularFireAuthGuard implements CanActivate {
     const authPipeFactory: AuthPipeGenerator = next.data.authGuardPipe || (() => loggedIn);
     return this.afAuth.user.pipe(
         take(1),
-        authPipe(next, state),
+        authPipeFactory(next, state),
         map(canActivate => typeof canActivate == "boolean" ? canActivate : this.router.createUrlTree(canActivate))
     );
   }
