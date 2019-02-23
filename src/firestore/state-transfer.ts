@@ -9,7 +9,7 @@ export const addStateTransferCapabilities = (ref:firestore.CollectionReference|f
         const originalListen = internalClient.listen;
         const isServer = isPlatformServer(platformId)
         // Inject our cache interceptor into internalClient listener
-        // @ts-ignore
+        // @ts-ignore doesn't like the function def in strict mode
         function newListen(query:any, asyncObserver:any, options:{}) {
             const canonicalId = query.canonicalId();
             const stateKey = makeStateKey(canonicalId);

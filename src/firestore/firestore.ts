@@ -102,6 +102,7 @@ export class AngularFirestore {
   public readonly firestore: FirebaseFirestore;
   public readonly persistenceEnabled$: Observable<boolean>;
   public readonly scheduler: FirebaseZoneScheduler;
+  private readonly transferState: TransferState|null;
 
   /**
    * Each Feature of AngularFire has a FirebaseApp injected. This way we
@@ -112,15 +113,16 @@ export class AngularFirestore {
   constructor(
     @Inject(FirebaseOptionsToken) options:FirebaseOptions,
     @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|undefined,
-    @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean|undefined,
-    @Optional() @Inject(FirestoreSettingsToken) settings: Settings|undefined,
-    @Inject(PLATFORM_ID) public platformId: Object,
+    @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean,
+    @Optional() @Inject(FirestoreSettingsToken) settings: Settings,
+    @Inject(PLATFORM_ID) private platformId: Object,
     zone: NgZone,
     @Optional() @Inject(PersistenceSettingsToken) persistenceSettings: PersistenceSettings|undefined,
-    @Optional() @Inject(EnableStateTransferToken) private stateTransferEnabled: boolean|undefined,
-    @Optional() private transferState: TransferState|undefined, // TODO make optional
+    @Optional() @Inject(EnableStateTransferToken) private stateTransferEnabled: boolean|null,
+    @Optional() transferState: TransferState, // TODO failing if I make this TransferState|null, seems I need the DI token
     private appRef: ApplicationRef
   ) {
+    this.transferState = transferState;
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.firestore = zone.runOutsideAngular(() => {
       const app = _firebaseAppFactory(options, nameOrConfig);

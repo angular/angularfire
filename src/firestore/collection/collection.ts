@@ -1,6 +1,6 @@
 import { Observable, from } from 'rxjs';
 import { fromCollectionRef } from '../observable/fromRef';
-import { map, filter, scan, take, tap } from 'rxjs/operators';
+import { map, filter, scan } from 'rxjs/operators';
 import { firestore } from 'firebase/app';
 
 import { DocumentChangeType, CollectionReference, Query, DocumentReference, DocumentData, DocumentChangeAction } from '../interfaces';
@@ -8,8 +8,6 @@ import { docChanges, sortedChanges } from './changes';
 import { AngularFirestoreDocument } from '../document/document';
 import { AngularFirestore } from '../firestore';
 import { runInZone } from '@angular/fire';
-
-import { isPlatformServer } from '@angular/common';
 
 export function validateEventsArray(events?: DocumentChangeType[]) {
   if(!events || events!.length === 0) {
@@ -77,7 +75,6 @@ export class AngularFirestoreCollection<T=DocumentData> {
         )
       )
       .pipe(
-        isPlatformServer(this.afs.platformId) ? take(1) : tap(),
         map(actions => actions.filter(change => events.indexOf(change.type) > -1)),
         filter(changes =>  changes.length > 0)
       );
@@ -101,9 +98,7 @@ export class AngularFirestoreCollection<T=DocumentData> {
     const validatedEvents = validateEventsArray(events);
     const sortedChanges$ = sortedChanges<T>(this.query, validatedEvents);
     const scheduledSortedChanges$ = this.afs.scheduler.runOutsideAngular(sortedChanges$);
-    return this.afs.scheduler.keepUnstableUntilFirst(scheduledSortedChanges$).pipe(
-      isPlatformServer(this.afs.platformId) ? take(1) : tap()
-    );
+    return this.afs.scheduler.keepUnstableUntilFirst(scheduledSortedChanges$);
   }
 
   /**
@@ -114,7 +109,6 @@ export class AngularFirestoreCollection<T=DocumentData> {
     const scheduled$ = this.afs.scheduler.runOutsideAngular(fromCollectionRef$);
     return this.afs.scheduler.keepUnstableUntilFirst(scheduled$)
       .pipe(
-        isPlatformServer(this.afs.platformId) ? take(1) : tap(),
         map(actions => actions.payload.docs.map(a => a.data()))
       );
   }
