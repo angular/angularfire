@@ -22,7 +22,7 @@ export const FirestoreSettingsToken = new InjectionToken<Settings>('angularfire2
 export const EnableStateTransferToken = new InjectionToken<boolean>('angularfire2.firestore.enableStateTransfer');
 
 // {timestampsInSnapshots: true} was depreciated in 5.8.0
-export const DefaultFirestoreSettings = (parseFloat(SDK_VERSION) > 5.8 ? {timestampsInSnapshots: true} : {}) as Settings;
+export const DefaultFirestoreSettings = (parseFloat(SDK_VERSION) < 5.8 ? {timestampsInSnapshots: true} : {}) as Settings;
 
 /**
  * A utility methods for associating a collection reference with
