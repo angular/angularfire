@@ -34,7 +34,7 @@ export class FirebaseApp implements app.App {
     functions: (region?: string) => FirebaseFunctions;
 }
 
-export function _firebaseAppFactory(options: FirebaseOptions, nameOrConfig?: string | FirebaseAppConfig) {
+export function _firebaseAppFactory(options: FirebaseOptions, nameOrConfig?: string|FirebaseAppConfig|null) {
     const name = typeof nameOrConfig === 'string' && nameOrConfig || '[DEFAULT]';
     const config = typeof nameOrConfig === 'object' && nameOrConfig || {};
     config.name = config.name || name;
