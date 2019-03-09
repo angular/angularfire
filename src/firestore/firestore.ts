@@ -9,7 +9,7 @@ import { AngularFirestoreCollection } from './collection/collection';
 import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
 import { isPlatformBrowser } from '@angular/common';
 
-import { firestore } from 'firebase/app';
+import { firestore, SDK_VERSION } from 'firebase/app';
 
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
@@ -18,7 +18,8 @@ export const EnablePersistenceToken = new InjectionToken<boolean>('angularfire2.
 export const PersistenceSettingsToken = new InjectionToken<PersistenceSettings|undefined>('angularfire2.firestore.persistenceSettings');
 export const FirestoreSettingsToken = new InjectionToken<Settings>('angularfire2.firestore.settings');
 
-export const DefaultFirestoreSettings = {timestampsInSnapshots: true} as Settings;
+// timestampsInSnapshots was depreciated in 5.8.0
+export const DefaultFirestoreSettings = (parseFloat(SDK_VERSION) < 5.8 ? {timestampsInSnapshots: true} : {}) as Settings;
 
 /**
  * A utility methods for associating a collection reference with
