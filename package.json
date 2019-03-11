@@ -1,6 +1,6 @@
 {
   "name": "angularfire2",
-  "version": "5.1.0",
+  "version": "5.1.2",
   "description": "The official library of Firebase and Angular.",
   "private": true,
   "scripts": {
@@ -12,7 +12,7 @@
     "delayed_karma": "sleep 10 && karma start",
     "build": "rm -rf dist && node tools/build.js",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 1",
-    "build:wrapper": "npm i --prefix wrapper && VERSION=5.1.0 npm run --prefix wrapper build"
+    "build:wrapper": "npm i --prefix wrapper && VERSION=5.1.2 npm run --prefix wrapper build"
   },
   "keywords": [
     "angular",
