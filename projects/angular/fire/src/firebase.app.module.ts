@@ -53,7 +53,7 @@ const FirebaseAppProvider = {
         [new Optional(), FirebaseNameOrConfigToken]
     ]
 };
- 
+
 @NgModule({
     providers: [ FirebaseAppProvider ],
 })
