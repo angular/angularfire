@@ -2,9 +2,10 @@ import { InjectionToken, NgZone, PLATFORM_ID, Injectable, Inject, Optional } fro
 
 import { Observable, of, from } from 'rxjs';
 
-import { Settings, PersistenceSettings, CollectionReference, DocumentReference, QueryFn, AssociatedReference } from './interfaces';
+import { Settings, PersistenceSettings, CollectionReference, DocumentReference, QueryFn, Query, QueryGroupFn, AssociatedReference } from './interfaces';
 import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
+import { AngularFirestoreCollectionGroup } from './collection-group/collection-group';
 
 import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
@@ -157,6 +158,19 @@ export class AngularFirestore {
     }
     const { ref, query } = associateQuery(collectionRef, queryFn);
     return new AngularFirestoreCollection<T>(ref, query, this);
+  }
+
+  /**
+   * Create a reference to a Firestore Collection Group based on a collectionId
+   * and an optional query function to narrow the result
+   * set.
+   * @param collectionId
+   * @param queryGroupFn
+   */
+  collectionGroup<T>(collectionId: string, queryGroupFn?: QueryGroupFn): AngularFirestoreCollectionGroup<T> {
+    const queryFn = queryGroupFn || (ref => ref);
+    const collectionGroup: Query = (this.firestore as any)._collectionGroup(collectionId);
+    return new AngularFirestoreCollectionGroup<T>(queryFn(collectionGroup), this);
   }
 
   /**
