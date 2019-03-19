@@ -8,7 +8,7 @@ export interface AngularFireStorageReference {
   getMetadata(): Observable<any>;
   delete(): Observable<any>;
   child(path: string): any;
-  updateMetatdata(meta: SettableMetadata): Observable<any>;
+  updateMetadata(meta: SettableMetadata): Observable<any>;
   put(data: any, metadata?: UploadMetadata | undefined): AngularFireUploadTask;
   putString(data: string, format?: string | undefined, metadata?: UploadMetadata | undefined): AngularFireUploadTask;
 }
@@ -32,7 +32,7 @@ export function createStorageRef(ref: Reference, scheduler: FirebaseZoneSchedule
     ),
     delete: () => from(ref.delete()),
     child: (path: string) => createStorageRef(ref.child(path), scheduler),
-    updateMetatdata: (meta: SettableMetadata) => from(ref.updateMetadata(meta)),
+    updateMetadata: (meta: SettableMetadata) => from(ref.updateMetadata(meta)),
     put: (data: any, metadata?: UploadMetadata) => {
       const task = ref.put(data, metadata);
       return createUploadTask(task);
