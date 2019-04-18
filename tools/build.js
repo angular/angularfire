@@ -45,7 +45,11 @@ const VERSIONS = {
   WS_VERSION: pkg.dependencies['ws'],
   BUFFERUTIL_VERSION: pkg.optionalDependencies['bufferutil'],
   UTF_8_VALIDATE_VERSION: pkg.optionalDependencies['utf-8-validate'],
-  XHR2_VERSION: pkg.dependencies['xhr2']
+  XHR2_VERSION: pkg.dependencies['xhr2'],
+  FIREBASE_TOOLS_VERSION: pkg.dependencies["firebase-tools"],
+  FUZZY_VERSION: pkg.dependencies["fuzzy"],
+  INQUIRER_VERSION: pkg.dependencies["inquirer"],
+  INQUIRER_AUTOCOMPLETE_VERSION: pkg.dependencies["inquirer-autocomplete-prompt"]
 };
 
 const MODULE_NAMES = {
@@ -240,6 +244,18 @@ function copyNodeFixes() {
   return copy(`${process.cwd()}/src/firebase-node`, `${process.cwd()}/dist/packages-dist/firebase-node`);
 }
 
+function copySchematicFiles() {
+  return Promise.all([
+    copy(`${process.cwd()}/src/core/builders.json`, `${process.cwd()}/dist/packages-dist/builders.json`),
+    copy(`${process.cwd()}/src/core/collection.json`, `${process.cwd()}/dist/packages-dist/collection.json`),
+    copy(`${process.cwd()}/src/schematics/deploy/schema.json`, `${process.cwd()}/dist/packages-dist/schematics/deploy`)
+  ]);
+}
+
+function compileSchematics() {
+  return spawnObservable(TSC, [`-p`, `${process.cwd()}/src/schematics/tsconfig.json`]);
+}
+
 function measure(module) {
   const path = `${process.cwd()}/dist/packages-dist/bundles/${module}.umd.js`;
   const file = readFileSync(path);
@@ -317,12 +333,14 @@ function buildModules(globals) {
 function buildLibrary(globals) {
   const modules$ = buildModules(globals);
   return forkJoin(modules$).pipe(
-    switchMap(() => from(createTestUmd(globals))),
     switchMap(() => from(copyNpmIgnore())),
     switchMap(() => from(copyReadme())),
     switchMap(() => from(copyDocs())),
     switchMap(() => from(copyNodeFixes())),
+    switchMap(() => compileSchematics()),
+    switchMap(() => from(copySchematicFiles())),
     switchMap(() => replaceVersionsObservable('firebase-node', VERSIONS)),
+    switchMap(() => from(createTestUmd(globals))),
     tap(() => {
       const coreStats = measure('core');
       const authStats = measure('auth');

@@ -1,8 +1,8 @@
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect/src/index2';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
-import deploy from './actions/deploy';
+import deploy from './actions';
 import { experimental, join, normalize } from '@angular-devkit/core';
-import { getFirebaseProjectName } from '../shared/utils';
+import { getFirebaseProjectName } from '../utils';
 
 // Call the createBuilder() function to create a builder. This mirrors
 // createJobHandler() but add typings specific to Architect Builders.

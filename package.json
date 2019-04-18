@@ -35,20 +35,28 @@
     "@angular/core": ">=6.0.0 <8",
     "@angular/platform-browser": ">=6.0.0 <8",
     "@angular/platform-browser-dynamic": ">=6.0.0 <8",
+    "@angular-devkit/architect": "^0.14.0-beta.5",
+    "@angular-devkit/core": "^8.0.0-beta.5",
+    "@angular-devkit/schematics": "^8.0.0-beta.5",
     "firebase": "^5.5.0",
+    "firebase-tools": "^6.3.1",
     "rxjs": "^6.0.0",
     "ws": "^3.3.2",
     "xhr2": "^0.1.4",
-    "zone.js": "^0.8.0"
+    "zone.js": "^0.8.0",
+    "fuzzy": "^0.1.3",
+    "inquirer": "^6.2.2",
+    "inquirer-autocomplete-prompt": "^1.0.1"
   },
   "optionalDependencies": {
     "bufferutil": "~3.0.0",
     "utf-8-validate": "~4.0.0"
-  },
+  },  
   "devDependencies": {
     "@angular/compiler-cli": ">=6.0.0 <8",
     "@angular/platform-server": ">=6.0.0 <8",
     "@angular/animations": ">=6.0.0 <8",
+    "@types/inquirer": "^0.0.44",
     "@types/jasmine": "^2.5.36",
     "@types/request": "0.0.30",
     "concurrently": "^2.2.0",
@@ -79,6 +87,7 @@
     "rollup": "^0.64.1",
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-watch": "^4.3.1",
+    "schematics-utilities": "^1.1.1",
     "shelljs": "^0.8.0",
     "systemjs": "^0.19.16",
     "systemjs-builder": "^0.15.7",

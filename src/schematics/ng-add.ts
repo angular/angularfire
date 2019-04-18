@@ -1,5 +1,5 @@
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
-import { FirebaseJSON, FirebaseRc } from '../shared/types';
+import { FirebaseJSON, FirebaseRc } from './interfaces';
 import { experimental, JsonParseMode, parseJson } from '@angular-devkit/core';
 
 const stringifyFormatted = (obj: any) => JSON.stringify(obj, null, 2);

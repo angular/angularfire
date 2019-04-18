@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import * as inquirer from 'inquirer';
-import { FirebaseRc, Project } from './types';
+import { FirebaseRc, Project } from './interfaces';
 import { join } from 'path';
 
 const firebase = require('firebase-tools');

@@ -1,5 +1,5 @@
 import { BuilderContext } from '@angular-devkit/architect/src/index2';
-import { FirebaseTools } from '../../shared/types';
+import { FirebaseTools } from '../interfaces';
 
 export default async function deploy(firebaseTools: FirebaseTools, context: BuilderContext, projectRoot: string, firebaseProject?: string) {
     if (!firebaseProject) {

@@ -1,10 +1,8 @@
 import { Tree } from '@angular-devkit/schematics';
 import { from, Observable } from 'rxjs';
-
-import { Project } from '../shared/types';
-
+import { Project } from './interfaces';
 import { ngAdd } from './ng-add';
-import { listProjects, projectPrompt } from '../shared/utils';
+import { listProjects, projectPrompt } from './utils';
 
 interface DeployOptions {
     project: string;
@@ -14,8 +12,7 @@ interface DeployOptions {
 // per file.
 export function ngDeploy({project}: DeployOptions): (host: Tree) => Observable<Tree> {
     return (host: Tree): Observable<Tree> => {
-
-        return from<Promise<Tree>>(
+        return from<Tree>(
             listProjects().then((projects: Project[]) => {
                 return projectPrompt(projects).then(({firebaseProject}: any) => {
                     return ngAdd(host, {firebaseProject, project})
