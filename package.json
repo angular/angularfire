@@ -51,7 +51,7 @@
   "optionalDependencies": {
     "bufferutil": "~3.0.0",
     "utf-8-validate": "~4.0.0"
-  },  
+  },
   "devDependencies": {
     "@angular/compiler-cli": ">=6.0.0 <8",
     "@angular/platform-server": ">=6.0.0 <8",
