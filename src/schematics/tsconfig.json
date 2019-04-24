@@ -20,5 +20,5 @@
       "target": "es6",
       "types": [ "node"]
     },
-    "include": ["*"]
+    "include": ["**/*.ts"]
 }
