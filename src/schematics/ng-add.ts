@@ -157,7 +157,7 @@ export function ngAdd(tree: Tree, options: NgAddOptions) {
     const outputPath = project.architect.build.options.outputPath;
 
     project.architect['deploy'] = {
-        builder: 'ng-deploy:deploy',
+        builder: '@angular/fire:deploy',
         options: {}
     };
 
