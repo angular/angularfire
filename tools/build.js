@@ -267,10 +267,6 @@ function copySchematicFiles() {
   ]);
 }
 
-function compileSchematics() {
-  return spawnObservable(TSC, [`-p`, `${process.cwd()}/src/schematics/tsconfig.json`]);
-}
-
 function measure(module) {
   const path = `${process.cwd()}/dist/packages-dist/bundles/${module}.umd.js`;
   const file = readFileSync(path);
@@ -354,7 +350,6 @@ function buildLibrary(globals) {
     switchMap(() => from(copyReadme())),
     switchMap(() => from(copyDocs())),
     switchMap(() => from(copyNodeFixes())),
-    switchMap(() => compileSchematics()),
     switchMap(() => from(copySchematicFiles())),
     switchMap(() => replaceVersionsObservable('firebase-node', VERSIONS)),
     switchMap(() => from(createTestUmd(globals))),
