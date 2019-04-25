@@ -19,7 +19,9 @@ export const PersistenceSettingsToken = new InjectionToken<PersistenceSettings|u
 export const FirestoreSettingsToken = new InjectionToken<Settings>('angularfire2.firestore.settings');
 
 // timestampsInSnapshots was depreciated in 5.8.0
-export const DefaultFirestoreSettings = (parseFloat(SDK_VERSION) < 5.8 ? {timestampsInSnapshots: true} : {}) as Settings;
+const major = parseInt(SDK_VERSION.split('.')[0]);
+const minor = parseInt(SDK_VERSION.split('.')[1]);
+export const DefaultFirestoreSettings = ((major < 5 || (major == 5 && minor < 8)) ? {timestampsInSnapshots: true} : {}) as Settings;
 
 /**
  * A utility methods for associating a collection reference with
