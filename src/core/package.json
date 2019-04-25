@@ -27,5 +27,6 @@
     "rxjs": "RXJS_VERSION",
     "zone.js": "ZONEJS_VERSION"
   },
+  "schematics": "./schematics/collection.json",
   "typings": "index.d.ts"
 }

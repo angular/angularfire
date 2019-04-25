@@ -30,7 +30,7 @@
 ## Install
 
 ```bash
-npm install firebase @angular/fire --save
+ng add @angular/fire
 ```
 
 ## Example use:
