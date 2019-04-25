@@ -1,0 +1,20 @@
+{
+    "extends": "./tsconfig-build.json",
+    "compilerOptions": {
+        "target": "es5",
+        "outDir": "../../dist/packages-dist/schematics",
+        "declaration": true
+    },
+    "files": [
+        "public_api.ts",
+        "../../node_modules/zone.js/dist/zone.js.d.ts"
+    ],
+    "angularCompilerOptions": {
+        "skipTemplateCodegen": true,
+        "strictMetadataEmit": true,
+        "enableSummariesForJit": false,
+        "flatModuleOutFile": "index.js",
+        "flatModuleId": "@angular/fire/schematics"
+    }
+  }
+  

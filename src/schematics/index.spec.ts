@@ -1,2 +1,3 @@
 import './ng-add.spec';
-import './deploy/index.spec';
+import './deploy/builder.spec';
+import './deploy/actions.spec';

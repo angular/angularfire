@@ -16,6 +16,11 @@ const GLOBALS = {
   '@angular/core': 'ng.core',
   '@angular/core/testing': 'ng.core.testing',
   '@angular/platform-browser': 'ng.platformBrowser',
+  '@angular-devkit/schematics': 'ng-devkit.schematics',
+  '@angular-devkit/core': 'ng-devkit.core',
+  '@angular-devkit/core/node': 'ng-devkit.core.node',
+  '@angular-devkit/architect': 'ng-devkit.architect',
+  '@angular-devkit/architect/src/index2': 'ng-devkit.architect-2',
   'firebase': 'firebase',
   'firebase/app': 'firebase',
   'firebase/auth': 'firebase',
@@ -32,6 +37,9 @@ const GLOBALS = {
   '@angular/fire/functions': 'angularfire2.functions',
   '@angular/fire/storage': 'angularfire2.storage',
   '@angular/fire/messaging': 'angularfire2.messaging',
+  'fs': 'node.fs',
+  'path': 'node.path',
+  'inquirer': 'inquirer'
 };
 
 // Map of dependency versions across all packages
@@ -59,6 +67,7 @@ const MODULE_NAMES = {
   "database-deprecated": 'angularfire2.database_deprecated',
   firestore: 'angularfire2.firestore',
   functions: 'angularfire2.functions',
+  schematics: 'angularfire2.schematics',
   storage: 'angularfire2.storage',
   messaging: 'angularfire2.messaging',
 };
@@ -70,6 +79,7 @@ const ENTRIES = {
   "database-deprecated": `${process.cwd()}/dist/packages-dist/database-deprecated/index.js`,
   firestore: `${process.cwd()}/dist/packages-dist/firestore/index.js`,
   functions: `${process.cwd()}/dist/packages-dist/functions/index.js`,
+  schematics: `${process.cwd()}/dist/packages-dist/schematics/index.js`,
   storage: `${process.cwd()}/dist/packages-dist/storage/index.js`,
   messaging: `${process.cwd()}/dist/packages-dist/messaging/index.js`,
 };
@@ -202,21 +212,26 @@ function getDestPackageFile(moduleName) {
 function replaceVersionsObservable(name, versions) {
   return Observable.create((observer) => {
     const package = getSrcPackageFile(name);
-    let pkg = readFileSync(package, 'utf8');
-    const regexs = Object.keys(versions).map(key =>
-      ({ expr: new RegExp(key, 'g'), key, val: versions[key] }));
-    regexs.forEach(reg => {
-      pkg = pkg.replace(reg.expr, reg.val);
-    });
-    const outPath = getDestPackageFile(name);
-    writeFile(outPath, pkg, err => {
-      if (err) {
-        observer.error(err);
-      } else {
-        observer.next(pkg);
-        observer.complete();
-      }
-    });
+    if (package) {
+      let pkg = readFileSync(package, 'utf8');
+      const regexs = Object.keys(versions).map(key =>
+        ({ expr: new RegExp(key, 'g'), key, val: versions[key] }));
+      regexs.forEach(reg => {
+        pkg = pkg.replace(reg.expr, reg.val);
+      });
+      const outPath = getDestPackageFile(name);
+      writeFile(outPath, pkg, err => {
+        if (err) {
+          observer.error(err);
+        } else {
+          observer.next(pkg);
+          observer.complete();
+        }
+      });
+    } else {
+      observer.next();
+      observer.complete();
+    }
   });
 }
 
@@ -316,10 +331,12 @@ function buildModules(globals) {
   const db$ = buildModule('database', globals);
   const firestore$ = buildModule('firestore', globals);
   const functions$ = buildModule('functions', globals);
+  const schematics$ = buildModule('schematics', globals);
   const storage$ = buildModule('storage', globals);
   const messaging$ = buildModule('messaging', globals);
   const dbdep$ = buildModule('database-deprecated', globals);
   return forkJoin(core$, from(copyRootTest())).pipe(
+    switchMapTo(schematics$),
     switchMapTo(auth$),
     switchMapTo(db$),
     switchMapTo(firestore$),

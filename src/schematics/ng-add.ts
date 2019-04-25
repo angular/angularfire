@@ -1,6 +1,10 @@
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
 import { FirebaseJSON, FirebaseRc } from './interfaces';
 import { experimental, JsonParseMode, parseJson } from '@angular-devkit/core';
+import { from } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+import { Project } from './interfaces';
+import { listProjects, projectPrompt } from './utils';
 
 const stringifyFormatted = (obj: any) => JSON.stringify(obj, null, 2);
 
@@ -114,6 +118,17 @@ interface NgAddOptions {
     firebaseProject: string;
     project?: string;
 }
+
+interface DeployOptions {
+  project: string;
+}
+
+// You don't have to export the function as default. You can also have more than one rule factory
+// per file.
+export const ngDeploy = ({project}: DeployOptions) => (host: Tree) => from(listProjects()).pipe(
+  switchMap((projects: Project[]) => projectPrompt(projects)),
+  map(({firebaseProject}: any) => ngAdd(host, {firebaseProject, project}))
+);
 
 export function ngAdd(tree: Tree, options: NgAddOptions) {
     const {path: workspacePath, workspace} = getWorkspace(tree);
