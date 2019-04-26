@@ -1,5 +1,7 @@
 import { InjectionToken, NgModule, Optional } from '@angular/core';
 import { app, auth, database, firestore, functions, messaging, storage } from 'firebase/app';
+import { PerformanceController } from '@firebase/performance/dist/src/controllers/perf';
+
 // @ts-ignore (https://github.com/firebase/firebase-js-sdk/pull/1206)
 import firebase from 'firebase/app'; // once fixed can pull in as "default as firebase" above
 
@@ -28,6 +30,7 @@ export class FirebaseApp implements app.App {
     // automaticDataCollectionEnabled is now private? _automaticDataCollectionEnabled?
     // automaticDataCollectionEnabled: true,
     messaging: () => FirebaseMessaging;
+    performance: () => PerformanceController;
     storage: (storageBucket?: string) => FirebaseStorage;
     delete: () => Promise<void>;
     firestore: () => FirebaseFirestore;
