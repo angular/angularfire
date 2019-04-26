@@ -5,6 +5,8 @@
   "main": "./bundles/core.umd.js",
   "module": "index.js",
   "es2015": "es2015/index.js",
+  "schematics": "./collection.json",
+  "builders": "./builders.json",
   "keywords": [
     "angular",
     "firebase",
@@ -26,6 +28,15 @@
     "firebase": "FIREBASE_VERSION",
     "rxjs": "RXJS_VERSION",
     "zone.js": "ZONEJS_VERSION"
+  },
+  "dependencies": {
+    "@angular-devkit/architect": "^0.14.0-beta.5",
+    "@angular-devkit/core": "ANGULAR_VERSION",
+    "@angular-devkit/schematics": "ANGULAR_VERSION",
+    "firebase-tools": "FIREBASE_TOOLS_VERSION",
+    "fuzzy": "FUZZY_VERSION",
+    "inquirer": "INQUIRER_VERSION",
+    "inquirer-autocomplete-prompt": "INQUIRER_AUTOCOMPLETE_VERSION"
   },
   "typings": "index.d.ts"
 }

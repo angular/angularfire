@@ -16,6 +16,11 @@ const GLOBALS = {
   '@angular/core': 'ng.core',
   '@angular/core/testing': 'ng.core.testing',
   '@angular/platform-browser': 'ng.platformBrowser',
+  '@angular-devkit/schematics': 'ng-devkit.schematics',
+  '@angular-devkit/core': 'ng-devkit.core',
+  '@angular-devkit/core/node': 'ng-devkit.core.node',
+  '@angular-devkit/architect': 'ng-devkit.architect',
+  '@angular-devkit/architect/src/index2': 'ng-devkit.architect-2',
   'firebase': 'firebase',
   'firebase/app': 'firebase',
   'firebase/auth': 'firebase',
@@ -32,6 +37,9 @@ const GLOBALS = {
   '@angular/fire/functions': 'angularfire2.functions',
   '@angular/fire/storage': 'angularfire2.storage',
   '@angular/fire/messaging': 'angularfire2.messaging',
+  'fs': 'node.fs',
+  'path': 'node.path',
+  'inquirer': 'inquirer'
 };
 
 // Map of dependency versions across all packages
@@ -45,7 +53,11 @@ const VERSIONS = {
   WS_VERSION: pkg.dependencies['ws'],
   BUFFERUTIL_VERSION: pkg.optionalDependencies['bufferutil'],
   UTF_8_VALIDATE_VERSION: pkg.optionalDependencies['utf-8-validate'],
-  XHR2_VERSION: pkg.dependencies['xhr2']
+  XHR2_VERSION: pkg.dependencies['xhr2'],
+  FIREBASE_TOOLS_VERSION: pkg.dependencies["firebase-tools"],
+  FUZZY_VERSION: pkg.dependencies["fuzzy"],
+  INQUIRER_VERSION: pkg.dependencies["inquirer"],
+  INQUIRER_AUTOCOMPLETE_VERSION: pkg.dependencies["inquirer-autocomplete-prompt"]
 };
 
 const MODULE_NAMES = {
@@ -55,6 +67,7 @@ const MODULE_NAMES = {
   "database-deprecated": 'angularfire2.database_deprecated',
   firestore: 'angularfire2.firestore',
   functions: 'angularfire2.functions',
+  schematics: 'angularfire2.schematics',
   storage: 'angularfire2.storage',
   messaging: 'angularfire2.messaging',
 };
@@ -66,6 +79,7 @@ const ENTRIES = {
   "database-deprecated": `${process.cwd()}/dist/packages-dist/database-deprecated/index.js`,
   firestore: `${process.cwd()}/dist/packages-dist/firestore/index.js`,
   functions: `${process.cwd()}/dist/packages-dist/functions/index.js`,
+  schematics: `${process.cwd()}/dist/packages-dist/schematics/index.js`,
   storage: `${process.cwd()}/dist/packages-dist/storage/index.js`,
   messaging: `${process.cwd()}/dist/packages-dist/messaging/index.js`,
 };
@@ -198,21 +212,26 @@ function getDestPackageFile(moduleName) {
 function replaceVersionsObservable(name, versions) {
   return Observable.create((observer) => {
     const package = getSrcPackageFile(name);
-    let pkg = readFileSync(package, 'utf8');
-    const regexs = Object.keys(versions).map(key =>
-      ({ expr: new RegExp(key, 'g'), key, val: versions[key] }));
-    regexs.forEach(reg => {
-      pkg = pkg.replace(reg.expr, reg.val);
-    });
-    const outPath = getDestPackageFile(name);
-    writeFile(outPath, pkg, err => {
-      if (err) {
-        observer.error(err);
-      } else {
-        observer.next(pkg);
-        observer.complete();
-      }
-    });
+    if (package) {
+      let pkg = readFileSync(package, 'utf8');
+      const regexs = Object.keys(versions).map(key =>
+        ({ expr: new RegExp(key, 'g'), key, val: versions[key] }));
+      regexs.forEach(reg => {
+        pkg = pkg.replace(reg.expr, reg.val);
+      });
+      const outPath = getDestPackageFile(name);
+      writeFile(outPath, pkg, err => {
+        if (err) {
+          observer.error(err);
+        } else {
+          observer.next(pkg);
+          observer.complete();
+        }
+      });
+    } else {
+      observer.next();
+      observer.complete();
+    }
   });
 }
 
@@ -238,6 +257,14 @@ function copyDocs() {
 
 function copyNodeFixes() {
   return copy(`${process.cwd()}/src/firebase-node`, `${process.cwd()}/dist/packages-dist/firebase-node`);
+}
+
+function copySchematicFiles() {
+  return Promise.all([
+    copy(`${process.cwd()}/src/core/builders.json`, `${process.cwd()}/dist/packages-dist/builders.json`),
+    copy(`${process.cwd()}/src/core/collection.json`, `${process.cwd()}/dist/packages-dist/collection.json`),
+    copy(`${process.cwd()}/src/schematics/deploy/schema.json`, `${process.cwd()}/dist/packages-dist/schematics/deploy/schema.json`)
+  ]);
 }
 
 function measure(module) {
@@ -300,10 +327,12 @@ function buildModules(globals) {
   const db$ = buildModule('database', globals);
   const firestore$ = buildModule('firestore', globals);
   const functions$ = buildModule('functions', globals);
+  const schematics$ = buildModule('schematics', globals);
   const storage$ = buildModule('storage', globals);
   const messaging$ = buildModule('messaging', globals);
   const dbdep$ = buildModule('database-deprecated', globals);
   return forkJoin(core$, from(copyRootTest())).pipe(
+    switchMapTo(schematics$),
     switchMapTo(auth$),
     switchMapTo(db$),
     switchMapTo(firestore$),
@@ -317,12 +346,13 @@ function buildModules(globals) {
 function buildLibrary(globals) {
   const modules$ = buildModules(globals);
   return forkJoin(modules$).pipe(
-    switchMap(() => from(createTestUmd(globals))),
     switchMap(() => from(copyNpmIgnore())),
     switchMap(() => from(copyReadme())),
     switchMap(() => from(copyDocs())),
     switchMap(() => from(copyNodeFixes())),
+    switchMap(() => from(copySchematicFiles())),
     switchMap(() => replaceVersionsObservable('firebase-node', VERSIONS)),
+    switchMap(() => from(createTestUmd(globals))),
     tap(() => {
       const coreStats = measure('core');
       const authStats = measure('auth');
