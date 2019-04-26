@@ -1,4 +1,5 @@
-import { InjectionToken, NgZone, PLATFORM_ID, Injectable, Inject, Optional } from '@angular/core';
+import { ApplicationRef, InjectionToken, NgZone, PLATFORM_ID, Injectable, Inject, Optional } from '@angular/core';
+import { TransferState } from '@angular/platform-browser';
 
 import { Observable, of, from } from 'rxjs';
 
@@ -10,6 +11,7 @@ import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsT
 import { isPlatformServer } from '@angular/common';
 
 import { firestore, SDK_VERSION } from 'firebase/app';
+import { addStateTransferCapabilities } from './state-transfer';
 
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
@@ -17,6 +19,7 @@ import { firestore, SDK_VERSION } from 'firebase/app';
 export const EnablePersistenceToken = new InjectionToken<boolean>('angularfire2.enableFirestorePersistence');
 export const PersistenceSettingsToken = new InjectionToken<PersistenceSettings|undefined>('angularfire2.firestore.persistenceSettings');
 export const FirestoreSettingsToken = new InjectionToken<Settings>('angularfire2.firestore.settings');
+export const EnableStateTransferToken = new InjectionToken<boolean>('angularfire2.firestore.enableStateTransfer');
 
 // timestampsInSnapshots was depreciated in 5.8.0
 const major = parseInt(SDK_VERSION.split('.')[0]);
@@ -101,6 +104,7 @@ export class AngularFirestore {
   public readonly firestore: FirebaseFirestore;
   public readonly persistenceEnabled$: Observable<boolean>;
   public readonly scheduler: FirebaseZoneScheduler;
+  private readonly transferState: TransferState|null;
 
   /**
    * Each Feature of AngularFire has a FirebaseApp injected. This way we
@@ -113,10 +117,14 @@ export class AngularFirestore {
     @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|null|undefined,
     @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean|null,
     @Optional() @Inject(FirestoreSettingsToken) settings: Settings|null,
-    @Inject(PLATFORM_ID) platformId: Object,
+    @Inject(PLATFORM_ID) private platformId: Object,
     zone: NgZone,
     @Optional() @Inject(PersistenceSettingsToken) persistenceSettings: PersistenceSettings|null,
+    @Optional() @Inject(EnableStateTransferToken) private stateTransferEnabled: boolean|null,
+    @Optional() transferState: TransferState, // TODO failing if I make this TransferState|null, seems I need the DI token
+    private appRef: ApplicationRef
   ) {
+    this.transferState = transferState;
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.firestore = zone.runOutsideAngular(() => {
       const app = _firebaseAppFactory(options, nameOrConfig);
@@ -158,6 +166,7 @@ export class AngularFirestore {
       collectionRef = pathOrRef;
     }
     const { ref, query } = associateQuery(collectionRef, queryFn);
+    if (this.stateTransferEnabled && this.transferState) { addStateTransferCapabilities(ref, this.transferState, this.appRef, this.platformId); }
     return new AngularFirestoreCollection<T>(ref, query, this);
   }
 
@@ -177,6 +186,7 @@ export class AngularFirestore {
     } else {
       ref = pathOrRef;
     }
+    if (this.stateTransferEnabled && this.transferState) { addStateTransferCapabilities(ref, this.transferState, this.appRef, this.platformId); }
     return new AngularFirestoreDocument<T>(ref, this);
   }
 

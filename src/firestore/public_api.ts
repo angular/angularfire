@@ -4,4 +4,5 @@ export * from './collection/collection';
 export * from './document/document';
 export * from './collection/changes';
 export * from './observable/fromRef';
+export * from './state-transfer';
 export * from './interfaces'
