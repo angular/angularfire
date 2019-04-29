@@ -13,14 +13,17 @@
     "declaration": false,
     "removeComments": true,
     "strictNullChecks": true,
-    "lib": ["es2015", "dom", "es2015.promise", "es2015.collection", "es2015.iterable"],
+    "lib": [
+      "es2015",
+      "dom",
+      "es2015.promise",
+      "es2015.collection",
+      "es2015.iterable"
+    ],
     "skipLibCheck": true,
     "moduleResolution": "node"
   },
-  "files": [
-    "index.ts",
-    "../../node_modules/zone.js/dist/zone.js.d.ts"
-  ],
+  "files": ["index.ts", "../../node_modules/zone.js/dist/zone.js.d.ts"],
   "angularCompilerOptions": {
     "skipTemplateCodegen": true,
     "strictMetadataEmit": true,
