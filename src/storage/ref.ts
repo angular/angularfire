@@ -33,7 +33,7 @@ export function createStorageRef(ref: Reference, scheduler: FirebaseZoneSchedule
     ),
     delete: () => from(ref.delete()),
     child: (path: string) => createStorageRef(ref.child(path), scheduler),
-    updateMetatdata: (meta: SettableMetadata) => from(ref.updateMetatdata(meta)),
+    updateMetatdata: (meta: SettableMetadata) => from(ref.updateMetadata(meta)),
     updateMetadata: (meta: SettableMetadata) => from(ref.updateMetadata(meta)),
     put: (data: any, metadata?: UploadMetadata) => {
       const task = ref.put(data, metadata);
