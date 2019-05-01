@@ -1,5 +1,5 @@
 import { InjectionToken, NgModule, Optional } from '@angular/core';
-import { app, auth, database, firestore, functions, messaging, storage } from 'firebase/app';
+import { app, auth, database, firestore, functions, messaging, storage, performance } from 'firebase/app';
 // @ts-ignore (https://github.com/firebase/firebase-js-sdk/pull/1206)
 import firebase from 'firebase/app'; // once fixed can pull in as "default as firebase" above
 
@@ -16,6 +16,7 @@ export type FirebaseMessaging = messaging.Messaging;
 export type FirebaseStorage = storage.Storage;
 export type FirebaseFirestore = firestore.Firestore;
 export type FirebaseFunctions = functions.Functions;
+export type FirebasePerformance = performance.Performance;
 
 // Have to implement as we need to return a class from the provider, we should consider exporting
 // this in the firebase/app types as this is our highest risk of breaks
@@ -32,6 +33,7 @@ export class FirebaseApp implements app.App {
     delete: () => Promise<void>;
     firestore: () => FirebaseFirestore;
     functions: (region?: string) => FirebaseFunctions;
+    performance: () => FirebasePerformance;
 }
 
 export function _firebaseAppFactory(options: FirebaseOptions, nameOrConfig?: string|FirebaseAppConfig|null) {
