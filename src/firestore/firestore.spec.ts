@@ -116,7 +116,8 @@ describe('AngularFirestore with different app', () => {
   });
 
   afterEach(done => {
-    app.delete().then(done, done.fail);
+    app.delete()
+    done();
   });
 
   describe('<constructor>', () => {
