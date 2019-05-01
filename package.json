@@ -46,9 +46,9 @@
     "utf-8-validate": "~4.0.0"
   },
   "devDependencies": {
+    "@angular/animations": ">=6.0.0 <8",
     "@angular/compiler-cli": ">=6.0.0 <8",
     "@angular/platform-server": ">=6.0.0 <8",
-    "@angular/animations": ">=6.0.0 <8",
     "@types/jasmine": "^2.5.36",
     "@types/request": "0.0.30",
     "concurrently": "^2.2.0",
