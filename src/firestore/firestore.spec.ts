@@ -116,7 +116,8 @@ describe('AngularFirestore with different app', () => {
   });
 
   afterEach(done => {
-    app.delete().then(done, done.fail);
+    app.delete();
+    done();
   });
 
   describe('<constructor>', () => {
@@ -153,6 +154,11 @@ describe('AngularFirestore without persistance', () => {
       app = _app;
       afs = _afs;
     })();
+  });
+
+  afterEach(done => {
+    app.delete();
+    done();
   });
 
   it('should not enable persistence', (done) => {
