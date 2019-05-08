@@ -19,7 +19,7 @@ describe('AngularFirestoreDocument', () => {
     TestBed.configureTestingModule({
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG),
-        AngularFirestoreModule.enablePersistence({experimentalTabSynchronization: true})
+        AngularFirestoreModule.enablePersistence({synchronizeTabs: true})
       ]
     });
     inject([FirebaseApp, AngularFirestore], (_app: FirebaseApp, _afs: AngularFirestore) => {
