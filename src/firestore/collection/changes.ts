@@ -54,14 +54,14 @@ export function combineChanges<T>(current: DocumentChange<T>[], changes: Documen
 export function combineChange<T>(combined: DocumentChange<T>[], change: DocumentChange<T>): DocumentChange<T>[] {
   switch(change.type) {
     case 'added':
-      if (combined[change.newIndex] && combined[change.newIndex].doc.id == change.doc.id) {
+      if (combined[change.newIndex] && combined[change.newIndex].doc.isEqual(change.doc)) {
         // Not sure why the duplicates are getting fired
       } else {
         combined.splice(change.newIndex, 0, change);
       }
       break;
     case 'modified':
-      if (combined[change.oldIndex] == null || combined[change.oldIndex].doc.id == change.doc.id) {
+      if (combined[change.oldIndex] == null || combined[change.oldIndex].doc.isEqual(change.doc)) {
         // When an item changes position we first remove it
         // and then add it's new position
         if(change.oldIndex !== change.newIndex) {
@@ -73,7 +73,7 @@ export function combineChange<T>(combined: DocumentChange<T>[], change: Document
       }
       break;
     case 'removed':
-      if (combined[change.oldIndex] && combined[change.oldIndex].doc.id == change.doc.id) {
+      if (combined[change.oldIndex] && combined[change.oldIndex].doc.isEqual(change.doc)) {
         combined.splice(change.oldIndex, 1);
       }
       break;
