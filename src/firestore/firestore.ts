@@ -171,7 +171,8 @@ export class AngularFirestore {
    */
   collectionGroup<T>(collectionId: string, queryGroupFn?: QueryGroupFn): AngularFirestoreCollectionGroup<T> {
     const queryFn = queryGroupFn || (ref => ref);
-    const collectionGroup: Query = this.firestore.collectionGroup(collectionId);
+    const firestore: any = this.firestore; // SEMVER: ditch any once targeting >= 6.0
+    const collectionGroup: Query = firestore.collectionGroup(collectionId);
     return new AngularFirestoreCollectionGroup<T>(queryFn(collectionGroup), this);
   }
 

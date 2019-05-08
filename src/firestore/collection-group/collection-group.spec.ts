@@ -15,7 +15,8 @@ import { Stock, randomName, FAKE_STOCK_DATA, createRandomStocks, delayAdd, delay
 async function collectionHarness(afs: AngularFirestore, items: number, queryGroupFn?: QueryGroupFn) {
   const randomCollectionName = randomName(afs.firestore);
   const ref = afs.firestore.collection(`${randomCollectionName}`);
-  const collectionGroup: Query = afs.firestore.collectionGroup(randomCollectionName);
+  const firestore: any = afs.firestore;
+  const collectionGroup: Query = firestore.collectionGroup(randomCollectionName);
   const queryFn = queryGroupFn || (ref => ref);
   const stocks = new AngularFirestoreCollectionGroup<Stock>(queryFn(collectionGroup), afs);
   let names = await createRandomStocks(afs.firestore, ref, items);
