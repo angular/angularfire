@@ -170,6 +170,7 @@ export class AngularFirestore {
    * @param queryGroupFn
    */
   collectionGroup<T>(collectionId: string, queryGroupFn?: QueryGroupFn): AngularFirestoreCollectionGroup<T> {
+    if (major < 6) { throw "collection group queries require Firebase JS SDK >= 6.0"}
     const queryFn = queryGroupFn || (ref => ref);
     const firestore: any = this.firestore; // SEMVER: ditch any once targeting >= 6.0
     const collectionGroup: Query = firestore.collectionGroup(collectionId);
