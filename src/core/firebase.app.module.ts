@@ -1,6 +1,5 @@
 import { InjectionToken, NgModule, Optional } from '@angular/core';
 import { auth, database, firestore, functions, messaging, storage } from 'firebase/app';
-
 // @ts-ignore (https://github.com/firebase/firebase-js-sdk/pull/1206)
 import firebase from 'firebase/app'; // once fixed can pull in as "default as firebase" above
 

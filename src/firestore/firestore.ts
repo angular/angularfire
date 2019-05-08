@@ -3,9 +3,10 @@ import { TransferState } from '@angular/platform-browser';
 
 import { Observable, of, from } from 'rxjs';
 
-import { Settings, PersistenceSettings, CollectionReference, DocumentReference, QueryFn, AssociatedReference } from './interfaces';
+import { Settings, PersistenceSettings, CollectionReference, DocumentReference, QueryFn, Query, QueryGroupFn, AssociatedReference } from './interfaces';
 import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
+import { AngularFirestoreCollectionGroup } from './collection-group/collection-group';
 
 import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
@@ -168,6 +169,21 @@ export class AngularFirestore {
     const { ref, query } = associateQuery(collectionRef, queryFn);
     if (this.stateTransferEnabled && this.transferState) { addStateTransferCapabilities(ref, this.transferState, this.appRef, this.platformId); }
     return new AngularFirestoreCollection<T>(ref, query, this);
+  }
+
+  /**
+   * Create a reference to a Firestore Collection Group based on a collectionId
+   * and an optional query function to narrow the result
+   * set.
+   * @param collectionId
+   * @param queryGroupFn
+   */
+  collectionGroup<T>(collectionId: string, queryGroupFn?: QueryGroupFn): AngularFirestoreCollectionGroup<T> {
+    if (major < 6) { throw "collection group queries require Firebase JS SDK >= 6.0"}
+    const queryFn = queryGroupFn || (ref => ref);
+    const firestore: any = this.firestore; // SEMVER: ditch any once targeting >= 6.0
+    const collectionGroup: Query = firestore.collectionGroup(collectionId);
+    return new AngularFirestoreCollectionGroup<T>(queryFn(collectionGroup), this);
   }
 
   /**
