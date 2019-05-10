@@ -103,8 +103,12 @@ export class AngularFirestoreCollection<T=DocumentData> {
 
   /**
    * Listen to all documents in the collection and its possible query as an Observable.
+   * 
+   * If the `idField` option is provided, document IDs are included and mapped to the
+   * provided `idField` property name.
+   * @param options
    */
-  valueChanges(idField?: string): Observable<T[]> {
+  valueChanges(options: {idField?: string} = {}): Observable<T[]> {
     const fromCollectionRef$ = fromCollectionRef<T>(this.query);
     const scheduled$ = this.afs.scheduler.runOutsideAngular(fromCollectionRef$);
     return this.afs.scheduler.keepUnstableUntilFirst(scheduled$)
@@ -112,7 +116,7 @@ export class AngularFirestoreCollection<T=DocumentData> {
         map(actions => actions.payload.docs.map(a => { 
             return { 
               ...a.data() as Object, 
-              ...(idField ? { [idField]: a.id } : null) 
+              ...(options.idField ? { [options.idField]: a.id } : null) 
             } as T;
           })
         )
