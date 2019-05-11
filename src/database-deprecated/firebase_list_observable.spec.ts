@@ -1,5 +1,5 @@
-import { FirebaseApp, FirebaseAppConfig, AngularFireModule} from '@angular/fire';
-import { AngularFireDatabase, AngularFireDatabaseModule, FirebaseListObservable, FirebaseObjectFactory } from '@angular/fire/database-deprecated';
+import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from '@angular/fire';
+import { AngularFireDatabase, AngularFireDatabaseModule, FirebaseListObservable, FirebaseObjectFactory, RealtimeDatabaseURL } from '@angular/fire/database-deprecated';
 import { Observer } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { unwrapMapFn } from './utils';
@@ -19,6 +19,9 @@ describe('FirebaseListObservable', () => {
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG),
         AngularFireDatabaseModule
+      ],
+      providers: [
+        //{ provide: RealtimeDatabaseURL,  useValue: 'http://localhost:9000' }
       ]
     });
     inject([FirebaseApp, AngularFireDatabase], (_app: FirebaseApp, _db: AngularFireDatabase) => {

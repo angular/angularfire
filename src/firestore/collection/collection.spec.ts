@@ -1,5 +1,5 @@
 import { FirebaseApp, AngularFireModule } from '@angular/fire';
-import { AngularFirestore } from '../firestore';
+import { AngularFirestore, FirestoreSettingsToken } from '../firestore';
 import { AngularFirestoreModule } from '../firestore.module';
 import { AngularFirestoreCollection } from './collection';
 import { QueryFn } from '../interfaces';
@@ -30,6 +30,9 @@ describe('AngularFirestoreCollection', () => {
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG),
         AngularFirestoreModule.enablePersistence({synchronizeTabs: true})
+      ],
+      providers: [
+        //{ provide: FirestoreSettingsToken, useValue: { host: 'http://localhost:8080', ssl: false } }
       ]
     });
     inject([FirebaseApp, AngularFirestore], (_app: FirebaseApp, _afs: AngularFirestore) => {

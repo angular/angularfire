@@ -1,6 +1,6 @@
 import { database } from 'firebase/app';
 import { FirebaseApp, AngularFireModule } from '@angular/fire';
-import { AngularFireDatabase, AngularFireDatabaseModule, listChanges } from '@angular/fire/database';
+import { AngularFireDatabase, AngularFireDatabaseModule, listChanges, RealtimeDatabaseURL } from '@angular/fire/database';
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../test-config';
 import { skip, take } from 'rxjs/operators';
@@ -27,13 +27,15 @@ describe('listChanges', () => {
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG, FIREBASE_APP_NAME),
         AngularFireDatabaseModule
+      ],
+      providers: [
+        //{ provide: RealtimeDatabaseURL,  useValue: 'http://localhost:9000' }
       ]
     });
     inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {
       app = app_;
       db = _db;
-      app.database().goOffline();
-      ref = (path: string) => { app.database().goOffline(); return app.database().ref(path); };
+      ref = (path: string) => db.database.ref(path);
     })();
   });
 
@@ -109,7 +111,6 @@ describe('listChanges', () => {
         const data = changes.map(change => change.payload.val());
         expect(data.length).toEqual(items.length - 1);
       }).add(done);
-      app.database().goOnline();
       aref.set(batch).then(() => {
         aref.child(items[0].key).remove();
       });
@@ -122,7 +123,6 @@ describe('listChanges', () => {
         const data = changes.map(change => change.payload.val());
         expect(data[1].name).toEqual('lol');
       }).add(done);
-      app.database().goOnline();
       aref.set(batch).then(() => {
         aref.child(items[1].key).update({ name: 'lol'});
       });
@@ -137,7 +137,6 @@ describe('listChanges', () => {
         // the new result is now the last result
         expect(data[data.length - 1]).toEqual(items[0]);
       }).add(done);
-      app.database().goOnline();
       aref.set(batch).then(() => {
         aref.child(items[0].key).setPriority('a', () => {});
       });

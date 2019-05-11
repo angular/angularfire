@@ -18,7 +18,8 @@ export function FirebaseListFactory (
 
   const queryObs = observeQuery(query);
   return new FirebaseListObservable(ref, subscriber => {
-    let sub = switchMap.call(map.call(queryObs, query => {
+    let sub = queryObs.pipe(
+        map(query => {
       let queried: DatabaseQuery = ref;
       // Only apply the populated keys
       // apply ordering and available querying options
@@ -48,11 +49,11 @@ export function FirebaseListFactory (
 
         // apply limitTos
         if (!utils.isNil(query.limitToFirst)) {
-          queried = queried.limitToFirst(query.limitToFirst);
+          queried = queried.limitToFirst(query.limitToFirst!);
         }
 
         if (!utils.isNil(query.limitToLast)) {
-          queried = queried.limitToLast(query.limitToLast);
+          queried = queried.limitToLast(query.limitToLast!);
         }
 
         return queried;
@@ -81,17 +82,17 @@ export function FirebaseListFactory (
 
       // apply limitTos
       if (!utils.isNil(query.limitToFirst)) {
-          queried = queried.limitToFirst(query.limitToFirst);
+          queried = queried.limitToFirst(query.limitToFirst!);
       }
 
       if (!utils.isNil(query.limitToLast)) {
-          queried = queried.limitToLast(query.limitToLast);
+          queried = queried.limitToLast(query.limitToLast!);
       }
 
       return queried;
-    }), (queryRef: Reference, ix: number) => {
+    }), switchMap((queryRef: Reference, ix: number) => {
       return firebaseListObservable(queryRef, { preserveSnapshot });
-    })
+    }))
     .subscribe(subscriber);
 
     return () => sub.unsubscribe();
@@ -184,7 +185,7 @@ function firebaseListObservable(ref: Reference | DatabaseQuery, {preserveSnapsho
   });
 
   // TODO: should be in the subscription zone instead
-  return observeOn.call(listObs, new FirebaseZoneScheduler(new NgZone({}), {}));
+  return listObs;
 
 }
 

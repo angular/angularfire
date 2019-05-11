@@ -1,6 +1,6 @@
 import { database } from 'firebase/app';
 import { FirebaseApp, AngularFireModule } from '@angular/fire';
-import { AngularFireDatabase, AngularFireDatabaseModule, snapshotChanges, ChildEvent } from '@angular/fire/database';
+import { AngularFireDatabase, AngularFireDatabaseModule, snapshotChanges, ChildEvent, RealtimeDatabaseURL } from '@angular/fire/database';
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../test-config';
 import { BehaviorSubject } from 'rxjs';
@@ -28,13 +28,15 @@ describe('snapshotChanges', () => {
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG, FIREBASE_APP_NAME),
         AngularFireDatabaseModule
+      ],
+      providers: [
+        //{ provide: RealtimeDatabaseURL,  useValue: 'http://localhost:9000' }
       ]
     });
     inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {
       app = app_;
       db = _db;
-      app.database().goOffline();
-      createRef = (path: string) => { app.database().goOffline(); return app.database().ref(path); };
+      createRef = (path: string) => db.database.ref(path);
     })();
   });
 
@@ -103,7 +105,6 @@ describe('snapshotChanges', () => {
       copy[0].name = name;
       expect(data).toEqual(copy);
     }).add(done);
-    app.database().goOnline();
     ref.set(batch).then(() => {
       ref.child(items[0].key).update({ name })
     });

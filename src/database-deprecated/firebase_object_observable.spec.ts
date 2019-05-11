@@ -1,7 +1,7 @@
 import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, FirebaseAppConfig, AngularFireModule } from '@angular/fire';
 import { COMMON_CONFIG } from './test-config';
-import { AngularFireDatabase, AngularFireDatabaseModule, FirebaseObjectObservable } from '@angular/fire/database-deprecated';
+import { AngularFireDatabase, AngularFireDatabaseModule, FirebaseObjectObservable, RealtimeDatabaseURL } from '@angular/fire/database-deprecated';
 import { Observer } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Reference } from './interfaces';
@@ -18,6 +18,9 @@ describe('FirebaseObjectObservable', () => {
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG),
         AngularFireDatabaseModule
+      ],
+      providers: [
+        //{ provide: RealtimeDatabaseURL,  useValue: 'http://localhost:9000' }
       ]
     });
     inject([FirebaseApp, AngularFireDatabase], (_app: FirebaseApp, _db: AngularFireDatabase) => {

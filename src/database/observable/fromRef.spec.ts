@@ -1,8 +1,8 @@
 import { DatabaseReference } from '../interfaces';
 import { FirebaseApp, AngularFireModule } from '@angular/fire';
-import { AngularFireDatabase, AngularFireDatabaseModule, fromRef } from '@angular/fire/database';
+import { AngularFireDatabase, AngularFireDatabaseModule, fromRef, RealtimeDatabaseURL } from '@angular/fire/database';
 import { TestBed, inject } from '@angular/core/testing';
-import { COMMON_CONFIG } from '../test-config';
+import { COMMON_CONFIG } from '../test-config'; 
 import { take } from 'rxjs/operators';
 
 // generate random string to test fidelity of naming
@@ -11,6 +11,7 @@ const FIREBASE_APP_NAME = rando();
 
 describe('fromRef', () => {
   let app: FirebaseApp;
+  let db: AngularFireDatabase;
   let ref: (path: string) => DatabaseReference;
   let batch = {};
   const items = [{ name: 'one' }, { name: 'two' }, { name: 'three' }].map(item => ( { key: rando(), ...item } ));
@@ -26,12 +27,15 @@ describe('fromRef', () => {
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG, FIREBASE_APP_NAME),
         AngularFireDatabaseModule
+      ],
+      providers: [
+        //{ provide: RealtimeDatabaseURL,  useValue: 'http://localhost:9000' }
       ]
     });
-    inject([FirebaseApp], (app_: FirebaseApp) => {
+    inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {
       app = app_;
-      app.database().goOffline();
-      ref = (path: string) => { app.database().goOffline(); return app.database().ref(path); };
+      db = _db;
+      ref = (path: string) => db.database.ref(path);
     })();
   });
 

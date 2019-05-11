@@ -1,8 +1,6 @@
-import { Observable } from 'rxjs/Observable';
-import { Observer } from 'rxjs/Observer';
-import { Subject } from 'rxjs/Subject';
+import { Observable, Observer, Subject } from 'rxjs';
 import { Query, ScalarQuery } from './interfaces';
-import { getOrderObservables, observeQuery } from '@angular/fire/database-deprecated';
+import { getOrderObservables, observeQuery, RealtimeDatabaseURL } from '@angular/fire/database-deprecated';
 
 function scalarQueryTest(query: ScalarQuery, done: any) {
   const queryObservable = observeQuery(query);
