@@ -29,7 +29,7 @@ describe('AngularFirestoreCollection', () => {
     TestBed.configureTestingModule({
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG),
-        AngularFirestoreModule.enablePersistence()
+        AngularFirestoreModule.enablePersistence({synchronizeTabs: true})
       ]
     });
     inject([FirebaseApp, AngularFirestore], (_app: FirebaseApp, _afs: AngularFirestore) => {
@@ -38,8 +38,8 @@ describe('AngularFirestoreCollection', () => {
     })();
   });
 
-  afterEach(async (done) => {
-    await app.delete();
+  afterEach(done => {
+    app.delete();
     done();
   });
 
