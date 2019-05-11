@@ -108,18 +108,24 @@ export class AngularFirestoreCollection<T=DocumentData> {
    * provided `idField` property name.
    * @param options
    */
-  valueChanges(options: {idField?: string} = {}): Observable<T[]> {
+  valueChanges(): Observable<T[]>
+  valueChanges({}): Observable<T[]>
+  valueChanges<K extends string>(options: {idField: K}): Observable<(T & { [T in K]: string })[]>
+  valueChanges<K extends string>(options: {idField?: K} = {}): Observable<T[]> {
     const fromCollectionRef$ = fromCollectionRef<T>(this.query);
     const scheduled$ = this.afs.scheduler.runOutsideAngular(fromCollectionRef$);
     return this.afs.scheduler.keepUnstableUntilFirst(scheduled$)
       .pipe(
-        map(actions => actions.payload.docs.map(a => { 
+        map(actions => actions.payload.docs.map(a => {
+          if (options.idField) {
             return { 
               ...a.data() as Object, 
-              ...(options.idField ? { [options.idField]: a.id } : null) 
-            } as T;
-          })
-        )
+              ...{ [options.idField]: a.id } 
+            } as T & { [T in K]: string };
+          } else {
+            return a.data()
+          }
+        }))
       );
   }
 
