@@ -3,8 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@angular/fire": ["../../dist/packages-dist"],
-      "@angular/fire/performance": ["../../dist/packages-dist/performance"]
+      "@angular/fire": ["../../dist/packages-dist"]
     }
   },
   "files": [

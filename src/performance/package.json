@@ -22,8 +22,7 @@
     "@angular/core": "ANGULAR_VERSION",
     "@angular/platform-browser": "ANGULAR_VERSION",
     "@angular/platform-browser-dynamic": "ANGULAR_VERSION",
-    "@firebase/app": "FIREBASE_APP_VERSION",
-    "@firebase/messaging": "FIREBASE_MESSAGING_VERSION",
+    "firebase": "FIREBASE_VERSION",
     "rxjs": "RXJS_VERSION",
     "zone.js": "ZONEJS_VERSION"
   },

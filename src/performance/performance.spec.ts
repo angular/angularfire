@@ -33,9 +33,4 @@ describe('AngularFirePerformance', () => {
     expect(afp.performance).toBeDefined();
   });
 
-  it('should have an initialized Firebase app', () => {
-    expect(afp.performance.app).toBeDefined();
-    expect(afp.performance.app).toEqual(app);
-  });
-
 });
