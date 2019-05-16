@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { filter, tap, take } from 'rxjs/operators';
 import { FirebaseOptions, FirebaseAppConfig } from '@angular/fire';
 import { FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory } from '@angular/fire';
-import { PerformanceController } from '@firebase/performance/dist/src/controllers/perf';
+import { performance } from 'firebase/app';
 
 export type TraceOptions = {
   metrics: {[key:string]: number},
@@ -16,7 +16,7 @@ export type TraceOptions = {
 @Injectable()
 export class AngularFirePerformance {
   
-  performance: PerformanceController;
+  performance: performance.Performance;
 
   constructor(
     @Inject(FirebaseOptionsToken) options:FirebaseOptions,
