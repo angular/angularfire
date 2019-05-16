@@ -6,7 +6,7 @@ import { Settings, PersistenceSettings, CollectionReference, DocumentReference, 
 import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 
-import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
+import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler, TypicalDependencyInjection } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
 
 import { firestore, SDK_VERSION } from 'firebase/app';
@@ -40,6 +40,11 @@ export function associateQuery(collectionRef: CollectionReference, queryFn = ref
   const ref = collectionRef;
   return { query, ref };
 }
+
+// TODO clean up anys
+export const getInstance =
+  (config: TypicalDependencyInjection & { enablePersistence?: boolean, settings?: Settings, persistenceSettings?: PersistenceSettings }) =>
+    new AngularFirestore(config.options,( <any>config).appName || (<any>config).appConfig, config.enablePersistence || null, config.settings || null, config.platformId, config.zone, config.persistenceSettings || null);
 
 /**
  * AngularFirestore Service

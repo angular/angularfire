@@ -1,10 +1,15 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID, InjectionToken } from '@angular/core';
 import { Observable, from } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { FirebaseOptions, FirebaseAppConfig } from '@angular/fire';
+import { FirebaseOptions, FirebaseAppConfig, TypicalDependencyInjection } from '@angular/fire';
 import { FirebaseFunctions, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
 
 export const FunctionsRegionToken = new InjectionToken<string>('angularfire2.functions.region');
+
+// TODO clean up anys
+export const getInstance =
+  (config: TypicalDependencyInjection & { region?: string }) =>
+    new AngularFireFunctions(config.options,( <any>config).appName || (<any>config).appConfig || undefined, config.platformId, config.zone, config.region || null);
 
 @Injectable()
 export class AngularFireFunctions {

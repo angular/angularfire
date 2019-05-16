@@ -1,7 +1,10 @@
-import { InjectionToken, NgModule, Optional } from '@angular/core';
+import { InjectionToken, NgModule, Optional, NgZone } from '@angular/core';
 import { auth, database, firestore, functions, messaging, storage } from 'firebase/app';
 // @ts-ignore (https://github.com/firebase/firebase-js-sdk/pull/1206)
 import firebase from 'firebase/app'; // once fixed can pull in as "default as firebase" above
+
+export type AllowOnlyOneOf<T, Keys extends keyof T = keyof T> = Pick<T, Exclude<keyof T, Keys>> & { [K in Keys]-?: Partial<Record<Exclude<Keys, K>, undefined>> }[Keys]
+export type TypicalDependencyInjection = AllowOnlyOneOf<{ options: FirebaseOptions, platformId: Object, zone: NgZone, appName?: string, appConfig?: FirebaseAppConfig }, 'appName'|'appConfig'>;
 
 // Public types don't expose FirebaseOptions or FirebaseAppConfig
 export type FirebaseOptions = {[key:string]: any};

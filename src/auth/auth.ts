@@ -1,10 +1,15 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
 import { Observable, of, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { FirebaseAppConfig, FirebaseOptions } from '@angular/fire';
+import { FirebaseAppConfig, FirebaseOptions, TypicalDependencyInjection } from '@angular/fire';
 import { User, auth } from 'firebase/app';
 
 import { FirebaseAuth, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
+
+// TODO clean up anys
+export const getInstance =
+  (config: TypicalDependencyInjection) =>
+    new AngularFireAuth(config.options,( <any>config).appName || (<any>config).appConfig, config.platformId, config.zone);
 
 @Injectable()
 export class AngularFireAuth {

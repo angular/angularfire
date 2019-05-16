@@ -13,6 +13,8 @@ export type TraceOptions = {
   metric$?:{[key:string]: Observable<number>}
 };
 
+export const getInstance = (options: { automaticallyTraceCoreNgMetrics?: boolean, appRef: ApplicationRef, zone: NgZone }) => new AngularFirePerformance(options.automaticallyTraceCoreNgMetrics || null, options.appRef, options.zone);
+
 @Injectable()
 export class AngularFirePerformance {
   

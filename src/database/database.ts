@@ -4,7 +4,12 @@ import { getRef } from './utils';
 import { InjectionToken } from '@angular/core';
 import { createListReference } from './list/create-reference';
 import { createObjectReference } from './object/create-reference';
-import { FirebaseDatabase, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, RealtimeDatabaseURL, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
+import { FirebaseDatabase, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, RealtimeDatabaseURL, _firebaseAppFactory, FirebaseZoneScheduler, TypicalDependencyInjection } from '@angular/fire';
+
+// TODO clean up anys
+export const getInstance =
+  (config: TypicalDependencyInjection & { databaseURL?: string }) =>
+    new AngularFireDatabase(config.options,( <any>config).appName || (<any>config).appConfig, config.databaseURL || null, config.platformId, config.zone);
 
 @Injectable()
 export class AngularFireDatabase {

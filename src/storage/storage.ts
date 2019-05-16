@@ -2,11 +2,16 @@ import { Injectable, Inject, Optional, InjectionToken, NgZone, PLATFORM_ID } fro
 import { createStorageRef, AngularFireStorageReference } from './ref';
 import { createUploadTask, AngularFireUploadTask } from './task';
 import { Observable } from 'rxjs';
-import { FirebaseStorage, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, FirebaseZoneScheduler, _firebaseAppFactory } from '@angular/fire';
+import { FirebaseStorage, TypicalDependencyInjection, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, FirebaseZoneScheduler, _firebaseAppFactory } from '@angular/fire';
 
 import { UploadMetadata } from './interfaces';
 
 export const StorageBucket = new InjectionToken<string>('angularfire2.storageBucket');
+
+// TODO clean up anys
+export const getInstance =
+  (config: TypicalDependencyInjection & { bucket?: string }) =>
+    new AngularFireStorage(config.options,( <any>config).appName || (<any>config).appConfig, config.bucket || null, config.platformId, config.zone);
 
 /**
  * AngularFireStorage Service
