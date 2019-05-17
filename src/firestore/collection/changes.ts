@@ -37,11 +37,10 @@ export function sortedChanges<T>(query: Query, events: DocumentChangeType[]): Ob
           return [{ type: 'metadata', payload: changes.payload.metadata } as DocumentChangeOrMetadata<T>];
         }
       }),
-      tap(() => firstEmission = false),
-      tap(change => console.log("change", change)),
       scan((current, changes) => combineChanges(current, changes, events), new Array<DocumentChange<T>>()),
       map(changes => changes.map(c => ({ type: c.type, payload: c } as DocumentChangeAction<T>))),
-      tap(change => console.log("c&m", change)),
+      filter(actions => actions.length > 0 || !firstEmission || events.indexOf('value') > 0 ),
+      tap(() => firstEmission = false)
     );
 }
 

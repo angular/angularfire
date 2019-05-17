@@ -225,6 +225,7 @@ describe('AngularFirestoreCollection', () => {
       const { randomCollectionName, ref, stocks, names } =
         await collectionHarness(afs, ITEMS, ref => ref.orderBy('price', 'desc'));
       const sub = stocks.snapshotChanges().subscribe(data => {
+        console.log(data);
         count = count + 1;
         // the first time should all be 'added'
         if(count === 1) {
@@ -249,8 +250,7 @@ describe('AngularFirestoreCollection', () => {
       const ITEMS = 10;
       const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
 
-      const sub = stocks.snapshotChanges(['modified']).pipe(skip(1)).subscribe(data => {
-        sub.unsubscribe();
+      const sub = stocks.snapshotChanges(['modified']).pipe(take(1)).subscribe(data => {
         const change = data.filter(x => x.payload.doc.id === names[0])[0];
         expect(data.length).toEqual(1);
         expect(change.payload.doc.data().price).toEqual(2);
@@ -266,20 +266,17 @@ describe('AngularFirestoreCollection', () => {
       const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
       var count = 0;
 
-      stocks.snapshotChanges(['modified', 'metadata']).pipe(take(3)).subscribe(data => {
-        console.log("data", pending, data);
-        if (count == 0) {
-          delayUpdate(stocks, names[0], { price: 4 });
-        } else {
-          const change = data.filter(x => x.payload.doc.id === names[0])[0];
-          console.log(pending, change.payload.doc.metadata);
-          expect(data.length).toEqual(1);
-          expect(change.payload.doc.data().price).toEqual(4);
-          expect(change.type).toEqual('modified');
-          expect(change.payload.doc.metadata.hasPendingWrites).toEqual(count == 1);
-          expect(change.payload.doc.metadata.fromCache).toEqual(count == 1);
-        }
+      stocks.snapshotChanges(['modified', 'metadata']).pipe(take(2)).subscribe(data => {
+        const change = data.filter(x => x.payload.doc.id === names[0])[0];
+        console.log(pending, change.payload.doc.metadata);
+        expect(data.length).toEqual(1);
+        expect(change.payload.doc.data().price).toEqual(4);
+        expect(change.type).toEqual('modified');
+        expect(change.payload.doc.metadata.hasPendingWrites).toEqual(count == 0);
+        expect(change.payload.doc.metadata.fromCache).toEqual(count == 0);
       });
+
+      delayUpdate(stocks, names[0], { price: 4 });
       
     });
 
