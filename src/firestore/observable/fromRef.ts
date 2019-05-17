@@ -22,5 +22,7 @@ export function fromDocRef<T>(ref: DocumentReference, options?: firestore.Snapsh
 }
 
 export function fromCollectionRef<T>(ref: Query, options?: firestore.SnapshotListenOptions): Observable<Action<QuerySnapshot<T>>> {
-  return fromRef<QuerySnapshot<T>>(ref, options).pipe(map(payload => ({ payload, type: 'query' })));
+  return fromRef<QuerySnapshot<T>>(ref, options).pipe(
+    map(payload => ({ payload, type: 'query' }))
+  );
 }

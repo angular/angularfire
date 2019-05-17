@@ -5,7 +5,7 @@ export type Settings =  firestore.Settings;
 export type CollectionReference = firestore.CollectionReference;
 export type DocumentReference = firestore.DocumentReference;
 export type PersistenceSettings = firestore.PersistenceSettings;
-export type DocumentChangeType = firestore.DocumentChangeType;
+export type DocumentChangeType = firestore.DocumentChangeType | "metadata" | "value";
 export type SnapshotOptions = firestore.SnapshotOptions;
 export type FieldPath = firestore.FieldPath;
 export type Query = firestore.Query;
@@ -36,6 +36,14 @@ export interface QuerySnapshot<T> extends firestore.QuerySnapshot {
 
 export interface DocumentChange<T> extends firestore.DocumentChange {
   readonly doc: QueryDocumentSnapshot<T>;
+}
+
+export type DocumentChangeOrMetadata<T> = DocumentChange<T> | {
+  type: 'metadata';
+  payload: firestore.SnapshotMetadata;
+} | {
+  type: 'value',
+  payload: DocumentChange<T>[]
 }
 
 export interface DocumentChangeAction<T> {

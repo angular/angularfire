@@ -11,14 +11,13 @@ import { runInZone } from '@angular/fire';
 
 export function validateEventsArray(events?: DocumentChangeType[]) {
   if(!events || events!.length === 0) {
-    events = ['added', 'removed', 'modified'];
+    events = ['value', 'added', 'removed', 'modified']; // SEMVER @ v6 add 'metadata'
   }
   return events;
 }
 
 export type ChangeOptions = firestore.SnapshotListenOptions & { events?: DocumentChangeType[] };
 
-// SEMVER @ v6 only allow options
 /**
  * AngularFirestoreCollection service
  *
@@ -64,16 +63,14 @@ export class AngularFirestoreCollection<T=DocumentData> {
    * your own data structure.
    * @param events
    */
-  stateChanges(eventsOrOptions?: DocumentChangeType[]|ChangeOptions): Observable<DocumentChangeAction<T>[]> {
-    const events = eventsOrOptions && (Array.isArray(eventsOrOptions) ? eventsOrOptions : eventsOrOptions.events) || [];
-    const options = eventsOrOptions && !Array.isArray(eventsOrOptions) ? eventsOrOptions : {};
-    const ret = this.afs.scheduler.keepUnstableUntilFirst(
+  stateChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction<T>[]> {
+    const validatedEvents = validateEventsArray(events);
+    return this.afs.scheduler.keepUnstableUntilFirst(
       this.afs.scheduler.runOutsideAngular(
-        docChanges<T>(this.query, options)
+        docChanges<T>(this.query)
       )
-    );
-    return events.length === 0 ? ret : ret.pipe(
-      map(actions => actions.filter(change => events.indexOf(change.type) > -1)),
+    ).pipe(
+      map(actions => actions.filter(change => validatedEvents.indexOf(change.type) > -1)),
       filter(changes =>  changes.length > 0)
     );
   }
@@ -83,8 +80,8 @@ export class AngularFirestoreCollection<T=DocumentData> {
    * but it collects each event in an array over time.
    * @param events
    */
-  auditTrail(eventsOrOptions?: DocumentChangeType[]|ChangeOptions): Observable<DocumentChangeAction<T>[]> {
-    return this.stateChanges(eventsOrOptions).pipe(scan((current, action) => [...current, ...action], []));
+  auditTrail(events?: DocumentChangeType[]): Observable<DocumentChangeAction<T>[]> {
+    return this.stateChanges(events).pipe(scan((current, action) => [...current, ...action], []));
   }
 
   /**
@@ -92,11 +89,9 @@ export class AngularFirestoreCollection<T=DocumentData> {
    * query order.
    * @param events
    */
-  snapshotChanges(eventsOrOptions?: DocumentChangeType[]|ChangeOptions): Observable<DocumentChangeAction<T>[]> {
-    const events = eventsOrOptions && (Array.isArray(eventsOrOptions) ? eventsOrOptions : eventsOrOptions.events) || [];
-    const options = eventsOrOptions && !Array.isArray(eventsOrOptions) ? eventsOrOptions : {};
+  snapshotChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction<T>[]> {
     const validatedEvents = validateEventsArray(events);
-    const sortedChanges$ = sortedChanges<T>(this.query, validatedEvents, options);
+    const sortedChanges$ = sortedChanges<T>(this.query, validatedEvents);
     const scheduledSortedChanges$ = this.afs.scheduler.runOutsideAngular(sortedChanges$);
     return this.afs.scheduler.keepUnstableUntilFirst(scheduledSortedChanges$);
   }
@@ -118,6 +113,7 @@ export class AngularFirestoreCollection<T=DocumentData> {
     const scheduled$ = this.afs.scheduler.runOutsideAngular(fromCollectionRef$);
     return this.afs.scheduler.keepUnstableUntilFirst(scheduled$)
       .pipe(
+        // TODO do we need to handle no doc changes, like snapshot?
         map(actions => actions.payload.docs.map(a => ({ 
           ...(a.data() as Object),
           ...(options.metadataField ? { [options.metadataField]: a.metadata } : {}),

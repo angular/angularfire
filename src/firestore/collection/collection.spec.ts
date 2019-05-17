@@ -49,7 +49,7 @@ describe('AngularFirestoreCollection', () => {
       const ITEMS = 4;
       const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
 
-      const sub = stocks.valueChanges({idField: 'id', metadataField: 'meta'}).subscribe(data => {
+      const sub = stocks.valueChanges().subscribe(data => {
         // unsub immediately as we will be deleting data at the bottom
         // and that will trigger another subscribe callback and fail
         // the test
@@ -59,8 +59,6 @@ describe('AngularFirestoreCollection', () => {
         // if the collection state is altered during a test run
         expect(data.length).toEqual(ITEMS);
         data.forEach(stock => {
-          console.log(stock.id);
-          console.log(stock.meta);
           // We used the same piece of data so they should all equal
           expect(stock).toEqual(FAKE_STOCK_DATA);
         });
@@ -75,13 +73,41 @@ describe('AngularFirestoreCollection', () => {
       const ITEMS = 1;
       const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
       const idField = 'myCustomID';
-      const sub = stocks.valueChanges({idField}).subscribe(data => {
-        sub.unsubscribe();
+      stocks.valueChanges({idField}).pipe(take(1)).subscribe(data => {
         const stock = data[0];
         expect(stock[idField]).toBeDefined();
         expect(stock).toEqual(jasmine.objectContaining(FAKE_STOCK_DATA));
-        deleteThemAll(names, ref).then(done).catch(fail);
-      })
+      }).add(() =>
+        deleteThemAll(names, ref).then(done).catch(fail)
+      );
+    });
+
+    it('should optionally map the metadata to the emitted data object', async (done: any) => {
+      const ITEMS = 1;
+      const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const metadataField = 'myCustomMeta';
+      stocks.valueChanges({metadataField}).pipe(take(1)).subscribe(data => {
+        const stock = data[0];
+        expect(stock[metadataField]).toBeDefined();
+        expect(stock).toEqual(jasmine.objectContaining(FAKE_STOCK_DATA));
+      }).add(() =>
+        deleteThemAll(names, ref).then(done).catch(fail)
+      );
+    });
+
+    it('should optionally map the doc ID and metadata to the emitted data object', async (done: any) => {
+      const ITEMS = 1;
+      const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const idField = 'myCustomID';
+      const metadataField = 'myCustomMeta';
+      stocks.valueChanges({idField, metadataField}).pipe(take(1)).subscribe(data => {
+        const stock = data[0];
+        expect(stock[idField]).toBeDefined();
+        expect(stock[metadataField]).toBeDefined();
+        expect(stock).toEqual(jasmine.objectContaining(FAKE_STOCK_DATA));
+      }).add(() => {
+        deleteThemAll(names, ref).then(done).catch(fail)
+      });
     });
 
     it('should handle multiple subscriptions (hot)', async (done: any) => {
@@ -233,6 +259,28 @@ describe('AngularFirestoreCollection', () => {
       });
 
       delayUpdate(stocks, names[0], { price: 2 });
+    });
+
+    it('should be able to includeMetadataChanges', async (done) => {
+      const ITEMS = 10;
+      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      var count = 0;
+
+      stocks.snapshotChanges(['modified', 'metadata']).pipe(take(3)).subscribe(data => {
+        console.log("data", pending, data);
+        if (count == 0) {
+          delayUpdate(stocks, names[0], { price: 4 });
+        } else {
+          const change = data.filter(x => x.payload.doc.id === names[0])[0];
+          console.log(pending, change.payload.doc.metadata);
+          expect(data.length).toEqual(1);
+          expect(change.payload.doc.data().price).toEqual(4);
+          expect(change.type).toEqual('modified');
+          expect(change.payload.doc.metadata.hasPendingWrites).toEqual(count == 1);
+          expect(change.payload.doc.metadata.fromCache).toEqual(count == 1);
+        }
+      });
+      
     });
 
     it('should be able to filter snapshotChanges() types - added', async (done) => {
