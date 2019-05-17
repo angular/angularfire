@@ -31,7 +31,7 @@ export function sortedChanges<T>(query: Query, events: DocumentChangeType[]): Ob
         const docChanges = changes.payload.docChanges(options);
         if (firstEmission) {
           return [{ type: 'value', payload: combineChanges([], docChanges, events) } as DocumentChangeOrMetadata<T>];
-        } else if (firstEmission && docChanges.length > 0) {
+        } else if (docChanges.length > 0) {
           return docChanges;
         } else {
           return [{ type: 'metadata', payload: changes.payload.metadata } as DocumentChangeOrMetadata<T>];
@@ -40,7 +40,8 @@ export function sortedChanges<T>(query: Query, events: DocumentChangeType[]): Ob
       tap(() => firstEmission = false),
       tap(change => console.log("change", change)),
       scan((current, changes) => combineChanges(current, changes, events), new Array<DocumentChange<T>>()),
-      map(changes => changes.map(c => ({ type: c.type, payload: c } as DocumentChangeAction<T>)))
+      map(changes => changes.map(c => ({ type: c.type, payload: c } as DocumentChangeAction<T>))),
+      tap(change => console.log("c&m", change)),
     );
 }
 
