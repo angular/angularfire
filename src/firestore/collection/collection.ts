@@ -16,6 +16,9 @@ export function validateEventsArray(events?: DocumentChangeType[]) {
   return events;
 }
 
+export type ChangeOptions = firestore.SnapshotListenOptions & { events?: DocumentChangeType[] };
+
+// SEMVER @ v6 only allow options
 /**
  * AngularFirestoreCollection service
  *
@@ -61,23 +64,18 @@ export class AngularFirestoreCollection<T=DocumentData> {
    * your own data structure.
    * @param events
    */
-  stateChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction<T>[]> {
-    if(!events || events.length === 0) {
-      return this.afs.scheduler.keepUnstableUntilFirst(
-        this.afs.scheduler.runOutsideAngular(
-          docChanges<T>(this.query)
-        )
-      );
-    }
-    return this.afs.scheduler.keepUnstableUntilFirst(
-        this.afs.scheduler.runOutsideAngular(
-          docChanges<T>(this.query)
-        )
+  stateChanges(eventsOrOptions?: DocumentChangeType[]|ChangeOptions): Observable<DocumentChangeAction<T>[]> {
+    const events = eventsOrOptions && (Array.isArray(eventsOrOptions) ? eventsOrOptions : eventsOrOptions.events) || [];
+    const options = eventsOrOptions && !Array.isArray(eventsOrOptions) ? eventsOrOptions : {};
+    const ret = this.afs.scheduler.keepUnstableUntilFirst(
+      this.afs.scheduler.runOutsideAngular(
+        docChanges<T>(this.query, options)
       )
-      .pipe(
-        map(actions => actions.filter(change => events.indexOf(change.type) > -1)),
-        filter(changes =>  changes.length > 0)
-      );
+    );
+    return events.length === 0 ? ret : ret.pipe(
+      map(actions => actions.filter(change => events.indexOf(change.type) > -1)),
+      filter(changes =>  changes.length > 0)
+    );
   }
 
   /**
@@ -85,8 +83,8 @@ export class AngularFirestoreCollection<T=DocumentData> {
    * but it collects each event in an array over time.
    * @param events
    */
-  auditTrail(events?: DocumentChangeType[]): Observable<DocumentChangeAction<T>[]> {
-    return this.stateChanges(events).pipe(scan((current, action) => [...current, ...action], []));
+  auditTrail(eventsOrOptions?: DocumentChangeType[]|ChangeOptions): Observable<DocumentChangeAction<T>[]> {
+    return this.stateChanges(eventsOrOptions).pipe(scan((current, action) => [...current, ...action], []));
   }
 
   /**
@@ -94,9 +92,11 @@ export class AngularFirestoreCollection<T=DocumentData> {
    * query order.
    * @param events
    */
-  snapshotChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction<T>[]> {
+  snapshotChanges(eventsOrOptions?: DocumentChangeType[]|ChangeOptions): Observable<DocumentChangeAction<T>[]> {
+    const events = eventsOrOptions && (Array.isArray(eventsOrOptions) ? eventsOrOptions : eventsOrOptions.events) || [];
+    const options = eventsOrOptions && !Array.isArray(eventsOrOptions) ? eventsOrOptions : {};
     const validatedEvents = validateEventsArray(events);
-    const sortedChanges$ = sortedChanges<T>(this.query, validatedEvents);
+    const sortedChanges$ = sortedChanges<T>(this.query, validatedEvents, options);
     const scheduledSortedChanges$ = this.afs.scheduler.runOutsideAngular(sortedChanges$);
     return this.afs.scheduler.keepUnstableUntilFirst(scheduledSortedChanges$);
   }
@@ -110,22 +110,19 @@ export class AngularFirestoreCollection<T=DocumentData> {
    */
   valueChanges(): Observable<T[]>
   valueChanges({}): Observable<T[]>
-  valueChanges<K extends string>(options: {idField: K}): Observable<(T & { [T in K]: string })[]>
-  valueChanges<K extends string>(options: {idField?: K} = {}): Observable<T[]> {
-    const fromCollectionRef$ = fromCollectionRef<T>(this.query);
+  valueChanges<K extends string, L extends string>(options: { idField: K, metadataField: L }): Observable<(T & { [T in L]: firestore.SnapshotMetadata } & { [T in K]: string })[]>
+  valueChanges<L extends string>(options: { metadataField: L }): Observable<(T & { [T in L]: firestore.SnapshotMetadata })[]>
+  valueChanges<K extends string>(options: { idField: K}): Observable<(T & { [T in K]: string })[]>
+  valueChanges(options: {idField?: string, metadataField?: string} = {}): Observable<T[]> {
+    const fromCollectionRef$ = fromCollectionRef<T>(this.query, options.metadataField ? { includeMetadataChanges: true } : {});
     const scheduled$ = this.afs.scheduler.runOutsideAngular(fromCollectionRef$);
     return this.afs.scheduler.keepUnstableUntilFirst(scheduled$)
       .pipe(
-        map(actions => actions.payload.docs.map(a => {
-          if (options.idField) {
-            return { 
-              ...a.data() as Object, 
-              ...{ [options.idField]: a.id } 
-            } as T & { [T in K]: string };
-          } else {
-            return a.data()
-          }
-        }))
+        map(actions => actions.payload.docs.map(a => ({ 
+          ...(a.data() as Object),
+          ...(options.metadataField ? { [options.metadataField]: a.metadata } : {}),
+          ...(options.idField ? { [options.idField]: a.id } : {})
+        } as T)))
       );
   }
 

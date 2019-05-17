@@ -49,7 +49,7 @@ describe('AngularFirestoreCollection', () => {
       const ITEMS = 4;
       const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
 
-      const sub = stocks.valueChanges().subscribe(data => {
+      const sub = stocks.valueChanges({idField: 'id', metadataField: 'meta'}).subscribe(data => {
         // unsub immediately as we will be deleting data at the bottom
         // and that will trigger another subscribe callback and fail
         // the test
@@ -59,6 +59,8 @@ describe('AngularFirestoreCollection', () => {
         // if the collection state is altered during a test run
         expect(data.length).toEqual(ITEMS);
         data.forEach(stock => {
+          console.log(stock.id);
+          console.log(stock.meta);
           // We used the same piece of data so they should all equal
           expect(stock).toEqual(FAKE_STOCK_DATA);
         });
