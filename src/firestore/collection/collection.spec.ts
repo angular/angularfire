@@ -1,7 +1,6 @@
 import { FirebaseApp, AngularFireModule } from '@angular/fire';
 import { AngularFirestore } from '../firestore';
 import { AngularFirestoreModule } from '../firestore.module';
-import { AngularFirestoreDocument } from '../document/document';
 import { AngularFirestoreCollection } from './collection';
 import { QueryFn } from '../interfaces';
 import { Observable, BehaviorSubject, Subscription } from 'rxjs';
@@ -30,7 +29,7 @@ describe('AngularFirestoreCollection', () => {
     TestBed.configureTestingModule({
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG),
-        AngularFirestoreModule.enablePersistence()
+        AngularFirestoreModule.enablePersistence({synchronizeTabs: true})
       ]
     });
     inject([FirebaseApp, AngularFirestore], (_app: FirebaseApp, _afs: AngularFirestore) => {
@@ -39,8 +38,8 @@ describe('AngularFirestoreCollection', () => {
     })();
   });
 
-  afterEach(async (done) => {
-    await app.delete();
+  afterEach(done => {
+    app.delete();
     done();
   });
 
@@ -68,6 +67,19 @@ describe('AngularFirestoreCollection', () => {
         Promise.all(promises).then(done).catch(fail);
       });
 
+    });
+
+    it('should optionally map the doc ID to the emitted data object', async (done: any) => {
+      const ITEMS = 1;
+      const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const idField = 'myCustomID';
+      const sub = stocks.valueChanges({idField}).subscribe(data => {
+        sub.unsubscribe();
+        const stock = data[0];
+        expect(stock[idField]).toBeDefined();
+        expect(stock).toEqual(jasmine.objectContaining(FAKE_STOCK_DATA));
+        deleteThemAll(names, ref).then(done).catch(fail);
+      })
     });
 
     it('should handle multiple subscriptions (hot)', async (done: any) => {
