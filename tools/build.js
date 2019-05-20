@@ -23,7 +23,7 @@ const GLOBALS = {
   'firebase/messaging': 'firebase',
   'firebase/firestore': 'firebase',
   'firebase/functions': 'firebase',
-  'firebase/perf': 'firebase',
+  'firebase/performance': 'firebase',
   'firebase/storage': 'firebase',
   '@angular/fire': 'angularfire2',
   '@angular/fire/auth': 'angularfire2.auth',

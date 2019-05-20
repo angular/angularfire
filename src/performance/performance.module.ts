@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { AngularFirePerformance } from './performance';
 
-import 'firebase/perf';
+import 'firebase/performance';
 
 @NgModule({
   providers: [ AngularFirePerformance ]

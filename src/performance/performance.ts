@@ -1,9 +1,9 @@
-import { Injectable, Inject, Optional, NgZone, ApplicationRef } from '@angular/core';
+import { Injectable, NgZone, ApplicationRef, InjectionToken, Inject, Optional } from '@angular/core';
 import { Observable } from 'rxjs';
-import { filter, tap, take } from 'rxjs/operators';
-import { FirebaseOptions, FirebaseAppConfig } from '@angular/fire';
-import { FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory } from '@angular/fire';
-import { PerformanceController } from '@firebase/performance/dist/src/controllers/perf';
+import { first, tap } from 'rxjs/operators';
+import { performance } from 'firebase/app';
+
+export const AUTOMATICALLY_TRACE_CORE_NG_METRICS = new InjectionToken<boolean>('angularfire2.performance.auto_trace');
 
 export type TraceOptions = {
   metrics: {[key:string]: number},
@@ -16,26 +16,25 @@ export type TraceOptions = {
 @Injectable()
 export class AngularFirePerformance {
   
-  performance: PerformanceController;
+  performance: performance.Performance;
 
   constructor(
-    @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|null|undefined,
+    @Optional() @Inject(AUTOMATICALLY_TRACE_CORE_NG_METRICS) automaticallyTraceCoreNgMetrics:boolean|null,
     appRef: ApplicationRef,
     private zone: NgZone
   ) {
     
-    this.performance = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(options, nameOrConfig);
-      return app.performance();
-    });
+    this.performance = zone.runOutsideAngular(() => performance());
     
-    // TODO detirmine more built in metrics
-    appRef.isStable.pipe(
-      this.traceComplete('isStable'),
-      filter(it => it),
-      take(1)
-    ).subscribe();
+    if (automaticallyTraceCoreNgMetrics != false) {
+
+      // TODO detirmine more built in metrics
+      appRef.isStable.pipe(
+        this.traceComplete('isStable'),
+        first(it => it)
+      ).subscribe();
+
+    }
 
   }
 
