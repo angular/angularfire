@@ -9,7 +9,7 @@ import { skipWhile, withLatestFrom, map, scan } from 'rxjs/operators';
 export function auditTrail<T>(query: DatabaseQuery, events?: ChildEvent[]): Observable<SnapshotAction<T>[]> {
   const auditTrail$ = stateChanges<T>(query, events)
     .pipe(
-      scan<SnapshotAction<T>>((current, action) => [...current, action], [])
+      scan((current, action) => [...current, action], [])
     );
   return waitForLoaded<T>(query, auditTrail$);
 }
