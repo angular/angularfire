@@ -1,3 +1,21 @@
+<a name="5.1.2"></a>
+# [5.1.2](https://github.com/angular/angularfire2/compare/5.1.1...5.1.2) (2019-03-11)
+
+
+### Bug Fixes
+
+* **afs:** No longer pull in the depreciated timestampsInSnapshots setting for Firebase 5.8 ([#2013](https://github.com/angular/angularfire2/issues/2013)) ([5df31c3](https://github.com/angular/angularfire2/commit/5df31c3))
+
+<a name="5.1.1"></a>
+# [5.1.1](https://github.com/angular/angularfire2/compare/5.1.0...5.1.1) (2018-11-29)
+
+
+### Bug Fixes
+
+* **functions:** Fix the default Functions region bug ([#1945](https://github.com/angular/angularfire2/issues/1945)) ([7d175b3](https://github.com/angular/angularfire2/commit/7d175b3))
+
+
+
 <a name="5.1.0"></a>
 # [5.1.0](https://github.com/angular/angularfire2/compare/5.0.0-rc.12...5.1.0) (2018-10-17)
 
@@ -9,7 +27,7 @@
 
 
 <a name="5.0.2"></a>
-## [5.0.2](https://github.com/angular/angularfire2/compare/5.0.1...5.0.2) (2018-09-21)
+# [5.0.2](https://github.com/angular/angularfire2/compare/5.0.1...5.0.2) (2018-09-21)
 
 ### Bug Fixes
 
