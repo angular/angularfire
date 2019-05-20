@@ -73,11 +73,11 @@ Notice that calling `httpsCallable()` does not initiate the request. It creates 
 
 ### Functions Region
 
-Allow configuration of the Function's region by adding the `FunctionsRegionToken` to the `providers` section of your `NgModule`. The default is `us-central1`.
+Allow configuration of the Function's region by adding `FUNCTIONS_REGION` to the `providers` section of your `NgModule`. The default is `us-central1`.
 
 ```ts
 import { NgModule } from '@angular/core';
-import { AngularFireFunctionsModule, FunctionsRegionToken } from '@angular/fire/functions';
+import { AngularFireFunctionsModule, FUNCTIONS_REGION } from '@angular/fire/functions';
 
 @NgModule({
   imports: [
@@ -87,7 +87,7 @@ import { AngularFireFunctionsModule, FunctionsRegionToken } from '@angular/fire/
   ],
   ...
   providers: [
-   { provide: FunctionsRegionToken, useValue: 'asia-northeast1' }
+   { provide: FUNCTIONS_REGION, useValue: 'asia-northeast1' }
   ]
 })
 export class AppModule {}
@@ -96,11 +96,11 @@ export class AppModule {}
 
 ### Cloud Functions emulator
 
-Point callable Functions to the Cloud Function emulator by adding the  `FunctionsEmulatorOriginToken` to the `providers` section of your `NgModule`.
+Point callable Functions to the Cloud Function emulator by adding `FUNCTIONS_ORIGIN` to the `providers` section of your `NgModule`.
 
 ```ts
 import { NgModule } from '@angular/core';
-import { AngularFireFunctionsModule, FunctionsEmulatorOriginToken } from '@angular/fire/functions';
+import { AngularFireFunctionsModule, FUNCTIONS_ORIGIN } from '@angular/fire/functions';
 
 @NgModule({
   imports: [
@@ -110,7 +110,7 @@ import { AngularFireFunctionsModule, FunctionsEmulatorOriginToken } from '@angul
   ],
   ...
   providers: [
-   { provide: FunctionsEmulatorOriginToken, useValue: 'http://localhost:5005' }
+   { provide: FUNCTIONS_ORIGIN, useValue: 'http://localhost:5005' }
   ]
 })
 export class AppModule {}
