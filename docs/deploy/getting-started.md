@@ -1,4 +1,4 @@
-# Deployment with the Angular CLI
+# Deploy your application on Firebase Hosting
 
 In this guide, we'll look at how to use `@angular/fire` to automatically deploy an Angular application to Firebase hosting by using the Angular CLI.
 
