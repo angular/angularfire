@@ -6,16 +6,13 @@ import { firestore } from 'firebase/app';
 import { DocumentChangeType, CollectionReference, Query, DocumentReference, DocumentData, DocumentChangeAction } from '../interfaces';
 import { validateEventsArray } from '../collection/collection';
 import { docChanges, sortedChanges } from '../collection/changes';
-import { AngularFirestoreDocument } from '../document/document';
 import { AngularFirestore } from '../firestore';
 import { runInZone } from '@angular/fire';
 
 /**
- * AngularFirestoreCollection service
+ * AngularFirestoreCollectionGroup service
  *
- * This class creates a reference to a Firestore Collection. A reference and a query are provided in
- * in the constructor. The query can be the unqueried reference if no query is desired.The class
- * is generic which gives you type safety for data update methods and data streaming.
+ * This class holds a reference to a Firestore Collection Group Query.
  *
  * This class uses Symbol.observable to transform into Observable using Observable.from().
  *
@@ -23,26 +20,19 @@ import { runInZone } from '@angular/fire';
  *
  * Example:
  *
- * const collectionRef = firebase.firestore.collection('stocks');
+ * const collectionGroup = firebase.firestore.collectionGroup('stocks');
  * const query = collectionRef.where('price', '>', '0.01');
- * const fakeStock = new AngularFirestoreCollection<Stock>(collectionRef, query);
- *
- * // NOTE!: the updates are performed on the reference not the query
- * await fakeStock.add({ name: 'FAKE', price: 0.01 });
+ * const fakeStock = new AngularFirestoreCollectionGroup<Stock>(query, afs);
  *
  * // Subscribe to changes as snapshots. This provides you data updates as well as delta updates.
  * fakeStock.valueChanges().subscribe(value => console.log(value));
  */
 export class AngularFirestoreCollectionGroup<T=DocumentData> {
   /**
-   * The constructor takes in a CollectionReference and Query to provide wrapper methods
+   * The constructor takes in a CollectionGroupQuery to provide wrapper methods
    * for data operations and data streaming.
-   *
-   * Note: Data operation methods are done on the reference not the query. This means
-   * when you update data it is not updating data to the window of your query unless
-   * the data fits the criteria of the query. See the AssociatedRefence type for details
-   * on this implication.
-   * @param ref
+   * @param query
+   * @param afs
    */
   constructor(
     private readonly query: Query,
