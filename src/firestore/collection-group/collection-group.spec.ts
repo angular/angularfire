@@ -139,7 +139,7 @@ describe('AngularFirestoreCollectionGroup', () => {
         // the first time should all be 'added'
         if(count === 1) {
           // make an update
-          stocks.doc(names[0]).update({ price: 2});
+          ref.doc(names[0]).update({ price: 2});
         }
         // on the second round, make sure the array is still the same
         // length but the updated item is now modified
@@ -192,7 +192,7 @@ describe('AngularFirestoreCollectionGroup', () => {
         if(count === 1) {
           // make an update
           firstIndex = data.filter(d => d.payload.doc.id === names[0])[0].payload.newIndex;
-          stocks.doc(names[0]).update({ price: 2 });
+          ref.doc(names[0]).update({ price: 2 });
         }
         // on the second round, make sure the array is still the same
         // length but the updated item is now modified
@@ -220,7 +220,7 @@ describe('AngularFirestoreCollectionGroup', () => {
         deleteThemAll(names, ref).then(done).catch(done.fail);
       });
 
-      delayUpdate(stocks, names[0], { price: 2 });
+      delayUpdate(ref, names[0], { price: 2 });
     });
 
     it('should be able to filter snapshotChanges() types - added', async (done) => {
@@ -240,7 +240,28 @@ describe('AngularFirestoreCollectionGroup', () => {
 
 
       names = names.concat([nextId]);
-      delayAdd(stocks, nextId, { price: 2 });
+      // TODO these two add tests are the only one really testing collection-group queries
+      //      should flex more, maybe split the stocks between more than one collection
+      delayAdd(ref.doc(names[0]).collection(randomCollectionName), nextId, { price: 2 });
+    });
+
+    it('should be able to filter snapshotChanges() types - added w/same id', async (done) => {
+      const ITEMS = 10;
+      let { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      
+      const sub = stocks.snapshotChanges(['added']).pipe(skip(1)).subscribe(data => {
+        sub.unsubscribe();
+        const change = data.filter(x => x.payload.doc.id === names[0])[1];
+        expect(data.length).toEqual(ITEMS + 1);
+        expect(change.payload.doc.data().price).toEqual(3);
+        expect(change.type).toEqual('added');
+        ref.doc(names[0]).collection(randomCollectionName).doc(names[0]).delete()
+          .then(() => deleteThemAll(names, ref))
+          .then(done).catch(done.fail);
+        done();
+      });
+
+      delayAdd(ref.doc(names[0]).collection(randomCollectionName), names[0], { price: 3 });
     });
 
     it('should be able to filter snapshotChanges() types - added/modified', async (done) => {
@@ -256,7 +277,7 @@ describe('AngularFirestoreCollectionGroup', () => {
           expect(data.length).toEqual(ITEMS + 1);
           expect(change.payload.doc.data().price).toEqual(2);
           expect(change.type).toEqual('added');
-          delayUpdate(stocks, names[0], { price: 2 });
+          delayUpdate(ref, names[0], { price: 2 });
         }
         if (count == 2) {
           const change = data.filter(x => x.payload.doc.id === names[0])[0];
@@ -269,7 +290,7 @@ describe('AngularFirestoreCollectionGroup', () => {
       });
 
       names = names.concat([nextId]);
-      delayAdd(stocks, nextId, { price: 2 });
+      delayAdd(ref, nextId, { price: 2 });
     });
 
     it('should be able to filter snapshotChanges() types - removed', async (done) => {
@@ -285,7 +306,7 @@ describe('AngularFirestoreCollectionGroup', () => {
         done();
       });
 
-      delayDelete(stocks, names[0], 400);
+      delayDelete(ref, names[0], 400);
     });
 
   });
@@ -321,7 +342,7 @@ describe('AngularFirestoreCollectionGroup', () => {
       const sub = stocks.stateChanges().subscribe(data => {
         count = count + 1;
         if(count === 1) {
-          stocks.doc(names[0]).update({ price: 2});
+          ref.doc(names[0]).update({ price: 2});
         }
         if(count === 2) {
           expect(data.length).toEqual(1);
@@ -372,7 +393,7 @@ describe('AngularFirestoreCollectionGroup', () => {
         done();
       });
 
-      delayUpdate(stocks, names[0], { price: 2 });
+      delayUpdate(ref, names[0], { price: 2 });
     });
 
     it('should be able to filter stateChanges() types - added', async (done) => {
@@ -391,7 +412,7 @@ describe('AngularFirestoreCollectionGroup', () => {
 
       const nextId = ref.doc('a').id;
       names = names.concat([nextId]);
-      delayAdd(stocks, nextId, { price: 2 });
+      delayAdd(ref, nextId, { price: 2 });
     });
 
     it('should be able to filter stateChanges() types - removed', async (done) => {
@@ -406,7 +427,7 @@ describe('AngularFirestoreCollectionGroup', () => {
         done();
       });
 
-      delayDelete(stocks, names[0], 400);
+      delayDelete(ref, names[0], 400);
     });
   });
 
@@ -418,7 +439,7 @@ describe('AngularFirestoreCollectionGroup', () => {
       const sub = stocks.auditTrail().subscribe(data => {
         count = count + 1;
         if(count === 1) {
-          stocks.doc(names[0]).update({ price: 2});
+          ref.doc(names[0]).update({ price: 2});
         }
         if(count === 2) {
           sub.unsubscribe();
@@ -441,7 +462,7 @@ describe('AngularFirestoreCollectionGroup', () => {
         done();
       });
 
-      delayDelete(stocks, names[0], 400);
+      delayDelete(ref, names[0], 400);
     });
   });
 
