@@ -20,7 +20,6 @@ const GLOBALS = {
   '@angular-devkit/core': 'ng-devkit.core',
   '@angular-devkit/core/node': 'ng-devkit.core.node',
   '@angular-devkit/architect': 'ng-devkit.architect',
-  '@angular-devkit/architect/src/index2': 'ng-devkit.architect-2',
   'firebase': 'firebase',
   'firebase/app': 'firebase',
   'firebase/auth': 'firebase',
@@ -45,6 +44,7 @@ const GLOBALS = {
 // Map of dependency versions across all packages
 const VERSIONS = {
   ANGULAR_VERSION: pkg.dependencies['@angular/core'],
+  ANGULAR_DEVKIT_ARCH_VERSION: pkg.dependencies['@angular-devkit/architect'],
   FIREBASE_VERSION: pkg.dependencies['firebase'],
   RXJS_VERSION: pkg.dependencies['rxjs'],
   ZONEJS_VERSION: pkg.dependencies['zone.js'],

@@ -2,7 +2,7 @@ import {
   BuilderContext,
   BuilderOutput,
   createBuilder
-} from "@angular-devkit/architect/src/index2";
+} from "@angular-devkit/architect";
 import { NodeJsSyncHost } from "@angular-devkit/core/node";
 import deploy from "./actions";
 import { experimental, join, normalize } from "@angular-devkit/core";

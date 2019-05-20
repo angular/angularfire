@@ -1,4 +1,4 @@
-import { BuilderContext } from "@angular-devkit/architect/src/index2";
+import { BuilderContext } from "@angular-devkit/architect";
 import { FirebaseTools } from "../interfaces";
 
 export default async function deploy(
