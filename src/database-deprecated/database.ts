@@ -17,8 +17,8 @@ export class AngularFireDatabase {
 
   constructor(
     @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|undefined,
-    @Optional() @Inject(RealtimeDatabaseURL) databaseURL:string,
+    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|null|undefined,
+    @Optional() @Inject(RealtimeDatabaseURL) databaseURL:string|null,
     zone: NgZone
   ) {
     this.database = zone.runOutsideAngular(() => {

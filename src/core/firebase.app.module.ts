@@ -1,5 +1,5 @@
 import { InjectionToken, NgModule, Optional } from '@angular/core';
-import { app, auth, database, firestore, functions, messaging, storage } from 'firebase/app';
+import { auth, database, firestore, functions, messaging, storage } from 'firebase/app';
 // @ts-ignore (https://github.com/firebase/firebase-js-sdk/pull/1206)
 import firebase from 'firebase/app'; // once fixed can pull in as "default as firebase" above
 
@@ -19,14 +19,11 @@ export type FirebaseFunctions = functions.Functions;
 
 // Have to implement as we need to return a class from the provider, we should consider exporting
 // this in the firebase/app types as this is our highest risk of breaks
-export class FirebaseApp implements app.App {
+export class FirebaseApp {
     name: string;
     options: {};
     auth: () => FirebaseAuth;
-    // app.App database() doesn't take a databaseURL arg in the public types?
     database: (databaseURL?: string) => FirebaseDatabase;
-    // automaticDataCollectionEnabled is now private? _automaticDataCollectionEnabled?
-    // automaticDataCollectionEnabled: true,
     messaging: () => FirebaseMessaging;
     storage: (storageBucket?: string) => FirebaseStorage;
     delete: () => Promise<void>;
@@ -34,7 +31,7 @@ export class FirebaseApp implements app.App {
     functions: (region?: string) => FirebaseFunctions;
 }
 
-export function _firebaseAppFactory(options: FirebaseOptions, nameOrConfig?: string | FirebaseAppConfig) {
+export function _firebaseAppFactory(options: FirebaseOptions, nameOrConfig?: string|FirebaseAppConfig|null) {
     const name = typeof nameOrConfig === 'string' && nameOrConfig || '[DEFAULT]';
     const config = typeof nameOrConfig === 'object' && nameOrConfig || {};
     config.name = config.name || name;

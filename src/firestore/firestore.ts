@@ -7,9 +7,9 @@ import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 
 import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformServer } from '@angular/common';
 
-import { firestore } from 'firebase/app';
+import { firestore, SDK_VERSION } from 'firebase/app';
 
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
@@ -18,7 +18,10 @@ export const EnablePersistenceToken = new InjectionToken<boolean>('angularfire2.
 export const PersistenceSettingsToken = new InjectionToken<PersistenceSettings|undefined>('angularfire2.firestore.persistenceSettings');
 export const FirestoreSettingsToken = new InjectionToken<Settings>('angularfire2.firestore.settings');
 
-export const DefaultFirestoreSettings = {timestampsInSnapshots: true} as Settings;
+// timestampsInSnapshots was depreciated in 5.8.0
+const major = parseInt(SDK_VERSION.split('.')[0]);
+const minor = parseInt(SDK_VERSION.split('.')[1]);
+export const DefaultFirestoreSettings = ((major < 5 || (major == 5 && minor < 8)) ? {timestampsInSnapshots: true} : {}) as Settings;
 
 /**
  * A utility methods for associating a collection reference with
@@ -107,12 +110,12 @@ export class AngularFirestore {
    */
   constructor(
     @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|undefined,
-    @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean,
-    @Optional() @Inject(FirestoreSettingsToken) settings: Settings,
+    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|null|undefined,
+    @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean|null,
+    @Optional() @Inject(FirestoreSettingsToken) settings: Settings|null,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
-    @Optional() @Inject(PersistenceSettingsToken) persistenceSettings: PersistenceSettings|undefined,
+    @Optional() @Inject(PersistenceSettingsToken) persistenceSettings: PersistenceSettings|null,
   ) {
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.firestore = zone.runOutsideAngular(() => {
@@ -122,12 +125,12 @@ export class AngularFirestore {
       return firestore;
     });
 
-    if (shouldEnablePersistence && isPlatformBrowser(platformId)) {
+    if (shouldEnablePersistence && !isPlatformServer(platformId)) {
       // We need to try/catch here because not all enablePersistence() failures are caught
       // https://github.com/firebase/firebase-js-sdk/issues/608
       const enablePersistence = () => {
         try {
-          return from(this.firestore.enablePersistence(persistenceSettings).then(() => true, () => false));
+          return from(this.firestore.enablePersistence(persistenceSettings || undefined).then(() => true, () => false));
         } catch(e) {
           return of(false);
         }
