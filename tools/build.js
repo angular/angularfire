@@ -16,9 +16,6 @@ const GLOBALS = {
   '@angular/core': 'ng.core',
   '@angular/core/testing': 'ng.core.testing',
   '@angular/platform-browser': 'ng.platformBrowser',
-  '@nguniversal/express-engine': 'ng.universal',
-  'cookie': 'cookie',
-  'express': 'express',
   'firebase': 'firebase',
   'firebase/app': 'firebase',
   'firebase/auth': 'firebase',
@@ -27,7 +24,6 @@ const GLOBALS = {
   'firebase/firestore': 'firebase',
   'firebase/functions': 'firebase',
   'firebase/storage': 'firebase',
-  'firebase-admin': 'firebase-admin',
   '@angular/fire': 'angularfire2',
   '@angular/fire/auth': 'angularfire2.auth',
   '@angular/fire/auth-guard': 'angularfire2.auth_guard',
@@ -50,11 +46,7 @@ const VERSIONS = {
   WS_VERSION: pkg.dependencies['ws'],
   BUFFERUTIL_VERSION: pkg.optionalDependencies['bufferutil'],
   UTF_8_VALIDATE_VERSION: pkg.optionalDependencies['utf-8-validate'],
-  XHR2_VERSION: pkg.dependencies['xhr2'],
-  FIREBASE_ADMIN_VERSION: pkg.dependencies['firebase-admin'],
-  EXPRESS_VERSION: pkg.dependencies['express'],
-  COOKIE_VERSION: pkg.dependencies['cookie'],
-  NGUNIVERSAL_VERSION: pkg.dependencies['@nguniversal/express-engine']
+  XHR2_VERSION: pkg.dependencies['xhr2']
 };
 
 const MODULE_NAMES = {
