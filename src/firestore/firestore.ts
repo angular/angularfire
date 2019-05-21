@@ -9,7 +9,12 @@ import { AngularFirestoreCollection } from './collection/collection';
 import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
 
-import { firestore, SDK_VERSION } from 'firebase/app';
+// Workaround for Nodejs build
+// @ts-ignore
+import firebase from 'firebase/app';
+
+// SEMVER: have to import here while we target ng 6, as the version of typescript doesn't allow dynamic import of types
+import { firestore } from 'firebase/app';
 
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
@@ -19,8 +24,8 @@ export const PersistenceSettingsToken = new InjectionToken<PersistenceSettings|u
 export const FirestoreSettingsToken = new InjectionToken<Settings>('angularfire2.firestore.settings');
 
 // timestampsInSnapshots was depreciated in 5.8.0
-const major = parseInt(SDK_VERSION.split('.')[0]);
-const minor = parseInt(SDK_VERSION.split('.')[1]);
+const major = parseInt(firebase.SDK_VERSION.split('.')[0]);
+const minor = parseInt(firebase.SDK_VERSION.split('.')[1]);
 export const DefaultFirestoreSettings = ((major < 5 || (major == 5 && minor < 8)) ? {timestampsInSnapshots: true} : {}) as Settings;
 
 /**
