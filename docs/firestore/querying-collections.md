@@ -197,6 +197,6 @@ ngOnInit() {
 }
 ```
 
-`collectionGroup` returns an `AngularFirestoreCollectionGroup` which is similar to `AngularFirestoreCollection` but as it has no set reference there are no data operation methods such as `add`.
+`collectionGroup` returns an `AngularFirestoreCollectionGroup` which is similar to `AngularFirestoreCollection`. The main difference is that `AngularFirestoreCollectionGroup` has no data operation methods such as `add` because it doesn't have a concrete reference.
 
 ### [Next Step: Getting started with Firebase Authentication](../auth/getting-started.md)
