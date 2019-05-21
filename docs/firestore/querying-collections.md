@@ -180,4 +180,23 @@ export class AppComponent {
 }
 ```
 
+## Collection Group Queries
+
+To query across collections and sub-collections with the same name anywhere in Firestore, you can use collection group queries.
+
+Collection Group Queries allow you to have a more nested data-structure without sacrificing performance. For example, we could easily query all comments a user posted; even if the comments were stored as a sub-collection under `Articles/**` or even nested deeply (`Articles/**/Comments/**/Comments/**/...`):
+
+```ts
+constructor(private afs: AngularFirestore) { }
+
+ngOnInit() {
+  ...
+  // Get all the user's comments, no matter how deeply nested
+  this.comments$ = afs.collectionGroup('Comments', ref => ref.where('user', '==', userId))
+                      .valueChanges({ idField });
+}
+```
+
+`collectionGroup` returns an `AngularFirestoreCollectionGroup` which is similar to `AngularFirestoreCollection`. The main difference is that `AngularFirestoreCollectionGroup` has no data operation methods such as `add` because it doesn't have a concrete reference.
+
 ### [Next Step: Getting started with Firebase Authentication](../auth/getting-started.md)
