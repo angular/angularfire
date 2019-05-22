@@ -12,7 +12,7 @@ ng add @angular/fire
 
 *Note that the command above assumes you have global Angular CLI installed. To install Angular CLI globally run `npm i -g @angular/cli`.*
 
-The command above will trigger the `@angular/fire` `ng-add` schematics. Once they install `@angular/fire`. If you are not authenticated, the schematics will open a browser which will guide you through the authentication flow. Once you authenticate, you'll see a prompt to select a Firebase hosting project.
+The command above will trigger the `@angular/fire` `ng-add` schematics. The schematics will open a web browser and guide you through the Firebase authentication flow (if you're not signed in already). After you authenticate, you'll see a prompt to select a Firebase hosting project.
 
 The schematics will do the following:
 
@@ -53,7 +53,7 @@ ng add @angular/fire --project=[PROJECT_NAME]
 As the second step, to deploy your project run:
 
 ```
-ng run [PROJECT_NAME]:deploy
+ng run [ANGULAR_PROJECT_NAME]:deploy
 ```
 
 The command above will trigger:
