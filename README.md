@@ -102,7 +102,7 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 
 > Firebase Hosting is production-grade web content hosting for developers. With Hosting, you can quickly and easily deploy web apps and static content to a global content delivery network (CDN) with a single command.
 
-- [Deploy your Angular application on Firebase Hosting](docs/deploying-angularfire-to-firebase.md)
+- [Deploy your application on Firebase Hosting](docs/deploy/getting-started.md)
 
 #### Server-side rendering
 

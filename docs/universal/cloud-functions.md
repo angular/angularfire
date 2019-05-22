@@ -7,7 +7,7 @@ After [setting up your application with Angular Universal as outlined in Getting
 If you don't already have the Firebase CLI installed, do so:
 
 ```bash
-npm i -g @firebase-tools
+npm i -g firebase-tools
 firebase login
 ```
 
