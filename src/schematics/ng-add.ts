@@ -1,10 +1,10 @@
-import { SchematicsException, Tree } from "@angular-devkit/schematics";
-import { FirebaseJSON, FirebaseRc } from "./interfaces";
-import { experimental, JsonParseMode, parseJson } from "@angular-devkit/core";
-import { from } from "rxjs";
-import { map, switchMap } from "rxjs/operators";
-import { Project } from "./interfaces";
-import { listProjects, projectPrompt } from "./utils";
+import { SchematicsException, Tree } from '@angular-devkit/schematics';
+import { FirebaseJSON, FirebaseRc } from './interfaces';
+import { experimental, JsonParseMode, parseJson } from '@angular-devkit/core';
+import { from } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+import { Project } from './interfaces';
+import { listProjects, projectPrompt } from './utils';
 
 const stringifyFormatted = (obj: any) => JSON.stringify(obj, null, 2);
 
@@ -24,11 +24,11 @@ function generateHostingConfig(project: string, dist: string) {
   return {
     target: project,
     public: dist,
-    ignore: ["firebase.json", "**/.*", "**/node_modules/**"],
+    ignore: ['firebase.json', '**/.*', '**/node_modules/**'],
     rewrites: [
       {
-        source: "**",
-        destination: "/index.html"
+        source: '**',
+        destination: '/index.html'
       }
     ]
   };
@@ -106,7 +106,7 @@ const overwriteIfExists = (tree: Tree, path: string, content: string) => {
 function getWorkspace(
   host: Tree
 ): { path: string; workspace: experimental.workspace.WorkspaceSchema } {
-  const possibleFiles = ["/angular.json", "/.angular.json"];
+  const possibleFiles = ['/angular.json', '/.angular.json'];
   const path = possibleFiles.filter(path => host.exists(path))[0];
 
   const configBuffer = host.read(path);
@@ -156,19 +156,21 @@ export function ngAdd(tree: Tree, options: NgAddOptions) {
       options.project = workspace.defaultProject;
     } else {
       throw new SchematicsException(
-        "No project selected and no default project in the workspace"
+        'No Angular project selected and no default project in the workspace'
       );
     }
   }
 
   const project = workspace.projects[options.project];
   if (!project) {
-    throw new SchematicsException("Project is not defined in this workspace");
+    throw new SchematicsException(
+      'The specified Angular project is not defined in this workspace'
+    );
   }
 
-  if (project.projectType !== "application") {
+  if (project.projectType !== 'application') {
     throw new SchematicsException(
-      `Deploy requires a project type of "application" in angular.json`
+      `Deploy requires an Angular project type of "application" in angular.json`
     );
   }
 
@@ -179,7 +181,7 @@ export function ngAdd(tree: Tree, options: NgAddOptions) {
     !project.architect.build.options.outputPath
   ) {
     throw new SchematicsException(
-      `Cannot read the output path (architect.build.options.outputPath) of project "${
+      `Cannot read the output path (architect.build.options.outputPath) of the Angular project "${
         options.project
       }" in angular.json`
     );
@@ -187,18 +189,18 @@ export function ngAdd(tree: Tree, options: NgAddOptions) {
 
   const outputPath = project.architect.build.options.outputPath;
 
-  project.architect["deploy"] = {
-    builder: "@angular/fire:deploy",
+  project.architect['deploy'] = {
+    builder: '@angular/fire:deploy',
     options: {}
   };
 
   tree.overwrite(workspacePath, JSON.stringify(workspace, null, 2));
-  generateFirebaseJson(tree, "firebase.json", options.project, outputPath);
+  generateFirebaseJson(tree, 'firebase.json', options.project!, outputPath);
   generateFirebaseRc(
     tree,
-    ".firebaserc",
+    '.firebaserc',
     options.firebaseProject,
-    options.project
+    options.project!
   );
   return tree;
 }
