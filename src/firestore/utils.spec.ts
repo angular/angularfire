@@ -32,19 +32,19 @@ export function deleteThemAll(names, ref) {
   return Promise.all(promises);
 }
 
-export function delayUpdate<T>(collection: AngularFirestoreCollection<T>, path, data, delay = 250) {
+export function delayUpdate<T>(collection: AngularFirestoreCollection<T>|firestore.CollectionReference, path, data, delay = 250) {
   setTimeout(() => {
     collection.doc(path).update(data);
   }, delay);
 }
 
-export function delayAdd<T>(collection: AngularFirestoreCollection<T>, path, data, delay = 250) {
+export function delayAdd<T>(collection: AngularFirestoreCollection<T>|firestore.CollectionReference, path, data, delay = 250) {
   setTimeout(() => {
     collection.doc(path).set(data);
   }, delay);
 }
 
-export function delayDelete<T>(collection: AngularFirestoreCollection<T>, path, delay = 250) {
+export function delayDelete<T>(collection: AngularFirestoreCollection<T>|firestore.CollectionReference, path, delay = 250) {
   setTimeout(() => {
     collection.doc(path).delete();
   }, delay);
