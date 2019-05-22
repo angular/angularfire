@@ -1,6 +1,6 @@
 # Route users with AngularFire guards
 
-`AngularFireAuthGuard` provided prebuild Route Guards using `AngularFireAuth` for your convenience. By default unauthenticated users are not permitted to navigate to protected routes:
+`AngularFireAuthGuard` provides a prebuilt (`canActivate` Router Guard)[https://angular.io/api/router/CanActivate] built with `AngularFireAuth`. By default unauthenticated users are not permitted to navigate to protected routes:
 
 ```ts
 import { AngularFireAuthGuard } from '@angular/fire/auth-guard';
@@ -13,16 +13,18 @@ export const routes: Routes = [
 
 ## Customizing the behavior of `AngularFireAuthGuard`
 
-The `auth-guard` module also provides pre-built pipes for more advanced use cases.
+To customize the behavior of `AngularFireAuthGuard`, you can pass an RXJS pipe through the route data's `authGuardPipe` key.
 
+The `auth-guard` module provides the following pre-built pipes:
+
+| Exported pipe                      | Functionality |
+|-|-|
 | `loggedIn`                         | The default pipe, rejects if the user is not authenticated. |
 | `isNotAnonymous`                   | Rejects if the user is anonymous |
 | `emailVerified`                    | Rejects if the user's email is not verified |
 | `hasCustomClaim(claim)`            | Rejects if the user does not have the specified claim |
 | `redirectUnauthorizedTo(redirect)` | Redirect unauthenticated users to a different route  |
 | `redirectLoggedInTo(redirect)`     | Redirect authenticated users to a different route |
-
-The chosen pipe should be passed into the route data under the key `authGuardPipe`.
 
 Example use:
 
@@ -59,7 +61,7 @@ export const routes: Routes = [
 
 ### Compose your own pipes
 
-`AngularFireAuthGuard` pipes are RXJS operators which transform an optional User to a boolean or Array (for redirects):
+`AngularFireAuthGuard` pipes are RXJS operators which transform an optional User to a boolean or Array (for redirects). You can build easily build your own to customize behavior further:
 
 ```ts
 import { map } from 'rxjs/operators';
@@ -81,7 +83,9 @@ import { customClaims } from '@angular/fire/auth-guard';
 const editorOnly = pipe(customClaims, map(claims => claims.role === "editor"));
 ```
 
-`AngularFireAuthGuard` will also accept `AuthPipeGenerator`s which will generate `AuthPipe`'s given the router state:
+### Using router state
+
+`AngularFireAuthGuard` will also accept `AuthPipeGenerator`s which generate `AuthPipe`'s given the router state:
 
 ```ts
 import { pipe } from 'rxjs';
