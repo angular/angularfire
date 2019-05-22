@@ -124,7 +124,7 @@ function spawnObservable(command, args) {
     const cmd = spawn(command, args);
     observer.next(''); // hack to kick things off, not every command will have a stdout
     cmd.stdout.on('data', (data) => { observer.next(data.toString('utf8')); });
-    cmd.stderr.on('data', (data) => { console.log(data); observer.error(data.toString('utf8')); });
+    cmd.stderr.on('data', (data) => { observer.error(data.toString('utf8')); });
     cmd.on('close', (data) => { observer.complete(); });
   });
 }
@@ -138,7 +138,7 @@ function generateBundle(input, { file, globals, name }) {
       // Supress Typescript this warning
       // https://github.com/rollup/rollup/wiki/Troubleshooting#this-is-undefined
       if (warning.code !== 'THIS_IS_UNDEFINED') {
-        console.log(warning.message);
+        console.warn(warning.message);
       }
     }
   }).then(bundle =>
@@ -298,7 +298,6 @@ function getVersions() {
 
 function verifyVersions() {
   const versions = getVersions();
-  console.log(versions);
   versions.map(version => {
     if(version !== pkg.version) {
       throw new Error('Versions mistmatch');
@@ -363,21 +362,17 @@ function buildLibrary(globals) {
       const messagingStats = measure('messaging');
       const dbdepStats = measure('database-deprecated');
       console.log(`
-      core.umd.js - ${coreStats.size}, ${coreStats.gzip}
-      auth.umd.js - ${authStats.size}, ${authStats.gzip}
-      database.umd.js - ${dbStats.size}, ${dbStats.gzip}
-      firestore.umd.js - ${fsStats.size}, ${fsStats.gzip}
-      functions.umd.js - ${functionsStats.size}, ${functionsStats.gzip}
-      storage.umd.js - ${storageStats.size}, ${storageStats.gzip}
-      messaging.umd.js - ${messagingStats.size}, ${messagingStats.gzip}
-      database-deprecated.umd.js - ${dbdepStats.size}, ${dbdepStats.gzip}
+core.umd.js - ${coreStats.size}, ${coreStats.gzip}
+auth.umd.js - ${authStats.size}, ${authStats.gzip}
+database.umd.js - ${dbStats.size}, ${dbStats.gzip}
+firestore.umd.js - ${fsStats.size}, ${fsStats.gzip}
+functions.umd.js - ${functionsStats.size}, ${functionsStats.gzip}
+storage.umd.js - ${storageStats.size}, ${storageStats.gzip}
+messaging.umd.js - ${messagingStats.size}, ${messagingStats.gzip}
+database-deprecated.umd.js - ${dbdepStats.size}, ${dbdepStats.gzip}
       `);
       verifyVersions();
     }));
 }
 
-buildLibrary(GLOBALS).subscribe(
-  data => { console.log('data', data) },
-  err => { console.log('err', err) },
-  () => { console.log('complete') }
-);
+buildLibrary(GLOBALS).subscribe(() => { }, err => { console.error(err) });

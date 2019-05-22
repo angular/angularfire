@@ -52,7 +52,7 @@ describe("ng-add", () => {
           project: ""
         })
       ).toThrowError(
-        /No project selected and no default project in the workspace/
+        /No Angular project selected and no default project in the workspace/
       );
     });
 
@@ -84,7 +84,7 @@ describe("ng-add", () => {
           firebaseProject: FIREBASE_PROJECT,
           project: PROJECT_NAME
         })
-      ).toThrowError(/Project is not defined in this workspace/);
+      ).toThrowError(/The specified Angular project is not defined in this workspace/);
     });
 
     it("Should throw if specified project is not application", async () => {
@@ -100,7 +100,7 @@ describe("ng-add", () => {
           firebaseProject: FIREBASE_PROJECT,
           project: PROJECT_NAME
         })
-      ).toThrowError(/Deploy requires a project type of "application"/);
+      ).toThrowError(/Deploy requires an Angular project type of "application" in angular.json/);
     });
 
     it("Should throw if app does not have architect configured", async () => {
