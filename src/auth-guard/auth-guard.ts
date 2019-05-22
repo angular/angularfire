@@ -5,8 +5,6 @@ import { map, switchMap, take } from 'rxjs/operators'
 import { User, auth } from 'firebase/app';
 import { AngularFireAuth } from '@angular/fire/auth';
 
-export const EnableRouterGuardListeners = new InjectionToken<boolean>('angularfire2.enableRouterGuardListeners');
-
 export type AuthPipeGenerator = (next: ActivatedRouteSnapshot, state: RouterStateSnapshot) => AuthPipe;
 export type AuthPipe = UnaryFunction<Observable<User|null>, Observable<boolean|any[]>>;
 
