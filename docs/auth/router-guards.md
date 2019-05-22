@@ -1,6 +1,6 @@
 # Route users with AngularFire guards
 
-`AngularFireAuthGuard` provides a prebuilt (`canActivate` Router Guard)[https://angular.io/api/router/CanActivate] built with `AngularFireAuth`. By default unauthenticated users are not permitted to navigate to protected routes:
+`AngularFireAuthGuard` provides a prebuilt [`canActivate` Router Guard](https://angular.io/api/router/CanActivate) using `AngularFireAuth`. By default unauthenticated users are not permitted to navigate to protected routes:
 
 ```ts
 import { AngularFireAuthGuard } from '@angular/fire/auth-guard';
@@ -85,7 +85,7 @@ const editorOnly = pipe(customClaims, map(claims => claims.role === "editor"));
 
 ### Using router state
 
-`AngularFireAuthGuard` will also accept `AuthPipeGenerator`s which generate `AuthPipe`'s given the router state:
+`AngularFireAuthGuard` will also accept `AuthPipeGenerator`s which generate `AuthPipe`s given the router state:
 
 ```ts
 import { pipe } from 'rxjs';
