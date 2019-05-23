@@ -34,6 +34,7 @@ module.exports = function(config) {
       'node_modules/firebase/firebase-storage.js',
       'dist/packages-dist/bundles/core.umd.{js,map}',
       'dist/packages-dist/bundles/auth.umd.{js,map}',
+      'dist/packages-dist/bundles/auth-guard.umd.{js,map}',
       'dist/packages-dist/bundles/database.umd.{js,map}',
       'dist/packages-dist/bundles/firestore.umd.{js,map}',
       'dist/packages-dist/bundles/functions.umd.{js,map}',
