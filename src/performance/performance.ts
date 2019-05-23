@@ -4,13 +4,15 @@ import { first, tap } from 'rxjs/operators';
 import { performance } from 'firebase/app';
 
 export const AUTOMATICALLY_TRACE_CORE_NG_METRICS = new InjectionToken<boolean>('angularfire2.performance.auto_trace');
+export const INSTRUMENTATION_ENABLED = new InjectionToken<boolean>('angularfire2.performance.instrumentationEnabled');
+export const DATA_COLLECTION_ENABLED = new InjectionToken<boolean>('angularfire2.performance.dataCollectionEnabled');
 
 export type TraceOptions = {
-  metrics: {[key:string]: number},
-  attributes?:{[key:string]:string},
-  attribute$?:{[key:string]:Observable<string>},
-  incrementMetric$:{[key:string]: Observable<number|void|null|undefined>},
-  metric$?:{[key:string]: Observable<number>}
+  metrics?: {[key:string]: number},
+  attributes?: {[key:string]:string},
+  attribute$?: {[key:string]:Observable<string>},
+  incrementMetric$?: {[key:string]: Observable<number|void|null|undefined>},
+  metric$?: {[key:string]: Observable<number>}
 };
 
 @Injectable()
@@ -20,17 +22,22 @@ export class AngularFirePerformance {
 
   constructor(
     @Optional() @Inject(AUTOMATICALLY_TRACE_CORE_NG_METRICS) automaticallyTraceCoreNgMetrics:boolean|null,
+    @Optional() @Inject(INSTRUMENTATION_ENABLED) instrumentationEnabled:boolean|null,
+    @Optional() @Inject(DATA_COLLECTION_ENABLED) dataCollectionEnabled:boolean|null,
     appRef: ApplicationRef,
     private zone: NgZone
   ) {
     
     this.performance = zone.runOutsideAngular(() => performance());
+
+    if (instrumentationEnabled == false) { this.performance.instrumentationEnabled = false }
+    if (dataCollectionEnabled == false) { this.performance.dataCollectionEnabled = false }
     
     if (automaticallyTraceCoreNgMetrics != false) {
 
-      // TODO detirmine more built in metrics
+      // TODO determine more built in metrics
       appRef.isStable.pipe(
-        this.traceComplete('isStable'),
+        this.traceUntilLast('isStable'),
         first(it => it)
       ).subscribe();
 
@@ -73,13 +80,31 @@ export class AngularFirePerformance {
     )
   };
 
-  traceComplete = <T=any>(name:string, options?: TraceOptions) => (source$: Observable<T>) => {
+  traceWhile = <T=any>(name:string, test: (a:T) => boolean, options?: TraceOptions) => (source$: Observable<T>) => {
+    const traceSubscription = this.trace$(name, options).subscribe();
+    return source$.pipe(
+      tap(a => { if (!test(a)) { traceSubscription.unsubscribe() }})
+    )
+  };
+
+  traceUntilLast= <T=any>(name:string, options?: TraceOptions) => (source$: Observable<T>) => {
     const traceSubscription = this.trace$(name, options).subscribe();
     return source$.pipe(
       tap(
         () => {},
         () => {},
         () => traceSubscription.unsubscribe()
+      )
+    )
+  };
+
+  traceUntilFirst = <T=any>(name:string, options?: TraceOptions) => (source$: Observable<T>) => {
+    const traceSubscription = this.trace$(name, options).subscribe();
+    return source$.pipe(
+      tap(
+        () => traceSubscription.unsubscribe(),
+        () => {},
+        () => {}
       )
     )
   };
