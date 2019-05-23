@@ -2,13 +2,13 @@
 # yarn lockfile v1
 
 
-"@angular-devkit/architect@^0.800.0-rc.4 || <9 || 9.0.0-0":
-  version "0.13.9"
-  resolved "https://registry.yarnpkg.com/@angular-devkit/architect/-/architect-0.13.9.tgz#8bbca4b968fccbf88fc2f86542cbee09e1256e1f"
-  integrity sha512-EAFtCs9dsGhpMRC45PoYsrkiExpWz9Ax15qXfzwdDRacz5DmdOVt+QpkLW1beUOwiyj/bhFyj23eaONK2RTn/w==
+"@angular-devkit/architect@^0.800.0-rc.4 || >=8.0.0 <9 || 9.0.0-0":
+  version "0.800.0-rc.4"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/architect/-/architect-0.800.0-rc.4.tgz#ca0bb9b7b62663caf7bf76f8f0afb2ec5ac32db1"
+  integrity sha512-R+LxKHuGKawzAtSBL7fQ9oYEQfzAEX5DNMvDVC1f+INmyA03vcTKPNf1JzgzetKAN4Y3rt4zpv4OSLiuhjvFwg==
   dependencies:
-    "@angular-devkit/core" "7.3.9"
-    rxjs "6.3.3"
+    "@angular-devkit/core" "8.0.0-rc.4"
+    rxjs "6.4.0"
 
 "@angular-devkit/core@7.3.9", "@angular-devkit/core@>=6.0.0 <9 || 9.0.0-0", "@angular-devkit/core@^7.3.6":
   version "7.3.9"
@@ -19,6 +19,17 @@
     chokidar "2.0.4"
     fast-json-stable-stringify "2.0.0"
     rxjs "6.3.3"
+    source-map "0.7.3"
+
+"@angular-devkit/core@8.0.0-rc.4":
+  version "8.0.0-rc.4"
+  resolved "https://registry.yarnpkg.com/@angular-devkit/core/-/core-8.0.0-rc.4.tgz#1deef68aae6e79513b843e9ac75c4f37382eaf73"
+  integrity sha512-+CzO7ymFRZxKEhWGxzHUOvK0lSTW+XV8yoKzNMNWPP9WxHNluAUi82/fxaNtpyUEr0BxKkRlJyU9dkFGYpb++Q==
+  dependencies:
+    ajv "6.10.0"
+    fast-json-stable-stringify "2.0.0"
+    magic-string "0.25.2"
+    rxjs "6.4.0"
     source-map "0.7.3"
 
 "@angular-devkit/schematics@>=6.0.0 <9 || 9.0.0-0", "@angular-devkit/schematics@^7.3.6":
@@ -547,20 +558,20 @@ agent-base@4, agent-base@^4.1.0, agent-base@^4.2.0, agent-base@~4.2.1:
   dependencies:
     es6-promisify "^5.0.0"
 
-ajv@6.9.1:
-  version "6.9.1"
-  resolved "https://registry.yarnpkg.com/ajv/-/ajv-6.9.1.tgz#a4d3683d74abc5670e75f0b16520f70a20ea8dc1"
-  integrity sha512-XDN92U311aINL77ieWHmqCcNlwjoP5cHXDxIxbf2MaPYuCXOHS7gHH8jktxeK5omgd52XbSTX6a4Piwd1pQmzA==
+ajv@6.10.0, ajv@^6.5.5:
+  version "6.10.0"
+  resolved "https://registry.yarnpkg.com/ajv/-/ajv-6.10.0.tgz#90d0d54439da587cd7e843bfb7045f50bd22bdf1"
+  integrity sha512-nffhOpkymDECQyR0mnsUtoCE8RlX38G0rYP+wgLWFyZuUyuuojSSvi/+euOiQBIn63whYwYVIIH1TvE3tu4OEg==
   dependencies:
     fast-deep-equal "^2.0.1"
     fast-json-stable-stringify "^2.0.0"
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
 
-ajv@^6.5.5:
-  version "6.10.0"
-  resolved "https://registry.yarnpkg.com/ajv/-/ajv-6.10.0.tgz#90d0d54439da587cd7e843bfb7045f50bd22bdf1"
-  integrity sha512-nffhOpkymDECQyR0mnsUtoCE8RlX38G0rYP+wgLWFyZuUyuuojSSvi/+euOiQBIn63whYwYVIIH1TvE3tu4OEg==
+ajv@6.9.1:
+  version "6.9.1"
+  resolved "https://registry.yarnpkg.com/ajv/-/ajv-6.9.1.tgz#a4d3683d74abc5670e75f0b16520f70a20ea8dc1"
+  integrity sha512-XDN92U311aINL77ieWHmqCcNlwjoP5cHXDxIxbf2MaPYuCXOHS7gHH8jktxeK5omgd52XbSTX6a4Piwd1pQmzA==
   dependencies:
     fast-deep-equal "^2.0.1"
     fast-json-stable-stringify "^2.0.0"
@@ -5453,7 +5464,7 @@ lru-queue@0.1:
   dependencies:
     es5-ext "~0.10.2"
 
-magic-string@^0.25.0:
+magic-string@0.25.2, magic-string@^0.25.0:
   version "0.25.2"
   resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.25.2.tgz#139c3a729515ec55e96e69e82a11fe890a293ad9"
   integrity sha512-iLs9mPjh9IuTtRsqqhNGYcZXGei0Nh/A4xirrsqW7c+QhKVFL2vm7U09ru6cHRD22azaP/wMDgI+HCqbETMTtg==
@@ -7406,6 +7417,13 @@ rxjs@6.3.3:
   version "6.3.3"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.3.3.tgz#3c6a7fa420e844a81390fb1158a9ec614f4bad55"
   integrity sha512-JTWmoY9tWCs7zvIk/CvRjhjGaOd+OVBM987mxFo+OW66cGpdKjZcpmc74ES1sB//7Kl/PAe8+wEakuhG4pcgOw==
+  dependencies:
+    tslib "^1.9.0"
+
+rxjs@6.4.0:
+  version "6.4.0"
+  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.4.0.tgz#f3bb0fe7bda7fb69deac0c16f17b50b0b8790504"
+  integrity sha512-Z9Yfa11F6B9Sg/BK9MnqnQ+aQYicPLtilXBp2yUtDt2JRCE0h26d33EnfO3ZxoNxG0T92OUucP3Ct7cpfkdFfw==
   dependencies:
     tslib "^1.9.0"
 
