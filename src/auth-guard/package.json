@@ -1,0 +1,32 @@
+{
+    "name": "@angular/fire/auth-guard",
+    "version": "ANGULARFIRE2_VERSION",
+    "description": "The auth guard module",
+    "main": "../bundles/auth-guard.umd.js",
+    "module": "index.js",
+    "es2015": "./es2015/index.js",
+    "keywords": [
+      "angular",
+      "firebase",
+      "rxjs"
+    ],
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/angular/angularfire2.git"
+    },
+    "author": "angular,firebase",
+    "license": "MIT",
+    "peerDependencies": {
+      "@angular/fire": "ANGULARFIRE2_VERSION",
+      "@angular/common": "ANGULAR_VERSION",
+      "@angular/core": "ANGULAR_VERSION",
+      "@angular/platform-browser": "ANGULAR_VERSION",
+      "@angular/platform-browser-dynamic": "ANGULAR_VERSION",
+      "@angular/router": "ANGULAR_VERSION",
+      "firebase": "FIREBASE_VERSION",
+      "rxjs": "RXJS_VERSION",
+      "zone.js": "ZONEJS_VERSION"
+    },
+    "typings": "index.d.ts"
+  }
+  

@@ -108,6 +108,13 @@
     tslib "^1.9.0"
     xhr2 "^0.1.4"
 
+"@angular/router@>=6.0.0 <9 || 9.0.0-0":
+  version "7.2.15"
+  resolved "https://registry.yarnpkg.com/@angular/router/-/router-7.2.15.tgz#b2acbd07c17158801006cdd7e93113d6ec1f116e"
+  integrity sha512-qAubRJRQanguUqJQ76J9GSZ4JFtoyhJKRmX5P23ANZJXpB6YLzF2fJmOGi+E6cV8F0tKBMEq1pjxFTisx0MXwQ==
+  dependencies:
+    tslib "^1.9.0"
+
 "@firebase/app-types@0.4.0":
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/@firebase/app-types/-/app-types-0.4.0.tgz#bb2c651f3b275fef549050cff28af752839c75c0"

@@ -30,6 +30,7 @@ const GLOBALS = {
   'firebase/storage': 'firebase',
   '@angular/fire': 'angularfire2',
   '@angular/fire/auth': 'angularfire2.auth',
+  '@angular/fire/auth-guard': 'angularfire2.auth_guard',
   '@angular/fire/database': 'angularfire2.database',
   '@angular/fire/database-deprecated': 'angularfire2.database_deprecated',
   '@angular/fire/firestore': 'angularfire2.firestore',
@@ -63,6 +64,7 @@ const VERSIONS = {
 const MODULE_NAMES = {
   core: 'angularfire2',
   auth: 'angularfire2.auth',
+  "auth-guard": 'angularfire2.auth_guard',
   database: 'angularfire2.database',
   "database-deprecated": 'angularfire2.database_deprecated',
   firestore: 'angularfire2.firestore',
@@ -75,6 +77,7 @@ const MODULE_NAMES = {
 const ENTRIES = {
   core: `${process.cwd()}/dist/packages-dist/index.js`,
   auth: `${process.cwd()}/dist/packages-dist/auth/index.js`,
+  "auth-guard": `${process.cwd()}/dist/packages-dist/auth-guard/index.js`,
   database: `${process.cwd()}/dist/packages-dist/database/index.js`,
   "database-deprecated": `${process.cwd()}/dist/packages-dist/database-deprecated/index.js`,
   firestore: `${process.cwd()}/dist/packages-dist/firestore/index.js`,
@@ -87,6 +90,7 @@ const ENTRIES = {
 const SRC_PKG_PATHS = {
   core: `${process.cwd()}/src/core/package.json`,
   auth: `${process.cwd()}/src/auth/package.json`,
+  "auth-guard": `${process.cwd()}/src/auth-guard/package.json`,
   database: `${process.cwd()}/src/database/package.json`,
   "database-deprecated": `${process.cwd()}/src/database-deprecated/package.json`,
   firestore: `${process.cwd()}/src/firestore/package.json`,
@@ -99,6 +103,7 @@ const SRC_PKG_PATHS = {
 const DEST_PKG_PATHS = {
   core: `${process.cwd()}/dist/packages-dist/package.json`,
   auth: `${process.cwd()}/dist/packages-dist/auth/package.json`,
+  "auth-guard": `${process.cwd()}/dist/packages-dist/auth-guard/package.json`,
   database: `${process.cwd()}/dist/packages-dist/database/package.json`,
   "database-deprecated": `${process.cwd()}/dist/packages-dist/database-deprecated/package.json`,
   firestore: `${process.cwd()}/dist/packages-dist/firestore/package.json`,
@@ -283,6 +288,7 @@ function getVersions() {
   const paths = [
     getDestPackageFile('core'),
     getDestPackageFile('auth'),
+    getDestPackageFile('auth-guard'),
     getDestPackageFile('database'),
     getDestPackageFile('firestore'),
     getDestPackageFile('firebase-node'),
@@ -323,6 +329,7 @@ function buildModule(name, globals) {
 function buildModules(globals) {
   const core$ = buildModule('core', globals);
   const auth$ = buildModule('auth', globals);
+  const authGuard$ = buildModule('auth-guard', globals);
   const db$ = buildModule('database', globals);
   const firestore$ = buildModule('firestore', globals);
   const functions$ = buildModule('functions', globals);
@@ -333,6 +340,7 @@ function buildModules(globals) {
   return forkJoin(core$, from(copyRootTest())).pipe(
     switchMapTo(schematics$),
     switchMapTo(auth$),
+    switchMapTo(authGuard$),
     switchMapTo(db$),
     switchMapTo(firestore$),
     switchMapTo(functions$),
@@ -355,6 +363,7 @@ function buildLibrary(globals) {
     tap(() => {
       const coreStats = measure('core');
       const authStats = measure('auth');
+      const authGuardStats = measure('auth-guard');
       const dbStats = measure('database');
       const fsStats = measure('firestore');
       const functionsStats = measure('functions');
@@ -364,6 +373,7 @@ function buildLibrary(globals) {
       console.log(`
 core.umd.js - ${coreStats.size}, ${coreStats.gzip}
 auth.umd.js - ${authStats.size}, ${authStats.gzip}
+auth-guard.umd.js - ${authGuardStats.size}, ${authGuardStats.gzip}
 database.umd.js - ${dbStats.size}, ${dbStats.gzip}
 firestore.umd.js - ${fsStats.size}, ${fsStats.gzip}
 functions.umd.js - ${functionsStats.size}, ${functionsStats.gzip}

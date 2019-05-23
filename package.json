@@ -41,6 +41,7 @@
     "@angular/core": ">=6.0.0 <9 || 9.0.0-0",
     "@angular/platform-browser": ">=6.0.0 <9 || 9.0.0-0",
     "@angular/platform-browser-dynamic": ">=6.0.0 <9 || 9.0.0-0",
+    "@angular/router": ">=6.0.0 <9 || 9.0.0-0",
     "firebase": ">= 5.5.7 <7",
     "firebase-tools": "^6.10.0",
     "fuzzy": "^0.1.3",

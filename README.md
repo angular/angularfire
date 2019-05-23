@@ -88,14 +88,18 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 ### Authenticate users
 
 - [Getting started with Firebase Authentication](docs/auth/getting-started.md)
+- [Route users with AngularFire guards](docs/auth/router-guards.md)
 
 ### Upload files
+
 - [Getting started with Cloud Storage](docs/storage/storage.md)
 
 ### Send push notifications
+
 - [Getting started with Firebase Messaging](docs/messaging/messaging.md)
 
 ### Directly call Cloud Functions
+
 - [Getting started with Callable Functions](docs/functions/functions.md)
 
 ### Deploying your application
