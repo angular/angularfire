@@ -98,6 +98,10 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 
 - [Getting started with Firebase Messaging](docs/messaging/messaging.md)
 
+### Monitor your application performance in production
+
+- [Getting started with Performance Monitoring](docs/performance/getting-started.md)
+
 ### Directly call Cloud Functions
 
 - [Getting started with Callable Functions](docs/functions/functions.md)

@@ -18,6 +18,7 @@
       "@angular/fire/functions": ["./functions"],
       "@angular/fire/storage": ["./storage"],
       "@angular/fire/messaging": ["./messaging"],
+      "@angular/fire/performance": ["./performance"],
       "@angular/fire/database-deprecated": ["./database-deprecated"]
     },
     "rootDir": ".",

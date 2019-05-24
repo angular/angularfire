@@ -25,6 +25,7 @@ export class FirebaseApp {
     auth: () => FirebaseAuth;
     database: (databaseURL?: string) => FirebaseDatabase;
     messaging: () => FirebaseMessaging;
+    performance: () => any; // SEMVER: once >= 6 import performance.Performance
     storage: (storageBucket?: string) => FirebaseStorage;
     delete: () => Promise<void>;
     firestore: () => FirebaseFirestore;

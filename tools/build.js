@@ -27,6 +27,7 @@ const GLOBALS = {
   'firebase/messaging': 'firebase',
   'firebase/firestore': 'firebase',
   'firebase/functions': 'firebase',
+  'firebase/performance': 'firebase',
   'firebase/storage': 'firebase',
   '@angular/fire': 'angularfire2',
   '@angular/fire/auth': 'angularfire2.auth',
@@ -37,6 +38,7 @@ const GLOBALS = {
   '@angular/fire/functions': 'angularfire2.functions',
   '@angular/fire/storage': 'angularfire2.storage',
   '@angular/fire/messaging': 'angularfire2.messaging',
+  '@angular/fire/performance': 'angularfire2.performance',
   'fs': 'node.fs',
   'path': 'node.path',
   'inquirer': 'inquirer'
@@ -72,6 +74,7 @@ const MODULE_NAMES = {
   schematics: 'angularfire2.schematics',
   storage: 'angularfire2.storage',
   messaging: 'angularfire2.messaging',
+  performance: 'angularfire2.performance'
 };
 
 const ENTRIES = {
@@ -85,6 +88,7 @@ const ENTRIES = {
   schematics: `${process.cwd()}/dist/packages-dist/schematics/index.js`,
   storage: `${process.cwd()}/dist/packages-dist/storage/index.js`,
   messaging: `${process.cwd()}/dist/packages-dist/messaging/index.js`,
+  performance: `${process.cwd()}/dist/packages-dist/performance/index.js`
 };
 
 const SRC_PKG_PATHS = {
@@ -98,6 +102,7 @@ const SRC_PKG_PATHS = {
   functions: `${process.cwd()}/src/functions/package.json`,
   storage: `${process.cwd()}/src/storage/package.json`,
   messaging: `${process.cwd()}/src/messaging/package.json`,
+  performance: `${process.cwd()}/src/performance/package.json`
 };
 
 const DEST_PKG_PATHS = {
@@ -111,6 +116,7 @@ const DEST_PKG_PATHS = {
   functions: `${process.cwd()}/dist/packages-dist/functions/package.json`,
   storage: `${process.cwd()}/dist/packages-dist/storage/package.json`,
   messaging: `${process.cwd()}/dist/packages-dist/messaging/package.json`,
+  performance: `${process.cwd()}/dist/packages-dist/performance/package.json`
 };
 
 // Constants for running typescript commands
@@ -295,6 +301,7 @@ function getVersions() {
     getDestPackageFile('functions'),
     getDestPackageFile('storage'),
     getDestPackageFile('messaging'),
+    getDestPackageFile('performance'),
     getDestPackageFile('database-deprecated')
   ];
   return paths
@@ -336,6 +343,7 @@ function buildModules(globals) {
   const schematics$ = buildModule('schematics', globals);
   const storage$ = buildModule('storage', globals);
   const messaging$ = buildModule('messaging', globals);
+  const performance$ = buildModule('performance', globals);
   const dbdep$ = buildModule('database-deprecated', globals);
   return forkJoin(core$, from(copyRootTest())).pipe(
     switchMapTo(schematics$),
@@ -346,6 +354,7 @@ function buildModules(globals) {
     switchMapTo(functions$),
     switchMapTo(storage$),
     switchMapTo(messaging$),
+    switchMapTo(performance$),
     switchMapTo(dbdep$)
   );
 }
@@ -369,6 +378,7 @@ function buildLibrary(globals) {
       const functionsStats = measure('functions');
       const storageStats = measure('storage');
       const messagingStats = measure('messaging');
+      const performanceStats = measure('performance');
       const dbdepStats = measure('database-deprecated');
       console.log(`
 core.umd.js - ${coreStats.size}, ${coreStats.gzip}
@@ -379,6 +389,7 @@ firestore.umd.js - ${fsStats.size}, ${fsStats.gzip}
 functions.umd.js - ${functionsStats.size}, ${functionsStats.gzip}
 storage.umd.js - ${storageStats.size}, ${storageStats.gzip}
 messaging.umd.js - ${messagingStats.size}, ${messagingStats.gzip}
+performance.umd.js - ${performanceStats.size}, ${performanceStats.gzip}
 database-deprecated.umd.js - ${dbdepStats.size}, ${dbdepStats.gzip}
       `);
       verifyVersions();

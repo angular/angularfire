@@ -1,5 +1,5 @@
 {
-  "name": "angularfire2",
+  "name": "@angular/fire",
   "version": "5.2.0",
   "description": "The official library of Firebase and Angular.",
   "private": true,
@@ -33,7 +33,7 @@
   },
   "homepage": "https://github.com/angular/angularfire2#readme",
   "dependencies": {
-    "@angular-devkit/architect": "^0.800.0-rc.4",
+    "@angular-devkit/architect": "^0.800.0-rc.4 || >=8.0.0 <9 || 9.0.0-0",
     "@angular-devkit/core": ">=6.0.0 <9 || 9.0.0-0",
     "@angular-devkit/schematics": ">=6.0.0 <9 || 9.0.0-0",
     "@angular/common": ">=6.0.0 <9 || 9.0.0-0",
