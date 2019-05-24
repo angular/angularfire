@@ -84,7 +84,7 @@ export class AngularFirePerformance {
     )
   };
 
-  traceWhile = <T=any>(name:string, test: (a:T) => boolean, options?: TraceOptions & { orUntilComplete: boolean}) => (source$: Observable<T>) => {
+  traceWhile = <T=any>(name:string, test: (a:T) => boolean, options?: TraceOptions & { orComplete: boolean}) => (source$: Observable<T>) => {
     let traceSubscription: Subscription|undefined;
     return source$.pipe(
       tap(
@@ -96,7 +96,7 @@ export class AngularFirePerformance {
           }
         },
         () => {},
-        () => options && options.orUntilComplete && traceSubscription && traceSubscription.unsubscribe()
+        () => options && options.orComplete && traceSubscription && traceSubscription.unsubscribe()
       )
     )
   };
