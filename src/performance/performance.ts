@@ -1,5 +1,5 @@
 import { Injectable, NgZone, ApplicationRef, InjectionToken, Inject, Optional } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { first, tap } from 'rxjs/operators';
 import { performance } from 'firebase/app';
 
@@ -37,7 +37,7 @@ export class AngularFirePerformance {
 
       // TODO determine more built in metrics
       appRef.isStable.pipe(
-        this.traceUntilLast('isStable'),
+        this.traceUntilComplete('isStable'),
         first(it => it)
       ).subscribe();
 
@@ -73,21 +73,35 @@ export class AngularFirePerformance {
     })
   );
 
-  traceUntil = <T=any>(name:string, test: (a:T) => boolean, options?: TraceOptions) => (source$: Observable<T>) => {
+  traceUntil = <T=any>(name:string, test: (a:T) => boolean, options?: TraceOptions & { orComplete: boolean }) => (source$: Observable<T>) => {
     const traceSubscription = this.trace$(name, options).subscribe();
     return source$.pipe(
-      tap(a => { if (test(a)) { traceSubscription.unsubscribe() }})
+      tap(
+        a  => test(a) && traceSubscription.unsubscribe(),
+        () => {},
+        () => options && options.orComplete && traceSubscription.unsubscribe()
+      )
     )
   };
 
-  traceWhile = <T=any>(name:string, test: (a:T) => boolean, options?: TraceOptions) => (source$: Observable<T>) => {
-    const traceSubscription = this.trace$(name, options).subscribe();
+  traceWhile = <T=any>(name:string, test: (a:T) => boolean, options?: TraceOptions & { orUntilComplete: boolean}) => (source$: Observable<T>) => {
+    let traceSubscription: Subscription|undefined;
     return source$.pipe(
-      tap(a => { if (!test(a)) { traceSubscription.unsubscribe() }})
+      tap(
+        a  => {
+          if (test(a)) {
+            traceSubscription = traceSubscription || this.trace$(name, options).subscribe();
+          } else {
+            traceSubscription && traceSubscription.unsubscribe();
+          }
+        },
+        () => {},
+        () => options && options.orUntilComplete && traceSubscription && traceSubscription.unsubscribe()
+      )
     )
   };
 
-  traceUntilLast= <T=any>(name:string, options?: TraceOptions) => (source$: Observable<T>) => {
+  traceUntilComplete = <T=any>(name:string, options?: TraceOptions) => (source$: Observable<T>) => {
     const traceSubscription = this.trace$(name, options).subscribe();
     return source$.pipe(
       tap(
