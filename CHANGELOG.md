@@ -16,7 +16,7 @@ AngularFire 5.2 introduces support for Angular 8 and version 6 of the Firebase S
 * **firestore:** Support Firestore Collection Group Queries ([#2066](https://github.com/angular/angularfire2/issues/2066)) ([c34c0f3](https://github.com/angular/angularfire2/commit/c34c0f3))
 * **functions:** Allow configuration of Functions Emulator Origin ([#2017](https://github.com/angular/angularfire2/issues/2017)) ([d12b4c5](https://github.com/angular/angularfire2/commit/d12b4c5))
 * **schematics:** ng deploy schematic ([#2046](https://github.com/angular/angularfire2/issues/2046)) ([be0a1fb](https://github.com/angular/angularfire2/commit/be0a1fb))
-
+* **firestore:** path on `AngularFirestoreCollection`'s `.doc` is optional ([#1974](https://github.com/angular/angularfire2/issues/1974)) ([c2354f8](https://github.com/angular/angularfire2/commit/c2354f8))
 
 
 <a name="5.1.2"></a>
