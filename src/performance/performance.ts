@@ -93,6 +93,7 @@ export class AngularFirePerformance {
             traceSubscription = traceSubscription || this.trace$(name, options).subscribe();
           } else {
             traceSubscription && traceSubscription.unsubscribe();
+            traceSubscription = undefined;
           }
         },
         () => {},
