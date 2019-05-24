@@ -52,13 +52,12 @@ and help you to craft the change so that it is successfully accepted into the pr
 
 1) Create a fork of AngularFire (See [Forking a Project][github-fork])
 
-2) CD into your clone and install dependencies
+2) Clone your fork, CD into the directory, and install dependencies
 
 ```shell
-$ git clone 
-$ npm install
-$ npm run build
-$ npm test
+$ git clone <your fork SSH/HTTPS from GitHub>
+$ yarn install
+$ yarn test
 ```
 
 3) Make your changes in a new git branch:
@@ -105,8 +104,7 @@ You can file new issues by providing the above information [here](https://github
 
 * Create your patch, **including appropriate test cases**.
 * Follow the [Angular Coding Rules][rules].
-* Run the full test suite, as described in the [developer documentation][dev-doc],
-  and ensure that all tests pass.
+* Run the full test suite (`yarn test`) and ensure that all tests pass.
 * Commit your changes using a descriptive commit message that follows the
   [Angular commit message conventions][commit]. Adherence to these conventions
   is necessary because release notes are automatically generated from these messages.
@@ -134,24 +132,6 @@ You can file new issues by providing the above information [here](https://github
     ```
 
 That's it! Thank you for your contribution!
-
-#### <a name="submit-docs"></a> Deploying Docs
-
-1) Build the docs
-
-`$ npm run docs`
-
-2) Deploy Docs to Firebase Hosting
-
-(Ask @jeffbcross to add you as a collaborator or deploy on your behalf)
-
-```
-$ npm install -g firebase-tools
-$ firebase login
-$ npm run docs
-$ cd docs
-$ firebase deploy
-```
 
 ## <a name="cla"></a> Signing the CLA
 
