@@ -1,3 +1,22 @@
+<a name="5.2.0"></a>
+# [5.2.0](https://github.com/angular/angularfire2/compare/5.1.3...5.2.0) (2019-05-24)
+
+### Bug Fixes
+
+* **firestore:** Fix for builds targeting Node ([#2079](https://github.com/angular/angularfire2/issues/2079)) ([8a33826](https://github.com/angular/angularfire2/commit/8a33826))
+* **storage:** Typo in updateMetadata method ([#2029](https://github.com/angular/angularfire2/issues/2029)) ([6133296](https://github.com/angular/angularfire2/commit/6133296))
+
+### Features
+
+* **performance:** AngularFire Performance Monitoring ([#2064](https://github.com/angular/angularfire2/issues/2064))
+* **auth-guard:** AngularFire Auth Guards ([#2016](https://github.com/angular/angularfire2/issues/2016)) ([e32164d](https://github.com/angular/angularfire2/commit/e32164d))
+* **firestore:** Added option to include document IDs on valueChanges() ([#1976](https://github.com/angular/angularfire2/issues/1976)) ([7108875](https://github.com/angular/angularfire2/commit/7108875))
+* **firestore:** Support Firestore Collection Group Queries ([#2066](https://github.com/angular/angularfire2/issues/2066)) ([c34c0f3](https://github.com/angular/angularfire2/commit/c34c0f3))
+* **functions:** Allow configuration of Functions Emulator Origin ([#2017](https://github.com/angular/angularfire2/issues/2017)) ([d12b4c5](https://github.com/angular/angularfire2/commit/d12b4c5))
+* **schematics:** ng deploy schematic ([#2046](https://github.com/angular/angularfire2/issues/2046)) ([be0a1fb](https://github.com/angular/angularfire2/commit/be0a1fb))
+
+
+
 <a name="5.1.2"></a>
 # [5.1.2](https://github.com/angular/angularfire2/compare/5.1.1...5.1.2) (2019-03-11)
 
