@@ -63,7 +63,7 @@ If the `orComplete` option is passed it will complete the trace when the observa
 
 ### `traceWhile(name, test: (T) => Boolean, options?)`
 
-Trace the observable between emissions that pass and then fail the provided test.
+Starting with an emission that passes the provided test, trace until an emission fails the test.
 
 If the `orComplete` option is passed it will complete any existing trace when the observable completes.
 
