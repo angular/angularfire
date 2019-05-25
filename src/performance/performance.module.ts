@@ -6,4 +6,8 @@ import 'firebase/performance';
 @NgModule({
   providers: [ AngularFirePerformance ]
 })
-export class AngularFirePerformanceModule { }
+export class AngularFirePerformanceModule {
+  constructor(_: AngularFirePerformance) {
+    // DI inject AFP here for the automatic data collection
+  } 
+}
