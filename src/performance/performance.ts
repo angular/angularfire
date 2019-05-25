@@ -37,8 +37,8 @@ export class AngularFirePerformance {
 
       // TODO determine more built in metrics
       appRef.isStable.pipe(
-        this.traceUntilComplete('isStable'),
-        first(it => it)
+        first(it => it),
+        this.traceUntilComplete('isStable')
       ).subscribe();
 
     }
