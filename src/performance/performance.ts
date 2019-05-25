@@ -2,6 +2,7 @@ import { Injectable, NgZone, ApplicationRef, InjectionToken, Inject, Optional } 
 import { Observable, Subscription } from 'rxjs';
 import { first, tap } from 'rxjs/operators';
 import { performance } from 'firebase/app';
+import { FirebaseApp } from '@angular/fire';
 
 export const AUTOMATICALLY_TRACE_CORE_NG_METRICS = new InjectionToken<boolean>('angularfire2.performance.auto_trace');
 export const INSTRUMENTATION_ENABLED = new InjectionToken<boolean>('angularfire2.performance.instrumentationEnabled');
@@ -21,6 +22,7 @@ export class AngularFirePerformance {
   performance: performance.Performance;
 
   constructor(
+    app: FirebaseApp,
     @Optional() @Inject(AUTOMATICALLY_TRACE_CORE_NG_METRICS) automaticallyTraceCoreNgMetrics:boolean|null,
     @Optional() @Inject(INSTRUMENTATION_ENABLED) instrumentationEnabled:boolean|null,
     @Optional() @Inject(DATA_COLLECTION_ENABLED) dataCollectionEnabled:boolean|null,
@@ -28,7 +30,7 @@ export class AngularFirePerformance {
     private zone: NgZone
   ) {
     
-    this.performance = zone.runOutsideAngular(() => performance());
+    this.performance = zone.runOutsideAngular(() => app.performance());
 
     if (instrumentationEnabled == false) { this.performance.instrumentationEnabled = false }
     if (dataCollectionEnabled == false) { this.performance.dataCollectionEnabled = false }
