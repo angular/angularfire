@@ -1,14 +1,15 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FirebaseOptionsToken, AngularFireModule } from '@angular/fire';
+
+import { AppComponent } from './app.component';
+
+import { FirebaseApp, AngularFireModule } from '@angular/fire';
 import { AngularFireDatabaseModule } from '@angular/fire/database';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireStorageModule } from '@angular/fire/storage';
-import { AngularFireFunctionsModule } from '@angular/fire/functions';
 import { AngularFireMessagingModule } from '@angular/fire/messaging';
-
-import { AppComponent } from './app.component';
+import { AngularFireFunctionsModule } from '@angular/fire/functions';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import { AppComponent } from './app.component';
     AngularFireMessagingModule,
     AngularFireFunctionsModule
   ],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
