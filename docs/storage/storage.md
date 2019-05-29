@@ -186,7 +186,7 @@ export class AppComponent {
 
 ### Downloading Files
 
-A convenient pipe exists for simple in page references
+A convenient pipe exists for simple in page references.
 
 ```ts
 @Component({
