@@ -4,6 +4,7 @@ import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, FirebaseOptionsToken, AngularFireModule, FirebaseNameOrConfigToken } from '@angular/fire';
 import { AngularFireStorageModule, AngularFireStorage, AngularFireUploadTask, StorageBucket } from '@angular/fire/storage';
 import { COMMON_CONFIG } from './test-config';
+import { AngularFirestoreStorageUrl } from './pipes/storageUrl.pipe'
 
 describe('AngularFireStorage', () => {
   let app: FirebaseApp;
@@ -197,6 +198,18 @@ describe('AngularFireStorage w/options', () => {
         .subscribe(done, done.fail);
     });
 
+  });
+
+  describe('pipes', () => {
+    it('ngfbStorageUrl should download a url', (done) => {
+      const ngfbStorageUrl = new AngularFirestoreStorageUrl( afStorage )
+      const url$ = ngfbStorageUrl.transform('af.json')
+      url$.subscribe(
+        url => { expect(url).toBeDefined(); },
+        e => { done.fail(); },
+        done
+      );
+    });
   });
 
 });
