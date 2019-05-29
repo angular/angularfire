@@ -125,6 +125,29 @@ describe('AngularFireStorage', () => {
 
   });
 
+  describe('pipes', () => {
+    it('ngfbStorageUrl should download a url', (done) => {
+      const data = { angular: "fire" };
+      const blob = new Blob([JSON.stringify(data)], { type : 'application/json' });
+      const ref = afStorage.ref('af.json');
+      const task = ref.put(blob);
+      const ngfbStorageUrl = new AngularFirestoreStorageUrl( afStorage )
+      
+      // Wait for the upload
+      task.then(()=>{
+        ngfbStorageUrl.transform('af.json')
+        .subscribe(
+          url => {
+            expect(url).toBeDefined();
+            done();
+          },
+          done.fail
+        )        
+      })
+      .catch( done.fail )
+    });
+  });
+
 });
 
 const FIREBASE_APP_NAME_TOO = (Math.random() + 1).toString(36).substring(7);
@@ -198,18 +221,6 @@ describe('AngularFireStorage w/options', () => {
         .subscribe(done, done.fail);
     });
 
-  });
-
-  describe('pipes', () => {
-    it('ngfbStorageUrl should download a url', (done) => {
-      const ngfbStorageUrl = new AngularFirestoreStorageUrl( afStorage )
-      const url$ = ngfbStorageUrl.transform('af.json')
-      url$.subscribe(
-        url => { expect(url).toBeDefined(); },
-        e => { done.fail(); },
-        done
-      );
-    });
   });
 
 });
