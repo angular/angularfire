@@ -1,6 +1,6 @@
 import { Injectable, NgZone, ApplicationRef, InjectionToken, Inject, Optional } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
-import { first, tap } from 'rxjs/operators';
+import { Observable, Subscription, from } from 'rxjs';
+import { first, tap, map, shareReplay, switchMap } from 'rxjs/operators';
 import { performance } from 'firebase/app';
 import { FirebaseApp } from '@angular/fire';
 
@@ -19,7 +19,7 @@ export type TraceOptions = {
 @Injectable()
 export class AngularFirePerformance {
   
-  performance: performance.Performance;
+  performance: Observable<performance.Performance>;
 
   constructor(
     app: FirebaseApp,
@@ -30,11 +30,19 @@ export class AngularFirePerformance {
     private zone: NgZone
   ) {
     
-    this.performance = zone.runOutsideAngular(() => app.performance());
+    // @ts-ignore zapping in the UMD in the build script
+    const requirePerformance = from(import('firebase/performance'));
 
-    if (instrumentationEnabled == false) { this.performance.instrumentationEnabled = false }
-    if (dataCollectionEnabled == false) { this.performance.dataCollectionEnabled = false }
-    
+    this.performance = requirePerformance.pipe(
+      // SEMVER while < 6 need to type, drop next major
+      map(() => zone.runOutsideAngular(() => <performance.Performance>app.performance())),
+      tap(performance => {
+        if (instrumentationEnabled == false) { performance.instrumentationEnabled = false }
+        if (dataCollectionEnabled == false) { performance.dataCollectionEnabled = false }
+      }),
+      shareReplay(1)
+    );
+
     if (automaticallyTraceCoreNgMetrics != false) {
 
       // TODO determine more built in metrics
@@ -47,33 +55,38 @@ export class AngularFirePerformance {
 
   }
 
-  trace$ = (name:string, options?: TraceOptions) => new Observable<void>(emitter => 
-    this.zone.runOutsideAngular(() => {
-      const trace = this.performance.trace(name);
-      options && options.metrics && Object.keys(options.metrics).forEach(metric => {
-        trace.putMetric(metric, options!.metrics![metric])
-      });
-      options && options.attributes && Object.keys(options.attributes).forEach(attribute => {
-        trace.putAttribute(attribute, options!.attributes![attribute])
-      });
-      const attributeSubscriptions = options && options.attribute$ ? Object.keys(options.attribute$).map(attribute =>
-        options!.attribute$![attribute].subscribe(next => trace.putAttribute(attribute, next))
-      ) : [];
-      const metricSubscriptions = options && options.metric$ ? Object.keys(options.metric$).map(metric =>
-        options!.metric$![metric].subscribe(next => trace.putMetric(metric, next))
-      ) : [];
-      const incrementOnSubscriptions = options && options.incrementMetric$ ? Object.keys(options.incrementMetric$).map(metric =>
-        options!.incrementMetric$![metric].subscribe(next => trace.incrementMetric(metric, next || undefined))
-      ) : [];
-      emitter.next(trace.start());
-      return { unsubscribe: () => {
-        trace.stop();
-        metricSubscriptions.forEach(m => m.unsubscribe());
-        incrementOnSubscriptions.forEach(m => m.unsubscribe());
-        attributeSubscriptions.forEach(m => m.unsubscribe());
-      }};
-    })
-  );
+  trace$ = (name:string, options?: TraceOptions) =>
+    this.performance.pipe(
+      switchMap(performance =>
+        new Observable<void>(emitter =>
+          this.zone.runOutsideAngular(() => {
+            const trace = performance.trace(name);
+            options && options.metrics && Object.keys(options.metrics).forEach(metric => {
+              trace.putMetric(metric, options!.metrics![metric])
+            });
+            options && options.attributes && Object.keys(options.attributes).forEach(attribute => {
+              trace.putAttribute(attribute, options!.attributes![attribute])
+            });
+            const attributeSubscriptions = options && options.attribute$ ? Object.keys(options.attribute$).map(attribute =>
+              options!.attribute$![attribute].subscribe(next => trace.putAttribute(attribute, next))
+            ) : [];
+            const metricSubscriptions = options && options.metric$ ? Object.keys(options.metric$).map(metric =>
+              options!.metric$![metric].subscribe(next => trace.putMetric(metric, next))
+            ) : [];
+            const incrementOnSubscriptions = options && options.incrementMetric$ ? Object.keys(options.incrementMetric$).map(metric =>
+              options!.incrementMetric$![metric].subscribe(next => trace.incrementMetric(metric, next || undefined))
+            ) : [];
+            emitter.next(trace.start());
+            return { unsubscribe: () => {
+              trace.stop();
+              metricSubscriptions.forEach(m => m.unsubscribe());
+              incrementOnSubscriptions.forEach(m => m.unsubscribe());
+              attributeSubscriptions.forEach(m => m.unsubscribe());
+            }};
+          })
+        )
+      )
+    );
 
   traceUntil = <T=any>(name:string, test: (a:T) => boolean, options?: TraceOptions & { orComplete?: boolean }) => (source$: Observable<T>) => new Observable<T>(subscriber => {
     const traceSubscription = this.trace$(name, options).subscribe();

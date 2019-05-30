@@ -2,7 +2,7 @@ const { rollup } = require('rollup');
 const { spawn } = require('child_process');
 const { Observable, from, forkJoin } = require('rxjs');
 const { switchMap, switchMapTo, tap } = require('rxjs/operators');
-const { copy, readFileSync, writeFile, statSync } = require('fs-extra');
+const { copy, readFileSync, writeFile, writeFileSync, statSync } = require('fs-extra');
 const { prettySize } = require('pretty-size');
 const gzipSize = require('gzip-size');
 const resolve = require('rollup-plugin-node-resolve');
@@ -282,6 +282,11 @@ function copySchematicFiles() {
   ]);
 }
 
+function replaceDynamicImportsForUMD() {
+  writeFileSync('./dist/packages-dist/bundles/performance.umd.js', readFileSync('./dist/packages-dist/bundles/performance.umd.js', 'utf8').replace("rxjs.from(import('firebase/performance'))", "rxjs.empty()"));
+  writeFileSync('./dist/packages-dist/bundles/messaging.umd.js', readFileSync('./dist/packages-dist/bundles/messaging.umd.js', 'utf8').replace("rxjs.from(import('firebase/messaging'))", "rxjs.empty()"));
+}
+
 function measure(module) {
   const path = `${process.cwd()}/dist/packages-dist/bundles/${module}.umd.js`;
   const file = readFileSync(path);
@@ -376,6 +381,7 @@ function buildLibrary(globals) {
     switchMap(() => replaceVersionsObservable('firebase-node', VERSIONS)),
     switchMap(() => from(createTestUmd(globals))),
     tap(() => {
+      replaceDynamicImportsForUMD();
       const coreStats = measure('core');
       const authStats = measure('auth');
       const authGuardStats = measure('auth-guard');
