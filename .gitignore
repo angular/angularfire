@@ -6,6 +6,7 @@ typings/
 npm-debug.log
 .idea/
 .vscode/settings.json
+angular-fire-*.tgz
 angularfire2-*.tgz
 *.ngfactory.ts
 *.ngsummary.json

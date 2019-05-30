@@ -11,9 +11,9 @@
     "karma": "karma start",
     "test:universal": "npm run build && cp -R dist/packages-dist test/universal-test/node_modules/angularfire2 && cd test/universal-test && npm run prerender",
     "delayed_karma": "sleep 10 && karma start",
-    "build": "rm -rf dist && node tools/build.js",
+    "build": "rm -rf dist && node tools/build.js && npm pack ./dist/packages-dist",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 1",
-    "build:wrapper": "npm i --prefix wrapper && npm run --prefix wrapper build"
+    "build:wrapper": "npm i --prefix wrapper && npm run --prefix wrapper build && npm pack ./dist/wrapper-dist"
   },
   "schematics": "./dist/packages-dist/collection.json",
   "builders": "./dist/packages-dist/builders.json",
@@ -50,7 +50,7 @@
     "rxjs": "^6.0.0",
     "ws": "^3.3.2",
     "xhr2": "^0.1.4",
-    "zone.js": "<0.10"
+    "zone.js": "^0.8 || ^0.9"
   },
   "optionalDependencies": {
     "bufferutil": "~3.0.0",

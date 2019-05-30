@@ -33,8 +33,8 @@
     "fuzzy": "FUZZY_VERSION",
     "inquirer": "INQUIRER_VERSION",
     "inquirer-autocomplete-prompt": "INQUIRER_AUTOCOMPLETE_VERSION",
-    "rxjs": "RXJS_VERSION",
-    "zone.js": "ZONEJS_VERSION"
+    "rxjs": "RXJS_VERSION"
   },
-  "typings": "index.d.ts"
+  "typings": "index.d.ts",
+  "sideEffects": false
 }

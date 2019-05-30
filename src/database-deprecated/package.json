@@ -1,30 +1,8 @@
 {
   "name": "@angular/fire/database-deprecated",
-  "version": "ANGULARFIRE2_VERSION",
-  "description": "The database module",
   "main": "../bundles/database.umd.js",
   "module": "index.js",
   "es2015": "./es2015/index.js",
-  "keywords": [
-    "angular",
-    "firebase",
-    "rxjs"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/angular/angularfire2.git"
-  },
-  "author": "angular,firebase",
-  "license": "MIT",
-  "peerDependencies": {
-    "@angular/fire": "ANGULARFIRE2_VERSION",
-    "@angular/common": "ANGULAR_VERSION",
-    "@angular/core": "ANGULAR_VERSION",
-    "@angular/platform-browser": "ANGULAR_VERSION",
-    "@angular/platform-browser-dynamic": "ANGULAR_VERSION",
-    "firebase": "FIREBASE_VERSION",
-    "rxjs": "RXJS_VERSION",
-    "zone.js": "ZONEJS_VERSION"
-  },
-  "typings": "index.d.ts"
+  "typings": "index.d.ts",
+  "sideEffects": false
 }
