@@ -42,6 +42,5 @@ script:
   - yarn run build
   - |
     ./node_modules/.bin/karma start --single-run --browsers ChromeHeadlessTravis --reporters mocha &&
-    yarn test:node &&
     node tools/run-typings-test.js &&
     bash ./test/ng-build/build.sh
