@@ -2,7 +2,7 @@ import { SchematicsException, Tree, SchematicContext } from '@angular-devkit/sch
 import { NodePackageInstallTask, RunSchematicTask } from '@angular-devkit/schematics/tasks';
 import { FirebaseJSON, FirebaseRc, FirebaseHostingConfig } from './interfaces';
 import { experimental, JsonParseMode, parseJson } from '@angular-devkit/core';
-import { from, of } from 'rxjs';
+import { from } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { Project } from './interfaces';
 import { listProjects, projectPrompt } from './utils';
@@ -157,12 +157,11 @@ interface DeployOptions {
 
 // You don't have to export the function as default. You can also have more than one rule factory
 // per file.
-export const setupNgDeploy = ({ project }: DeployOptions) => (host: Tree) => {
-  return from(listProjects()).pipe(
+export const setupNgDeploy = ({ project }: DeployOptions) => (host: Tree) =>
+  from(listProjects()).pipe(
     switchMap((projects: Project[]) => projectPrompt(projects)),
     map(({ firebaseProject }: any) => setupFirebaseProject(host, { firebaseProject, project }))
   );
-}
 
 export const ngAdd = (options: DeployOptions) => (host: Tree, context: SchematicContext) => {
   const packageJson = host.exists('package.json') && safeReadJSON('package.json', host);
