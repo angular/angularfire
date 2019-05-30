@@ -96,7 +96,7 @@
     "systemjs": "^0.19.16",
     "systemjs-builder": "^0.15.7",
     "traceur": "0.0.96",
-    "typescript": "^3.1.6 <3.2"
+    "typescript": ">=3.4.0 <3.5.0"
   },
   "typings": "index.d.ts"
 }
