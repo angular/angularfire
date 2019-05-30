@@ -2,7 +2,7 @@
 # yarn lockfile v1
 
 
-"@angular-devkit/architect@<0.900 || ^0.800.0 || ^0.900.0-0 || ^9.0.0-0":
+"@angular-devkit/architect@<0.900 || ^0.900.0-0 || ^9.0.0-0":
   version "0.800.0"
   resolved "https://registry.yarnpkg.com/@angular-devkit/architect/-/architect-0.800.0.tgz#2f2ce1178b12b0c0fde455d00def60104b9cd08e"
   integrity sha512-haXTS9EDaJfKyYiFylK2hObJH5DVGhX3OEn3OC7XUVlfKV3GRmC6NKXPjnxcN0wWP5zIV1c4xuB2N64mcxSnaA==
@@ -9216,7 +9216,7 @@ zip-stream@^1.2.0:
     lodash "^4.8.0"
     readable-stream "^2.0.0"
 
-"zone.js@^0.8 || ^0.9":
+"zone.js@^0.8.0 || ^0.9.0":
   version "0.9.1"
   resolved "https://registry.yarnpkg.com/zone.js/-/zone.js-0.9.1.tgz#e37c6e5c54c13fae4de26b5ffe8d8e9212da6d9b"
   integrity sha512-GkPiJL8jifSrKReKaTZ5jkhrMEgXbXYC+IPo1iquBjayRa0q86w3Dipjn8b415jpitMExe9lV8iTsv8tk3DGag==

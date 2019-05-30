@@ -33,7 +33,7 @@
   },
   "homepage": "https://github.com/angular/angularfire2#readme",
   "dependencies": {
-    "@angular-devkit/architect": "<0.900 || ^0.800.0 || ^0.900.0-0 || ^9.0.0-0",
+    "@angular-devkit/architect": "<0.900 || ^0.900.0-0 || ^9.0.0-0",
     "@angular-devkit/core": ">=6.0.0 <9 || ^9.0.0-0",
     "@angular-devkit/schematics": ">=6.0.0 <9 || ^9.0.0-0",
     "@angular/common": ">=6.0.0 <9 || ^9.0.0-0",
@@ -50,7 +50,7 @@
     "rxjs": "^6.0.0",
     "ws": "^3.3.2",
     "xhr2": "^0.1.4",
-    "zone.js": "^0.8 || ^0.9"
+    "zone.js": "^0.8.0 || ^0.9.0"
   },
   "optionalDependencies": {
     "bufferutil": "~3.0.0",
