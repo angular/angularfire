@@ -67,8 +67,8 @@ export function getFirebaseProjectName(
   const { targets }: FirebaseRc = JSON.parse(
     readFileSync(join(projectRoot, ".firebaserc"), "UTF-8")
   );
-  const projects = Object.keys(targets);
+  const projects = Object.keys(targets!);
   return projects.find(
-    project => !!Object.keys(targets[project].hosting).find(t => t === target)
+    project => !!Object.keys(targets![project].hosting).find(t => t === target)
   );
 }

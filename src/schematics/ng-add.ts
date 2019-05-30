@@ -1,5 +1,5 @@
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
-import { FirebaseJSON, FirebaseRc } from './interfaces';
+import { FirebaseJSON, FirebaseRc, FirebaseHostingConfig } from './interfaces';
 import { experimental, JsonParseMode, parseJson } from '@angular-devkit/core';
 import { from } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
@@ -52,13 +52,24 @@ function generateFirebaseJson(
     ? safeReadJSON(path, tree)
     : emptyFirebaseJson();
 
-  if (firebaseJson.hosting.find(config => config.target === project)) {
+  if (firebaseJson.hosting &&
+    (Array.isArray(firebaseJson.hosting) &&
+      firebaseJson.hosting.find(config => config.target === project) ||
+      (<FirebaseHostingConfig>firebaseJson.hosting).target === project
+  )) {
     throw new SchematicsException(
       `Target ${project} already exists in firebase.json`
     );
   }
 
-  firebaseJson.hosting.push(generateHostingConfig(project, dist));
+  const newConfig = generateHostingConfig(project, dist);
+  if (firebaseJson.hosting === undefined) {
+    firebaseJson.hosting = newConfig;
+  } else if (Array.isArray(firebaseJson.hosting)) {
+    firebaseJson.hosting.push(newConfig);
+  } else {
+    firebaseJson.hosting = [firebaseJson.hosting!, newConfig];
+  }
 
   overwriteIfExists(tree, path, stringifyFormatted(firebaseJson));
 }
@@ -84,7 +95,9 @@ function generateFirebaseRc(
     ? safeReadJSON(path, tree)
     : emptyFirebaseRc();
 
-  if (firebaseProject in firebaseRc.targets) {
+  firebaseRc.targets = firebaseRc.targets || {};
+
+  if (firebaseProject in firebaseRc.targets!) {
     throw new SchematicsException(
       `Firebase project ${firebaseProject} already defined in .firebaserc`
     );
