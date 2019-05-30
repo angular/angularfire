@@ -4,7 +4,7 @@
   "description": "The official library of Firebase and Angular.",
   "private": true,
   "scripts": {
-    "test": "npm run build && karma start --single-run && npm run test:node",
+    "test": "npm run build && karma start --single-run",
     "test:node": "jasmine 'dist/packages-dist/schematics/**/*[sS]pec.js'",
     "test:watch": "concurrently \"npm run build:watch\" \"npm run delayed_karma\"",
     "test:debug": "npm run build && karma start",
