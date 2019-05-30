@@ -55,13 +55,29 @@ ngOnInit() {
 
 The most basic operator, `trace` will measure the amount of time it takes for your observable to either complete or emit its first value. Beyond the basic trace there are several other operators:
 
-### `traceUntil(name: string, test: (T) => Boolean, options?: TraceOptions & { orComplete?: true })`
+<h3>
+<pre>
+traceUntil(
+  name: string,
+  test: (T) => Boolean,
+  options?: TraceOptions & { orComplete?: true }
+)
+</pre>
+</h3>
 
 Trace the observable until the first emission that passes the provided test.
 
 If the `orComplete` option is passed it will complete the trace when the observable completes, even if an emission never passed the provided test.
 
-### `traceWhile(name: string, test: (T) => Boolean, options?: TraceOptions & { orComplete?: true})`
+<h3>
+<pre>
+traceWhile(
+  name: string,
+  test: (T) => Boolean,
+  options?: TraceOptions & { orComplete?: true }
+)
+</pre>
+</h3>
 
 Starting with an emission that passes the provided test, trace until an emission fails the test.
 
