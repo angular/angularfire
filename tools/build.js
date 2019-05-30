@@ -102,7 +102,9 @@ const SRC_PKG_PATHS = {
   functions: `${process.cwd()}/src/functions/package.json`,
   storage: `${process.cwd()}/src/storage/package.json`,
   messaging: `${process.cwd()}/src/messaging/package.json`,
-  performance: `${process.cwd()}/src/performance/package.json`
+  performance: `${process.cwd()}/src/performance/package.json`,
+  schematics: `${process.cwd()}/dist/packages-dist/schematics/versions.js`,
+  "schematics-es2015": `${process.cwd()}/dist/packages-dist/schematics/es2015/versions.js`
 };
 
 const DEST_PKG_PATHS = {
@@ -116,7 +118,9 @@ const DEST_PKG_PATHS = {
   functions: `${process.cwd()}/dist/packages-dist/functions/package.json`,
   storage: `${process.cwd()}/dist/packages-dist/storage/package.json`,
   messaging: `${process.cwd()}/dist/packages-dist/messaging/package.json`,
-  performance: `${process.cwd()}/dist/packages-dist/performance/package.json`
+  performance: `${process.cwd()}/dist/packages-dist/performance/package.json`,
+  schematics: `${process.cwd()}/dist/packages-dist/schematics/versions.js`,
+  "schematics-es2015": `${process.cwd()}/dist/packages-dist/schematics/es2015/versions.js`
 };
 
 // Constants for running typescript commands
@@ -367,6 +371,8 @@ function buildLibrary(globals) {
     switchMap(() => from(copyDocs())),
     switchMap(() => from(copyNodeFixes())),
     switchMap(() => from(copySchematicFiles())),
+    switchMap(() => replaceVersionsObservable('schematics', VERSIONS)),
+    switchMap(() => replaceVersionsObservable('schematics-es2015', VERSIONS)),
     switchMap(() => replaceVersionsObservable('firebase-node', VERSIONS)),
     switchMap(() => from(createTestUmd(globals))),
     tap(() => {
