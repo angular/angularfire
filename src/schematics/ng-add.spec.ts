@@ -1,5 +1,5 @@
 import { Tree } from "@angular-devkit/schematics";
-import { ngAdd } from "./ng-add";
+import { setupFirebaseProject } from "./ng-add";
 
 const PROJECT_NAME = "pie-ka-chu";
 const PROJECT_ROOT = "pirojok";
@@ -18,22 +18,22 @@ describe("ng-add", () => {
     });
 
     it('generates new files if starting from scratch', async () => {
-      const result = ngAdd(tree, {firebaseProject: FIREBASE_PROJECT, project: PROJECT_NAME});
+      const result = setupFirebaseProject(tree, {firebaseProject: FIREBASE_PROJECT, project: PROJECT_NAME});
       expect(result.read('firebase.json')!.toString()).toEqual(initialFirebaseJson);
       expect(result.read('.firebaserc')!.toString()).toEqual(initialFirebaserc);
       expect(result.read('angular.json')!.toString()).toEqual(initialAngularJson);
     });
 
     it('uses default project', async () => {
-      const result = ngAdd(tree, {firebaseProject: FIREBASE_PROJECT});
+      const result = setupFirebaseProject(tree, {firebaseProject: FIREBASE_PROJECT});
       expect(result.read('firebase.json')!.toString()).toEqual(overwriteFirebaseJson);
       expect(result.read('.firebaserc')!.toString()).toEqual(overwriteFirebaserc);
       expect(result.read('angular.json')!.toString()).toEqual(overwriteAngularJson);
     });
 
     it('overrides existing files', async () => {
-      const tempTree = ngAdd(tree, {firebaseProject: FIREBASE_PROJECT, project: PROJECT_NAME});
-      const result = ngAdd(tempTree, {firebaseProject: OTHER_FIREBASE_PROJECT_NAME, project: OTHER_PROJECT_NAME});
+      const tempTree = setupFirebaseProject(tree, {firebaseProject: FIREBASE_PROJECT, project: PROJECT_NAME});
+      const result = setupFirebaseProject(tempTree, {firebaseProject: OTHER_FIREBASE_PROJECT_NAME, project: OTHER_PROJECT_NAME});
       expect(result.read('firebase.json')!.toString()).toEqual(projectFirebaseJson);
       expect(result.read('.firebaserc')!.toString()).toEqual(projectFirebaserc);
       expect(result.read('angular.json')!.toString()).toEqual(projectAngularJson);
@@ -47,7 +47,7 @@ describe("ng-add", () => {
       delete angularJSON.defaultProject;
       tree.create("angular.json", JSON.stringify(angularJSON));
       expect(() =>
-        ngAdd(tree, {
+        setupFirebaseProject(tree, {
           firebaseProject: FIREBASE_PROJECT,
           project: ""
         })
@@ -58,7 +58,7 @@ describe("ng-add", () => {
 
     it("Should throw if angular.json not found", async () => {
       expect(() =>
-        ngAdd(Tree.empty(), {
+        setupFirebaseProject(Tree.empty(), {
           firebaseProject: FIREBASE_PROJECT,
           project: PROJECT_NAME
         })
@@ -69,7 +69,7 @@ describe("ng-add", () => {
       const tree = Tree.empty();
       tree.create("angular.json", "hi");
       expect(() =>
-        ngAdd(tree, {
+        setupFirebaseProject(tree, {
           firebaseProject: FIREBASE_PROJECT,
           project: PROJECT_NAME
         })
@@ -80,7 +80,7 @@ describe("ng-add", () => {
       const tree = Tree.empty();
       tree.create("angular.json", JSON.stringify({ projects: {} }));
       expect(() =>
-        ngAdd(tree, {
+        setupFirebaseProject(tree, {
           firebaseProject: FIREBASE_PROJECT,
           project: PROJECT_NAME
         })
@@ -96,7 +96,7 @@ describe("ng-add", () => {
         })
       );
       expect(() =>
-        ngAdd(tree, {
+        setupFirebaseProject(tree, {
           firebaseProject: FIREBASE_PROJECT,
           project: PROJECT_NAME
         })
@@ -112,7 +112,7 @@ describe("ng-add", () => {
         })
       );
       expect(() =>
-        ngAdd(tree, {
+        setupFirebaseProject(tree, {
           firebaseProject: FIREBASE_PROJECT,
           project: PROJECT_NAME
         })
@@ -122,13 +122,13 @@ describe("ng-add", () => {
     it("Should throw if firebase.json has the project already", async () => {
       const tree = Tree.empty();
       tree.create("angular.json", JSON.stringify(generateAngularJson()));
-      const tempTree = ngAdd(tree, {
+      const tempTree = setupFirebaseProject(tree, {
         firebaseProject: FIREBASE_PROJECT,
         project: PROJECT_NAME
       });
 
       expect(() =>
-        ngAdd(tempTree, {
+        setupFirebaseProject(tempTree, {
           firebaseProject: FIREBASE_PROJECT,
           project: PROJECT_NAME
         })
@@ -140,7 +140,7 @@ describe("ng-add", () => {
       tree.create("angular.json", JSON.stringify(generateAngularJson()));
       tree.create("firebase.json", "I'm broken 😔");
       expect(() =>
-        ngAdd(tree, {
+        setupFirebaseProject(tree, {
           firebaseProject: FIREBASE_PROJECT,
           project: PROJECT_NAME
         })
@@ -152,7 +152,7 @@ describe("ng-add", () => {
       tree.create("angular.json", JSON.stringify(generateAngularJson()));
       tree.create(".firebaserc", "I'm broken 😔");
       expect(() =>
-        ngAdd(tree, {
+        setupFirebaseProject(tree, {
           firebaseProject: FIREBASE_PROJECT,
           project: PROJECT_NAME
         })
@@ -162,13 +162,13 @@ describe("ng-add", () => {
     it("Should throw if firebase.json has the project already", async () => {
       const tree = Tree.empty();
       tree.create("angular.json", JSON.stringify(generateAngularJson()));
-      const tempTree = ngAdd(tree, {
+      const tempTree = setupFirebaseProject(tree, {
         firebaseProject: FIREBASE_PROJECT,
         project: PROJECT_NAME
       });
 
       expect(() =>
-        ngAdd(tempTree, {
+        setupFirebaseProject(tempTree, {
           firebaseProject: FIREBASE_PROJECT,
           project: OTHER_PROJECT_NAME
         })
@@ -179,13 +179,13 @@ describe("ng-add", () => {
       const tree = Tree.empty();
       tree.create("angular.json", JSON.stringify(generateAngularJson()));
 
-      const tempTree = ngAdd(tree, {
+      const tempTree = setupFirebaseProject(tree, {
         firebaseProject: FIREBASE_PROJECT,
         project: PROJECT_NAME
       });
 
       expect(() =>
-        ngAdd(tempTree, {
+        setupFirebaseProject(tempTree, {
           firebaseProject: FIREBASE_PROJECT,
           project: OTHER_PROJECT_NAME
         })
