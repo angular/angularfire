@@ -7,6 +7,7 @@ AngularFire 5.2 introduces support for Angular 8 and version 6 of the Firebase S
 
 * **firestore:** Fix for builds targeting Node ([#2079](https://github.com/angular/angularfire2/issues/2079)) ([8a33826](https://github.com/angular/angularfire2/commit/8a33826))
 * **storage:** Typo in updateMetadata method ([#2029](https://github.com/angular/angularfire2/issues/2029)) ([6133296](https://github.com/angular/angularfire2/commit/6133296))
+* **messaging:** Allow `AngularFireMessaging` to be included in a server build ([#1938](https://github.com/angular/angularfire2/issues/1938)) ([9b870a9](https://github.com/angular/angularfire2/commit/9b870a9))
 
 ### Features
 
