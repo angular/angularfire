@@ -12,11 +12,13 @@
     "paths": {
       "@angular/fire": ["./core"],
       "@angular/fire/auth": ["./auth"],
+      "@angular/fire/auth-guard": ["./auth-guard"],
       "@angular/fire/database": ["./database"],
       "@angular/fire/firestore": ["./firestore"],
       "@angular/fire/functions": ["./functions"],
       "@angular/fire/storage": ["./storage"],
       "@angular/fire/messaging": ["./messaging"],
+      "@angular/fire/performance": ["./performance"],
       "@angular/fire/database-deprecated": ["./database-deprecated"]
     },
     "rootDir": ".",

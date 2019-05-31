@@ -2,14 +2,20 @@ import { InjectionToken, NgZone, PLATFORM_ID, Injectable, Inject, Optional } fro
 
 import { Observable, of, from } from 'rxjs';
 
-import { Settings, PersistenceSettings, CollectionReference, DocumentReference, QueryFn, AssociatedReference } from './interfaces';
+import { Settings, PersistenceSettings, CollectionReference, DocumentReference, QueryFn, Query, QueryGroupFn, AssociatedReference } from './interfaces';
 import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
+import { AngularFirestoreCollectionGroup } from './collection-group/collection-group';
 
 import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
 
-import { firestore, SDK_VERSION } from 'firebase/app';
+// Workaround for Nodejs build
+// @ts-ignore
+import firebase from 'firebase/app';
+
+// SEMVER: have to import here while we target ng 6, as the version of typescript doesn't allow dynamic import of types
+import { firestore } from 'firebase/app';
 
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
@@ -19,7 +25,9 @@ export const PersistenceSettingsToken = new InjectionToken<PersistenceSettings|u
 export const FirestoreSettingsToken = new InjectionToken<Settings>('angularfire2.firestore.settings');
 
 // timestampsInSnapshots was depreciated in 5.8.0
-export const DefaultFirestoreSettings = (parseFloat(SDK_VERSION) < 5.8 ? {timestampsInSnapshots: true} : {}) as Settings;
+const major = parseInt(firebase.SDK_VERSION.split('.')[0]);
+const minor = parseInt(firebase.SDK_VERSION.split('.')[1]);
+export const DefaultFirestoreSettings = ((major < 5 || (major == 5 && minor < 8)) ? {timestampsInSnapshots: true} : {}) as Settings;
 
 /**
  * A utility methods for associating a collection reference with
@@ -157,6 +165,21 @@ export class AngularFirestore {
     }
     const { ref, query } = associateQuery(collectionRef, queryFn);
     return new AngularFirestoreCollection<T>(ref, query, this);
+  }
+
+  /**
+   * Create a reference to a Firestore Collection Group based on a collectionId
+   * and an optional query function to narrow the result
+   * set.
+   * @param collectionId
+   * @param queryGroupFn
+   */
+  collectionGroup<T>(collectionId: string, queryGroupFn?: QueryGroupFn): AngularFirestoreCollectionGroup<T> {
+    if (major < 6) { throw "collection group queries require Firebase JS SDK >= 6.0"}
+    const queryFn = queryGroupFn || (ref => ref);
+    const firestore: any = this.firestore; // SEMVER: ditch any once targeting >= 6.0
+    const collectionGroup: Query = firestore.collectionGroup(collectionId);
+    return new AngularFirestoreCollectionGroup<T>(queryFn(collectionGroup), this);
   }
 
   /**

@@ -1,10 +1,11 @@
 {
-  "name": "angularfire2",
-  "version": "5.1.2",
+  "name": "@angular/fire",
+  "version": "5.2.0",
   "description": "The official library of Firebase and Angular.",
   "private": true,
   "scripts": {
-    "test": "npm run build && karma start --single-run",
+    "test": "npm run build && karma start --single-run && npm run test:node",
+    "test:node": "jasmine 'dist/packages-dist/schematics/**/*[sS]pec.js'",
     "test:watch": "concurrently \"npm run build:watch\" \"npm run delayed_karma\"",
     "test:debug": "npm run build && karma start",
     "karma": "karma start",
@@ -12,8 +13,10 @@
     "delayed_karma": "sleep 10 && karma start",
     "build": "rm -rf dist && node tools/build.js",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 1",
-    "build:wrapper": "npm i --prefix wrapper && VERSION=5.1.2 npm run --prefix wrapper build"
+    "build:wrapper": "npm i --prefix wrapper && npm run --prefix wrapper build"
   },
+  "schematics": "./dist/packages-dist/collection.json",
+  "builders": "./dist/packages-dist/builders.json",
   "keywords": [
     "angular",
     "firebase",
@@ -30,25 +33,34 @@
   },
   "homepage": "https://github.com/angular/angularfire2#readme",
   "dependencies": {
-    "@angular/common": ">=6.0.0 <8",
-    "@angular/compiler": ">=6.0.0 <8",
-    "@angular/core": ">=6.0.0 <8",
-    "@angular/platform-browser": ">=6.0.0 <8",
-    "@angular/platform-browser-dynamic": ">=6.0.0 <8",
-    "firebase": "^5.5.0",
+    "@angular-devkit/architect": "^0.800.0-rc.4 || >=8.0.0 <9 || 9.0.0-0",
+    "@angular-devkit/core": ">=6.0.0 <9 || 9.0.0-0",
+    "@angular-devkit/schematics": ">=6.0.0 <9 || 9.0.0-0",
+    "@angular/common": ">=6.0.0 <9 || 9.0.0-0",
+    "@angular/compiler": ">=6.0.0 <9 || 9.0.0-0",
+    "@angular/core": ">=6.0.0 <9 || 9.0.0-0",
+    "@angular/platform-browser": ">=6.0.0 <9 || 9.0.0-0",
+    "@angular/platform-browser-dynamic": ">=6.0.0 <9 || 9.0.0-0",
+    "@angular/router": ">=6.0.0 <9 || 9.0.0-0",
+    "firebase": ">= 5.5.7 <7",
+    "firebase-tools": "^6.10.0",
+    "fuzzy": "^0.1.3",
+    "inquirer": "^6.2.2",
+    "inquirer-autocomplete-prompt": "^1.0.1",
     "rxjs": "^6.0.0",
     "ws": "^3.3.2",
     "xhr2": "^0.1.4",
-    "zone.js": "^0.8.0"
+    "zone.js": "^0.8.0 || ^0.9.0"
   },
   "optionalDependencies": {
     "bufferutil": "~3.0.0",
     "utf-8-validate": "~4.0.0"
   },
   "devDependencies": {
-    "@angular/compiler-cli": ">=6.0.0 <8",
-    "@angular/platform-server": ">=6.0.0 <8",
-    "@angular/animations": ">=6.0.0 <8",
+    "@angular/animations": ">=6.0.0 <9 || 9.0.0-0",
+    "@angular/compiler-cli": ">=6.0.0 <9 || 9.0.0-0",
+    "@angular/platform-server": ">=6.0.0 <9 || 9.0.0-0",
+    "@types/inquirer": "^0.0.44",
     "@types/jasmine": "^2.5.36",
     "@types/request": "0.0.30",
     "concurrently": "^2.2.0",
@@ -79,11 +91,12 @@
     "rollup": "^0.64.1",
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-watch": "^4.3.1",
+    "schematics-utilities": "^1.1.1",
     "shelljs": "^0.8.0",
     "systemjs": "^0.19.16",
     "systemjs-builder": "^0.15.7",
     "traceur": "0.0.96",
-    "typescript": ">=2.7.2 <2.8.0, >=3.1.1 <3.2"
+    "typescript": "^3.1.6 <3.2"
   },
   "typings": "index.d.ts"
 }

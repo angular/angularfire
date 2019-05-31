@@ -88,21 +88,29 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 ### Authenticate users
 
 - [Getting started with Firebase Authentication](docs/auth/getting-started.md)
+- [Route users with AngularFire guards](docs/auth/router-guards.md)
 
 ### Upload files
+
 - [Getting started with Cloud Storage](docs/storage/storage.md)
 
 ### Send push notifications
+
 - [Getting started with Firebase Messaging](docs/messaging/messaging.md)
 
+### Monitor your application performance in production
+
+- [Getting started with Performance Monitoring](docs/performance/getting-started.md)
+
 ### Directly call Cloud Functions
+
 - [Getting started with Callable Functions](docs/functions/functions.md)
 
 ### Deploying your application
 
 > Firebase Hosting is production-grade web content hosting for developers. With Hosting, you can quickly and easily deploy web apps and static content to a global content delivery network (CDN) with a single command.
 
-- [Deploy your Angular application on Firebase Hosting](docs/deploying-angularfire-to-firebase.md)
+- [Deploy your application on Firebase Hosting](docs/deploy/getting-started.md)
 
 #### Server-side rendering
 
