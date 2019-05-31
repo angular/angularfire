@@ -32,7 +32,7 @@ export interface FirebaseHostingConfig {
 }
 
 export interface FirebaseJSON {
-  hosting: FirebaseHostingConfig[];
+  hosting?: FirebaseHostingConfig[] | FirebaseHostingConfig;
 }
 
 export interface FirebaseRcTarget {
@@ -40,5 +40,5 @@ export interface FirebaseRcTarget {
 }
 
 export interface FirebaseRc {
-  targets: Record<string, FirebaseRcTarget>;
+  targets?: Record<string, FirebaseRcTarget>;
 }

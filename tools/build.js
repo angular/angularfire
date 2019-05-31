@@ -2,7 +2,7 @@ const { rollup } = require('rollup');
 const { spawn } = require('child_process');
 const { Observable, from, forkJoin } = require('rxjs');
 const { switchMap, switchMapTo, tap } = require('rxjs/operators');
-const { copy, readFileSync, writeFile, statSync } = require('fs-extra');
+const { copy, readFileSync, writeFile, writeFileSync, statSync } = require('fs-extra');
 const { prettySize } = require('pretty-size');
 const gzipSize = require('gzip-size');
 const resolve = require('rollup-plugin-node-resolve');
@@ -102,7 +102,9 @@ const SRC_PKG_PATHS = {
   functions: `${process.cwd()}/src/functions/package.json`,
   storage: `${process.cwd()}/src/storage/package.json`,
   messaging: `${process.cwd()}/src/messaging/package.json`,
-  performance: `${process.cwd()}/src/performance/package.json`
+  performance: `${process.cwd()}/src/performance/package.json`,
+  schematics: `${process.cwd()}/dist/packages-dist/schematics/versions.js`,
+  "schematics-es2015": `${process.cwd()}/dist/packages-dist/schematics/es2015/versions.js`
 };
 
 const DEST_PKG_PATHS = {
@@ -116,7 +118,9 @@ const DEST_PKG_PATHS = {
   functions: `${process.cwd()}/dist/packages-dist/functions/package.json`,
   storage: `${process.cwd()}/dist/packages-dist/storage/package.json`,
   messaging: `${process.cwd()}/dist/packages-dist/messaging/package.json`,
-  performance: `${process.cwd()}/dist/packages-dist/performance/package.json`
+  performance: `${process.cwd()}/dist/packages-dist/performance/package.json`,
+  schematics: `${process.cwd()}/dist/packages-dist/schematics/versions.js`,
+  "schematics-es2015": `${process.cwd()}/dist/packages-dist/schematics/es2015/versions.js`
 };
 
 // Constants for running typescript commands
@@ -278,6 +282,11 @@ function copySchematicFiles() {
   ]);
 }
 
+function replaceDynamicImportsForUMD() {
+  writeFileSync('./dist/packages-dist/bundles/performance.umd.js', readFileSync('./dist/packages-dist/bundles/performance.umd.js', 'utf8').replace("rxjs.from(import('firebase/performance'))", "rxjs.empty()"));
+  writeFileSync('./dist/packages-dist/bundles/messaging.umd.js', readFileSync('./dist/packages-dist/bundles/messaging.umd.js', 'utf8').replace("rxjs.from(import('firebase/messaging'))", "rxjs.empty()"));
+}
+
 function measure(module) {
   const path = `${process.cwd()}/dist/packages-dist/bundles/${module}.umd.js`;
   const file = readFileSync(path);
@@ -367,9 +376,12 @@ function buildLibrary(globals) {
     switchMap(() => from(copyDocs())),
     switchMap(() => from(copyNodeFixes())),
     switchMap(() => from(copySchematicFiles())),
+    switchMap(() => replaceVersionsObservable('schematics', VERSIONS)),
+    switchMap(() => replaceVersionsObservable('schematics-es2015', VERSIONS)),
     switchMap(() => replaceVersionsObservable('firebase-node', VERSIONS)),
     switchMap(() => from(createTestUmd(globals))),
     tap(() => {
+      replaceDynamicImportsForUMD();
       const coreStats = measure('core');
       const authStats = measure('auth');
       const authGuardStats = measure('auth-guard');

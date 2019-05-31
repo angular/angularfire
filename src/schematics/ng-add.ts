@@ -1,10 +1,12 @@
-import { SchematicsException, Tree } from '@angular-devkit/schematics';
-import { FirebaseJSON, FirebaseRc } from './interfaces';
+import { SchematicsException, Tree, SchematicContext } from '@angular-devkit/schematics';
+import { NodePackageInstallTask, RunSchematicTask } from '@angular-devkit/schematics/tasks';
+import { FirebaseJSON, FirebaseRc, FirebaseHostingConfig } from './interfaces';
 import { experimental, JsonParseMode, parseJson } from '@angular-devkit/core';
 import { from } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { Project } from './interfaces';
 import { listProjects, projectPrompt } from './utils';
+import { dependencies as requiredDependencyVersions, devDependencies as requiredDevDependencyVersions } from './versions';
 
 const stringifyFormatted = (obj: any) => JSON.stringify(obj, null, 2);
 
@@ -52,13 +54,24 @@ function generateFirebaseJson(
     ? safeReadJSON(path, tree)
     : emptyFirebaseJson();
 
-  if (firebaseJson.hosting.find(config => config.target === project)) {
+  if (firebaseJson.hosting &&
+    (Array.isArray(firebaseJson.hosting) &&
+      firebaseJson.hosting.find(config => config.target === project) ||
+      (<FirebaseHostingConfig>firebaseJson.hosting).target === project
+  )) {
     throw new SchematicsException(
       `Target ${project} already exists in firebase.json`
     );
   }
 
-  firebaseJson.hosting.push(generateHostingConfig(project, dist));
+  const newConfig = generateHostingConfig(project, dist);
+  if (firebaseJson.hosting === undefined) {
+    firebaseJson.hosting = newConfig;
+  } else if (Array.isArray(firebaseJson.hosting)) {
+    firebaseJson.hosting.push(newConfig);
+  } else {
+    firebaseJson.hosting = [firebaseJson.hosting!, newConfig];
+  }
 
   overwriteIfExists(tree, path, stringifyFormatted(firebaseJson));
 }
@@ -84,7 +97,9 @@ function generateFirebaseRc(
     ? safeReadJSON(path, tree)
     : emptyFirebaseRc();
 
-  if (firebaseProject in firebaseRc.targets) {
+  firebaseRc.targets = firebaseRc.targets || {};
+
+  if (firebaseProject in firebaseRc.targets!) {
     throw new SchematicsException(
       `Firebase project ${firebaseProject} already defined in .firebaserc`
     );
@@ -142,13 +157,35 @@ interface DeployOptions {
 
 // You don't have to export the function as default. You can also have more than one rule factory
 // per file.
-export const ngDeploy = ({ project }: DeployOptions) => (host: Tree) =>
+export const setupNgDeploy = ({ project }: DeployOptions) => (host: Tree) =>
   from(listProjects()).pipe(
     switchMap((projects: Project[]) => projectPrompt(projects)),
-    map(({ firebaseProject }: any) => ngAdd(host, { firebaseProject, project }))
+    map(({ firebaseProject }: any) => setupFirebaseProject(host, { firebaseProject, project }))
   );
 
-export function ngAdd(tree: Tree, options: NgAddOptions) {
+export const ngAdd = (options: DeployOptions) => (host: Tree, context: SchematicContext) => {
+  const packageJson = host.exists('package.json') && safeReadJSON('package.json', host);
+
+  if (packageJson === undefined) {
+    throw new SchematicsException('Could not locate package.json');
+  }
+
+  Object.keys(requiredDependencyVersions).forEach(name => {
+    packageJson.dependencies[name] = packageJson.dependencies[name] || requiredDependencyVersions[name];
+  });
+
+  Object.keys(requiredDevDependencyVersions).forEach(name => {
+    packageJson.devDependencies[name] = packageJson.devDependencies[name] || requiredDevDependencyVersions[name];
+  });
+
+  overwriteIfExists(host, 'package.json', stringifyFormatted(packageJson));
+
+  const installTaskId = context.addTask(new NodePackageInstallTask());
+
+  context.addTask(new RunSchematicTask('ng-add-setup-firebase-deploy', options), [installTaskId]);
+}
+
+export function setupFirebaseProject(tree: Tree, options: NgAddOptions) {
   const { path: workspacePath, workspace } = getWorkspace(tree);
 
   if (!options.project) {

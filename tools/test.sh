@@ -7,4 +7,4 @@ apt-get -y install google-chrome-stable
 # TODO parallelize these
 npx karma start --single-run --browsers ChromeHeadlessTravis --reporters mocha &&
 node tools/run-typings-test.js &&
-cd test/ng-build/ng6 && yarn && yarn build:prod
+bash ./test/ng-build/build.sh

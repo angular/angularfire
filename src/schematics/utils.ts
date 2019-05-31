@@ -1,23 +1,14 @@
 import { readFileSync } from "fs";
-import * as inquirer from "inquirer";
 import { FirebaseRc, Project } from "./interfaces";
 import { join } from "path";
 
-const firebase = require("firebase-tools");
-
-const fuzzy = require("fuzzy");
-
 export function listProjects() {
+  const firebase = require('firebase-tools');
   return firebase.list().catch(
     /* If list failed, then login and try again. */
     () => firebase.login().then(() => firebase.list())
   );
 }
-
-inquirer.registerPrompt(
-  "autocomplete",
-  require("inquirer-autocomplete-prompt")
-);
 
 // `fuzzy` passes either the original list of projects or an internal object
 // which contains the project as a property.
@@ -28,7 +19,7 @@ const isProject = (elem: Project | { original: Project }): elem is Project => {
 const searchProjects = (projects: Project[]) => {
   return (_: any, input: string) => {
     return Promise.resolve(
-      fuzzy
+      require('fuzzy')
         .filter(input, projects, {
           extract(el: Project) {
             return `${el.id} ${el.name} ${el.permission}`;
@@ -52,7 +43,12 @@ const searchProjects = (projects: Project[]) => {
 };
 
 export const projectPrompt = (projects: Project[]) => {
-  return (inquirer as any).prompt({
+  const inquirer = require('inquirer');
+  inquirer.registerPrompt(
+    "autocomplete",
+    require("inquirer-autocomplete-prompt")
+  );
+  return inquirer.prompt({
     type: "autocomplete",
     name: "firebaseProject",
     source: searchProjects(projects),
@@ -67,8 +63,8 @@ export function getFirebaseProjectName(
   const { targets }: FirebaseRc = JSON.parse(
     readFileSync(join(projectRoot, ".firebaserc"), "UTF-8")
   );
-  const projects = Object.keys(targets);
+  const projects = Object.keys(targets!);
   return projects.find(
-    project => !!Object.keys(targets[project].hosting).find(t => t === target)
+    project => !!Object.keys(targets![project].hosting).find(t => t === target)
   );
 }

@@ -11,9 +11,9 @@
     "karma": "karma start",
     "test:universal": "npm run build && cp -R dist/packages-dist test/universal-test/node_modules/angularfire2 && cd test/universal-test && npm run prerender",
     "delayed_karma": "sleep 10 && karma start",
-    "build": "rm -rf dist && node tools/build.js",
+    "build": "rm -rf dist && node tools/build.js && npm pack ./dist/packages-dist",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 1",
-    "build:wrapper": "npm i --prefix wrapper && npm run --prefix wrapper build"
+    "build:wrapper": "npm i --prefix wrapper && npm run --prefix wrapper build && npm pack ./dist/wrapper-dist"
   },
   "schematics": "./dist/packages-dist/collection.json",
   "builders": "./dist/packages-dist/builders.json",
@@ -33,15 +33,15 @@
   },
   "homepage": "https://github.com/angular/angularfire2#readme",
   "dependencies": {
-    "@angular-devkit/architect": "^0.800.0-rc.4 || >=8.0.0 <9 || 9.0.0-0",
-    "@angular-devkit/core": ">=6.0.0 <9 || 9.0.0-0",
-    "@angular-devkit/schematics": ">=6.0.0 <9 || 9.0.0-0",
-    "@angular/common": ">=6.0.0 <9 || 9.0.0-0",
-    "@angular/compiler": ">=6.0.0 <9 || 9.0.0-0",
-    "@angular/core": ">=6.0.0 <9 || 9.0.0-0",
-    "@angular/platform-browser": ">=6.0.0 <9 || 9.0.0-0",
-    "@angular/platform-browser-dynamic": ">=6.0.0 <9 || 9.0.0-0",
-    "@angular/router": ">=6.0.0 <9 || 9.0.0-0",
+    "@angular-devkit/architect": "<0.900 || ^0.900.0-0 || ^9.0.0-0",
+    "@angular-devkit/core": ">=6.0.0 <9 || ^9.0.0-0",
+    "@angular-devkit/schematics": ">=6.0.0 <9 || ^9.0.0-0",
+    "@angular/common": ">=6.0.0 <9 || ^9.0.0-0",
+    "@angular/compiler": ">=6.0.0 <9 || ^9.0.0-0",
+    "@angular/core": ">=6.0.0 <9 || ^9.0.0-0",
+    "@angular/platform-browser": ">=6.0.0 <9 || ^9.0.0-0",
+    "@angular/platform-browser-dynamic": ">=6.0.0 <9 || ^9.0.0-0",
+    "@angular/router": ">=6.0.0 <9 || ^9.0.0-0",
     "firebase": ">= 5.5.7 <7",
     "firebase-tools": "^6.10.0",
     "fuzzy": "^0.1.3",
@@ -57,9 +57,9 @@
     "utf-8-validate": "~4.0.0"
   },
   "devDependencies": {
-    "@angular/animations": ">=6.0.0 <9 || 9.0.0-0",
-    "@angular/compiler-cli": ">=6.0.0 <9 || 9.0.0-0",
-    "@angular/platform-server": ">=6.0.0 <9 || 9.0.0-0",
+    "@angular/animations": ">=6.0.0 <9 || ^9.0.0-0",
+    "@angular/compiler-cli": ">=6.0.0 <9 || ^9.0.0-0",
+    "@angular/platform-server": ">=6.0.0 <9 || ^9.0.0-0",
     "@types/inquirer": "^0.0.44",
     "@types/jasmine": "^2.5.36",
     "@types/request": "0.0.30",
@@ -96,7 +96,7 @@
     "systemjs": "^0.19.16",
     "systemjs-builder": "^0.15.7",
     "traceur": "0.0.96",
-    "typescript": "^3.1.6 <3.2"
+    "typescript": ">=3.4.0 <3.5.0"
   },
   "typings": "index.d.ts"
 }

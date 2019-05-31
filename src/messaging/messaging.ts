@@ -23,16 +23,16 @@ export class AngularFireMessaging {
     zone: NgZone
   ) {
 
+    // @ts-ignore zapping in the UMD in the build script
+    const requireMessaging = from(import('firebase/messaging'));
+
+    this.messaging = requireMessaging.pipe(
+      map(() => _firebaseAppFactory(options, nameOrConfig)),
+      map(app => app.messaging()),
+      runOutsideAngular(zone)
+    );
+
     if (!isPlatformServer(platformId)) {
-
-      // @ts-ignore
-      const requireMessaging = from(import('firebase/messaging'));
-
-      this.messaging = requireMessaging.pipe(
-        map(() => _firebaseAppFactory(options, nameOrConfig)),
-        map(app => app.messaging()),
-        runOutsideAngular(zone)
-      );
 
       this.requestPermission = this.messaging.pipe(
         switchMap(messaging => messaging.requestPermission()),
@@ -41,7 +41,6 @@ export class AngularFireMessaging {
 
     } else {
 
-      this.messaging = empty();
       this.requestPermission = throwError('Not available on server platform.');
 
     }
