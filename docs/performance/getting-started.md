@@ -32,6 +32,16 @@ The page load trace breaks down into the following default metrics:
 * [first input delay traces](https://firebase.google.com/docs/perf-mon/automatic-web#input-delay) — measure the time between when the user interacts with a page and when the browser is able to respond to that input
 * **Angular specific traces** - measure the time needed for `ApplicationRef.isStable` to be true, an important metric to track if you're concerned about solving Zone.js issues for proper functionality of NGSW and Server Side Rendering
 
+### Measuring First Input Delay
+
+> First Input Delay (FID) measures the time from when a user first interacts with your site (i.e. when they click a link, tap on a button, or use a custom, JavaScript-powered control) to the time when the browser is actually able to respond to that interaction. [See the article on the Google Developer's Blog for more information on FID.](https://developers.google.com/web/updates/2018/05/first-input-delay)
+
+In order to track first input delay, you'll want to [polyfill the browser performance API](https://github.com/GoogleChromeLabs/first-input-delay):
+
+`npm install --save-dev first-input-delay`
+
+Then add `import 'first-input-delay';` to your `src/polyfills.ts`.
+
 ## Manual traces
 
 You can inject `AngularFirePerformance` to perform manual traces on Observables.
