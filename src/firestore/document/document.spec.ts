@@ -2,7 +2,7 @@ import { FirebaseApp, AngularFireModule } from '@angular/fire';
 import { AngularFirestore } from '../firestore';
 import { AngularFirestoreModule } from '../firestore.module';
 import { AngularFirestoreDocument } from '../document/document';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 
 import { TestBed, inject } from '@angular/core/testing';
@@ -19,7 +19,7 @@ describe('AngularFirestoreDocument', () => {
     TestBed.configureTestingModule({
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG),
-        AngularFirestoreModule.enablePersistence({synchronizeTabs: true})
+        AngularFirestoreModule.enablePersistence({ synchronizeTabs: true })
       ]
     });
     inject([FirebaseApp, AngularFirestore], (_app: FirebaseApp, _afs: AngularFirestore) => {
@@ -33,32 +33,54 @@ describe('AngularFirestoreDocument', () => {
     done();
   });
 
-  it('should get action updates', async (done: any) => {
-    const randomCollectionName = randomName(afs.firestore);
-    const ref = afs.firestore.doc(`${randomCollectionName}/FAKE`);
-    const stock = new AngularFirestoreDocument<Stock>(ref, afs);
-    await stock.set(FAKE_STOCK_DATA);
-    const sub = stock
-      .snapshotChanges()
-      .subscribe(async a => {
-        sub.unsubscribe();
-        if (a.payload.exists) {
-          expect(a.payload.data()).toEqual(FAKE_STOCK_DATA);
-          stock.delete().then(done).catch(done.fail);
-        }
+  describe('valueChanges()', () => {
+
+    it('should get unwrapped snapshot', async (done: any) => {
+      const randomCollectionName = afs.firestore.collection('a').doc().id;
+      const ref = afs.firestore.doc(`${randomCollectionName}/FAKE`);
+      const stock = new AngularFirestoreDocument<Stock>(ref, afs);
+      await stock.set(FAKE_STOCK_DATA);
+      const obs$ = stock.valueChanges();
+      obs$.pipe(take(1)).subscribe(async data => {
+        expect(JSON.stringify(data)).toBe(JSON.stringify(FAKE_STOCK_DATA));
+        stock.delete().then(done).catch(done.fail);
       });
+    });
+
+    it('should optionally map the doc ID to the emitted data object', async (done: any) => {
+      const randomCollectionName = afs.firestore.collection('a').doc().id;
+      const ref = afs.firestore.doc(`${randomCollectionName}/FAKE`);
+      const stock = new AngularFirestoreDocument<Stock>(ref, afs);
+      await stock.set(FAKE_STOCK_DATA);
+      const idField = 'myCustomID';
+      const obs$ = stock.valueChanges({ idField });
+      obs$.pipe(take(1)).subscribe(async data => {
+        expect(data[idField]).toBeDefined();
+        expect(data).toEqual(jasmine.objectContaining(FAKE_STOCK_DATA));
+        stock.delete().then(done).catch(done.fail);
+      });
+    });
+
   });
 
-  it('should get unwrapped snapshot', async (done: any) => {
-    const randomCollectionName = afs.firestore.collection('a').doc().id;
-    const ref = afs.firestore.doc(`${randomCollectionName}/FAKE`);
-    const stock = new AngularFirestoreDocument<Stock>(ref, afs);
-    await stock.set(FAKE_STOCK_DATA);
-    const obs$ = stock.valueChanges();
-    obs$.pipe(take(1)).subscribe(async data => {
-      expect(JSON.stringify(data)).toBe(JSON.stringify(FAKE_STOCK_DATA));
-      stock.delete().then(done).catch(done.fail);
+  describe('snapshotChanges()', () => {
+
+    it('should get action updates', async (done: any) => {
+      const randomCollectionName = randomName(afs.firestore);
+      const ref = afs.firestore.doc(`${randomCollectionName}/FAKE`);
+      const stock = new AngularFirestoreDocument<Stock>(ref, afs);
+      await stock.set(FAKE_STOCK_DATA);
+      const sub = stock
+        .snapshotChanges()
+        .subscribe(async a => {
+          sub.unsubscribe();
+          if (a.payload.exists) {
+            expect(a.payload.data()).toEqual(FAKE_STOCK_DATA);
+            stock.delete().then(done).catch(done.fail);
+          }
+        });
     });
+
   });
 
 });

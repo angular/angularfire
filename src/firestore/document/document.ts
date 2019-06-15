@@ -30,7 +30,7 @@ import { runInZone } from '@angular/fire';
  * // OR! Transform using Observable.from() and the data is unwrapped for you
  * Observable.from(fakeStock).subscribe(value => console.log(value));
  */
-export class AngularFirestoreDocument<T=DocumentData> {
+export class AngularFirestoreDocument<T = DocumentData> {
 
   /**
    * The contstuctor takes in a DocumentReference to provide wrapper methods
@@ -69,7 +69,7 @@ export class AngularFirestoreDocument<T=DocumentData> {
    * @param path
    * @param queryFn
    */
-  collection<R=DocumentData>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<R> {
+  collection<R = DocumentData>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<R> {
     const collectionRef = this.ref.collection(path);
     const { ref, query } = associateQuery(collectionRef, queryFn);
     return new AngularFirestoreCollection<R>(ref, query, this.afs);
@@ -86,12 +86,22 @@ export class AngularFirestoreDocument<T=DocumentData> {
 
   /**
    * Listen to unwrapped snapshot updates from the document.
+   *
+   * If the `idField` option is provided, document IDs are included and mapped to the
+   * provided `idField` property name.
+   * @param options
    */
-  valueChanges(): Observable<T|undefined> {
+  valueChanges(): Observable<T | undefined>
+  valueChanges({ }): Observable<T | undefined>
+  valueChanges<K extends string>(options: { idField: K }): Observable<(T & { [T in K]: string }) | undefined>
+  valueChanges<K extends string>(options: { idField?: K } = {}): Observable<T | undefined> {
     return this.snapshotChanges().pipe(
-      map(action => {
-        return action.payload.data();
-      })
+      map(({ payload }) =>
+        options.idField ? {
+          ...payload.data() as Object,
+          ...{ [options.idField]: payload.id }
+        } as T & { [T in K]: string } : payload.data()
+      )
     );
   }
 
