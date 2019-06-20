@@ -36,6 +36,7 @@ describe('AngularFireStorage', () => {
 
   it('should have an initialized Firebase app', () => {
     expect(afStorage.storage.app).toBeDefined();
+    // @ts-ignore
     expect(afStorage.storage.app).toEqual(app);
   });
 
@@ -167,6 +168,7 @@ describe('AngularFireStorage w/options', () => {
 
     it('should have an initialized Firebase app', () => {
       expect(afStorage.storage.app).toBeDefined();
+      // @ts-ignore
       expect(afStorage.storage.app).toEqual(app);
     });
 

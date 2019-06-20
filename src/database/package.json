@@ -1,8 +1,10 @@
 {
-  "name": "@angular/fire/database",
-  "main": "../bundles/database.umd.js",
-  "module": "index.js",
-  "es2015": "./es2015/index.js",
-  "typings": "index.d.ts",
-  "sideEffects": false
+  "ngPackage": {
+    "lib": {
+      "umdModuleIds": {
+        "firebase/app": "firebase"
+      },
+      "entryFile": "public_api.ts"
+    }
+  }
 }

@@ -1,0 +1,12 @@
+{
+  "name": "@angular/fire",
+  "ngPackage": {
+    "lib": {
+      "umdModuleIds": {
+        "firebase/app": "firebase"
+      },
+      "entryFile": "core/public_api.ts"
+    },
+    "dest": "../dist/packages-dist"
+  }
+}
