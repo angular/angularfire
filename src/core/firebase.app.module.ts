@@ -44,8 +44,10 @@ export function _firebaseAppFactory(options: FirebaseOptions, nameOrConfig?: str
     // We support FirebaseConfig, initializeApp's public type only accepts string; need to cast as any
     // Could be solved with https://github.com/firebase/firebase-js-sdk/pull/1206
     const app = (existingApp || firebase.initializeApp(options, config as any)) as FirebaseApp;
-    app.registerLibrary('angular-fire', VERSION.full);
-    app.registerLibrary('angular-core', NG_VERSION.full);
+    if (app.registerLibrary) {
+        app.registerLibrary('angular-fire', VERSION.full);
+        app.registerLibrary('angular-core', NG_VERSION.full);
+    }
     return app;
 }
 
