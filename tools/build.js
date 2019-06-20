@@ -287,6 +287,17 @@ function replaceDynamicImportsForUMD() {
   writeFileSync('./dist/packages-dist/bundles/messaging.umd.js', readFileSync('./dist/packages-dist/bundles/messaging.umd.js', 'utf8').replace("rxjs.from(import('firebase/messaging'))", "rxjs.empty()"));
 }
 
+function writeCoreVersion() {
+  const splitVersion = VERSIONS.ANGULARFIRE2_VERSION.split('.');
+  const major = parseInt(splitVersion[0]);
+  const minor = parseInt(splitVersion[1]);
+  const patch = parseInt(splitVersion[2]);
+  const exportVersion = `VERSION = {major: ${major}, minor: ${minor}, patch: ${patch}, full: "${VERSIONS.ANGULARFIRE2_VERSION}"};`
+  writeFileSync('./dist/packages-dist/bundles/core.umd.js', readFileSync('./dist/packages-dist/bundles/core.umd.js', 'utf8').replace(/VERSION = .+/g, exportVersion));
+  writeFileSync('./dist/packages-dist/firebase.app.module.js', readFileSync('./dist/packages-dist/firebase.app.module.js', 'utf8').replace(/VERSION = .+/g, exportVersion));
+  writeFileSync('./dist/packages-dist/es2015/firebase.app.module.js', readFileSync('./dist/packages-dist/es2015/firebase.app.module.js', 'utf8').replace(/VERSION = .+/g, exportVersion));
+}
+
 function measure(module) {
   const path = `${process.cwd()}/dist/packages-dist/bundles/${module}.umd.js`;
   const file = readFileSync(path);
@@ -382,6 +393,7 @@ function buildLibrary(globals) {
     switchMap(() => from(createTestUmd(globals))),
     tap(() => {
       replaceDynamicImportsForUMD();
+      writeCoreVersion();
       const coreStats = measure('core');
       const authStats = measure('auth');
       const authGuardStats = measure('auth-guard');
