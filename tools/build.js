@@ -288,14 +288,9 @@ function replaceDynamicImportsForUMD() {
 }
 
 function writeCoreVersion() {
-  const splitVersion = VERSIONS.ANGULARFIRE2_VERSION.split('.');
-  const major = parseInt(splitVersion[0]);
-  const minor = parseInt(splitVersion[1]);
-  const patch = parseInt(splitVersion[2]);
-  const exportVersion = `VERSION = {major: ${major}, minor: ${minor}, patch: ${patch}, full: "${VERSIONS.ANGULARFIRE2_VERSION}"};`
-  writeFileSync('./dist/packages-dist/bundles/core.umd.js', readFileSync('./dist/packages-dist/bundles/core.umd.js', 'utf8').replace(/VERSION = .+/g, exportVersion));
-  writeFileSync('./dist/packages-dist/firebase.app.module.js', readFileSync('./dist/packages-dist/firebase.app.module.js', 'utf8').replace(/VERSION = .+/g, exportVersion));
-  writeFileSync('./dist/packages-dist/es2015/firebase.app.module.js', readFileSync('./dist/packages-dist/es2015/firebase.app.module.js', 'utf8').replace(/VERSION = .+/g, exportVersion));
+  writeFileSync('./dist/packages-dist/bundles/core.umd.js', readFileSync('./dist/packages-dist/bundles/core.umd.js', 'utf8').replace('ANGULARFIRE2_VERSION', VERSIONS.ANGULARFIRE2_VERSION));
+  writeFileSync('./dist/packages-dist/firebase.app.module.js', readFileSync('./dist/packages-dist/firebase.app.module.js', 'utf8').replace('ANGULARFIRE2_VERSION', VERSIONS.ANGULARFIRE2_VERSION));
+  writeFileSync('./dist/packages-dist/es2015/firebase.app.module.js', readFileSync('./dist/packages-dist/es2015/firebase.app.module.js', 'utf8').replace('ANGULARFIRE2_VERSION', VERSIONS.ANGULARFIRE2_VERSION));
 }
 
 function measure(module) {

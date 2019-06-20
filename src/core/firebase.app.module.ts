@@ -1,4 +1,4 @@
-import { InjectionToken, NgModule, Optional, VERSION as NG_VERSION } from '@angular/core';
+import { InjectionToken, NgModule, Optional, VERSION as NG_VERSION, Version } from '@angular/core';
 import { auth, database, firestore, functions, messaging, storage } from 'firebase/app';
 // @ts-ignore (https://github.com/firebase/firebase-js-sdk/pull/1206)
 import firebase from 'firebase/app'; // once fixed can pull in as "default as firebase" above
@@ -33,7 +33,7 @@ export class FirebaseApp {
     registerLibrary: (library: string, version: string) => void;
 }
 
-export const VERSION = { major: 0, minor: 0, patch: 0, full: '0.0.0' };
+export const VERSION = new Version('ANGULARFIRE2_VERSION');
 
 export function _firebaseAppFactory(options: FirebaseOptions, nameOrConfig?: string|FirebaseAppConfig|null) {
     const name = typeof nameOrConfig === 'string' && nameOrConfig || '[DEFAULT]';
