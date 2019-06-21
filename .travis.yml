@@ -39,9 +39,8 @@ install:
     fi
 
 script:
-  - yarn build
-  - |
-    ./node_modules/.bin/karma start --single-run --browsers ChromeHeadlessTravis --reporters mocha &&
+  - | 
+  - yarn test &&
     yarn test:node &&
     node tools/run-typings-test.js &&
     bash ./test/ng-build/build.sh
