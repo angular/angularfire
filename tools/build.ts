@@ -6,7 +6,7 @@ import { ngPackagr } from 'ng-packagr';
 
 const rootPackage = import(`${process.cwd()}/package.json`);
 
-async function replaceVersions(path) {
+async function replaceVersions(path: string) {
   const root = await rootPackage;
   var pkg = await import(path);
   Object.keys(pkg.peerDependencies).forEach(peer => {
@@ -16,7 +16,7 @@ async function replaceVersions(path) {
   return writeFile(path, JSON.stringify(pkg, null, 2));
 }
 
-function spawnPromise(command, args) {
+function spawnPromise(command: string, args: string[]) {
   return new Promise(resolve => {
     const cmd = spawn(command, args);
     cmd.on('close', resolve);
@@ -45,7 +45,7 @@ async function replaceDynamicImportsForUMD() {
   ]);
 }
 
-async function measure(module) {
+async function measure(module: string) {
   const path = `${process.cwd()}/dist/packages-dist/bundles/${module}.umd.js`;
   const file = await readFile(path);
   const gzip = prettySize(gzipSync(file), true);
