@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "test": "npm run build && npx ng test",
+    "lint": "npx ng lint",
     "test:node": "jasmine 'dist/packages-dist/schematics/**/*[sS]pec.js'",
     "test:universal": "npm run build && cp -R dist/packages-dist test/universal-test/node_modules/angularfire2 && cd test/universal-test && npm run prerender",
     "build": "tsc tools/build.ts; node ./tools/build.js",
@@ -62,6 +63,7 @@
     "@types/inquirer": "^0.0.44",
     "@types/jasmine": "^3.3.13",
     "@types/request": "0.0.30",
+    "codelyzer": "^5.0.0",
     "concurrently": "^2.2.0",
     "conventional-changelog-cli": "^1.2.0",
     "fs-extra": "^8.0.1",
@@ -83,6 +85,7 @@
     "rollup-plugin-node-resolve": "^5.0.3",
     "schematics-utilities": "^1.1.1",
     "tsickle": "^0.35.0",
+    "tslint": "^5.17.0",
     "typescript": ">=3.4.0 <3.5.0"
   },
   "typings": "index.d.ts"
