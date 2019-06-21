@@ -6,7 +6,7 @@ import { Observable, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 
 import { TestBed, inject } from '@angular/core/testing';
-import { COMMON_CONFIG } from '../test-config';
+import { COMMON_CONFIG } from '../../test-config';
 
 import { Stock, randomName, FAKE_STOCK_DATA } from '../utils.spec';
 

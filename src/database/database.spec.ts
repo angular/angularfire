@@ -1,7 +1,7 @@
 import { FirebaseApp, AngularFireModule, FirebaseOptionsToken, FirebaseNameOrConfigToken } from '@angular/fire';
 import { AngularFireDatabase, AngularFireDatabaseModule, RealtimeDatabaseURL } from '@angular/fire/database';
 import { TestBed, inject } from '@angular/core/testing';
-import { COMMON_CONFIG } from './test-config';
+import { COMMON_CONFIG } from '../test-config';
 import { NgZone } from '@angular/core';
 
 // generate random string to test fidelity of naming

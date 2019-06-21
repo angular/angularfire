@@ -54,7 +54,7 @@ async function measure(module: string) {
 }
 
 async function buildLibrary() {
-  await ngPackagr().forProject(`${process.cwd()}/src/package.json`).build();
+  await ngPackagr().forProject(`${process.cwd()}/src/package.json`).withTsConfig(`${process.cwd()}/tsconfig.lib.json`).build();
   await Promise.all([
     copy(`${process.cwd()}/.npmignore`, `${process.cwd()}/dist/packages-dist/.npmignore`),
     copy(`${process.cwd()}/README.md`, `${process.cwd()}/dist/packages-dist/README.md`),

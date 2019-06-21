@@ -15,7 +15,8 @@ export class FirebaseZoneScheduler {
     if (isPlatformServer(this.platformId)) {
       return new Observable<T>(subscriber => {
         const noop = () => {};
-        const task = global['Zone'].current.scheduleMacroTask('firebaseZoneBlock', noop, {}, noop, noop);
+        // @ts-ignore
+        const task = Zone.current.scheduleMacroTask('firebaseZoneBlock', noop, {}, noop, noop);
         obs$.subscribe(
           next => {
             if (task.state === 'scheduled') { task.invoke() };

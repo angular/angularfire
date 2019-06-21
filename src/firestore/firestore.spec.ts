@@ -7,7 +7,7 @@ import { AngularFirestoreCollection } from './collection/collection';
 import { Observable, Subscription } from 'rxjs';
 
 import { TestBed, inject } from '@angular/core/testing';
-import { COMMON_CONFIG } from './test-config';
+import { COMMON_CONFIG } from '../test-config';
 
 interface Stock {
   name: string;

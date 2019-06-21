@@ -30,6 +30,7 @@ export class FirebaseApp {
     delete: () => Promise<void>;
     firestore: () => FirebaseFirestore;
     functions: (region?: string) => FirebaseFunctions;
+    installations: () => any; // SEMVER: drop once we can target
 }
 
 export function _firebaseAppFactory(options: FirebaseOptions, nameOrConfig?: string|FirebaseAppConfig|null) {

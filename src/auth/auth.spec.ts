@@ -3,7 +3,7 @@ import { Observable, Subject } from 'rxjs'
 import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, FirebaseOptionsToken, AngularFireModule, FirebaseNameOrConfigToken } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule } from '@angular/fire/auth';
-import { COMMON_CONFIG } from './test-config';
+import { COMMON_CONFIG } from '../test-config';
 import { take, skip } from 'rxjs/operators';
 
 function authTake(auth: Observable<any>, count: number): Observable<any> {
@@ -38,10 +38,12 @@ describe('AngularFireAuth', () => {
     })();
 
     mockAuthState = new Subject<User>();
+    //@ts-ignore
     spyOn(afAuth, 'authState').and.returnValue(mockAuthState);
+    //@ts-ignore
     spyOn(afAuth, 'idToken').and.returnValue(mockAuthState);
-    afAuth.authState = mockAuthState as Observable<User>;
-    afAuth.idToken = mockAuthState as Observable<User>;
+    (<any>afAuth).authState = mockAuthState as Observable<User>;
+    (<any>afAuth).idToken = mockAuthState as Observable<User>;
   });
 
   afterEach(done => {
@@ -112,7 +114,7 @@ describe('AngularFireAuth', () => {
         count = count + 1;
         mockAuthState.next(firebaseUser);
       } else {
-        expect(user).toEqual(firebaseUser);
+        expect(<any>user).toEqual(firebaseUser);
         subs.unsubscribe();
         done();
       }

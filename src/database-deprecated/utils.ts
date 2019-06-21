@@ -43,13 +43,7 @@ export interface CheckUrlRef {
   isQuery?: () => any;
 }
 
-/**
- * Unwraps the data returned in the DataSnapshot. Exposes the DataSnapshot key and exists methods through the $key and $exists properties respectively. If the value is primitive, it is unwrapped using a $value property. The $ properies mean they cannot be saved in the Database as those characters are invalid.
- * @param {DataSnapshot} snapshot - The snapshot to unwrap
- * @return AFUnwrappedDataSnapshot
- * @example
- * unwrapMapFn(snapshot) => { name: 'David', $key: 'david', $exists: Function }
- */
+// Unwraps the data returned in the DataSnapshot. Exposes the DataSnapshot key and exists methods through the $key and $exists properties respectively. If the value is primitive, it is unwrapped using a $value property. The $ properies mean they cannot be saved in the Database as those characters are invalid.
 export function unwrapMapFn (snapshot:DataSnapshot): AFUnwrappedDataSnapshot {
   var unwrapped = !isNil(snapshot.val()) ? snapshot.val() : { $value: null };
   if ((/string|number|boolean/).test(typeof unwrapped)) {
