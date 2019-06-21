@@ -1,1 +1,1 @@
-declare function __export(m: any): void;
+export * from '@angular/fire/database-deprecated';
