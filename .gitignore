@@ -15,3 +15,4 @@ yarn-error.log
 *.bak
 package-lock.json
 tools/build.js
+coverage

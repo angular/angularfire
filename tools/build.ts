@@ -2,7 +2,6 @@ import { spawn } from 'child_process';
 import { copy, writeFile, readFile } from 'fs-extra';
 import { prettySize } from 'pretty-size';
 import { sync as gzipSync } from 'gzip-size';
-import { ngPackagr } from 'ng-packagr';
 
 const rootPackage = import(`${process.cwd()}/package.json`);
 
@@ -17,14 +16,11 @@ async function replaceVersions(path: string) {
 }
 
 function spawnPromise(command: string, args: string[]) {
-  return new Promise(resolve => {
-    const cmd = spawn(command, args);
-    cmd.on('close', resolve);
-  });
+  return new Promise(resolve => spawn(command, args, {stdio: 'inherit'}).on('close', resolve));
 }
 
 async function compileSchematics() {
-  await spawnPromise('node_modules/.bin/tsc', ['-p', 'src/schematics/tsconfig.json']);
+  await spawnPromise(`${process.cwd()}/node_modules/.bin/tsc`, ['-p', `${process.cwd()}/src/schematics/tsconfig.json`]);
   return Promise.all([
     copy(`${process.cwd()}/src/core/builders.json`, `${process.cwd()}/dist/packages-dist/builders.json`),
     copy(`${process.cwd()}/src/core/collection.json`, `${process.cwd()}/dist/packages-dist/collection.json`),
@@ -33,8 +29,8 @@ async function compileSchematics() {
 }
 
 async function replaceDynamicImportsForUMD() {
-  const perfPath = './dist/packages-dist/bundles/angular-fire-performance.umd.js';
-  const messagingPath = './dist/packages-dist/bundles/angular-fire-messaging.umd.js';
+  const perfPath = `${process.cwd()}/dist/packages-dist/bundles/angular-fire-performance.umd.js`;
+  const messagingPath = `${process.cwd()}/dist/packages-dist/bundles/angular-fire-messaging.umd.js`;
   const [perf, messaging] = await Promise.all([
     readFile(perfPath, 'utf8'),
     readFile(messagingPath, 'utf8')
@@ -54,7 +50,7 @@ async function measure(module: string) {
 }
 
 async function buildLibrary() {
-  await ngPackagr().forProject(`${process.cwd()}/src/package.json`).withTsConfig(`${process.cwd()}/tsconfig.lib.json`).build();
+  await spawnPromise(`${process.cwd()}/node_modules/.bin/ng`, ['build']);
   await Promise.all([
     copy(`${process.cwd()}/.npmignore`, `${process.cwd()}/dist/packages-dist/.npmignore`),
     copy(`${process.cwd()}/README.md`, `${process.cwd()}/dist/packages-dist/README.md`),

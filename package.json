@@ -54,6 +54,7 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.800.3",
+    "@angular-devkit/build-ng-packagr": "^0.800.3",
     "@angular/animations": ">=6.0.0 <9 || ^9.0.0-0",
     "@angular/cli": "^8.0.3",
     "@angular/compiler-cli": ">=6.0.0 <9 || ^9.0.0-0",
@@ -81,8 +82,6 @@
     "protractor": "3.0.0",
     "reflect-metadata": "0.1.2",
     "rimraf": "^2.5.4",
-    "rollup": "^1.15.6",
-    "rollup-plugin-node-resolve": "^5.0.3",
     "schematics-utilities": "^1.1.1",
     "tsickle": "^0.35.0",
     "tslint": "^5.17.0",
