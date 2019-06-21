@@ -1,5 +1,30 @@
 {
   "name": "@angular/fire",
+  "version": "ANGULARFIRE2_VERSION",
+  "description": "The official library for Firebase and Angular",
+  "schematics": "./collection.json",
+  "builders": "./builders.json",
+  "keywords": [
+    "angular",
+    "firebase",
+    "rxjs",
+    "angularfire",
+    "angularfire2"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/angular/angularfire2.git"
+  },
+  "author": "angular,firebase",
+  "license": "MIT",
+  "peerDependencies": {
+    "@angular/common": "ANGULAR_VERSION",
+    "@angular/core": "ANGULAR_VERSION",
+    "@angular/platform-browser": "ANGULAR_VERSION",
+    "@angular/platform-browser-dynamic": "ANGULAR_VERSION",
+    "firebase": "FIREBASE_VERSION",
+    "rxjs": "RXJS_VERSION"
+  },
   "ngPackage": {
     "lib": {
       "umdModuleIds": {

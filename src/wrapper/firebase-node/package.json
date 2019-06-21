@@ -1,0 +1,6 @@
+{
+  "name": "angularfire2/firebase-node",
+  "main": "index.js",
+  "typings": "index.d.ts",
+  "sideEffects": false
+}

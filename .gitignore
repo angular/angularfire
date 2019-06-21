@@ -14,3 +14,4 @@ angularfire2-*.tgz
 yarn-error.log
 *.bak
 package-lock.json
+tools/build.js

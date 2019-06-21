@@ -1,5 +1,3 @@
-apt-get -y update
-apt-get -y install rsync
 yarn
 
 if test $TAG_NAME; then
@@ -10,4 +8,3 @@ fi
 
 npm version $VERSION
 yarn build
-yarn build:wrapper
