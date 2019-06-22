@@ -40,8 +40,4 @@ install:
 
 script:
   - | 
-  - yarn build &&
-    yarn test:headless &&
-    yarn test:node &&
-    node tools/run-typings-test.js &&
-    bash ./test/ng-build/build.sh
+  - yarn build && yarn test:all
