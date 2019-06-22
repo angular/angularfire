@@ -1,6 +1,6 @@
 import { JsonObject, logging } from '@angular-devkit/core';
-import { BuilderContext, BuilderRun, ScheduleOptions, Target, } from '@angular-devkit/architect/src/index2';
-import { FirebaseTools, FirebaseDeployConfig } from 'schematics/interfaces';
+import { BuilderContext, BuilderRun, ScheduleOptions, Target, } from '@angular-devkit/architect';
+import { FirebaseTools, FirebaseDeployConfig } from '../interfaces';
 import deploy from './actions';
 
 
@@ -80,7 +80,7 @@ const initMocks = () => {
     use: () => Promise.resolve()
   };
 
-  context = {
+  context = <any>{
     target: {
       configuration: 'production',
       project: PROJECT,

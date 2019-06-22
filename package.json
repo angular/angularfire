@@ -4,10 +4,14 @@
   "description": "The official library of Firebase and Angular.",
   "private": true,
   "scripts": {
-    "test": "npm run build && npx ng test",
+    "test": "npx ng test",
+    "test:headless": "npx ng test --watch=false --browsers=ChromeHeadless",
     "lint": "npx ng lint",
-    "test:node": "jasmine 'dist/packages-dist/schematics/**/*[sS]pec.js'",
-    "test:universal": "npm run build && cp -R dist/packages-dist test/universal-test/node_modules/angularfire2 && cd test/universal-test && npm run prerender",
+    "test:node": "npx tsc -p tsconfig.jasmine.json && node -r tsconfig-paths/register ./tools/jasmine.js",
+    "test:typings": "node ./tools/run-typings-test.js",
+    "test:build": "bash ./test/ng-build/build.sh",
+    "test:universal": "cp -R dist/packages-dist test/universal-test/node_modules/angularfire2 && cd test/universal-test && npm run prerender",
+    "test:all": "npm run test:headless && npm run test:node && npm run test:typings && npm run test:build",
     "build": "tsc tools/build.ts; node ./tools/build.js",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 1"
   },
@@ -83,6 +87,7 @@
     "reflect-metadata": "0.1.2",
     "rimraf": "^2.5.4",
     "schematics-utilities": "^1.1.1",
+    "tsconfig-paths": "^3.8.0",
     "tsickle": "^0.35.0",
     "tslint": "^5.17.0",
     "typescript": ">=3.4.0 <3.5.0"

@@ -1,0 +1,36 @@
+{
+    "compileOnSave": false,
+    "compilerOptions": {
+      "baseUrl": "./",
+      "outDir": "./dist",
+      "sourceMap": true,
+      "declaration": false,
+      "downlevelIteration": true,
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+      "module": "esnext",
+      "moduleResolution": "node",
+      "importHelpers": true,
+      "target": "es2015",
+      "typeRoots": [
+        "node_modules/@types"
+      ],
+      "lib": [
+        "es2018",
+        "dom"
+      ],
+      "paths": {
+        "@angular/fire": ["dist/packages-dist"],
+        "@angular/fire/auth": ["dist/packages-dist/auth"],
+        "@angular/fire/auth-guard": ["dist/packages-dist/auth-guard"],
+        "@angular/fire/database": ["dist/packages-dist/database"],
+        "@angular/fire/database-deprecated": ["dist/packages-dist/database-deprecated"],
+        "@angular/fire/firebase-node": ["dist/packages-dist/firebase-node"],
+        "@angular/fire/firestore": ["dist/packages-dist/firestore"],
+        "@angular/fire/functions": ["dist/packages-dist/functions"],
+        "@angular/fire/messaging": ["dist/packages-dist/messaging"],
+        "@angular/fire/performance": ["dist/packages-dist/performance"],
+        "@angular/fire/storage": ["dist/packages-dist/storage"]
+      }
+    }
+  }

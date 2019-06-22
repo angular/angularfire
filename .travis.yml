@@ -41,6 +41,7 @@ install:
 script:
   - | 
   - yarn build &&
-    npx ng test --watch=false --browsers=ChromeHeadless &&
+    yarn test:headless &&
+    yarn test:node &&
     node tools/run-typings-test.js &&
     bash ./test/ng-build/build.sh
