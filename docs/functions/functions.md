@@ -116,3 +116,48 @@ import { AngularFireFunctionsModule, FUNCTIONS_ORIGIN } from '@angular/fire/func
 export class AppModule {}
 
 ```
+
+### Firebase Hosting integration
+
+If you serve your app using [Firebase Hosting](https://firebase.google.com/docs/hosting/), you can configure Functions to be served from the same domain as your app. This will avoid an extra round-trip per function call due to [CORS preflight request](https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request).
+
+To set this up, you first need to update your `hosting` section in `firebase.json` and add one `rewrite` rule per function:
+
+```json
+  "hosting": {
+    "rewrites": [
+      {
+        "source": "/project-name/us-central1/someFunction",
+        "function": "someFunction"
+      },
+      {
+        "source": "/project-name/us-central1/anotherFunction",
+        "function": "anotherFunction"
+      },
+      ...
+    ]
+  }
+```
+
+Replace `project-name` with your Firebase project id (you can find it by looking at the value of `projectId` field in the Firebase app config). Then deploy your hosting project so that the new settings go into effect.
+
+Next, configure functions origin to point at your app domain:
+
+```ts
+import { NgModule } from '@angular/core';
+import { AngularFireFunctionsModule, FUNCTIONS_ORIGIN } from '@angular/fire/functions';
+
+@NgModule({
+  imports: [
+    ...
+    AngularFireFunctionsModule,
+    ...
+  ],
+  ...
+  providers: [
+   { provide: FUNCTIONS_ORIGIN, useValue: 'https://project-name.web.app' }
+  ]
+})
+export class AppModule {}
+
+```
