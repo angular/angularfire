@@ -38,7 +38,7 @@ describe('AngularFireDatabase', () => {
 
     it('should have an initialized Firebase app', () => {
       expect(db.database.app).toBeDefined();
-      expect(db.database.app).toEqual(app);
+      expect(<any>db.database.app).toEqual(app);
     });
 
     it('should accept a Firebase App in the constructor', () => {
@@ -92,7 +92,7 @@ describe('AngularFireDatabase w/options', () => {
 
     it('should have an initialized Firebase app', () => {
       expect(db.database.app).toBeDefined();
-      expect(db.database.app).toEqual(app);
+      expect(<any>db.database.app).toEqual(app);
     });
 
     it('should have an initialized Firebase app instance member', () => {

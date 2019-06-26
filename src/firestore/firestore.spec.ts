@@ -44,7 +44,7 @@ describe('AngularFirestore', () => {
 
   it('should have an initialized Firebase app', () => {
     expect(afs.firestore.app).toBeDefined();
-    expect(afs.firestore.app).toEqual(app);
+    expect(<any>afs.firestore.app).toEqual(app);
   });
 
   it('should create an AngularFirestoreDocument from a string path', () => {
@@ -128,7 +128,7 @@ describe('AngularFirestore with different app', () => {
 
     it('should have an initialized Firebase app', () => {
       expect(afs.firestore.app).toBeDefined();
-      expect(afs.firestore.app).toEqual(app);
+      expect(<any>afs.firestore.app).toEqual(app);
     });
 
     it('should have an initialized Firebase app instance member', () => {
