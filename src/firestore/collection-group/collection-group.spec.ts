@@ -8,7 +8,7 @@ import { Observable, BehaviorSubject, Subscription } from 'rxjs';
 import { skip, take, switchMap } from 'rxjs/operators';
 
 import { TestBed, inject } from '@angular/core/testing';
-import { COMMON_CONFIG } from '../../test-config';
+import { FIRESTORE_CONFIG } from '../../test-config';
 
 import { Stock, randomName, FAKE_STOCK_DATA, createRandomStocks, delayAdd, delayDelete, delayUpdate, deleteThemAll } from '../utils.spec';
 
@@ -31,7 +31,7 @@ describe('AngularFirestoreCollectionGroup', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireModule.initializeApp(FIRESTORE_CONFIG),
         AngularFirestoreModule.enablePersistence({synchronizeTabs:true})
       ]
     });

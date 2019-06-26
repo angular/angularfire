@@ -7,3 +7,12 @@ export const COMMON_CONFIG = {
     messagingSenderId: "920323787688",
     appId: "1:920323787688:web:2253a0e5eb5b9a8b"
 };
+
+export const FIRESTORE_CONFIG = {
+    apiKey: "AIzaSyAwRrxjjft7KMdhwfLKPkd8PCBR3JFaLfo",
+    authDomain: "angularfirestore.firebaseapp.com",
+    databaseURL: "https://angularfirestore.firebaseio.com",
+    projectId: "angularfirestore",
+    storageBucket: "angularfirestore.appspot.com",
+    messagingSenderId: "1039984584356"
+};

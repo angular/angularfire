@@ -7,7 +7,7 @@ import { AngularFirestoreCollection } from './collection/collection';
 import { Observable, Subscription } from 'rxjs';
 
 import { TestBed, inject } from '@angular/core/testing';
-import { COMMON_CONFIG } from '../test-config';
+import { FIRESTORE_CONFIG } from '../test-config';
 
 interface Stock {
   name: string;
@@ -22,7 +22,7 @@ describe('AngularFirestore', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireModule.initializeApp(FIRESTORE_CONFIG),
         AngularFirestoreModule.enablePersistence({synchronizeTabs: true})
       ]
     });
@@ -101,12 +101,12 @@ describe('AngularFirestore with different app', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireModule.initializeApp(FIRESTORE_CONFIG),
         AngularFirestoreModule
       ],
       providers: [
         { provide: FirebaseNameOrConfigToken, useValue: FIREBASE_APP_NAME_TOO },
-        { provide: FirebaseOptionsToken, useValue: COMMON_CONFIG }
+        { provide: FirebaseOptionsToken, useValue: FIRESTORE_CONFIG }
       ]
     });
     inject([FirebaseApp, AngularFirestore], (app_: FirebaseApp, _afs: AngularFirestore) => {
@@ -146,7 +146,7 @@ describe('AngularFirestore without persistance', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireModule.initializeApp(FIRESTORE_CONFIG),
         AngularFirestoreModule
       ]
     });
