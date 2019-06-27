@@ -2,10 +2,15 @@ import { spawn } from 'child_process';
 import { copy, writeFile, readFile } from 'fs-extra';
 import { prettySize } from 'pretty-size';
 import { sync as gzipSync } from 'gzip-size';
+import { join } from 'path';
 
-const rootPackage = import(`${process.cwd()}/package.json`);
+const src = (...args:string[]) => join(process.cwd(), 'src', ...args);
+const dest = (...args:string[]) => join(process.cwd(), 'dist', 'packages-dist', ...args);
 
-async function replaceVersions(path: string) {
+const rootPackage = import(join(process.cwd(), 'package.json'));
+
+async function replacePackageJsonVersions() {
+  const path = dest('package.json');
   const root = await rootPackage;
   var pkg = await import(path);
   Object.keys(pkg.peerDependencies).forEach(peer => {
@@ -15,22 +20,33 @@ async function replaceVersions(path: string) {
   return writeFile(path, JSON.stringify(pkg, null, 2));
 }
 
+async function replaceSchematicVersions() {
+  const root = await rootPackage;
+  const path = dest('schematics', 'versions.json');
+  const dependencies = await import(path);
+  Object.keys(dependencies.default).forEach(name => {
+    dependencies.default[name].version = root.dependencies[name] || root.devDependencies[name];
+  });
+  return writeFile(path, JSON.stringify(dependencies, null, 2));
+}
+
 function spawnPromise(command: string, args: string[]) {
   return new Promise(resolve => spawn(command, args, {stdio: 'inherit'}).on('close', resolve));
 }
 
 async function compileSchematics() {
-  await spawnPromise(`${process.cwd()}/node_modules/.bin/tsc`, ['-p', `${process.cwd()}/src/schematics/tsconfig.json`]);
+  await spawnPromise(`npx`, ['tsc', '-p', src('schematics', 'tsconfig.json')]);
   return Promise.all([
-    copy(`${process.cwd()}/src/core/builders.json`, `${process.cwd()}/dist/packages-dist/builders.json`),
-    copy(`${process.cwd()}/src/core/collection.json`, `${process.cwd()}/dist/packages-dist/collection.json`),
-    copy(`${process.cwd()}/src/schematics/deploy/schema.json`, `${process.cwd()}/dist/packages-dist/schematics/deploy/schema.json`)
+    copy(src('core', 'builders.json'), dest('builders.json')),
+    copy(src('core', 'collection.json'), dest('collection.json')),
+    copy(src('schematics', 'deploy', 'schema.json'), dest('deploy', 'schema.json')),
+    replaceSchematicVersions()
   ]);
 }
 
 async function replaceDynamicImportsForUMD() {
-  const perfPath = `${process.cwd()}/dist/packages-dist/bundles/angular-fire-performance.umd.js`;
-  const messagingPath = `${process.cwd()}/dist/packages-dist/bundles/angular-fire-messaging.umd.js`;
+  const perfPath = dest('bundles', 'angular-fire-performance.umd.js');
+  const messagingPath = dest('bundles', 'angular-fire-messaging.umd.js');
   const [perf, messaging] = await Promise.all([
     readFile(perfPath, 'utf8'),
     readFile(messagingPath, 'utf8')
@@ -42,7 +58,7 @@ async function replaceDynamicImportsForUMD() {
 }
 
 async function measure(module: string) {
-  const path = `${process.cwd()}/dist/packages-dist/bundles/${module}.umd.js`;
+  const path = dest('bundles', `${module}.umd.js`);
   const file = await readFile(path);
   const gzip = prettySize(gzipSync(file), true);
   const size = prettySize(file.byteLength, true);
@@ -50,14 +66,14 @@ async function measure(module: string) {
 }
 
 async function buildLibrary() {
-  await spawnPromise(`${process.cwd()}/node_modules/.bin/ng`, ['build']);
+  await spawnPromise('npx', ['ng', 'build']);
   await Promise.all([
-    copy(`${process.cwd()}/.npmignore`, `${process.cwd()}/dist/packages-dist/.npmignore`),
-    copy(`${process.cwd()}/README.md`, `${process.cwd()}/dist/packages-dist/README.md`),
-    copy(`${process.cwd()}/docs`, `${process.cwd()}/dist/packages-dist/docs`),
-    copy(`${process.cwd()}/src/firebase-node`, `${process.cwd()}/dist/packages-dist/firebase-node`),
+    copy(join(process.cwd(), '.npmignore'), dest('.npmignore')),
+    copy(join(process.cwd(), 'README.md'), dest('README.md')),
+    copy(join(process.cwd(), 'docs'), dest('docs')),
+    copy(src('firebase-node'), dest('firebase-node')),
     compileSchematics(),
-    replaceVersions(`${process.cwd()}/dist/packages-dist/package.json`),
+    replacePackageJsonVersions(),
     replaceDynamicImportsForUMD()
   ]);
   return Promise.all([
@@ -74,9 +90,9 @@ async function buildLibrary() {
 }
 
 async function buildWrapper() {
-  await copy(`${process.cwd()}/src/wrapper`, `${process.cwd()}/dist/wrapper-dist`);
+  await copy(src('wrapper'), join(process.cwd(), 'dist', 'wrapper-dist'));
   const root = await rootPackage;
-  const path = `${process.cwd()}/dist/wrapper-dist/package.json`;
+  const path = join(process.cwd(), 'dist', 'wrapper-dist', 'package.json');
   var pkg = await import(path);
   pkg.dependencies['@angular/fire'] = pkg.version = root.version;
   return writeFile(path, JSON.stringify(pkg, null, 2));

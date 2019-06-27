@@ -6,6 +6,7 @@
         "declaration": false,
         "removeComments": true,
         "strictNullChecks": true,
+        "resolveJsonModule": true,
         "lib": [
             "es2015",
             "dom",
