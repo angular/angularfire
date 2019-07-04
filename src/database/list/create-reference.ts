@@ -38,14 +38,25 @@ export function createListReference<T=any>(query: DatabaseQuery, afDatabase: Ang
         )
       );
     },
-    valueChanges(events?: ChildEvent[]) {
+    valueChanges<K extends string>(events?: ChildEvent[], options?: {idField?: K}) {
       const snapshotChanges$ = snapshotChanges<T>(query, events);
       return afDatabase.scheduler.keepUnstableUntilFirst(
         afDatabase.scheduler.runOutsideAngular(
           snapshotChanges$
         )
       ).pipe(
-        map(actions => actions.map(a => a.payload.val() as T))
+        map(actions => actions.map(a => {
+          if (options && options.idField) {
+            return {
+              ...a.payload.val() as T,
+              ...{
+                [options.idField]: a.key
+              }
+            };
+          } else {
+            return a.payload.val() as T;
+          }
+        }))
       );
     }
   }
