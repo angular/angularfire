@@ -1,5 +1,10 @@
+<a name="5.2.1"></a>
+# [5.2.1](https://github.com/angular/angularfire2/compare/5.2.0...5.2.1) (2019-06-01)
+
+Removed unnecessary `peerDependencies` ([#2095](https://github.com/angular/angularfire2/pull/2095)) ([5e49442](https://github.com/angular/angularfire2/pull/2095/commits/5e49442))
+
 <a name="5.2.0"></a>
-# [5.2.0](https://github.com/angular/angularfire2/compare/5.1.3...5.2.0) (2019-05-24)
+# [5.2.0](https://github.com/angular/angularfire2/compare/5.1.3...5.2.0) (2019-05-31)
 
 AngularFire 5.2 introduces support for Angular 8 and version 6 of the Firebase SDK.
 

@@ -21,18 +21,11 @@
   "author": "angular,firebase",
   "license": "MIT",
   "peerDependencies": {
-    "@angular-devkit/architect": "ANGULAR_DEVKIT_ARCH_VERSION",
-    "@angular-devkit/core": "ANGULAR_VERSION",
-    "@angular-devkit/schematics": "ANGULAR_VERSION",
     "@angular/common": "ANGULAR_VERSION",
     "@angular/core": "ANGULAR_VERSION",
     "@angular/platform-browser": "ANGULAR_VERSION",
     "@angular/platform-browser-dynamic": "ANGULAR_VERSION",
     "firebase": "FIREBASE_VERSION",
-    "firebase-tools": "FIREBASE_TOOLS_VERSION",
-    "fuzzy": "FUZZY_VERSION",
-    "inquirer": "INQUIRER_VERSION",
-    "inquirer-autocomplete-prompt": "INQUIRER_AUTOCOMPLETE_VERSION",
     "rxjs": "RXJS_VERSION"
   },
   "typings": "index.d.ts",
