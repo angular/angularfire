@@ -27,7 +27,7 @@ export const FirestoreSettingsToken = new InjectionToken<Settings>('angularfire2
 // timestampsInSnapshots was depreciated in 5.8.0
 const major = parseInt(firebase.SDK_VERSION.split('.')[0]);
 const minor = parseInt(firebase.SDK_VERSION.split('.')[1]);
-export const DefaultFirestoreSettings = ((major < 5 || (major == 5 && minor < 8)) ? {timestampsInSnapshots: true} : {}) as Settings;
+export const DefaultFirestoreSettings = (major < 5 || (major == 5 && minor < 8)) ? {timestampsInSnapshots: true} as Settings : undefined;
 
 /**
  * A utility methods for associating a collection reference with
@@ -118,7 +118,7 @@ export class AngularFirestore {
     @Inject(FirebaseOptionsToken) options:FirebaseOptions,
     @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|null|undefined,
     @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean|null,
-    @Optional() @Inject(FirestoreSettingsToken) settings: Settings|null,
+    @Optional() @Inject(FirestoreSettingsToken) _settings: Settings|null,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
     @Optional() @Inject(PersistenceSettingsToken) persistenceSettings: PersistenceSettings|null,
@@ -127,7 +127,8 @@ export class AngularFirestore {
     this.firestore = zone.runOutsideAngular(() => {
       const app = _firebaseAppFactory(options, nameOrConfig);
       const firestore = app.firestore();
-      firestore.settings(settings || DefaultFirestoreSettings);
+      const settings = _settings || DefaultFirestoreSettings;
+      if (settings) { firestore.settings(settings) }
       return firestore;
     });
 

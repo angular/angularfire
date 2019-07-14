@@ -1,6 +1,6 @@
 import { DatabaseReference } from '../interfaces';
 import { FirebaseApp, AngularFireModule } from '@angular/fire';
-import { AngularFireDatabase, AngularFireDatabaseModule, auditTrail, ChildEvent } from '@angular/fire/database';
+import { AngularFireDatabase, AngularFireDatabaseModule, auditTrail, ChildEvent, RealtimeDatabaseURL } from '@angular/fire/database';
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 import { skip } from 'rxjs/operators';
@@ -25,8 +25,11 @@ describe('auditTrail', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG, FIREBASE_APP_NAME),
+        AngularFireModule.initializeTestApp(COMMON_CONFIG, FIREBASE_APP_NAME),
         AngularFireDatabaseModule
+      ],
+      providers: [
+        { provide: RealtimeDatabaseURL, useValue: 'http://localhost:9000?ns=angularfire2-test'}
       ]
     });
     inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {

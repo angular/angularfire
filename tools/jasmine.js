@@ -1,4 +1,5 @@
 Jasmine = require('jasmine');
+FirebaseTesting = require('@firebase/testing');
 
 jasmine = new Jasmine();
 jasmine.loadConfig({

@@ -13,7 +13,7 @@ describe('AngularFireAuthGuard', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
-                AngularFireModule.initializeApp(COMMON_CONFIG),
+                AngularFireModule.initializeTestApp(COMMON_CONFIG),
                 AngularFireAuthModule,
                 AngularFireAuthGuardModule,
                 RouterModule.forRoot([

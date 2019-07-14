@@ -10,7 +10,7 @@ describe('AngularFirePerformance', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireModule.initializeTestApp(COMMON_CONFIG),
         AngularFirePerformanceModule
       ]
     });

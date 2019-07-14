@@ -8,7 +8,8 @@ export type FirebaseOptions = {[key:string]: any};
 export type FirebaseAppConfig = {[key:string]: any};
 
 export const FirebaseOptionsToken = new InjectionToken<FirebaseOptions>('angularfire2.app.options');
-export const FirebaseNameOrConfigToken = new InjectionToken<string|FirebaseAppConfig|undefined>('angularfire2.app.nameOrConfig')
+export const FirebaseNameOrConfigToken = new InjectionToken<string|FirebaseAppConfig|undefined>('angularfire2.app.nameOrConfig');
+export const InitializeAsTestApp = new InjectionToken<boolean>('angularfire2.app.test');
 
 export type FirebaseDatabase = database.Database;
 export type FirebaseAuth = auth.Auth;
@@ -33,15 +34,20 @@ export class FirebaseApp {
     installations: () => any; // SEMVER: drop once we can target
 }
 
-export function _firebaseAppFactory(options: FirebaseOptions, nameOrConfig?: string|FirebaseAppConfig|null) {
-    const name = typeof nameOrConfig === 'string' && nameOrConfig || '[DEFAULT]';
-    const config = typeof nameOrConfig === 'object' && nameOrConfig || {};
-    config.name = config.name || name;
+export function _firebaseAppFactory(options: FirebaseOptions, nameOrConfig?: string|FirebaseAppConfig|null, initializeAsTestApp?: boolean|null) {
     // Added any due to some inconsistency between @firebase/app and firebase types
-    const existingApp = firebase.apps.filter(app => app && app.name === config.name)[0] as any;
-    // We support FirebaseConfig, initializeApp's public type only accepts string; need to cast as any
-    // Could be solved with https://github.com/firebase/firebase-js-sdk/pull/1206
-    return (existingApp || firebase.initializeApp(options, config as any)) as FirebaseApp;
+    if (typeof window === 'undefined' && initializeAsTestApp) {
+        // @ts-ignore
+        return FirebaseTesting.initializeTestApp(options) as FirebaseApp;
+    } else {
+        const name = typeof nameOrConfig === 'string' && nameOrConfig || '[DEFAULT]';
+        const config = typeof nameOrConfig === 'object' && nameOrConfig || {};
+        config.name = config.name || name;    
+        const existingApp = <any>firebase.apps.filter(app => app && app.name === config.name)[0];
+        // We support FirebaseConfig, initializeApp's public type only accepts string; need to cast as any
+        // Could be solved with https://github.com/firebase/firebase-js-sdk/pull/1206
+        return (existingApp || <any>firebase.initializeApp(options, config as any)) as FirebaseApp;
+    }
 }
 
 const FirebaseAppProvider = {
@@ -49,7 +55,8 @@ const FirebaseAppProvider = {
     useFactory: _firebaseAppFactory,
     deps: [
         FirebaseOptionsToken,
-        [new Optional(), FirebaseNameOrConfigToken]
+        [new Optional(), FirebaseNameOrConfigToken],
+        [new Optional(), InitializeAsTestApp]
     ]
 };
  
@@ -62,7 +69,18 @@ export class AngularFireModule {
             ngModule: AngularFireModule,
             providers: [
                 { provide: FirebaseOptionsToken, useValue: options },
-                { provide: FirebaseNameOrConfigToken, useValue: nameOrConfig }
+                { provide: FirebaseNameOrConfigToken, useValue: nameOrConfig },
+                { provide: InitializeAsTestApp, useValue: false }
+            ]
+        }
+    }
+    static initializeTestApp(options: FirebaseOptions, nameOrConfig?: string | FirebaseAppConfig) {
+        return {
+            ngModule: AngularFireModule,
+            providers: [
+                { provide: FirebaseOptionsToken, useValue: options },
+                { provide: FirebaseNameOrConfigToken, useValue: nameOrConfig },
+                { provide: InitializeAsTestApp, useValue: true }
             ]
         }
     }

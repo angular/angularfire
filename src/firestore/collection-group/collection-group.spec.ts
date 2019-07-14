@@ -1,5 +1,5 @@
 import { FirebaseApp, AngularFireModule } from '@angular/fire';
-import { AngularFirestore } from '../firestore';
+import { AngularFirestore, FirestoreSettingsToken } from '../firestore';
 import { AngularFirestoreModule } from '../firestore.module';
 import { AngularFirestoreDocument } from '../document/document';
 import { AngularFirestoreCollectionGroup } from './collection-group';
@@ -31,8 +31,11 @@ describe('AngularFirestoreCollectionGroup', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(FIRESTORE_CONFIG),
+        AngularFireModule.initializeTestApp(FIRESTORE_CONFIG),
         AngularFirestoreModule.enablePersistence({synchronizeTabs:true})
+      ],
+      providers: [
+        { provide: FirestoreSettingsToken, useValue: { host: 'localhost:8080', ssl: false } }
       ]
     });
     inject([FirebaseApp, AngularFirestore], (_app: FirebaseApp, _afs: AngularFirestore) => {

@@ -15,8 +15,11 @@ describe('AngularFireDatabase', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG, FIREBASE_APP_NAME),
+        AngularFireModule.initializeTestApp(COMMON_CONFIG, FIREBASE_APP_NAME),
         AngularFireDatabaseModule
+      ],
+      providers: [
+        { provide: RealtimeDatabaseURL, useValue: 'http://localhost:9000?ns=angularfire2-test'}
       ]
     });
     inject([FirebaseApp, AngularFireDatabase, NgZone], (app_: FirebaseApp, _db: AngularFireDatabase, _zone: NgZone) => {
@@ -38,7 +41,6 @@ describe('AngularFireDatabase', () => {
 
     it('should have an initialized Firebase app', () => {
       expect(db.database.app).toBeDefined();
-      expect(<any>db.database.app).toEqual(app);
     });
 
     it('should accept a Firebase App in the constructor', () => {
@@ -65,7 +67,7 @@ describe('AngularFireDatabase w/options', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG, FIREBASE_APP_NAME),
+        AngularFireModule.initializeTestApp(COMMON_CONFIG, FIREBASE_APP_NAME),
         AngularFireDatabaseModule
       ],
       providers: [
@@ -92,7 +94,6 @@ describe('AngularFireDatabase w/options', () => {
 
     it('should have an initialized Firebase app', () => {
       expect(db.database.app).toBeDefined();
-      expect(<any>db.database.app).toEqual(app);
     });
 
     it('should have an initialized Firebase app instance member', () => {

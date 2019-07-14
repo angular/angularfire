@@ -16,3 +16,4 @@ yarn-error.log
 package-lock.json
 tools/build.js
 coverage
+*.log

@@ -11,7 +11,7 @@ describe('AngularFireFunctions', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireModule.initializeTestApp(COMMON_CONFIG),
         AngularFireFunctionsModule
       ]
     });
@@ -45,7 +45,7 @@ describe('AngularFireFunctions with different app', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireModule.initializeTestApp(COMMON_CONFIG),
         AngularFireFunctionsModule
       ],
       providers: [
