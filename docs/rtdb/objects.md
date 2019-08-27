@@ -27,7 +27,7 @@ import { Observable } from 'rxjs';
 export class AppComponent {
   items: Observable<any[]>;
   constructor(db: AngularFireDatabase) {
-    this.items = db.list('items').valueChanges();
+    this.items = db.list('items').get();
   }
 }
 ```
@@ -37,7 +37,7 @@ In this section, we're going to modify the `/src/app/app.component.ts`  to retri
 ## Create an object binding
 
 ```ts
-const relative = db.object('item').valueChanges();
+const relative = db.object('item').get();
 ```
 
 ### Retrieve data
@@ -60,7 +60,7 @@ import { Observable } from 'rxjs';
 export class AppComponent {
   item: Observable<any>;
   constructor(db: AngularFireDatabase) {
-    this.item = db.object('item').valueChanges();
+    this.item = db.object('item').get();
   }
 }
 ```
@@ -146,7 +146,7 @@ export class AppComponent {
   item: Observable<any>;
   constructor(db: AngularFireDatabase) {
     this.itemRef = db.object('item');
-    this.item = this.itemRef.valueChanges();
+    this.item = this.itemRef.get();
   }
   save(newName: string) {
     this.itemRef.set({ name: newName });
@@ -162,7 +162,7 @@ export class AppComponent {
 
 ## Retrieving the snapshot
 
-AngularFire `valueChanges()` unwraps the Firebase DataSnapshot by default, but you can get the data as the original snapshot by using the `snapshotChanges()` option.
+AngularFire `get()` unwraps the Firebase DataSnapshot by default, but you can get the data as the original snapshot by using the `snapshotChanges()` option.
 
 ```ts
 this.itemRef = db.object('item');
