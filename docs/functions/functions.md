@@ -49,7 +49,7 @@ AngularFireFunctions is super easy. You create a function on the server side and
 
 | method   |                    |
 | ---------|--------------------|
-| `httpCallable(name: string): (data: T) ` | Creates a callable function based on a function name. Returns a function that can create the observable of the http call. |
+| `httpCall(name: string): (data: T) ` | Creates a callable function based on a function name. Returns a function that can create the observable of the http call. |
 ```ts
 
 import { Component } from '@angular/core';
@@ -61,7 +61,7 @@ import { AngularFireFunctions } from '@angular/fire/functions';
 })
 export class AppComponent {
   constructor(private fns: AngularFireFunctions) { 
-    const callable = fns.httpsCallable('my-fn-name');
+    const callable = fns.httpsCall('my-fn-name');
     this.data$ = callable({ name: 'some-data' });
   }
 }
