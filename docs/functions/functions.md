@@ -1,6 +1,6 @@
 # AngularFireFunctions
 
-> The Cloud Functions for Firebase client SDKs let you call functions directly from a Firebase app. To call a function from your app in this way, write and deploy an HTTPS Callable function in Cloud Functions, and then add client logic to call the function from your app.
+> The Cloud Functions for Firebase client SDKs let you call server functions directly from a Firebase app. To call a function from your app in this way, write and deploy an HTTPS Callable function in Cloud Functions, and then add client logic to call the function from your app.
 
 ### Import the `NgModule`
 
