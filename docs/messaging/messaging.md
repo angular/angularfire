@@ -101,7 +101,7 @@ export class AppComponent {
 }
 ```
 
-Once you have a user's token, you need to save it to the server in order to send them notifications in response to events. Let's say ou want to send a push each time a user sends a chat message. Once a user grants permission, you can send the token to the Realtime Database or Cloud Firestore and associate it with a unique id, like a Firebase Auth UID. You can then create a Cloud Function trigger that looks up the user's token when a chat message is created.
+Once you have a user's token, you need to save it to the server in order to send them notifications in response to events. Let's say you want to send a push each time a user sends a chat message. Once a user grants permission, you can send the token to the Realtime Database or Cloud Firestore and associate it with a unique id, like a Firebase Auth UID. You can then create a Cloud Function trigger that looks up the user's token when a chat message is created.
 
 ### Shortcutting token requests
 
