@@ -66,7 +66,7 @@ import { Observable } from 'rxjs';
 export class AppComponent {
   items: Observable<any[]>;
   constructor(db: AngularFireDatabase) {
-    this.items = db.list('items').valueChanges();
+    this.items = db.list('items').get();
   }
 }
 ```
@@ -75,7 +75,7 @@ export class AppComponent {
 
 AngularFire provides methods that stream data back as redux compatible actions. This gives you extra horsepower when using libraries like Animations, ngrx, and ReactiveForms. 
 
-### `valueChanges()`
+### `get()`
 
 **What is it?** - Returns an Observable of data as a synchronized array of JSON objects. All Snapshot metadata is stripped and just the method provides only the data.
 
