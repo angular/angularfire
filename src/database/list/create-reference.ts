@@ -38,7 +38,7 @@ export function createListReference<T=any>(query: DatabaseQuery, afDatabase: Ang
         )
       );
     },
-    valueChanges(events?: ChildEvent[]) {
+    get(events?: ChildEvent[]) {
       const snapshotChanges$ = snapshotChanges<T>(query, events);
       return afDatabase.scheduler.keepUnstableUntilFirst(
         afDatabase.scheduler.runOutsideAngular(
