@@ -40,7 +40,7 @@ export class AngularFireFunctions {
 
   }
 
-  public httpsCallable<T=any, R=any>(name: string) {
+  public httpsCall<T=any, R=any>(name: string) {
     const callable = this.functions.httpsCallable(name);
     return (data: T) => {
       const callable$ = from(callable(data));
