@@ -61,7 +61,7 @@ export const routes: Routes = [
 
 ### Compose your own pipes
 
-`AngularFireAuthGuard` pipes are RXJS operators which transform an optional User to a boolean or Array (for redirects). You can build easily build your own to customize behavior further:
+`AngularFireAuthGuard` pipes are RXJS operators which transform an optional User to a boolean or Array (for redirects). You can easily build your own to customize behavior further:
 
 ```ts
 import { map } from 'rxjs/operators';
