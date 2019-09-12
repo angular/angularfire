@@ -9,7 +9,7 @@ export interface AngularFireList<T> {
   snapshotChanges(events?: ChildEvent[]): Observable<SnapshotAction<T>[]>;
   stateChanges(events?: ChildEvent[]): Observable<SnapshotAction<T>>;
   auditTrail(events?: ChildEvent[]): Observable<SnapshotAction<T>[]>;
-  update(item: FirebaseOperation, data: T): Promise<void>;
+  update(item: FirebaseOperation, data: Partial<T>): Promise<void>;
   set(item: FirebaseOperation, data: T): Promise<void>;
   push(data: T): database.ThenableReference;
   remove(item?: FirebaseOperation): Promise<void>;
