@@ -59,7 +59,7 @@ export class AuthService {
 	}
   
   signInWithFacebook() {
-		console.log('Sign in with google');
+		console.log('Sign in with facebook');
 		return this.oauthSignIn(new firebase.auth.FacebookAuthProvider());
 	}
 
