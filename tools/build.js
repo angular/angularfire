@@ -21,6 +21,7 @@ const GLOBALS = {
   '@angular-devkit/core/node': 'ng-devkit.core.node',
   '@angular-devkit/architect': 'ng-devkit.architect',
   'firebase': 'firebase',
+  'firebase/analytics': 'firebase',
   'firebase/app': 'firebase',
   'firebase/auth': 'firebase',
   'firebase/database': 'firebase',
@@ -28,9 +29,11 @@ const GLOBALS = {
   'firebase/firestore': 'firebase',
   'firebase/functions': 'firebase',
   'firebase/performance': 'firebase',
+  'firebase/remote-config': 'firebase',
   'firebase/storage': 'firebase',
   '@angular/fire': 'angularfire2',
   '@angular/fire/auth': 'angularfire2.auth',
+  '@angular/fire/analytics': 'angularfire2.analytics',
   '@angular/fire/auth-guard': 'angularfire2.auth_guard',
   '@angular/fire/database': 'angularfire2.database',
   '@angular/fire/database-deprecated': 'angularfire2.database_deprecated',
@@ -39,6 +42,7 @@ const GLOBALS = {
   '@angular/fire/storage': 'angularfire2.storage',
   '@angular/fire/messaging': 'angularfire2.messaging',
   '@angular/fire/performance': 'angularfire2.performance',
+  '@angular/fire/remote-config': 'angularfire2.remote_config',
   'fs': 'node.fs',
   'path': 'node.path',
   'inquirer': 'inquirer'
@@ -65,6 +69,7 @@ const VERSIONS = {
 
 const MODULE_NAMES = {
   core: 'angularfire2',
+  analytics: 'angularfire2.analytics',
   auth: 'angularfire2.auth',
   "auth-guard": 'angularfire2.auth_guard',
   database: 'angularfire2.database',
@@ -74,11 +79,13 @@ const MODULE_NAMES = {
   schematics: 'angularfire2.schematics',
   storage: 'angularfire2.storage',
   messaging: 'angularfire2.messaging',
-  performance: 'angularfire2.performance'
+  performance: 'angularfire2.performance',
+  "remote-config": 'angularfire2.remote_config'
 };
 
 const ENTRIES = {
   core: `${process.cwd()}/dist/packages-dist/index.js`,
+  analytics: `${process.cwd()}/dist/packages-dist/analytics/index.js`,
   auth: `${process.cwd()}/dist/packages-dist/auth/index.js`,
   "auth-guard": `${process.cwd()}/dist/packages-dist/auth-guard/index.js`,
   database: `${process.cwd()}/dist/packages-dist/database/index.js`,
@@ -88,11 +95,13 @@ const ENTRIES = {
   schematics: `${process.cwd()}/dist/packages-dist/schematics/index.js`,
   storage: `${process.cwd()}/dist/packages-dist/storage/index.js`,
   messaging: `${process.cwd()}/dist/packages-dist/messaging/index.js`,
-  performance: `${process.cwd()}/dist/packages-dist/performance/index.js`
+  performance: `${process.cwd()}/dist/packages-dist/performance/index.js`,
+  "remote-config": `${process.cwd()}/dist/packages-dist/remote-config/index.js`
 };
 
 const SRC_PKG_PATHS = {
   core: `${process.cwd()}/src/core/package.json`,
+  analytics: `${process.cwd()}/src/analytics/package.json`,
   auth: `${process.cwd()}/src/auth/package.json`,
   "auth-guard": `${process.cwd()}/src/auth-guard/package.json`,
   database: `${process.cwd()}/src/database/package.json`,
@@ -103,12 +112,14 @@ const SRC_PKG_PATHS = {
   storage: `${process.cwd()}/src/storage/package.json`,
   messaging: `${process.cwd()}/src/messaging/package.json`,
   performance: `${process.cwd()}/src/performance/package.json`,
+  "remote-config": `${process.cwd()}/src/remote-config/package.json`,
   schematics: `${process.cwd()}/dist/packages-dist/schematics/versions.js`,
   "schematics-es2015": `${process.cwd()}/dist/packages-dist/schematics/es2015/versions.js`
 };
 
 const DEST_PKG_PATHS = {
   core: `${process.cwd()}/dist/packages-dist/package.json`,
+  analytics: `${process.cwd()}/dist/packages-dist/analytics/package.json`,
   auth: `${process.cwd()}/dist/packages-dist/auth/package.json`,
   "auth-guard": `${process.cwd()}/dist/packages-dist/auth-guard/package.json`,
   database: `${process.cwd()}/dist/packages-dist/database/package.json`,
@@ -119,6 +130,7 @@ const DEST_PKG_PATHS = {
   storage: `${process.cwd()}/dist/packages-dist/storage/package.json`,
   messaging: `${process.cwd()}/dist/packages-dist/messaging/package.json`,
   performance: `${process.cwd()}/dist/packages-dist/performance/package.json`,
+  "remote-config": `${process.cwd()}/dist/packages-dist/remote-config/package.json`,
   schematics: `${process.cwd()}/dist/packages-dist/schematics/versions.js`,
   "schematics-es2015": `${process.cwd()}/dist/packages-dist/schematics/es2015/versions.js`
 };
@@ -285,6 +297,8 @@ function copySchematicFiles() {
 function replaceDynamicImportsForUMD() {
   writeFileSync('./dist/packages-dist/bundles/performance.umd.js', readFileSync('./dist/packages-dist/bundles/performance.umd.js', 'utf8').replace("rxjs.from(import('firebase/performance'))", "rxjs.empty()"));
   writeFileSync('./dist/packages-dist/bundles/messaging.umd.js', readFileSync('./dist/packages-dist/bundles/messaging.umd.js', 'utf8').replace("rxjs.from(import('firebase/messaging'))", "rxjs.empty()"));
+  writeFileSync('./dist/packages-dist/bundles/remote-config.umd.js', readFileSync('./dist/packages-dist/bundles/remote-config.umd.js', 'utf8').replace("rxjs.from(import('firebase/remote-config'))", "rxjs.empty()"));
+  writeFileSync('./dist/packages-dist/bundles/analytics.umd.js', readFileSync('./dist/packages-dist/bundles/analytics.umd.js', 'utf8').replace("rxjs.from(import('firebase/analytics'))", "rxjs.empty()"));
 }
 
 function measure(module) {
@@ -302,6 +316,7 @@ function measure(module) {
 function getVersions() {
   const paths = [
     getDestPackageFile('core'),
+    getDestPackageFile('analytics'),
     getDestPackageFile('auth'),
     getDestPackageFile('auth-guard'),
     getDestPackageFile('database'),
@@ -311,6 +326,7 @@ function getVersions() {
     getDestPackageFile('storage'),
     getDestPackageFile('messaging'),
     getDestPackageFile('performance'),
+    getDestPackageFile('remote-config'),
     getDestPackageFile('database-deprecated')
   ];
   return paths
@@ -344,6 +360,7 @@ function buildModule(name, globals) {
  */
 function buildModules(globals) {
   const core$ = buildModule('core', globals);
+  const analytics$ = buildModule('analytics', globals);
   const auth$ = buildModule('auth', globals);
   const authGuard$ = buildModule('auth-guard', globals);
   const db$ = buildModule('database', globals);
@@ -353,9 +370,11 @@ function buildModules(globals) {
   const storage$ = buildModule('storage', globals);
   const messaging$ = buildModule('messaging', globals);
   const performance$ = buildModule('performance', globals);
+  const remoteConfig$ = buildModule('remote-config', globals);
   const dbdep$ = buildModule('database-deprecated', globals);
   return forkJoin(core$, from(copyRootTest())).pipe(
     switchMapTo(schematics$),
+    switchMapTo(analytics$),
     switchMapTo(auth$),
     switchMapTo(authGuard$),
     switchMapTo(db$),
@@ -364,6 +383,7 @@ function buildModules(globals) {
     switchMapTo(storage$),
     switchMapTo(messaging$),
     switchMapTo(performance$),
+    switchMapTo(remoteConfig$),
     switchMapTo(dbdep$)
   );
 }
@@ -383,6 +403,7 @@ function buildLibrary(globals) {
     tap(() => {
       replaceDynamicImportsForUMD();
       const coreStats = measure('core');
+      const analyticsStats = measure('analytics');
       const authStats = measure('auth');
       const authGuardStats = measure('auth-guard');
       const dbStats = measure('database');
@@ -391,9 +412,11 @@ function buildLibrary(globals) {
       const storageStats = measure('storage');
       const messagingStats = measure('messaging');
       const performanceStats = measure('performance');
+      const remoteConfigStats = measure('remote-config');
       const dbdepStats = measure('database-deprecated');
       console.log(`
 core.umd.js - ${coreStats.size}, ${coreStats.gzip}
+analytics.umd.js - ${analyticsStats.size}, ${analyticsStats.gzip}
 auth.umd.js - ${authStats.size}, ${authStats.gzip}
 auth-guard.umd.js - ${authGuardStats.size}, ${authGuardStats.gzip}
 database.umd.js - ${dbStats.size}, ${dbStats.gzip}
@@ -402,6 +425,7 @@ functions.umd.js - ${functionsStats.size}, ${functionsStats.gzip}
 storage.umd.js - ${storageStats.size}, ${storageStats.gzip}
 messaging.umd.js - ${messagingStats.size}, ${messagingStats.gzip}
 performance.umd.js - ${performanceStats.size}, ${performanceStats.gzip}
+remote-config.umd.js - ${remoteConfigStats.size}, ${remoteConfigStats.gzip}
 database-deprecated.umd.js - ${dbdepStats.size}, ${dbdepStats.gzip}
       `);
       verifyVersions();
