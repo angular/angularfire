@@ -8,7 +8,10 @@ export type FirebaseOptions = {[key:string]: any};
 export type FirebaseAppConfig = {[key:string]: any};
 
 export const FirebaseOptionsToken = new InjectionToken<FirebaseOptions>('angularfire2.app.options');
-export const FirebaseNameOrConfigToken = new InjectionToken<string|FirebaseAppConfig|undefined>('angularfire2.app.nameOrConfig')
+export const FirebaseNameOrConfigToken = new InjectionToken<string|FirebaseAppConfig|undefined>('angularfire2.app.nameOrConfig');
+
+export const FIREBASE_OPTIONS = FirebaseOptionsToken;
+export const FIREBASE_APP_NAME = FirebaseNameOrConfigToken;
 
 export type FirebaseDatabase = database.Database;
 export type FirebaseAuth = auth.Auth;
@@ -51,8 +54,8 @@ const FirebaseAppProvider = {
     provide: FirebaseApp,
     useFactory: _firebaseAppFactory,
     deps: [
-        FirebaseOptionsToken,
-        [new Optional(), FirebaseNameOrConfigToken]
+        FIREBASE_OPTIONS,
+        [new Optional(), FIREBASE_APP_NAME]
     ]
 };
  
@@ -64,8 +67,8 @@ export class AngularFireModule {
         return {
             ngModule: AngularFireModule,
             providers: [
-                { provide: FirebaseOptionsToken, useValue: options },
-                { provide: FirebaseNameOrConfigToken, useValue: nameOrConfig }
+                { provide: FIREBASE_OPTIONS, useValue: options },
+                { provide: FIREBASE_APP_NAME, useValue: nameOrConfig }
             ]
         }
     }

@@ -4,6 +4,7 @@ import { Observable, Subscription, queueScheduler as queue } from 'rxjs';
 
 // Put in database.ts when we drop database-depreciated
 export const RealtimeDatabaseURL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
+export const DATABASE_URL = RealtimeDatabaseURL;
 
 export class FirebaseZoneScheduler {
   constructor(public zone: NgZone, private platformId: Object) {}

@@ -7,7 +7,7 @@ import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 import { AngularFirestoreCollectionGroup } from './collection-group/collection-group';
 
-import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
+import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FIREBASE_OPTIONS, FIREBASE_APP_NAME, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
 
 // Workaround for Nodejs build
@@ -23,6 +23,10 @@ import { firestore } from 'firebase/app';
 export const EnablePersistenceToken = new InjectionToken<boolean>('angularfire2.enableFirestorePersistence');
 export const PersistenceSettingsToken = new InjectionToken<PersistenceSettings|undefined>('angularfire2.firestore.persistenceSettings');
 export const FirestoreSettingsToken = new InjectionToken<Settings>('angularfire2.firestore.settings');
+
+export const ENABLE_PERSISTENCE = EnablePersistenceToken;
+export const PERSISTENCE_SETTINGS = PersistenceSettingsToken
+export const FIRESTORE_SETTINGS = FirestoreSettingsToken;
 
 // timestampsInSnapshots was depreciated in 5.8.0
 const major = parseInt(firebase.SDK_VERSION.split('.')[0]);
@@ -115,13 +119,13 @@ export class AngularFirestore {
    * @param app
    */
   constructor(
-    @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|null|undefined,
-    @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean|null,
-    @Optional() @Inject(FirestoreSettingsToken) settings: Settings|null,
+    @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
+    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
+    @Optional() @Inject(ENABLE_PERSISTENCE) shouldEnablePersistence: boolean|null,
+    @Optional() @Inject(FIRESTORE_SETTINGS) settings: Settings|null,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
-    @Optional() @Inject(PersistenceSettingsToken) persistenceSettings: PersistenceSettings|null,
+    @Optional() @Inject(PERSISTENCE_SETTINGS) persistenceSettings: PersistenceSettings|null,
   ) {
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.firestore = zone.runOutsideAngular(() => {

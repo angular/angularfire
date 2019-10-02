@@ -1,8 +1,8 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID, InjectionToken } from '@angular/core';
 import { Observable, from } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { FirebaseOptions, FirebaseAppConfig } from '@angular/fire';
-import { FirebaseFunctions, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
+import { FirebaseOptions, FirebaseAppConfig, FIREBASE_APP_NAME } from '@angular/fire';
+import { FirebaseFunctions, FIREBASE_OPTIONS, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
 
 // SEMVER: @ v6 remove FunctionsRegionToken in favor of FUNCTIONS_REGION
 export const FunctionsRegionToken = new InjectionToken<string>('angularfire2.functions.region');
@@ -20,8 +20,8 @@ export class AngularFireFunctions {
   public readonly scheduler: FirebaseZoneScheduler;
 
   constructor(
-    @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|null|undefined,
+    @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
+    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
     @Optional() @Inject(FUNCTIONS_REGION) region:string|null,

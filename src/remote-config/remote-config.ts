@@ -1,15 +1,15 @@
 import { Injectable, Inject, Optional, NgZone, InjectionToken } from '@angular/core';
 import { Observable, from } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
-import { FirebaseAppConfig, FirebaseOptions } from '@angular/fire';
+import { FirebaseAppConfig, FirebaseOptions, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire';
 import { remoteConfig } from 'firebase/app';
 
 export interface DefaultConfig {[key:string]: string|number|boolean};
 
-export const SETTINGS = new InjectionToken<remoteConfig.Settings>('angularfire2.remoteConfig.settings');
+export const REMOTE_CONFIG_SETTINGS = new InjectionToken<remoteConfig.Settings>('angularfire2.remoteConfig.settings');
 export const DEFAULT_CONFIG = new InjectionToken<DefaultConfig>('angularfire2.remoteConfig.defaultConfig');
 
-import { FirebaseRemoteConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, runOutsideAngular } from '@angular/fire';
+import { FirebaseRemoteConfig, _firebaseAppFactory, runOutsideAngular } from '@angular/fire';
 
 @Injectable()
 export class AngularFireRemoteConfig {
@@ -24,9 +24,9 @@ export class AngularFireRemoteConfig {
   public readonly configuration: Observable<{[key:string]: remoteConfig.Value}>;
 
   constructor(
-    @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|null|undefined,
-    @Optional() @Inject(SETTINGS) settings:remoteConfig.Settings|null,
+    @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
+    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
+    @Optional() @Inject(REMOTE_CONFIG_SETTINGS) settings:remoteConfig.Settings|null,
     @Optional() @Inject(DEFAULT_CONFIG) defaultConfig:DefaultConfig|null,
     private zone: NgZone
   ) {
