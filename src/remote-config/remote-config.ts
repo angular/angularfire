@@ -1,6 +1,6 @@
 import { Injectable, Inject, Optional, NgZone, InjectionToken } from '@angular/core';
-import { Observable, from } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
+import { Observable, from, concat } from 'rxjs';
+import { map, switchMap, tap, take } from 'rxjs/operators';
 import { FirebaseAppConfig, FirebaseOptions, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire';
 import { remoteConfig } from 'firebase/app';
 
@@ -26,6 +26,8 @@ export class AngularFireRemoteConfig {
 
   public readonly configuration: Observable<{[key:string]: remoteConfig.Value}>;
 
+  public readonly activate: Observable<{[key:string]: remoteConfig.Value}>;
+
   constructor(
     @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
@@ -50,15 +52,25 @@ export class AngularFireRemoteConfig {
       runOutsideAngular(zone)
     );
 
-    this.freshConfiguration = this.remoteConfig.pipe(
-      switchMap(rc => rc.fetchAndActivate().then(() => rc.getAll())),
-      runOutsideAngular(zone)
-    )
-
-    this.configuration = this.remoteConfig.pipe(
+    this.activate = this.remoteConfig.pipe(
       switchMap(rc => rc.activate().then(() => rc)),
       tap(rc => rc.fetch()),
       map(rc => rc.getAll()),
+      runOutsideAngular(zone),
+      take(1)
+    )
+
+    this.freshConfiguration = this.remoteConfig.pipe(
+      switchMap(rc => rc.fetchAndActivate().then(() => rc.getAll())),
+      runOutsideAngular(zone),
+      take(1)
+    )
+
+    this.configuration = this.remoteConfig.pipe(
+      switchMap(rc => concat(
+        rc.activate().then(() => rc.getAll()),
+        rc.fetchAndActivate().then(() => rc.getAll())
+      )),
       runOutsideAngular(zone)
     )
   }

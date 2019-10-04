@@ -6,6 +6,7 @@ import { Router, NavigationEnd, ActivationEnd } from '@angular/router';
 import { FirebaseAnalytics, FIREBASE_OPTIONS, FIREBASE_APP_NAME, _firebaseAppFactory } from '@angular/fire';
 
 export const AUTOMATICALLY_SET_CURRENT_SCREEN = new InjectionToken<boolean>('angularfire2.analytics.setCurrentScreen');
+export const AUTOMATICALLY_LOG_SCREEN_VIEWS = new InjectionToken<boolean>('angularfire2.analytics.logScreenViews');
 export const ANALYTICS_COLLECTION_ENABLED = new InjectionToken<boolean>('angularfire2.analytics.analyticsCollectionEnabled');
 export const AUTOMATICALLY_TRACK_USER_IDENTIFIER = new InjectionToken<boolean>('angularfire2.analytics.trackUserIdentifier');
 export const APP_VERSION = new InjectionToken<string>('angularfire2.analytics.appVersion');
@@ -27,6 +28,7 @@ export class AngularFireAnalytics {
     @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
     @Optional() router:Router,
     @Optional() @Inject(AUTOMATICALLY_SET_CURRENT_SCREEN) automaticallySetCurrentScreen:boolean|null,
+    @Optional() @Inject(AUTOMATICALLY_LOG_SCREEN_VIEWS) automaticallyLogScreenViews:boolean|null,
     @Optional() @Inject(ANALYTICS_COLLECTION_ENABLED) analyticsCollectionEnabled:boolean|null,
     @Optional() @Inject(AUTOMATICALLY_TRACK_USER_IDENTIFIER) automaticallyTrackUserIdentifier:boolean|null,
     @Optional() @Inject(APP_VERSION) providedAppVersion:string|null,
@@ -45,7 +47,7 @@ export class AngularFireAnalytics {
       runOutsideAngular(zone)
     );
 
-    if (router && automaticallySetCurrentScreen !== false) {
+    if (router && (automaticallySetCurrentScreen !== false || automaticallyLogScreenViews !== false)) {
       const app_name = providedAppName || DEFAULT_APP_NAME;
       const app_version = providedAppVersion || DEFAULT_APP_VERSION;
       const activationEndEvents = router.events.pipe(filter<ActivationEnd>(e => e instanceof ActivationEnd));
@@ -56,9 +58,13 @@ export class AngularFireAnalytics {
           const url = navigationEnd.url;
           const screen_name = activationEnd.snapshot.routeConfig && activationEnd.snapshot.routeConfig.path || undefined;
           const outlet = activationEnd.snapshot.outlet;
-          analytics.logEvent("screen_view", { app_name, app_version, screen_name, outlet, url });
-          // TODO when is screen_name undefined?
-          analytics.setCurrentScreen(screen_name || url, { global: outlet == "primary" })
+          if (automaticallyLogScreenViews !== false) {
+            analytics.logEvent("screen_view", { app_name, app_version, screen_name, outlet, url });
+          }
+          if (automaticallySetCurrentScreen !== false) {
+            // TODO when is screen_name undefined?
+            analytics.setCurrentScreen(screen_name || url, { global: outlet == "primary" })
+          }
         }),
         runOutsideAngular(zone)
       ).subscribe();
