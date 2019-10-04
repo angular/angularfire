@@ -30,6 +30,7 @@ const GLOBALS = {
   'firebase/functions': 'firebase',
   'firebase/performance': 'firebase',
   'firebase/remote-config': 'firebase',
+  '@firebase/remote-config': 'firebase',
   'firebase/storage': 'firebase',
   '@angular/fire': 'angularfire2',
   '@angular/fire/auth': 'angularfire2.auth',

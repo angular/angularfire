@@ -4,6 +4,9 @@ import { map, switchMap, tap } from 'rxjs/operators';
 import { FirebaseAppConfig, FirebaseOptions, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire';
 import { remoteConfig } from 'firebase/app';
 
+// @ts-ignore
+import firebase from 'firebase/app';
+
 export interface DefaultConfig {[key:string]: string|number|boolean};
 
 export const REMOTE_CONFIG_SETTINGS = new InjectionToken<remoteConfig.Settings>('angularfire2.remoteConfig.settings');
@@ -30,10 +33,14 @@ export class AngularFireRemoteConfig {
     @Optional() @Inject(DEFAULT_CONFIG) defaultConfig:DefaultConfig|null,
     private zone: NgZone
   ) {
+    // import('firebase/remote-config') isn't working for some reason...
+    // it might have something to do with https://github.com/firebase/firebase-js-sdk/pull/2229
+    // import from @firebase/remote-config so I can manually register on the Firebase instance
     // @ts-ignore zapping in the UMD in the build script
-    const requireRemoteConfig = from(import('firebase/remote-config'));
+    const requireRemoteConfig = from(import('@firebase/remote-config'));
 
     this.remoteConfig = requireRemoteConfig.pipe(
+      map(rc => rc.registerRemoteConfig(firebase)),
       map(() => _firebaseAppFactory(options, nameOrConfig)),
       map(app => app.remoteConfig()),
       tap(rc => {
