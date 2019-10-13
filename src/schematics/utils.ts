@@ -1,6 +1,5 @@
 import { readFileSync } from "fs";
 import { FirebaseRc, Project } from "./interfaces";
-import { join } from "path";
 
 export function listProjects() {
   const firebase = require('firebase-tools');
@@ -57,11 +56,10 @@ export const projectPrompt = (projects: Project[]) => {
 };
 
 export function getFirebaseProjectName(
-  projectRoot: string,
   target: string
 ): string | undefined {
   const { targets }: FirebaseRc = JSON.parse(
-    readFileSync(join(projectRoot, ".firebaserc"), "UTF-8")
+    readFileSync(".firebaserc", "UTF-8")
   );
   const projects = Object.keys(targets!);
   return projects.find(

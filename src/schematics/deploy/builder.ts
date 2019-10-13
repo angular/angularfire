@@ -29,7 +29,6 @@ export default createBuilder<any>(
     const project = workspace.getProject(context.target.project);
 
     const firebaseProject = getFirebaseProjectName(
-      workspace.root,
       context.target.project
     );
 
@@ -37,7 +36,7 @@ export default createBuilder<any>(
       await deploy(
         require("firebase-tools"),
         context,
-        join(workspace.root, project.root),
+        project.root,
         firebaseProject
       );
     } catch (e) {
