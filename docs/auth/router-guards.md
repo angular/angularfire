@@ -31,9 +31,9 @@ Example use:
 ```ts
 import { AngularFireAuthGuard, hasCustomClaim, redirectUnauthorizedTo, redirectLoggedInTo } from '@angular/fire/auth-guard';
 
-const adminOnly = hasCustomClaim('admin');
-const redirectUnauthorizedToLogin = redirectUnauthorizedTo(['login']);
-const redirectLoggedInToItems = redirectLoggedInTo(['items']);
+const adminOnly = () => hasCustomClaim('admin');
+const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['login']);
+const redirectLoggedInToItems = () => redirectLoggedInTo(['items']);
 const belongsToAccount = (next) => hasCustomClaim(`account-${next.params.id}`);
 
 export const routes: Routes = [
