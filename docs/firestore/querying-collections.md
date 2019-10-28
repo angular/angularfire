@@ -197,6 +197,8 @@ ngOnInit() {
 }
 ```
 
-`collectionGroup` returns an `AngularFirestoreCollectionGroup` which is similar to `AngularFirestoreCollection`. The main difference is that `AngularFirestoreCollectionGroup` has no data operation methods such as `add` because it doesn't have a concrete reference.
+`collectionGroup` returns an `AngularFirestoreCollectionGroup` which is similar to `AngularFirestoreCollection`. The main difference is that `AngularFirestoreCollectionGroup` has no data operation methods such as `add` because it doesn't have a concrete reference. 
+
+There should be custom indexes defined in firebase console -> firestore -> Database -> Indexes -> Single Field -> Add Excemption -> Collection ID: `Comments` -> Field path: `user` -> Check Collection Group -> Check Ascending -> Save.
 
 ### [Next Step: Getting started with Firebase Authentication](../auth/getting-started.md)
