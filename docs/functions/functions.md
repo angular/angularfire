@@ -119,7 +119,7 @@ export class AppModule {}
 
 ### Firebase Hosting integration
 
-If you serve your app using [Firebase Hosting](https://firebase.google.com/docs/hosting/), you can configure Functions to be served from the same domain as your app. This will avoid an extra round-trip per function call due to [CORS preflight request](https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request).
+If you serve your app using [Firebase Hosting](https://firebase.google.com/docs/hosting/), you can configure Functions to be served from the same domain as your app. This will avoid an extra round-trip per function call due to [CORS preflight request](https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request). This only applies to sites hosted via firebase on `us-central1`.
 
 To set this up, you first need to update your `hosting` section in `firebase.json` and add one `rewrite` rule per function:
 

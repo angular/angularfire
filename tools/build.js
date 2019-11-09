@@ -5,6 +5,7 @@ const { switchMap, switchMapTo, tap } = require('rxjs/operators');
 const { copy, readFileSync, writeFile, writeFileSync, statSync } = require('fs-extra');
 const { prettySize } = require('pretty-size');
 const gzipSize = require('gzip-size');
+const path = require('path');
 const resolve = require('rollup-plugin-node-resolve');
 const pkg = require(`${process.cwd()}/package.json`);
 
@@ -137,8 +138,10 @@ const DEST_PKG_PATHS = {
 };
 
 // Constants for running typescript commands
-const TSC = 'node_modules/.bin/tsc';
-const NGC = 'node_modules/.bin/ngc';
+const binSuffix = process.platform === "win32" ? '.cmd' : '';
+const TSC = path.normalize('node_modules/.bin/tsc' + binSuffix);
+const NGC = path.normalize('node_modules/.bin/ngc' +  binSuffix);
+
 const TSC_ARGS = (name, config = 'build') => [`-p`, `${process.cwd()}/src/${name}/tsconfig-${config}.json`];
 const TSC_TEST_ARGS = [`-p`, `${process.cwd()}/src/tsconfig-test.json`];
 
