@@ -4,7 +4,7 @@
     "baseUrl": ".",
     "paths": {
       "@angular/fire": ["../../dist/packages-dist"],
-      "@angular/fire/auth": ["../../dist/packages-dist/auth"]
+      "@angular/fire/reomte-config": ["../../dist/packages-dist/remote-config"]
     }
   },
   "files": [
