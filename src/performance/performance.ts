@@ -31,7 +31,7 @@ export class AngularFirePerformance {
   ) {
     
     // @ts-ignore zapping in the UMD in the build script
-    const requirePerformance = from(import('firebase/performance'));
+    const requirePerformance = from(zone.runOutsideAngular(() => import('firebase/performance')));
 
     this.performance = requirePerformance.pipe(
       // SEMVER while < 6 need to type, drop next major
