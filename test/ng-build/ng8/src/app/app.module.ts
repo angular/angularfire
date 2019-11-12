@@ -37,9 +37,7 @@ import { AngularFireAuthGuardModule } from '@angular/fire/auth-guard';
     AngularFirePerformanceModule,
     AngularFireAuthGuardModule
   ],
-  providers: [{
-    provide: AUTOMATICALLY_TRACE_CORE_NG_METRICS, useValue: false
-  }],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
