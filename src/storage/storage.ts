@@ -29,7 +29,7 @@ export class AngularFireStorage {
   ) {
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     this.storage = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(options, nameOrConfig);
+      const app = _firebaseAppFactory(options, zone, nameOrConfig);
       return app.storage(storageBucket || undefined);
     });
   }

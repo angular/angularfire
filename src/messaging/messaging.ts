@@ -27,7 +27,7 @@ export class AngularFireMessaging {
     const requireMessaging = from(import('firebase/messaging'));
 
     this.messaging = requireMessaging.pipe(
-      map(() => _firebaseAppFactory(options, nameOrConfig)),
+      map(() => _firebaseAppFactory(options, zone, nameOrConfig)),
       map(app => app.messaging()),
       runOutsideAngular(zone)
     );
