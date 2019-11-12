@@ -23,6 +23,7 @@
     "@angular/platform-browser": "6.0.1",
     "@angular/platform-browser-dynamic": "6.0.1",
     "@angular/router": "6.0.1",
+    "firebase": "<7",
     "core-js": "^2.4.1",
     "rxjs": "^6.0.0",
     "zone.js": "^0.8.14"

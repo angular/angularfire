@@ -5,9 +5,10 @@ yarn
 if test $TAG_NAME; then
     export VERSION=$TAG_NAME
 else
-    export VERSION=$(npm version | head -n 1 |  sed "s/^.*: '\([^']*\).*/\1/")-canary.$SHORT_SHA
+    export VERSION=$(npm version | sed -n "s/. '@angular\/fire': '\(.*\)',/\1/p")-canary.$SHORT_SHA
 fi
 
-npm version $VERSION
-yarn build
+echo $VERSION &&
+npm version $VERSION --allow-same-version &&
+yarn build &&
 yarn build:wrapper

@@ -30,7 +30,7 @@ export class AngularFireFunctions {
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     
     this.functions = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(options, nameOrConfig);
+      const app = _firebaseAppFactory(options, zone, nameOrConfig);
       return app.functions(region || undefined);
     });
 
