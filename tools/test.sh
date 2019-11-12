@@ -5,6 +5,4 @@ apt-get -y update
 apt-get -y install google-chrome-stable
 
 # TODO parallelize these
-npx karma start --single-run --browsers ChromeHeadlessTravis --reporters mocha &&
-node tools/run-typings-test.js &&
-bash ./test/ng-build/build.sh
+npx karma start --single-run --browsers ChromeHeadlessTravis --reporters mocha
