@@ -1,3 +1,12 @@
+<a name="5.2.2"></a>
+## [5.2.2](https://github.com/angular/angularfire2/compare/5.2.0...5.2.2) (2019-11-12)
+
+### Bug Fixes
+
+* **build:** Make the build work on windows ([#2231](https://github.com/angular/angularfire2/issues/2231)) ([97d8532](https://github.com/angular/angularfire2/commit/97d8532)), closes [/github.com/angular/angularfire/issues/1799#issuecomment-423128066](https://github.com//github.com/angular/angularfire/issues/1799/issues/issuecomment-423128066)
+* **core:** Support Firebase 7 peer and fix zone instabilities with `AngularFirePerformanceModule` and the injectable `FirebaseApp` ([#2240](https://github.com/angular/angularfire2/issues/2240)) ([60fd575](https://github.com/angular/angularfire2/commit/60fd575))
+* **rtdb:** Allow update to take "Partial<T>" ([#2169](https://github.com/angular/angularfire2/issues/2169)) ([ca43c8b](https://github.com/angular/angularfire2/commit/ca43c8b))
+
 <a name="5.2.1"></a>
 # [5.2.1](https://github.com/angular/angularfire2/compare/5.2.0...5.2.1) (2019-06-01)
 
