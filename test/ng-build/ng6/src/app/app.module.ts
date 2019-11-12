@@ -7,6 +7,8 @@ import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireStorageModule } from '@angular/fire/storage';
 import { AngularFireFunctionsModule } from '@angular/fire/functions';
 import { AngularFireMessagingModule } from '@angular/fire/messaging';
+import { AngularFirePerformanceModule } from '@angular/fire/performance';
+import { AngularFireAuthGuardModule } from '@angular/fire/auth-guard';
 
 import { AppComponent } from './app.component';
 
@@ -29,7 +31,9 @@ import { AppComponent } from './app.component';
     AngularFirestoreModule,
     AngularFireStorageModule,
     AngularFireMessagingModule,
-    AngularFireFunctionsModule
+    AngularFireFunctionsModule,
+    AngularFirePerformanceModule,
+    AngularFireAuthGuardModule
   ],
   bootstrap: [AppComponent]
 })

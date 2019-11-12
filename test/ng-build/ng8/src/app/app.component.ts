@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ApplicationRef } from '@angular/core';
 
 import { FirebaseApp } from '@angular/fire';
 import { AngularFireDatabase } from '@angular/fire/database';
@@ -7,6 +7,8 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { AngularFireMessaging } from '@angular/fire/messaging';
 import { AngularFireFunctions } from '@angular/fire/functions';
+import { AngularFirePerformance } from '@angular/fire/performance';
+import { canActivate, loggedIn } from '@angular/fire/auth-guard';
 
 @Component({
   selector: 'app-root',
@@ -22,8 +24,12 @@ export class AppComponent {
     private readonly afStore: AngularFirestore,
     private readonly storage: AngularFireStorage,
     private readonly messaging: AngularFireMessaging,
-    private readonly functions: AngularFireFunctions
+    private readonly functions: AngularFireFunctions,
+    private readonly performance: AngularFirePerformance,
+    private readonly appRef: ApplicationRef
   ) {
-    console.log(app, db, auth, afStore, storage, messaging, functions);
+    const authArgs = canActivate(loggedIn);
+    console.log(app, db, auth, afStore, storage, messaging, functions, performance, authArgs);
+    appRef.isStable.subscribe(it => console.log("isStable", it));
   }
 }

@@ -10,6 +10,9 @@ import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireStorageModule } from '@angular/fire/storage';
 import { AngularFireMessagingModule } from '@angular/fire/messaging';
 import { AngularFireFunctionsModule } from '@angular/fire/functions';
+import { AngularFirePerformanceModule, AUTOMATICALLY_TRACE_CORE_NG_METRICS } from '@angular/fire/performance';
+import { AngularFireAuthGuardModule } from '@angular/fire/auth-guard';
+
 
 @NgModule({
   declarations: [
@@ -30,9 +33,13 @@ import { AngularFireFunctionsModule } from '@angular/fire/functions';
     AngularFirestoreModule,
     AngularFireStorageModule,
     AngularFireMessagingModule,
-    AngularFireFunctionsModule
+    AngularFireFunctionsModule,
+    AngularFirePerformanceModule,
+    AngularFireAuthGuardModule
   ],
-  providers: [],
+  providers: [{
+    provide: AUTOMATICALLY_TRACE_CORE_NG_METRICS, useValue: false
+  }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
