@@ -8,6 +8,7 @@ else
     export VERSION=$(npm version | head -n 1 |  sed "s/^.*: '\([^']*\).*/\1/")-canary.$SHORT_SHA
 fi
 
-npm version $VERSION
-yarn build
+echo $VERSION &&
+npm version $VERSION &&
+yarn build &&
 yarn build:wrapper
