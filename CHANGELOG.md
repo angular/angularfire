@@ -1,5 +1,5 @@
 <a name="5.2.2"></a>
-## [5.2.2](https://github.com/angular/angularfire2/compare/5.2.0...5.2.2) (2019-11-12)
+## [5.2.2](https://github.com/angular/angularfire2/compare/5.2.1...5.2.2) (2019-11-12)
 
 ### Bug Fixes
 
