@@ -9,6 +9,6 @@ else
 fi
 
 echo $VERSION &&
-npm version $VERSION &&
+npm version $VERSION --allow-same-version &&
 yarn build &&
 yarn build:wrapper
