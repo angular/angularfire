@@ -37,7 +37,7 @@ export class AngularFireAnalytics {
   ) {
     // @ts-ignore zapping in the UMD in the build script
     const requireAnalytics = from(import('firebase/analytics'));
-    const app = _firebaseAppFactory(options, nameOrConfig);
+    const app = _firebaseAppFactory(options, zone, nameOrConfig);
 
     this.analytics = requireAnalytics.pipe(
       map(() => app.analytics()),
@@ -63,7 +63,7 @@ export class AngularFireAnalytics {
           }
           if (automaticallySetCurrentScreen !== false) {
             // TODO when is screen_name undefined?
-            analytics.setCurrentScreen(screen_name || url, { global: outlet == "primary" })
+            analytics.setCurrentScreen(screen_name || url, { global: outlet == "primary" });
           }
         }),
         runOutsideAngular(zone)

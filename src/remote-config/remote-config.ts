@@ -43,7 +43,7 @@ export class AngularFireRemoteConfig {
 
     this.remoteConfig = requireRemoteConfig.pipe(
       map(rc => rc.registerRemoteConfig(firebase)),
-      map(() => _firebaseAppFactory(options, nameOrConfig)),
+      map(() => _firebaseAppFactory(options, zone, nameOrConfig)),
       map(app => app.remoteConfig()),
       tap(rc => {
         if (settings) { rc.settings = settings }
