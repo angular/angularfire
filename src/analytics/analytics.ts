@@ -1,9 +1,9 @@
 import { Injectable, Inject, Optional, NgZone, InjectionToken } from '@angular/core';
 import { Observable, from } from 'rxjs';
-import { map, tap, filter, withLatestFrom } from 'rxjs/operators';
-import { FirebaseAppConfig, FirebaseOptions, runOutsideAngular } from '@angular/fire';
+import { map, tap, filter, withLatestFrom, shareReplay } from 'rxjs/operators';
 import { Router, NavigationEnd, ActivationEnd } from '@angular/router';
-import { FirebaseAnalytics, FIREBASE_OPTIONS, FIREBASE_APP_NAME, _firebaseAppFactory } from '@angular/fire';
+import { FirebaseAppConfig, FirebaseOptions, runOutsideAngular, _lazySDKProxy, FirebaseAnalytics, FIREBASE_OPTIONS, FIREBASE_APP_NAME, _firebaseAppFactory } from '@angular/fire';
+import { analytics, app } from 'firebase';
 
 export const AUTOMATICALLY_SET_CURRENT_SCREEN = new InjectionToken<boolean>('angularfire2.analytics.setCurrentScreen');
 export const AUTOMATICALLY_LOG_SCREEN_VIEWS = new InjectionToken<boolean>('angularfire2.analytics.logScreenViews');
@@ -15,13 +15,28 @@ export const APP_NAME = new InjectionToken<string>('angularfire2.analytics.appNa
 export const DEFAULT_APP_VERSION = '?';
 export const DEFAULT_APP_NAME = 'Angular App';
 
+// SEMVER: once we move to Typescript 3.6 use `PromiseProxy<analytics.Analytics>`
+type AnalyticsProxy = {
+  // TODO can we pull the richer types from the Firebase SDK .d.ts? ReturnType<T[K]> is infering
+  //      I could even do this in a manual build-step
+  logEvent(eventName: string, eventParams?: {[key: string]: any}, options?: analytics.AnalyticsCallOptions): Promise<void>,
+  setCurrentScreen(screenName: string, options?: analytics.AnalyticsCallOptions): Promise<void>,
+  setUserId(id: string, options?: analytics.AnalyticsCallOptions): Promise<void>,
+  setUserProperties(properties: analytics.CustomParams, options?: analytics.AnalyticsCallOptions): Promise<void>,
+  setAnalyticsCollectionEnabled(enabled: boolean): Promise<void>,
+  app: Promise<app.App>
+};
+
+export interface AngularFireAnalytics extends AnalyticsProxy {};
+
 @Injectable()
 export class AngularFireAnalytics {
 
   /**
    * Firebase Analytics instance
    */
-  public readonly analytics: Observable<FirebaseAnalytics>;
+  private readonly analytics$: Observable<FirebaseAnalytics>;
+  private get analytics() { return this.analytics$.toPromise(); }
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
@@ -39,12 +54,13 @@ export class AngularFireAnalytics {
     const requireAnalytics = from(import('firebase/analytics'));
     const app = _firebaseAppFactory(options, zone, nameOrConfig);
 
-    this.analytics = requireAnalytics.pipe(
+    this.analytics$ = requireAnalytics.pipe(
       map(() => app.analytics()),
       tap(analytics => {
         if (analyticsCollectionEnabled === false) { analytics.setAnalyticsCollectionEnabled(false) }
       }),
-      runOutsideAngular(zone)
+      runOutsideAngular(zone),
+      shareReplay(1)
     );
 
     if (router && (automaticallySetCurrentScreen !== false || automaticallyLogScreenViews !== false)) {
@@ -53,7 +69,7 @@ export class AngularFireAnalytics {
       const activationEndEvents = router.events.pipe(filter<ActivationEnd>(e => e instanceof ActivationEnd));
       const navigationEndEvents = router.events.pipe(filter<NavigationEnd>(e => e instanceof NavigationEnd));
       navigationEndEvents.pipe(
-        withLatestFrom(activationEndEvents, this.analytics),
+        withLatestFrom(activationEndEvents, this.analytics$),
         tap(([navigationEnd, activationEnd, analytics]) => {
           const url = navigationEnd.url;
           const screen_name = activationEnd.snapshot.routeConfig && activationEnd.snapshot.routeConfig.path || undefined;
@@ -73,11 +89,13 @@ export class AngularFireAnalytics {
     // TODO do something other than just check auth presence, what if it's lazy loaded?
     if (app.auth && automaticallyTrackUserIdentifier !== false) {
       new Observable<firebase.User|null>(app.auth().onAuthStateChanged.bind(app.auth())).pipe(
-        withLatestFrom(this.analytics),
+        withLatestFrom(this.analytics$),
         tap(([user, analytics]) => analytics.setUserId(user ? user.uid : null!, { global: true })),
         runOutsideAngular(zone)
       ).subscribe()
     }
+
+    return _lazySDKProxy(this, this.analytics, zone);
 
   }
 

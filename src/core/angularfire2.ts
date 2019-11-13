@@ -66,3 +66,36 @@ export const runInZone = (zone: NgZone) => <T>(obs$: Observable<T>): Observable<
     );
   });
 }
+
+//SEMVER: once we move to TypeScript 3.6, we can use these to build lazy interfaces
+/*
+  type FunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? K : never }[keyof T];
+  type PromiseReturningFunctionPropertyNames<T> = { [K in FunctionPropertyNames<T>]: ReturnType<T[K]> extends Promise<any> ? K : never }[FunctionPropertyNames<T>];
+  type NonPromiseReturningFunctionPropertyNames<T> = { [K in FunctionPropertyNames<T>]: ReturnType<T[K]> extends Promise<any> ? never : K }[FunctionPropertyNames<T>];
+  type NonFunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof T];
+
+  export type PromiseProxy<T> = { [K in NonFunctionPropertyNames<T>]: Promise<T[K]> } &
+    { [K in NonPromiseReturningFunctionPropertyNames<T>]: (...args: Parameters<T[K]>) => Promise<ReturnType<T[K]>> } &
+    { [K in PromiseReturningFunctionPropertyNames<T>   ]: (...args: Parameters<T[K]>) => ReturnType<T[K]> };
+*/
+
+export const _lazySDKProxy = (klass: any, promise: Promise<any>, zone: NgZone) => new Proxy(klass, {
+  get: (_, name) => zone.runOutsideAngular(() =>
+    klass[name] || new Proxy(() => 
+      promise.then(mod => {
+        const ret = mod[name];
+        // TODO move to proper type guards
+        if (typeof ret == 'function') {
+          return ret.bind(mod);
+        } else if (ret && ret.then) {
+          return ret.then((res:any) => zone.run(() => res));
+        } else {
+          return zone.run(() => ret);
+        }
+      }), {
+        get: (self, name) => self()[name],
+        // TODO handle callbacks
+        apply: (self, _, args) => self().then(it => it(...args))
+      })
+  )
+});

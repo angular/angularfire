@@ -1,7 +1,7 @@
 import { Injectable, Inject, Optional, NgZone, InjectionToken } from '@angular/core';
 import { Observable, from, concat } from 'rxjs';
-import { map, switchMap, tap, take } from 'rxjs/operators';
-import { FirebaseAppConfig, FirebaseOptions, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire';
+import { map, switchMap, tap, shareReplay, distinctUntilChanged } from 'rxjs/operators';
+import { FirebaseAppConfig, FirebaseOptions, _lazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire';
 import { remoteConfig } from 'firebase/app';
 
 // @ts-ignore
@@ -14,19 +14,38 @@ export const DEFAULT_CONFIG = new InjectionToken<DefaultConfig>('angularfire2.re
 
 import { FirebaseRemoteConfig, _firebaseAppFactory, runOutsideAngular } from '@angular/fire';
 
+// SEMVER: once we move to Typescript 3.6 use `PromiseProxy<remoteConfig.RemoteConfig>` rather than hardcoding
+type RemoteConfigProxy = {
+  activate: () => Promise<void>;
+  ensureInitialized: () => Promise<void>;
+  fetch: () => Promise<void>;
+  fetchAndActivate: () => Promise<void>;
+  getAll: () => Promise<{[key:string]: remoteConfig.Value}>;
+  getBoolean: (key:string) => Promise<boolean>;
+  getNumber: (key:string) => Promise<number>;
+  getString: (key:string) => Promise<string>;
+  getValue: (key:string) => Promise<remoteConfig.Value>;
+  setLogLevel: (logLevel: remoteConfig.LogLevel) => Promise<void>;
+  settings: Promise<remoteConfig.Settings>;
+  defaultConfig: Promise<{
+      [key: string]: string | number | boolean;
+  }>;
+  fetchTimeMillis: Promise<number>;
+  lastFetchStatus: Promise<remoteConfig.FetchStatus>;
+};
+
+export interface AngularFireRemoteConfig extends RemoteConfigProxy {};
+
 @Injectable()
 export class AngularFireRemoteConfig {
 
-  /**
-   * Firebase RemoteConfig instance
-   */
-  public readonly remoteConfig: Observable<FirebaseRemoteConfig>;
+  private readonly remoteConfig$: Observable<remoteConfig.RemoteConfig>;
+  private get remoteConfig() { return this.remoteConfig$.toPromise(); }
 
-  public readonly freshConfiguration: Observable<{[key:string]: remoteConfig.Value}>;
-
-  public readonly configuration: Observable<{[key:string]: remoteConfig.Value}>;
-
-  public readonly activate: Observable<{[key:string]: remoteConfig.Value}>;
+  readonly all: Observable<{[key:string]: remoteConfig.Value}>;
+  readonly numbers: Observable<{[key:string]: number}> & {[key:string]: Observable<number>};
+  readonly booleans: Observable<{[key:string]: boolean}> & {[key:string]: Observable<boolean>};
+  readonly strings: Observable<{[key:string]: string}> & {[key:string]: Observable<string>};
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
@@ -41,7 +60,7 @@ export class AngularFireRemoteConfig {
     // @ts-ignore zapping in the UMD in the build script
     const requireRemoteConfig = from(import('@firebase/remote-config'));
 
-    this.remoteConfig = requireRemoteConfig.pipe(
+    this.remoteConfig$ = requireRemoteConfig.pipe(
       map(rc => rc.registerRemoteConfig(firebase)),
       map(() => _firebaseAppFactory(options, zone, nameOrConfig)),
       map(app => app.remoteConfig()),
@@ -49,30 +68,50 @@ export class AngularFireRemoteConfig {
         if (settings) { rc.settings = settings }
         if (defaultConfig) { rc.defaultConfig = defaultConfig }
       }),
-      runOutsideAngular(zone)
+      runOutsideAngular(zone),
+      shareReplay(1)
     );
 
-    this.activate = this.remoteConfig.pipe(
-      switchMap(rc => rc.activate().then(() => rc)),
-      tap(rc => rc.fetch()),
-      map(rc => rc.getAll()),
-      runOutsideAngular(zone),
-      take(1)
-    )
-
-    this.freshConfiguration = this.remoteConfig.pipe(
-      switchMap(rc => rc.fetchAndActivate().then(() => rc.getAll())),
-      runOutsideAngular(zone),
-      take(1)
-    )
-
-    this.configuration = this.remoteConfig.pipe(
+    this.all = this.remoteConfig$.pipe(
       switchMap(rc => concat(
         rc.activate().then(() => rc.getAll()),
         rc.fetchAndActivate().then(() => rc.getAll())
       )),
-      runOutsideAngular(zone)
-    )
+      runOutsideAngular(zone),
+      // TODO startWith(rehydrate(deafultConfig)),
+      shareReplay(1)
+      // TODO distinctUntilChanged(compareFn)
+    );
+
+    const allAs = (type: 'String'|'Boolean'|'Number') => this.all.pipe(
+      map(all => Object.keys(all).reduce((c, k) => {
+        c[k] = all[k][`as${type}`]();
+        return c;
+      }, {}))
+    ) as any;
+
+    this.strings = new Proxy(allAs('String'), {
+      get: (self, name:string) => self[name] || this.all.pipe(
+        map(rc => rc[name].asString()),
+        distinctUntilChanged()
+      )
+    });
+
+    this.booleans = new Proxy(allAs('Boolean'), {
+      get: (self, name:string) => self[name] || this.all.pipe(
+        map(rc => rc[name].asBoolean()),
+        distinctUntilChanged()
+      )
+    });
+
+    this.numbers = new Proxy(allAs('Number'), {
+      get: (self, name:string) => self[name] || this.all.pipe(
+        map(rc => rc[name].asNumber()),
+        distinctUntilChanged()
+      )
+    });
+
+    return _lazySDKProxy(this, this.remoteConfig, zone);
   }
 
 }
