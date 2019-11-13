@@ -9,7 +9,7 @@
     "test:watch": "concurrently \"npm run build:watch\" \"npm run delayed_karma\"",
     "test:debug": "npm run build && karma start",
     "karma": "karma start",
-    "test:universal": "npm run build && cp -R dist/packages-dist test/universal-test/node_modules/angularfire2 && cd test/universal-test && npm run prerender",
+    "test:universal": "npm run build && cd test/universal-test && yarn && npm run prerender",
     "delayed_karma": "sleep 10 && karma start",
     "build": "rimraf dist && node tools/build.js && npm pack ./dist/packages-dist",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 1",
