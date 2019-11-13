@@ -7,7 +7,7 @@ import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 import { AngularFirestoreCollectionGroup } from './collection-group/collection-group';
 
-import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
+import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, AngularFireSchedulers, keepUnstableUntilFirstFactory } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
 
 // Workaround for Nodejs build
@@ -106,7 +106,8 @@ export function associateQuery(collectionRef: CollectionReference, queryFn = ref
 export class AngularFirestore {
   public readonly firestore: FirebaseFirestore;
   public readonly persistenceEnabled$: Observable<boolean>;
-  public readonly scheduler: FirebaseZoneScheduler;
+  public readonly schedulers: AngularFireSchedulers;
+  public readonly keepUnstableUntilFirst: <T>(obs: Observable<T>) => Observable<T>;
 
   /**
    * Each Feature of AngularFire has a FirebaseApp injected. This way we
@@ -123,7 +124,9 @@ export class AngularFirestore {
     zone: NgZone,
     @Optional() @Inject(PersistenceSettingsToken) persistenceSettings: PersistenceSettings|null,
   ) {
-    this.scheduler = new FirebaseZoneScheduler(zone, platformId);
+    this.schedulers = new AngularFireSchedulers(zone);
+    this.keepUnstableUntilFirst = keepUnstableUntilFirstFactory(this.schedulers, platformId);
+
     this.firestore = zone.runOutsideAngular(() => {
       const app = _firebaseAppFactory(options, zone, nameOrConfig);
       const firestore = app.firestore();

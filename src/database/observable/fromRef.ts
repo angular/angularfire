@@ -1,5 +1,5 @@
 import { DatabaseQuery, DatabaseSnapshot, ListenEvent, AngularFireAction } from '../interfaces';
-import { Observable, asyncScheduler, SchedulerLike } from 'rxjs';
+import { Observable, asapScheduler, SchedulerLike } from 'rxjs';
 import { map, delay, share } from 'rxjs/operators';
 
 interface SnapshotPrevKey<T> {
@@ -12,7 +12,7 @@ interface SnapshotPrevKey<T> {
  * @param ref Database Reference
  * @param event Listen event type ('value', 'added', 'changed', 'removed', 'moved')
  */
-export function fromRef<T>(ref: DatabaseQuery, event: ListenEvent, listenType = 'on', scheduler: SchedulerLike = asyncScheduler): Observable<AngularFireAction<DatabaseSnapshot<T>>> {
+export function fromRef<T>(ref: DatabaseQuery, event: ListenEvent, listenType = 'on', scheduler: SchedulerLike = asapScheduler): Observable<AngularFireAction<DatabaseSnapshot<T>>> {
   return new Observable<SnapshotPrevKey<T>>(subscriber => {
     let fn: any | null = null;
     scheduler.schedule(() => {

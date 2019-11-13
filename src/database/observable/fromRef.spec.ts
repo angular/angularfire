@@ -1,9 +1,11 @@
-import { DatabaseReference } from '../interfaces';
+  import { DatabaseReference } from '../interfaces';
 import { FirebaseApp, AngularFireModule } from '@angular/fire';
 import { AngularFireDatabase, AngularFireDatabaseModule, fromRef } from '@angular/fire/database';
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../test-config';
 import { take } from 'rxjs/operators';
+import { TestScheduler } from 'rxjs/testing';
+
 
 // generate random string to test fidelity of naming
 const rando = () => (Math.random() + 1).toString(36).substring(7);
@@ -39,7 +41,7 @@ describe('fromRef', () => {
     app.delete().then(done, done.fail);
   });
 
-  it('it should be async', (done) => {
+  it('it should be async by default', (done) => {
     const itemRef = ref(rando());
     itemRef.set(batch);
     const obs = fromRef(itemRef, 'value');
@@ -52,6 +54,20 @@ describe('fromRef', () => {
       sub.unsubscribe();
     });
     expect(count).toEqual(0);
+  });
+
+  it('should take a scheduler', () => {
+    const itemRef = ref(rando());
+    itemRef.set(batch);
+    const testScheduler = new TestScheduler((a,b) => a === b);
+    const obs = fromRef(itemRef, 'value', undefined, testScheduler);
+    let hit = false;
+    obs.subscribe(() => {
+      hit = true;
+    });
+    expect(hit).toEqual(false);
+    testScheduler.flush();
+    expect(hit).toEqual(true);
   });
 
   it('it should should handle non-existence', (done) => {
