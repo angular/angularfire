@@ -30,8 +30,8 @@ function blockUntilFirst(ngZone: NgZone) {
     // Defer creation of the Zone blocking task until the observable is subscribed to
     return defer(function () {
       // Create a task inside the angular zone to block it
-      let task: MicroTask | null = ngZone.run(() => {
-        return Zone.current.scheduleMicroTask('firebaseZoneBlock', noop, {}, noop);
+      let task: MacroTask | null = ngZone.run(() => {
+        return Zone.current.scheduleMacroTask('firebaseZoneBlock', noop, {}, noop, noop);
       });
 
       // Cancel the task in the zone to unblock it. This is cheaper than invoke since there is
