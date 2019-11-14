@@ -4,7 +4,7 @@
     "baseUrl": ".",
     "paths": {
       "@angular/fire": ["../../dist/packages-dist"],
-      "@angular/fire/reomte-config": ["../../dist/packages-dist/remote-config"]
+      "@angular/fire/remote-config": ["../../dist/packages-dist/remote-config"]
     }
   },
   "files": [
