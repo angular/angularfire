@@ -1,11 +1,12 @@
-import { NgModule } from '@angular/core';
+import { NgModule, Optional } from '@angular/core';
+import { UserTrackingService, ScreenTrackingService } from './analytics.service';
 import { AngularFireAnalytics } from './analytics';
 
-@NgModule({
-  providers: [ AngularFireAnalytics ]
-})
+@NgModule()
 export class AngularFireAnalyticsModule {
-  constructor(_: AngularFireAnalytics) {
-    // DI inject Analytics here for the automatic data collection
-  } 
+  constructor(
+    analytics: AngularFireAnalytics,
+    @Optional() screenTracking: ScreenTrackingService,
+    @Optional() userTracking: UserTrackingService
+  ) { }
 }

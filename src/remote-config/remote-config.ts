@@ -1,11 +1,8 @@
 import { Injectable, Inject, Optional, NgZone, InjectionToken } from '@angular/core';
-import { Observable, from, concat } from 'rxjs';
+import { Observable, concat, of, empty } from 'rxjs';
 import { map, switchMap, tap, shareReplay, distinctUntilChanged } from 'rxjs/operators';
 import { FirebaseAppConfig, FirebaseOptions, _lazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire';
 import { remoteConfig } from 'firebase/app';
-
-// @ts-ignore
-import firebase from 'firebase/app';
 
 export interface DefaultConfig {[key:string]: string|number|boolean};
 
@@ -13,13 +10,14 @@ export const REMOTE_CONFIG_SETTINGS = new InjectionToken<remoteConfig.Settings>(
 export const DEFAULT_CONFIG = new InjectionToken<DefaultConfig>('angularfire2.remoteConfig.defaultConfig');
 
 import { FirebaseRemoteConfig, _firebaseAppFactory, runOutsideAngular } from '@angular/fire';
+import { AngularFireRemoteConfigModule } from './remote-config.module';
 
 // SEMVER: once we move to Typescript 3.6 use `PromiseProxy<remoteConfig.RemoteConfig>` rather than hardcoding
 type RemoteConfigProxy = {
-  activate: () => Promise<void>;
+  activate: () => Promise<boolean>;
   ensureInitialized: () => Promise<void>;
   fetch: () => Promise<void>;
-  fetchAndActivate: () => Promise<void>;
+  fetchAndActivate: () => Promise<boolean>;
   getAll: () => Promise<{[key:string]: remoteConfig.Value}>;
   getBoolean: (key:string) => Promise<boolean>;
   getNumber: (key:string) => Promise<number>;
@@ -36,13 +34,24 @@ type RemoteConfigProxy = {
 
 export interface AngularFireRemoteConfig extends RemoteConfigProxy {};
 
-@Injectable()
+// TODO export as implements Partial<...> so minor doesn't break us
+export class Value implements remoteConfig.Value {
+  asBoolean() { return ['1', 'true', 't', 'y', 'yes', 'on'].indexOf(this._value.toLowerCase()) > -1 }
+  asString() { return this._value }
+  asNumber() { return Number(this._value) || 0 }
+  getSource() { return this._source; }
+  constructor(private _source: remoteConfig.ValueSource, private _value: string) { }
+}
+
+@Injectable({
+  providedIn: AngularFireRemoteConfigModule
+})
 export class AngularFireRemoteConfig {
 
-  private readonly remoteConfig$: Observable<remoteConfig.RemoteConfig>;
-  private get remoteConfig() { return this.remoteConfig$.toPromise(); }
+  private default$: Observable<{[key:string]: remoteConfig.Value}>;
 
-  readonly all: Observable<{[key:string]: remoteConfig.Value}>;
+  readonly changes: Observable<{}>;
+  readonly all: Observable<{[key:string]: remoteConfig.Value}> & {[key:string]: Observable<remoteConfig.Value>};
   readonly numbers: Observable<{[key:string]: number}> & {[key:string]: Observable<number>};
   readonly booleans: Observable<{[key:string]: boolean}> & {[key:string]: Observable<boolean>};
   readonly strings: Observable<{[key:string]: string}> & {[key:string]: Observable<string>};
@@ -54,33 +63,57 @@ export class AngularFireRemoteConfig {
     @Optional() @Inject(DEFAULT_CONFIG) defaultConfig:DefaultConfig|null,
     private zone: NgZone
   ) {
-    // import('firebase/remote-config') isn't working for some reason...
-    // it might have something to do with https://github.com/firebase/firebase-js-sdk/pull/2229
-    // import from @firebase/remote-config so I can manually register on the Firebase instance
-    // @ts-ignore zapping in the UMD in the build script
-    const requireRemoteConfig = from(import('@firebase/remote-config'));
 
-    this.remoteConfig$ = requireRemoteConfig.pipe(
-      map(rc => rc.registerRemoteConfig(firebase)),
+    const remoteConfig = of(undefined).pipe(
+      // @ts-ignore zapping in the UMD in the build script
+      switchMap(() => import('firebase/remote-config')),
       map(() => _firebaseAppFactory(options, zone, nameOrConfig)),
       map(app => app.remoteConfig()),
       tap(rc => {
         if (settings) { rc.settings = settings }
         if (defaultConfig) { rc.defaultConfig = defaultConfig }
+        this.default$ = empty(); // once the SDK is loaded, we don't need our defaults anylonger
       }),
       runOutsideAngular(zone),
       shareReplay(1)
     );
 
-    this.all = this.remoteConfig$.pipe(
-      switchMap(rc => concat(
-        rc.activate().then(() => rc.getAll()),
-        rc.fetchAndActivate().then(() => rc.getAll())
-      )),
-      runOutsideAngular(zone),
-      // TODO startWith(rehydrate(deafultConfig)),
-      shareReplay(1)
-      // TODO distinctUntilChanged(compareFn)
+    const defaultToStartWith = Object.keys(defaultConfig || {}).reduce((c, k) => {
+      c[k] = new Value("default", defaultConfig![k].toString());
+      return c;
+    }, {});
+
+    const mapRemoteConfig = (rc: {[key:string]: Value | remoteConfig.Value}) => {
+      return Object.keys(rc).reduce((c, key, index) => {
+        const value = rc[key];
+        c[index] = { key, value };
+        return c;
+      }, new Array<{}>(rc.length));
+    }
+
+    const proxy: AngularFireRemoteConfig = _lazySDKProxy(this, remoteConfig, zone);
+
+    this.default$ = of(defaultToStartWith);
+
+    const existing = of(undefined).pipe(
+      switchMap(() => proxy.activate()),
+      switchMap(() => proxy.getAll())
+    );
+
+    let fresh = of(undefined).pipe(
+      switchMap(() => proxy.fetchAndActivate()),
+      switchMap(() => proxy.getAll())
+    );
+
+    this.all = new Proxy(concat(this.default$, existing, fresh), {
+      get: (self, name:string) => self[name] || self.pipe(
+        map(rc => rc[name] ? rc[name] : undefined),
+        distinctUntilChanged((a,b) => JSON.stringify(a) === JSON.stringify(b))
+      )
+    }) as any;
+
+    this.changes = this.all.pipe(
+      switchMap(all => of(...mapRemoteConfig(all)))
     );
 
     const allAs = (type: 'String'|'Boolean'|'Number') => this.all.pipe(
@@ -92,26 +125,26 @@ export class AngularFireRemoteConfig {
 
     this.strings = new Proxy(allAs('String'), {
       get: (self, name:string) => self[name] || this.all.pipe(
-        map(rc => rc[name].asString()),
+        map(rc => rc[name] ? rc[name].asString() : undefined),
         distinctUntilChanged()
       )
     });
 
     this.booleans = new Proxy(allAs('Boolean'), {
       get: (self, name:string) => self[name] || this.all.pipe(
-        map(rc => rc[name].asBoolean()),
+        map(rc => rc[name] ? rc[name].asBoolean() : false),
         distinctUntilChanged()
       )
     });
 
     this.numbers = new Proxy(allAs('Number'), {
       get: (self, name:string) => self[name] || this.all.pipe(
-        map(rc => rc[name].asNumber()),
+        map(rc => rc[name] ? rc[name].asNumber() : 0),
         distinctUntilChanged()
       )
     });
 
-    return _lazySDKProxy(this, this.remoteConfig, zone);
+    return proxy;
   }
 
 }

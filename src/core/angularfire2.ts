@@ -79,10 +79,10 @@ export const runInZone = (zone: NgZone) => <T>(obs$: Observable<T>): Observable<
     { [K in PromiseReturningFunctionPropertyNames<T>   ]: (...args: Parameters<T[K]>) => ReturnType<T[K]> };
 */
 
-export const _lazySDKProxy = (klass: any, promise: Promise<any>, zone: NgZone) => new Proxy(klass, {
+export const _lazySDKProxy = (klass: any, observable: Observable<any>, zone: NgZone) => new Proxy(klass, {
   get: (_, name) => zone.runOutsideAngular(() =>
     klass[name] || new Proxy(() => 
-      promise.then(mod => {
+      observable.toPromise().then(mod => {
         const ret = mod[name];
         // TODO move to proper type guards
         if (typeof ret == 'function') {
