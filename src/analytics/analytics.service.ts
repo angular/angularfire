@@ -22,19 +22,21 @@ export class ScreenTrackingService implements OnDestroy {
     private disposable: Subscription|undefined;
   
     constructor(
-      private analytics: AngularFireAnalytics,
-      private router:Router,
-      @Optional() @Inject(AUTOMATICALLY_SET_CURRENT_SCREEN) private automaticallySetCurrentScreen:boolean|null,
-      @Optional() @Inject(AUTOMATICALLY_LOG_SCREEN_VIEWS) private automaticallyLogScreenViews:boolean|null,
-      @Optional() @Inject(APP_VERSION) private providedAppVersion:string|null,
-      @Optional() @Inject(APP_NAME) private providedAppName:string|null,
-      private zone: NgZone
+      analytics: AngularFireAnalytics,
+      @Optional() router:Router,
+      @Optional() @Inject(AUTOMATICALLY_SET_CURRENT_SCREEN) automaticallySetCurrentScreen:boolean|null,
+      @Optional() @Inject(AUTOMATICALLY_LOG_SCREEN_VIEWS) automaticallyLogScreenViews:boolean|null,
+      @Optional() @Inject(APP_VERSION) providedAppVersion:string|null,
+      @Optional() @Inject(APP_NAME) providedAppName:string|null,
+      zone: NgZone
     ) {
-        if (this.automaticallySetCurrentScreen !== false || this.automaticallyLogScreenViews !== false) {
-            const app_name = this.providedAppName || DEFAULT_APP_NAME;
-            const app_version = this.providedAppVersion || DEFAULT_APP_VERSION;
-            const activationEndEvents = this.router.events.pipe(filter<ActivationEnd>(e => e instanceof ActivationEnd));
-            const navigationEndEvents = this.router.events.pipe(filter<NavigationEnd>(e => e instanceof NavigationEnd));
+        if (!router) {
+            // TODO warning about Router
+        } else if (automaticallySetCurrentScreen !== false || automaticallyLogScreenViews !== false) {
+            const app_name = providedAppName || DEFAULT_APP_NAME;
+            const app_version = providedAppVersion || DEFAULT_APP_VERSION;
+            const activationEndEvents = router.events.pipe(filter<ActivationEnd>(e => e instanceof ActivationEnd));
+            const navigationEndEvents = router.events.pipe(filter<NavigationEnd>(e => e instanceof NavigationEnd));
             this.disposable = navigationEndEvents.pipe(
                 withLatestFrom(activationEndEvents),
                 switchMap(([navigationEnd, activationEnd]) => {
@@ -43,26 +45,26 @@ export class ScreenTrackingService implements OnDestroy {
                     const outlet = activationEnd.snapshot.outlet;
                     const component = activationEnd.snapshot.component;
                     const ret = new Array<Promise<void>>();
-                    if (this.automaticallyLogScreenViews !== false) {
+                    if (automaticallyLogScreenViews !== false) {
                         if (component) {
                             const screen_class = component.hasOwnProperty('name') && (component as any).name || component.toString();
-                            ret.push(this.analytics.logEvent("screen_view", { app_name, screen_class, app_version, screen_name, outlet, url }));
+                            ret.push(analytics.logEvent("screen_view", { app_name, screen_class, app_version, screen_name, outlet, url }));
                         } else if (activationEnd.snapshot.routeConfig && activationEnd.snapshot.routeConfig.loadChildren) {
                             ret.push((activationEnd.snapshot.routeConfig.loadChildren as any)().then((child:any) => {
                                 const screen_class = child.name;
                                 console.log("logEvent", "screen_view", { app_name, screen_class, app_version, screen_name, outlet, url });
-                                return this.analytics.logEvent("screen_view", { app_name, screen_class, app_version, screen_name, outlet, url });
+                                return analytics.logEvent("screen_view", { app_name, screen_class, app_version, screen_name, outlet, url });
                             }));
                         } else {
-                            ret.push(this.analytics.logEvent("screen_view", { app_name, app_version, screen_name, outlet, url }));
+                            ret.push(analytics.logEvent("screen_view", { app_name, app_version, screen_name, outlet, url }));
                         }
                     }
-                    if (this.automaticallySetCurrentScreen !== false) {
-                        ret.push(this.analytics.setCurrentScreen(screen_name || url, { global: outlet == "primary" }));
+                    if (automaticallySetCurrentScreen !== false) {
+                        ret.push(analytics.setCurrentScreen(screen_name || url, { global: outlet == "primary" }));
                     }
                     return Promise.all(ret);
                 }),
-                runOutsideAngular(this.zone)
+                runOutsideAngular(zone)
             ).subscribe();
         }
     }
