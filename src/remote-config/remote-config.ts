@@ -40,7 +40,14 @@ export class Value implements remoteConfig.Value {
   asString() { return this._value }
   asNumber() { return Number(this._value) || 0 }
   getSource() { return this._source; }
-  constructor(private _source: remoteConfig.ValueSource, private _value: string) { }
+  constructor(public _source: remoteConfig.ValueSource, public _value: string) { }
+}
+
+// SEMVER use ConstructorParameters when we can support Typescript 3.6
+export class KeyedValue extends Value {
+  constructor(private key: string, source: remoteConfig.ValueSource, value: string) {
+    super(source, value);
+  }
 }
 
 @Injectable({
@@ -50,8 +57,8 @@ export class AngularFireRemoteConfig {
 
   private default$: Observable<{[key:string]: remoteConfig.Value}>;
 
-  readonly changes: Observable<{}>;
-  readonly all: Observable<{[key:string]: remoteConfig.Value}> & {[key:string]: Observable<remoteConfig.Value>};
+  readonly changes: Observable<{key:string} & remoteConfig.Value>;
+  readonly values: Observable<{[key:string]: remoteConfig.Value}> & {[key:string]: Observable<remoteConfig.Value>};
   readonly numbers: Observable<{[key:string]: number}> & {[key:string]: Observable<number>};
   readonly booleans: Observable<{[key:string]: boolean}> & {[key:string]: Observable<boolean>};
   readonly strings: Observable<{[key:string]: string}> & {[key:string]: Observable<string>};
@@ -81,14 +88,15 @@ export class AngularFireRemoteConfig {
     const defaultToStartWith = Object.keys(defaultConfig || {}).reduce((c, k) => {
       c[k] = new Value("default", defaultConfig![k].toString());
       return c;
-    }, {});
+    }, {} as {[key:string]: remoteConfig.Value});
 
     const mapRemoteConfig = (rc: {[key:string]: Value | remoteConfig.Value}) => {
-      return Object.keys(rc).reduce((c, key, index) => {
+      const keys = Object.keys(rc);
+      return keys.reduce((c, key, index) => {
         const value = rc[key];
-        c[index] = { key, value };
+        c[index] = new KeyedValue(key, value.getSource(), value.asString());
         return c;
-      }, new Array<{}>(rc.length));
+      }, new Array<KeyedValue>(keys.length));
     }
 
     const proxy: AngularFireRemoteConfig = _lazySDKProxy(this, remoteConfig, zone);
@@ -105,40 +113,40 @@ export class AngularFireRemoteConfig {
       switchMap(() => proxy.getAll())
     );
 
-    this.all = new Proxy(concat(this.default$, existing, fresh), {
+    this.values = new Proxy(concat(this.default$, existing, fresh), {
       get: (self, name:string) => self[name] || self.pipe(
         map(rc => rc[name] ? rc[name] : undefined),
         distinctUntilChanged((a,b) => JSON.stringify(a) === JSON.stringify(b))
       )
-    }) as any;
+    }) as any; // TODO figure out the types here
 
-    this.changes = this.all.pipe(
+    this.changes = this.values.pipe(
       switchMap(all => of(...mapRemoteConfig(all)))
-    );
+    ) as any; // TODO figure out the types here
 
-    const allAs = (type: 'String'|'Boolean'|'Number') => this.all.pipe(
+    const allAs = (type: 'String'|'Boolean'|'Number') => this.values.pipe(
       map(all => Object.keys(all).reduce((c, k) => {
         c[k] = all[k][`as${type}`]();
         return c;
       }, {}))
-    ) as any;
+    ) as any; // TODO figure out the types here
 
     this.strings = new Proxy(allAs('String'), {
-      get: (self, name:string) => self[name] || this.all.pipe(
+      get: (self, name:string) => self[name] || this.values.pipe(
         map(rc => rc[name] ? rc[name].asString() : undefined),
         distinctUntilChanged()
       )
     });
 
     this.booleans = new Proxy(allAs('Boolean'), {
-      get: (self, name:string) => self[name] || this.all.pipe(
+      get: (self, name:string) => self[name] || this.values.pipe(
         map(rc => rc[name] ? rc[name].asBoolean() : false),
         distinctUntilChanged()
       )
     });
 
     this.numbers = new Proxy(allAs('Number'), {
-      get: (self, name:string) => self[name] || this.all.pipe(
+      get: (self, name:string) => self[name] || this.values.pipe(
         map(rc => rc[name] ? rc[name].asNumber() : 0),
         distinctUntilChanged()
       )
