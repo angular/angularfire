@@ -47,13 +47,12 @@ export class ScreenTrackingService implements OnDestroy {
                     const ret = new Array<Promise<void>>();
                     if (automaticallyLogScreenViews !== false) {
                         if (component) {
-                            const screen_class = component.hasOwnProperty('name') && (component as any).name || component.toString();
-                            ret.push(analytics.logEvent("screen_view", { app_name, screen_class, app_version, screen_name, outlet, url }));
+                            const firebase_screen_class = component.hasOwnProperty('name') && (component as any).name || component.toString();
+                            ret.push(analytics.logEvent("screen_view", { app_name, firebase_screen_class, app_version, screen_name, outlet, url }));
                         } else if (activationEnd.snapshot.routeConfig && activationEnd.snapshot.routeConfig.loadChildren) {
                             ret.push((activationEnd.snapshot.routeConfig.loadChildren as any)().then((child:any) => {
-                                const screen_class = child.name;
-                                console.log("logEvent", "screen_view", { app_name, screen_class, app_version, screen_name, outlet, url });
-                                return analytics.logEvent("screen_view", { app_name, screen_class, app_version, screen_name, outlet, url });
+                                const firebase_screen_class = child.name;
+                                return analytics.logEvent("screen_view", { app_name, firebase_screen_class, app_version, screen_name, outlet, url });
                             }));
                         } else {
                             ret.push(analytics.logEvent("screen_view", { app_name, app_version, screen_name, outlet, url }));
