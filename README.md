@@ -64,6 +64,12 @@ export class MyApp {
 
 - [Installation & Setup](docs/install-and-setup.md)
 
+### **NEW:** Monitor usage of your application in production
+
+> `AngularFireAnalytics` provides a convient method of interacting with Google Analytics in your Angular application. The provided `ScreenTrackingService` and `UserTrackingService` automatically log events when you're using the Angular Router or Firebase Authentication respectively. [Learn more about Google Analytics](https://firebase.google.com/docs/analytics).
+
+- [Getting started with Google Analytics](docs/analytics/getting-started.md)
+
 ### Interacting with your database(s)
 
 Firebase offers two cloud-based, client-accessible database solutions that support realtime data syncing. [Learn about the differences between them in the Firebase Documentation](https://firebase.google.com/docs/firestore/rtdb-vs-firestore).
@@ -94,11 +100,19 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 
 - [Getting started with Cloud Storage](docs/storage/storage.md)
 
-### Send push notifications
+### Receive push notifications
 
 - [Getting started with Firebase Messaging](docs/messaging/messaging.md)
 
-### Monitor your application performance in production
+### **NEW:** Change behavior and appearance of your application without deploying
+
+> Firebase Remote Config is a cloud service that lets you change the behavior and appearance of your app without requiring users to download an app update. [Learn more about Remote Config](https://firebase.google.com/docs/remote-config).
+
+- [Getting started with Remote Config](docs/remote-config/getting-started.md)
+
+### **NEW:** Monitor your application performance in production
+
+> Firebase Performance Monitoring is a service that helps you to gain insight into the performance characteristics of your iOS, Android, and web apps. [Learn more about Performance Monitor](https://firebase.google.com/docs/perf-mon).
 
 - [Getting started with Performance Monitoring](docs/performance/getting-started.md)
 
