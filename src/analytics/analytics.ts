@@ -35,7 +35,8 @@ export class AngularFireAnalytics {
       // @ts-ignore zapping in the UMD in the build script
       switchMap(() => zone.runOutsideAngular(() => import('firebase/analytics'))),
       map(() => _firebaseAppFactory(options, zone, nameOrConfig)),
-      map(app => app.analytics()),
+      // SEMVER no need to cast once we drop older Firebase
+      map(app => <analytics.Analytics>app.analytics()),
       tap(analytics => {
         if (analyticsCollectionEnabled === false) { analytics.setAnalyticsCollectionEnabled(false) }
       }),

@@ -75,7 +75,8 @@ export class AngularFireRemoteConfig {
       // @ts-ignore zapping in the UMD in the build script
       switchMap(() => import('firebase/remote-config')),
       map(() => _firebaseAppFactory(options, zone, nameOrConfig)),
-      map(app => app.remoteConfig()),
+      // SEMVER no need to cast once we drop older Firebase
+      map(app => <remoteConfig.RemoteConfig>app.remoteConfig()),
       tap(rc => {
         if (settings) { rc.settings = settings }
         if (defaultConfig) { rc.defaultConfig = defaultConfig }

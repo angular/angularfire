@@ -1,5 +1,5 @@
 import { InjectionToken, NgModule, Optional, NgZone } from '@angular/core';
-import { auth, database, firestore, functions, messaging, storage, analytics, remoteConfig } from 'firebase/app';
+import { auth, database, messaging, storage, firestore, functions } from 'firebase/app';
 // @ts-ignore (https://github.com/firebase/firebase-js-sdk/pull/1206)
 import firebase from 'firebase/app'; // once fixed can pull in as "default as firebase" above
 
@@ -15,12 +15,16 @@ export const FIREBASE_APP_NAME = FirebaseNameOrConfigToken;
 
 export type FirebaseDatabase = database.Database;
 export type FirebaseAuth = auth.Auth;
-export type FirebaseAnalytics = analytics.Analytics;
+// SEMVER analytics.Analytics;
+export type FirebaseAnalytics = any;
 export type FirebaseMessaging = messaging.Messaging;
+// SEMVER performance.Performance
+export type FirebasePerformance = any;
 export type FirebaseStorage = storage.Storage;
 export type FirebaseFirestore = firestore.Firestore;
 export type FirebaseFunctions = functions.Functions;
-export type FirebaseRemoteConfig = remoteConfig.RemoteConfig;
+// SEMVER remoteConfig.RemoteConfig;
+export type FirebaseRemoteConfig = any;
 
 // Have to implement as we need to return a class from the provider, we should consider exporting
 // this in the firebase/app types as this is our highest risk of breaks
@@ -31,7 +35,7 @@ export class FirebaseApp {
     auth: () => FirebaseAuth;
     database: (databaseURL?: string) => FirebaseDatabase;
     messaging: () => FirebaseMessaging;
-    performance: () => any; // SEMVER: once >= 6 import performance.Performance
+    performance: () => FirebasePerformance;
     storage: (storageBucket?: string) => FirebaseStorage;
     delete: () => Promise<void>;
     firestore: () => FirebaseFirestore;
