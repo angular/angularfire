@@ -54,15 +54,18 @@ export class ScreenTrackingService implements OnDestroy {
                 };
                 const component = activationEnd.snapshot.component;
                 const routeConfig = activationEnd.snapshot.routeConfig;
+                const loadedConfig = routeConfig && (routeConfig as any)._loadedConfig;
                 const loadChildren = routeConfig && routeConfig.loadChildren;
                 if (component) {
                     return of({...params, firebase_screen_class: nameOrToString(component) });
+                } else if (loadedConfig && loadedConfig.module && loadedConfig.module._moduleType) {
+                    return of({...params, firebase_screen_class: nameOrToString(loadedConfig.module._moduleType)});
                 } else if (typeof loadChildren === "string") {
                     // TODO is this an older lazy loading style parse
                     return of({...params, firebase_screen_class: loadChildren });
                 } else if (loadChildren) {
-                    // TODO look into the return types here
-                    return from(loadChildren).pipe(map(child => ({...params, firebase_screen_class: nameOrToString(child) })));
+                    // TODO look into the other return types here
+                    return from(loadChildren() as Promise<any>).pipe(map(child => ({...params, firebase_screen_class: nameOrToString(child) })));
                 } else {
                     // TODO figure out what forms of router events I might be missing
                     return of(params);
@@ -77,7 +80,7 @@ export class ScreenTrackingService implements OnDestroy {
                     analytics.setCurrentScreen(params.screen_name, { global: true })
                 }
             }),
-            map(params => ({ firebase_screen_id: getScreenId(params), ...params})),
+            map(params => ({ firebase_screen_id: nextScreenId(params), ...params})),
             groupBy(params => params.outlet),
             mergeMap(group => group.pipe(startWith(undefined), pairwise())),
             map(([prior, current]) => prior ? {
@@ -123,19 +126,19 @@ export class UserTrackingService implements OnDestroy {
     }
 }
 
-let nextScreenId = Math.floor(Math.random() * 2**64) - 2**63;
+// firebase_screen_id is an INT64 but use INT32 cause javascript
+const randomInt32 = () => Math.floor(Math.random() * (2**32 - 1)) - 2**31;
 
-const screenIds: {[key:string]: number} = {};
+const currentScreenIds: {[key:string]: number} = {};
 
-const getScreenId = (params:AngularFireAnalyticsEventParams) => {
-    const name = params.firebase_screen_class || params.screen_name;
-    const existingScreenId = screenIds[name];
-    if (existingScreenId) {
-        return existingScreenId;
+const nextScreenId = (params:AngularFireAnalyticsEventParams) => {
+    const scope = params.outlet;
+    if (currentScreenIds.hasOwnProperty(scope)) {
+        return ++currentScreenIds[scope];
     } else {
-        const screenId = nextScreenId++;
-        screenIds[name] = screenId;
-        return screenId;
+        const ret = randomInt32();
+        currentScreenIds[scope] = ret;
+        return ret;
     }
 }
 
