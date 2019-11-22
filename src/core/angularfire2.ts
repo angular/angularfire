@@ -3,6 +3,7 @@ import { isPlatformServer } from '@angular/common';
 import { Observable, Subscription, queueScheduler as queue } from 'rxjs';
 
 // Put in database.ts when we drop database-depreciated
+// SEMVER drop RealtimeDatabaseURL in favor of DATABASE_URL in next major
 export const RealtimeDatabaseURL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
 export const DATABASE_URL = RealtimeDatabaseURL;
 

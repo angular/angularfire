@@ -6,8 +6,8 @@ import { FirebaseStorage, FirebaseOptions, FirebaseAppConfig, FirebaseZoneSchedu
 
 import { UploadMetadata } from './interfaces';
 
+// SEMVER drop StorageBucket in favor of STORAGE_BUCKET
 export const StorageBucket = new InjectionToken<string>('angularfire2.storageBucket');
-
 export const STORAGE_BUCKET = StorageBucket;
 
 /**

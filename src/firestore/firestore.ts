@@ -17,6 +17,7 @@ import firebase from 'firebase/app';
 // SEMVER: have to import here while we target ng 6, as the version of typescript doesn't allow dynamic import of types
 import { firestore } from 'firebase/app';
 
+// SEMVER drop EnablePersistenceToken, PersistenceSettingsToken, and FirestoreSettingsToken in favor of new export names
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
  */
@@ -28,6 +29,7 @@ export const ENABLE_PERSISTENCE = EnablePersistenceToken;
 export const PERSISTENCE_SETTINGS = PersistenceSettingsToken
 export const FIRESTORE_SETTINGS = FirestoreSettingsToken;
 
+// SEMVER kill this in the next major
 // timestampsInSnapshots was depreciated in 5.8.0
 const major = parseInt(firebase.SDK_VERSION.split('.')[0]);
 const minor = parseInt(firebase.SDK_VERSION.split('.')[1]);

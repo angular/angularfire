@@ -7,6 +7,7 @@ import firebase from 'firebase/app'; // once fixed can pull in as "default as fi
 export type FirebaseOptions = {[key:string]: any};
 export type FirebaseAppConfig = {[key:string]: any};
 
+// SEMVER drop FirebaseOptionsToken and FirebaseNameOrConfigToken in favor of FIREBASE_OPTIONS and FIREBASE_APP_NAME in next major
 export const FirebaseOptionsToken = new InjectionToken<FirebaseOptions>('angularfire2.app.options');
 export const FirebaseNameOrConfigToken = new InjectionToken<string|FirebaseAppConfig|undefined>('angularfire2.app.nameOrConfig');
 
