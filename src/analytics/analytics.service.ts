@@ -73,6 +73,7 @@ export class ScreenTrackingService implements OnDestroy {
                 if (params.outlet == "primary") {
                     // TODO do I need to add gtag config for firebase_screen, firebase_screen_class, firebase_screen_id?
                     //      also shouldn't these be computed in the setCurrentScreen function? prior too?
+                    //      do we want to be logging screen name or class?
                     analytics.setCurrentScreen(params.screen_name, { global: true })
                 }
             }),
@@ -83,9 +84,9 @@ export class ScreenTrackingService implements OnDestroy {
                 firebase_previous_class: prior.firebase_screen_class,
                 firebase_previous_screen: prior.firebase_screen,
                 firebase_previous_id: prior.firebase_screen_id,
-                ...current
-            } : current),
-            switchMap(params => analytics.logEvent('screen_view', params)),
+                ...current!
+            } : current!),
+            tap(params => analytics.logEvent('screen_view', params)),
             runOutsideAngular(zone)
         ).subscribe();
     }
@@ -127,7 +128,7 @@ let nextScreenId = Math.floor(Math.random() * 2**64) - 2**63;
 const screenIds: {[key:string]: number} = {};
 
 const getScreenId = (params:AngularFireAnalyticsEventParams) => {
-    const name = params.screen_name;
+    const name = params.firebase_screen_class || params.screen_name;
     const existingScreenId = screenIds[name];
     if (existingScreenId) {
         return existingScreenId;
