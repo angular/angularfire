@@ -19,6 +19,7 @@ module.exports = function(config) {
       'node_modules/zone.js/dist/jasmine-patch.js',
       'node_modules/zone.js/dist/async-test.js',
       'node_modules/zone.js/dist/fake-async-test.js',
+      'node_modules/zone.js/dist/task-tracking.js',
 
       'node_modules/rxjs/bundles/rxjs.umd.{js,map}',
 

@@ -1,6 +1,6 @@
 import { InjectionToken, NgZone } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
-import { Observable, Subscription, defer, queueScheduler as queue } from 'rxjs';
+import { Observable, Subscription, defer, asyncScheduler, SchedulerLike, SchedulerAction } from 'rxjs';
 import { subscribeOn, observeOn, tap } from 'rxjs/operators';
 
 // Put in database.ts when we drop database-depreciated
@@ -11,17 +11,26 @@ function noop() { }
 /**
  * Schedules tasks so that they are invoked inside the Zone that is passed in the constructor.
  */
-export class ZoneScheduler {
-  constructor(private zone: any) { }
+export class ZoneScheduler implements SchedulerLike {
+  constructor(private zone: any, private delegate = asyncScheduler) { }
 
   now() {
-    return queue.now();
+    return this.delegate.now();
   }
 
-  schedule(...args: any[]): Subscription {
-    return this.zone.runGuarded(function () {
-      return queue.schedule.apply(queue, args);
-    });
+  schedule(work: (this: SchedulerAction<any>, state?: any) => void, delay?: number, state?: any): Subscription {
+    const targetZone = this.zone;
+    // Wrap the specified work function to make sure that if nested scheduling takes place the
+    // work is executed in the correct zone
+    const workInZone = function (this: SchedulerAction<any>, state: any) {
+      targetZone.runGuarded(() => {
+        work.apply(this, [state]);
+      });
+    }
+
+    // Scheduling itself needs to be run in zone to ensure setInterval calls for async scheduling are done
+    // inside the correct zone
+    return this.zone.runGuarded(() => this.delegate.schedule(workInZone, delay, state));
   }
 }
 
@@ -73,7 +82,7 @@ export function keepUnstableUntilFirstFactory(
   return function keepUnstableUntilFirst<T>(obs$: Observable<T>): Observable<T> {
     const inCorrectZones$ = obs$.pipe(
       // Run the subscription method inside the angular zone
-      subscribeOn(schedulers.insideAngular),
+      subscribeOn(schedulers.outsideAngular),
       // Run operators inside the angular zone (e.g. side effects via tap())
       observeOn(schedulers.insideAngular)
     );

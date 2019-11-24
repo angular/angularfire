@@ -8,7 +8,7 @@ export function createObjectReference<T=any>(query: DatabaseQuery, afDatabase: A
     query,
     snapshotChanges<T>() {
       return createObjectSnapshotChanges<T>(query, afDatabase.schedulers.outsideAngular)().pipe(
-        afDatabase.keepUnstableUntilFirst
+        afDatabase.keepUnstableUntilFirst!
       );
     },
     update(data: Partial<T>) { return query.ref.update(data as any) as Promise<void>; },

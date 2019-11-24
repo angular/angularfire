@@ -1,8 +1,8 @@
-import { Observable, SchedulerLike } from 'rxjs';
+import { Observable, SchedulerLike, asyncScheduler } from 'rxjs';
 import { DocumentReference, Query, Action, Reference, DocumentSnapshot, QuerySnapshot } from '../interfaces';
 import { map, share } from 'rxjs/operators';
 
-function _fromRef<T, R>(ref: Reference<T>, scheduler?: SchedulerLike): Observable<R> {
+function _fromRef<T, R>(ref: Reference<T>, scheduler: SchedulerLike = asyncScheduler): Observable<R> {
   return new Observable(subscriber => {
     let unsubscribe;
     if (scheduler != null) {
