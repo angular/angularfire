@@ -12,7 +12,7 @@ function noop() { }
  * Schedules tasks so that they are invoked inside the Zone that is passed in the constructor.
  */
 export class ZoneScheduler implements SchedulerLike {
-  constructor(private zone: any, private delegate = asyncScheduler) { }
+  constructor(private zone: any, private delegate: any = asyncScheduler) { }
 
   now() {
     return this.delegate.now();
