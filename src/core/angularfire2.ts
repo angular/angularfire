@@ -81,7 +81,7 @@ export function keepUnstableUntilFirstFactory(
 ) {
   return function keepUnstableUntilFirst<T>(obs$: Observable<T>): Observable<T> {
     const inCorrectZones$ = obs$.pipe(
-      // Run the subscription method inside the angular zone
+      // Run the subscribe body outside of Angular (e.g. calling Firebase SDK to add a listener to a change event)
       subscribeOn(schedulers.outsideAngular),
       // Run operators inside the angular zone (e.g. side effects via tap())
       observeOn(schedulers.insideAngular)
