@@ -10,8 +10,7 @@ import { AngularFirestoreCollectionGroup } from './collection-group/collection-g
 import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
 
-// Workaround for Nodejs build
-// @ts-ignore
+// @ts-ignore Workaround for Nodejs build
 import firebase from 'firebase/app';
 
 // SEMVER: have to import here while we target ng 6, as the version of typescript doesn't allow dynamic import of types

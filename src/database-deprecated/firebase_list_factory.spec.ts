@@ -1,12 +1,10 @@
 import { DataSnapshot } from '@firebase/database-types';
-import { FirebaseApp, FirebaseAppConfig, AngularFireModule} from '@angular/fire';
+import { FirebaseApp, AngularFireModule} from '@angular/fire';
 import { AngularFireDatabase, AngularFireDatabaseModule, FirebaseListObservable,
-  FirebaseListFactory, onChildAdded, onChildChanged, onChildRemoved, onChildUpdated,
-  FirebaseObjectFactory
+  FirebaseListFactory, onChildAdded, onChildChanged, onChildRemoved, onChildUpdated
 } from '@angular/fire/database-deprecated';
 import { TestBed, inject } from '@angular/core/testing';
 import * as utils from './utils';
-import { Query, AFUnwrappedDataSnapshot } from './interfaces';
 import { Subscription, Observable, Subject } from 'rxjs';
 import { COMMON_CONFIG } from './test-config';
 import { _do } from 'rxjs/operator/do';

@@ -1,4 +1,3 @@
-import { Subscription, Scheduler } from 'rxjs';
 import { PathReference, DatabaseReference, FirebaseOperation, FirebaseOperationCases } from './interfaces';
 import { FirebaseDatabase } from '@angular/fire';
 

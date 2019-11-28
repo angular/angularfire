@@ -1,5 +1,5 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID, InjectionToken } from '@angular/core';
-import { Observable, from } from 'rxjs';
+import { from } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { FirebaseOptions, FirebaseAppConfig } from '@angular/fire';
 import { FirebaseFunctions, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
@@ -28,7 +28,7 @@ export class AngularFireFunctions {
     @Optional() @Inject(FUNCTIONS_ORIGIN) origin:string|null
   ) {
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
-    
+
     this.functions = zone.runOutsideAngular(() => {
       const app = _firebaseAppFactory(options, zone, nameOrConfig);
       return app.functions(region || undefined);

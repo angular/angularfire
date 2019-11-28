@@ -1,10 +1,10 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
 import { messaging } from 'firebase/app';
-import { Observable, empty, from, of, throwError } from 'rxjs';
+import { Observable, from, of, throwError } from 'rxjs';
 import { mergeMap, catchError, map, switchMap, concat, defaultIfEmpty } from 'rxjs/operators';
 import { FirebaseOptions, FirebaseAppConfig, runOutsideAngular } from '@angular/fire';
-import { FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
+import { FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory} from '@angular/fire';
 
 @Injectable()
 export class AngularFireMessaging {

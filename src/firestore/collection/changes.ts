@@ -1,8 +1,8 @@
 import { fromCollectionRef } from '../observable/fromRef';
 import { Observable } from 'rxjs';
-import { map, filter, scan } from 'rxjs/operators';
+import { map, scan } from 'rxjs/operators';
 
-import { Query, DocumentChangeType, DocumentChange, DocumentChangeAction, Action } from '../interfaces';
+import { Query, DocumentChangeType, DocumentChange, DocumentChangeAction} from '../interfaces';
 
 /**
  * Return a stream of document changes on a query. These results are not in sort order but in

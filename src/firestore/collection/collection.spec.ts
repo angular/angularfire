@@ -3,7 +3,7 @@ import { AngularFirestore } from '../firestore';
 import { AngularFirestoreModule } from '../firestore.module';
 import { AngularFirestoreCollection } from './collection';
 import { QueryFn } from '../interfaces';
-import { Observable, BehaviorSubject, Subscription } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import { skip, take, switchMap } from 'rxjs/operators';
 
 import { TestBed, inject } from '@angular/core/testing';

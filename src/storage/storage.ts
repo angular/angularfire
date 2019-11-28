@@ -1,7 +1,5 @@
 import { Injectable, Inject, Optional, InjectionToken, NgZone, PLATFORM_ID } from '@angular/core';
-import { createStorageRef, AngularFireStorageReference } from './ref';
-import { createUploadTask, AngularFireUploadTask } from './task';
-import { Observable } from 'rxjs';
+import { createStorageRef} from './ref';
 import { FirebaseStorage, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, FirebaseZoneScheduler, _firebaseAppFactory } from '@angular/fire';
 
 import { UploadMetadata } from './interfaces';

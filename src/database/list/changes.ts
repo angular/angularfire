@@ -1,7 +1,7 @@
 import { fromRef } from '../observable/fromRef';
 import { Observable, of, merge } from 'rxjs';
 
-import { DatabaseQuery, ChildEvent, AngularFireAction, SnapshotAction } from '../interfaces';
+import { DatabaseQuery, ChildEvent, SnapshotAction } from '../interfaces';
 import { isNil } from '../utils';
 
 import { switchMap, distinctUntilChanged, scan } from 'rxjs/operators';
@@ -28,8 +28,8 @@ function positionFor<T>(changes: SnapshotAction<T>[], key) {
 }
 
 function positionAfter<T>(changes: SnapshotAction<T>[], prevKey?: string) {
-  if(isNil(prevKey)) { 
-    return 0; 
+  if(isNil(prevKey)) {
+    return 0;
   } else {
     const i = positionFor(changes, prevKey);
     if( i === -1) {
@@ -41,7 +41,7 @@ function positionAfter<T>(changes: SnapshotAction<T>[], prevKey?: string) {
 }
 
 function buildView(current, action) {
-  const { payload, type, prevKey, key } = action; 
+  const { payload, type, prevKey, key } = action;
   const currentKeyPosition = positionFor(current, key);
   const afterPreviousKeyPosition = positionAfter(current, prevKey);
   switch (action.type) {

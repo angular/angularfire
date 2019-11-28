@@ -1,5 +1,5 @@
-import { FirebaseApp, FirebaseAppConfig, AngularFireModule} from '@angular/fire';
-import { AngularFireDatabase, AngularFireDatabaseModule, FirebaseListObservable, FirebaseObjectFactory } from '@angular/fire/database-deprecated';
+import { FirebaseApp, AngularFireModule} from '@angular/fire';
+import { AngularFireDatabase, AngularFireDatabaseModule, FirebaseListObservable} from '@angular/fire/database-deprecated';
 import { Observer } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { unwrapMapFn } from './utils';

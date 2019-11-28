@@ -1,5 +1,5 @@
-import { Observable, forkJoin } from 'rxjs'
-import { map, mergeMap, tap } from 'rxjs/operators';
+import { forkJoin } from 'rxjs'
+import { mergeMap, tap } from 'rxjs/operators';
 import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, FirebaseOptionsToken, AngularFireModule, FirebaseNameOrConfigToken } from '@angular/fire';
 import { AngularFireStorageModule, AngularFireStorage, AngularFireUploadTask, StorageBucket } from '@angular/fire/storage';
@@ -74,8 +74,8 @@ describe('AngularFireStorage', () => {
       const blob = new Blob([JSON.stringify(data)], { type : 'application/json' });
       const ref = afStorage.ref('af.json');
       const task: AngularFireUploadTask = ref.put(blob);
-      task.then(snap => { 
-        expect(snap).toBeDefined(); 
+      task.then(snap => {
+        expect(snap).toBeDefined();
         done();
       }).catch(done.fail);
     });
@@ -156,7 +156,7 @@ describe('AngularFireStorage w/options', () => {
   });
 
   describe('<constructor>', () => {
-   
+
     it('should exist', () => {
       expect(afStorage instanceof AngularFireStorage).toBe(true);
     });

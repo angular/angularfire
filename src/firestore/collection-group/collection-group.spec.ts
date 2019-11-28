@@ -1,10 +1,9 @@
 import { FirebaseApp, AngularFireModule } from '@angular/fire';
 import { AngularFirestore } from '../firestore';
 import { AngularFirestoreModule } from '../firestore.module';
-import { AngularFirestoreDocument } from '../document/document';
 import { AngularFirestoreCollectionGroup } from './collection-group';
 import { QueryGroupFn, Query } from '../interfaces';
-import { Observable, BehaviorSubject, Subscription } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import { skip, take, switchMap } from 'rxjs/operators';
 
 import { TestBed, inject } from '@angular/core/testing';
@@ -248,7 +247,7 @@ describe('AngularFirestoreCollectionGroup', () => {
     it('should be able to filter snapshotChanges() types - added w/same id', async (done) => {
       const ITEMS = 10;
       let { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
-      
+
       const sub = stocks.snapshotChanges(['added']).pipe(skip(1)).subscribe(data => {
         sub.unsubscribe();
         const change = data.filter(x => x.payload.doc.id === names[0])[1];

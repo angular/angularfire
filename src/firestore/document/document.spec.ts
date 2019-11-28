@@ -2,7 +2,7 @@ import { FirebaseApp, AngularFireModule } from '@angular/fire';
 import { AngularFirestore } from '../firestore';
 import { AngularFirestoreModule } from '../firestore.module';
 import { AngularFirestoreDocument } from '../document/document';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 
 import { TestBed, inject } from '@angular/core/testing';

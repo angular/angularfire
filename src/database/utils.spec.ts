@@ -1,4 +1,3 @@
-import { TestBed, inject } from '@angular/core/testing';
 import * as utils from './utils';
 
 describe('utils', () => {

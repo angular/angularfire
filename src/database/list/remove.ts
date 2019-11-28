@@ -1,8 +1,10 @@
-import { DatabaseReference, DataSnapshot, FirebaseOperation, DatabaseSnapshot } from '../interfaces';
+import { DatabaseReference, FirebaseOperation, DatabaseSnapshot } from '../interfaces';
 import { checkOperationCases } from '../utils';
+
+// @ts-ignore Workaround for Nodejs build
 import { database } from 'firebase/app';
 
-// TODO(davideast): Find out why TS thinks this returns firebase.Primise
+// TODO(davideast): Find out why TS thinks this returns firebase.Promise
 // instead of Promise.
 export function createRemoveMethod<T>(ref: DatabaseReference) {
   return function remove(item?: FirebaseOperation): any {

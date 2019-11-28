@@ -3,7 +3,7 @@ import { fromCollectionRef } from '../observable/fromRef';
 import { map, filter, scan } from 'rxjs/operators';
 import { firestore } from 'firebase/app';
 
-import { DocumentChangeType, CollectionReference, Query, DocumentReference, DocumentData, DocumentChangeAction } from '../interfaces';
+import { DocumentChangeType, Query, DocumentData, DocumentChangeAction } from '../interfaces';
 import { validateEventsArray } from '../collection/collection';
 import { docChanges, sortedChanges } from '../collection/changes';
 import { AngularFirestore } from '../firestore';
@@ -97,8 +97,8 @@ export class AngularFirestoreCollectionGroup<T=DocumentData> {
   }
 
   /**
-   * Retrieve the results of the query once. 
-   * @param options 
+   * Retrieve the results of the query once.
+   * @param options
    */
   get(options?: firestore.GetOptions) {
     return from(this.query.get(options)).pipe(
