@@ -26,7 +26,7 @@ describe('AngularFireFunctions', () => {
     done();
   });
 
-  it('should be exist', () => {
+  it('should exist', () => {
     expect(afFns instanceof AngularFireFunctions).toBe(true);
   });
 
