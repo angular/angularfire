@@ -112,7 +112,7 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 
 ### **NEW:** Monitor your application performance in production
 
-> Firebase Performance Monitoring is a service that helps you to gain insight into the performance characteristics of your iOS, Android, and web apps. [Learn more about Performance Monitor](https://firebase.google.com/docs/perf-mon).
+> Firebase Performance Monitoring is a service that helps you to gain insight into the performance characteristics of your iOS, Android, and web apps. [Learn more about Performance Monitoring](https://firebase.google.com/docs/perf-mon).
 
 - [Getting started with Performance Monitoring](docs/performance/getting-started.md)
 
