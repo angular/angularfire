@@ -1,7 +1,7 @@
 import { Injectable, Inject, Optional, NgZone, InjectionToken } from '@angular/core';
 import { Observable, concat, of, empty } from 'rxjs';
 import { map, switchMap, tap, shareReplay, distinctUntilChanged } from 'rxjs/operators';
-import { FirebaseAppConfig, FirebaseOptions, _lazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire';
+import { FirebaseAppConfig, FirebaseOptions, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire';
 import { remoteConfig } from 'firebase/app';
 
 export interface DefaultConfig {[key:string]: string|number|boolean};
@@ -100,7 +100,7 @@ export class AngularFireRemoteConfig {
       }, new Array<KeyedValue>(keys.length));
     }
 
-    const proxy: AngularFireRemoteConfig = _lazySDKProxy(this, remoteConfig, zone);
+    const proxy: AngularFireRemoteConfig = ɵlazySDKProxy(this, remoteConfig, zone);
 
     this.default$ = of(defaultToStartWith);
 
