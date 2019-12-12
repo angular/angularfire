@@ -16,13 +16,18 @@ const SCREEN_NAME_KEY = 'screen_name';
 const PAGE_PATH_KEY = 'page_path';
 const EVENT_ORIGIN_KEY = 'event_origin';
 const FIREBASE_SCREEN_NAME_KEY = 'firebase_screen';
-const SCREEN_CLASS_KEY = 'firebase_screen_class';
+const FIREBASE_SCREEN_CLASS_KEY = 'firebase_screen_class';
 const OUTLET_KEY = 'outlet';
 const PAGE_TITLE_KEY = 'page_title';
 const PREVIOUS_SCREEN_CLASS_KEY = 'firebase_previous_class';
 const PREVIOUS_SCREEN_INSTANCE_ID_KEY  = 'firebase_previous_id';
 const PREVIOUS_SCREEN_NAME_KEY = 'firebase_previous_screen';
 const SCREEN_INSTANCE_ID_KEY = 'firebase_screen_id';
+
+// Do I need these?
+const SCREEN_CLASS_KEY = 'screen_class';
+const GA_SCREEN_CLASS_KEY = 'ga_screen_class';
+const GA_SCREEN_NAME_KEY = 'ga_screen';
 
 const SCREEN_VIEW_EVENT = 'screen_view';
 const EVENT_ORIGIN_AUTO = 'auto';
@@ -54,7 +59,9 @@ export class ScreenTrackingService implements OnDestroy {
                     [SCREEN_NAME_KEY]: screen_name,
                     [PAGE_PATH_KEY]: page_path,
                     [EVENT_ORIGIN_KEY]: EVENT_ORIGIN_AUTO,
-                    [FIREBASE_SCREEN_NAME_KEY]: screen_name,
+                    // TODO remove unneeded, just testing here
+                    [FIREBASE_SCREEN_NAME_KEY]: `${screen_name} (firebase)`,
+                    [GA_SCREEN_NAME_KEY]: `${screen_name} (ga)`,
                     [OUTLET_KEY]: activationEnd.snapshot.outlet
                 };
                 if (title) { params[PAGE_TITLE_KEY] = title.getTitle() }
@@ -78,16 +85,25 @@ export class ScreenTrackingService implements OnDestroy {
                     return of({...params, [SCREEN_CLASS_KEY]: DEFAULT_SCREEN_CLASS});
                 }
             }),
+            map(params => ({
+                // TODO remove unneeded, just testing here
+                [GA_SCREEN_CLASS_KEY]: `${params[SCREEN_CLASS_KEY]} (ga)`,
+                [FIREBASE_SCREEN_CLASS_KEY]: `${params[SCREEN_CLASS_KEY]} (firebase)`,
+                [SCREEN_INSTANCE_ID_KEY]: getScreenInstanceID(params),
+                ...params
+            })),
             tap(params => {
                 // TODO perhaps I can be smarter about this, bubble events up to the nearest outlet?
                 if (params[OUTLET_KEY] == NG_PRIMARY_OUTLET) {
                     // TODO do we want to track the firebase_ attributes?
-                    analytics.setCurrentScreen(params.screen_name);
-                    analytics.updateConfig({ [PAGE_PATH_KEY]: params[PAGE_PATH_KEY] });
+                    analytics.setCurrentScreen(params[SCREEN_NAME_KEY]);
+                    analytics.updateConfig({
+                        [PAGE_PATH_KEY]: params[PAGE_PATH_KEY],
+                        [SCREEN_CLASS_KEY]: params[SCREEN_CLASS_KEY]
+                    });
                     if (title) { analytics.updateConfig({ [PAGE_TITLE_KEY]: params[PAGE_TITLE_KEY] }) }
                 }
             }),
-            map(params => ({ [SCREEN_INSTANCE_ID_KEY]: getScreenInstanceID(params), ...params })),
             groupBy(params => params[OUTLET_KEY]),
             mergeMap(group => group.pipe(startWith(undefined), pairwise())),
             map(([prior, current]) => prior ? {

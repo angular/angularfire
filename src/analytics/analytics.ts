@@ -1,5 +1,6 @@
-import { Injectable, Inject, Optional, NgZone, InjectionToken } from '@angular/core';
+import { Injectable, Inject, Optional, NgZone, InjectionToken, PLATFORM_ID } from '@angular/core';
 import { of } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
 import { map, tap, shareReplay, switchMap } from 'rxjs/operators';
 import { FirebaseAppConfig, FirebaseOptions, runOutsideAngular, ɵlazySDKProxy, FirebaseAnalytics, FIREBASE_OPTIONS, FIREBASE_APP_NAME, _firebaseAppFactory } from '@angular/fire';
 import { analytics, app } from 'firebase';
@@ -15,9 +16,8 @@ const APP_VERSION_KEY = 'app_version';
 const DEBUG_MODE_KEY = 'debug_mode';
 const ANALYTICS_ID_FIELD = 'measurementId';
 const GTAG_CONFIG_COMMAND = 'config';
-
-// TODO can we get this from js sdk?
-const GTAG_FUNCTION = 'gtag';
+const GTAG_FUNCTION_NAME = 'gtag';
+const DATA_LAYER_NAME = 'dataLayer';
 
 // SEMVER: once we move to Typescript 3.6 use `PromiseProxy<analytics.Analytics>`
 type AnalyticsProxy = {
@@ -36,17 +36,42 @@ export interface AngularFireAnalytics extends AnalyticsProxy {};
 @Injectable()
 export class AngularFireAnalytics {
 
-  public updateConfig: (options: {[key:string]: any}) => void;
+  private gtag: (...args: any[]) => {};
+  private analyticsInitialized: Promise<void>;
+
+  async updateConfig(config: {[key:string]: any}) {
+    await this.analyticsInitialized;
+    this.gtag(GTAG_CONFIG_COMMAND, this.options[ANALYTICS_ID_FIELD], { ...config, update: true });
+  };
 
   constructor(
-    @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
+    @Inject(FIREBASE_OPTIONS) private options:FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
     @Optional() @Inject(ANALYTICS_COLLECTION_ENABLED) analyticsCollectionEnabled:boolean|null,
     @Optional() @Inject(APP_VERSION) providedAppVersion:string|null,
     @Optional() @Inject(APP_NAME) providedAppName:string|null,
     @Optional() @Inject(DEBUG_MODE) debugModeEnabled:boolean|null,
+    @Inject(PLATFORM_ID) platformId,
     zone: NgZone
   ) {
+
+    if (isPlatformBrowser(platformId)) {
+      window[DATA_LAYER_NAME] = window[DATA_LAYER_NAME] || [];
+      this.gtag = window[GTAG_FUNCTION_NAME] || function() { window[DATA_LAYER_NAME].push(arguments) }
+      this.analyticsInitialized = new Promise(resolve => {
+        window[GTAG_FUNCTION_NAME] = (...args: any[]) => {
+          if (args[0] == 'js') { resolve() }
+          this.gtag(...args);
+        }
+      });
+    } else {
+      this.analyticsInitialized = Promise.reject();
+    }
+
+    if (providedAppName)    { this.updateConfig({ [APP_NAME_KEY]:    providedAppName }) }
+    if (providedAppVersion) { this.updateConfig({ [APP_VERSION_KEY]: providedAppVersion }) }
+    if (debugModeEnabled)   { this.updateConfig({ [DEBUG_MODE_KEY]:  1 }) }
+
     const analytics = of(undefined).pipe(
       // @ts-ignore zapping in the UMD in the build script
       switchMap(() => zone.runOutsideAngular(() => import('firebase/analytics'))),
@@ -55,16 +80,9 @@ export class AngularFireAnalytics {
       map(app => <analytics.Analytics>app.analytics()),
       tap(analytics => {
         if (analyticsCollectionEnabled === false) { analytics.setAnalyticsCollectionEnabled(false) }
-        if (providedAppName)    { this.updateConfig({ [APP_NAME_KEY]:    providedAppName }) }
-        if (providedAppVersion) { this.updateConfig({ [APP_VERSION_KEY]: providedAppVersion }) }
-        if (debugModeEnabled)   { this.updateConfig({ [DEBUG_MODE_KEY]:  1 }) }
       }),
       runOutsideAngular(zone),
       shareReplay(1)
-    );
-
-    this.updateConfig = (config: {[key:string]: any}) => analytics.toPromise().then(() =>
-      window[GTAG_FUNCTION](GTAG_CONFIG_COMMAND, options[ANALYTICS_ID_FIELD], { ...config, update: true })
     );
 
     return ɵlazySDKProxy(this, analytics, zone);
