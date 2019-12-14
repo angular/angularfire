@@ -1,4 +1,4 @@
-import { Injectable, Optional, NgZone, OnDestroy } from '@angular/core';
+import { Injectable, Optional, NgZone, OnDestroy, ComponentFactoryResolver, Inject, PLATFORM_ID } from '@angular/core';
 import { Subscription, from, Observable, empty, of } from 'rxjs';
 import { filter, withLatestFrom, switchMap, map, tap, pairwise, startWith, groupBy, mergeMap } from 'rxjs/operators';
 import { Router, NavigationEnd, ActivationEnd } from '@angular/router';
@@ -6,28 +6,20 @@ import { runOutsideAngular } from '@angular/fire';
 import { AngularFireAnalytics } from './analytics';
 import { User } from 'firebase/app';
 import { Title } from '@angular/platform-browser';
+import { isPlatformBrowser } from '@angular/common';
 
-// Gold seems to take page_title and screen_path but the v2 protocol doesn't seem
-// to allow any class name, obviously v2 was designed for the basic web. I'm still
-// sending firebase_screen_class (largely for BQ compatability) but the Firebase Console
-// doesn't appear to be consuming the event properties.
-// FWIW I'm seeing notes that firebase_* is depreciated in favor of ga_* in GMS... so IDK 
-const SCREEN_NAME_KEY = 'screen_name';
-const PAGE_PATH_KEY = 'page_path';
-const EVENT_ORIGIN_KEY = 'event_origin';
-const FIREBASE_SCREEN_NAME_KEY = 'firebase_screen';
+const FIREBASE_EVENT_ORIGIN_KEY = 'firebase_event_origin';
+const FIREBASE_PREVIOUS_SCREEN_CLASS_KEY = 'firebase_previous_class';
+const FIREBASE_PREVIOUS_SCREEN_INSTANCE_ID_KEY  = 'firebase_previous_id';
+const FIREBASE_PREVIOUS_SCREEN_NAME_KEY = 'firebase_previous_screen';
 const FIREBASE_SCREEN_CLASS_KEY = 'firebase_screen_class';
+const FIREBASE_SCREEN_INSTANCE_ID_KEY = 'firebase_screen_id';
+const FIREBASE_SCREEN_NAME_KEY = 'firebase_screen';
 const OUTLET_KEY = 'outlet';
+const PAGE_PATH_KEY = 'page_path';
 const PAGE_TITLE_KEY = 'page_title';
-const PREVIOUS_SCREEN_CLASS_KEY = 'firebase_previous_class';
-const PREVIOUS_SCREEN_INSTANCE_ID_KEY  = 'firebase_previous_id';
-const PREVIOUS_SCREEN_NAME_KEY = 'firebase_previous_screen';
-const SCREEN_INSTANCE_ID_KEY = 'firebase_screen_id';
-
-// Do I need these?
 const SCREEN_CLASS_KEY = 'screen_class';
-const GA_SCREEN_CLASS_KEY = 'ga_screen_class';
-const GA_SCREEN_NAME_KEY = 'ga_screen';
+const SCREEN_NAME_KEY = 'screen_name';
 
 const SCREEN_VIEW_EVENT = 'screen_view';
 const EVENT_ORIGIN_AUTO = 'auto';
@@ -44,77 +36,89 @@ export class ScreenTrackingService implements OnDestroy {
       analytics: AngularFireAnalytics,
       @Optional() router:Router,
       @Optional() title:Title,
+      componentFactoryResolver: ComponentFactoryResolver,
+      @Inject(PLATFORM_ID) platformId:Object,
       zone: NgZone
     ) {
-        if (!router) { return this }
-        const activationEndEvents = router.events.pipe(filter<ActivationEnd>(e => e instanceof ActivationEnd));
-        const navigationEndEvents = router.events.pipe(filter<NavigationEnd>(e => e instanceof NavigationEnd));
-        this.disposable = navigationEndEvents.pipe(
-            withLatestFrom(activationEndEvents),
-            switchMap(([navigationEnd, activationEnd]) => {
-                // SEMVER: start using optional chains and nullish coalescing once we support newer typescript
-                const page_path = navigationEnd.url;
-                const screen_name = activationEnd.snapshot.routeConfig && activationEnd.snapshot.routeConfig.path || page_path;
-                const params = {
-                    [SCREEN_NAME_KEY]: screen_name,
-                    [PAGE_PATH_KEY]: page_path,
-                    [EVENT_ORIGIN_KEY]: EVENT_ORIGIN_AUTO,
-                    // TODO remove unneeded, just testing here
-                    [FIREBASE_SCREEN_NAME_KEY]: `${screen_name} (firebase)`,
-                    [GA_SCREEN_NAME_KEY]: `${screen_name} (ga)`,
-                    [OUTLET_KEY]: activationEnd.snapshot.outlet
-                };
-                if (title) { params[PAGE_TITLE_KEY] = title.getTitle() }
-                const component = activationEnd.snapshot.component;
-                const routeConfig = activationEnd.snapshot.routeConfig;
-                // TODO maybe not lean on _loadedConfig...
-                const loadedConfig = routeConfig && (routeConfig as any)._loadedConfig;
-                const loadChildren = routeConfig && routeConfig.loadChildren;
-                if (component) {
-                    return of({...params, [SCREEN_CLASS_KEY]: nameOrToString(component) });
-                } else if (loadedConfig && loadedConfig.module && loadedConfig.module._moduleType) {
-                    return of({...params, [SCREEN_CLASS_KEY]: nameOrToString(loadedConfig.module._moduleType)});
-                } else if (typeof loadChildren === "string") {
-                    // TODO is the an older lazy loading style? parse, if so
-                    return of({...params, [SCREEN_CLASS_KEY]: loadChildren });
-                } else if (loadChildren) {
-                    // TODO look into the other return types here
-                    return from(loadChildren() as Promise<any>).pipe(map(child => ({...params, [SCREEN_CLASS_KEY]: nameOrToString(child) })));
-                } else {
-                    // TODO figure out what forms of router events I might be missing
-                    return of({...params, [SCREEN_CLASS_KEY]: DEFAULT_SCREEN_CLASS});
-                }
-            }),
-            map(params => ({
-                // TODO remove unneeded, just testing here
-                [GA_SCREEN_CLASS_KEY]: `${params[SCREEN_CLASS_KEY]} (ga)`,
-                [FIREBASE_SCREEN_CLASS_KEY]: `${params[SCREEN_CLASS_KEY]} (firebase)`,
-                [SCREEN_INSTANCE_ID_KEY]: getScreenInstanceID(params),
-                ...params
-            })),
-            tap(params => {
-                // TODO perhaps I can be smarter about this, bubble events up to the nearest outlet?
-                if (params[OUTLET_KEY] == NG_PRIMARY_OUTLET) {
-                    // TODO do we want to track the firebase_ attributes?
-                    analytics.setCurrentScreen(params[SCREEN_NAME_KEY]);
-                    analytics.updateConfig({
-                        [PAGE_PATH_KEY]: params[PAGE_PATH_KEY],
-                        [SCREEN_CLASS_KEY]: params[SCREEN_CLASS_KEY]
-                    });
-                    if (title) { analytics.updateConfig({ [PAGE_TITLE_KEY]: params[PAGE_TITLE_KEY] }) }
-                }
-            }),
-            groupBy(params => params[OUTLET_KEY]),
-            mergeMap(group => group.pipe(startWith(undefined), pairwise())),
-            map(([prior, current]) => prior ? {
-                [PREVIOUS_SCREEN_CLASS_KEY]: prior[SCREEN_CLASS_KEY],
-                [PREVIOUS_SCREEN_NAME_KEY]: prior[SCREEN_NAME_KEY],
-                [PREVIOUS_SCREEN_INSTANCE_ID_KEY]: prior[SCREEN_INSTANCE_ID_KEY],
-                ...current!
-            } : current!),
-            tap(params => analytics.logEvent(SCREEN_VIEW_EVENT, params)),
-            runOutsideAngular(zone)
-        ).subscribe();
+        if (!router || !isPlatformBrowser(platformId)) { return this }
+        zone.runOutsideAngular(() => {
+            const activationEndEvents = router.events.pipe(filter<ActivationEnd>(e => e instanceof ActivationEnd));
+            const navigationEndEvents = router.events.pipe(filter<NavigationEnd>(e => e instanceof NavigationEnd));
+            this.disposable = navigationEndEvents.pipe(
+                withLatestFrom(activationEndEvents),
+                switchMap(([navigationEnd, activationEnd]) => {
+                    // SEMVER: start using optional chains and nullish coalescing once we support newer typescript
+                    const page_path = navigationEnd.url;
+                    const screen_name = activationEnd.snapshot.routeConfig && activationEnd.snapshot.routeConfig.path || page_path;
+                    const params = {
+                        [SCREEN_NAME_KEY]: screen_name,
+                        [PAGE_PATH_KEY]: page_path,
+                        [FIREBASE_EVENT_ORIGIN_KEY]: EVENT_ORIGIN_AUTO,
+                        [FIREBASE_SCREEN_NAME_KEY]: screen_name,
+                        [OUTLET_KEY]: activationEnd.snapshot.outlet
+                    };
+                    if (title) {
+                        params[PAGE_TITLE_KEY] = title.getTitle()
+                    }
+                    const component = activationEnd.snapshot.component;
+                    const routeConfig = activationEnd.snapshot.routeConfig;
+                    const loadChildren = routeConfig && routeConfig.loadChildren;
+                    // TODO figure out how to handle minification
+                    if (typeof loadChildren === "string") {
+                        // SEMVER: this is the older lazy load style "./path#ClassName", drop this when we drop old ng
+                        // TODO is it worth seeing if I can look up the component factory selector from the module name?
+                        // it's lazy so it's not registered with componentFactoryResolver yet... seems a pain for a depreciated style
+                        return of({...params, [SCREEN_CLASS_KEY]: loadChildren.split('#')[1]});
+                    } else if (typeof component === 'string') {
+                        // TODO figure out when this would this be a string
+                        return of({...params, [SCREEN_CLASS_KEY]: component });
+                    } else if (component) {
+                        const componentFactory = componentFactoryResolver.resolveComponentFactory(component);
+                        return of({...params, [SCREEN_CLASS_KEY]: componentFactory.selector });
+                    } else if (loadChildren) {
+                        const loadedChildren = loadChildren();
+                        var loadedChildren$: Observable<any>;
+                        // TODO clean up this handling...
+                        // can componentFactorymoduleType take an ngmodulefactory or should i pass moduletype?
+                        try { loadedChildren$ = from(zone.runOutsideAngular(() => loadedChildren as any)) } catch(_) { loadedChildren$ = of(loadedChildren as any) }
+                        return loadedChildren$.pipe(map(child => {
+                            const componentFactory = componentFactoryResolver.resolveComponentFactory(child);
+                            return {...params, [SCREEN_CLASS_KEY]: componentFactory.selector };
+                        }));
+                    } else {
+                        // TODO figure out what forms of router events I might be missing
+                        return of({...params, [SCREEN_CLASS_KEY]: DEFAULT_SCREEN_CLASS});
+                    }
+                }),
+                map(params => ({
+                    [FIREBASE_SCREEN_CLASS_KEY]: params[SCREEN_CLASS_KEY],
+                    [FIREBASE_SCREEN_INSTANCE_ID_KEY]: getScreenInstanceID(params),
+                    ...params
+                })),
+                tap(params => {
+                    // TODO perhaps I can be smarter about this, bubble events up to the nearest outlet?
+                    if (params[OUTLET_KEY] == NG_PRIMARY_OUTLET) {
+                        analytics.setCurrentScreen(params[SCREEN_NAME_KEY]);
+                        analytics.updateConfig({
+                            [PAGE_PATH_KEY]: params[PAGE_PATH_KEY],
+                            [SCREEN_CLASS_KEY]: params[SCREEN_CLASS_KEY]
+                        });
+                        if (title) {
+                            analytics.updateConfig({ [PAGE_TITLE_KEY]: params[PAGE_TITLE_KEY] })
+                        }
+                    }
+                }),
+                groupBy(params => params[OUTLET_KEY]),
+                mergeMap(group => group.pipe(startWith(undefined), pairwise())),
+                map(([prior, current]) => prior ? {
+                    [FIREBASE_PREVIOUS_SCREEN_CLASS_KEY]: prior[SCREEN_CLASS_KEY],
+                    [FIREBASE_PREVIOUS_SCREEN_NAME_KEY]: prior[SCREEN_NAME_KEY],
+                    [FIREBASE_PREVIOUS_SCREEN_INSTANCE_ID_KEY]: prior[FIREBASE_SCREEN_INSTANCE_ID_KEY],
+                    ...current!
+                } : current!),
+                tap(params => zone.runOutsideAngular(() => analytics.logEvent(SCREEN_VIEW_EVENT, params)))
+            ).subscribe();
+        });
     }
   
     ngOnDestroy() {
@@ -166,5 +170,3 @@ const getScreenInstanceID = (params:{[key:string]: any}) => {
         return ret;
     }
 }
-
-const nameOrToString = (it:any): string => it.name || it.toString();

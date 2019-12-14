@@ -36,7 +36,7 @@ export interface AngularFireAnalytics extends AnalyticsProxy {};
 @Injectable()
 export class AngularFireAnalytics {
 
-  private gtag: (...args: any[]) => {};
+  private gtag: (...args: any[]) => void;
   private analyticsInitialized: Promise<void>;
 
   async updateConfig(config: {[key:string]: any}) {
@@ -51,22 +51,28 @@ export class AngularFireAnalytics {
     @Optional() @Inject(APP_VERSION) providedAppVersion:string|null,
     @Optional() @Inject(APP_NAME) providedAppName:string|null,
     @Optional() @Inject(DEBUG_MODE) debugModeEnabled:boolean|null,
-    @Inject(PLATFORM_ID) platformId,
+    @Inject(PLATFORM_ID) platformId:Object,
     zone: NgZone
   ) {
 
-    if (isPlatformBrowser(platformId)) {
-      window[DATA_LAYER_NAME] = window[DATA_LAYER_NAME] || [];
-      this.gtag = window[GTAG_FUNCTION_NAME] || function() { window[DATA_LAYER_NAME].push(arguments) }
-      this.analyticsInitialized = new Promise(resolve => {
+    if (!isPlatformBrowser(platformId)) {
+      // TODO flush out non-browser support
+      this.analyticsInitialized = Promise.resolve();
+      this.gtag = () => {}
+      // TODO fix the proxy for the server
+      return this;
+    }
+
+    window[DATA_LAYER_NAME] = window[DATA_LAYER_NAME] || [];
+    this.gtag = window[GTAG_FUNCTION_NAME] || function() { window[DATA_LAYER_NAME].push(arguments) }
+    this.analyticsInitialized = zone.runOutsideAngular(() =>
+      new Promise(resolve => {
         window[GTAG_FUNCTION_NAME] = (...args: any[]) => {
           if (args[0] == 'js') { resolve() }
           this.gtag(...args);
         }
-      });
-    } else {
-      this.analyticsInitialized = Promise.reject();
-    }
+      })
+    );
 
     if (providedAppName)    { this.updateConfig({ [APP_NAME_KEY]:    providedAppName }) }
     if (providedAppVersion) { this.updateConfig({ [APP_VERSION_KEY]: providedAppVersion }) }
@@ -86,6 +92,7 @@ export class AngularFireAnalytics {
     );
 
     return ɵlazySDKProxy(this, analytics, zone);
+    
   }
 
 }

@@ -84,14 +84,20 @@ export const ɵlazySDKProxy = (klass: any, observable: Observable<any>, zone: Ng
   get: (_, name) => zone.runOutsideAngular(() =>
     klass[name] || new Proxy(() => 
       observable.toPromise().then(mod => {
-        const ret = mod[name];
-        // TODO move to proper type guards
-        if (typeof ret == 'function') {
-          return ret.bind(mod);
-        } else if (ret && ret.then) {
-          return ret.then((res:any) => zone.run(() => res));
+        if (mod) {
+          const ret = mod[name];
+          // TODO move to proper type guards
+          if (typeof ret == 'function') {
+            return ret.bind(mod);
+          } else if (ret && ret.then) {
+            return ret.then((res:any) => zone.run(() => res));
+          } else {
+            return zone.run(() => ret);
+          }
         } else {
-          return zone.run(() => ret);
+          // the module is not available, SSR maybe?
+          // TODO dig into this deeper, maybe return a never resolving promise?
+          return () => {};
         }
       }), {
         get: (self, name) => self()[name],

@@ -299,10 +299,10 @@ function copySchematicFiles() {
 }
 
 function replaceDynamicImportsForUMD() {
-  writeFileSync('./dist/packages-dist/bundles/performance.umd.js', readFileSync('./dist/packages-dist/bundles/performance.umd.js', 'utf8').replace("rxjs.from(import('firebase/performance'))", "rxjs.empty()"));
+  writeFileSync('./dist/packages-dist/bundles/performance.umd.js', readFileSync('./dist/packages-dist/bundles/performance.umd.js', 'utf8').replace("return import('firebase/performance');", "return rxjs.empty();"));
   writeFileSync('./dist/packages-dist/bundles/messaging.umd.js', readFileSync('./dist/packages-dist/bundles/messaging.umd.js', 'utf8').replace("rxjs.from(import('firebase/messaging'))", "rxjs.empty()"));
-  writeFileSync('./dist/packages-dist/bundles/remote-config.umd.js', readFileSync('./dist/packages-dist/bundles/remote-config.umd.js', 'utf8').replace("rxjs.from(import('firebase/remote-config'))", "rxjs.empty()"));
-  writeFileSync('./dist/packages-dist/bundles/analytics.umd.js', readFileSync('./dist/packages-dist/bundles/analytics.umd.js', 'utf8').replace("rxjs.from(import('firebase/analytics'))", "rxjs.empty()"));
+  writeFileSync('./dist/packages-dist/bundles/remote-config.umd.js', readFileSync('./dist/packages-dist/bundles/remote-config.umd.js', 'utf8').replace("return import('firebase/remote-config');", "return rxjs.empty();"));
+  writeFileSync('./dist/packages-dist/bundles/analytics.umd.js', readFileSync('./dist/packages-dist/bundles/analytics.umd.js', 'utf8').replace("return import('firebase/analytics');", "return rxjs.empty();"));
 }
 
 function measure(module) {

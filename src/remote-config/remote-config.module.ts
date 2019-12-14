@@ -1,4 +1,7 @@
 import { NgModule } from '@angular/core';
+import { AngularFireRemoteConfig } from './remote-config';
 
-@NgModule()
+@NgModule({
+    providers: [AngularFireRemoteConfig]
+})
 export class AngularFireRemoteConfigModule { }
