@@ -1,6 +1,6 @@
 import { Injectable, Inject, Optional, NgZone, InjectionToken, PLATFORM_ID } from '@angular/core';
-import { Observable, concat, of, empty, pipe, OperatorFunction } from 'rxjs';
-import { map, switchMap, tap, shareReplay, distinctUntilChanged, filter, groupBy, mergeMap } from 'rxjs/operators';
+import { Observable, concat, of, pipe, OperatorFunction, UnaryFunction } from 'rxjs';
+import { map, switchMap, tap, shareReplay, distinctUntilChanged, filter, groupBy, mergeMap, scan, withLatestFrom, startWith } from 'rxjs/operators';
 import { FirebaseAppConfig, FirebaseOptions, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire';
 import { remoteConfig } from 'firebase/app';
 
@@ -50,48 +50,24 @@ export class Parameter extends Value {
   }
 }
 
-type Filter<T, K={}, M=any> = T extends {[key:string]: M} ?
-                                OperatorFunction<T, {[key:string]: M & K}> :
-                                OperatorFunction<T, T & K>;
+// If it's a Parameter array, test any, else test the individual Parameter
+const filterTest = (fn: (param:Parameter) => boolean) => filter<Parameter|Parameter[]>(it => Array.isArray(it) ? it.some(fn) : fn(it))
 
-const filterKey = (attribute: any, test: (param:any) => boolean) => pipe(
-  map((value:Parameter | Record<string, Parameter>) => {
-    const param = value[attribute];
-    if (param) {
-      if (test(param)) {
-        return value;
-      } else {
-        return undefined;
-      }
-    } else {
-      const filtered = Object.keys(value).reduce((c, k) => {
-        if (test(value[k][attribute])) {
-          return {...c, [k]: value[k]};
-        } else {
-          return c;
-        }
-      }, {});
-      return Object.keys(filtered).length > 0 ? filtered : undefined
-    }
-  }),
-  filter(a => !!a)
-) as any; // TODO figure out the typing here
+// Allow the user to bypass the default values and wait till they get something from the server, even if it's a cached copy;
+// if used in conjuntion with first() it will only fetch RC values from the server if they aren't cached locally
+export const filterRemote = () => filterTest(p => p.getSource() === 'remote');
 
-export const filterStatic = <T>(): Filter<T, {_source: 'static', getSource: () => 'static'}> => filterKey('_source', s => s === 'static');
-export const filterRemote = <T>(): Filter<T, {_source: 'remote', getSource: () => 'remote'}> => filterKey('_source', s => s === 'remote');
-export const filterDefault = <T>(): Filter<T, {_source: 'default', getSource: () => 'default'}> => filterKey('_source', s => s === 'default');
-
-const DEFAULT_INTERVAL = 60 * 60 * 1000; // 1 hour
-export const filterFresh = <T>(howRecentInMillis: number = DEFAULT_INTERVAL): OperatorFunction<T, T> => filterKey('fetchTimeMillis', f => f + howRecentInMillis >= new Date().getTime());
+// filterFresh allows the developer to effectively set up a maximum cache time
+export const filterFresh = (howRecentInMillis: number) => filterTest(p => p.fetchTimeMillis + howRecentInMillis >= new Date().getTime());
 
 @Injectable()
 export class AngularFireRemoteConfig {
 
-  readonly changes:  Observable<Parameter>;
-  readonly values:   Observable<Record<string, Parameter>> & Record<string, Observable<Parameter>>;
-  readonly numbers:  Observable<Record<string, number>>    & Record<string, Observable<number>>;
-  readonly booleans: Observable<Record<string, boolean>>   & Record<string, Observable<boolean>>;
-  readonly strings:  Observable<Record<string, string>>    & Record<string, Observable<string>>;
+  readonly changes:    Observable<Parameter>;
+  readonly parameters: Observable<Parameter[]>;
+  readonly numbers:    Observable<Record<string, number>>  & Record<string, Observable<number>>;
+  readonly booleans:   Observable<Record<string, boolean>> & Record<string, Observable<boolean>>;
+  readonly strings:    Observable<Record<string, string>>  & Record<string, Observable<string|undefined>>;
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
@@ -101,15 +77,8 @@ export class AngularFireRemoteConfig {
     @Inject(PLATFORM_ID) platformId:Object,
     private zone: NgZone
   ) {
-
-    let default$: Observable<{[key:string]: remoteConfig.Value}> = of(Object.keys(defaultConfig || {}).reduce(
-      (c, k) => ({...c, [k]: new Value("default", defaultConfig![k].toString()) }), {}
-    ));
-
-    let _remoteConfig: remoteConfig.RemoteConfig|undefined = undefined;
-    const fetchTimeMillis = () => _remoteConfig && _remoteConfig.fetchTimeMillis || -1;
     
-    const remoteConfig = of(undefined).pipe(
+    const remoteConfig$ = of(undefined).pipe(
       // @ts-ignore zapping in the UMD in the build script
       switchMap(() => zone.runOutsideAngular(() => import('firebase/remote-config'))),
       map(() => _firebaseAppFactory(options, zone, nameOrConfig)),
@@ -117,75 +86,94 @@ export class AngularFireRemoteConfig {
       map(app => <remoteConfig.RemoteConfig>app.remoteConfig()),
       tap(rc => {
         if (settings) { rc.settings = settings }
-        if (defaultConfig) { rc.defaultConfig = defaultConfig }
-        default$ = empty(); // once the SDK is loaded, we don't need our defaults anylonger
-        _remoteConfig = rc; // hack, keep the state around for easy injection of fetchTimeMillis
+        // FYI we don't load the defaults into remote config, since we have our own implementation
+        // see the comment on scanToParametersArray
       }),
+      startWith(undefined),
       runOutsideAngular(zone),
-      shareReplay(1)
+      shareReplay({ bufferSize: 1, refCount: false })
     );
 
-    const existing = of(undefined).pipe(
-      switchMap(() => remoteConfig),
+    const loadedRemoteConfig$ = remoteConfig$.pipe(
+      filter<remoteConfig.RemoteConfig>(rc => !!rc)
+    );
+
+    let default$: Observable<{[key:string]: remoteConfig.Value}> = of(Object.keys(defaultConfig || {}).reduce(
+      (c, k) => ({...c, [k]: new Value("default", defaultConfig![k].toString()) }), {}
+    ));
+
+    const existing$ = loadedRemoteConfig$.pipe(
       switchMap(rc => rc.activate().then(() => rc.getAll()))
     );
 
-    let fresh = of(undefined).pipe(
-      switchMap(() => remoteConfig),
+    const fresh$ = loadedRemoteConfig$.pipe(
       switchMap(rc => zone.runOutsideAngular(() => rc.fetchAndActivate().then(() => rc.getAll())))
     );
 
-    const all = concat(default$, existing, fresh).pipe(
-      distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
-      map(all => Object.keys(all).reduce((c, k) => ({...c, [k]: new Parameter(k, fetchTimeMillis(), all[k].getSource(), all[k].asString())}), {} as Record<string, Parameter>)),
+    this.parameters = concat(default$, existing$, fresh$).pipe(
+      scanToParametersArray(remoteConfig$),
       shareReplay({ bufferSize: 1, refCount: true })
     );
 
-    this.changes = all.pipe(
-      map(all => Object.values(all)),
+    this.changes = this.parameters.pipe(
       switchMap(params => of(...params)),
       groupBy(param => param.key),
       mergeMap(group => group.pipe(
-        distinctUntilChanged((a,b) => JSON.stringify(a) === JSON.stringify(b))
+        distinctUntilChanged()
       ))
     );
 
-    this.values = new Proxy(all, {
-      get: (self, name:string) => self[name] || all.pipe(
-        map(rc => rc[name] ? rc[name] : undefined),
-        distinctUntilChanged((a,b) => JSON.stringify(a) === JSON.stringify(b))
-      )
-    }) as any; // TODO types
-
-    // TODO change the any, once i figure out how to type the proxies better
-    const allAs = (type: 'Number'|'Boolean'|'String') => all.pipe(
-      map(all => Object.values(all).reduce((c, p) => ({...c, [p.key]: p[`as${type}`]()}), {})),
-      distinctUntilChanged((a,b) => JSON.stringify(a) === JSON.stringify(b))
-    ) as any;
-
-    this.strings = new Proxy(allAs('String'), {
-      get: (self, name:string) => self[name] || all.pipe(
-        map(rc => rc[name] ? rc[name].asString() : undefined),
-        distinctUntilChanged()
-      )
-    });
-
-    this.booleans = new Proxy(allAs('Boolean'), {
-      get: (self, name:string) => self[name] || all.pipe(
-        map(rc => rc[name] ? rc[name].asBoolean() : false),
-        distinctUntilChanged()
-      )
-    });
-
-    this.numbers = new Proxy(allAs('Number'), {
-      get: (self, name:string) => self[name] || all.pipe(
-        map(rc => rc[name] ? rc[name].asNumber() : 0),
-        distinctUntilChanged()
-      )
-    });
+    this.strings  = proxyAll(this.parameters, 'asString');
+    this.booleans = proxyAll(this.parameters, 'asBoolean');
+    this.numbers  = proxyAll(this.parameters, 'asNumber');
 
     // TODO fix the proxy for server
-    return isPlatformServer(platformId) ? this : ɵlazySDKProxy(this, remoteConfig, zone);
+    return isPlatformServer(platformId) ? this : ɵlazySDKProxy(this, remoteConfig$, zone);
   }
 
 }
+
+// I ditched loading the defaults into RC and a simple map for scan since we already have our own defaults implementation.
+// The idea here being that if they have a default that never loads from the server, they will be able to tell via fetchTimeMillis on the Parameter.
+// Also if it doesn't come from the server it won't emit again in .changes, due to the distinctUntilChanged, which we can simplify to === rather than deep comparison
+const scanToParametersArray = (remoteConfig: Observable<remoteConfig.RemoteConfig|undefined>): OperatorFunction<Record<string, remoteConfig.Value>, Parameter[]> => pipe(
+  withLatestFrom(remoteConfig),
+  scan((existing, [all, rc]) => {
+    // SEMVER use "new Set" to unique once we're only targeting es6
+    // at the scale we expect remote config to be at, we probably won't see a performance hit from this unoptimized uniqueness implementation
+    // const allKeys = [...new Set([...existing.map(p => p.key), ...Object.keys(all)])];
+    const allKeys = [...existing.map(p => p.key), ...Object.keys(all)].filter((v, i, a) => a.indexOf(v) === i);
+    return allKeys.map(key => {
+      const updatedValue = all[key];
+      return updatedValue ? new Parameter(key, rc ? rc.fetchTimeMillis : -1, updatedValue.getSource(), updatedValue.asString())
+                : existing.find(p => p.key === key)!
+    });
+  }, [] as Array<Parameter>)
+);
+
+const PROXY_DEFAULTS = {'asNumber': 0, 'asBoolean': false, 'asString': undefined};
+
+
+function mapToObject(fn: 'asNumber'): UnaryFunction<Observable<Parameter[]>, Observable<Record<string, number>>>;
+function mapToObject(fn: 'asBoolean'): UnaryFunction<Observable<Parameter[]>, Observable<Record<string, boolean>>>;
+function mapToObject(fn: 'asString'): UnaryFunction<Observable<Parameter[]>, Observable<Record<string, string|undefined>>>;
+function mapToObject(fn: 'asNumber'|'asBoolean'|'asString') {
+  return pipe(
+    map((params: Parameter[]) => params.reduce((c, p) => ({...c, [p.key]: p[fn]()}), {} as Record<string, number|boolean|string|undefined>)),
+    distinctUntilChanged((a,b) => JSON.stringify(a) === JSON.stringify(b))
+  );
+};
+
+export const mapAsStrings = () => mapToObject('asString');
+export const mapAsBooleans = () => mapToObject('asBoolean');
+export const mapAsNumbers = () => mapToObject('asNumber');
+
+// TODO look into the types here, I don't like the anys
+const proxyAll = (observable: Observable<Parameter[]>, fn: 'asNumber'|'asBoolean'|'asString') => new Proxy(
+  observable.pipe(mapToObject(fn as any)), {
+    get: (self, name:string) => self[name] || self.pipe(
+      map(all => all[name] || PROXY_DEFAULTS[fn]),
+      distinctUntilChanged()
+    )
+  }
+) as any;
