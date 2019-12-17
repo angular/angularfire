@@ -1,5 +1,5 @@
 import { Injectable, Inject, Optional, NgZone, InjectionToken, PLATFORM_ID } from '@angular/core';
-import { Observable, concat, of, pipe, OperatorFunction } from 'rxjs';
+import { Observable, concat, of, pipe, OperatorFunction, MonoTypeOperatorFunction } from 'rxjs';
 import { map, switchMap, tap, shareReplay, distinctUntilChanged, filter, groupBy, mergeMap, scan, withLatestFrom, startWith, debounceTime } from 'rxjs/operators';
 import { FirebaseAppConfig, FirebaseOptions, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire';
 import { remoteConfig } from 'firebase/app';
@@ -65,9 +65,9 @@ export class AngularFireRemoteConfig {
 
   readonly changes:    Observable<Parameter>;
   readonly parameters: Observable<Parameter[]>;
-  readonly numbers:    Observable<{[key:string]: number}>  & {[key:string]: Observable<number>};
-  readonly booleans:   Observable<{[key:string]: boolean}> & {[key:string]: Observable<boolean>};
-  readonly strings:    Observable<{[key:string]: string}>  & {[key:string]: Observable<string|undefined>};
+  readonly numbers:    Observable<{[key:string]: number|undefined}>  & {[key:string]: Observable<number>};
+  readonly booleans:   Observable<{[key:string]: boolean|undefined}> & {[key:string]: Observable<boolean>};
+  readonly strings:    Observable<{[key:string]: string|undefined}>  & {[key:string]: Observable<string|undefined>};
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
@@ -154,7 +154,7 @@ const scanToParametersArray = (remoteConfig: Observable<remoteConfig.RemoteConfi
 const AS_TO_FN = { 'strings': 'asString', 'numbers': 'asNumber', 'booleans': 'asBoolean' };
 const PROXY_DEFAULTS = { 'numbers': 0, 'booleans': false, 'strings': undefined };
 
-export const budget = (interval: number) => <T>(source: Observable<T>) => new Observable<T>(observer => {
+export const budget = <T>(interval: number): MonoTypeOperatorFunction<T> => (source: Observable<T>) => new Observable<T>(observer => {
     let timedOut = false;
     // TODO use scheduler task rather than settimeout
     const timeout = setTimeout(() => {
@@ -177,30 +177,44 @@ const typedMethod = (it:any) => {
   }
 };
 
-export function scanToObject(): OperatorFunction<Parameter, {[key:string]: string}>;
-export function scanToObject(as: 'numbers'): OperatorFunction<Parameter, {[key:string]: number}>;
-export function scanToObject(as: 'booleans'): OperatorFunction<Parameter, {[key:string]: boolean}>;
-export function scanToObject(as: 'strings'): OperatorFunction<Parameter, {[key:string]: string}>;
+export function scanToObject(): OperatorFunction<Parameter, {[key:string]: string|undefined}>;
+export function scanToObject(to: 'numbers'): OperatorFunction<Parameter, {[key:string]: number|undefined}>;
+export function scanToObject(to: 'booleans'): OperatorFunction<Parameter, {[key:string]: boolean|undefined}>;
+export function scanToObject(to: 'strings'): OperatorFunction<Parameter, {[key:string]: string|undefined}>;
 export function scanToObject<T extends ConfigTemplate>(template: T): OperatorFunction<Parameter, T & {[key:string]: string|undefined}>;
-export function scanToObject(as: 'numbers'|'booleans'|'strings'|ConfigTemplate = 'strings') {
+export function scanToObject<T extends ConfigTemplate>(to: 'numbers'|'booleans'|'strings'|T = 'strings') {
   return pipe(
     // TODO cleanup
-    scan((c, p: Parameter) => ({...c, [p.key]: typeof as === 'object' ? p[typedMethod(as[p.key])]() : p[AS_TO_FN[as]]()}), typeof as === 'object' ? as : {} as {[key:string]: number|boolean|string}),
+    scan(
+      (c, p: Parameter) => ({...c, [p.key]: typeof to === 'object' ?
+        p[typedMethod(to[p.key])]() :
+        p[AS_TO_FN[to]]()  }),
+      typeof to === 'object' ?
+        to as T & {[key:string]: string|undefined}:
+        {} as {[key:string]: number|boolean|string}
+    ),
     debounceTime(1),
     budget(10),
     distinctUntilChanged((a,b) => JSON.stringify(a) === JSON.stringify(b))
   );
 };
 
-export function mapToObject(): OperatorFunction<Parameter[], {[key:string]: string}>;
-export function mapToObject(as: 'numbers'): OperatorFunction<Parameter[], {[key:string]: number}>;
-export function mapToObject(as: 'booleans'): OperatorFunction<Parameter[], {[key:string]:  boolean}>;
-export function mapToObject(as: 'strings'): OperatorFunction<Parameter[], {[key:string]: string}>;
+export function mapToObject(): OperatorFunction<Parameter[], {[key:string]: string|undefined}>;
+export function mapToObject(to: 'numbers'): OperatorFunction<Parameter[], {[key:string]: number|undefined}>;
+export function mapToObject(to: 'booleans'): OperatorFunction<Parameter[], {[key:string]:  boolean|undefined}>;
+export function mapToObject(to: 'strings'): OperatorFunction<Parameter[], {[key:string]: string|undefined}>;
 export function mapToObject<T extends ConfigTemplate>(template: T): OperatorFunction<Parameter[], T & {[key:string]: string|undefined}>;
-export function mapToObject(as: 'numbers'|'booleans'|'strings'|ConfigTemplate = 'strings') {
+export function mapToObject<T extends ConfigTemplate>(to: 'numbers'|'booleans'|'strings'|T = 'strings') {
   return pipe(
     // TODO this is getting a little long, cleanup
-    map((params: Parameter[]) => params.reduce((c, p) => ({...c, [p.key]: typeof as === 'object' ? p[typedMethod(as[p.key])]() : p[AS_TO_FN[as]]()}), typeof as === 'object' ? as : {} as {[key:string]: number|boolean|string})),
+    map((params: Parameter[]) => params.reduce(
+      (c, p) => ({...c, [p.key]: typeof to === 'object' ?
+        p[typedMethod(to[p.key])]() :
+        p[AS_TO_FN[to]]() }),
+      typeof to === 'object' ?
+        to as T & {[key:string]: string|undefined} :
+        {} as {[key:string]: number|boolean|string}
+    )),
     distinctUntilChanged((a,b) => JSON.stringify(a) === JSON.stringify(b))
   );
 };
