@@ -1,13 +1,13 @@
 import { Injectable, Inject, Optional, NgZone, InjectionToken, PLATFORM_ID } from '@angular/core';
-import { Observable, concat, of, pipe, OperatorFunction, UnaryFunction } from 'rxjs';
-import { map, switchMap, tap, shareReplay, distinctUntilChanged, filter, groupBy, mergeMap, scan, withLatestFrom, startWith } from 'rxjs/operators';
+import { Observable, concat, of, pipe, OperatorFunction } from 'rxjs';
+import { map, switchMap, tap, shareReplay, distinctUntilChanged, filter, groupBy, mergeMap, scan, withLatestFrom, startWith, debounceTime } from 'rxjs/operators';
 import { FirebaseAppConfig, FirebaseOptions, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire';
 import { remoteConfig } from 'firebase/app';
 
-export interface DefaultConfig {[key:string]: string|number|boolean};
+export interface ConfigTemplate {[key:string]: string|number|boolean};
 
 export const REMOTE_CONFIG_SETTINGS = new InjectionToken<remoteConfig.Settings>('angularfire2.remoteConfig.settings');
-export const DEFAULT_CONFIG = new InjectionToken<DefaultConfig>('angularfire2.remoteConfig.defaultConfig');
+export const DEFAULT_CONFIG = new InjectionToken<ConfigTemplate>('angularfire2.remoteConfig.defaultConfig');
 
 import { FirebaseRemoteConfig, _firebaseAppFactory, runOutsideAngular } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
@@ -65,15 +65,15 @@ export class AngularFireRemoteConfig {
 
   readonly changes:    Observable<Parameter>;
   readonly parameters: Observable<Parameter[]>;
-  readonly numbers:    Observable<Record<string, number>>  & Record<string, Observable<number>>;
-  readonly booleans:   Observable<Record<string, boolean>> & Record<string, Observable<boolean>>;
-  readonly strings:    Observable<Record<string, string>>  & Record<string, Observable<string|undefined>>;
+  readonly numbers:    Observable<{[key:string]: number}>  & {[key:string]: Observable<number>};
+  readonly booleans:   Observable<{[key:string]: boolean}> & {[key:string]: Observable<boolean>};
+  readonly strings:    Observable<{[key:string]: string}>  & {[key:string]: Observable<string|undefined>};
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
     @Optional() @Inject(REMOTE_CONFIG_SETTINGS) settings:remoteConfig.Settings|null,
-    @Optional() @Inject(DEFAULT_CONFIG) defaultConfig:DefaultConfig|null,
+    @Optional() @Inject(DEFAULT_CONFIG) defaultConfig:ConfigTemplate|null,
     @Inject(PLATFORM_ID) platformId:Object,
     private zone: NgZone
   ) {
@@ -123,9 +123,9 @@ export class AngularFireRemoteConfig {
       ))
     );
 
-    this.strings  = proxyAll(this.parameters, 'asString');
-    this.booleans = proxyAll(this.parameters, 'asBoolean');
-    this.numbers  = proxyAll(this.parameters, 'asNumber');
+    this.strings  = proxyAll(this.parameters, 'strings');
+    this.booleans = proxyAll(this.parameters, 'booleans');
+    this.numbers  = proxyAll(this.parameters, 'numbers');
 
     // TODO fix the proxy for server
     return isPlatformServer(platformId) ? this : ɵlazySDKProxy(this, remoteConfig$, zone);
@@ -136,7 +136,7 @@ export class AngularFireRemoteConfig {
 // I ditched loading the defaults into RC and a simple map for scan since we already have our own defaults implementation.
 // The idea here being that if they have a default that never loads from the server, they will be able to tell via fetchTimeMillis on the Parameter.
 // Also if it doesn't come from the server it won't emit again in .changes, due to the distinctUntilChanged, which we can simplify to === rather than deep comparison
-const scanToParametersArray = (remoteConfig: Observable<remoteConfig.RemoteConfig|undefined>): OperatorFunction<Record<string, remoteConfig.Value>, Parameter[]> => pipe(
+const scanToParametersArray = (remoteConfig: Observable<remoteConfig.RemoteConfig|undefined>): OperatorFunction<{[key:string]: remoteConfig.Value}, Parameter[]> => pipe(
   withLatestFrom(remoteConfig),
   scan((existing, [all, rc]) => {
     // SEMVER use "new Set" to unique once we're only targeting es6
@@ -151,28 +151,66 @@ const scanToParametersArray = (remoteConfig: Observable<remoteConfig.RemoteConfi
   }, [] as Array<Parameter>)
 );
 
-const PROXY_DEFAULTS = {'asNumber': 0, 'asBoolean': false, 'asString': undefined};
+const AS_TO_FN = { 'strings': 'asString', 'numbers': 'asNumber', 'booleans': 'asBoolean' };
+const PROXY_DEFAULTS = { 'numbers': 0, 'booleans': false, 'strings': undefined };
 
+export const budget = (interval: number) => <T>(source: Observable<T>) => new Observable<T>(observer => {
+    let timedOut = false;
+    // TODO use scheduler task rather than settimeout
+    const timeout = setTimeout(() => {
+      observer.complete();
+      timedOut = true;
+    }, interval);
+    return source.subscribe({
+      next(val) { if (!timedOut) { observer.next(val); } },
+      error(err) { if (!timedOut) { clearTimeout(timeout); observer.error(err); } },
+      complete() { if (!timedOut) { clearTimeout(timeout); observer.complete(); } }
+    })
+  });
 
-function mapToObject(fn: 'asNumber'): UnaryFunction<Observable<Parameter[]>, Observable<Record<string, number>>>;
-function mapToObject(fn: 'asBoolean'): UnaryFunction<Observable<Parameter[]>, Observable<Record<string, boolean>>>;
-function mapToObject(fn: 'asString'): UnaryFunction<Observable<Parameter[]>, Observable<Record<string, string|undefined>>>;
-function mapToObject(fn: 'asNumber'|'asBoolean'|'asString') {
+const typedMethod = (it:any) => {
+  switch(typeof it) {
+    case 'string': return 'asString';
+    case 'boolean': return 'asBoolean';
+    case 'number': return 'asNumber';
+    default: return 'asString';
+  }
+};
+
+export function scanToObject(): OperatorFunction<Parameter, {[key:string]: string}>;
+export function scanToObject(as: 'numbers'): OperatorFunction<Parameter, {[key:string]: number}>;
+export function scanToObject(as: 'booleans'): OperatorFunction<Parameter, {[key:string]: boolean}>;
+export function scanToObject(as: 'strings'): OperatorFunction<Parameter, {[key:string]: string}>;
+export function scanToObject<T extends ConfigTemplate>(template: T): OperatorFunction<Parameter, T & {[key:string]: string|undefined}>;
+export function scanToObject(as: 'numbers'|'booleans'|'strings'|ConfigTemplate = 'strings') {
   return pipe(
-    map((params: Parameter[]) => params.reduce((c, p) => ({...c, [p.key]: p[fn]()}), {} as Record<string, number|boolean|string|undefined>)),
+    // TODO cleanup
+    scan((c, p: Parameter) => ({...c, [p.key]: typeof as === 'object' ? p[typedMethod(as[p.key])]() : p[AS_TO_FN[as]]()}), typeof as === 'object' ? as : {} as {[key:string]: number|boolean|string}),
+    debounceTime(1),
+    budget(10),
     distinctUntilChanged((a,b) => JSON.stringify(a) === JSON.stringify(b))
   );
 };
 
-export const mapAsStrings = () => mapToObject('asString');
-export const mapAsBooleans = () => mapToObject('asBoolean');
-export const mapAsNumbers = () => mapToObject('asNumber');
+export function mapToObject(): OperatorFunction<Parameter[], {[key:string]: string}>;
+export function mapToObject(as: 'numbers'): OperatorFunction<Parameter[], {[key:string]: number}>;
+export function mapToObject(as: 'booleans'): OperatorFunction<Parameter[], {[key:string]:  boolean}>;
+export function mapToObject(as: 'strings'): OperatorFunction<Parameter[], {[key:string]: string}>;
+export function mapToObject<T extends ConfigTemplate>(template: T): OperatorFunction<Parameter[], T & {[key:string]: string|undefined}>;
+export function mapToObject(as: 'numbers'|'booleans'|'strings'|ConfigTemplate = 'strings') {
+  return pipe(
+    // TODO this is getting a little long, cleanup
+    map((params: Parameter[]) => params.reduce((c, p) => ({...c, [p.key]: typeof as === 'object' ? p[typedMethod(as[p.key])]() : p[AS_TO_FN[as]]()}), typeof as === 'object' ? as : {} as {[key:string]: number|boolean|string})),
+    distinctUntilChanged((a,b) => JSON.stringify(a) === JSON.stringify(b))
+  );
+};
 
 // TODO look into the types here, I don't like the anys
-const proxyAll = (observable: Observable<Parameter[]>, fn: 'asNumber'|'asBoolean'|'asString') => new Proxy(
-  observable.pipe(mapToObject(fn as any)), {
-    get: (self, name:string) => self[name] || self.pipe(
-      map(all => all[name] || PROXY_DEFAULTS[fn]),
+const proxyAll = (observable: Observable<Parameter[]>, as: 'numbers'|'booleans'|'strings') => new Proxy(
+  observable.pipe(mapToObject(as as any)), {
+    get: (self, name:string) => self[name] || observable.pipe(
+      map(all => all.find(p => p.key === name)),
+      map(param => param ? param[AS_TO_FN[as]]() : PROXY_DEFAULTS[as]),
       distinctUntilChanged()
     )
   }
