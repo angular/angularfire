@@ -1,7 +1,7 @@
 import { InjectionToken, NgZone } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
-import { Observable, Subscription, defer, asyncScheduler, SchedulerLike, SchedulerAction } from 'rxjs';
-import { subscribeOn, observeOn, tap } from 'rxjs/operators';
+import { Observable, Subscription, SchedulerLike, SchedulerAction, queueScheduler, Operator, Subscriber, TeardownLogic, asyncScheduler } from 'rxjs';
+import { subscribeOn, observeOn, tap, share } from 'rxjs/operators';
 
 // Put in database.ts when we drop database-depreciated
 export const RealtimeDatabaseURL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
@@ -12,7 +12,7 @@ function noop() { }
  * Schedules tasks so that they are invoked inside the Zone that is passed in the constructor.
  */
 export class ZoneScheduler implements SchedulerLike {
-  constructor(private zone: any, private delegate: any = asyncScheduler) { }
+  constructor(private zone: any, private delegate: any = queueScheduler) { }
 
   now() {
     return this.delegate.now();
@@ -29,33 +29,31 @@ export class ZoneScheduler implements SchedulerLike {
     }
 
     // Scheduling itself needs to be run in zone to ensure setInterval calls for async scheduling are done
-    // inside the correct zone
-    return this.zone.runGuarded(() => this.delegate.schedule(workInZone, delay, state));
+    // inside the correct zone. This scheduler needs to schedule asynchronously always to ensure that
+    // firebase emissions are never synchronous. Specifying a delay causes issues with the queueScheduler delegate.
+    return this.delegate.schedule(workInZone, delay, state)
   }
 }
 
-function blockUntilFirst(ngZone: NgZone) {
-  return function operatorFn<T>(obs$: Observable<T>): Observable<T> {
-    // Defer creation of the Zone blocking task until the observable is subscribed to
-    return defer(function () {
-      // Create a task inside the angular zone to block it
-      let task: MacroTask | null = ngZone.run(() => {
-        return Zone.current.scheduleMacroTask('firebaseZoneBlock', noop, {}, noop, noop);
-      });
+export class BlockUntilFirstOperator<T> implements Operator<T, T> {
+  private task: MacroTask | null = null;
 
-      // Cancel the task in the zone to unblock it. This is cheaper than invoke since there is
-      // no context switch needed
-      function cancelTask() {
-        if (task != null && task.state === 'scheduled') {
-          task.zone.cancelTask(task);
-          task = null;
-        }
-      }
+  constructor(private zone: any) { }
 
-      return obs$.pipe(
-        tap(cancelTask, cancelTask, cancelTask)
-      );
-    });
+  call(subscriber: Subscriber<T>, source: Observable<T>): TeardownLogic {
+    const unscheduleTask = this.unscheduleTask.bind(this);
+    this.task = this.zone.run(() => Zone.current.scheduleMacroTask('firebaseZoneBlock', noop, {}, noop, noop));
+
+    return source.pipe(
+      tap(unscheduleTask, unscheduleTask, unscheduleTask)
+    ).subscribe(subscriber).add(unscheduleTask);
+  }
+
+  private unscheduleTask() {
+    if (this.task != null && this.task.state === 'scheduled') {
+      this.task.invoke();
+      this.task = null;
+    }
   }
 }
 
@@ -65,7 +63,7 @@ export class AngularFireSchedulers {
 
   constructor(public ngZone: NgZone) {
     this.outsideAngular = ngZone.runOutsideAngular(() => new ZoneScheduler(Zone.current));
-    this.insideAngular = ngZone.run(() => new ZoneScheduler(Zone.current));
+    this.insideAngular = ngZone.run(() => new ZoneScheduler(Zone.current, asyncScheduler));
   }
 }
 
@@ -80,15 +78,18 @@ export function keepUnstableUntilFirstFactory(
   platformId: Object
 ) {
   return function keepUnstableUntilFirst<T>(obs$: Observable<T>): Observable<T> {
-    const inCorrectZones$ = obs$.pipe(
+    if (isPlatformServer(platformId)) {
+      obs$ = obs$.lift(
+        new BlockUntilFirstOperator(schedulers.ngZone)
+      );
+    }
+
+    return obs$.pipe(
       // Run the subscribe body outside of Angular (e.g. calling Firebase SDK to add a listener to a change event)
       subscribeOn(schedulers.outsideAngular),
       // Run operators inside the angular zone (e.g. side effects via tap())
       observeOn(schedulers.insideAngular),
       share()
-      );
-    } else {
-      return inCorrectZones$;
-    }
+    );
   }
 }
