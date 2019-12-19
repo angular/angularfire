@@ -1,6 +1,6 @@
 import { Observable, SchedulerLike, asyncScheduler } from 'rxjs';
 import { DocumentReference, Query, Action, Reference, DocumentSnapshot, QuerySnapshot } from '../interfaces';
-import { map, share } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 function _fromRef<T, R>(ref: Reference<T>, scheduler: SchedulerLike = asyncScheduler): Observable<R> {
   return new Observable(subscriber => {
@@ -22,7 +22,7 @@ function _fromRef<T, R>(ref: Reference<T>, scheduler: SchedulerLike = asyncSched
 }
 
 export function fromRef<R>(ref: DocumentReference | Query, scheduler?: SchedulerLike) {
-  return _fromRef<typeof ref, R>(ref, scheduler).pipe(share());
+  return _fromRef<typeof ref, R>(ref, scheduler);
 }
 
 export function fromDocRef<T>(ref: DocumentReference, scheduler?: SchedulerLike): Observable<Action<DocumentSnapshot<T>>>{

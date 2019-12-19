@@ -84,12 +84,8 @@ export function keepUnstableUntilFirstFactory(
       // Run the subscribe body outside of Angular (e.g. calling Firebase SDK to add a listener to a change event)
       subscribeOn(schedulers.outsideAngular),
       // Run operators inside the angular zone (e.g. side effects via tap())
-      observeOn(schedulers.insideAngular)
-    );
-
-    if (isPlatformServer(platformId)) {
-      return inCorrectZones$.pipe(
-        blockUntilFirst(schedulers.ngZone)
+      observeOn(schedulers.insideAngular),
+      share()
       );
     } else {
       return inCorrectZones$;
