@@ -55,24 +55,25 @@ export class AngularFireAnalytics {
     zone: NgZone
   ) {
 
-    if (!isPlatformBrowser(platformId)) {
-      // TODO flush out non-browser support
+    if (isPlatformBrowser(platformId)) {
+
+      window[DATA_LAYER_NAME] = window[DATA_LAYER_NAME] || [];
+      this.gtag = window[GTAG_FUNCTION_NAME] || function() { window[DATA_LAYER_NAME].push(arguments) }
+      this.analyticsInitialized = zone.runOutsideAngular(() =>
+        new Promise(resolve => {
+          window[GTAG_FUNCTION_NAME] = (...args: any[]) => {
+            if (args[0] == 'js') { resolve() }
+            this.gtag(...args);
+          }
+        })
+      );
+
+    } else {
+
       this.analyticsInitialized = Promise.resolve();
       this.gtag = () => {}
-      // TODO fix the proxy for the server
-      return this;
-    }
 
-    window[DATA_LAYER_NAME] = window[DATA_LAYER_NAME] || [];
-    this.gtag = window[GTAG_FUNCTION_NAME] || function() { window[DATA_LAYER_NAME].push(arguments) }
-    this.analyticsInitialized = zone.runOutsideAngular(() =>
-      new Promise(resolve => {
-        window[GTAG_FUNCTION_NAME] = (...args: any[]) => {
-          if (args[0] == 'js') { resolve() }
-          this.gtag(...args);
-        }
-      })
-    );
+    }
 
     if (providedAppName)    { this.updateConfig({ [APP_NAME_KEY]:    providedAppName }) }
     if (providedAppVersion) { this.updateConfig({ [APP_VERSION_KEY]: providedAppVersion }) }

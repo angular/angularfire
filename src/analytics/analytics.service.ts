@@ -1,9 +1,9 @@
-import { Injectable, Optional, NgZone, OnDestroy, ComponentFactoryResolver, Inject, PLATFORM_ID } from '@angular/core';
+import { Injectable, Optional, NgZone, OnDestroy, ComponentFactoryResolver, Inject, PLATFORM_ID, Injector, NgModuleFactory } from '@angular/core';
 import { Subscription, from, Observable, empty, of } from 'rxjs';
 import { filter, withLatestFrom, switchMap, map, tap, pairwise, startWith, groupBy, mergeMap } from 'rxjs/operators';
-import { Router, NavigationEnd, ActivationEnd } from '@angular/router';
+import { Router, NavigationEnd, ActivationEnd, ROUTES } from '@angular/router';
 import { runOutsideAngular } from '@angular/fire';
-import { AngularFireAnalytics } from './analytics';
+import { AngularFireAnalytics, DEBUG_MODE } from './analytics';
 import { User } from 'firebase/app';
 import { Title } from '@angular/platform-browser';
 import { isPlatformBrowser } from '@angular/common';
@@ -27,6 +27,8 @@ const DEFAULT_SCREEN_CLASS = '???';
 const NG_PRIMARY_OUTLET = 'primary';
 const SCREEN_INSTANCE_DELIMITER = '#';
 
+const ANNOTATIONS = '__annotations__';
+
 @Injectable()
 export class ScreenTrackingService implements OnDestroy {
 
@@ -38,7 +40,9 @@ export class ScreenTrackingService implements OnDestroy {
       @Optional() title:Title,
       componentFactoryResolver: ComponentFactoryResolver,
       @Inject(PLATFORM_ID) platformId:Object,
-      zone: NgZone
+      @Optional() @Inject(DEBUG_MODE) debugModeEnabled:boolean|null,
+      zone: NgZone,
+      injector: Injector
     ) {
         if (!router || !isPlatformBrowser(platformId)) { return this }
         zone.runOutsideAngular(() => {
@@ -70,23 +74,40 @@ export class ScreenTrackingService implements OnDestroy {
                         // it's lazy so it's not registered with componentFactoryResolver yet... seems a pain for a depreciated style
                         return of({...params, [SCREEN_CLASS_KEY]: loadChildren.split('#')[1]});
                     } else if (typeof component === 'string') {
-                        // TODO figure out when this would this be a string
                         return of({...params, [SCREEN_CLASS_KEY]: component });
                     } else if (component) {
                         const componentFactory = componentFactoryResolver.resolveComponentFactory(component);
                         return of({...params, [SCREEN_CLASS_KEY]: componentFactory.selector });
                     } else if (loadChildren) {
                         const loadedChildren = loadChildren();
-                        var loadedChildren$: Observable<any>;
-                        // TODO clean up this handling...
-                        // can componentFactorymoduleType take an ngmodulefactory or should i pass moduletype?
-                        try { loadedChildren$ = from(zone.runOutsideAngular(() => loadedChildren as any)) } catch(_) { loadedChildren$ = of(loadedChildren as any) }
-                        return loadedChildren$.pipe(map(child => {
-                            const componentFactory = componentFactoryResolver.resolveComponentFactory(child);
-                            return {...params, [SCREEN_CLASS_KEY]: componentFactory.selector };
-                        }));
+                        var loadedChildren$: Observable<any> = (loadedChildren instanceof Observable) ? loadedChildren : from(Promise.resolve(loadedChildren));
+                        return loadedChildren$.pipe(
+                          map(lazyModule => {
+                            if (lazyModule instanceof NgModuleFactory) {
+                              // AOT create an injector
+                              const moduleRef = lazyModule.create(injector);
+                              // INVESTIGATE is this the right way to get at the matching route?
+                              const routes = moduleRef.injector.get(ROUTES);
+                              const component = routes[0][0].component; // should i just be grabbing 0-0 here?
+                              try {
+                                const componentFactory = moduleRef.componentFactoryResolver.resolveComponentFactory(component!);
+                                return {...params, [SCREEN_CLASS_KEY]: componentFactory.selector};
+                              } catch(_) {
+                                return {...params, [SCREEN_CLASS_KEY]: DEFAULT_SCREEN_CLASS};
+                              }
+                            } else {
+                              // JIT look at the annotations
+                              // INVESTIGATE are there public APIs for this stuff?
+                              const declarations = [].concat.apply([], (lazyModule[ANNOTATIONS] || []).map((f:any) => f.declarations));
+                              const selectors = [].concat.apply([], declarations.map((c:any) => (c[ANNOTATIONS] || []).map((f:any) => f.selector)));
+                              // should I just be grabbing the selector like this or should i match against the route component?
+                              //   const routerModule = lazyModule.ngInjectorDef.imports.find(i => !!i.ngModule);
+                              //   const route = routerModule.providers[0].find(p => p.provide == ROUTES).useValue[0];
+                              return {...params, [SCREEN_CLASS_KEY]: selectors[0] || DEFAULT_SCREEN_CLASS};
+                            }
+                          })
+                        );
                     } else {
-                        // TODO figure out what forms of router events I might be missing
                         return of({...params, [SCREEN_CLASS_KEY]: DEFAULT_SCREEN_CLASS});
                     }
                 }),
@@ -116,6 +137,7 @@ export class ScreenTrackingService implements OnDestroy {
                     [FIREBASE_PREVIOUS_SCREEN_INSTANCE_ID_KEY]: prior[FIREBASE_SCREEN_INSTANCE_ID_KEY],
                     ...current!
                 } : current!),
+                tap(params => debugModeEnabled && console.info(SCREEN_VIEW_EVENT, params)),
                 tap(params => zone.runOutsideAngular(() => analytics.logEvent(SCREEN_VIEW_EVENT, params)))
             ).subscribe();
         });
