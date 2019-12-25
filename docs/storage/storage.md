@@ -243,3 +243,22 @@ export class AppComponent {
   }
 }
 ```
+
+#### Listing all the files in a directory
+```ts
+@Component({
+  selector: 'app-root',
+  template: `
+    <ul><li *ngFor="let file of files">file</li></ul>
+ `
+})
+export class AppComponent {
+  files: string[]=[];
+  constructor(private storage: AngularFireStorage) {}
+  listFiles(){
+    this.storage.ref('somedir/somechilddir').listAll().then((filesRef: firebase.storage.ListResult) => {
+      filesRef.items.forEach(file=>this.files.push(file.name));
+    });
+  }
+}
+```
