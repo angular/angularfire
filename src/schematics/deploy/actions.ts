@@ -1,11 +1,12 @@
-import { BuilderContext } from "@angular-devkit/architect";
+import { BuilderContext, targetFromTargetString } from "@angular-devkit/architect";
 import { FirebaseTools } from "../interfaces";
 
 export default async function deploy(
   firebaseTools: FirebaseTools,
   context: BuilderContext,
   projectRoot: string,
-  firebaseProject?: string
+  buildTarget: string,
+  firebaseProject?: string,
 ) {
   if (!firebaseProject) {
     throw new Error("Cannot find firebase project for your app in .firebaserc");
@@ -25,11 +26,7 @@ export default async function deploy(
 
   context.logger.info(`📦 Building "${context.target.project}"`);
 
-  const run = await context.scheduleTarget({
-    target: "build",
-    project: context.target.project,
-    configuration: "production"
-  });
+  const run = await context.scheduleTarget(targetFromTargetString(buildTarget));
   await run.result;
 
   try {
