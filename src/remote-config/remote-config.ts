@@ -10,7 +10,6 @@ export const REMOTE_CONFIG_SETTINGS = new InjectionToken<remoteConfig.Settings>(
 export const DEFAULT_CONFIG = new InjectionToken<ConfigTemplate>('angularfire2.remoteConfig.defaultConfig');
 
 import { FirebaseRemoteConfig, _firebaseAppFactory, runOutsideAngular } from '@angular/fire';
-import { isPlatformServer } from '@angular/common';
 
 // SEMVER: once we move to Typescript 3.6 use `PromiseProxy<remoteConfig.RemoteConfig>` rather than hardcoding
 type RemoteConfigProxy = {
@@ -127,8 +126,7 @@ export class AngularFireRemoteConfig {
     this.booleans = proxyAll(this.parameters, 'booleans');
     this.numbers  = proxyAll(this.parameters, 'numbers');
 
-    // TODO fix the proxy for server
-    return isPlatformServer(platformId) ? this : ɵlazySDKProxy(this, remoteConfig$, zone);
+    return ɵlazySDKProxy(this, loadedRemoteConfig$, zone);
   }
 
 }

@@ -80,10 +80,24 @@ export const runInZone = (zone: NgZone) => <T>(obs$: Observable<T>): Observable<
     { [K in PromiseReturningFunctionPropertyNames<T>   ]: (...args: Parameters<T[K]>) => ReturnType<T[K]> };
 */
 
-export const ɵlazySDKProxy = (klass: any, observable: Observable<any>, zone: NgZone) => new Proxy(klass, {
-  get: (_, name) => zone.runOutsideAngular(() =>
-    klass[name] || new Proxy(() => 
-      observable.toPromise().then(mod => {
+// DEBUG quick debugger function for inline logging that typescript doesn't complain about
+//       wrote it for debugging the ɵlazySDKProxy, commenting out for now; should consider exposing a
+//       verbose mode for AngularFire in a future release that uses something like this in multiple places
+//       usage: () => log('something') || returnValue
+// const log = (...args: any[]): false => { console.log(...args); return false }
+
+// The problem here are things like ngOnDestroy are missing, then triggering the service
+// rather than dig too far; I'm capturing these as I go.
+const noopFunctions = ['ngOnDestroy'];
+
+// INVESTIGATE should we make the Proxy revokable and do some cleanup?
+//             right now it's fairly simple but I'm sure this will grow in complexity
+export const ɵlazySDKProxy = (klass: any, observable: Observable<any>, zone: NgZone) => {
+  return new Proxy(klass, {
+    get: (_, name:string) => zone.runOutsideAngular(() => {
+      if (klass[name]) { return klass[name] }
+      if (noopFunctions.includes(name)) { return () => {} }
+      let promise = observable.toPromise().then(mod => {
         const ret = mod && mod[name];
         // TODO move to proper type guards
         if (typeof ret == 'function') {
@@ -93,15 +107,14 @@ export const ɵlazySDKProxy = (klass: any, observable: Observable<any>, zone: Ng
         } else {
           return zone.run(() => ret);
         }
-      }), {
-        get: (self, name) => {
-          const ret = self();
-          // TODO proxy so we can have apply?
-          return ret && ret[name] || (() => {});
-        },
-        // TODO handle callbacks as transparently as I can 
-        apply: (self, _, args) => self().then(it => it && it(...args))
-      }
-    )
-  )
-});
+      });
+      // recurse the proxy
+      return new Proxy(() => undefined, {
+          get: (_, name) => promise[name],
+          // TODO handle callbacks as transparently as I can 
+          apply: (self, _, args) => promise.then(it => it && it(...args))
+        }
+      )
+    })
+  })
+};

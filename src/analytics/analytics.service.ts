@@ -1,12 +1,12 @@
 import { Injectable, Optional, NgZone, OnDestroy, ComponentFactoryResolver, Inject, PLATFORM_ID, Injector, NgModuleFactory } from '@angular/core';
-import { Subscription, from, Observable, empty, of } from 'rxjs';
+import { Subscription, from, Observable, of } from 'rxjs';
 import { filter, withLatestFrom, switchMap, map, tap, pairwise, startWith, groupBy, mergeMap } from 'rxjs/operators';
 import { Router, NavigationEnd, ActivationEnd, ROUTES } from '@angular/router';
 import { runOutsideAngular } from '@angular/fire';
 import { AngularFireAnalytics, DEBUG_MODE } from './analytics';
 import { User } from 'firebase/app';
 import { Title } from '@angular/platform-browser';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 
 const FIREBASE_EVENT_ORIGIN_KEY = 'firebase_event_origin';
 const FIREBASE_PREVIOUS_SCREEN_CLASS_KEY = 'firebase_previous_class';
@@ -101,7 +101,7 @@ export class ScreenTrackingService implements OnDestroy {
                               const declarations = [].concat.apply([], (lazyModule[ANNOTATIONS] || []).map((f:any) => f.declarations));
                               const selectors = [].concat.apply([], declarations.map((c:any) => (c[ANNOTATIONS] || []).map((f:any) => f.selector)));
                               // should I just be grabbing the selector like this or should i match against the route component?
-                              //   const routerModule = lazyModule.ngInjectorDef.imports.find(i => !!i.ngModule);
+                              //   const routerModule = lazyModule.ngInjectorDef.imports.find(i => i.ngModule && ....);
                               //   const route = routerModule.providers[0].find(p => p.provide == ROUTES).useValue[0];
                               return {...params, [SCREEN_CLASS_KEY]: selectors[0] || DEFAULT_SCREEN_CLASS};
                             }
@@ -157,15 +157,21 @@ export class UserTrackingService implements OnDestroy {
     // TODO a user properties injector
     constructor(
         analytics: AngularFireAnalytics,
-        zone: NgZone
+        zone: NgZone,
+        @Inject(PLATFORM_ID) platformId:Object
     ) {
-        this.disposable = from(analytics.app).pipe(
-            // TODO can I hook into auth being loaded...
-            map(app => app.auth()),
-            switchMap(auth => auth ? new Observable<User>(auth.onAuthStateChanged.bind(auth)) : empty()),
-            switchMap(user => analytics.setUserId(user ? user.uid : null!)),
-            runOutsideAngular(zone)
-        ).subscribe();
+        if (!isPlatformServer(platformId)) {
+            zone.runOutsideAngular(() => {
+                // @ts-ignore zap the import in the UMD
+                this.disposable = from(import('firebase/auth')).pipe(
+                    switchMap(() => analytics.app),
+                    map(app => app.auth()),
+                    switchMap(auth => new Observable<User|null>(auth.onAuthStateChanged.bind(auth))),
+                    switchMap(user => analytics.setUserId(user ? user.uid : null!)),
+                    runOutsideAngular(zone)
+                ).subscribe();
+            });
+        }
     }
 
     ngOnDestroy() {

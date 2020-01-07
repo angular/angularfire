@@ -89,7 +89,7 @@ export class AngularFireAnalytics {
         if (analyticsCollectionEnabled === false) { analytics.setAnalyticsCollectionEnabled(false) }
       }),
       runOutsideAngular(zone),
-      shareReplay(1)
+      shareReplay({ bufferSize: 1, refCount: false }),
     );
 
     return ɵlazySDKProxy(this, analytics, zone);
