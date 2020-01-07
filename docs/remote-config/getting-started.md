@@ -5,6 +5,8 @@
 ### API:
 
 ```ts
+class AngularFireRemoteConfigModule { }
+
 interface ConfigTemplate {[key:string]: string|number|boolean}
 
 type Parameter extends remoteConfig.Value {
@@ -43,8 +45,12 @@ budget: <T>(interval: number) => MonoTypeOperatorFunction<T>
 
 // scanToObject is for use with .changes
 scanToObject: () => OperatorFunction<Parameter, {[key: string]: string|undefined}>
+
 // mapToObject is the same behavior are scanToObject but for use with .parameters,
 mapToObject: () => OperatorFunction<Parameter[], {[key: string]: string|undefined}>
+
+SETTINGS = InjectionToken<remoteConfig.Settings>;
+DEFAULTS = InjectionToken<ConfigTemplate>;
 ```
 
 ## Configuration with Dependency Injection

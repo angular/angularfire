@@ -1,6 +1,28 @@
 # Getting started with Google Analytics
 
-`AngularFireAnalytics` dynamic imports the `firebase/analytics` library and provides a promisified version of the [Firebase Analytics SDK (`firebase.analytics.Analytics`)](https://firebase.google.com/docs/reference/js/firebase.analytics.Analytics.html).
+`AngularFireAnalytics` dynamically imports the `firebase/analytics` library and provides a promisified version of the [Firebase Analytics SDK (`firebase.analytics.Analytics`)](https://firebase.google.com/docs/reference/js/firebase.analytics.Analytics.html).
+
+### API:
+
+```ts
+class AngularFireAnalytics {
+  updateConfig(options: {[key:string]: any}): Promise<void>;
+
+  // from firebase.analytics() proxy:
+  logEvent(eventName: string, eventParams?: {[key: string]: any}, options?: analytics.AnalyticsCallOptions): Promise<void>;
+  setCurrentScreen(screenName: string, options?: analytics.AnalyticsCallOptions): Promise<void>;
+  setUserId(id: string, options?: analytics.AnalyticsCallOptions): Promise<void>;
+  setUserProperties(properties: analytics.CustomParams, options?: analytics.AnalyticsCallOptions): Promise<void>;
+  setAnalyticsCollectionEnabled(enabled: boolean): Promise<void>;
+  app: Promise<app.App>;
+}
+
+COLLECTION_ENABLED = InjectionToken<boolean>;
+APP_VERSION = InjectionToken<string>;
+APP_NAME = InjectionToken<string>;
+DEBUG_MODE = InjectionToken<boolean>;
+CONFIG = InjectionToken<Config>;
+```
 
 ### Usage:
 
