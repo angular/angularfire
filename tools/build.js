@@ -303,6 +303,8 @@ function replaceDynamicImportsForUMD() {
   writeFileSync('./dist/packages-dist/bundles/messaging.umd.js', readFileSync('./dist/packages-dist/bundles/messaging.umd.js', 'utf8').replace("rxjs.from(import('firebase/messaging'))", "rxjs.empty()"));
   writeFileSync('./dist/packages-dist/bundles/remote-config.umd.js', readFileSync('./dist/packages-dist/bundles/remote-config.umd.js', 'utf8').replace("return import('firebase/remote-config');", "return rxjs.empty();"));
   writeFileSync('./dist/packages-dist/bundles/analytics.umd.js', readFileSync('./dist/packages-dist/bundles/analytics.umd.js', 'utf8').replace("return import('firebase/analytics');", "return rxjs.empty();"));
+  // TODO move into own step
+  writeFileSync('./dist/packages-dist/remote-config/remote-config.d.ts', readFileSync('./dist/packages-dist/remote-config/remote-config.d.ts', 'utf8').replace("implements remoteConfig.Value", "implements Partial<remoteConfig.Value>"));
 }
 
 function measure(module) {
