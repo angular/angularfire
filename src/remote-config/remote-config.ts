@@ -1,4 +1,4 @@
-import { Injectable, Inject, Optional, NgZone, InjectionToken, PLATFORM_ID } from '@angular/core';
+import { Injectable, Inject, Optional, NgZone, InjectionToken } from '@angular/core';
 import { Observable, concat, of, pipe, OperatorFunction, MonoTypeOperatorFunction } from 'rxjs';
 import { map, switchMap, tap, shareReplay, distinctUntilChanged, filter, groupBy, mergeMap, scan, withLatestFrom, startWith, debounceTime } from 'rxjs/operators';
 import { FirebaseAppConfig, FirebaseOptions, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire';
@@ -6,8 +6,8 @@ import { remoteConfig } from 'firebase/app';
 
 export interface ConfigTemplate {[key:string]: string|number|boolean};
 
-export const REMOTE_CONFIG_SETTINGS = new InjectionToken<remoteConfig.Settings>('angularfire2.remoteConfig.settings');
-export const DEFAULT_CONFIG = new InjectionToken<ConfigTemplate>('angularfire2.remoteConfig.defaultConfig');
+export const SETTINGS = new InjectionToken<remoteConfig.Settings>('angularfire2.remoteConfig.settings');
+export const DEFAULTS = new InjectionToken<ConfigTemplate>('angularfire2.remoteConfig.defaultConfig');
 
 import { FirebaseRemoteConfig, _firebaseAppFactory, runOutsideAngular } from '@angular/fire';
 
@@ -71,9 +71,8 @@ export class AngularFireRemoteConfig {
   constructor(
     @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
-    @Optional() @Inject(REMOTE_CONFIG_SETTINGS) settings:remoteConfig.Settings|null,
-    @Optional() @Inject(DEFAULT_CONFIG) defaultConfig:ConfigTemplate|null,
-    @Inject(PLATFORM_ID) platformId:Object,
+    @Optional() @Inject(SETTINGS) settings:remoteConfig.Settings|null,
+    @Optional() @Inject(DEFAULTS) defaultConfig:ConfigTemplate|null,
     private zone: NgZone
   ) {
     
@@ -85,8 +84,7 @@ export class AngularFireRemoteConfig {
       map(app => <remoteConfig.RemoteConfig>app.remoteConfig()),
       tap(rc => {
         if (settings) { rc.settings = settings }
-        // FYI we don't load the defaults into remote config, since we have our own implementation
-        // see the comment on scanToParametersArray
+        if (defaultConfig) { rc.defaultConfig = defaultConfig }
       }),
       startWith(undefined),
       runOutsideAngular(zone),
@@ -101,12 +99,22 @@ export class AngularFireRemoteConfig {
       (c, k) => ({...c, [k]: new Value("default", defaultConfig![k].toString()) }), {}
     ));
 
+    // we should filter out the defaults we provided to RC, since we have our own implementation
+    // that gives us a -1 for fetchTimeMillis (so filterFresh can filter them out)
+    const filterOutDefaults = map<{[key: string]: remoteConfig.Value}, {[key: string]: remoteConfig.Value}>(all =>
+      Object.keys(all)
+        .filter(key => all[key].getSource() != 'default')
+        .reduce((acc, key) => ({...acc, [key]: all[key]}), {})
+    );
+
     const existing$ = loadedRemoteConfig$.pipe(
-      switchMap(rc => rc.activate().then(() => rc.getAll()))
+      switchMap(rc => rc.activate().then(() => rc.getAll())),
+      filterOutDefaults
     );
 
     const fresh$ = loadedRemoteConfig$.pipe(
-      switchMap(rc => zone.runOutsideAngular(() => rc.fetchAndActivate().then(() => rc.getAll())))
+      switchMap(rc => zone.runOutsideAngular(() => rc.fetchAndActivate().then(() => rc.getAll()))),
+      filterOutDefaults
     );
 
     this.parameters = concat(default$, existing$, fresh$).pipe(
@@ -150,7 +158,7 @@ const scanToParametersArray = (remoteConfig: Observable<remoteConfig.RemoteConfi
 );
 
 const AS_TO_FN = { 'strings': 'asString', 'numbers': 'asNumber', 'booleans': 'asBoolean' };
-const PROXY_DEFAULTS = { 'numbers': 0, 'booleans': false, 'strings': undefined };
+const STATIC_VALUES = { 'numbers': 0, 'booleans': false, 'strings': undefined };
 
 export const budget = <T>(interval: number): MonoTypeOperatorFunction<T> => (source: Observable<T>) => new Observable<T>(observer => {
     let timedOut = false;
@@ -222,7 +230,7 @@ const proxyAll = (observable: Observable<Parameter[]>, as: 'numbers'|'booleans'|
   observable.pipe(mapToObject(as as any)), {
     get: (self, name:string) => self[name] || observable.pipe(
       map(all => all.find(p => p.key === name)),
-      map(param => param ? param[AS_TO_FN[as]]() : PROXY_DEFAULTS[as]),
+      map(param => param ? param[AS_TO_FN[as]]() : STATIC_VALUES[as]),
       distinctUntilChanged()
     )
   }

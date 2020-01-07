@@ -5,11 +5,13 @@ import { map, tap, shareReplay, switchMap } from 'rxjs/operators';
 import { FirebaseAppConfig, FirebaseOptions, runOutsideAngular, ɵlazySDKProxy, FirebaseAnalytics, FIREBASE_OPTIONS, FIREBASE_APP_NAME, _firebaseAppFactory } from '@angular/fire';
 import { analytics, app } from 'firebase';
 
-export const ANALYTICS_COLLECTION_ENABLED = new InjectionToken<boolean>('angularfire2.analytics.analyticsCollectionEnabled');
+export interface Config {[key:string]: any};
 
+export const COLLECTION_ENABLED = new InjectionToken<boolean>('angularfire2.analytics.analyticsCollectionEnabled');
 export const APP_VERSION = new InjectionToken<string>('angularfire2.analytics.appVersion');
 export const APP_NAME = new InjectionToken<string>('angularfire2.analytics.appName');
 export const DEBUG_MODE = new InjectionToken<boolean>('angularfire2.analytics.debugMode');
+export const CONFIG = new InjectionToken<Config>('angularfire2.analytics.config');
 
 const APP_NAME_KEY = 'app_name';
 const APP_VERSION_KEY = 'app_version';
@@ -39,7 +41,7 @@ export class AngularFireAnalytics {
   private gtag: (...args: any[]) => void;
   private analyticsInitialized: Promise<void>;
 
-  async updateConfig(config: {[key:string]: any}) {
+  async updateConfig(config: Config) {
     await this.analyticsInitialized;
     this.gtag(GTAG_CONFIG_COMMAND, this.options[ANALYTICS_ID_FIELD], { ...config, update: true });
   };
@@ -47,10 +49,11 @@ export class AngularFireAnalytics {
   constructor(
     @Inject(FIREBASE_OPTIONS) private options:FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
-    @Optional() @Inject(ANALYTICS_COLLECTION_ENABLED) analyticsCollectionEnabled:boolean|null,
+    @Optional() @Inject(COLLECTION_ENABLED) analyticsCollectionEnabled:boolean|null,
     @Optional() @Inject(APP_VERSION) providedAppVersion:string|null,
     @Optional() @Inject(APP_NAME) providedAppName:string|null,
     @Optional() @Inject(DEBUG_MODE) debugModeEnabled:boolean|null,
+    @Optional() @Inject(CONFIG) providedConfig:Config|null,
     @Inject(PLATFORM_ID) platformId:Object,
     zone: NgZone
   ) {
@@ -75,6 +78,7 @@ export class AngularFireAnalytics {
 
     }
 
+    if (providedConfig)     { this.updateConfig(providedConfig) }
     if (providedAppName)    { this.updateConfig({ [APP_NAME_KEY]:    providedAppName }) }
     if (providedAppVersion) { this.updateConfig({ [APP_VERSION_KEY]: providedAppVersion }) }
     if (debugModeEnabled)   { this.updateConfig({ [DEBUG_MODE_KEY]:  1 }) }

@@ -7,7 +7,11 @@ import { AngularFireAnalytics } from './analytics';
 })
 export class AngularFireAnalyticsModule {
   constructor(
+    analytics: AngularFireAnalytics,
     @Optional() screenTracking: ScreenTrackingService,
     @Optional() userTracking: UserTrackingService
-  ) { }
+  ) {
+    // calling anything on analytics will eagerly load the SDK
+    analytics.app;
+  }
 }

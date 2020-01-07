@@ -104,7 +104,7 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 
 - [Getting started with Firebase Messaging](docs/messaging/messaging.md)
 
-### **NEW:** Change behavior and appearance of your application without deploying
+### **BETA:** Change behavior and appearance of your application without deploying
 
 > Firebase Remote Config is a cloud service that lets you change the behavior and appearance of your app without requiring users to download an app update. [Learn more about Remote Config](https://firebase.google.com/docs/remote-config).
 
