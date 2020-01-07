@@ -1,0 +1,8 @@
+{
+  "name": "@angular/fire/analytics",
+  "main": "../bundles/analytics.umd.js",
+  "module": "index.js",
+  "es2015": "./es2015/index.js",
+  "typings": "index.d.ts",
+  "sideEffects": false
+}
