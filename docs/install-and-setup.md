@@ -104,6 +104,7 @@ After adding the AngularFireModule you also need to add modules for the individu
  - `AngularFireRemoteConfigModule`
  - `AngularFireStorageModule`
  - `AngularFireMessagingModule`
+ - `AngularFirePerformanceModule`
 
 #### Adding the Firebase Database and Auth Modules
 

@@ -25,7 +25,7 @@ describe('AngularFirePerformance', () => {
     done();
   });
 
-  it('should be exist', () => {
+  it('should exist', () => {
     expect(afp instanceof AngularFirePerformance).toBe(true);
   });
 

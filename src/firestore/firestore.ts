@@ -65,7 +65,7 @@ export function associateQuery(collectionRef: CollectionReference, queryFn = ref
  * import { Component } from '@angular/core';
  * import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
  * import { Observable } from 'rxjs/Observable';
- * import { from } from 'rxjs/observable/from';
+ * import { from } from 'rxjs/observable';
  *
  * @Component({
  *   selector: 'app-my-component',
