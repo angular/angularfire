@@ -39,4 +39,4 @@ export class AngularFireDatabase {
 
 }
 
-export { DATABASE_URL };
+export { DATABASE_URL, DATABASE_URL as URL };

@@ -4,10 +4,14 @@ import { map } from 'rxjs/operators';
 import { FirebaseOptions, FirebaseAppConfig, FIREBASE_APP_NAME } from '@angular/fire';
 import { FirebaseFunctions, FIREBASE_OPTIONS, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
 
-// SEMVER: @ v6 remove FunctionsRegionToken in favor of FUNCTIONS_REGION
+// SEMVER: @ v6 remove FunctionsRegionToken and FUNCTIONS_REGION in favor of REGION
 export const FunctionsRegionToken = new InjectionToken<string>('angularfire2.functions.region');
-export const FUNCTIONS_ORIGIN = new InjectionToken<string>('angularfire2.functions.origin');
 export const FUNCTIONS_REGION = FunctionsRegionToken;
+// SEMVER: @ v6 remove FUNCTIONS_ORIGIN in favor of ORIGIN
+export const FUNCTIONS_ORIGIN = new InjectionToken<string>('angularfire2.functions.origin');
+
+export const ORIGIN = FUNCTIONS_ORIGIN;
+export const REGION = FunctionsRegionToken;
 
 @Injectable()
 export class AngularFireFunctions {
@@ -24,8 +28,8 @@ export class AngularFireFunctions {
     @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
-    @Optional() @Inject(FUNCTIONS_REGION) region:string|null,
-    @Optional() @Inject(FUNCTIONS_ORIGIN) origin:string|null
+    @Optional() @Inject(REGION) region:string|null,
+    @Optional() @Inject(ORIGIN) origin:string|null
   ) {
     this.scheduler = new FirebaseZoneScheduler(zone, platformId);
     

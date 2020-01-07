@@ -6,9 +6,9 @@ import { FirebaseStorage, FirebaseOptions, FirebaseAppConfig, FirebaseZoneSchedu
 
 import { UploadMetadata } from './interfaces';
 
-// SEMVER drop StorageBucket in favor of STORAGE_BUCKET
+// SEMVER drop StorageBucket in favor of BUCKET
 export const StorageBucket = new InjectionToken<string>('angularfire2.storageBucket');
-export const STORAGE_BUCKET = StorageBucket;
+export const BUCKET = StorageBucket;
 
 /**
  * AngularFireStorage Service
@@ -25,7 +25,7 @@ export class AngularFireStorage {
   constructor(
     @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
-    @Optional() @Inject(STORAGE_BUCKET) storageBucket:string|null,
+    @Optional() @Inject(BUCKET) storageBucket:string|null,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {

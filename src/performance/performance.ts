@@ -4,6 +4,7 @@ import { first, tap, map, shareReplay, switchMap } from 'rxjs/operators';
 import { performance } from 'firebase/app';
 import { FirebaseApp } from '@angular/fire';
 
+// SEMVER @ v6, drop and move core ng metrics to a service
 export const AUTOMATICALLY_TRACE_CORE_NG_METRICS = new InjectionToken<boolean>('angularfire2.performance.auto_trace');
 export const INSTRUMENTATION_ENABLED = new InjectionToken<boolean>('angularfire2.performance.instrumentationEnabled');
 export const DATA_COLLECTION_ENABLED = new InjectionToken<boolean>('angularfire2.performance.dataCollectionEnabled');
@@ -46,6 +47,7 @@ export class AngularFirePerformance {
     if (automaticallyTraceCoreNgMetrics != false) {
 
       // TODO determine more built in metrics
+      // this leaks...
       appRef.isStable.pipe(
         first(it => it),
         this.traceUntilComplete('isStable')

@@ -58,4 +58,4 @@ export {
   SnapshotAction
 } from './interfaces';
 
-export { RealtimeDatabaseURL, DATABASE_URL };
+export { RealtimeDatabaseURL, DATABASE_URL, DATABASE_URL as URL };

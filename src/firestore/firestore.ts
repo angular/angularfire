@@ -27,7 +27,7 @@ export const FirestoreSettingsToken = new InjectionToken<Settings>('angularfire2
 
 export const ENABLE_PERSISTENCE = EnablePersistenceToken;
 export const PERSISTENCE_SETTINGS = PersistenceSettingsToken
-export const FIRESTORE_SETTINGS = FirestoreSettingsToken;
+export const SETTINGS = FirestoreSettingsToken;
 
 // SEMVER kill this in the next major
 // timestampsInSnapshots was depreciated in 5.8.0
@@ -124,7 +124,7 @@ export class AngularFirestore {
     @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
     @Optional() @Inject(ENABLE_PERSISTENCE) shouldEnablePersistence: boolean|null,
-    @Optional() @Inject(FIRESTORE_SETTINGS) settings: Settings|null,
+    @Optional() @Inject(SETTINGS) settings: Settings|null,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
     @Optional() @Inject(PERSISTENCE_SETTINGS) persistenceSettings: PersistenceSettings|null,
