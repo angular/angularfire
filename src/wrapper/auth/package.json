@@ -1,0 +1,6 @@
+{
+  "name": "angularfire2/auth",
+  "main": "index.js",
+  "typings": "index.d.ts",
+  "sideEffects": false
+}

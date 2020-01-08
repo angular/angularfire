@@ -6,7 +6,7 @@ import { from } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { Project } from './interfaces';
 import { listProjects, projectPrompt } from './utils';
-import { dependencies as requiredDependencyVersions, devDependencies as requiredDevDependencyVersions } from './versions';
+import requiredDependencies from './versions.json';
 
 const stringifyFormatted = (obj: any) => JSON.stringify(obj, null, 2);
 
@@ -170,12 +170,10 @@ export const ngAdd = (options: DeployOptions) => (host: Tree, context: Schematic
     throw new SchematicsException('Could not locate package.json');
   }
 
-  Object.keys(requiredDependencyVersions).forEach(name => {
-    packageJson.dependencies[name] = packageJson.dependencies[name] || requiredDependencyVersions[name];
-  });
-
-  Object.keys(requiredDevDependencyVersions).forEach(name => {
-    packageJson.devDependencies[name] = packageJson.devDependencies[name] || requiredDevDependencyVersions[name];
+  Object.keys(requiredDependencies).forEach(name => {
+    const dev: Boolean|undefined = requiredDependencies[name].dev;
+    const dependencies = dev ? packageJson.devDependencies : packageJson.dependencies
+    dependencies[name] = dependencies[name] || requiredDependencies[name].version;
   });
 
   overwriteIfExists(host, 'package.json', stringifyFormatted(packageJson));

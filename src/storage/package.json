@@ -1,8 +1,7 @@
 {
-  "name": "@angular/fire/storage",
-  "main": "../bundles/storage.umd.js",
-  "module": "index.js",
-  "es2015": "./es2015/index.js",
-  "typings": "index.d.ts",
-  "sideEffects": false
+  "ngPackage": {
+    "lib": {
+      "entryFile": "public_api.ts"
+    }
+  }
 }

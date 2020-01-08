@@ -1,0 +1,6 @@
+{
+  "name": "angularfire2/functions",
+  "main": "index.js",
+  "typings": "index.d.ts",
+  "sideEffects": false
+}

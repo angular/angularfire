@@ -2,7 +2,7 @@ import { database } from 'firebase/app';
 import { FirebaseApp, AngularFireModule } from '@angular/fire';
 import { AngularFireDatabase, AngularFireDatabaseModule, stateChanges, ChildEvent } from '@angular/fire/database';
 import { TestBed, inject } from '@angular/core/testing';
-import { COMMON_CONFIG } from '../test-config';
+import { COMMON_CONFIG } from '../../test-config';
 import { skip } from 'rxjs/operators';
 
 // generate random string to test fidelity of naming

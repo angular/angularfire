@@ -1,7 +1,7 @@
 import { FirebaseApp, AngularFireModule, FirebaseOptionsToken, FirebaseNameOrConfigToken } from '@angular/fire';
 import { AngularFireDatabase, AngularFireDatabaseModule, RealtimeDatabaseURL } from '@angular/fire/database';
 import { TestBed, inject } from '@angular/core/testing';
-import { COMMON_CONFIG } from './test-config';
+import { COMMON_CONFIG } from '../test-config';
 import { NgZone } from '@angular/core';
 
 // generate random string to test fidelity of naming
@@ -38,7 +38,7 @@ describe('AngularFireDatabase', () => {
 
     it('should have an initialized Firebase app', () => {
       expect(db.database.app).toBeDefined();
-      expect(db.database.app).toEqual(app);
+      expect(<any>db.database.app).toEqual(app);
     });
 
     it('should accept a Firebase App in the constructor', () => {
@@ -92,7 +92,7 @@ describe('AngularFireDatabase w/options', () => {
 
     it('should have an initialized Firebase app', () => {
       expect(db.database.app).toBeDefined();
-      expect(db.database.app).toEqual(app);
+      expect(<any>db.database.app).toEqual(app);
     });
 
     it('should have an initialized Firebase app instance member', () => {

@@ -3,7 +3,7 @@ import { map, mergeMap, tap } from 'rxjs/operators';
 import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, FirebaseOptionsToken, AngularFireModule, FirebaseNameOrConfigToken } from '@angular/fire';
 import { AngularFireStorageModule, AngularFireStorage, AngularFireUploadTask, StorageBucket } from '@angular/fire/storage';
-import { COMMON_CONFIG } from './test-config';
+import { COMMON_CONFIG } from '../test-config';
 
 describe('AngularFireStorage', () => {
   let app: FirebaseApp;
@@ -36,6 +36,7 @@ describe('AngularFireStorage', () => {
 
   it('should have an initialized Firebase app', () => {
     expect(afStorage.storage.app).toBeDefined();
+    // @ts-ignore
     expect(afStorage.storage.app).toEqual(app);
   });
 
@@ -167,6 +168,7 @@ describe('AngularFireStorage w/options', () => {
 
     it('should have an initialized Firebase app', () => {
       expect(afStorage.storage.app).toBeDefined();
+      // @ts-ignore
       expect(afStorage.storage.app).toEqual(app);
     });
 

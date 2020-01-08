@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "rootDir": ".",
+        "sourceMap": false,
+        "inlineSources": false,
+        "declaration": false,
+        "removeComments": true,
+        "strictNullChecks": true,
+        "resolveJsonModule": true,
+        "lib": [
+            "es2015",
+            "dom",
+            "es2015.promise",
+            "es2015.collection",
+            "es2015.iterable"
+        ],
+        "skipLibCheck": true,
+        "moduleResolution": "node",
+        "target": "es6",
+        "module": "commonjs",
+        "outDir": "../../dist/packages-dist/schematics"
+    },
+    "files": ["public_api.ts"]
+}

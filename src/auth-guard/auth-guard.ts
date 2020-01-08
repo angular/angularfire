@@ -1,7 +1,7 @@
 import { Injectable, InjectionToken } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Router } from '@angular/router';
 import { Observable, of, pipe, UnaryFunction } from 'rxjs';
-import { map, switchMap, take } from 'rxjs/operators'
+import { map, switchMap, take, tap } from 'rxjs/operators'
 import { User, auth } from 'firebase/app';
 import { AngularFireAuth } from '@angular/fire/auth';
 
@@ -13,12 +13,12 @@ export class AngularFireAuthGuard implements CanActivate {
 
   constructor(private afAuth: AngularFireAuth, private router: Router) {}
 
-  canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
+  canActivate = (next: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
     const authPipeFactory: AuthPipeGenerator = next.data.authGuardPipe || (() => loggedIn);
     return this.afAuth.user.pipe(
         take(1),
         authPipeFactory(next, state),
-        map(canActivate => typeof canActivate == "boolean" ? canActivate : this.router.createUrlTree(canActivate))
+        map(can => typeof can == "boolean" ? can : this.router.createUrlTree(<any[]>can))
     );
   }
 

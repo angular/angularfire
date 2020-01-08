@@ -1,6 +1,6 @@
 import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, AngularFireModule } from '@angular/fire';
-import { COMMON_CONFIG } from './test-config';
+import { COMMON_CONFIG } from '../test-config';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFireAuthGuardModule, AngularFireAuthGuard } from '@angular/fire/auth-guard';
 import { RouterModule, Router } from '@angular/router';

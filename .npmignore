@@ -1,3 +1,2 @@
 *.spec.*
-bundles/test.umd.js
 test-config.*

@@ -1,9 +1,6 @@
 {
-    "name": "@angular/fire/firebase-node",
-    "version": "ANGULARFIRE2_VERSION",
-    "description": "Fixes for Node.js",
-    "main": "index.js",
-    "typings": "index.d.ts",
-    "sideEffects": true
-  }
+    "main": "./index.js",
+    "sideEffects": true,
+    "name": "@angular/fire/firebase-node"
+}
   
