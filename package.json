@@ -1,6 +1,6 @@
 {
   "name": "@angular/fire",
-  "version": "5.2.3",
+  "version": "5.3.0",
   "description": "The official library of Firebase and Angular.",
   "private": true,
   "scripts": {
