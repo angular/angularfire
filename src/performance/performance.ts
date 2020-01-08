@@ -35,8 +35,7 @@ export class AngularFirePerformance {
     const requirePerformance = from(zone.runOutsideAngular(() => import('firebase/performance')));
 
     this.performance = requirePerformance.pipe(
-      // SEMVER while < 6 need to type, drop next major
-      map(() => zone.runOutsideAngular(() => <performance.Performance>app.performance())),
+      map(() => zone.runOutsideAngular(() => app.performance())),
       tap(performance => {
         if (instrumentationEnabled == false) { performance.instrumentationEnabled = false }
         if (dataCollectionEnabled == false) { performance.dataCollectionEnabled = false }

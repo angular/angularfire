@@ -3,8 +3,8 @@ import { isPlatformServer } from '@angular/common';
 import { messaging } from 'firebase/app';
 import { Observable, empty, from, of, throwError } from 'rxjs';
 import { mergeMap, catchError, map, switchMap, concat, defaultIfEmpty } from 'rxjs/operators';
-import { FirebaseOptions, FirebaseAppConfig, runOutsideAngular, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire';
-import { _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
+import { FirebaseOptions, FirebaseAppConfig, ɵrunOutsideAngular, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire';
+import { ɵfirebaseAppFactory, ɵFirebaseZoneScheduler } from '@angular/fire';
 
 @Injectable()
 export class AngularFireMessaging {
@@ -27,16 +27,16 @@ export class AngularFireMessaging {
     const requireMessaging = from(import('firebase/messaging'));
 
     this.messaging = requireMessaging.pipe(
-      map(() => _firebaseAppFactory(options, zone, nameOrConfig)),
+      map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
       map(app => app.messaging()),
-      runOutsideAngular(zone)
+      ɵrunOutsideAngular(zone)
     );
 
     if (!isPlatformServer(platformId)) {
 
       this.requestPermission = this.messaging.pipe(
         switchMap(messaging => messaging.requestPermission()),
-        runOutsideAngular(zone)
+        ɵrunOutsideAngular(zone)
       );
 
     } else {
@@ -48,14 +48,14 @@ export class AngularFireMessaging {
     this.getToken = this.messaging.pipe(
       switchMap(messaging => messaging.getToken()),
       defaultIfEmpty(null),
-      runOutsideAngular(zone)
+      ɵrunOutsideAngular(zone)
     );
 
     const tokenChanges = this.messaging.pipe(
       switchMap(messaging => new Observable(messaging.onTokenRefresh.bind(messaging)).pipe(
         switchMap(() => messaging.getToken())
       )),
-      runOutsideAngular(zone)
+      ɵrunOutsideAngular(zone)
     );
 
     this.tokenChanges = this.getToken.pipe(
@@ -64,7 +64,7 @@ export class AngularFireMessaging {
 
     this.messages = this.messaging.pipe(
       switchMap(messaging => new Observable(messaging.onMessage.bind(messaging))),
-      runOutsideAngular(zone)
+      ɵrunOutsideAngular(zone)
     );
 
     this.requestToken = this.requestPermission.pipe(
@@ -75,7 +75,7 @@ export class AngularFireMessaging {
     this.deleteToken = (token: string) => this.messaging.pipe(
       switchMap(messaging => messaging.deleteToken(token)),
       defaultIfEmpty(false),
-      runOutsideAngular(zone)
+      ɵrunOutsideAngular(zone)
     );
   }
 

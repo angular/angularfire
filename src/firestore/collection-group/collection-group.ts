@@ -7,7 +7,7 @@ import { DocumentChangeType, CollectionReference, Query, DocumentReference, Docu
 import { validateEventsArray } from '../collection/collection';
 import { docChanges, sortedChanges } from '../collection/changes';
 import { AngularFirestore } from '../firestore';
-import { runInZone } from '@angular/fire';
+import { ɵrunInZone } from '@angular/fire';
 
 /**
  * AngularFirestoreCollectionGroup service
@@ -102,7 +102,7 @@ export class AngularFirestoreCollectionGroup<T=DocumentData> {
    */
   get(options?: firestore.GetOptions) {
     return from(this.query.get(options)).pipe(
-      runInZone(this.afs.scheduler.zone)
+      ɵrunInZone(this.afs.scheduler.zone)
     );
   }
 

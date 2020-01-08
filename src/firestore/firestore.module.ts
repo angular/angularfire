@@ -1,6 +1,6 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { PersistenceSettings } from './interfaces';
-import { AngularFirestore, EnablePersistenceToken, PersistenceSettingsToken } from './firestore';
+import { AngularFirestore, ENABLE_PERSISTENCE, PERSISTENCE_SETTINGS } from './firestore';
 
 import 'firebase/firestore';
 
@@ -15,8 +15,8 @@ export class AngularFirestoreModule {
     return {
       ngModule: AngularFirestoreModule,
       providers: [
-        { provide: EnablePersistenceToken, useValue: true },
-        { provide: PersistenceSettingsToken, useValue: persistenceSettings },
+        { provide: ENABLE_PERSISTENCE, useValue: true },
+        { provide: PERSISTENCE_SETTINGS, useValue: persistenceSettings },
       ]
     }
   }

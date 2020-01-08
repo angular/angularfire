@@ -2,12 +2,10 @@ import { InjectionToken, NgZone } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
 import { Observable, Subscription, queueScheduler as queue } from 'rxjs';
 
-// Put in database.ts when we drop database-depreciated
-// SEMVER drop RealtimeDatabaseURL in favor of DATABASE_URL in next major
-export const RealtimeDatabaseURL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
-export const DATABASE_URL = RealtimeDatabaseURL;
+// SEMVER put in database.ts when we drop database-depreciated
+export const DATABASE_URL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
 
-export class FirebaseZoneScheduler {
+export class ɵFirebaseZoneScheduler {
   constructor(public zone: NgZone, private platformId: Object) {}
   schedule(...args: any[]): Subscription {
     return <Subscription>this.zone.runGuarded(function() { return queue.schedule.apply(queue, args)});
@@ -50,15 +48,15 @@ export class FirebaseZoneScheduler {
   }
 }
 
-export const runOutsideAngular = (zone: NgZone) => <T>(obs$: Observable<T>): Observable<T> => {
+export const ɵrunOutsideAngular = (zone: NgZone) => <T>(obs$: Observable<T>): Observable<T> => {
   return new Observable<T>(subscriber => {
     return zone.runOutsideAngular(() => {
-      runInZone(zone)(obs$).subscribe(subscriber);
+      ɵrunInZone(zone)(obs$).subscribe(subscriber);
     });
   });
 }
 
-export const runInZone = (zone: NgZone) => <T>(obs$: Observable<T>): Observable<T> => {
+export const ɵrunInZone = (zone: NgZone) => <T>(obs$: Observable<T>): Observable<T> => {
   return new Observable<T>(subscriber => {
     return obs$.subscribe(
       value => zone.run(() => subscriber.next(value)),
@@ -68,17 +66,15 @@ export const runInZone = (zone: NgZone) => <T>(obs$: Observable<T>): Observable<
   });
 }
 
-//SEMVER: once we move to TypeScript 3.6, we can use these to build lazy interfaces
-/*
-  type FunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? K : never }[keyof T];
-  type PromiseReturningFunctionPropertyNames<T> = { [K in FunctionPropertyNames<T>]: ReturnType<T[K]> extends Promise<any> ? K : never }[FunctionPropertyNames<T>];
-  type NonPromiseReturningFunctionPropertyNames<T> = { [K in FunctionPropertyNames<T>]: ReturnType<T[K]> extends Promise<any> ? never : K }[FunctionPropertyNames<T>];
-  type NonFunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof T];
+type FunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? K : never }[keyof T];
+type PromiseReturningFunctionPropertyNames<T> = { [K in FunctionPropertyNames<T>]: ReturnType<T[K]> extends Promise<any> ? K : never }[FunctionPropertyNames<T>];
+type NonPromiseReturningFunctionPropertyNames<T> = { [K in FunctionPropertyNames<T>]: ReturnType<T[K]> extends Promise<any> ? never : K }[FunctionPropertyNames<T>];
+type NonFunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof T];
 
-  export type PromiseProxy<T> = { [K in NonFunctionPropertyNames<T>]: Promise<T[K]> } &
-    { [K in NonPromiseReturningFunctionPropertyNames<T>]: (...args: Parameters<T[K]>) => Promise<ReturnType<T[K]>> } &
-    { [K in PromiseReturningFunctionPropertyNames<T>   ]: (...args: Parameters<T[K]>) => ReturnType<T[K]> };
-*/
+export type PromiseProxy<T> = { [K in NonFunctionPropertyNames<T>]: Promise<T[K]> } &
+  { [K in NonPromiseReturningFunctionPropertyNames<T>]: (...args: Parameters<T[K]>) => Promise<ReturnType<T[K]>> } &
+  { [K in PromiseReturningFunctionPropertyNames<T>   ]: (...args: Parameters<T[K]>) => ReturnType<T[K]> };
+
 
 // DEBUG quick debugger function for inline logging that typescript doesn't complain about
 //       wrote it for debugging the ɵlazySDKProxy, commenting out for now; should consider exposing a

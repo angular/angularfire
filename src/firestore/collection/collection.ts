@@ -7,7 +7,7 @@ import { DocumentChangeType, CollectionReference, Query, DocumentReference, Docu
 import { docChanges, sortedChanges } from './changes';
 import { AngularFirestoreDocument } from '../document/document';
 import { AngularFirestore } from '../firestore';
-import { runInZone } from '@angular/fire';
+import { ɵrunInZone } from '@angular/fire';
 
 export function validateEventsArray(events?: DocumentChangeType[]) {
   if(!events || events!.length === 0) {
@@ -135,7 +135,7 @@ export class AngularFirestoreCollection<T=DocumentData> {
    */
   get(options?: firestore.GetOptions) {
     return from(this.query.get(options)).pipe(
-      runInZone(this.afs.scheduler.zone)
+      ɵrunInZone(this.afs.scheduler.zone)
     );
   }
 

@@ -9,6 +9,7 @@
     "strictNullChecks": true,
     "noImplicitAny": false,
     "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
     "paths": {
       "@angular/fire": ["./core"],
       "@angular/fire/analytics": ["./analytics"],

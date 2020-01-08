@@ -6,7 +6,7 @@ import { map } from 'rxjs/operators';
 import { AngularFirestore, associateQuery } from '../firestore';
 import { AngularFirestoreCollection } from '../collection/collection';
 import { firestore } from 'firebase/app';
-import { runInZone } from '@angular/fire';
+import { ɵrunInZone } from '@angular/fire';
 
 /**
  * AngularFirestoreDocument service
@@ -101,7 +101,7 @@ export class AngularFirestoreDocument<T=DocumentData> {
    */
   get(options?: firestore.GetOptions) {
     return from(this.ref.get(options)).pipe(
-      runInZone(this.afs.scheduler.zone)
+      ɵrunInZone(this.afs.scheduler.zone)
     );
   }
 }

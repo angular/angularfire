@@ -2,8 +2,8 @@ import { Injectable, Inject, Optional, NgZone, InjectionToken, PLATFORM_ID } fro
 import { of } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { map, tap, shareReplay, switchMap } from 'rxjs/operators';
-import { FirebaseAppConfig, FirebaseOptions, runOutsideAngular, ɵlazySDKProxy, FirebaseAnalytics, FIREBASE_OPTIONS, FIREBASE_APP_NAME, _firebaseAppFactory } from '@angular/fire';
-import { analytics, app } from 'firebase';
+import { FirebaseAppConfig, FirebaseOptions, ɵrunOutsideAngular, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵfirebaseAppFactory, PromiseProxy } from '@angular/fire';
+import { analytics } from 'firebase';
 
 export interface Config {[key:string]: any};
 
@@ -21,19 +21,7 @@ const GTAG_CONFIG_COMMAND = 'config';
 const GTAG_FUNCTION_NAME = 'gtag';
 const DATA_LAYER_NAME = 'dataLayer';
 
-// SEMVER: once we move to Typescript 3.6 use `PromiseProxy<analytics.Analytics>`
-type AnalyticsProxy = {
-  // TODO can we pull the richer types from the Firebase SDK .d.ts? ReturnType<T[K]> is infering
-  //      I could even do this in a manual build-step
-  logEvent(eventName: string, eventParams?: {[key: string]: any}, options?: analytics.AnalyticsCallOptions): Promise<void>,
-  setCurrentScreen(screenName: string, options?: analytics.AnalyticsCallOptions): Promise<void>,
-  setUserId(id: string, options?: analytics.AnalyticsCallOptions): Promise<void>,
-  setUserProperties(properties: analytics.CustomParams, options?: analytics.AnalyticsCallOptions): Promise<void>,
-  setAnalyticsCollectionEnabled(enabled: boolean): Promise<void>,
-  app: Promise<app.App>
-};
-
-export interface AngularFireAnalytics extends AnalyticsProxy {};
+export interface AngularFireAnalytics extends PromiseProxy<analytics.Analytics> {};
 
 @Injectable()
 export class AngularFireAnalytics {
@@ -86,13 +74,12 @@ export class AngularFireAnalytics {
     const analytics = of(undefined).pipe(
       // @ts-ignore zapping in the UMD in the build script
       switchMap(() => zone.runOutsideAngular(() => import('firebase/analytics'))),
-      map(() => _firebaseAppFactory(options, zone, nameOrConfig)),
-      // SEMVER no need to cast once we drop older Firebase
-      map(app => <analytics.Analytics>app.analytics()),
+      map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
+      map(app => app.analytics()),
       tap(analytics => {
         if (analyticsCollectionEnabled === false) { analytics.setAnalyticsCollectionEnabled(false) }
       }),
-      runOutsideAngular(zone),
+      ɵrunOutsideAngular(zone),
       shareReplay({ bufferSize: 1, refCount: false }),
     );
 

@@ -1,5 +1,5 @@
 import { NgZone } from '@angular/core';
-import { FirebaseZoneScheduler } from '@angular/fire';
+import { ɵFirebaseZoneScheduler } from '@angular/fire';
 import * as utils from './utils';
 import { AFUnwrappedDataSnapshot } from './interfaces';
 import { FirebaseListObservable } from './firebase_list_observable';
@@ -184,7 +184,7 @@ function firebaseListObservable(ref: Reference | DatabaseQuery, {preserveSnapsho
   });
 
   // TODO: should be in the subscription zone instead
-  return observeOn.call(listObs, new FirebaseZoneScheduler(new NgZone({}), {}));
+  return observeOn.call(listObs, new ɵFirebaseZoneScheduler(new NgZone({}), {}));
 
 }
 

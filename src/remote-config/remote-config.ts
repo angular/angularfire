@@ -1,37 +1,16 @@
 import { Injectable, Inject, Optional, NgZone, InjectionToken } from '@angular/core';
 import { Observable, concat, of, pipe, OperatorFunction, MonoTypeOperatorFunction } from 'rxjs';
 import { map, switchMap, tap, shareReplay, distinctUntilChanged, filter, groupBy, mergeMap, scan, withLatestFrom, startWith, debounceTime } from 'rxjs/operators';
-import { FirebaseAppConfig, FirebaseOptions, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire';
+import { FirebaseAppConfig, FirebaseOptions, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME, PromiseProxy } from '@angular/fire';
 import { remoteConfig } from 'firebase/app';
+import { ɵfirebaseAppFactory, ɵrunOutsideAngular } from '@angular/fire';
 
 export interface ConfigTemplate {[key:string]: string|number|boolean};
 
 export const SETTINGS = new InjectionToken<remoteConfig.Settings>('angularfire2.remoteConfig.settings');
 export const DEFAULTS = new InjectionToken<ConfigTemplate>('angularfire2.remoteConfig.defaultConfig');
 
-import { FirebaseRemoteConfig, _firebaseAppFactory, runOutsideAngular } from '@angular/fire';
-
-// SEMVER: once we move to Typescript 3.6 use `PromiseProxy<remoteConfig.RemoteConfig>` rather than hardcoding
-type RemoteConfigProxy = {
-  activate: () => Promise<boolean>;
-  ensureInitialized: () => Promise<void>;
-  fetch: () => Promise<void>;
-  fetchAndActivate: () => Promise<boolean>;
-  getAll: () => Promise<{[key:string]: remoteConfig.Value}>;
-  getBoolean: (key:string) => Promise<boolean>;
-  getNumber: (key:string) => Promise<number>;
-  getString: (key:string) => Promise<string>;
-  getValue: (key:string) => Promise<remoteConfig.Value>;
-  setLogLevel: (logLevel: remoteConfig.LogLevel) => Promise<void>;
-  settings: Promise<remoteConfig.Settings>;
-  defaultConfig: Promise<{
-      [key: string]: string | number | boolean;
-  }>;
-  fetchTimeMillis: Promise<number>;
-  lastFetchStatus: Promise<remoteConfig.FetchStatus>;
-};
-
-export interface AngularFireRemoteConfig extends RemoteConfigProxy {};
+export interface AngularFireRemoteConfig extends PromiseProxy<remoteConfig.RemoteConfig> {};
 
 // TODO export as implements Partial<...> so minor doesn't break us
 export class Value implements remoteConfig.Value {
@@ -79,15 +58,14 @@ export class AngularFireRemoteConfig {
     const remoteConfig$ = of(undefined).pipe(
       // @ts-ignore zapping in the UMD in the build script
       switchMap(() => zone.runOutsideAngular(() => import('firebase/remote-config'))),
-      map(() => _firebaseAppFactory(options, zone, nameOrConfig)),
-      // SEMVER no need to cast once we drop older Firebase
-      map(app => <remoteConfig.RemoteConfig>app.remoteConfig()),
+      map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
+      map(app => app.remoteConfig()),
       tap(rc => {
         if (settings) { rc.settings = settings }
         if (defaultConfig) { rc.defaultConfig = defaultConfig }
       }),
       startWith(undefined),
-      runOutsideAngular(zone),
+      ɵrunOutsideAngular(zone),
       shareReplay({ bufferSize: 1, refCount: false })
     );
 

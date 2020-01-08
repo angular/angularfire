@@ -1,17 +1,11 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID, InjectionToken } from '@angular/core';
-import { Observable, from } from 'rxjs';
+import { from } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { FirebaseOptions, FirebaseAppConfig, FIREBASE_APP_NAME } from '@angular/fire';
-import { FirebaseFunctions, FIREBASE_OPTIONS, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
+import { FirebaseFunctions, FIREBASE_OPTIONS, ɵfirebaseAppFactory, ɵFirebaseZoneScheduler } from '@angular/fire';
 
-// SEMVER: @ v6 remove FunctionsRegionToken and FUNCTIONS_REGION in favor of REGION
-export const FunctionsRegionToken = new InjectionToken<string>('angularfire2.functions.region');
-export const FUNCTIONS_REGION = FunctionsRegionToken;
-// SEMVER: @ v6 remove FUNCTIONS_ORIGIN in favor of ORIGIN
-export const FUNCTIONS_ORIGIN = new InjectionToken<string>('angularfire2.functions.origin');
-
-export const ORIGIN = FUNCTIONS_ORIGIN;
-export const REGION = FunctionsRegionToken;
+export const ORIGIN = new InjectionToken<string>('angularfire2.functions.origin');
+export const REGION = new InjectionToken<string>('angularfire2.functions.region');
 
 @Injectable()
 export class AngularFireFunctions {
@@ -21,7 +15,7 @@ export class AngularFireFunctions {
    */
   public readonly functions: FirebaseFunctions;
 
-  public readonly scheduler: FirebaseZoneScheduler;
+  public readonly scheduler: ɵFirebaseZoneScheduler;
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
@@ -31,10 +25,10 @@ export class AngularFireFunctions {
     @Optional() @Inject(REGION) region:string|null,
     @Optional() @Inject(ORIGIN) origin:string|null
   ) {
-    this.scheduler = new FirebaseZoneScheduler(zone, platformId);
+    this.scheduler = new ɵFirebaseZoneScheduler(zone, platformId);
     
     this.functions = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(options, zone, nameOrConfig);
+      const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
       return app.functions(region || undefined);
     });
 

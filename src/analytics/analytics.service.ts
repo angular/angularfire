@@ -2,7 +2,7 @@ import { Injectable, Optional, NgZone, OnDestroy, ComponentFactoryResolver, Inje
 import { Subscription, from, Observable, of } from 'rxjs';
 import { filter, withLatestFrom, switchMap, map, tap, pairwise, startWith, groupBy, mergeMap } from 'rxjs/operators';
 import { Router, NavigationEnd, ActivationEnd, ROUTES } from '@angular/router';
-import { runOutsideAngular } from '@angular/fire';
+import { ɵrunOutsideAngular } from '@angular/fire';
 import { AngularFireAnalytics, DEBUG_MODE } from './analytics';
 import { User } from 'firebase/app';
 import { Title } from '@angular/platform-browser';
@@ -168,7 +168,7 @@ export class UserTrackingService implements OnDestroy {
                     map(app => app.auth()),
                     switchMap(auth => new Observable<User|null>(auth.onAuthStateChanged.bind(auth))),
                     switchMap(user => analytics.setUserId(user ? user.uid : null!)),
-                    runOutsideAngular(zone)
+                    ɵrunOutsideAngular(zone)
                 ).subscribe();
             });
         }
