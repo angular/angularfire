@@ -1,8 +1,8 @@
 import { Observable, forkJoin } from 'rxjs'
 import { map, mergeMap, tap } from 'rxjs/operators';
 import { TestBed, inject } from '@angular/core/testing';
-import { FirebaseApp, FirebaseOptionsToken, AngularFireModule, FirebaseNameOrConfigToken } from '@angular/fire';
-import { AngularFireStorageModule, AngularFireStorage, AngularFireUploadTask, StorageBucket } from '@angular/fire/storage';
+import { FirebaseApp, FIREBASE_OPTIONS, AngularFireModule, FIREBASE_APP_NAME } from '@angular/fire';
+import { AngularFireStorageModule, AngularFireStorage, AngularFireUploadTask, BUCKET } from '@angular/fire/storage';
 import { COMMON_CONFIG } from '../test-config';
 
 describe('AngularFireStorage', () => {
@@ -141,9 +141,9 @@ describe('AngularFireStorage w/options', () => {
         AngularFireStorageModule
       ],
       providers: [
-        { provide: FirebaseNameOrConfigToken, useValue: FIREBASE_APP_NAME_TOO },
-        { provide: FirebaseOptionsToken, useValue:  COMMON_CONFIG },
-        { provide: StorageBucket, useValue: FIREBASE_STORAGE_BUCKET }
+        { provide: FIREBASE_APP_NAME, useValue: FIREBASE_APP_NAME_TOO },
+        { provide: FIREBASE_OPTIONS, useValue:  COMMON_CONFIG },
+        { provide: BUCKET, useValue: FIREBASE_STORAGE_BUCKET }
       ]
     });
     inject([FirebaseApp, AngularFireStorage], (app_: FirebaseApp, _storage: AngularFireStorage) => {

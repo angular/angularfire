@@ -1,8 +1,8 @@
 import { ReflectiveInjector, Provider } from '@angular/core';
 import { TestBed, inject } from '@angular/core/testing';
-import { FirebaseApp, FirebaseOptionsToken, AngularFireModule, FirebaseNameOrConfigToken } from '@angular/fire';
-import { AngularFireRemoteConfig, AngularFireRemoteConfigModule, REMOTE_CONFIG_SETTINGS, DEFAULT_CONFIG } from '@angular/fire/remote-config';
-import { COMMON_CONFIG } from './test-config';
+import { FirebaseApp, FIREBASE_OPTIONS, AngularFireModule, FIREBASE_APP_NAME } from '@angular/fire';
+import { AngularFireRemoteConfig, AngularFireRemoteConfigModule, SETTINGS, DEFAULTS } from '@angular/fire/remote-config';
+import { COMMON_CONFIG } from '../test-config';
 
 describe('AngularFireRemoteConfig', () => {
   let app: FirebaseApp;
@@ -49,10 +49,10 @@ describe('AngularFireRemoteConfig with different app', () => {
         AngularFireRemoteConfigModule
       ],
       providers: [
-        { provide: FirebaseNameOrConfigToken, useValue: FIREBASE_APP_NAME_TOO },
-        { provide: FirebaseOptionsToken, useValue: COMMON_CONFIG },
-        { provide: REMOTE_CONFIG_SETTINGS, useValue: {} },
-        { provide: DEFAULT_CONFIG, useValue: {} }
+        { provide: FIREBASE_APP_NAME, useValue: FIREBASE_APP_NAME_TOO },
+        { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG },
+        { provide: SETTINGS, useValue: {} },
+        { provide: DEFAULTS, useValue: {} }
       ]
     });
     inject([FirebaseApp, AngularFireRemoteConfig], (app_: FirebaseApp, _rc: AngularFireRemoteConfig) => {

@@ -1,7 +1,7 @@
 import { User } from 'firebase/app';
 import { Observable, Subject } from 'rxjs'
 import { TestBed, inject } from '@angular/core/testing';
-import { FirebaseApp, FirebaseOptionsToken, AngularFireModule, FirebaseNameOrConfigToken } from '@angular/fire';
+import { FirebaseApp, FIREBASE_OPTIONS, AngularFireModule, FIREBASE_APP_NAME } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule } from '@angular/fire/auth';
 import { COMMON_CONFIG } from '../test-config';
 import { take, skip } from 'rxjs/operators';
@@ -137,8 +137,8 @@ describe('AngularFireAuth with different app', () => {
         AngularFireAuthModule
       ],
       providers: [
-        { provide: FirebaseNameOrConfigToken, useValue: FIREBASE_APP_NAME_TOO },
-        { provide: FirebaseOptionsToken, useValue: COMMON_CONFIG }
+        { provide: FIREBASE_APP_NAME, useValue: FIREBASE_APP_NAME_TOO },
+        { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG }
       ]
     });
     inject([FirebaseApp, AngularFireAuth], (app_: FirebaseApp, _afAuth: AngularFireAuth) => {

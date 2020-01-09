@@ -1,4 +1,4 @@
-import { FirebaseApp, FirebaseOptionsToken, AngularFireModule, FirebaseNameOrConfigToken } from '@angular/fire';
+import { FirebaseApp, FIREBASE_OPTIONS, AngularFireModule, FIREBASE_APP_NAME } from '@angular/fire';
 import { AngularFirestore } from './firestore';
 import { AngularFirestoreModule } from './firestore.module';
 import { AngularFirestoreDocument } from './document/document';
@@ -105,8 +105,8 @@ describe('AngularFirestore with different app', () => {
         AngularFirestoreModule
       ],
       providers: [
-        { provide: FirebaseNameOrConfigToken, useValue: FIREBASE_APP_NAME_TOO },
-        { provide: FirebaseOptionsToken, useValue: FIRESTORE_CONFIG }
+        { provide: FIREBASE_APP_NAME, useValue: FIREBASE_APP_NAME_TOO },
+        { provide: FIREBASE_OPTIONS, useValue: FIRESTORE_CONFIG }
       ]
     });
     inject([FirebaseApp, AngularFirestore], (app_: FirebaseApp, _afs: AngularFirestore) => {

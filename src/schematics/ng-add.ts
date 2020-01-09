@@ -6,7 +6,7 @@ import { from } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { Project } from './interfaces';
 import { listProjects, projectPrompt } from './utils';
-import requiredDependencies from './versions.json';
+import requiredDependencies from './versions';
 
 const stringifyFormatted = (obj: any) => JSON.stringify(obj, null, 2);
 

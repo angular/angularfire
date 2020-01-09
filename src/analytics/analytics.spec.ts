@@ -1,8 +1,7 @@
-import { ReflectiveInjector, Provider } from '@angular/core';
 import { TestBed, inject } from '@angular/core/testing';
-import { FirebaseApp, FirebaseOptionsToken, AngularFireModule, FirebaseNameOrConfigToken } from '@angular/fire';
+import { FirebaseApp, FIREBASE_OPTIONS, AngularFireModule, FIREBASE_APP_NAME } from '@angular/fire';
 import { AngularFireAnalytics, AngularFireAnalyticsModule, COLLECTION_ENABLED, APP_VERSION, APP_NAME } from '@angular/fire/analytics';
-import { COMMON_CONFIG } from './test-config';
+import { COMMON_CONFIG } from '../test-config';
 
 
 describe('AngularFireAnalytics', () => {
@@ -50,8 +49,8 @@ describe('AngularFireAnalytics with different app', () => {
         AngularFireAnalyticsModule
       ],
       providers: [
-        { provide: FirebaseNameOrConfigToken, useValue: FIREBASE_APP_NAME_TOO },
-        { provide: FirebaseOptionsToken, useValue: COMMON_CONFIG },
+        { provide: FIREBASE_APP_NAME, useValue: FIREBASE_APP_NAME_TOO },
+        { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG },
         { provide: COLLECTION_ENABLED, useValue: true },
         { provide: APP_VERSION, useValue: '0.0' },
         { provide: APP_NAME, useValue: 'Test App!' }
