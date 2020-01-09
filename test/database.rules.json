@@ -1,0 +1,10 @@
+{
+  "rules": {
+    ".read": true,
+    ".write": true,
+    ".indexOn": [
+      "height",
+      ".value"
+    ]
+  }
+}

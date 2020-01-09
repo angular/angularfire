@@ -1,5 +1,5 @@
 import { FirebaseApp, AngularFireModule } from '@angular/fire';
-import { AngularFirestore } from '../firestore';
+import { AngularFirestore, SETTINGS } from '../firestore';
 import { AngularFirestoreModule } from '../firestore.module';
 import { AngularFirestoreDocument } from '../document/document';
 import { Observable, Subscription } from 'rxjs';
@@ -20,6 +20,9 @@ describe('AngularFirestoreDocument', () => {
       imports: [
         AngularFireModule.initializeApp(FIRESTORE_CONFIG),
         AngularFirestoreModule.enablePersistence({synchronizeTabs: true})
+      ],
+      providers: [
+        { provide: SETTINGS, useValue: { host: 'localhost:8080', ssl: false } }
       ]
     });
     inject([FirebaseApp, AngularFirestore], (_app: FirebaseApp, _afs: AngularFirestore) => {

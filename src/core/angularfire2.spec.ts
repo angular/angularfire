@@ -42,34 +42,41 @@ describe('angularfire', () => {
   });
 
   describe('FirebaseApp', () => {
+
     it('should provide a FirebaseApp for the FirebaseApp binding', () => {
       expect(typeof app.delete).toBe('function');
     });
-    it('should have the provided name', () => {
-      expect(app.name).toBe(APP_NAME);
-    })
-    it('should use an already intialized firebase app if it exists', done => {
-      @NgModule({
-        imports: [
-          AngularFireModule.initializeApp(COMMON_CONFIG, APP_NAME),
-          BrowserModule
-        ]})
-      class MyModule {
-        ngDoBootstrap() {}
-      }
 
-      const compilerFactory: CompilerFactory =
-          defaultPlatform.injector.get(CompilerFactory, null);
-      const moduleFactory = compilerFactory.createCompiler().compileModuleSync(MyModule);
+    if (typeof window !== 'undefined') {
 
-      defaultPlatform.bootstrapModuleFactory(moduleFactory)
-        .then(moduleRef => {
-          const ref = moduleRef.injector.get(FirebaseApp);
-          expect(ref.name).toEqual(app.name);
-        }).then(done, e => {
-          fail(e);
-          done()
-        });
-    })
+      it('should have the provided name', () => {
+        expect(app.name).toBe(APP_NAME);
+      });
+
+      it('should use an already intialized firebase app if it exists', done => {
+        @NgModule({
+          imports: [
+            AngularFireModule.initializeApp(COMMON_CONFIG, APP_NAME),
+            BrowserModule
+          ]})
+        class MyModule {
+          ngDoBootstrap() {}
+        }
+
+        const compilerFactory: CompilerFactory =
+            defaultPlatform.injector.get(CompilerFactory, null);
+        const moduleFactory = compilerFactory.createCompiler().compileModuleSync(MyModule);
+
+        defaultPlatform.bootstrapModuleFactory(moduleFactory)
+          .then(moduleRef => {
+            const ref = moduleRef.injector.get(FirebaseApp);
+            expect(ref.name).toEqual(app.name);
+          }).then(done, e => {
+            fail(e);
+            done()
+          });
+      })
+
+    }
   });
 });

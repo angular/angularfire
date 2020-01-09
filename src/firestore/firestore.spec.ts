@@ -1,5 +1,5 @@
 import { FirebaseApp, FIREBASE_OPTIONS, AngularFireModule, FIREBASE_APP_NAME } from '@angular/fire';
-import { AngularFirestore } from './firestore';
+import { AngularFirestore, SETTINGS } from './firestore';
 import { AngularFirestoreModule } from './firestore.module';
 import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
@@ -24,6 +24,9 @@ describe('AngularFirestore', () => {
       imports: [
         AngularFireModule.initializeApp(FIRESTORE_CONFIG),
         AngularFirestoreModule.enablePersistence({synchronizeTabs: true})
+      ],
+      providers: [
+        { provide: SETTINGS, useValue: { host: 'localhost:8080', ssl: false } }
       ]
     });
     inject([FirebaseApp, AngularFirestore], (_app: FirebaseApp, _afs: AngularFirestore) => {
@@ -44,7 +47,6 @@ describe('AngularFirestore', () => {
 
   it('should have an initialized Firebase app', () => {
     expect(afs.firestore.app).toBeDefined();
-    expect(<any>afs.firestore.app).toEqual(app);
   });
 
   it('should create an AngularFirestoreDocument from a string path', () => {
@@ -83,12 +85,25 @@ describe('AngularFirestore', () => {
     expect(quadWrapper).toThrowError();
   });
 
-  it('should enable persistence', (done) => {
-    const sub = afs.persistenceEnabled$.subscribe(isEnabled => {
-      expect(isEnabled).toBe(true);
-      done();
+  if (typeof window == 'undefined') {
+    
+    it('should not enable persistence (Node.js)', (done) => {
+      const sub = afs.persistenceEnabled$.subscribe(isEnabled => {
+        expect(isEnabled).toBe(false);
+        done();
+      });
     });
-  });
+
+  } else {
+    
+    it('should enable persistence', (done) => {
+      const sub = afs.persistenceEnabled$.subscribe(isEnabled => {
+        expect(isEnabled).toBe(true);
+        done();
+      });
+    });
+
+  }
 
 });
 
@@ -128,7 +143,6 @@ describe('AngularFirestore with different app', () => {
 
     it('should have an initialized Firebase app', () => {
       expect(afs.firestore.app).toBeDefined();
-      expect(<any>afs.firestore.app).toEqual(app);
     });
 
     it('should have an initialized Firebase app instance member', () => {

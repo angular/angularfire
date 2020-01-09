@@ -1,6 +1,6 @@
 import { database } from 'firebase/app';
 import { FirebaseApp, AngularFireModule } from '@angular/fire';
-import { AngularFireDatabase, AngularFireDatabaseModule, listChanges } from '@angular/fire/database';
+import { AngularFireDatabase, AngularFireDatabaseModule, listChanges, URL } from '@angular/fire/database';
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 import { skip, take } from 'rxjs/operators';
@@ -27,6 +27,9 @@ describe('listChanges', () => {
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG, FIREBASE_APP_NAME),
         AngularFireDatabaseModule
+      ],
+      providers: [
+        { provide: URL, useValue: 'http://localhost:9000?ns=angularfire2-test'}
       ]
     });
     inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {

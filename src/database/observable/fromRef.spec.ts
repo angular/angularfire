@@ -1,6 +1,6 @@
 import { DatabaseReference } from '../interfaces';
 import { FirebaseApp, AngularFireModule } from '@angular/fire';
-import { AngularFireDatabase, AngularFireDatabaseModule, fromRef } from '@angular/fire/database';
+import { AngularFireDatabase, AngularFireDatabaseModule, fromRef, URL } from '@angular/fire/database';
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 import { take } from 'rxjs/operators';
@@ -26,6 +26,9 @@ describe('fromRef', () => {
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG, FIREBASE_APP_NAME),
         AngularFireDatabaseModule
+      ],
+      providers: [
+        { provide: URL, useValue: 'http://localhost:9000?ns=angularfire2-test'}
       ]
     });
     inject([FirebaseApp], (app_: FirebaseApp) => {

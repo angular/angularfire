@@ -1,6 +1,6 @@
 import { database } from 'firebase/app';
 import { FirebaseApp, AngularFireModule } from '@angular/fire';
-import { AngularFireDatabase, AngularFireDatabaseModule, snapshotChanges, ChildEvent } from '@angular/fire/database';
+import { AngularFireDatabase, AngularFireDatabaseModule, snapshotChanges, ChildEvent, URL } from '@angular/fire/database';
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 import { BehaviorSubject } from 'rxjs';
@@ -28,6 +28,9 @@ describe('snapshotChanges', () => {
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG, FIREBASE_APP_NAME),
         AngularFireDatabaseModule
+      ],
+      providers: [
+        { provide: URL, useValue: 'http://localhost:9000?ns=angularfire2-test'}
       ]
     });
     inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {
