@@ -5,6 +5,7 @@ import { FirebaseApp, FIREBASE_OPTIONS, AngularFireModule, FIREBASE_APP_NAME } f
 import { AngularFireAuth, AngularFireAuthModule } from '@angular/fire/auth';
 import { COMMON_CONFIG } from '../test-config';
 import { take, skip } from 'rxjs/operators';
+import 'firebase/auth';
 
 function authTake(auth: Observable<any>, count: number): Observable<any> {
   return take.call(auth, 1);

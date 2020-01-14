@@ -4,6 +4,7 @@ import { AngularFireDatabase, AngularFireDatabaseModule, fromRef, URL } from '@a
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 import { take } from 'rxjs/operators';
+import 'firebase/database';
 
 // generate random string to test fidelity of naming
 const rando = () => (Math.random() + 1).toString(36).substring(7);
@@ -33,8 +34,7 @@ describe('fromRef', () => {
     });
     inject([FirebaseApp], (app_: FirebaseApp) => {
       app = app_;
-      app.database().goOffline();
-      ref = (path: string) => { app.database().goOffline(); return app.database().ref(path); };
+      ref = (path: string) => app.database().ref(path);
     })();
   });
 

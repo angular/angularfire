@@ -3,6 +3,7 @@ import { AngularFireDatabase, AngularFireDatabaseModule, URL } from '@angular/fi
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../test-config';
 import { NgZone } from '@angular/core';
+import 'firebase/database';
 
 // generate random string to test fidelity of naming
 const APP_NAME = (Math.random() + 1).toString(36).substring(7);
@@ -57,7 +58,7 @@ describe('AngularFireDatabase', () => {
 });
 
 const FIREBASE_APP_NAME_TOO = (Math.random() + 1).toString(36).substring(7);
-const FIREBASE_DB_NAME = `https://angularfire2-test2.firebaseio.com/`;
+const FIREBASE_DB_NAME = 'http://localhost:9000/';
 const QUERY = (Math.random() + 1).toString(36).substring(7)
 
 describe('AngularFireDatabase w/options', () => {

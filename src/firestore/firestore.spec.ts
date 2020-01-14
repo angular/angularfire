@@ -8,6 +8,7 @@ import { Observable, Subscription } from 'rxjs';
 
 import { TestBed, inject } from '@angular/core/testing';
 import { FIRESTORE_CONFIG } from '../test-config';
+import 'firebase/firestore';
 
 interface Stock {
   name: string;

@@ -4,6 +4,7 @@ import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, FIREBASE_OPTIONS, AngularFireModule, FIREBASE_APP_NAME } from '@angular/fire';
 import { AngularFireStorageModule, AngularFireStorage, AngularFireUploadTask, BUCKET } from '@angular/fire/storage';
 import { COMMON_CONFIG } from '../test-config';
+import 'firebase/storage';
 
 describe('AngularFireStorage', () => {
   let app: FirebaseApp;

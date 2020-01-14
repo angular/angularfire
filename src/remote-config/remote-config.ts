@@ -1,6 +1,6 @@
 import { Injectable, Inject, Optional, NgZone, InjectionToken } from '@angular/core';
-import { Observable, concat, of, pipe, OperatorFunction, MonoTypeOperatorFunction } from 'rxjs';
-import { map, switchMap, tap, shareReplay, distinctUntilChanged, filter, groupBy, mergeMap, scan, withLatestFrom, startWith, debounceTime } from 'rxjs/operators';
+import { Observable, concat, of, pipe, OperatorFunction, MonoTypeOperatorFunction, empty, throwError } from 'rxjs';
+import { map, switchMap, tap, shareReplay, distinctUntilChanged, filter, groupBy, mergeMap, scan, withLatestFrom, startWith, debounceTime, catchError } from 'rxjs/operators';
 import { FirebaseAppConfig, FirebaseOptions, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME, PromiseProxy } from '@angular/fire';
 import { remoteConfig } from 'firebase/app';
 import { ɵfirebaseAppFactory, ɵrunOutsideAngular } from '@angular/fire';
@@ -58,6 +58,7 @@ export class AngularFireRemoteConfig {
     const remoteConfig$ = of(undefined).pipe(
       // @ts-ignore zapping in the UMD in the build script
       switchMap(() => zone.runOutsideAngular(() => import('firebase/remote-config'))),
+      catchError(err => err.message === 'Not supported' ? empty() : throwError(err) ),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
       map(app => app.remoteConfig()),
       tap(rc => {

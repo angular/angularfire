@@ -1,14 +1,11 @@
 import { FirebaseApp, AngularFireModule } from '@angular/fire';
-import { AngularFirestore, SETTINGS } from '../firestore';
-import { AngularFirestoreModule } from '../firestore.module';
-import { AngularFirestoreDocument } from '../document/document';
-import { AngularFirestoreCollectionGroup } from './collection-group';
+import { AngularFirestore, AngularFirestoreModule, AngularFirestoreDocument, AngularFirestoreCollectionGroup, SETTINGS } from '@angular/fire/firestore';
 import { QueryGroupFn, Query } from '../interfaces';
 import { Observable, BehaviorSubject, Subscription } from 'rxjs';
 import { skip, take, switchMap } from 'rxjs/operators';
-
 import { TestBed, inject } from '@angular/core/testing';
 import { FIRESTORE_CONFIG } from '../../test-config';
+import 'firebase/firestore';
 
 import { Stock, randomName, FAKE_STOCK_DATA, createRandomStocks, delayAdd, delayDelete, delayUpdate, deleteThemAll } from '../utils.spec';
 

@@ -4,6 +4,7 @@ import { AngularFireDatabase, AngularFireDatabaseModule, auditTrail, ChildEvent,
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 import { skip } from 'rxjs/operators';
+import 'firebase/database';
 
 // generate random string to test fidelity of naming
 const rando = () => (Math.random() + 1).toString(36).substring(7);
@@ -35,8 +36,7 @@ describe('auditTrail', () => {
     inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {
       app = app_;
       db = _db;
-      app.database().goOffline();
-      createRef = (path: string) => { app.database().goOffline(); return app.database().ref(path); };
+      createRef = (path: string) => app.database().ref(path);
     })();
   });
 

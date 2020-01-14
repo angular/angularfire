@@ -5,6 +5,7 @@ import { AngularFirestoreCollection } from './collection';
 import { QueryFn } from '../interfaces';
 import { Observable, BehaviorSubject, Subscription } from 'rxjs';
 import { skip, take, switchMap } from 'rxjs/operators';
+import 'firebase/firestore';
 
 import { TestBed, inject } from '@angular/core/testing';
 import { FIRESTORE_CONFIG } from '../../test-config';
