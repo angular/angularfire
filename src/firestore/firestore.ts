@@ -111,6 +111,7 @@ export class AngularFirestore {
     this.scheduler = new ɵFirebaseZoneScheduler(zone, platformId);
     this.firestore = zone.runOutsideAngular(() => {
       const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
+      if (!app.firestore) { throw "You must import 'firebase/firestore' before using AngularFirestore" }
       const firestore = app.firestore();
       if (settings) { firestore.settings(settings) }
       return firestore;

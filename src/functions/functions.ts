@@ -29,6 +29,7 @@ export class AngularFireFunctions {
     
     this.functions = zone.runOutsideAngular(() => {
       const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
+      if (!app.functions) { throw "You must import 'firebase/functions' before using AngularFireFunctions" }
       return app.functions(region || undefined);
     });
 

@@ -20,6 +20,7 @@ export class AngularFireDatabase {
     this.scheduler = new ɵFirebaseZoneScheduler(zone, platformId);
     this.database = zone.runOutsideAngular(() => {
       const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
+      if (!app.database) { throw "You must import 'firebase/database' before using AngularFireDatabase" }
       return app.database(databaseURL || undefined);
     });
   }

@@ -43,6 +43,7 @@ export class AngularFireAuth {
     const scheduler = new ɵFirebaseZoneScheduler(zone, platformId);
     this.auth = zone.runOutsideAngular(() => {
       const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
+      if (!app.auth) { throw "You must import 'firebase/auth' before using AngularFireAuth" }
       return app.auth();
     });
 
