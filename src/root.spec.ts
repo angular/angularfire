@@ -15,6 +15,7 @@ export * from './database/list/changes.spec';
 export * from './database/list/snapshot-changes.spec';
 export * from './database/list/state-changes.spec';
 export * from './database/list/audit-trail.spec';
+export * from './messaging/messaging.spec';
 export * from './remote-config/remote-config.spec';
 export * from './storage/storage.spec';
 export * from './performance/performance.spec';
