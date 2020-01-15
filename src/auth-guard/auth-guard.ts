@@ -1,8 +1,8 @@
-import { Injectable, InjectionToken } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Router } from '@angular/router';
+import { Injectable } from '@angular/core';
+import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
 import { Observable, of, pipe, UnaryFunction } from 'rxjs';
-import { map, switchMap, take, tap } from 'rxjs/operators'
-import { User, auth } from 'firebase/app';
+import { map, switchMap, take } from 'rxjs/operators'
+import { User } from 'firebase/app';
 import { AngularFireAuth } from '@angular/fire/auth';
 
 export type AuthPipeGenerator = (next: ActivatedRouteSnapshot, state: RouterStateSnapshot) => AuthPipe;
@@ -26,8 +26,8 @@ export class AngularFireAuthGuard implements CanActivate {
 
 }
 
-export const canActivate = (pipe: AuthPipe|AuthPipeGenerator) => ({
-    canActivate: [ AngularFireAuthGuard ], data: { authGuardPipe: pipe.name === "" ? pipe : () => pipe}
+export const canActivate = (pipe: AuthPipeGenerator) => ({
+    canActivate: [ AngularFireAuthGuard ], data: { authGuardPipe: pipe }
 });
 
 export const loggedIn: AuthPipe = map(user => !!user);
