@@ -1,16 +1,15 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
 import { Observable, of, from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
-import { FIREBASE_OPTIONS, FIREBASE_APP_NAME, FirebaseOptions, FirebaseAppConfig, FirebaseAuth, ɵfirebaseAppFactory, ɵFirebaseZoneScheduler } from '@angular/fire';
+import { switchMap, shareReplay, map } from 'rxjs/operators';
+import { FIREBASE_OPTIONS, FIREBASE_APP_NAME, FirebaseOptions, FirebaseAppConfig, FirebaseAuth, ɵfirebaseAppFactory, ɵFirebaseZoneScheduler, ɵrunOutsideAngular, PromiseProxy, ɵlazySDKProxy } from '@angular/fire';
 import { User, auth } from 'firebase/app';
 
-@Injectable()
-export class AngularFireAuth {
+export interface AngularFireAuth extends PromiseProxy<auth.Auth> {};
 
-  /**
-   * Firebase Auth instance
-   */
-  public readonly auth: FirebaseAuth;
+@Injectable({
+  providedIn: 'root'
+})
+export class AngularFireAuth {
 
   /**
    * Observable of authentication state; as of Firebase 4.0 this is only triggered via sign-in/out
@@ -41,37 +40,37 @@ export class AngularFireAuth {
     private zone: NgZone
   ) {
     const scheduler = new ɵFirebaseZoneScheduler(zone, platformId);
-    this.auth = zone.runOutsideAngular(() => {
-      const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
-      if (!app.auth) { throw "You must import 'firebase/auth' before using AngularFireAuth" }
-      return app.auth();
-    });
 
-    this.authState = scheduler.keepUnstableUntilFirst(
-      scheduler.runOutsideAngular(
-        new Observable(subscriber => {
-          const unsubscribe = this.auth.onAuthStateChanged(subscriber);
-          return { unsubscribe };
-        })
-      )
+    const auth = of(undefined).pipe(
+      switchMap(() => zone.runOutsideAngular(() => import('firebase/auth'))),
+      map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
+      map(app => app.auth()),
+      ɵrunOutsideAngular(zone),
+      shareReplay({ bufferSize: 1, refCount: false }),
     );
 
-    this.user = scheduler.keepUnstableUntilFirst(
-      scheduler.runOutsideAngular(
-        new Observable(subscriber => {
-          const unsubscribe = this.auth.onIdTokenChanged(subscriber);
-          return { unsubscribe };
-        })
-      )
+    this.authState = auth.pipe(
+      switchMap(auth => from(auth.onAuthStateChanged)),
+      ɵrunOutsideAngular(zone),
+      scheduler.keepUnstableUntilFirst.bind(scheduler),
     );
 
-    this.idToken = this.user.pipe(switchMap(user => {
-      return user ? from(user.getIdToken()) : of(null)
-    }));
+    this.user = auth.pipe(
+      switchMap(auth => from(auth.onIdTokenChanged)),
+      ɵrunOutsideAngular(zone),
+      scheduler.keepUnstableUntilFirst.bind(scheduler),
+    );
 
-    this.idTokenResult = this.user.pipe(switchMap(user => {
-      return user ? from(user.getIdTokenResult()) : of(null)
-    }));
+    this.idToken = this.user.pipe(
+      switchMap(user => user ? from(user.getIdToken()) : of(null))
+    );
+
+    this.idTokenResult = this.user.pipe(
+      switchMap(user => user ? from(user.getIdTokenResult()) : of(null))
+    );
+
+    return ɵlazySDKProxy(this, auth, zone);
+
   }
 
 }

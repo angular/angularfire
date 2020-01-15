@@ -1,6 +1,6 @@
 import { TestBed, inject } from '@angular/core/testing';
 import { PlatformRef, NgModule, CompilerFactory } from '@angular/core';
-import { FirebaseApp, AngularFireModule } from '@angular/fire';
+import { FirebaseApp, AngularFireModule } from './public_api';
 import { Subscription } from 'rxjs';
 import { COMMON_CONFIG } from '../test-config';
 import { BrowserModule } from '@angular/platform-browser';

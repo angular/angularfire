@@ -7,7 +7,9 @@ import { FirebaseObjectObservable } from './firebase_object_observable';
 import * as utils from './utils';
 import { FirebaseDatabase, FirebaseOptions, FirebaseAppConfig, FIREBASE_OPTIONS, FIREBASE_APP_NAME, DATABASE_URL, ɵfirebaseAppFactory } from '@angular/fire';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class AngularFireDatabase {
 
   /**

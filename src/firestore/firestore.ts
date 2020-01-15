@@ -87,7 +87,9 @@ export function associateQuery(collectionRef: CollectionReference, queryFn = ref
  *   }
  * }
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class AngularFirestore {
   public readonly firestore: FirebaseFirestore;
   public readonly persistenceEnabled$: Observable<boolean>;

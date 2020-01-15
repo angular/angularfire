@@ -6,7 +6,8 @@ export const COMMON_CONFIG = {
     storageBucket: "angularfire2-test.appspot.com",
     messagingSenderId: "920323787688",
     appId: "1:920323787688:web:2253a0e5eb5b9a8b",
-    databaseName: 'angularfire2-test'
+    databaseName: 'angularfire2-test',
+    measurementId: "G-W20QDV5CZP"
 };
 
 export const FIRESTORE_CONFIG = {

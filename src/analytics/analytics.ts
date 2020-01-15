@@ -23,7 +23,9 @@ const DATA_LAYER_NAME = 'dataLayer';
 
 export interface AngularFireAnalytics extends PromiseProxy<analytics.Analytics> {};
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class AngularFireAnalytics {
 
   private gtag: (...args: any[]) => void;
@@ -72,7 +74,6 @@ export class AngularFireAnalytics {
     if (debugModeEnabled)   { this.updateConfig({ [DEBUG_MODE_KEY]:  1 }) }
 
     const analytics = of(undefined).pipe(
-      // @ts-ignore zapping in the UMD in the build script
       switchMap(() => zone.runOutsideAngular(() => import('firebase/analytics'))),
       catchError(err => err.message === 'Not supported' ? empty() : throwError(err) ),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),

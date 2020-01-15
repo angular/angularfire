@@ -2,7 +2,7 @@ import { User } from 'firebase/app';
 import { Observable, Subject } from 'rxjs'
 import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, FIREBASE_OPTIONS, AngularFireModule, FIREBASE_APP_NAME } from '@angular/fire';
-import { AngularFireAuth, AngularFireAuthModule } from '@angular/fire/auth';
+import { AngularFireAuth, AngularFireAuthModule } from './public_api';
 import { COMMON_CONFIG } from '../test-config';
 import { take, skip } from 'rxjs/operators';
 import 'firebase/auth';
@@ -48,7 +48,7 @@ describe('AngularFireAuth', () => {
   });
 
   afterEach(done => {
-    afAuth.auth.app.delete().then(done, done.fail);
+    afAuth.app.then(app => app.delete()).then(done, done.fail);
   });
 
   describe('Zones', () => {
@@ -78,12 +78,8 @@ describe('AngularFireAuth', () => {
     expect(afAuth instanceof AngularFireAuth).toBe(true);
   });
 
-  it('should have the Firebase Auth instance', () => {
-    expect(afAuth.auth).toBeDefined();
-  });
-
   it('should have an initialized Firebase app', () => {
-    expect(afAuth.auth.app).toBeDefined();
+    expect(afAuth.app).toBeDefined();
   });
 
   it('should emit auth updates through authState', (done: any) => {
@@ -158,11 +154,12 @@ describe('AngularFireAuth with different app', () => {
     });
 
     it('should have an initialized Firebase app', () => {
-      expect(afAuth.auth.app).toBeDefined();
+      expect(afAuth.app).toBeDefined();
     });
 
-    it('should have an initialized Firebase app instance member', () => {
-      expect(afAuth.auth.app.name).toEqual(FIREBASE_APP_NAME_TOO);
+    it('should have an initialized Firebase app instance member', async () => {
+      const app = await afAuth.app;
+      expect(app.name).toEqual(FIREBASE_APP_NAME_TOO);
     });
   });
 

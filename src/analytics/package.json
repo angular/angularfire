@@ -1,8 +1,10 @@
 {
+  "$schema": "../node_modules/ng-packagr/package.schema.json",
   "ngPackage": {
     "lib": {
       "umdModuleIds": {
-        "firebase/app": "firebase"
+        "firebase/app": "firebase",
+        "tslib": "tslib"
       },
       "entryFile": "public_api.ts"
     }

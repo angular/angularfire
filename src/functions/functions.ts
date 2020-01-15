@@ -1,54 +1,52 @@
-import { Injectable, Inject, Optional, NgZone, PLATFORM_ID, InjectionToken } from '@angular/core';
-import { from } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { FirebaseOptions, FirebaseAppConfig, FIREBASE_APP_NAME } from '@angular/fire';
-import { FirebaseFunctions, FIREBASE_OPTIONS, ɵfirebaseAppFactory, ɵFirebaseZoneScheduler } from '@angular/fire';
+import { Injectable, Inject, Optional, NgZone, InjectionToken } from '@angular/core';
+import { of, from, Observable } from 'rxjs';
+import { map, switchMap, shareReplay, tap } from 'rxjs/operators';
+import { FirebaseOptions, FirebaseAppConfig, FIREBASE_APP_NAME, ɵrunOutsideAngular, ɵlazySDKProxy, PromiseProxy } from '@angular/fire';
+import { FIREBASE_OPTIONS, ɵfirebaseAppFactory } from '@angular/fire';
+import { functions } from 'firebase/app';
 
 export const ORIGIN = new InjectionToken<string>('angularfire2.functions.origin');
 export const REGION = new InjectionToken<string>('angularfire2.functions.region');
 
-@Injectable()
+// override httpsCallable for compatibility with 5.x
+export interface AngularFireFunctions extends Omit<PromiseProxy<functions.Functions>, 'httpsCallable'> { };
+
+@Injectable({
+  providedIn: 'root'
+})
 export class AngularFireFunctions {
 
-  /**
-   * Firebase Functions instance
-   */
-  public readonly functions: FirebaseFunctions;
-
-  public readonly scheduler: ɵFirebaseZoneScheduler;
+  public readonly httpsCallable: <T=any, R=any>(name: string) => (data: T) => Observable<R>
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
-    @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
     @Optional() @Inject(REGION) region:string|null,
     @Optional() @Inject(ORIGIN) origin:string|null
   ) {
-    this.scheduler = new ɵFirebaseZoneScheduler(zone, platformId);
-    
-    this.functions = zone.runOutsideAngular(() => {
-      const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
-      if (!app.functions) { throw "You must import 'firebase/functions' before using AngularFireFunctions" }
-      return app.functions(region || undefined);
-    });
 
-    if (origin) {
-      this.functions.useFunctionsEmulator(origin);
-    }
+    const functions = of(undefined).pipe(
+      switchMap(() => zone.runOutsideAngular(() => import('firebase/functions'))),
+      map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
+      map(app => app.functions(region || undefined)),
+      tap(functions => {
+        if (origin) { functions.useFunctionsEmulator(origin) }
+      }),
+      ɵrunOutsideAngular(zone),
+      shareReplay({ bufferSize: 1, refCount: false }),
+    );
 
-  }
-
-  public httpsCallable<T=any, R=any>(name: string) {
-    const callable = this.functions.httpsCallable(name);
-    return (data: T) => {
-      const callable$ = from(callable(data));
-      return this.scheduler.runOutsideAngular(
-        callable$.pipe(
+    this.httpsCallable = <T=any, R=any>(name: string) =>
+      (data: T) => zone.runOutsideAngular(() =>
+        from(functions).pipe(
+          switchMap(functions => functions.httpsCallable(name)(data)),
           map(r => r.data as R)
         )
       )
-    }
+
+    return ɵlazySDKProxy(this, functions, zone);
+
   }
 
 }

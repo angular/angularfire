@@ -1,20 +1,24 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
-import { isPlatformServer } from '@angular/common';
 import { messaging } from 'firebase/app';
 import { Observable, empty, from, of, throwError } from 'rxjs';
-import { mergeMap, catchError, map, switchMap, concat, defaultIfEmpty } from 'rxjs/operators';
-import { FirebaseOptions, FirebaseAppConfig, ɵrunOutsideAngular, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire';
-import { ɵfirebaseAppFactory, ɵFirebaseZoneScheduler } from '@angular/fire';
+import { mergeMap, catchError, map, switchMap, concat, shareReplay, defaultIfEmpty } from 'rxjs/operators';
+import { FirebaseOptions, FirebaseAppConfig, ɵrunOutsideAngular, FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵlazySDKProxy, PromiseProxy } from '@angular/fire';
+import { ɵfirebaseAppFactory } from '@angular/fire';
+import { isPlatformServer } from '@angular/common';
 
-@Injectable()
+export interface AngularFireMessaging extends Omit<PromiseProxy<messaging.Messaging>, 'deleteToken'|'getToken'|'requestPermission'> {};
+
+@Injectable({
+  providedIn: 'root'
+})
 export class AngularFireMessaging {
-  messaging: Observable<messaging.Messaging>;
-  requestPermission: Observable<void>;
-  getToken: Observable<string|null>;
-  tokenChanges: Observable<string|null>;
-  messages: Observable<{}>;
-  requestToken: Observable<string|null>;
-  deleteToken: (token: string) => Observable<boolean>;
+
+  public readonly requestPermission: Observable<void>;
+  public readonly getToken: Observable<string|null>;
+  public readonly tokenChanges: Observable<string|null>;
+  public readonly messages: Observable<{}>;
+  public readonly requestToken: Observable<string|null>;
+  public readonly deleteToken: (token: string) => Observable<boolean>;
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
@@ -23,60 +27,65 @@ export class AngularFireMessaging {
     zone: NgZone
   ) {
 
-    // @ts-ignore zapping in the UMD in the build script
-    const requireMessaging = from(import('firebase/messaging'));
-
-    this.messaging = requireMessaging.pipe(
+    const messaging = of(undefined).pipe(
+      switchMap(() => from(import('firebase/messaging'))),
+      // TODO is this needed?
+      catchError(err => err.message === 'Not supported' ? empty() : throwError(err) ),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
       map(app => app.messaging()),
-      ɵrunOutsideAngular(zone)
+      ɵrunOutsideAngular(zone),
+      shareReplay({ bufferSize: 1, refCount: false })
     );
 
     if (!isPlatformServer(platformId)) {
-
-      this.requestPermission = this.messaging.pipe(
+    
+      this.requestPermission = messaging.pipe(
         switchMap(messaging => messaging.requestPermission()),
         ɵrunOutsideAngular(zone)
       );
-
+    
     } else {
-
+    
       this.requestPermission = throwError('Not available on server platform.');
-
+    
     }
 
-    this.getToken = this.messaging.pipe(
+    this.getToken = messaging.pipe(
       switchMap(messaging => messaging.getToken()),
       defaultIfEmpty(null),
       ɵrunOutsideAngular(zone)
-    );
+    )
 
-    const tokenChanges = this.messaging.pipe(
+    const tokenChanges = messaging.pipe(
       switchMap(messaging => new Observable(messaging.onTokenRefresh.bind(messaging)).pipe(
         switchMap(() => messaging.getToken())
       )),
       ɵrunOutsideAngular(zone)
     );
 
-    this.tokenChanges = this.getToken.pipe(
+    this.tokenChanges = messaging.pipe(
+      switchMap(messaging => messaging.getToken()),
       concat(tokenChanges)
     );
 
-    this.messages = this.messaging.pipe(
+    this.messages = messaging.pipe(
       switchMap(messaging => new Observable(messaging.onMessage.bind(messaging))),
       ɵrunOutsideAngular(zone)
     );
 
-    this.requestToken = this.requestPermission.pipe(
+    this.requestToken = of(undefined).pipe(
+      switchMap(() => this.requestPermission),
       catchError(() => of(null)),
       mergeMap(() => this.tokenChanges)
     );
 
-    this.deleteToken = (token: string) => this.messaging.pipe(
+    this.deleteToken = (token: string) => messaging.pipe(
       switchMap(messaging => messaging.deleteToken(token)),
       defaultIfEmpty(false),
       ɵrunOutsideAngular(zone)
     );
+
+    return ɵlazySDKProxy(this, messaging, zone);
   }
 
 }

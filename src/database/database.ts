@@ -5,7 +5,9 @@ import { createListReference } from './list/create-reference';
 import { createObjectReference } from './object/create-reference';
 import { FirebaseDatabase, FirebaseOptions, FirebaseAppConfig, DATABASE_URL, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵfirebaseAppFactory, ɵFirebaseZoneScheduler } from '@angular/fire';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class AngularFireDatabase {
   public readonly database: FirebaseDatabase;
   public readonly scheduler: ɵFirebaseZoneScheduler;

@@ -1,7 +1,7 @@
 import { ReflectiveInjector, Provider } from '@angular/core';
 import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, FIREBASE_OPTIONS, AngularFireModule, FIREBASE_APP_NAME } from '@angular/fire';
-import { AngularFireRemoteConfig, AngularFireRemoteConfigModule, SETTINGS, DEFAULTS } from '@angular/fire/remote-config';
+import { AngularFireRemoteConfig, AngularFireRemoteConfigModule, SETTINGS, DEFAULTS } from './public_api';
 import { COMMON_CONFIG } from '../test-config';
 
 describe('AngularFireRemoteConfig', () => {

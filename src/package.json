@@ -1,4 +1,5 @@
 {
+  "$schema": "../node_modules/ng-packagr/package.schema.json",
   "name": "@angular/fire",
   "version": "ANGULARFIRE2_VERSION",
   "description": "The official library for Firebase and Angular",
@@ -30,7 +31,9 @@
       "umdModuleIds": {
         "@angular/core": "ng",
         "@angular/common": "ng",
-        "firebase/app": "firebase"
+        "firebase/app": "firebase",
+        "tslib": "tslib",
+        "rxjs": "rxjs"
       },
       "entryFile": "core/public_api.ts"
     },

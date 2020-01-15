@@ -1,5 +1,5 @@
 import { FirebaseApp, AngularFireModule } from '@angular/fire';
-import { AngularFirestore, AngularFirestoreModule, AngularFirestoreDocument, AngularFirestoreCollectionGroup, SETTINGS } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreModule, AngularFirestoreDocument, AngularFirestoreCollectionGroup, SETTINGS } from '../public_api';
 import { QueryGroupFn, Query } from '../interfaces';
 import { Observable, BehaviorSubject, Subscription } from 'rxjs';
 import { skip, take, switchMap } from 'rxjs/operators';

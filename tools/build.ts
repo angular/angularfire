@@ -44,19 +44,6 @@ async function compileSchematics() {
   ]);
 }
 
-async function replaceDynamicImportsForUMD() {
-  const perfPath = dest('bundles', 'angular-fire-performance.umd.js');
-  const messagingPath = dest('bundles', 'angular-fire-messaging.umd.js');
-  const [perf, messaging] = await Promise.all([
-    readFile(perfPath, 'utf8'),
-    readFile(messagingPath, 'utf8')
-  ]);
-  return Promise.all([
-    writeFile(perfPath, perf.replace("rxjs.from(import('firebase/performance'))", "rxjs.empty()")),
-    writeFile(messagingPath, messaging.replace("rxjs.from(import('firebase/messaging'))", "rxjs.empty()"))
-  ]);
-}
-
 async function measure(module: string) {
   const path = dest('bundles', `${module}.umd.js`);
   const file = await readFile(path);
@@ -73,8 +60,7 @@ async function buildLibrary() {
     copy(join(process.cwd(), 'docs'), dest('docs')),
     copy(src('firebase-node'), dest('firebase-node')),
     compileSchematics(),
-    replacePackageJsonVersions(),
-    replaceDynamicImportsForUMD()
+    replacePackageJsonVersions()
   ]);
   return Promise.all([
     measure('angular-fire'),

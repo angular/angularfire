@@ -38,7 +38,9 @@ export const filterRemote = () => filterTest(p => p.getSource() === 'remote');
 // filterFresh allows the developer to effectively set up a maximum cache time
 export const filterFresh = (howRecentInMillis: number) => filterTest(p => p.fetchTimeMillis + howRecentInMillis >= new Date().getTime());
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class AngularFireRemoteConfig {
 
   readonly changes:    Observable<Parameter>;

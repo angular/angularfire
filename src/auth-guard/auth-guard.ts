@@ -8,7 +8,9 @@ import { AngularFireAuth } from '@angular/fire/auth';
 export type AuthPipeGenerator = (next: ActivatedRouteSnapshot, state: RouterStateSnapshot) => AuthPipe;
 export type AuthPipe = UnaryFunction<Observable<User|null>, Observable<boolean|any[]>>;
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class AngularFireAuthGuard implements CanActivate {
 
   constructor(private afAuth: AngularFireAuth, private router: Router) {}

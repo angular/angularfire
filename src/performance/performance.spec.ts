@@ -1,6 +1,6 @@
 import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, AngularFireModule } from '@angular/fire';
-import { AngularFirePerformance, AngularFirePerformanceModule } from '@angular/fire/performance';
+import { AngularFirePerformance, AngularFirePerformanceModule } from './public_api';
 import { COMMON_CONFIG } from '../test-config';
 
 describe('AngularFirePerformance', () => {
@@ -30,7 +30,7 @@ describe('AngularFirePerformance', () => {
   });
 
   it('should have the Performance instance', () => {
-    expect(afp.performance).toBeDefined();
+    expect(afp.dataCollectionEnabled).toBeDefined();
   });
 
 });

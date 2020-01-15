@@ -1,7 +1,6 @@
 import { Injectable, Inject, Optional, InjectionToken, NgZone, PLATFORM_ID } from '@angular/core';
 import { createStorageRef } from './ref';
 import { FirebaseStorage, FirebaseOptions, FirebaseAppConfig, ɵFirebaseZoneScheduler, ɵfirebaseAppFactory, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire';
-
 import { UploadMetadata } from './interfaces';
 
 export const BUCKET = new InjectionToken<string>('angularfire2.storageBucket');
@@ -13,7 +12,9 @@ export const BUCKET = new InjectionToken<string>('angularfire2.storageBucket');
  * an API for uploading and downloading binary files from Cloud Storage for
  * Firebase.
  */
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class AngularFireStorage {
   public readonly storage: FirebaseStorage;
   public readonly scheduler: ɵFirebaseZoneScheduler;
@@ -28,7 +29,7 @@ export class AngularFireStorage {
     this.scheduler = new ɵFirebaseZoneScheduler(zone, platformId);
     this.storage = zone.runOutsideAngular(() => {
       const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
-      if (!app.storage) { throw "You must import 'firebase/storage' before using AngularFireStorage" }
+      if (!app.storage) { throw "You must import 'firebase/database' before using AngularFireDatabase" }
       return app.storage(storageBucket || undefined);
     });
   }
