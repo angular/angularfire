@@ -2,11 +2,11 @@ import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core
 import { messaging } from 'firebase/app';
 import { Observable, empty, from, of, throwError } from 'rxjs';
 import { mergeMap, catchError, map, switchMap, concat, shareReplay, defaultIfEmpty } from 'rxjs/operators';
-import { FirebaseOptions, FirebaseAppConfig, ɵrunOutsideAngular, FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵlazySDKProxy, PromiseProxy } from '@angular/fire';
+import { FirebaseOptions, FirebaseAppConfig, ɵrunOutsideAngular, FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
 import { ɵfirebaseAppFactory } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
 
-export interface AngularFireMessaging extends Omit<PromiseProxy<messaging.Messaging>, 'deleteToken'|'getToken'|'requestPermission'> {};
+export interface AngularFireMessaging extends Omit<ɵPromiseProxy<messaging.Messaging>, 'deleteToken'|'getToken'|'requestPermission'> {};
 
 @Injectable({
   providedIn: 'root'

@@ -22,6 +22,7 @@
     "@angular/platform-browser": "~9.0.0-rc.8",
     "@angular/platform-browser-dynamic": "~9.0.0-rc.8",
     "@angular/router": "~9.0.0-rc.8",
+    "firebase": "^7.6.2",
     "rxjs": "~6.5.3",
     "tslib": "^1.10.0",
     "zone.js": "~0.10.2"

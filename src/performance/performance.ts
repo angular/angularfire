@@ -2,14 +2,14 @@ import { Injectable, NgZone, ApplicationRef, InjectionToken, Inject, Optional } 
 import { Observable, Subscription, of } from 'rxjs';
 import { first, tap, map, shareReplay, switchMap } from 'rxjs/operators';
 import { performance } from 'firebase/app';
-import { FirebaseApp, PromiseProxy, ɵlazySDKProxy } from '@angular/fire';
+import { FirebaseApp, ɵPromiseProxy, ɵlazySDKProxy } from '@angular/fire';
 
 // SEMVER @ v6, drop and move core ng metrics to a service
 export const AUTOMATICALLY_TRACE_CORE_NG_METRICS = new InjectionToken<boolean>('angularfire2.performance.auto_trace');
 export const INSTRUMENTATION_ENABLED = new InjectionToken<boolean>('angularfire2.performance.instrumentationEnabled');
 export const DATA_COLLECTION_ENABLED = new InjectionToken<boolean>('angularfire2.performance.dataCollectionEnabled');
 
-export interface AngularFirePerformance extends Omit<PromiseProxy<performance.Performance>, 'trace'> {};
+export interface AngularFirePerformance extends Omit<ɵPromiseProxy<performance.Performance>, 'trace'> {};
 
 export type TraceOptions = {
   metrics?: {[key:string]: number},

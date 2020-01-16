@@ -1,7 +1,7 @@
 import { Injectable, Inject, Optional, NgZone, InjectionToken } from '@angular/core';
 import { of, from, Observable } from 'rxjs';
 import { map, switchMap, shareReplay, tap } from 'rxjs/operators';
-import { FirebaseOptions, FirebaseAppConfig, FIREBASE_APP_NAME, ɵrunOutsideAngular, ɵlazySDKProxy, PromiseProxy } from '@angular/fire';
+import { FirebaseOptions, FirebaseAppConfig, FIREBASE_APP_NAME, ɵrunOutsideAngular, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
 import { FIREBASE_OPTIONS, ɵfirebaseAppFactory } from '@angular/fire';
 import { functions } from 'firebase/app';
 
@@ -9,7 +9,7 @@ export const ORIGIN = new InjectionToken<string>('angularfire2.functions.origin'
 export const REGION = new InjectionToken<string>('angularfire2.functions.region');
 
 // override httpsCallable for compatibility with 5.x
-export interface AngularFireFunctions extends Omit<PromiseProxy<functions.Functions>, 'httpsCallable'> { };
+export interface AngularFireFunctions extends Omit<ɵPromiseProxy<functions.Functions>, 'httpsCallable'> { };
 
 @Injectable({
   providedIn: 'root'

@@ -11,31 +11,21 @@ export interface FirebaseAppConfig {[key:string]: any};
 export const FIREBASE_OPTIONS = new InjectionToken<FirebaseOptions>('angularfire2.app.options');
 export const FIREBASE_APP_NAME = new InjectionToken<string|FirebaseAppConfig|undefined>('angularfire2.app.nameOrConfig');
 
-export type FirebaseDatabase = database.Database;
-export type FirebaseAuth = auth.Auth;
-export type FirebaseAnalytics = analytics.Analytics;
-export type FirebaseMessaging = messaging.Messaging;
-export type FirebasePerformance = performance.Performance;
-export type FirebaseStorage = storage.Storage;
-export type FirebaseFirestore = firestore.Firestore;
-export type FirebaseFunctions = functions.Functions;
-export type FirebaseRemoteConfig = remoteConfig.RemoteConfig;
-
 // Have to implement as we need to return a class from the provider, we should consider exporting
 // this in the firebase/app types as this is our highest risk of breaks
 export class FirebaseApp implements Partial<app.App> {
     name: string;
     options: {};
-    analytics: () => FirebaseAnalytics;
-    auth: () => FirebaseAuth;
-    database: (databaseURL?: string) => FirebaseDatabase;
-    messaging: () => FirebaseMessaging;
-    performance: () => FirebasePerformance;
-    storage: (storageBucket?: string) => FirebaseStorage;
+    analytics: () => analytics.Analytics;
+    auth: () => auth.Auth;
+    database: (databaseURL?: string) => database.Database;
+    messaging: () => messaging.Messaging;
+    performance: () => performance.Performance;
+    storage: (storageBucket?: string) => storage.Storage;
     delete: () => Promise<void>;
-    firestore: () => FirebaseFirestore;
-    functions: (region?: string) => FirebaseFunctions;
-    remoteConfig: () => FirebaseRemoteConfig;
+    firestore: () => firestore.Firestore;
+    functions: (region?: string) => functions.Functions;
+    remoteConfig: () => remoteConfig.RemoteConfig;
 }
 
 export function ɵfirebaseAppFactory(options: FirebaseOptions, zone: NgZone, nameOrConfig?: string|FirebaseAppConfig|null) {

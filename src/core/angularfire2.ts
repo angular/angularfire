@@ -3,7 +3,7 @@ import { isPlatformServer } from '@angular/common';
 import { Observable, Subscription, queueScheduler as queue } from 'rxjs';
 
 // SEMVER put in database.ts when we drop database-depreciated
-export const DATABASE_URL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
+export const ɵDATABASE_URL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
 
 export class ɵFirebaseZoneScheduler {
   constructor(public zone: NgZone, private platformId: Object) {}
@@ -72,7 +72,7 @@ type PromiseReturningFunctionPropertyNames<T> = { [K in FunctionPropertyNames<T>
 type NonPromiseReturningFunctionPropertyNames<T> = { [K in FunctionPropertyNames<T>]: ReturnType<T[K]> extends Promise<any> ? never : K }[FunctionPropertyNames<T>];
 type NonFunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof T];
 
-export type PromiseProxy<T> = { [K in NonFunctionPropertyNames<T>]: Promise<T[K]> } &
+export type ɵPromiseProxy<T> = { [K in NonFunctionPropertyNames<T>]: Promise<T[K]> } &
   { [K in NonPromiseReturningFunctionPropertyNames<T>]: (...args: Parameters<T[K]>) => Promise<ReturnType<T[K]>> } &
   { [K in PromiseReturningFunctionPropertyNames<T>   ]: (...args: Parameters<T[K]>) => ReturnType<T[K]> };
 

@@ -2,7 +2,7 @@ import { Injectable, Inject, Optional, NgZone, InjectionToken, PLATFORM_ID } fro
 import { of, empty, throwError } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { map, tap, shareReplay, switchMap, catchError } from 'rxjs/operators';
-import { FirebaseAppConfig, FirebaseOptions, ɵrunOutsideAngular, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵfirebaseAppFactory, PromiseProxy } from '@angular/fire';
+import { FirebaseAppConfig, FirebaseOptions, ɵrunOutsideAngular, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵfirebaseAppFactory, ɵPromiseProxy } from '@angular/fire';
 import { analytics } from 'firebase';
 
 export interface Config {[key:string]: any};
@@ -21,7 +21,7 @@ const GTAG_CONFIG_COMMAND = 'config';
 const GTAG_FUNCTION_NAME = 'gtag';
 const DATA_LAYER_NAME = 'dataLayer';
 
-export interface AngularFireAnalytics extends PromiseProxy<analytics.Analytics> {};
+export interface AngularFireAnalytics extends ɵPromiseProxy<analytics.Analytics> {};
 
 @Injectable({
   providedIn: 'root'

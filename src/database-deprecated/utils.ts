@@ -1,6 +1,6 @@
 import { Subscription, Scheduler, queueScheduler as queue } from 'rxjs';
 import { DataSnapshot, AFUnwrappedDataSnapshot, PathReference, DatabaseReference } from './interfaces';
-import { FirebaseDatabase } from '@angular/fire';
+import { database } from 'firebase/app';
 
 const REGEX_ABSOLUTE_URL = /^[a-z]+:\/\/.*/;
 
@@ -101,7 +101,7 @@ export function isAbsoluteUrl(url: string) {
  * @param app - Firebase App
  * @param path - Database path, relative or absolute
  */
-export function getRef(database: FirebaseDatabase, pathRef: PathReference): DatabaseReference {
+export function getRef(database: database.Database, pathRef: PathReference): DatabaseReference {
   // if a db ref was passed in, just return it
   if(isFirebaseRef(pathRef)) {
     return pathRef as DatabaseReference;

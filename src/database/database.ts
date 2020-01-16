@@ -3,19 +3,22 @@ import { DatabaseQuery, PathReference, QueryFn, AngularFireList, AngularFireObje
 import { getRef } from './utils';
 import { createListReference } from './list/create-reference';
 import { createObjectReference } from './object/create-reference';
-import { FirebaseDatabase, FirebaseOptions, FirebaseAppConfig, DATABASE_URL, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵfirebaseAppFactory, ɵFirebaseZoneScheduler } from '@angular/fire';
+import { FirebaseOptions, FirebaseAppConfig, ɵDATABASE_URL as URL, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵfirebaseAppFactory, ɵFirebaseZoneScheduler } from '@angular/fire';
+import { database } from 'firebase/app';
+
+export { URL };
 
 @Injectable({
   providedIn: 'root'
 })
 export class AngularFireDatabase {
-  public readonly database: FirebaseDatabase;
+  public readonly database: database.Database;
   public readonly scheduler: ɵFirebaseZoneScheduler;
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
-    @Optional() @Inject(DATABASE_URL) databaseURL:string|null,
+    @Optional() @Inject(URL) databaseURL:string|null,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
@@ -59,5 +62,3 @@ export {
   Action,
   SnapshotAction
 } from './interfaces';
-
-export { DATABASE_URL as URL };

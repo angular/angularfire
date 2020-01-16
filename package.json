@@ -98,6 +98,7 @@
     "tsconfig-paths": "^3.8.0",
     "tsickle": "^0.35.0",
     "tslint": "^5.17.0",
+    "typedoc": "^0.16.4",
     "typescript": "~3.6.4"
   },
   "typings": "index.d.ts"

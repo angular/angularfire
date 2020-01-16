@@ -1,10 +1,10 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
 import { Observable, of, from } from 'rxjs';
 import { switchMap, shareReplay, map } from 'rxjs/operators';
-import { FIREBASE_OPTIONS, FIREBASE_APP_NAME, FirebaseOptions, FirebaseAppConfig, FirebaseAuth, ɵfirebaseAppFactory, ɵFirebaseZoneScheduler, ɵrunOutsideAngular, PromiseProxy, ɵlazySDKProxy } from '@angular/fire';
+import { FIREBASE_OPTIONS, FIREBASE_APP_NAME, FirebaseOptions, FirebaseAppConfig, ɵfirebaseAppFactory, ɵFirebaseZoneScheduler, ɵrunOutsideAngular, ɵPromiseProxy, ɵlazySDKProxy } from '@angular/fire';
 import { User, auth } from 'firebase/app';
 
-export interface AngularFireAuth extends PromiseProxy<auth.Auth> {};
+export interface AngularFireAuth extends ɵPromiseProxy<auth.Auth> {};
 
 @Injectable({
   providedIn: 'root'

@@ -1,8 +1,17 @@
 import { spawn } from 'child_process';
-import { copy, writeFile, readFile } from 'fs-extra';
+import { copy, writeFile, readFile, accessSync } from 'fs-extra';
 import { prettySize } from 'pretty-size';
 import { sync as gzipSync } from 'gzip-size';
-import { join } from 'path';
+import { join, dirname } from 'path';
+
+// TODO infer these from the package.json
+const MODULES = [
+  'core', 'analytics', 'auth', 'auth-guard', 'database',
+  'database-deprecated', 'firestore', 'functions', 'remote-config',
+  'storage', 'messaging', 'performance'
+];
+const UMD_NAMES = MODULES.map(m => m === 'core' ? 'angular-fire' : `angular-fire-${m}`);
+const ENTRY_NAMES = MODULES.map(m => m === 'core' ? '@angular/fire' : `@angular/fire/${m}`);
 
 const src = (...args:string[]) => join(process.cwd(), 'src', ...args);
 const dest = (...args:string[]) => join(process.cwd(), 'dist', 'packages-dist', ...args);
@@ -62,19 +71,32 @@ async function buildLibrary() {
     compileSchematics(),
     replacePackageJsonVersions()
   ]);
-  return Promise.all([
-    measure('angular-fire'),
-    measure('angular-fire-analytics'),
-    measure('angular-fire-auth'),
-    measure('angular-fire-auth-guard'),
-    measure('angular-fire-database'),
-    measure('angular-fire-firestore'),
-    measure('angular-fire-functions'),
-    measure('angular-fire-remote-config'),
-    measure('angular-fire-storage'),
-    measure('angular-fire-messaging'),
-    measure('angular-fire-performance')
-  ]);
+}
+
+function measureLibrary() {
+  return Promise.all(UMD_NAMES.map(measure));
+}
+
+async function buildDocs() {
+  // INVESTIGATE json to stdout rather than FS?
+  await Promise.all(MODULES.map(module => spawnPromise('npx', ['typedoc', `./src/${module}`, '--json', `./dist/typedocs/${module}.json`])));
+  const entries = await Promise.all(MODULES.map(async (module, index) => {
+    const buffer = await readFile(`./dist/typedocs/${module}.json`);
+    const typedoc = JSON.parse(buffer.toString());
+    // TODO infer the entryPoint from the package.json
+    const entryPoint = typedoc.children.find((c:any) => c.name === "\"public_api\"");
+    const allChildren = [].concat(...typedoc.children.map(child =>
+      // TODO chop out the working directory and filename
+      child.children ? child.children.map(c => ({...c, path: dirname(child.originalName.split(process.cwd())[1])})) : []
+    ));
+    const exports = entryPoint.children.filter(c => c.name[0] !== 'ɵ' /* private */).map(child => {
+      return {...allChildren.find(c => child.target === c.id)};
+    });
+    return { name: ENTRY_NAMES[index], exports };
+  }));
+  const root = await rootPackage;
+  const afdoc = entries.reduce((acc, entry, index) => ({...acc, [MODULES[index]]: entry }), {});
+  return writeFile(`./api-${root.version}.json`, JSON.stringify(afdoc, null, 2));
 }
 
 async function buildWrapper() {
@@ -86,22 +108,10 @@ async function buildWrapper() {
   return writeFile(path, JSON.stringify(pkg, null, 2));
 }
 
-buildLibrary().then(stats => {
-  var line = 0;
+buildLibrary().then(buildWrapper).then(buildDocs).then(measureLibrary).then(stats =>
   console.log(`
 Package      Size     Gzipped
 -----------------------------
-Core         ${stats[line].size.padEnd(8)} ${stats[line++].gzip}
-Analytics    ${stats[line].size.padEnd(8)} ${stats[line++].gzip}
-Auth         ${stats[line].size.padEnd(8)} ${stats[line++].gzip}
-AuthGuard    ${stats[line].size.padEnd(8)} ${stats[line++].gzip}
-Database     ${stats[line].size.padEnd(8)} ${stats[line++].gzip}
-Firestore    ${stats[line].size.padEnd(8)} ${stats[line++].gzip}
-Functions    ${stats[line].size.padEnd(8)} ${stats[line++].gzip}
-RemoteConfig ${stats[line].size.padEnd(8)} ${stats[line++].gzip}
-Storage      ${stats[line].size.padEnd(8)} ${stats[line++].gzip}
-Messaging    ${stats[line].size.padEnd(8)} ${stats[line++].gzip}
-Performance  ${stats[line].size.padEnd(8)} ${stats[line++].gzip}
-  `);
-  return buildWrapper();
-});
+${stats.map((s, i) => [MODULES[i].padEnd(20), s.size.padEnd(8), s.gzip].join("")).join("\n")}`
+  )
+);

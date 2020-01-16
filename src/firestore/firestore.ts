@@ -4,8 +4,9 @@ import { Settings, PersistenceSettings, CollectionReference, DocumentReference, 
 import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 import { AngularFirestoreCollectionGroup } from './collection-group/collection-group';
-import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵfirebaseAppFactory, ɵFirebaseZoneScheduler } from '@angular/fire';
+import { FirebaseOptions, FirebaseAppConfig, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵfirebaseAppFactory, ɵFirebaseZoneScheduler } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
+import { firestore } from 'firebase/app';
 
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
@@ -91,7 +92,7 @@ export function associateQuery(collectionRef: CollectionReference, queryFn = ref
   providedIn: 'root'
 })
 export class AngularFirestore {
-  public readonly firestore: FirebaseFirestore;
+  public readonly firestore: firestore.Firestore;
   public readonly persistenceEnabled$: Observable<boolean>;
   public readonly scheduler: ɵFirebaseZoneScheduler;
 

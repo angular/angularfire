@@ -1,7 +1,7 @@
 import { Injectable, Inject, Optional, NgZone, InjectionToken } from '@angular/core';
 import { Observable, concat, of, pipe, OperatorFunction, MonoTypeOperatorFunction, empty, throwError } from 'rxjs';
 import { map, switchMap, tap, shareReplay, distinctUntilChanged, filter, groupBy, mergeMap, scan, withLatestFrom, startWith, debounceTime, catchError } from 'rxjs/operators';
-import { FirebaseAppConfig, FirebaseOptions, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME, PromiseProxy } from '@angular/fire';
+import { FirebaseAppConfig, FirebaseOptions, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵPromiseProxy } from '@angular/fire';
 import { remoteConfig } from 'firebase/app';
 import { ɵfirebaseAppFactory, ɵrunOutsideAngular } from '@angular/fire';
 
@@ -10,7 +10,7 @@ export interface ConfigTemplate {[key:string]: string|number|boolean};
 export const SETTINGS = new InjectionToken<remoteConfig.Settings>('angularfire2.remoteConfig.settings');
 export const DEFAULTS = new InjectionToken<ConfigTemplate>('angularfire2.remoteConfig.defaultConfig');
 
-export interface AngularFireRemoteConfig extends PromiseProxy<remoteConfig.RemoteConfig> {};
+export interface AngularFireRemoteConfig extends ɵPromiseProxy<remoteConfig.RemoteConfig> {};
 
 // TODO export as implements Partial<...> so minor doesn't break us
 export class Value implements remoteConfig.Value {

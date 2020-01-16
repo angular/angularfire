@@ -5,7 +5,10 @@ import { FirebaseListFactoryOpts, FirebaseObjectFactoryOpts, PathReference } fro
 import { FirebaseObjectFactory } from './firebase_object_factory';
 import { FirebaseObjectObservable } from './firebase_object_observable';
 import * as utils from './utils';
-import { FirebaseDatabase, FirebaseOptions, FirebaseAppConfig, FIREBASE_OPTIONS, FIREBASE_APP_NAME, DATABASE_URL, ɵfirebaseAppFactory } from '@angular/fire';
+import { FirebaseOptions, FirebaseAppConfig, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵDATABASE_URL as URL, ɵfirebaseAppFactory } from '@angular/fire';
+import { database } from 'firebase/app';
+
+export { URL };
 
 @Injectable({
   providedIn: 'root'
@@ -15,12 +18,12 @@ export class AngularFireDatabase {
   /**
    * Firebase Database instance
    */
-  database: FirebaseDatabase;
+  database: database.Database;
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
-    @Optional() @Inject(DATABASE_URL) databaseURL:string|null,
+    @Optional() @Inject(URL) databaseURL:string|null,
     zone: NgZone
   ) {
     this.database = zone.runOutsideAngular(() => {
@@ -41,5 +44,3 @@ export class AngularFireDatabase {
   }
 
 }
-
-export { DATABASE_URL, DATABASE_URL as URL };

@@ -1,7 +1,8 @@
 import { Injectable, Inject, Optional, InjectionToken, NgZone, PLATFORM_ID } from '@angular/core';
 import { createStorageRef } from './ref';
-import { FirebaseStorage, FirebaseOptions, FirebaseAppConfig, ɵFirebaseZoneScheduler, ɵfirebaseAppFactory, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire';
+import { FirebaseOptions, FirebaseAppConfig, ɵFirebaseZoneScheduler, ɵfirebaseAppFactory, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire';
 import { UploadMetadata } from './interfaces';
+import { storage } from 'firebase/app';
 
 export const BUCKET = new InjectionToken<string>('angularfire2.storageBucket');
 
@@ -16,7 +17,7 @@ export const BUCKET = new InjectionToken<string>('angularfire2.storageBucket');
   providedIn: 'root'
 })
 export class AngularFireStorage {
-  public readonly storage: FirebaseStorage;
+  public readonly storage: storage.Storage;
   public readonly scheduler: ɵFirebaseZoneScheduler;
 
   constructor(
