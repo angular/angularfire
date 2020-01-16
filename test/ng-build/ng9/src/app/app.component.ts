@@ -35,7 +35,7 @@ export class AppComponent {
     private readonly remoteConfig: AngularFireRemoteConfig,
     private readonly appRef: ApplicationRef
   ) {
-    const authArgs = canActivate(loggedIn);
+    const authArgs = canActivate(() => loggedIn);
     console.log(analytics, app, db, auth, afStore, storage, messaging, functions, remoteConfig, performance, authArgs);
     appRef.isStable.subscribe(it => console.log("isStable", it));
   }
