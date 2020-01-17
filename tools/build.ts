@@ -89,13 +89,34 @@ async function buildDocs() {
       // TODO chop out the working directory and filename
       child.children ? child.children.map(c => ({...c, path: dirname(child.originalName.split(process.cwd())[1])})) : []
     ));
-    const exports = entryPoint.children.filter(c => c.name[0] !== 'ɵ' /* private */).map(child => {
-      return {...allChildren.find(c => child.target === c.id)};
-    });
-    return { name: ENTRY_NAMES[index], exports };
+    return entryPoint.children
+      .filter(c => c.name[0] !== 'ɵ' && c.name[0] !== '_' /* private */)
+      .map(child => ({...allChildren.find(c => child.target === c.id)}))
+      .reduce((acc, child) => ({...acc, [encodeURIComponent(child.name)]: child}), {});
   }));
   const root = await rootPackage;
-  const afdoc = entries.reduce((acc, entry, index) => ({...acc, [MODULES[index]]: entry }), {});
+  const pipes = ['MonoTypeOperatorFunction', 'OperatorFunction', 'AuthPipe', 'UnaryFunction'];
+  const tocType = child => {
+    const decorators: string[] = child.decorators && child.decorators.map(d => d.name) || [];
+    if (decorators.includes('NgModule')) {
+      return 'NgModule'
+    } else if (child.kindString === 'Type alias') {
+      return 'Type alias';
+    } else if (child.kindString === 'Variable' && child.defaultValue && child.defaultValue.startsWith('new InjectionToken')) {
+      return 'InjectionToken'
+    } else if (child.type) {
+      return pipes.includes(child.type.name) ? 'Pipe' : child.type.name;
+    } else if (child.signatures && child.signatures[0] && child.signatures[0].type && pipes.includes(child.signatures[0].type.name)) {
+      return 'Pipe';
+    } else {
+      return child.kindString;
+    }
+  }
+  const table_of_contents = entries.reduce((acc, entry, index) =>
+    ({...acc, [MODULES[index]]: {name: ENTRY_NAMES[index], exports: Object.keys(entry).reduce((acc, key) => ({...acc, [key]: tocType(entry[key])}), {})}}),
+    {}
+  );
+  const afdoc = entries.reduce((acc, entry, index) => ({...acc, [MODULES[index]]: entry }), { table_of_contents });
   return writeFile(`./api-${root.version}.json`, JSON.stringify(afdoc, null, 2));
 }
 
