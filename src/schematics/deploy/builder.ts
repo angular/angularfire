@@ -5,8 +5,9 @@ import {
 } from "@angular-devkit/architect";
 import { NodeJsSyncHost } from "@angular-devkit/core/node";
 import deploy from "./actions";
-import { experimental, join, normalize, json } from "@angular-devkit/core";
+import { experimental, normalize, json } from "@angular-devkit/core";
 import { DeployBuilderSchema } from '../interfaces';
+import * as path from "path";
 import { getFirebaseProjectName } from "../utils";
 
 type DeployBuilderOptions = DeployBuilderSchema & json.JsonObject;
@@ -32,7 +33,7 @@ export default createBuilder<any>(
     const project = workspace.getProject(context.target.project);
 
     const firebaseProject = getFirebaseProjectName(
-      workspace.root,
+      context.workspaceRoot,
       context.target.project
     );
 
@@ -42,9 +43,9 @@ export default createBuilder<any>(
       await deploy(
         require("firebase-tools"),
         context,
-        join(workspace.root, project.root),
+        path.join(context.workspaceRoot, project.root),
         buildTarget,
-        firebaseProject,
+        firebaseProject
       );
     } catch (e) {
       console.error("Error when trying to deploy: ");
