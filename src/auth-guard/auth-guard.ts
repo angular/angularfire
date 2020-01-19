@@ -24,8 +24,8 @@ export class AngularFireAuthGuard implements CanActivate {
 
 }
 
-export const canActivate = (pipe: AuthPipe|AuthPipeGenerator) => ({
-    canActivate: [ AngularFireAuthGuard ], data: { authGuardPipe: pipe.name === "" ? pipe : () => pipe}
+export const canActivate = (pipe: AuthPipe | AuthPipeGenerator) => ({
+  canActivate: [AngularFireAuthGuard], data: { authGuardPipe: pipe.name !== 'piped' ? pipe : () => pipe },
 });
 
 export const loggedIn: AuthPipe = map(user => !!user);
