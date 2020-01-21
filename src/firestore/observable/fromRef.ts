@@ -1,25 +1,37 @@
-import { Observable, Subscriber } from 'rxjs';
+import { Observable, SchedulerLike, asyncScheduler } from 'rxjs';
 import { DocumentReference, Query, Action, Reference, DocumentSnapshot, QuerySnapshot } from '../interfaces';
-import { map, share } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
-function _fromRef<T, R>(ref: Reference<T>): Observable<R> {
+function _fromRef<T, R>(ref: Reference<T>, scheduler: SchedulerLike = asyncScheduler): Observable<R> {
   return new Observable(subscriber => {
-    const unsubscribe = ref.onSnapshot(subscriber);
-    return { unsubscribe };
+    let unsubscribe;
+    if (scheduler != null) {
+      scheduler.schedule(() => {
+        unsubscribe = ref.onSnapshot(subscriber);
+      });
+    } else {
+      unsubscribe = ref.onSnapshot(subscriber);
+    }
+
+    return function() {
+      if (unsubscribe != null) {
+        unsubscribe();
+      }
+    }
   });
 }
 
-export function fromRef<R>(ref: DocumentReference | Query) {
-  return _fromRef<typeof ref, R>(ref).pipe(share());
+export function fromRef<R>(ref: DocumentReference | Query, scheduler?: SchedulerLike) {
+  return _fromRef<typeof ref, R>(ref, scheduler);
 }
 
-export function fromDocRef<T>(ref: DocumentReference): Observable<Action<DocumentSnapshot<T>>>{
-  return fromRef<DocumentSnapshot<T>>(ref)
+export function fromDocRef<T>(ref: DocumentReference, scheduler?: SchedulerLike): Observable<Action<DocumentSnapshot<T>>>{
+  return fromRef<DocumentSnapshot<T>>(ref, scheduler)
     .pipe(
       map(payload => ({ payload, type: 'value' }))
     );
 }
 
-export function fromCollectionRef<T>(ref: Query): Observable<Action<QuerySnapshot<T>>> {
-  return fromRef<QuerySnapshot<T>>(ref).pipe(map(payload => ({ payload, type: 'query' })));
+export function fromCollectionRef<T>(ref: Query, scheduler?: SchedulerLike): Observable<Action<QuerySnapshot<T>>> {
+  return fromRef<QuerySnapshot<T>>(ref, scheduler).pipe(map(payload => ({ payload, type: 'query' })));
 }
