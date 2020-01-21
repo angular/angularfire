@@ -1,8 +1,8 @@
 import { Injectable, Inject, Optional, NgZone, InjectionToken, PLATFORM_ID } from '@angular/core';
 import { of } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
-import { map, tap, shareReplay, switchMap } from 'rxjs/operators';
-import { FirebaseAppConfig, FirebaseOptions, runOutsideAngular, ɵlazySDKProxy, FirebaseAnalytics, FIREBASE_OPTIONS, FIREBASE_APP_NAME, _firebaseAppFactory } from '@angular/fire';
+import { map, tap, shareReplay, switchMap, observeOn } from 'rxjs/operators';
+import { FirebaseAppConfig, FirebaseOptions, ɵlazySDKProxy, FirebaseAnalytics, FIREBASE_OPTIONS, FIREBASE_APP_NAME, _firebaseAppFactory, AngularFireSchedulers } from '@angular/fire';
 import { analytics, app } from 'firebase';
 
 export interface Config {[key:string]: any};
@@ -58,6 +58,8 @@ export class AngularFireAnalytics {
     zone: NgZone
   ) {
 
+    const schedulers = new AngularFireSchedulers(zone);
+
     if (isPlatformBrowser(platformId)) {
 
       window[DATA_LAYER_NAME] = window[DATA_LAYER_NAME] || [];
@@ -84,15 +86,15 @@ export class AngularFireAnalytics {
     if (debugModeEnabled)   { this.updateConfig({ [DEBUG_MODE_KEY]:  1 }) }
 
     const analytics = of(undefined).pipe(
+      observeOn(schedulers.outsideAngular),
       // @ts-ignore zapping in the UMD in the build script
-      switchMap(() => zone.runOutsideAngular(() => import('firebase/analytics'))),
+      switchMap(() => import('firebase/analytics')),
       map(() => _firebaseAppFactory(options, zone, nameOrConfig)),
       // SEMVER no need to cast once we drop older Firebase
       map(app => <analytics.Analytics>app.analytics()),
       tap(analytics => {
         if (analyticsCollectionEnabled === false) { analytics.setAnalyticsCollectionEnabled(false) }
       }),
-      runOutsideAngular(zone),
       shareReplay({ bufferSize: 1, refCount: false }),
     );
 

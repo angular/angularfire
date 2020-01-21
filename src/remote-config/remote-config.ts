@@ -1,6 +1,6 @@
 import { Injectable, Inject, Optional, NgZone, InjectionToken } from '@angular/core';
 import { Observable, concat, of, pipe, OperatorFunction, MonoTypeOperatorFunction } from 'rxjs';
-import { map, switchMap, tap, shareReplay, distinctUntilChanged, filter, groupBy, mergeMap, scan, withLatestFrom, startWith, debounceTime } from 'rxjs/operators';
+import { map, switchMap, tap, shareReplay, distinctUntilChanged, filter, groupBy, mergeMap, scan, withLatestFrom, startWith, debounceTime, observeOn } from 'rxjs/operators';
 import { FirebaseAppConfig, FirebaseOptions, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire';
 import { remoteConfig } from 'firebase/app';
 
@@ -9,7 +9,7 @@ export interface ConfigTemplate {[key:string]: string|number|boolean};
 export const SETTINGS = new InjectionToken<remoteConfig.Settings>('angularfire2.remoteConfig.settings');
 export const DEFAULTS = new InjectionToken<ConfigTemplate>('angularfire2.remoteConfig.defaultConfig');
 
-import { FirebaseRemoteConfig, _firebaseAppFactory, runOutsideAngular } from '@angular/fire';
+import { FirebaseRemoteConfig, _firebaseAppFactory, AngularFireSchedulers } from '@angular/fire';
 
 // SEMVER: once we move to Typescript 3.6 use `PromiseProxy<remoteConfig.RemoteConfig>` rather than hardcoding
 type RemoteConfigProxy = {
@@ -75,8 +75,11 @@ export class AngularFireRemoteConfig {
     @Optional() @Inject(DEFAULTS) defaultConfig:ConfigTemplate|null,
     private zone: NgZone
   ) {
+
+    const schedulers = new AngularFireSchedulers(zone);
     
     const remoteConfig$ = of(undefined).pipe(
+      observeOn(schedulers.outsideAngular),
       // @ts-ignore zapping in the UMD in the build script
       switchMap(() => zone.runOutsideAngular(() => import('firebase/remote-config'))),
       map(() => _firebaseAppFactory(options, zone, nameOrConfig)),
@@ -87,7 +90,6 @@ export class AngularFireRemoteConfig {
         if (defaultConfig) { rc.defaultConfig = defaultConfig }
       }),
       startWith(undefined),
-      runOutsideAngular(zone),
       shareReplay({ bufferSize: 1, refCount: false })
     );
 
