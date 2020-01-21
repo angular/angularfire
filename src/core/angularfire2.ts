@@ -96,6 +96,69 @@ export function keepUnstableUntilFirstFactory(
   }
 }
 
+// SEMVER: drop v6, here for compatibility
+export const runOutsideAngular = (zone: NgZone) => <T>(obs$: Observable<T>): Observable<T> => {
+  return new Observable<T>(subscriber => {
+    return zone.runOutsideAngular(() => {
+      runInZone(zone)(obs$).subscribe(subscriber);
+    });
+  });
+}
+
+// SEMVER: drop v6, here for compatibility
+export const runInZone = (zone: NgZone) => <T>(obs$: Observable<T>): Observable<T> => {
+  return new Observable<T>(subscriber => {
+    return obs$.subscribe(
+      value => zone.run(() => subscriber.next(value)),
+      error => zone.run(() => subscriber.error(error)),
+      ()    => zone.run(() => subscriber.complete()),
+    );
+  });
+}
+
+// SEMVER: drop v6, here for compatibility
+export class FirebaseZoneScheduler {
+  constructor(public zone: NgZone, private platformId: Object) {}
+  schedule(...args: any[]): Subscription {
+    return <Subscription>this.zone.runGuarded(function() { return queueScheduler.schedule.apply(queueScheduler, args)});
+  }
+  keepUnstableUntilFirst<T>(obs$: Observable<T>) {
+    if (isPlatformServer(this.platformId)) {
+      return new Observable<T>(subscriber => {
+        const noop = () => {};
+        const task = Zone.current.scheduleMacroTask('firebaseZoneBlock', noop, {}, noop, noop);
+        obs$.subscribe(
+          next => {
+            if (task.state === 'scheduled') { task.invoke() };
+            subscriber.next(next);
+          },
+          error => {
+            if (task.state === 'scheduled') { task.invoke() }
+            subscriber.error(error);
+          },
+          () => {
+            if (task.state === 'scheduled') { task.invoke() }
+            subscriber.complete();
+          }
+        );
+      });
+    } else {
+      return obs$;
+    }
+  }
+  runOutsideAngular<T>(obs$: Observable<T>): Observable<T> {
+    return new Observable<T>(subscriber => {
+      return this.zone.runOutsideAngular(() => {
+        return obs$.subscribe(
+          value => this.zone.run(() => subscriber.next(value)),
+          error => this.zone.run(() => subscriber.error(error)),
+          ()    => this.zone.run(() => subscriber.complete()),
+        );
+      });
+    });
+  }
+}
+
 //SEMVER: once we move to TypeScript 3.6, we can use these to build lazy interfaces
 /*
   type FunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? K : never }[keyof T];
