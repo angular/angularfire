@@ -108,12 +108,20 @@ export class AngularFireRemoteConfig {
     );
 
     const existing$ = loadedRemoteConfig$.pipe(
-      switchMap(rc => rc.activate().then(() => rc.getAll())),
+      switchMap(rc =>
+        rc.activate()
+          .then(() => rc.ensureInitialized())
+          .then(() => rc.getAll())
+      ),
       filterOutDefaults
     );
 
     const fresh$ = loadedRemoteConfig$.pipe(
-      switchMap(rc => zone.runOutsideAngular(() => rc.fetchAndActivate().then(() => rc.getAll()))),
+      switchMap(rc => zone.runOutsideAngular(() =>
+        rc.fetchAndActivate()
+          .then(() => rc.ensureInitialized())
+          .then(() => rc.getAll())
+      )),
       filterOutDefaults
     );
 
