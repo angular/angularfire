@@ -1,8 +1,8 @@
 import { Injectable, Optional, NgZone, OnDestroy, ComponentFactoryResolver, Inject, PLATFORM_ID, Injector, NgModuleFactory } from '@angular/core';
 import { Subscription, from, Observable, of } from 'rxjs';
-import { filter, withLatestFrom, switchMap, map, tap, pairwise, startWith, groupBy, mergeMap } from 'rxjs/operators';
+import { filter, withLatestFrom, switchMap, map, tap, pairwise, startWith, groupBy, mergeMap, observeOn } from 'rxjs/operators';
 import { Router, NavigationEnd, ActivationEnd, ROUTES } from '@angular/router';
-import { runOutsideAngular } from '@angular/fire';
+import { ɵAngularFireSchedulers } from '@angular/fire';
 import { AngularFireAnalytics, DEBUG_MODE } from './analytics';
 import { User } from 'firebase/app';
 import { Title } from '@angular/platform-browser';
@@ -160,15 +160,17 @@ export class UserTrackingService implements OnDestroy {
         zone: NgZone,
         @Inject(PLATFORM_ID) platformId:Object
     ) {
+        const schedulers = new ɵAngularFireSchedulers(zone);
+
         if (!isPlatformServer(platformId)) {
             zone.runOutsideAngular(() => {
                 // @ts-ignore zap the import in the UMD
                 this.disposable = from(import('firebase/auth')).pipe(
+                    observeOn(schedulers.outsideAngular),
                     switchMap(() => analytics.app),
                     map(app => app.auth()),
                     switchMap(auth => new Observable<User|null>(auth.onAuthStateChanged.bind(auth))),
-                    switchMap(user => analytics.setUserId(user ? user.uid : null!)),
-                    runOutsideAngular(zone)
+                    switchMap(user => analytics.setUserId(user ? user.uid : null!))
                 ).subscribe();
             });
         }

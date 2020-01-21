@@ -1,8 +1,8 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID, InjectionToken } from '@angular/core';
 import { Observable, from } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, observeOn } from 'rxjs/operators';
 import { FirebaseOptions, FirebaseAppConfig, FIREBASE_APP_NAME } from '@angular/fire';
-import { FirebaseFunctions, FIREBASE_OPTIONS, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
+import { FirebaseFunctions, FIREBASE_OPTIONS, _firebaseAppFactory, ɵAngularFireSchedulers } from '@angular/fire';
 
 // SEMVER: @ v6 remove FunctionsRegionToken and FUNCTIONS_REGION in favor of REGION
 export const FunctionsRegionToken = new InjectionToken<string>('angularfire2.functions.region');
@@ -21,7 +21,7 @@ export class AngularFireFunctions {
    */
   public readonly functions: FirebaseFunctions;
 
-  public readonly scheduler: FirebaseZoneScheduler;
+  public readonly schedulers: ɵAngularFireSchedulers;
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
@@ -31,8 +31,8 @@ export class AngularFireFunctions {
     @Optional() @Inject(REGION) region:string|null,
     @Optional() @Inject(ORIGIN) origin:string|null
   ) {
-    this.scheduler = new FirebaseZoneScheduler(zone, platformId);
-    
+    this.schedulers = new ɵAngularFireSchedulers(zone);
+
     this.functions = zone.runOutsideAngular(() => {
       const app = _firebaseAppFactory(options, zone, nameOrConfig);
       return app.functions(region || undefined);
@@ -48,11 +48,10 @@ export class AngularFireFunctions {
     const callable = this.functions.httpsCallable(name);
     return (data: T) => {
       const callable$ = from(callable(data));
-      return this.scheduler.runOutsideAngular(
-        callable$.pipe(
-          map(r => r.data as R)
-        )
-      )
+      return callable$.pipe(
+        observeOn(this.schedulers.outsideAngular),
+        map(r => r.data as R)
+      );
     }
   }
 

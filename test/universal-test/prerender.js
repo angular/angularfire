@@ -2,7 +2,7 @@ require('zone.js/dist/zone-node');
 const { renderModuleFactory } = require('@angular/platform-server');
 const fs = require('fs');
 
-const { AppServerModuleNgFactory } = require(`./dist-server/main.bundle`);
+const { AppServerModuleNgFactory } = require(`./dist-server/main`);
 const index = require('fs').readFileSync('./src/index.html', 'utf8');
 
 let renderComplete = false;
@@ -19,5 +19,6 @@ renderModuleFactory(AppServerModuleNgFactory, {
 .then(html => {
   console.log('bootstrap done');
   renderComplete = true;
-  fs.writeFileSync('./dist-server/index.html', html)
+  fs.writeFileSync('./dist-server/index.html', html);
+  process.exit(0);
 });
