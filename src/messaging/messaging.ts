@@ -1,10 +1,9 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
 import { messaging } from 'firebase/app';
-import { Observable, from, of, throwError } from 'rxjs';
+import { Observable, empty, from, of, throwError } from 'rxjs';
 import { mergeMap, catchError, map, switchMap, concat, defaultIfEmpty, observeOn } from 'rxjs/operators';
-import { FirebaseOptions, FirebaseAppConfig, AngularFireSchedulers } from '@angular/fire';
-import { FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory } from '@angular/fire';
+import { FirebaseOptions, FirebaseAppConfig, AngularFireSchedulers, _firebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire';
 
 @Injectable()
 export class AngularFireMessaging {
@@ -17,8 +16,8 @@ export class AngularFireMessaging {
   deleteToken: (token: string) => Observable<boolean>;
 
   constructor(
-    @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|null|undefined,
+    @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
+    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {

@@ -1,3 +1,8 @@
+<a name="5.3.0"></a>
+# [5.3.0](https://github.com/angular/angularfire2/compare/5.2.3...5.3.0) (2020-01-07)
+
+AngularFire 5.3 introduces [Analytics](docs/analytics/getting-started.md) and [Remote Config](docs/remote-config/getting-started.md) modules.
+
 <a name="5.2.3"></a>
 # [5.2.3](https://github.com/angular/angularfire2/compare/5.2.1...5.2.3) (2019-11-12)
 

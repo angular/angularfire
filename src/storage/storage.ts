@@ -2,11 +2,13 @@ import { Injectable, Inject, Optional, InjectionToken, NgZone, PLATFORM_ID } fro
 import { createStorageRef, AngularFireStorageReference } from './ref';
 import { createUploadTask, AngularFireUploadTask } from './task';
 import { Observable } from 'rxjs';
-import { FirebaseStorage, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, keepUnstableUntilFirstFactory, AngularFireSchedulers } from '@angular/fire';
+import { FirebaseStorage, FirebaseOptions, FirebaseAppConfig, _firebaseAppFactory, FIREBASE_OPTIONS, FIREBASE_APP_NAME, keepUnstableUntilFirstFactory, AngularFireSchedulers } from '@angular/fire';
 
 import { UploadMetadata } from './interfaces';
 
+// SEMVER drop StorageBucket in favor of BUCKET
 export const StorageBucket = new InjectionToken<string>('angularfire2.storageBucket');
+export const BUCKET = StorageBucket;
 
 /**
  * AngularFireStorage Service
@@ -23,9 +25,9 @@ export class AngularFireStorage {
   public readonly schedulers: AngularFireSchedulers;
 
   constructor(
-    @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|null|undefined,
-    @Optional() @Inject(StorageBucket) storageBucket:string|null,
+    @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
+    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
+    @Optional() @Inject(BUCKET) storageBucket:string|null,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {

@@ -1,23 +1,24 @@
 import { ReflectiveInjector, Provider } from '@angular/core';
 import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, FirebaseOptionsToken, AngularFireModule, FirebaseNameOrConfigToken } from '@angular/fire';
-import { AngularFireFunctions, AngularFireFunctionsModule, FUNCTIONS_REGION, FUNCTIONS_ORIGIN } from '@angular/fire/functions';
+import { AngularFireAnalytics, AngularFireAnalyticsModule, COLLECTION_ENABLED, APP_VERSION, APP_NAME } from '@angular/fire/analytics';
 import { COMMON_CONFIG } from './test-config';
 
-describe('AngularFireFunctions', () => {
+
+describe('AngularFireAnalytics', () => {
   let app: FirebaseApp;
-  let afFns: AngularFireFunctions;
+  let analytics: AngularFireAnalytics;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG),
-        AngularFireFunctionsModule
+        AngularFireAnalyticsModule
       ]
     });
-    inject([FirebaseApp, AngularFireFunctions], (app_: FirebaseApp, _fn: AngularFireFunctions) => {
+    inject([FirebaseApp, AngularFireAnalytics], (app_: FirebaseApp, _analytics: AngularFireAnalytics) => {
       app = app_;
-      afFns = _fn;
+      analytics = _analytics;
     })();
   });
 
@@ -26,38 +27,39 @@ describe('AngularFireFunctions', () => {
     done();
   });
 
-  it('should exist', () => {
-    expect(afFns instanceof AngularFireFunctions).toBe(true);
+  it('should be exist', () => {
+    expect(analytics instanceof AngularFireAnalytics).toBe(true);
   });
 
   it('should have the Firebase Functions instance', () => {
-    expect(afFns.functions).toBeDefined();
+    expect(analytics.app).toBeDefined();
   });
 
 });
 
 const FIREBASE_APP_NAME_TOO = (Math.random() + 1).toString(36).substring(7);
 
-describe('AngularFireFunctions with different app', () => {
+describe('AngularFireAnalytics with different app', () => {
   let app: FirebaseApp;
-  let afFns: AngularFireFunctions;
+  let analytics: AngularFireAnalytics;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG),
-        AngularFireFunctionsModule
+        AngularFireAnalyticsModule
       ],
       providers: [
         { provide: FirebaseNameOrConfigToken, useValue: FIREBASE_APP_NAME_TOO },
         { provide: FirebaseOptionsToken, useValue: COMMON_CONFIG },
-        { provide: FUNCTIONS_ORIGIN, useValue: 'http://0.0.0.0:9999' },
-        { provide: FUNCTIONS_REGION, useValue: 'asia-northeast1' }
+        { provide: COLLECTION_ENABLED, useValue: true },
+        { provide: APP_VERSION, useValue: '0.0' },
+        { provide: APP_NAME, useValue: 'Test App!' }
       ]
     });
-    inject([FirebaseApp, AngularFireFunctions], (app_: FirebaseApp, _fns: AngularFireFunctions) => {
+    inject([FirebaseApp, AngularFireAnalytics], (app_: FirebaseApp, _analytics: AngularFireAnalytics) => {
       app = app_;
-      afFns = _fns;
+      analytics = _analytics;
     })();
   });
 
@@ -69,11 +71,11 @@ describe('AngularFireFunctions with different app', () => {
   describe('<constructor>', () => {
 
     it('should be an AngularFireAuth type', () => {
-      expect(afFns instanceof AngularFireFunctions).toEqual(true);
+      expect(analytics instanceof AngularFireAnalytics).toEqual(true);
     });
 
     it('should have the Firebase Functions instance', () => {
-      expect(afFns.functions).toBeDefined();
+      expect(analytics.app).toBeDefined();
     });
 
   });

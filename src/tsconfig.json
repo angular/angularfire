@@ -11,6 +11,7 @@
     "noFallthroughCasesInSwitch": true,
     "paths": {
       "@angular/fire": ["./core"],
+      "@angular/fire/analytics": ["./analytics"],
       "@angular/fire/auth": ["./auth"],
       "@angular/fire/auth-guard": ["./auth-guard"],
       "@angular/fire/database": ["./database"],
@@ -19,6 +20,7 @@
       "@angular/fire/storage": ["./storage"],
       "@angular/fire/messaging": ["./messaging"],
       "@angular/fire/performance": ["./performance"],
+      "@angular/fire/remote-config": ["./remote-config"],
       "@angular/fire/database-deprecated": ["./database-deprecated"]
     },
     "rootDir": ".",

@@ -3,7 +3,7 @@ import { DatabaseQuery, PathReference, QueryFn, AngularFireList, AngularFireObje
 import { getRef } from './utils';
 import { createListReference } from './list/create-reference';
 import { createObjectReference } from './object/create-reference';
-import { FirebaseDatabase, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, RealtimeDatabaseURL, _firebaseAppFactory, keepUnstableUntilFirstFactory, AngularFireSchedulers } from '@angular/fire';
+import { FirebaseDatabase, FirebaseOptions, FirebaseAppConfig, RealtimeDatabaseURL, FIREBASE_OPTIONS, FIREBASE_APP_NAME, DATABASE_URL, _firebaseAppFactory, keepUnstableUntilFirstFactory, AngularFireSchedulers } from '@angular/fire';
 import { Observable } from 'rxjs';
 
 @Injectable()
@@ -14,9 +14,9 @@ export class AngularFireDatabase {
   public readonly keepUnstableUntilFirst: <T>(obs$: Observable<T>) => Observable<T>;
 
   constructor(
-    @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|null|undefined,
-    @Optional() @Inject(RealtimeDatabaseURL) databaseURL:string|null,
+    @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
+    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
+    @Optional() @Inject(DATABASE_URL) databaseURL:string|null,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
@@ -62,4 +62,4 @@ export {
   SnapshotAction
 } from './interfaces';
 
-export { RealtimeDatabaseURL };
+export { RealtimeDatabaseURL, DATABASE_URL, DATABASE_URL as URL };
