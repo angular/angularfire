@@ -30,7 +30,7 @@ export class FirebaseApp {
     delete: () => Promise<void>;
     firestore: () => FirebaseFirestore;
     functions: (region?: string) => FirebaseFunctions;
-    registerLibrary: (library: string, version: string) => void;
+    registerVersion?: (library: string, version: string) => void;
 }
 
 export const VERSION = new Version('ANGULARFIRE2_VERSION');
@@ -44,9 +44,9 @@ export function _firebaseAppFactory(options: FirebaseOptions, nameOrConfig?: str
     // We support FirebaseConfig, initializeApp's public type only accepts string; need to cast as any
     // Could be solved with https://github.com/firebase/firebase-js-sdk/pull/1206
     const app = (existingApp || firebase.initializeApp(options, config as any)) as FirebaseApp;
-    if (app.registerLibrary) {
-        app.registerLibrary('angular-fire', VERSION.full);
-        app.registerLibrary('angular-core', NG_VERSION.full);
+    if (app.registerVersion) {
+        app.registerVersion('angularfire', VERSION.full);
+        app.registerVersion('angular', NG_VERSION.full);
     }
     return app;
 }
