@@ -46,3 +46,7 @@ export interface FirebaseRcTarget {
 export interface FirebaseRc {
   targets?: Record<string, FirebaseRcTarget>;
 }
+
+export interface DeployBuilderSchema {
+  buildTarget?: string;
+}
