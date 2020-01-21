@@ -2,9 +2,8 @@ import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core
 import { isPlatformServer } from '@angular/common';
 import { messaging } from 'firebase/app';
 import { Observable, empty, from, of, throwError } from 'rxjs';
-import { mergeMap, catchError, map, switchMap, concat, defaultIfEmpty } from 'rxjs/operators';
-import { FirebaseOptions, FirebaseAppConfig, runOutsideAngular, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire';
-import { _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
+import { mergeMap, catchError, map, switchMap, concat, defaultIfEmpty, observeOn } from 'rxjs/operators';
+import { FirebaseOptions, FirebaseAppConfig, AngularFireSchedulers, _firebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire';
 
 @Injectable()
 export class AngularFireMessaging {
@@ -22,21 +21,22 @@ export class AngularFireMessaging {
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
+    const schedulers = new AngularFireSchedulers(zone);
 
     // @ts-ignore zapping in the UMD in the build script
     const requireMessaging = from(import('firebase/messaging'));
 
     this.messaging = requireMessaging.pipe(
+      observeOn(schedulers.outsideAngular),
       map(() => _firebaseAppFactory(options, zone, nameOrConfig)),
       map(app => app.messaging()),
-      runOutsideAngular(zone)
     );
 
     if (!isPlatformServer(platformId)) {
 
       this.requestPermission = this.messaging.pipe(
+        observeOn(schedulers.outsideAngular),
         switchMap(messaging => messaging.requestPermission()),
-        runOutsideAngular(zone)
       );
 
     } else {
@@ -46,16 +46,16 @@ export class AngularFireMessaging {
     }
 
     this.getToken = this.messaging.pipe(
+      observeOn(schedulers.outsideAngular),
       switchMap(messaging => messaging.getToken()),
       defaultIfEmpty(null),
-      runOutsideAngular(zone)
     );
 
     const tokenChanges = this.messaging.pipe(
+      observeOn(schedulers.outsideAngular),
       switchMap(messaging => new Observable(messaging.onTokenRefresh.bind(messaging)).pipe(
         switchMap(() => messaging.getToken())
       )),
-      runOutsideAngular(zone)
     );
 
     this.tokenChanges = this.getToken.pipe(
@@ -63,8 +63,8 @@ export class AngularFireMessaging {
     );
 
     this.messages = this.messaging.pipe(
+      observeOn(schedulers.outsideAngular),
       switchMap(messaging => new Observable(messaging.onMessage.bind(messaging))),
-      runOutsideAngular(zone)
     );
 
     this.requestToken = this.requestPermission.pipe(
@@ -73,9 +73,9 @@ export class AngularFireMessaging {
     );
 
     this.deleteToken = (token: string) => this.messaging.pipe(
+      observeOn(schedulers.outsideAngular),
       switchMap(messaging => messaging.deleteToken(token)),
       defaultIfEmpty(false),
-      runOutsideAngular(zone)
     );
   }
 
