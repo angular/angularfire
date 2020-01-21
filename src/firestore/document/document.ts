@@ -1,12 +1,11 @@
 import { Observable, from } from 'rxjs';
 import { DocumentReference, SetOptions, DocumentData, QueryFn, Action, DocumentSnapshot } from '../interfaces';
 import { fromDocRef } from '../observable/fromRef';
-import { map } from 'rxjs/operators';
+import { map, observeOn } from 'rxjs/operators';
 
 import { AngularFirestore, associateQuery } from '../firestore';
 import { AngularFirestoreCollection } from '../collection/collection';
 import { firestore } from 'firebase/app';
-import { runInZone } from '@angular/fire';
 
 /**
  * AngularFirestoreDocument service
@@ -79,9 +78,10 @@ export class AngularFirestoreDocument<T=DocumentData> {
    * Listen to snapshot updates from the document.
    */
   snapshotChanges(): Observable<Action<DocumentSnapshot<T>>> {
-    const fromDocRef$ = fromDocRef<T>(this.ref);
-    const scheduledFromDocRef$ = this.afs.scheduler.runOutsideAngular(fromDocRef$);
-    return this.afs.scheduler.keepUnstableUntilFirst(scheduledFromDocRef$);
+    const scheduledFromDocRef$ = fromDocRef<T>(this.ref, this.afs.schedulers.outsideAngular);
+    return scheduledFromDocRef$.pipe(
+      this.afs.keepUnstableUntilFirst
+    )
   }
 
   /**
@@ -101,7 +101,7 @@ export class AngularFirestoreDocument<T=DocumentData> {
    */
   get(options?: firestore.GetOptions) {
     return from(this.ref.get(options)).pipe(
-      runInZone(this.afs.scheduler.zone)
+      observeOn(this.afs.schedulers.insideAngular),
     );
   }
 }

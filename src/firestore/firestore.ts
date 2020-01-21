@@ -7,7 +7,7 @@ import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 import { AngularFirestoreCollectionGroup } from './collection-group/collection-group';
 
-import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
+import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FIREBASE_OPTIONS, FIREBASE_APP_NAME, _firebaseAppFactory, ɵAngularFireSchedulers, ɵkeepUnstableUntilFirstFactory } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
 
 // Workaround for Nodejs build
@@ -17,6 +17,7 @@ import firebase from 'firebase/app';
 // SEMVER: have to import here while we target ng 6, as the version of typescript doesn't allow dynamic import of types
 import { firestore } from 'firebase/app';
 
+// SEMVER drop EnablePersistenceToken, PersistenceSettingsToken, and FirestoreSettingsToken in favor of new export names
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
  */
@@ -24,6 +25,11 @@ export const EnablePersistenceToken = new InjectionToken<boolean>('angularfire2.
 export const PersistenceSettingsToken = new InjectionToken<PersistenceSettings|undefined>('angularfire2.firestore.persistenceSettings');
 export const FirestoreSettingsToken = new InjectionToken<Settings>('angularfire2.firestore.settings');
 
+export const ENABLE_PERSISTENCE = EnablePersistenceToken;
+export const PERSISTENCE_SETTINGS = PersistenceSettingsToken
+export const SETTINGS = FirestoreSettingsToken;
+
+// SEMVER kill this in the next major
 // timestampsInSnapshots was depreciated in 5.8.0
 const major = parseInt(firebase.SDK_VERSION.split('.')[0]);
 const minor = parseInt(firebase.SDK_VERSION.split('.')[1]);
@@ -59,7 +65,7 @@ export function associateQuery(collectionRef: CollectionReference, queryFn = ref
  * import { Component } from '@angular/core';
  * import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
  * import { Observable } from 'rxjs/Observable';
- * import { from } from 'rxjs/observable/from';
+ * import { from } from 'rxjs/observable';
  *
  * @Component({
  *   selector: 'app-my-component',
@@ -106,7 +112,8 @@ export function associateQuery(collectionRef: CollectionReference, queryFn = ref
 export class AngularFirestore {
   public readonly firestore: FirebaseFirestore;
   public readonly persistenceEnabled$: Observable<boolean>;
-  public readonly scheduler: FirebaseZoneScheduler;
+  public readonly schedulers: ɵAngularFireSchedulers;
+  public readonly keepUnstableUntilFirst: <T>(obs: Observable<T>) => Observable<T>;
 
   /**
    * Each Feature of AngularFire has a FirebaseApp injected. This way we
@@ -115,17 +122,19 @@ export class AngularFirestore {
    * @param app
    */
   constructor(
-    @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|null|undefined,
-    @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean|null,
-    @Optional() @Inject(FirestoreSettingsToken) settings: Settings|null,
+    @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
+    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
+    @Optional() @Inject(ENABLE_PERSISTENCE) shouldEnablePersistence: boolean|null,
+    @Optional() @Inject(SETTINGS) settings: Settings|null,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
-    @Optional() @Inject(PersistenceSettingsToken) persistenceSettings: PersistenceSettings|null,
+    @Optional() @Inject(PERSISTENCE_SETTINGS) persistenceSettings: PersistenceSettings|null,
   ) {
-    this.scheduler = new FirebaseZoneScheduler(zone, platformId);
+    this.schedulers = new ɵAngularFireSchedulers(zone);
+    this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers, platformId);
+
     this.firestore = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(options, nameOrConfig);
+      const app = _firebaseAppFactory(options, zone, nameOrConfig);
       const firestore = app.firestore();
       firestore.settings(settings || DefaultFirestoreSettings);
       return firestore;

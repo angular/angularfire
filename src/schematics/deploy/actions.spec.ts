@@ -9,6 +9,7 @@ let firebaseMock: FirebaseTools;
 
 const FIREBASE_PROJECT = 'ikachu-aa3ef';
 const PROJECT = 'pirojok-project';
+const BUILD_TARGET = `${PROJECT}:build:production`;
 
 describe('Deploy Angular apps', () => {
   beforeEach(() => initMocks());
@@ -16,7 +17,7 @@ describe('Deploy Angular apps', () => {
   it('should check if the user is authenticated by invoking list', async () => {
     const spy = spyOn(firebaseMock, 'list');
     const spyLogin = spyOn(firebaseMock, 'login');
-    await deploy(firebaseMock, context, 'host', FIREBASE_PROJECT);
+    await deploy(firebaseMock, context, 'host', BUILD_TARGET, FIREBASE_PROJECT);
     expect(spy).toHaveBeenCalled();
     expect(spyLogin).not.toHaveBeenCalled();
   });
@@ -25,14 +26,14 @@ describe('Deploy Angular apps', () => {
     firebaseMock.list = () => Promise.reject();
     const spy = spyOn(firebaseMock, 'list').and.callThrough();
     const spyLogin = spyOn(firebaseMock, 'login');
-    await deploy(firebaseMock, context, 'host', FIREBASE_PROJECT);
+    await deploy(firebaseMock, context, 'host', BUILD_TARGET, FIREBASE_PROJECT);
     expect(spy).toHaveBeenCalled();
     expect(spyLogin).toHaveBeenCalled();
   });
 
   it('should invoke the builder', async () => {
     const spy = spyOn(context, 'scheduleTarget').and.callThrough();
-    await deploy(firebaseMock, context, 'host', FIREBASE_PROJECT);
+    await deploy(firebaseMock, context, 'host', BUILD_TARGET, FIREBASE_PROJECT);
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith({
       target: 'build',
@@ -41,9 +42,17 @@ describe('Deploy Angular apps', () => {
     });
   });
 
+  it('should allow the buildTarget to be specified', async () => {
+    const buildTarget = `${PROJECT}:prerender`;
+    const spy = spyOn(context, 'scheduleTarget').and.callThrough();
+    await deploy(firebaseMock, context, 'host', buildTarget, FIREBASE_PROJECT);
+    expect(spy).toHaveBeenCalled();
+    expect(spy).toHaveBeenCalledWith({ target: 'prerender', project: PROJECT });
+  });
+
   it('should invoke firebase.deploy', async () => {
     const spy = spyOn(firebaseMock, 'deploy').and.callThrough();
-    await deploy(firebaseMock, context, 'host', FIREBASE_PROJECT);
+    await deploy(firebaseMock, context, 'host', BUILD_TARGET, FIREBASE_PROJECT);
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith({
       cwd: 'host', only: 'hosting:' + PROJECT
@@ -53,7 +62,7 @@ describe('Deploy Angular apps', () => {
   describe('error handling',  () => {
     it('throws if there is no firebase project', async () => {
       try {
-        await deploy(firebaseMock, context, 'host')
+        await deploy(firebaseMock, context, 'host', BUILD_TARGET)
         fail();
       } catch (e) {
         expect(e.message).toMatch(/Cannot find firebase project/);
@@ -63,7 +72,7 @@ describe('Deploy Angular apps', () => {
     it('throws if there is no target project', async () => {
       context.target = undefined;
       try {
-        await deploy(firebaseMock, context, 'host', FIREBASE_PROJECT)
+        await deploy(firebaseMock, context, 'host', BUILD_TARGET, FIREBASE_PROJECT)
         fail();
       } catch (e) {
         expect(e.message).toMatch(/Cannot execute the build target/);

@@ -6,6 +6,7 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { AngularFireMessaging } from '@angular/fire/messaging';
 import { AngularFireFunctions } from '@angular/fire/functions';
+import { AngularFirePerformance } from '@angular/fire/performance';
 
 @Component({
   selector: 'app-root',
@@ -38,8 +39,9 @@ export class AppComponent {
     private readonly afStore: AngularFirestore,
     private readonly storage: AngularFireStorage,
     private readonly messaging: AngularFireMessaging,
-    private readonly functions: AngularFireFunctions
+    private readonly functions: AngularFireFunctions,
+    private readonly perf: AngularFirePerformance
   ) {
-    console.log(app, db, auth, afStore, storage, messaging, functions);
+    console.log(app, db, auth, afStore, storage, messaging, functions, perf);
   }
 }

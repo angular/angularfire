@@ -1,26 +1,30 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
-import { DatabaseQuery, PathReference, DatabaseSnapshot, ChildEvent, ListenEvent, QueryFn, AngularFireList, AngularFireObject } from './interfaces';
+import { DatabaseQuery, PathReference, QueryFn, AngularFireList, AngularFireObject } from './interfaces';
 import { getRef } from './utils';
-import { InjectionToken } from '@angular/core';
 import { createListReference } from './list/create-reference';
 import { createObjectReference } from './object/create-reference';
-import { FirebaseDatabase, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, RealtimeDatabaseURL, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
+import { FirebaseDatabase, FirebaseOptions, FirebaseAppConfig, RealtimeDatabaseURL, FIREBASE_OPTIONS, FIREBASE_APP_NAME, DATABASE_URL, _firebaseAppFactory, ɵkeepUnstableUntilFirstFactory, ɵAngularFireSchedulers } from '@angular/fire';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class AngularFireDatabase {
   public readonly database: FirebaseDatabase;
-  public readonly scheduler: FirebaseZoneScheduler;
+
+  public readonly schedulers: ɵAngularFireSchedulers;
+  public readonly keepUnstableUntilFirst: <T>(obs$: Observable<T>) => Observable<T>;
 
   constructor(
-    @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|null|undefined,
-    @Optional() @Inject(RealtimeDatabaseURL) databaseURL:string|null,
+    @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
+    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
+    @Optional() @Inject(DATABASE_URL) databaseURL:string|null,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
-    this.scheduler = new FirebaseZoneScheduler(zone, platformId);
+    this.schedulers = new ɵAngularFireSchedulers(zone);
+    this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers, platformId);
+
     this.database = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(options, nameOrConfig);
+      const app = _firebaseAppFactory(options, zone, nameOrConfig);
       return app.database(databaseURL || undefined);
     });
   }
@@ -58,4 +62,4 @@ export {
   SnapshotAction
 } from './interfaces';
 
-export { RealtimeDatabaseURL };
+export { RealtimeDatabaseURL, DATABASE_URL, DATABASE_URL as URL };

@@ -1,6 +1,13 @@
 {
+  "$schema": "http://json-schema.org/draft-07/schema",
   "id": "FirebaseDeploySchema",
   "title": "Firebase Deploy",
-  "description": "TBD",
-  "properties": {}
+  "description": "Ng Deploy target options for Firebase.",
+  "properties": {
+    "buildTarget": {
+      "type": "string",
+      "description": "Target to build.",
+      "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
+    }
+  }
 }

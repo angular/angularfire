@@ -1,5 +1,29 @@
+<a name="5.3.0"></a>
+# [5.3.0](https://github.com/angular/angularfire2/compare/5.2.3...5.3.0) (2020-01-07)
+
+AngularFire 5.3 introduces [Analytics](docs/analytics/getting-started.md) and [Remote Config](docs/remote-config/getting-started.md) modules.
+
+<a name="5.2.3"></a>
+# [5.2.3](https://github.com/angular/angularfire2/compare/5.2.1...5.2.3) (2019-11-12)
+
+### Bug Fixes
+
+* **build:** Make the build work on windows ([#2231](https://github.com/angular/angularfire2/issues/2231)) ([97d8532](https://github.com/angular/angularfire2/commit/97d8532))
+* **core:** Support Firebase 7 peer and fix zone instabilities with `AngularFirePerformanceModule` and the injectable `FirebaseApp` ([#2240](https://github.com/angular/angularfire2/issues/2240)) ([60fd575](https://github.com/angular/angularfire2/commit/60fd575))
+* **rtdb:** Allow update to take "Partial<T>" ([#2169](https://github.com/angular/angularfire2/issues/2169)) ([ca43c8b](https://github.com/angular/angularfire2/commit/ca43c8b))
+
+<a name="5.2.2"></a>
+# [5.2.2](https://github.com/angular/angularfire2/compare/5.2.1...5.2.2) (2019-11-12)
+
+`5.2.2` was mistakenly released to `@canary` due to a CI/CD bug. It was republished to `@latest` as `5.2.3`.
+
+<a name="5.2.1"></a>
+# [5.2.1](https://github.com/angular/angularfire2/compare/5.2.0...5.2.1) (2019-06-01)
+
+Removed unnecessary `peerDependencies` ([#2095](https://github.com/angular/angularfire2/pull/2095)) ([5e49442](https://github.com/angular/angularfire2/pull/2095/commits/5e49442))
+
 <a name="5.2.0"></a>
-# [5.2.0](https://github.com/angular/angularfire2/compare/5.1.3...5.2.0) (2019-05-24)
+# [5.2.0](https://github.com/angular/angularfire2/compare/5.1.3...5.2.0) (2019-05-31)
 
 AngularFire 5.2 introduces support for Angular 8 and version 6 of the Firebase SDK.
 

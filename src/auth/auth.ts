@@ -1,10 +1,8 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
 import { Observable, of, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { FirebaseAppConfig, FirebaseOptions } from '@angular/fire';
+import { FIREBASE_OPTIONS, FIREBASE_APP_NAME, FirebaseOptions, FirebaseAppConfig, FirebaseAuth, _firebaseAppFactory, ɵAngularFireSchedulers, ɵkeepUnstableUntilFirstFactory } from '@angular/fire';
 import { User, auth } from 'firebase/app';
-
-import { FirebaseAuth, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
 
 @Injectable()
 export class AngularFireAuth {
@@ -37,34 +35,25 @@ export class AngularFireAuth {
   public readonly idTokenResult: Observable<auth.IdTokenResult|null>;
 
   constructor(
-    @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|null|undefined,
+    @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
+    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
     @Inject(PLATFORM_ID) platformId: Object,
-    private zone: NgZone
+    zone: NgZone
   ) {
-    const scheduler = new FirebaseZoneScheduler(zone, platformId);
+    const keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(new ɵAngularFireSchedulers(zone), platformId);
+
     this.auth = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(options, nameOrConfig);
+      const app = _firebaseAppFactory(options, zone, nameOrConfig);
       return app.auth();
     });
 
-    this.authState = scheduler.keepUnstableUntilFirst(
-      scheduler.runOutsideAngular(
-        new Observable(subscriber => {
-          const unsubscribe = this.auth.onAuthStateChanged(subscriber);
-          return { unsubscribe };
-        })
-      )
-    );
+    this.authState = new Observable<User | null>(subscriber => {
+      return zone.runOutsideAngular(() => this.auth.onIdTokenChanged(subscriber));
+    }).pipe(keepUnstableUntilFirst);;
 
-    this.user = scheduler.keepUnstableUntilFirst(
-      scheduler.runOutsideAngular(
-        new Observable(subscriber => {
-          const unsubscribe = this.auth.onIdTokenChanged(subscriber);
-          return { unsubscribe };
-        })
-      )
-    );
+    this.user = new Observable<User | null>(subscriber => {
+      return zone.runOutsideAngular(() => this.auth.onIdTokenChanged(subscriber));
+    }).pipe(keepUnstableUntilFirst);
 
     this.idToken = this.user.pipe(switchMap(user => {
       return user ? from(user.getIdToken()) : of(null)

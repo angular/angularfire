@@ -71,7 +71,7 @@ describe('AngularFireAuth', () => {
     });
   });
 
-  it('should be exist', () => {
+  it('should exist', () => {
     expect(afAuth instanceof AngularFireAuth).toBe(true);
   });
 

@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig-esm.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@angular/fire": ["../../dist/packages-dist"],
+      "@angular/fire/analytics": ["../../dist/packages-dist/analytics"]
+    }
+  },
+  "files": [
+    "index.spec.ts",
+    "../../node_modules/zone.js/dist/zone.js.d.ts"
+  ]
+}
