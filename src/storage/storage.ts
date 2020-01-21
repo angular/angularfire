@@ -2,7 +2,7 @@ import { Injectable, Inject, Optional, InjectionToken, NgZone, PLATFORM_ID } fro
 import { createStorageRef, AngularFireStorageReference } from './ref';
 import { createUploadTask, AngularFireUploadTask } from './task';
 import { Observable } from 'rxjs';
-import { FirebaseStorage, FirebaseOptions, FirebaseAppConfig, _firebaseAppFactory, FIREBASE_OPTIONS, FIREBASE_APP_NAME, keepUnstableUntilFirstFactory, AngularFireSchedulers } from '@angular/fire';
+import { FirebaseStorage, FirebaseOptions, FirebaseAppConfig, _firebaseAppFactory, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵkeepUnstableUntilFirstFactory, ɵAngularFireSchedulers } from '@angular/fire';
 
 import { UploadMetadata } from './interfaces';
 
@@ -22,7 +22,7 @@ export class AngularFireStorage {
   public readonly storage: FirebaseStorage;
 
   public readonly keepUnstableUntilFirst: <T>(obs: Observable<T>) => Observable<T>;
-  public readonly schedulers: AngularFireSchedulers;
+  public readonly schedulers: ɵAngularFireSchedulers;
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
@@ -31,8 +31,8 @@ export class AngularFireStorage {
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
-    this.schedulers = new AngularFireSchedulers(zone);
-    this.keepUnstableUntilFirst = keepUnstableUntilFirstFactory(this.schedulers, platformId);
+    this.schedulers = new ɵAngularFireSchedulers(zone);
+    this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers, platformId);
 
     this.storage = zone.runOutsideAngular(() => {
       const app = _firebaseAppFactory(options, zone, nameOrConfig);

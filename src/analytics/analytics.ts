@@ -2,7 +2,7 @@ import { Injectable, Inject, Optional, NgZone, InjectionToken, PLATFORM_ID } fro
 import { of } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { map, tap, shareReplay, switchMap, observeOn } from 'rxjs/operators';
-import { FirebaseAppConfig, FirebaseOptions, ɵlazySDKProxy, FirebaseAnalytics, FIREBASE_OPTIONS, FIREBASE_APP_NAME, _firebaseAppFactory, AngularFireSchedulers } from '@angular/fire';
+import { FirebaseAppConfig, FirebaseOptions, ɵlazySDKProxy, FirebaseAnalytics, FIREBASE_OPTIONS, FIREBASE_APP_NAME, _firebaseAppFactory, ɵAngularFireSchedulers } from '@angular/fire';
 import { analytics, app } from 'firebase';
 
 export interface Config {[key:string]: any};
@@ -58,7 +58,7 @@ export class AngularFireAnalytics {
     zone: NgZone
   ) {
 
-    const schedulers = new AngularFireSchedulers(zone);
+    const schedulers = new ɵAngularFireSchedulers(zone);
 
     if (isPlatformBrowser(platformId)) {
 

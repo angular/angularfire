@@ -1,5 +1,5 @@
 import { DatabaseReference } from '../interfaces';
-import { FirebaseApp, AngularFireModule, ZoneScheduler } from '@angular/fire';
+import { FirebaseApp, AngularFireModule, ɵZoneScheduler } from '@angular/fire';
 import { AngularFireDatabase, AngularFireDatabaseModule, fromRef } from '@angular/fire/database';
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../test-config';
@@ -109,7 +109,7 @@ describe('fromRef', () => {
     const itemRef = ref(rando());
     itemRef.set(batch);
 
-    const scheduler = new ZoneScheduler(Zone.current.fork({
+    const scheduler = new ɵZoneScheduler(Zone.current.fork({
       name: 'ExpectedZone'
     }));
     const completeObservable = fromRef(

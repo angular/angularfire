@@ -13,7 +13,7 @@ function noop() { }
 /**
  * Schedules tasks so that they are invoked inside the Zone that is passed in the constructor.
  */
-export class ZoneScheduler implements SchedulerLike {
+export class ɵZoneScheduler implements SchedulerLike {
   constructor(private zone: any, private delegate: any = queueScheduler) { }
 
   now() {
@@ -37,7 +37,7 @@ export class ZoneScheduler implements SchedulerLike {
   }
 }
 
-export class BlockUntilFirstOperator<T> implements Operator<T, T> {
+export class ɵBlockUntilFirstOperator<T> implements Operator<T, T> {
   private task: MacroTask | null = null;
 
   constructor(private zone: any) { }
@@ -59,13 +59,13 @@ export class BlockUntilFirstOperator<T> implements Operator<T, T> {
   }
 }
 
-export class AngularFireSchedulers {
-  public readonly outsideAngular: ZoneScheduler;
-  public readonly insideAngular: ZoneScheduler;
+export class ɵAngularFireSchedulers {
+  public readonly outsideAngular: ɵZoneScheduler;
+  public readonly insideAngular: ɵZoneScheduler;
 
   constructor(public ngZone: NgZone) {
-    this.outsideAngular = ngZone.runOutsideAngular(() => new ZoneScheduler(Zone.current));
-    this.insideAngular = ngZone.run(() => new ZoneScheduler(Zone.current, asyncScheduler));
+    this.outsideAngular = ngZone.runOutsideAngular(() => new ɵZoneScheduler(Zone.current));
+    this.insideAngular = ngZone.run(() => new ɵZoneScheduler(Zone.current, asyncScheduler));
   }
 }
 
@@ -75,14 +75,14 @@ export class AngularFireSchedulers {
  * value from firebase but doesn't block the zone forever since the firebase subscription
  * is still alive.
  */
-export function keepUnstableUntilFirstFactory(
-  schedulers: AngularFireSchedulers,
+export function ɵkeepUnstableUntilFirstFactory(
+  schedulers: ɵAngularFireSchedulers,
   platformId: Object
 ) {
   return function keepUnstableUntilFirst<T>(obs$: Observable<T>): Observable<T> {
     if (isPlatformServer(platformId)) {
       obs$ = obs$.lift(
-        new BlockUntilFirstOperator(schedulers.ngZone)
+        new ɵBlockUntilFirstOperator(schedulers.ngZone)
       );
     }
 

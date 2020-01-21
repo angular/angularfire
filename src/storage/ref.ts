@@ -1,7 +1,7 @@
 import { SettableMetadata, UploadMetadata, Reference, StringFormat } from './interfaces';
 import { createUploadTask, AngularFireUploadTask } from './task';
 import { Observable, from } from 'rxjs';
-import { AngularFireSchedulers } from '@angular/fire';
+import { ɵAngularFireSchedulers } from '@angular/fire';
 
 export interface AngularFireStorageReference {
   getDownloadURL(): Observable<any>;
@@ -21,7 +21,7 @@ export interface AngularFireStorageReference {
  */
 export function createStorageRef(
   ref: Reference,
-  schedulers: AngularFireSchedulers,
+  schedulers: ɵAngularFireSchedulers,
   keepUnstableUntilFirst: <T>(obs$: Observable<T>) => Observable<T>
 ): AngularFireStorageReference {
   return {

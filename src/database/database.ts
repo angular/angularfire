@@ -3,14 +3,14 @@ import { DatabaseQuery, PathReference, QueryFn, AngularFireList, AngularFireObje
 import { getRef } from './utils';
 import { createListReference } from './list/create-reference';
 import { createObjectReference } from './object/create-reference';
-import { FirebaseDatabase, FirebaseOptions, FirebaseAppConfig, RealtimeDatabaseURL, FIREBASE_OPTIONS, FIREBASE_APP_NAME, DATABASE_URL, _firebaseAppFactory, keepUnstableUntilFirstFactory, AngularFireSchedulers } from '@angular/fire';
+import { FirebaseDatabase, FirebaseOptions, FirebaseAppConfig, RealtimeDatabaseURL, FIREBASE_OPTIONS, FIREBASE_APP_NAME, DATABASE_URL, _firebaseAppFactory, ɵkeepUnstableUntilFirstFactory, ɵAngularFireSchedulers } from '@angular/fire';
 import { Observable } from 'rxjs';
 
 @Injectable()
 export class AngularFireDatabase {
   public readonly database: FirebaseDatabase;
 
-  public readonly schedulers: AngularFireSchedulers;
+  public readonly schedulers: ɵAngularFireSchedulers;
   public readonly keepUnstableUntilFirst: <T>(obs$: Observable<T>) => Observable<T>;
 
   constructor(
@@ -20,8 +20,8 @@ export class AngularFireDatabase {
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
-    this.schedulers = new AngularFireSchedulers(zone);
-    this.keepUnstableUntilFirst = keepUnstableUntilFirstFactory(this.schedulers, platformId);
+    this.schedulers = new ɵAngularFireSchedulers(zone);
+    this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers, platformId);
 
     this.database = zone.runOutsideAngular(() => {
       const app = _firebaseAppFactory(options, zone, nameOrConfig);

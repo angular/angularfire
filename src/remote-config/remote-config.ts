@@ -9,7 +9,7 @@ export interface ConfigTemplate {[key:string]: string|number|boolean};
 export const SETTINGS = new InjectionToken<remoteConfig.Settings>('angularfire2.remoteConfig.settings');
 export const DEFAULTS = new InjectionToken<ConfigTemplate>('angularfire2.remoteConfig.defaultConfig');
 
-import { FirebaseRemoteConfig, _firebaseAppFactory, AngularFireSchedulers } from '@angular/fire';
+import { FirebaseRemoteConfig, _firebaseAppFactory, ɵAngularFireSchedulers } from '@angular/fire';
 
 // SEMVER: once we move to Typescript 3.6 use `PromiseProxy<remoteConfig.RemoteConfig>` rather than hardcoding
 type RemoteConfigProxy = {
@@ -76,7 +76,7 @@ export class AngularFireRemoteConfig {
     private zone: NgZone
   ) {
 
-    const schedulers = new AngularFireSchedulers(zone);
+    const schedulers = new ɵAngularFireSchedulers(zone);
     
     const remoteConfig$ = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),

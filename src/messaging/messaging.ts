@@ -3,7 +3,7 @@ import { isPlatformServer } from '@angular/common';
 import { messaging } from 'firebase/app';
 import { Observable, empty, from, of, throwError } from 'rxjs';
 import { mergeMap, catchError, map, switchMap, concat, defaultIfEmpty, observeOn } from 'rxjs/operators';
-import { FirebaseOptions, FirebaseAppConfig, AngularFireSchedulers, _firebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire';
+import { FirebaseOptions, FirebaseAppConfig, ɵAngularFireSchedulers, _firebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire';
 
 @Injectable()
 export class AngularFireMessaging {
@@ -21,7 +21,7 @@ export class AngularFireMessaging {
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
-    const schedulers = new AngularFireSchedulers(zone);
+    const schedulers = new ɵAngularFireSchedulers(zone);
 
     // @ts-ignore zapping in the UMD in the build script
     const requireMessaging = from(import('firebase/messaging'));

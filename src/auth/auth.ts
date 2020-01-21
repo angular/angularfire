@@ -1,7 +1,7 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
 import { Observable, of, from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { FIREBASE_OPTIONS, FIREBASE_APP_NAME, FirebaseOptions, FirebaseAppConfig, FirebaseAuth, _firebaseAppFactory, AngularFireSchedulers, keepUnstableUntilFirstFactory } from '@angular/fire';
+import { FIREBASE_OPTIONS, FIREBASE_APP_NAME, FirebaseOptions, FirebaseAppConfig, FirebaseAuth, _firebaseAppFactory, ɵAngularFireSchedulers, ɵkeepUnstableUntilFirstFactory } from '@angular/fire';
 import { User, auth } from 'firebase/app';
 
 @Injectable()
@@ -40,7 +40,7 @@ export class AngularFireAuth {
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
-    const keepUnstableUntilFirst = keepUnstableUntilFirstFactory(new AngularFireSchedulers(zone), platformId);
+    const keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(new ɵAngularFireSchedulers(zone), platformId);
 
     this.auth = zone.runOutsideAngular(() => {
       const app = _firebaseAppFactory(options, zone, nameOrConfig);

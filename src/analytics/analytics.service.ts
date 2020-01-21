@@ -2,7 +2,7 @@ import { Injectable, Optional, NgZone, OnDestroy, ComponentFactoryResolver, Inje
 import { Subscription, from, Observable, of } from 'rxjs';
 import { filter, withLatestFrom, switchMap, map, tap, pairwise, startWith, groupBy, mergeMap, observeOn } from 'rxjs/operators';
 import { Router, NavigationEnd, ActivationEnd, ROUTES } from '@angular/router';
-import { AngularFireSchedulers } from '@angular/fire';
+import { ɵAngularFireSchedulers } from '@angular/fire';
 import { AngularFireAnalytics, DEBUG_MODE } from './analytics';
 import { User } from 'firebase/app';
 import { Title } from '@angular/platform-browser';
@@ -160,7 +160,7 @@ export class UserTrackingService implements OnDestroy {
         zone: NgZone,
         @Inject(PLATFORM_ID) platformId:Object
     ) {
-        const schedulers = new AngularFireSchedulers(zone);
+        const schedulers = new ɵAngularFireSchedulers(zone);
 
         if (!isPlatformServer(platformId)) {
             zone.runOutsideAngular(() => {

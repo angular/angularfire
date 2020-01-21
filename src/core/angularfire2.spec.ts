@@ -5,7 +5,7 @@ import { Subscription, Observable, Subject, of } from 'rxjs';
 import { COMMON_CONFIG } from './test-config';
 import { BrowserModule } from '@angular/platform-browser';
 import { database } from 'firebase/app';
-import { ZoneScheduler, keepUnstableUntilFirstFactory, AngularFireSchedulers } from './angularfire2';
+import { ɵZoneScheduler, ɵkeepUnstableUntilFirstFactory, ɵAngularFireSchedulers } from './angularfire2';
 import { ɵPLATFORM_BROWSER_ID, ɵPLATFORM_SERVER_ID } from '@angular/common';
 import { tap  } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
@@ -53,7 +53,7 @@ describe('angularfire', () => {
 
       // Mimic real behavior: Executing in Angular
       ngZone.run(() => {
-        const outsideAngularScheduler = new ZoneScheduler(rootZone);
+        const outsideAngularScheduler = new ɵZoneScheduler(rootZone);
         outsideAngularScheduler.schedule(() => {
           expect(Zone.current.name).not.toEqual('ngZone');
           done();
@@ -64,7 +64,7 @@ describe('angularfire', () => {
     it('should execute nested scheduled work inside the specified zone', done => {
       const testScheduler = new TestScheduler(null!);
       testScheduler.run(helpers => {
-        const outsideAngularScheduler = new ZoneScheduler(Zone.current, testScheduler);
+        const outsideAngularScheduler = new ɵZoneScheduler(Zone.current, testScheduler);
 
         let ngZone = Zone.current.fork({
           name: 'ngZone'
@@ -104,7 +104,7 @@ describe('angularfire', () => {
   })
 
   describe('keepUnstableUntilFirstFactory', () => {
-    let schedulers: AngularFireSchedulers;
+    let schedulers: ɵAngularFireSchedulers;
     let outsideZone: Zone;
     let insideZone: Zone;
     beforeAll(() => {
@@ -118,11 +118,11 @@ describe('angularfire', () => {
         runOutsideAngular: outsideZone.runGuarded.bind(outsideZone),
         runTask: insideZone.run.bind(insideZone)
       } as NgZone;
-      schedulers = new AngularFireSchedulers(ngZone);
+      schedulers = new ɵAngularFireSchedulers(ngZone);
     })
 
     it('should re-schedule emissions asynchronously', done => {
-      const keepUnstableOp = keepUnstableUntilFirstFactory(schedulers, ɵPLATFORM_SERVER_ID);
+      const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(schedulers, ɵPLATFORM_SERVER_ID);
 
       let ran = false;
       of(null).pipe(
@@ -138,7 +138,7 @@ describe('angularfire', () => {
 
     [ɵPLATFORM_SERVER_ID, ɵPLATFORM_BROWSER_ID].map(platformId =>
       it(`should subscribe outside angular and observe inside angular (${platformId})`, done => {
-        const keepUnstableOp = keepUnstableUntilFirstFactory(schedulers, platformId);
+        const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(schedulers, platformId);
 
         insideZone.run(() => {
           new Observable(s => {
@@ -165,17 +165,17 @@ describe('angularfire', () => {
         const outsideZone = Zone.current;
         const taskTrack = new Zone['TaskTrackingZoneSpec']();
         const insideZone = Zone.current.fork(taskTrack);
-        const trackingSchedulers: AngularFireSchedulers = {
+        const trackingSchedulers: ɵAngularFireSchedulers = {
           ngZone: {
             run: insideZone.run.bind(insideZone),
             runGuarded: insideZone.runGuarded.bind(insideZone),
             runOutsideAngular: outsideZone.runGuarded.bind(outsideZone),
             runTask: insideZone.run.bind(insideZone)
           } as NgZone,
-          outsideAngular: new ZoneScheduler(outsideZone, testScheduler),
-          insideAngular: new ZoneScheduler(insideZone, testScheduler),
+          outsideAngular: new ɵZoneScheduler(outsideZone, testScheduler),
+          insideAngular: new ɵZoneScheduler(insideZone, testScheduler),
         };
-        const keepUnstableOp = keepUnstableUntilFirstFactory(trackingSchedulers, ɵPLATFORM_SERVER_ID);
+        const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(trackingSchedulers, ɵPLATFORM_SERVER_ID);
 
         const s = new Subject();
         s.pipe(
@@ -205,17 +205,17 @@ describe('angularfire', () => {
         const outsideZone = Zone.current;
         const taskTrack = new Zone['TaskTrackingZoneSpec']();
         const insideZone = Zone.current.fork(taskTrack);
-        const trackingSchedulers: AngularFireSchedulers = {
+        const trackingSchedulers: ɵAngularFireSchedulers = {
           ngZone: {
             run: insideZone.run.bind(insideZone),
             runGuarded: insideZone.runGuarded.bind(insideZone),
             runOutsideAngular: outsideZone.runGuarded.bind(outsideZone),
             runTask: insideZone.run.bind(insideZone)
           } as NgZone,
-          outsideAngular: new ZoneScheduler(outsideZone, testScheduler),
-          insideAngular: new ZoneScheduler(insideZone, testScheduler),
+          outsideAngular: new ɵZoneScheduler(outsideZone, testScheduler),
+          insideAngular: new ɵZoneScheduler(insideZone, testScheduler),
         };
-        const keepUnstableOp = keepUnstableUntilFirstFactory(trackingSchedulers, ɵPLATFORM_BROWSER_ID);
+        const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(trackingSchedulers, ɵPLATFORM_BROWSER_ID);
 
         const s = new Subject();
         s.pipe(
