@@ -307,6 +307,12 @@ function replaceDynamicImportsForUMD() {
   writeFileSync('./dist/packages-dist/remote-config/remote-config.d.ts', readFileSync('./dist/packages-dist/remote-config/remote-config.d.ts', 'utf8').replace("implements remoteConfig.Value", "implements Partial<remoteConfig.Value>"));
 }
 
+function writeCoreVersion() {
+  writeFileSync('./dist/packages-dist/bundles/core.umd.js', readFileSync('./dist/packages-dist/bundles/core.umd.js', 'utf8').replace('ANGULARFIRE2_VERSION', VERSIONS.ANGULARFIRE2_VERSION));
+  writeFileSync('./dist/packages-dist/firebase.app.module.js', readFileSync('./dist/packages-dist/firebase.app.module.js', 'utf8').replace('ANGULARFIRE2_VERSION', VERSIONS.ANGULARFIRE2_VERSION));
+  writeFileSync('./dist/packages-dist/es2015/firebase.app.module.js', readFileSync('./dist/packages-dist/es2015/firebase.app.module.js', 'utf8').replace('ANGULARFIRE2_VERSION', VERSIONS.ANGULARFIRE2_VERSION));
+}
+
 function measure(module) {
   const path = `${process.cwd()}/dist/packages-dist/bundles/${module}.umd.js`;
   const file = readFileSync(path);
@@ -408,6 +414,7 @@ function buildLibrary(globals) {
     switchMap(() => from(createTestUmd(globals))),
     tap(() => {
       replaceDynamicImportsForUMD();
+      writeCoreVersion();
       const coreStats = measure('core');
       const analyticsStats = measure('analytics');
       const authStats = measure('auth');
