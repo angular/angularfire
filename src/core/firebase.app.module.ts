@@ -1,4 +1,4 @@
-import { InjectionToken, NgModule, Optional, NgZone } from '@angular/core';
+import { InjectionToken, NgModule, Optional, NgZone, VERSION as NG_VERSION, Version, Inject, PLATFORM_ID } from '@angular/core';
 import { auth, database, messaging, storage, firestore, functions } from 'firebase/app';
 // @ts-ignore (https://github.com/firebase/firebase-js-sdk/pull/1206)
 import firebase from 'firebase/app'; // once fixed can pull in as "default as firebase" above
@@ -44,6 +44,8 @@ export class FirebaseApp {
     remoteConfig: () => FirebaseRemoteConfig;
 }
 
+export const VERSION = new Version('ANGULARFIRE2_VERSION');
+
 export function _firebaseAppFactory(options: FirebaseOptions, zone: NgZone, nameOrConfig?: string|FirebaseAppConfig|null) {
     const name = typeof nameOrConfig === 'string' && nameOrConfig || '[DEFAULT]';
     const config = typeof nameOrConfig === 'object' && nameOrConfig || {};
@@ -76,6 +78,12 @@ export class AngularFireModule {
                 { provide: FIREBASE_OPTIONS, useValue: options },
                 { provide: FIREBASE_APP_NAME, useValue: nameOrConfig }
             ]
+        }
+    }
+    constructor(@Inject(PLATFORM_ID) platformId:Object ) {
+        if (firebase.registerVersion) {
+            firebase.registerVersion('angularfire', VERSION.full, platformId.toString());
+            firebase.registerVersion('angular', NG_VERSION.full);
         }
     }
 }
