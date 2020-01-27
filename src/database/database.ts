@@ -3,7 +3,8 @@ import { DatabaseQuery, PathReference, QueryFn, AngularFireList, AngularFireObje
 import { getRef } from './utils';
 import { createListReference } from './list/create-reference';
 import { createObjectReference } from './object/create-reference';
-import { FirebaseOptions, FirebaseAppConfig, ɵDATABASE_URL as URL, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵfirebaseAppFactory, ɵFirebaseZoneScheduler } from '@angular/fire';
+import { FirebaseOptions, FirebaseAppConfig, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵDATABASE_URL as URL, ɵfirebaseAppFactory, ɵkeepUnstableUntilFirstFactory, ɵAngularFireSchedulers } from '@angular/fire';
+import { Observable } from 'rxjs';
 import { database } from 'firebase/app';
 
 export { URL };
@@ -13,7 +14,9 @@ export { URL };
 })
 export class AngularFireDatabase {
   public readonly database: database.Database;
-  public readonly scheduler: ɵFirebaseZoneScheduler;
+
+  public readonly schedulers: ɵAngularFireSchedulers;
+  public readonly keepUnstableUntilFirst: <T>(obs$: Observable<T>) => Observable<T>;
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
@@ -22,7 +25,9 @@ export class AngularFireDatabase {
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
-    this.scheduler = new ɵFirebaseZoneScheduler(zone, platformId);
+    this.schedulers = new ɵAngularFireSchedulers(zone);
+    this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers, platformId);
+
     this.database = zone.runOutsideAngular(() => {
       const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
       if (!app.database) { throw "You must import 'firebase/database' before using AngularFireDatabase" }

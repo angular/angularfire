@@ -1,10 +1,10 @@
 import { DatabaseReference } from '../interfaces';
-import { FirebaseApp, AngularFireModule } from '@angular/fire';
-import { AngularFireDatabase, AngularFireDatabaseModule, fromRef, URL } from '../public_api';
+import { FirebaseApp, AngularFireModule, ɵZoneScheduler } from '@angular/fire';
+import { AngularFireDatabase, AngularFireDatabaseModule, fromRef } from '../public_api';
 import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 import { take } from 'rxjs/operators';
-import 'firebase/database';
+import { TestScheduler } from 'rxjs/testing';
 
 // generate random string to test fidelity of naming
 const rando = () => (Math.random() + 1).toString(36).substring(7);
@@ -14,7 +14,7 @@ describe('fromRef', () => {
   let app: FirebaseApp;
   let ref: (path: string) => DatabaseReference;
   let batch = {};
-  const items = [{ name: 'one' }, { name: 'two' }, { name: 'three' }].map(item => ( { key: rando(), ...item } ));
+  const items = [{ name: 'one' }, { name: 'two' }, { name: 'three' }].map(item => ({ key: rando(), ...item }));
   Object.keys(items).forEach(function (key) {
     const itemValue = items[key];
     batch[itemValue.key] = itemValue;
@@ -42,7 +42,7 @@ describe('fromRef', () => {
     app.delete().then(done, done.fail);
   });
 
-  it('it should be async', (done) => {
+  it('it should be async by default', (done) => {
     const itemRef = ref(rando());
     itemRef.set(batch);
     const obs = fromRef(itemRef, 'value');
@@ -51,11 +51,84 @@ describe('fromRef', () => {
     const sub = obs.subscribe(change => {
       count = count + 1;
       expect(count).toEqual(1);
-      done();
       sub.unsubscribe();
+      done();
     });
     expect(count).toEqual(0);
   });
+
+  it('should take a scheduler', done => {
+    const itemRef = ref(rando());
+    itemRef.set(batch);
+
+    const testScheduler = new TestScheduler((actual, expected) => {
+      expect(actual).toEqual(expected);
+    });
+    spyOn(testScheduler, 'schedule').and.callThrough();
+
+    const obs = fromRef(itemRef, 'value', 'once', testScheduler);
+    expect(testScheduler.schedule).not.toHaveBeenCalled();
+
+    obs.subscribe(() => {
+      expect(testScheduler.schedule).toHaveBeenCalled();
+      done();
+    }, err => {
+      console.error(err);
+      expect(false).toEqual(true, "Shouldnt error");
+      done();
+    }, () => {
+      expect(testScheduler.schedule).toHaveBeenCalled();
+      done()
+    });
+    testScheduler.flush();
+  });
+
+  it('should schedule completed and error correctly', done => {
+    const testScheduler = new TestScheduler((actual, expected) => {
+      expect(actual).toEqual(expected);
+    });
+    spyOn(testScheduler, 'schedule').and.callThrough();
+
+    // Error
+    const errorObservable = fromRef({
+      once: (event, snap, err) => err()
+    } as any,
+      'value',
+      'once',
+      testScheduler
+    );
+    errorObservable.subscribe(() => {
+      fail("Should not emit");
+    }, () => {
+      expect(testScheduler.schedule).toHaveBeenCalled();
+    }, () => {
+      fail("Should not complete");
+    });
+
+    testScheduler.flush();
+
+    // Completed
+    const itemRef = ref(rando());
+    itemRef.set(batch);
+
+    const scheduler = new ɵZoneScheduler(Zone.current.fork({
+      name: 'ExpectedZone'
+    }));
+    const completeObservable = fromRef(
+      itemRef,
+      'value',
+      'once',
+      scheduler
+    );
+    completeObservable.subscribe(
+      () => { },
+      () => fail("Should not error"),
+      () => expect(Zone.current.name).toEqual("ExpectedZone")
+    );
+    testScheduler.flush();
+    done();
+  });
+
 
   it('it should should handle non-existence', (done) => {
     const itemRef = ref(rando());
@@ -71,7 +144,7 @@ describe('fromRef', () => {
     const itemRef = ref(rando());
     itemRef.set(batch);
     const obs = fromRef(itemRef, 'value', 'once');
-    obs.subscribe(change => {}, () => {}, done);
+    obs.subscribe(change => { }, () => { }, done);
   });
 
   it('it should listen and then unsubscribe', (done) => {
@@ -158,7 +231,7 @@ describe('fromRef', () => {
         sub.unsubscribe();
         done();
       });
-      itemRef.child(key).setPriority(-100, () => {});
+      itemRef.child(key).setPriority(-100, () => { });
     });
 
     it('should stream back a value event', (done: any) => {

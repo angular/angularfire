@@ -1,6 +1,5 @@
-import { InjectionToken, NgModule, Optional, NgZone } from '@angular/core';
+import { InjectionToken, NgModule, Optional, NgZone, VERSION as NG_VERSION, Version } from '@angular/core';
 import { app, auth, database, messaging, storage, firestore, functions, analytics, performance, remoteConfig } from 'firebase/app';
-
 // @ts-ignore (https://github.com/firebase/firebase-js-sdk/pull/1206)
 import firebase from 'firebase/app'; // once fixed can pull in as "default as firebase" above
 
@@ -26,7 +25,10 @@ export class FirebaseApp implements Partial<app.App> {
     firestore: () => firestore.Firestore;
     functions: (region?: string) => functions.Functions;
     remoteConfig: () => remoteConfig.RemoteConfig;
+    registerVersion?: (library: string, version: string) => void;
 }
+
+export const VERSION = new Version('ANGULARFIRE2_VERSION');
 
 export function ɵfirebaseAppFactory(options: FirebaseOptions, zone: NgZone, nameOrConfig?: string|FirebaseAppConfig|null) {
     const name = typeof nameOrConfig === 'string' && nameOrConfig || '[DEFAULT]';
@@ -36,7 +38,12 @@ export function ɵfirebaseAppFactory(options: FirebaseOptions, zone: NgZone, nam
     const existingApp = firebase.apps.filter(app => app && app.name === config.name)[0] as any;
     // We support FirebaseConfig, initializeApp's public type only accepts string; need to cast as any
     // Could be solved with https://github.com/firebase/firebase-js-sdk/pull/1206
-    return (existingApp || zone.runOutsideAngular(() => firebase.initializeApp(options, config as any))) as FirebaseApp;
+    const app = (existingApp || zone.runOutsideAngular(() => firebase.initializeApp(options, config as any))) as FirebaseApp;
+    if (app.registerVersion) {
+        app.registerVersion('angularfire', VERSION.full);
+        app.registerVersion('angular', NG_VERSION.full);
+    }
+    return app;
 }
 
 const FirebaseAppProvider = {

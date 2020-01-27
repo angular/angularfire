@@ -4,7 +4,7 @@ import { Settings, PersistenceSettings, CollectionReference, DocumentReference, 
 import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 import { AngularFirestoreCollectionGroup } from './collection-group/collection-group';
-import { FirebaseOptions, FirebaseAppConfig, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵfirebaseAppFactory, ɵFirebaseZoneScheduler } from '@angular/fire';
+import { FirebaseOptions, FirebaseAppConfig, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵfirebaseAppFactory, ɵAngularFireSchedulers, ɵkeepUnstableUntilFirstFactory } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
 import { firestore } from 'firebase/app';
 
@@ -94,7 +94,8 @@ export function associateQuery(collectionRef: CollectionReference, queryFn = ref
 export class AngularFirestore {
   public readonly firestore: firestore.Firestore;
   public readonly persistenceEnabled$: Observable<boolean>;
-  public readonly scheduler: ɵFirebaseZoneScheduler;
+  public readonly schedulers: ɵAngularFireSchedulers;
+  public readonly keepUnstableUntilFirst: <T>(obs: Observable<T>) => Observable<T>;
 
   /**
    * Each Feature of AngularFire has a FirebaseApp injected. This way we
@@ -111,7 +112,9 @@ export class AngularFirestore {
     zone: NgZone,
     @Optional() @Inject(PERSISTENCE_SETTINGS) persistenceSettings: PersistenceSettings|null,
   ) {
-    this.scheduler = new ɵFirebaseZoneScheduler(zone, platformId);
+    this.schedulers = new ɵAngularFireSchedulers(zone);
+    this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers, platformId);
+
     this.firestore = zone.runOutsideAngular(() => {
       const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
       if (!app.firestore) { throw "You must import 'firebase/firestore' before using AngularFirestore" }

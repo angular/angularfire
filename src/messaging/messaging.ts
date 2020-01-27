@@ -1,8 +1,8 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
 import { messaging } from 'firebase/app';
 import { Observable, empty, from, of, throwError } from 'rxjs';
-import { mergeMap, catchError, map, switchMap, concat, shareReplay, defaultIfEmpty } from 'rxjs/operators';
-import { FirebaseOptions, FirebaseAppConfig, ɵrunOutsideAngular, FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
+import { mergeMap, catchError, map, switchMap, concat, observeOn, defaultIfEmpty } from 'rxjs/operators';
+import { FirebaseOptions, FirebaseAppConfig, ɵAngularFireSchedulers, FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
 import { ɵfirebaseAppFactory } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
 
@@ -26,22 +26,23 @@ export class AngularFireMessaging {
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
+    const schedulers = new ɵAngularFireSchedulers(zone);
 
-    const messaging = of(undefined).pipe(
-      switchMap(() => from(import('firebase/messaging'))),
-      // TODO is this needed?
-      catchError(err => err.message === 'Not supported' ? empty() : throwError(err) ),
+    // @ts-ignore zapping in the UMD in the build script
+    const requireMessaging = from(import('firebase/messaging'));
+
+    const messaging = requireMessaging.pipe(
+      observeOn(schedulers.outsideAngular),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
       map(app => app.messaging()),
-      ɵrunOutsideAngular(zone),
-      shareReplay({ bufferSize: 1, refCount: false })
+      catchError(err => err.message === 'Not supported' ? empty() : throwError(err) )
     );
 
     if (!isPlatformServer(platformId)) {
-    
+
       this.requestPermission = messaging.pipe(
+        observeOn(schedulers.outsideAngular),
         switchMap(messaging => messaging.requestPermission()),
-        ɵrunOutsideAngular(zone)
       );
     
     } else {
@@ -51,26 +52,27 @@ export class AngularFireMessaging {
     }
 
     this.getToken = messaging.pipe(
+      observeOn(schedulers.outsideAngular),
       switchMap(messaging => messaging.getToken()),
-      defaultIfEmpty(null),
-      ɵrunOutsideAngular(zone)
+      defaultIfEmpty(null)
     )
 
     const tokenChanges = messaging.pipe(
+      observeOn(schedulers.outsideAngular),
       switchMap(messaging => new Observable(messaging.onTokenRefresh.bind(messaging)).pipe(
         switchMap(() => messaging.getToken())
-      )),
-      ɵrunOutsideAngular(zone)
+      ))
     );
 
     this.tokenChanges = messaging.pipe(
+      observeOn(schedulers.outsideAngular),
       switchMap(messaging => messaging.getToken()),
       concat(tokenChanges)
     );
 
     this.messages = messaging.pipe(
-      switchMap(messaging => new Observable(messaging.onMessage.bind(messaging))),
-      ɵrunOutsideAngular(zone)
+      observeOn(schedulers.outsideAngular),
+      switchMap(messaging => new Observable(messaging.onMessage.bind(messaging)))
     );
 
     this.requestToken = of(undefined).pipe(
@@ -80,9 +82,9 @@ export class AngularFireMessaging {
     );
 
     this.deleteToken = (token: string) => messaging.pipe(
+      observeOn(schedulers.outsideAngular),
       switchMap(messaging => messaging.deleteToken(token)),
-      defaultIfEmpty(false),
-      ɵrunOutsideAngular(zone)
+      defaultIfEmpty(false)
     );
 
     return ɵlazySDKProxy(this, messaging, zone);

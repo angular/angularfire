@@ -1,17 +1,16 @@
 import { DataSnapshot, DatabaseQuery, ChildEvent, DatabaseSnapshot, AngularFireAction, SnapshotAction } from '../interfaces';
 import { stateChanges } from './state-changes';
-import { Observable } from 'rxjs';
+import { Observable, SchedulerLike } from 'rxjs';
 import { fromRef } from '../observable/fromRef';
-import { AngularFireDatabase } from '../database';
 
 import { skipWhile, withLatestFrom, map, scan } from 'rxjs/operators';
 
-export function auditTrail<T>(query: DatabaseQuery, events?: ChildEvent[]): Observable<SnapshotAction<T>[]> {
+export function auditTrail<T>(query: DatabaseQuery, events?: ChildEvent[], scheduler?: SchedulerLike): Observable<SnapshotAction<T>[]> {
   const auditTrail$ = stateChanges<T>(query, events)
     .pipe(
       scan((current, action) => [...current, action], [])
     );
-  return waitForLoaded<T>(query, auditTrail$);
+  return waitForLoaded<T>(query, auditTrail$, scheduler);
 }
 
 interface LoadedMetadata {
@@ -19,11 +18,11 @@ interface LoadedMetadata {
   lastKeyToLoad: any;
 }
 
-function loadedData<T>(query: DatabaseQuery): Observable<LoadedMetadata> {
+function loadedData<T>(query: DatabaseQuery, scheduler?: SchedulerLike): Observable<LoadedMetadata> {
   // Create an observable of loaded values to retrieve the
   // known dataset. This will allow us to know what key to
   // emit the "whole" array at when listening for child events.
-  return fromRef<T>(query, 'value')
+  return fromRef<T>(query, 'value', 'on', scheduler)
   .pipe(
     map(data => {
       // Store the last key in the data set
@@ -38,8 +37,8 @@ function loadedData<T>(query: DatabaseQuery): Observable<LoadedMetadata> {
   );
 }
 
-function waitForLoaded<T>(query: DatabaseQuery, action$: Observable<SnapshotAction<T>[]>) {
-  const loaded$ = loadedData<T>(query);
+function waitForLoaded<T>(query: DatabaseQuery, action$: Observable<SnapshotAction<T>[]>, scheduler?: SchedulerLike) {
+  const loaded$ = loadedData<T>(query, scheduler);
   return loaded$
     .pipe(
       withLatestFrom(action$),

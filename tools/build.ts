@@ -54,7 +54,7 @@ async function compileSchematics() {
 }
 
 async function measure(module: string) {
-  const path = dest('bundles', `${module}.umd.js`);
+  const path = dest('bundles', `${module}.umd.min.js`);
   const file = await readFile(path);
   const gzip = prettySize(gzipSync(file), true);
   const size = prettySize(file.byteLength, true);
@@ -129,10 +129,18 @@ async function buildWrapper() {
   return writeFile(path, JSON.stringify(pkg, null, 2));
 }
 
-buildLibrary().then(buildWrapper).then(buildDocs).then(measureLibrary).then(stats =>
+function packLibrary() {
+  return spawnPromise('npm', ['pack', './dist/packages-dist']);
+}
+
+Promise.all([
+  buildWrapper(),
+  buildDocs(),
+  buildLibrary().then(packLibrary)
+]).then(measureLibrary).then(stats =>
   console.log(`
-Package      Size     Gzipped
------------------------------
+Package             Size     Gzipped
+------------------------------------
 ${stats.map((s, i) => [MODULES[i].padEnd(20), s.size.padEnd(8), s.gzip].join("")).join("\n")}`
   )
 );

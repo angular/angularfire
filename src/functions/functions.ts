@@ -1,7 +1,7 @@
 import { Injectable, Inject, Optional, NgZone, InjectionToken } from '@angular/core';
 import { of, from, Observable } from 'rxjs';
-import { map, switchMap, shareReplay, tap } from 'rxjs/operators';
-import { FirebaseOptions, FirebaseAppConfig, FIREBASE_APP_NAME, ɵrunOutsideAngular, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
+import { map, switchMap, shareReplay, tap, observeOn } from 'rxjs/operators';
+import { FirebaseOptions, FirebaseAppConfig, FIREBASE_APP_NAME, ɵlazySDKProxy, ɵPromiseProxy, ɵAngularFireSchedulers } from '@angular/fire';
 import { FIREBASE_OPTIONS, ɵfirebaseAppFactory } from '@angular/fire';
 import { functions } from 'firebase/app';
 
@@ -25,24 +25,24 @@ export class AngularFireFunctions {
     @Optional() @Inject(REGION) region:string|null,
     @Optional() @Inject(ORIGIN) origin:string|null
   ) {
+    const schedulers = new ɵAngularFireSchedulers(zone);
 
     const functions = of(undefined).pipe(
-      switchMap(() => zone.runOutsideAngular(() => import('firebase/functions'))),
+      observeOn(schedulers.outsideAngular),
+      switchMap(() => import('firebase/functions')),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
       map(app => app.functions(region || undefined)),
       tap(functions => {
         if (origin) { functions.useFunctionsEmulator(origin) }
       }),
-      ɵrunOutsideAngular(zone),
       shareReplay({ bufferSize: 1, refCount: false }),
     );
 
     this.httpsCallable = <T=any, R=any>(name: string) =>
-      (data: T) => zone.runOutsideAngular(() =>
-        from(functions).pipe(
-          switchMap(functions => functions.httpsCallable(name)(data)),
-          map(r => r.data as R)
-        )
+      (data: T) => from(functions).pipe(
+        observeOn(schedulers.outsideAngular),
+        switchMap(functions => functions.httpsCallable(name)(data)),
+        map(r => r.data as R)
       )
 
     return ɵlazySDKProxy(this, functions, zone);

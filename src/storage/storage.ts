@@ -1,6 +1,7 @@
 import { Injectable, Inject, Optional, InjectionToken, NgZone, PLATFORM_ID } from '@angular/core';
 import { createStorageRef } from './ref';
-import { FirebaseOptions, FirebaseAppConfig, ɵFirebaseZoneScheduler, ɵfirebaseAppFactory, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire';
+import { Observable } from 'rxjs';
+import { FirebaseOptions, FirebaseAppConfig, ɵfirebaseAppFactory, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵkeepUnstableUntilFirstFactory, ɵAngularFireSchedulers } from '@angular/fire';
 import { UploadMetadata } from './interfaces';
 import { storage } from 'firebase/app';
 
@@ -18,7 +19,9 @@ export const BUCKET = new InjectionToken<string>('angularfire2.storageBucket');
 })
 export class AngularFireStorage {
   public readonly storage: storage.Storage;
-  public readonly scheduler: ɵFirebaseZoneScheduler;
+
+  public readonly keepUnstableUntilFirst: <T>(obs: Observable<T>) => Observable<T>;
+  public readonly schedulers: ɵAngularFireSchedulers;
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
@@ -27,7 +30,9 @@ export class AngularFireStorage {
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
-    this.scheduler = new ɵFirebaseZoneScheduler(zone, platformId);
+    this.schedulers = new ɵAngularFireSchedulers(zone);
+    this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers, platformId);
+
     this.storage = zone.runOutsideAngular(() => {
       const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
       if (!app.storage) { throw "You must import 'firebase/database' before using AngularFireDatabase" }
@@ -36,12 +41,12 @@ export class AngularFireStorage {
   }
 
   ref(path: string) {
-    return createStorageRef(this.storage.ref(path), this.scheduler);
+    return createStorageRef(this.storage.ref(path), this.schedulers, this.keepUnstableUntilFirst);
   }
 
   upload(path: string, data: any, metadata?: UploadMetadata) {
     const storageRef = this.storage.ref(path);
-    const ref = createStorageRef(storageRef, this.scheduler);
+    const ref = createStorageRef(storageRef, this.schedulers, this.keepUnstableUntilFirst);
     return ref.put(data, metadata);
   }
 

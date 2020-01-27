@@ -1,9 +1,8 @@
 import { Injectable, Inject, Optional, NgZone, InjectionToken } from '@angular/core';
 import { Observable, concat, of, pipe, OperatorFunction, MonoTypeOperatorFunction, empty, throwError } from 'rxjs';
-import { map, switchMap, tap, shareReplay, distinctUntilChanged, filter, groupBy, mergeMap, scan, withLatestFrom, startWith, debounceTime, catchError } from 'rxjs/operators';
-import { FirebaseAppConfig, FirebaseOptions, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵPromiseProxy } from '@angular/fire';
+import { map, switchMap, tap, shareReplay, distinctUntilChanged, filter, groupBy, mergeMap, scan, withLatestFrom, startWith, debounceTime, observeOn, catchError } from 'rxjs/operators';
+import { ɵPromiseProxy, ɵfirebaseAppFactory, ɵAngularFireSchedulers, FirebaseAppConfig, FirebaseOptions, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire';
 import { remoteConfig } from 'firebase/app';
-import { ɵfirebaseAppFactory, ɵrunOutsideAngular } from '@angular/fire';
 
 export interface ConfigTemplate {[key:string]: string|number|boolean};
 
@@ -56,8 +55,11 @@ export class AngularFireRemoteConfig {
     @Optional() @Inject(DEFAULTS) defaultConfig:ConfigTemplate|null,
     private zone: NgZone
   ) {
+
+    const schedulers = new ɵAngularFireSchedulers(zone);
     
     const remoteConfig$ = of(undefined).pipe(
+      observeOn(schedulers.outsideAngular),
       // @ts-ignore zapping in the UMD in the build script
       switchMap(() => zone.runOutsideAngular(() => import('firebase/remote-config'))),
       catchError(err => err.message === 'Not supported' ? empty() : throwError(err) ),
@@ -68,7 +70,6 @@ export class AngularFireRemoteConfig {
         if (defaultConfig) { rc.defaultConfig = defaultConfig }
       }),
       startWith(undefined),
-      ɵrunOutsideAngular(zone),
       shareReplay({ bufferSize: 1, refCount: false })
     );
 
@@ -89,12 +90,20 @@ export class AngularFireRemoteConfig {
     );
 
     const existing$ = loadedRemoteConfig$.pipe(
-      switchMap(rc => rc.activate().then(() => rc.getAll())),
+      switchMap(rc =>
+        rc.activate()
+          .then(() => rc.ensureInitialized())
+          .then(() => rc.getAll())
+      ),
       filterOutDefaults
     );
 
     const fresh$ = loadedRemoteConfig$.pipe(
-      switchMap(rc => zone.runOutsideAngular(() => rc.fetchAndActivate().then(() => rc.getAll()))),
+      switchMap(rc => zone.runOutsideAngular(() =>
+        rc.fetchAndActivate()
+          .then(() => rc.ensureInitialized())
+          .then(() => rc.getAll())
+      )),
       filterOutDefaults
     );
 

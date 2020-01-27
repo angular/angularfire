@@ -1,8 +1,8 @@
 import { Injectable, Inject, Optional, NgZone, InjectionToken, PLATFORM_ID } from '@angular/core';
 import { of, empty, throwError } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
-import { map, tap, shareReplay, switchMap, catchError } from 'rxjs/operators';
-import { FirebaseAppConfig, FirebaseOptions, ɵrunOutsideAngular, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵfirebaseAppFactory, ɵPromiseProxy } from '@angular/fire';
+import { map, tap, shareReplay, switchMap, catchError, observeOn } from 'rxjs/operators';
+import { FirebaseAppConfig, FirebaseOptions, ɵAngularFireSchedulers, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵfirebaseAppFactory, ɵPromiseProxy } from '@angular/fire';
 import { analytics } from 'firebase';
 
 export interface Config {[key:string]: any};
@@ -48,6 +48,8 @@ export class AngularFireAnalytics {
     zone: NgZone
   ) {
 
+    const schedulers = new ɵAngularFireSchedulers(zone);
+
     if (isPlatformBrowser(platformId)) {
 
       window[DATA_LAYER_NAME] = window[DATA_LAYER_NAME] || [];
@@ -74,14 +76,14 @@ export class AngularFireAnalytics {
     if (debugModeEnabled)   { this.updateConfig({ [DEBUG_MODE_KEY]:  1 }) }
 
     const analytics = of(undefined).pipe(
-      switchMap(() => zone.runOutsideAngular(() => import('firebase/analytics'))),
+      observeOn(schedulers.outsideAngular),
+      switchMap(() => import('firebase/analytics')),
       catchError(err => err.message === 'Not supported' ? empty() : throwError(err) ),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
       map(app => app.analytics()),
       tap(analytics => {
         if (analyticsCollectionEnabled === false) { analytics.setAnalyticsCollectionEnabled(false) }
       }),
-      ɵrunOutsideAngular(zone),
       shareReplay({ bufferSize: 1, refCount: false }),
     );
 

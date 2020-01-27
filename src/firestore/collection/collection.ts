@@ -1,13 +1,12 @@
 import { Observable, from } from 'rxjs';
 import { fromCollectionRef } from '../observable/fromRef';
-import { map, filter, scan } from 'rxjs/operators';
+import { map, filter, scan, observeOn } from 'rxjs/operators';
 import { firestore } from 'firebase/app';
 
 import { DocumentChangeType, CollectionReference, Query, DocumentReference, DocumentData, DocumentChangeAction } from '../interfaces';
 import { docChanges, sortedChanges } from './changes';
 import { AngularFirestoreDocument } from '../document/document';
 import { AngularFirestore } from '../firestore';
-import { ɵrunInZone } from '@angular/fire';
 
 export function validateEventsArray(events?: DocumentChangeType[]) {
   if(!events || events!.length === 0) {
@@ -63,21 +62,15 @@ export class AngularFirestoreCollection<T=DocumentData> {
    */
   stateChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction<T>[]> {
     if(!events || events.length === 0) {
-      return this.afs.scheduler.keepUnstableUntilFirst(
-        this.afs.scheduler.runOutsideAngular(
-          docChanges<T>(this.query)
-        )
+      return docChanges<T>(this.query, this.afs.schedulers.outsideAngular).pipe(
+        this.afs.keepUnstableUntilFirst
       );
     }
-    return this.afs.scheduler.keepUnstableUntilFirst(
-        this.afs.scheduler.runOutsideAngular(
-          docChanges<T>(this.query)
-        )
-      )
-      .pipe(
-        map(actions => actions.filter(change => events.indexOf(change.type) > -1)),
-        filter(changes =>  changes.length > 0)
-      );
+    return docChanges<T>(this.query, this.afs.schedulers.outsideAngular).pipe(
+      this.afs.keepUnstableUntilFirst,
+      map(actions => actions.filter(change => events.indexOf(change.type) > -1)),
+      filter(changes =>  changes.length > 0)
+    );
   }
 
   /**
@@ -96,14 +89,15 @@ export class AngularFirestoreCollection<T=DocumentData> {
    */
   snapshotChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction<T>[]> {
     const validatedEvents = validateEventsArray(events);
-    const sortedChanges$ = sortedChanges<T>(this.query, validatedEvents);
-    const scheduledSortedChanges$ = this.afs.scheduler.runOutsideAngular(sortedChanges$);
-    return this.afs.scheduler.keepUnstableUntilFirst(scheduledSortedChanges$);
+    const scheduledSortedChanges$ = sortedChanges<T>(this.query, validatedEvents, this.afs.schedulers.outsideAngular);
+    return scheduledSortedChanges$.pipe(
+      this.afs.keepUnstableUntilFirst
+    );
   }
 
   /**
    * Listen to all documents in the collection and its possible query as an Observable.
-   * 
+   *
    * If the `idField` option is provided, document IDs are included and mapped to the
    * provided `idField` property name.
    * @param options
@@ -112,15 +106,14 @@ export class AngularFirestoreCollection<T=DocumentData> {
   valueChanges({}): Observable<T[]>
   valueChanges<K extends string>(options: {idField: K}): Observable<(T & { [T in K]: string })[]>
   valueChanges<K extends string>(options: {idField?: K} = {}): Observable<T[]> {
-    const fromCollectionRef$ = fromCollectionRef<T>(this.query);
-    const scheduled$ = this.afs.scheduler.runOutsideAngular(fromCollectionRef$);
-    return this.afs.scheduler.keepUnstableUntilFirst(scheduled$)
+    return fromCollectionRef<T>(this.query, this.afs.schedulers.outsideAngular)
       .pipe(
+        this.afs.keepUnstableUntilFirst,
         map(actions => actions.payload.docs.map(a => {
           if (options.idField) {
-            return { 
-              ...a.data() as Object, 
-              ...{ [options.idField]: a.id } 
+            return {
+              ...a.data() as Object,
+              ...{ [options.idField]: a.id }
             } as T & { [T in K]: string };
           } else {
             return a.data()
@@ -130,12 +123,12 @@ export class AngularFirestoreCollection<T=DocumentData> {
   }
 
   /**
-   * Retrieve the results of the query once. 
-   * @param options 
+   * Retrieve the results of the query once.
+   * @param options
    */
   get(options?: firestore.GetOptions) {
     return from(this.query.get(options)).pipe(
-      ɵrunInZone(this.afs.scheduler.zone)
+      observeOn(this.afs.schedulers.insideAngular),
     );
   }
 
