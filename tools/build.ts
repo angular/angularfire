@@ -1,5 +1,5 @@
 import { spawn } from 'child_process';
-import { copy, writeFile, readFile, accessSync } from 'fs-extra';
+import { copy, writeFile, readFile } from 'fs-extra';
 import { prettySize } from 'pretty-size';
 import { sync as gzipSync } from 'gzip-size';
 import { join, dirname } from 'path';
@@ -17,6 +17,16 @@ const src = (...args:string[]) => join(process.cwd(), 'src', ...args);
 const dest = (...args:string[]) => join(process.cwd(), 'dist', 'packages-dist', ...args);
 
 const rootPackage = import(join(process.cwd(), 'package.json'));
+
+async function replacePackageCoreVersion() {
+  const root = await rootPackage;
+  const replace = require('replace-in-file');
+  return replace({
+    files: dest('**', '*.js'),
+    from: 'ANGULARFIRE2_VERSION',
+    to: root.version
+  });
+}
 
 async function replacePackageJsonVersions() {
   const path = dest('package.json');
@@ -69,7 +79,8 @@ async function buildLibrary() {
     copy(join(process.cwd(), 'docs'), dest('docs')),
     copy(src('firebase-node'), dest('firebase-node')),
     compileSchematics(),
-    replacePackageJsonVersions()
+    replacePackageJsonVersions(),
+    replacePackageCoreVersion()
   ]);
 }
 

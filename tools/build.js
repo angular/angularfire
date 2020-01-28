@@ -82,6 +82,28 @@ var dest = function () {
     return path_1.join.apply(void 0, __spreadArrays([process.cwd(), 'dist', 'packages-dist'], args));
 };
 var rootPackage = Promise.resolve().then(function () { return require(path_1.join(process.cwd(), 'package.json')); });
+function replacePackageCoreVersion() {
+    return __awaiter(this, void 0, void 0, function () {
+        var root, replace, result;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, rootPackage];
+                case 1:
+                    root = _a.sent();
+                    replace = require('replace-in-file');
+                    return [4 /*yield*/, replace({
+                            files: dest('**', '*.js'),
+                            from: 'ANGULARFIRE2_VERSION',
+                            to: root.version
+                        })];
+                case 2:
+                    result = _a.sent();
+                    console.log(result);
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
 function replacePackageJsonVersions() {
     return __awaiter(this, void 0, void 0, function () {
         var path, root, pkg;
@@ -174,7 +196,8 @@ function buildLibrary() {
                             fs_extra_1.copy(path_1.join(process.cwd(), 'docs'), dest('docs')),
                             fs_extra_1.copy(src('firebase-node'), dest('firebase-node')),
                             compileSchematics(),
-                            replacePackageJsonVersions()
+                            replacePackageJsonVersions(),
+                            replacePackageCoreVersion()
                         ])];
                 case 2:
                     _a.sent();

@@ -89,6 +89,7 @@
     "pretty-size": "^2.0.0",
     "protractor": "3.0.0",
     "reflect-metadata": "0.1.2",
+    "replace-in-file": "^5.0.2",
     "rimraf": "^2.5.4",
     "schematics-utilities": "^2.0.1",
     "shelljs": "^0.8.0",
