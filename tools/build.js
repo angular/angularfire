@@ -84,22 +84,18 @@ var dest = function () {
 var rootPackage = Promise.resolve().then(function () { return require(path_1.join(process.cwd(), 'package.json')); });
 function replacePackageCoreVersion() {
     return __awaiter(this, void 0, void 0, function () {
-        var root, replace, result;
+        var root, replace;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, rootPackage];
                 case 1:
                     root = _a.sent();
                     replace = require('replace-in-file');
-                    return [4 /*yield*/, replace({
+                    return [2 /*return*/, replace({
                             files: dest('**', '*.js'),
                             from: 'ANGULARFIRE2_VERSION',
                             to: root.version
                         })];
-                case 2:
-                    result = _a.sent();
-                    console.log(result);
-                    return [2 /*return*/];
             }
         });
     });

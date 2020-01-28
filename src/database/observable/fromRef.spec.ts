@@ -29,7 +29,7 @@ describe('fromRef', () => {
         AngularFireDatabaseModule
       ],
       providers: [
-        { provide: URL, useValue: 'http://localhost:9000?ns=angularfire2-test'}
+        { provide: URL, useValue: 'http://localhost:9000'}
       ]
     });
     inject([FirebaseApp], (app_: FirebaseApp) => {

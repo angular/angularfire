@@ -6,21 +6,21 @@ import { NgZone } from '@angular/core';
 import 'firebase/database';
 
 // generate random string to test fidelity of naming
-const APP_NAME = (Math.random() + 1).toString(36).substring(7);
+const rando = () => (Math.random() + 1).toString(36).substring(7);
+const FIREBASE_DB_NAME = 'http://localhost:9000/';
 
 describe('AngularFireDatabase', () => {
   let app: FirebaseApp;
   let db: AngularFireDatabase;
   let zone: NgZone
+  let firebaseAppName: string;
 
   beforeEach(() => {
+    firebaseAppName = rando();
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG, APP_NAME),
+        AngularFireModule.initializeApp(COMMON_CONFIG, firebaseAppName),
         AngularFireDatabaseModule
-      ],
-      providers: [
-        { provide: URL, useValue: 'http://localhost:9000?ns=angularfire2-test'}
       ]
     });
     inject([FirebaseApp, AngularFireDatabase, NgZone], (app_: FirebaseApp, _db: AngularFireDatabase, _zone: NgZone) => {
@@ -50,31 +50,30 @@ describe('AngularFireDatabase', () => {
     });
 
     it('should have an initialized Firebase app instance member', () => {
-      expect(db.database.app.name).toEqual(APP_NAME);
+      expect(db.database.app.name).toEqual(firebaseAppName);
     });
 
   });
 
 });
 
-const FIREBASE_APP_NAME_TOO = (Math.random() + 1).toString(36).substring(7);
-const FIREBASE_DB_NAME = 'http://localhost:9000/';
 const QUERY = (Math.random() + 1).toString(36).substring(7)
 
 describe('AngularFireDatabase w/options', () => {
   let app: FirebaseApp;
   let db: AngularFireDatabase;
+  let firebaseAppName: string;
 
   beforeEach(() => {
+    firebaseAppName = rando();
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG, APP_NAME),
+        AngularFireModule.initializeApp(COMMON_CONFIG, firebaseAppName),
         AngularFireDatabaseModule
       ],
       providers: [
-        { provide: FIREBASE_APP_NAME, useValue: FIREBASE_APP_NAME_TOO },
-        { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG },
-        { provide: URL,  useValue: FIREBASE_DB_NAME }
+        { provide: FIREBASE_APP_NAME, useValue: firebaseAppName },
+        { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG }
       ]
     });
     inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {
@@ -98,7 +97,7 @@ describe('AngularFireDatabase w/options', () => {
     });
 
     it('should have an initialized Firebase app instance member', () => {
-      expect(db.database.app.name).toEqual(FIREBASE_APP_NAME_TOO);
+      expect(db.database.app.name).toEqual(firebaseAppName);
     });
 
     it('database be pointing to the provided DB instance', () => {

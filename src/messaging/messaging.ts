@@ -1,6 +1,6 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
 import { messaging } from 'firebase/app';
-import { Observable, empty, from, of, throwError } from 'rxjs';
+import { Observable, empty, of, throwError } from 'rxjs';
 import { mergeMap, catchError, map, switchMap, concat, observeOn, defaultIfEmpty } from 'rxjs/operators';
 import { FirebaseOptions, FirebaseAppConfig, ɵAngularFireSchedulers, FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
 import { ɵfirebaseAppFactory } from '@angular/fire';
@@ -28,14 +28,11 @@ export class AngularFireMessaging {
   ) {
     const schedulers = new ɵAngularFireSchedulers(zone);
 
-    // @ts-ignore zapping in the UMD in the build script
-    const requireMessaging = from(import('firebase/messaging'));
-
-    const messaging = requireMessaging.pipe(
+    const messaging = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
+      switchMap(() => isPlatformServer(platformId) ? empty() : import('firebase/messaging')),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
-      map(app => app.messaging()),
-      catchError(err => err.message === 'Not supported' ? empty() : throwError(err) )
+      map(app => app.messaging())
     );
 
     if (!isPlatformServer(platformId)) {

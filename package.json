@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "test": "npm run test:node",
-    "test:chrome": "npx firebase emulators:exec --project=angularfire2-test \"npx ng test  --watch=false --browsers=Chrome\"",
+    "test:watch": "npx firebase emulators:exec --project=angularfire2-test \"npx ng test --watch=true --browsers=Chrome\"",
+    "test:chrome": "npx firebase emulators:exec --project=angularfire2-test \"npx ng test --watch=false --browsers=Chrome\"",
     "test:chrome-headless": "npx firebase emulators:exec --project=angularfire2-test \"npx ng test --watch=false --browsers=ChromeHeadless\"",
     "lint": "npx ng lint",
     "test:node": "npx tsc -p tsconfig.jasmine.json; cp ./dist/packages-dist/schematics/versions.json ./dist/out-tsc/jasmine/schematics && npx firebase emulators:exec --project=angularfire2-test \"node -r tsconfig-paths/register ./tools/jasmine.js\"",

@@ -1,7 +1,7 @@
 import { Injectable, Inject, Optional, NgZone, InjectionToken, PLATFORM_ID } from '@angular/core';
-import { of, empty, throwError } from 'rxjs';
+import { of, empty } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
-import { map, tap, shareReplay, switchMap, catchError, observeOn } from 'rxjs/operators';
+import { map, tap, shareReplay, switchMap, observeOn } from 'rxjs/operators';
 import { FirebaseAppConfig, FirebaseOptions, ɵAngularFireSchedulers, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵfirebaseAppFactory, ɵPromiseProxy } from '@angular/fire';
 import { analytics } from 'firebase';
 
@@ -77,8 +77,7 @@ export class AngularFireAnalytics {
 
     const analytics = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
-      switchMap(() => import('firebase/analytics')),
-      catchError(err => err.message === 'Not supported' ? empty() : throwError(err) ),
+      switchMap(() => isPlatformBrowser(platformId) ? import('firebase/analytics') : empty()),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
       map(app => app.analytics()),
       tap(analytics => {
@@ -88,7 +87,7 @@ export class AngularFireAnalytics {
     );
 
     return ɵlazySDKProxy(this, analytics, zone);
-    
+
   }
 
 }

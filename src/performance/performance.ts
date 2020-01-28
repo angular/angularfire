@@ -1,8 +1,9 @@
-import { Injectable, NgZone, ApplicationRef, InjectionToken, Inject, Optional } from '@angular/core';
-import { Observable, Subscription, of } from 'rxjs';
+import { Injectable, NgZone, ApplicationRef, InjectionToken, Inject, Optional, PLATFORM_ID } from '@angular/core';
+import { Observable, Subscription, of, empty } from 'rxjs';
 import { first, tap, map, shareReplay, switchMap } from 'rxjs/operators';
 import { performance } from 'firebase/app';
 import { FirebaseApp, ɵPromiseProxy, ɵlazySDKProxy } from '@angular/fire';
+import { isPlatformBrowser } from '@angular/common';
 
 // SEMVER @ v6, drop and move core ng metrics to a service
 export const AUTOMATICALLY_TRACE_CORE_NG_METRICS = new InjectionToken<boolean>('angularfire2.performance.auto_trace');
@@ -32,11 +33,12 @@ export class AngularFirePerformance {
     @Optional() @Inject(INSTRUMENTATION_ENABLED) instrumentationEnabled:boolean|null,
     @Optional() @Inject(DATA_COLLECTION_ENABLED) dataCollectionEnabled:boolean|null,
     appRef: ApplicationRef,
-    private zone: NgZone
+    private zone: NgZone,
+    @Inject(PLATFORM_ID) platformId:Object
   ) {
 
     this.performance = of(undefined).pipe(
-      switchMap(() => zone.runOutsideAngular(() => import('firebase/performance'))),
+      switchMap(() => isPlatformBrowser(platformId) ? zone.runOutsideAngular(() => import('firebase/performance')) : empty()),
       map(() => zone.runOutsideAngular(() => app.performance())),
       tap(performance => {
         if (instrumentationEnabled == false) { performance.instrumentationEnabled = false }

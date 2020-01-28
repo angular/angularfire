@@ -2,7 +2,7 @@ import { TestBed, inject } from '@angular/core/testing';
 import { PlatformRef, NgModule, CompilerFactory, NgZone } from '@angular/core';
 import { FirebaseApp, AngularFireModule } from './public_api';
 import { Subscription, Observable, Subject, of } from 'rxjs';
-import { COMMON_CONFIG } from './test-config';
+import { COMMON_CONFIG } from '../test-config';
 import { BrowserModule } from '@angular/platform-browser';
 import { database } from 'firebase/app';
 import { ɵZoneScheduler, ɵkeepUnstableUntilFirstFactory, ɵAngularFireSchedulers } from './angularfire2';
