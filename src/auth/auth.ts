@@ -52,13 +52,13 @@ export class AngularFireAuth {
 
     this.authState = auth.pipe(
       observeOn(schedulers.outsideAngular),
-      switchMap(auth => from(auth.onAuthStateChanged)),
+      switchMap(auth => new Observable<User|null>(auth.onAuthStateChanged.bind(auth))),
       keepUnstableUntilFirst
     );
 
     this.user = auth.pipe(
       observeOn(schedulers.outsideAngular),
-      switchMap(auth => from(auth.onIdTokenChanged)),
+      switchMap(auth => new Observable<User|null>(auth.onIdTokenChanged.bind(auth))),
       keepUnstableUntilFirst
     );
 
