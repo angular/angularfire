@@ -31,7 +31,7 @@ describe('AngularFireMessaging', () => {
   });
 
   it('should have the FCM instance', () => {
-    expect(afm.messaging).toBeDefined();
+    expect(afm.deleteToken).toBeDefined();
   });
 
 });
@@ -71,7 +71,7 @@ describe('AngularFireMessaging with different app', () => {
     });
 
     it('should have the FCM instance', () => {
-      expect(afm.messaging).toBeDefined();
+      expect(afm.deleteToken).toBeDefined();
     });
 
   });

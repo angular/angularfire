@@ -9,10 +9,10 @@ import { AppComponent }   from './app.component';
     BrowserModule.withServerTransition({appId: 'my-app'}),
     AngularFireDatabaseModule,
     AngularFireModule.initializeApp({
-      apiKey: "AIzaSyDFbuKX0UeXje-PRAvwIymYo2jk-uGqMa4",
-      authDomain: "test-bc800.firebaseapp.com",
-      databaseURL: "https://test-bc800.firebaseio.com",
-      storageBucket: ""
+      apiKey: "AIzaSyBVSy3YpkVGiKXbbxeK0qBnu3-MNZ9UIjA",
+      authDomain: "angularfire2-test.firebaseapp.com",
+      databaseURL: "https://angularfire2-test.firebaseio.com",
+      storageBucket: "angularfire2-test.appspot.com",
     }),
   ],
   declarations: [ AppComponent ],

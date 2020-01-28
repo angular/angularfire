@@ -1,7 +1,7 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
 import { Observable, of, from } from 'rxjs';
-import { switchMap, shareReplay, map } from 'rxjs/operators';
-import { FIREBASE_OPTIONS, FIREBASE_APP_NAME, FirebaseOptions, FirebaseAppConfig, ɵfirebaseAppFactory, ɵFirebaseZoneScheduler, ɵrunOutsideAngular, ɵPromiseProxy, ɵlazySDKProxy } from '@angular/fire';
+import { switchMap, map, observeOn, shareReplay } from 'rxjs/operators';
+import { FIREBASE_OPTIONS, FIREBASE_APP_NAME, FirebaseOptions, FirebaseAppConfig, ɵPromiseProxy, ɵlazySDKProxy, ɵfirebaseAppFactory, ɵAngularFireSchedulers, ɵkeepUnstableUntilFirstFactory } from '@angular/fire';
 import { User, auth } from 'firebase/app';
 
 export interface AngularFireAuth extends ɵPromiseProxy<auth.Auth> {};
@@ -37,28 +37,29 @@ export class AngularFireAuth {
     @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
     @Inject(PLATFORM_ID) platformId: Object,
-    private zone: NgZone
+    zone: NgZone
   ) {
-    const scheduler = new ɵFirebaseZoneScheduler(zone, platformId);
+    const schedulers = new ɵAngularFireSchedulers(zone);
+    const keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(schedulers, platformId);
 
     const auth = of(undefined).pipe(
+      observeOn(schedulers.outsideAngular),
       switchMap(() => zone.runOutsideAngular(() => import('firebase/auth'))),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
       map(app => app.auth()),
-      ɵrunOutsideAngular(zone),
       shareReplay({ bufferSize: 1, refCount: false }),
     );
 
     this.authState = auth.pipe(
+      observeOn(schedulers.outsideAngular),
       switchMap(auth => from(auth.onAuthStateChanged)),
-      ɵrunOutsideAngular(zone),
-      scheduler.keepUnstableUntilFirst.bind(scheduler),
+      keepUnstableUntilFirst
     );
 
     this.user = auth.pipe(
+      observeOn(schedulers.outsideAngular),
       switchMap(auth => from(auth.onIdTokenChanged)),
-      ɵrunOutsideAngular(zone),
-      scheduler.keepUnstableUntilFirst.bind(scheduler),
+      keepUnstableUntilFirst
     );
 
     this.idToken = this.user.pipe(

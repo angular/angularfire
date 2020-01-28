@@ -6,7 +6,8 @@
       "declaration": true,
       "inlineSources": true,
       "types": [
-        "node"
+        "node",
+        "zone.js"
       ],
       "lib": [
         "dom",

@@ -1,5 +1,5 @@
 import { spawn } from 'child_process';
-import { copy, writeFile, readFile, accessSync } from 'fs-extra';
+import { copy, writeFile, readFile } from 'fs-extra';
 import { prettySize } from 'pretty-size';
 import { sync as gzipSync } from 'gzip-size';
 import { join, dirname } from 'path';
@@ -17,6 +17,16 @@ const src = (...args:string[]) => join(process.cwd(), 'src', ...args);
 const dest = (...args:string[]) => join(process.cwd(), 'dist', 'packages-dist', ...args);
 
 const rootPackage = import(join(process.cwd(), 'package.json'));
+
+async function replacePackageCoreVersion() {
+  const root = await rootPackage;
+  const replace = require('replace-in-file');
+  return replace({
+    files: dest('**', '*.js'),
+    from: 'ANGULARFIRE2_VERSION',
+    to: root.version
+  });
+}
 
 async function replacePackageJsonVersions() {
   const path = dest('package.json');
@@ -54,7 +64,7 @@ async function compileSchematics() {
 }
 
 async function measure(module: string) {
-  const path = dest('bundles', `${module}.umd.js`);
+  const path = dest('bundles', `${module}.umd.min.js`);
   const file = await readFile(path);
   const gzip = prettySize(gzipSync(file), true);
   const size = prettySize(file.byteLength, true);
@@ -69,7 +79,8 @@ async function buildLibrary() {
     copy(join(process.cwd(), 'docs'), dest('docs')),
     copy(src('firebase-node'), dest('firebase-node')),
     compileSchematics(),
-    replacePackageJsonVersions()
+    replacePackageJsonVersions(),
+    replacePackageCoreVersion()
   ]);
 }
 
@@ -89,13 +100,34 @@ async function buildDocs() {
       // TODO chop out the working directory and filename
       child.children ? child.children.map(c => ({...c, path: dirname(child.originalName.split(process.cwd())[1])})) : []
     ));
-    const exports = entryPoint.children.filter(c => c.name[0] !== 'ɵ' /* private */).map(child => {
-      return {...allChildren.find(c => child.target === c.id)};
-    });
-    return { name: ENTRY_NAMES[index], exports };
+    return entryPoint.children
+      .filter(c => c.name[0] !== 'ɵ' && c.name[0] !== '_' /* private */)
+      .map(child => ({...allChildren.find(c => child.target === c.id)}))
+      .reduce((acc, child) => ({...acc, [encodeURIComponent(child.name)]: child}), {});
   }));
   const root = await rootPackage;
-  const afdoc = entries.reduce((acc, entry, index) => ({...acc, [MODULES[index]]: entry }), {});
+  const pipes = ['MonoTypeOperatorFunction', 'OperatorFunction', 'AuthPipe', 'UnaryFunction'];
+  const tocType = child => {
+    const decorators: string[] = child.decorators && child.decorators.map(d => d.name) || [];
+    if (decorators.includes('NgModule')) {
+      return 'NgModule'
+    } else if (child.kindString === 'Type alias') {
+      return 'Type alias';
+    } else if (child.kindString === 'Variable' && child.defaultValue && child.defaultValue.startsWith('new InjectionToken')) {
+      return 'InjectionToken'
+    } else if (child.type) {
+      return pipes.includes(child.type.name) ? 'Pipe' : child.type.name;
+    } else if (child.signatures && child.signatures[0] && child.signatures[0].type && pipes.includes(child.signatures[0].type.name)) {
+      return 'Pipe';
+    } else {
+      return child.kindString;
+    }
+  }
+  const table_of_contents = entries.reduce((acc, entry, index) =>
+    ({...acc, [MODULES[index]]: {name: ENTRY_NAMES[index], exports: Object.keys(entry).reduce((acc, key) => ({...acc, [key]: tocType(entry[key])}), {})}}),
+    {}
+  );
+  const afdoc = entries.reduce((acc, entry, index) => ({...acc, [MODULES[index]]: entry }), { table_of_contents });
   return writeFile(`./api-${root.version}.json`, JSON.stringify(afdoc, null, 2));
 }
 
@@ -108,10 +140,18 @@ async function buildWrapper() {
   return writeFile(path, JSON.stringify(pkg, null, 2));
 }
 
-buildLibrary().then(buildWrapper).then(buildDocs).then(measureLibrary).then(stats =>
+function packLibrary() {
+  return spawnPromise('npm', ['pack', './dist/packages-dist']);
+}
+
+Promise.all([
+  buildWrapper(),
+  buildDocs(),
+  buildLibrary().then(packLibrary)
+]).then(measureLibrary).then(stats =>
   console.log(`
-Package      Size     Gzipped
------------------------------
+Package             Size     Gzipped
+------------------------------------
 ${stats.map((s, i) => [MODULES[i].padEnd(20), s.size.padEnd(8), s.gzip].join("")).join("\n")}`
   )
 );

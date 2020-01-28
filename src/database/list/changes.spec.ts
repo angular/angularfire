@@ -28,9 +28,6 @@ describe('listChanges', () => {
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG, FIREBASE_APP_NAME),
         AngularFireDatabaseModule
-      ],
-      providers: [
-        { provide: URL, useValue: 'http://localhost:9000?ns=angularfire2-test'}
       ]
     });
     inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {

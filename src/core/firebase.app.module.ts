@@ -1,8 +1,6 @@
-import { InjectionToken, NgModule, Optional, NgZone } from '@angular/core';
+import { InjectionToken, NgModule, Optional, NgZone, VERSION as NG_VERSION, Version, PLATFORM_ID, Inject } from '@angular/core';
 import { app, auth, database, messaging, storage, firestore, functions, analytics, performance, remoteConfig } from 'firebase/app';
-
-// @ts-ignore (https://github.com/firebase/firebase-js-sdk/pull/1206)
-import firebase from 'firebase/app'; // once fixed can pull in as "default as firebase" above
+import * as firebase from 'firebase/app';
 
 // INVESTIGATE Public types don't expose FirebaseOptions or FirebaseAppConfig, is this the case anylonger?
 export interface FirebaseOptions {[key:string]: any};
@@ -27,6 +25,8 @@ export class FirebaseApp implements Partial<app.App> {
     functions: (region?: string) => functions.Functions;
     remoteConfig: () => remoteConfig.RemoteConfig;
 }
+
+export const VERSION = new Version('ANGULARFIRE2_VERSION');
 
 export function ɵfirebaseAppFactory(options: FirebaseOptions, zone: NgZone, nameOrConfig?: string|FirebaseAppConfig|null) {
     const name = typeof nameOrConfig === 'string' && nameOrConfig || '[DEFAULT]';
@@ -61,5 +61,9 @@ export class AngularFireModule {
                 { provide: FIREBASE_APP_NAME, useValue: nameOrConfig }
             ]
         }
+    }
+    constructor(@Inject(PLATFORM_ID) platformId:Object ) {
+        firebase.registerVersion('angularfire', VERSION.full, platformId.toString());
+        firebase.registerVersion('angular', NG_VERSION.full);
     }
 }

@@ -15,6 +15,8 @@ require('zone.js/dist/async-test');
 require('zone.js/dist/sync-test');
 require('zone.js/dist/fake-async-test');
 require('zone.js/dist/proxy');
+require('zone.js/dist/zone-patch-rxjs');
+require('zone.js/dist/task-tracking');
 
 const { getTestBed } = require('@angular/core/testing');
 const { platformServerTesting, ServerTestingModule } = require('@angular/platform-server/testing');

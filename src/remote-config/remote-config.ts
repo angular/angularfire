@@ -1,9 +1,9 @@
-import { Injectable, Inject, Optional, NgZone, InjectionToken } from '@angular/core';
+import { Injectable, Inject, Optional, NgZone, InjectionToken, PLATFORM_ID } from '@angular/core';
 import { Observable, concat, of, pipe, OperatorFunction, MonoTypeOperatorFunction, empty, throwError } from 'rxjs';
-import { map, switchMap, tap, shareReplay, distinctUntilChanged, filter, groupBy, mergeMap, scan, withLatestFrom, startWith, debounceTime, catchError } from 'rxjs/operators';
-import { FirebaseAppConfig, FirebaseOptions, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵPromiseProxy } from '@angular/fire';
+import { map, switchMap, tap, shareReplay, distinctUntilChanged, filter, groupBy, mergeMap, scan, withLatestFrom, startWith, debounceTime, observeOn, catchError } from 'rxjs/operators';
+import { ɵPromiseProxy, ɵfirebaseAppFactory, ɵAngularFireSchedulers, FirebaseAppConfig, FirebaseOptions, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire';
 import { remoteConfig } from 'firebase/app';
-import { ɵfirebaseAppFactory, ɵrunOutsideAngular } from '@angular/fire';
+import { isPlatformBrowser } from '@angular/common';
 
 export interface ConfigTemplate {[key:string]: string|number|boolean};
 
@@ -54,13 +54,15 @@ export class AngularFireRemoteConfig {
     @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
     @Optional() @Inject(SETTINGS) settings:remoteConfig.Settings|null,
     @Optional() @Inject(DEFAULTS) defaultConfig:ConfigTemplate|null,
-    private zone: NgZone
+    private zone: NgZone,
+    @Inject(PLATFORM_ID) platformId:Object
   ) {
+
+    const schedulers = new ɵAngularFireSchedulers(zone);
     
     const remoteConfig$ = of(undefined).pipe(
-      // @ts-ignore zapping in the UMD in the build script
-      switchMap(() => zone.runOutsideAngular(() => import('firebase/remote-config'))),
-      catchError(err => err.message === 'Not supported' ? empty() : throwError(err) ),
+      observeOn(schedulers.outsideAngular),
+      switchMap(() => isPlatformBrowser(platformId) ? import('firebase/remote-config') : empty()),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
       map(app => app.remoteConfig()),
       tap(rc => {
@@ -68,7 +70,6 @@ export class AngularFireRemoteConfig {
         if (defaultConfig) { rc.defaultConfig = defaultConfig }
       }),
       startWith(undefined),
-      ɵrunOutsideAngular(zone),
       shareReplay({ bufferSize: 1, refCount: false })
     );
 
@@ -89,12 +90,20 @@ export class AngularFireRemoteConfig {
     );
 
     const existing$ = loadedRemoteConfig$.pipe(
-      switchMap(rc => rc.activate().then(() => rc.getAll())),
+      switchMap(rc =>
+        rc.activate()
+          .then(() => rc.ensureInitialized())
+          .then(() => rc.getAll())
+      ),
       filterOutDefaults
     );
 
     const fresh$ = loadedRemoteConfig$.pipe(
-      switchMap(rc => zone.runOutsideAngular(() => rc.fetchAndActivate().then(() => rc.getAll()))),
+      switchMap(rc => zone.runOutsideAngular(() =>
+        rc.fetchAndActivate()
+          .then(() => rc.ensureInitialized())
+          .then(() => rc.getAll())
+      )),
       filterOutDefaults
     );
 
