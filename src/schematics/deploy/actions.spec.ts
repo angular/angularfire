@@ -1,6 +1,6 @@
 import { JsonObject, logging } from '@angular-devkit/core';
-import { BuilderContext, BuilderRun, ScheduleOptions, Target, } from '@angular-devkit/architect/src/index2';
-import { FirebaseTools, FirebaseDeployConfig } from 'schematics/interfaces';
+import { BuilderContext, BuilderRun, ScheduleOptions, Target, } from '@angular-devkit/architect';
+import { FirebaseTools, FirebaseDeployConfig } from '../interfaces';
 import deploy from './actions';
 
 
@@ -13,21 +13,10 @@ const PROJECT = 'pirojok-project';
 describe('Deploy Angular apps', () => {
   beforeEach(() => initMocks());
 
-  it('should check if the user is authenticated by invoking list', async () => {
-    const spy = spyOn(firebaseMock, 'list');
-    const spyLogin = spyOn(firebaseMock, 'login');
+  it('should call login', async () => {
+    const spy = spyOn(firebaseMock, 'login');
     await deploy(firebaseMock, context, 'host', FIREBASE_PROJECT);
     expect(spy).toHaveBeenCalled();
-    expect(spyLogin).not.toHaveBeenCalled();
-  });
-
-  it('should invoke login if list rejects', async () => {
-    firebaseMock.list = () => Promise.reject();
-    const spy = spyOn(firebaseMock, 'list').and.callThrough();
-    const spyLogin = spyOn(firebaseMock, 'login');
-    await deploy(firebaseMock, context, 'host', FIREBASE_PROJECT);
-    expect(spy).toHaveBeenCalled();
-    expect(spyLogin).toHaveBeenCalled();
   });
 
   it('should invoke the builder', async () => {
@@ -75,12 +64,14 @@ describe('Deploy Angular apps', () => {
 const initMocks = () => {
   firebaseMock = {
     login: () => Promise.resolve(),
-    list: () => Promise.resolve([]),
+    projects: {
+      list: () => Promise.resolve([]),
+    },
     deploy: (_: FirebaseDeployConfig) => Promise.resolve(),
     use: () => Promise.resolve()
   };
 
-  context = {
+  context = <any>{
     target: {
       configuration: 'production',
       project: PROJECT,

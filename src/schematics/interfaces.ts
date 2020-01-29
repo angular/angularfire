@@ -1,7 +1,9 @@
 export interface Project {
+  projectId: string;
+  projectNumber: string;
+  displayName: string;
   name: string;
-  id: string;
-  permission: "edit" | "view" | "own";
+  resources: { [key:string]: string }
 }
 
 export interface FirebaseDeployConfig {
@@ -12,7 +14,9 @@ export interface FirebaseDeployConfig {
 export interface FirebaseTools {
   login(): Promise<void>;
 
-  list(): Promise<Project[]>;
+  projects: {
+    list(): Promise<Project[]>;
+  }
 
   deploy(config: FirebaseDeployConfig): Promise<any>;
 

@@ -11,14 +11,8 @@ export default async function deploy(
     throw new Error("Cannot find firebase project for your app in .firebaserc");
   }
 
-  try {
-    await firebaseTools.list();
-  } catch (e) {
-    context.logger.warn(
-      "🚨 You're not logged into Firebase. Logging you in..."
-    );
-    await firebaseTools.login();
-  }
+  await firebaseTools.login();
+
   if (!context.target) {
     throw new Error("Cannot execute the build target");
   }

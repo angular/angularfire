@@ -2,12 +2,10 @@ import { readFileSync } from "fs";
 import { FirebaseRc, Project } from "./interfaces";
 import { join } from "path";
 
-export function listProjects() {
+export async function listProjects() {
   const firebase = require('firebase-tools');
-  return firebase.list().catch(
-    /* If list failed, then login and try again. */
-    () => firebase.login().then(() => firebase.list())
-  );
+  await firebase.login();
+  return firebase.projects.list();
 }
 
 // `fuzzy` passes either the original list of projects or an internal object
@@ -22,7 +20,7 @@ const searchProjects = (projects: Project[]) => {
       require('fuzzy')
         .filter(input, projects, {
           extract(el: Project) {
-            return `${el.id} ${el.name} ${el.permission}`;
+            return `${el.projectId} ${el.displayName}`;
           }
         })
         .map((result: Project | { original: Project }) => {
@@ -33,9 +31,9 @@ const searchProjects = (projects: Project[]) => {
             original = result.original;
           }
           return {
-            name: `${original.id} (${original.name})`,
-            title: original.name,
-            value: original.id
+            name: `${original.displayName} (${original.projectId})`,
+            title: original.displayName,
+            value: original.projectId
           };
         })
     );
