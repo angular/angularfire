@@ -5,9 +5,9 @@
         "description": "Add firebase deploy schematic",
         "factory": "./schematics/public_api#ngAdd"
       },
-      "ng-add-setup-firebase-deploy": {
+      "ng-add-setup-project": {
         "description": "Setup ng deploy",
-        "factory": "./schematics/public_api#setupNgDeploy"
+	"factory": "./schematics/public_api#ngAddSetupProject"
       }
     }
   }
