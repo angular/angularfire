@@ -58,7 +58,7 @@ async function compileSchematics() {
   return Promise.all([
     copy(src('core', 'builders.json'), dest('builders.json')),
     copy(src('core', 'collection.json'), dest('collection.json')),
-    copy(src('schematics', 'deploy', 'schema.json'), dest('deploy', 'schema.json')),
+    copy(src('schematics', 'deploy', 'schema.json'), dest('schematics', 'deploy', 'schema.json')),
     replaceSchematicVersions()
   ]);
 }
