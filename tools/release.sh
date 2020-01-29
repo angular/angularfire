@@ -5,10 +5,7 @@ PRODUCTION_TEST="^[^-]*$"
 
 if test $TAG_NAME; then
     if [[ $TAG_NAME =~ $PRODUCTION_TEST ]]; then
-        npm publish . &&
-        cd ../wrapper-dist &&
-        npm publish . &&
-        npm deprecate angularfire2 "AngularFire has moved, we're now @angular/fire"
+        npm publish .
     else
         npm publish . --tag next
     fi

@@ -1,6 +1,0 @@
-{
-  "name": "angularfire2/storage",
-  "main": "index.js",
-  "typings": "index.d.ts",
-  "sideEffects": false
-}

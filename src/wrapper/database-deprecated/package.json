@@ -1,6 +1,0 @@
-{
-  "name": "angularfire2/database-deprecated",
-  "main": "index.js",
-  "typings": "index.d.ts",
-  "sideEffects": false
-}

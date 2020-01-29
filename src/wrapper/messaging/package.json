@@ -1,6 +1,0 @@
-{
-  "name": "angularfire2/messaging",
-  "main": "index.js",
-  "typings": "index.d.ts",
-  "sideEffects": false
-}
