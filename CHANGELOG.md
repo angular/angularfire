@@ -58,7 +58,7 @@ Version 6 of AngularFire drops support for Angular version 8 and below, older ve
 
 #### `@angular/fire/performance`
 
-* `AngularFirePerformance` now Proxies the underlying Firebase `messaging.Messaging` instance
+* `AngularFirePerformance` now Proxies the underlying Firebase `performance.Performance` instance
 
 #### `@angular/fire/remote-config`
 
