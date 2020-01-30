@@ -5,6 +5,12 @@
 
 [![Build Status](https://travis-ci.org/angular/angularfire.svg?branch=master)](https://travis-ci.org/angular/angularfire) [![Join the chat at https://gitter.im/angular/angularfire2](https://badges.gitter.im/angular/angularfire2.svg)](https://gitter.im/angular/angularfire2?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+---
+
+> **WARNING**: Master branch is the work in progress for version 6 of AngularFire. [You can find version 5 here](https://github.com/angular/angularfire/tree/v5), if you're looking for documentation or to contribute to stable. [Learn more about the road toward version 6 here](https://github.com/angular/angularfire/issues/2267).
+
+---
+
 ## What is AngularFire?
 
 - **Observable based** - Use the power of RxJS, Angular, and Firebase.

@@ -1,13 +1,16 @@
-import { Injectable, NgZone, ApplicationRef, InjectionToken, Inject, Optional } from '@angular/core';
-import { Observable, Subscription, from } from 'rxjs';
+import { Injectable, NgZone, ApplicationRef, InjectionToken, Inject, Optional, PLATFORM_ID } from '@angular/core';
+import { Observable, Subscription, of, empty } from 'rxjs';
 import { first, tap, map, shareReplay, switchMap } from 'rxjs/operators';
 import { performance } from 'firebase/app';
-import { FirebaseApp } from '@angular/fire';
+import { FirebaseApp, ɵPromiseProxy, ɵlazySDKProxy } from '@angular/fire';
+import { isPlatformBrowser } from '@angular/common';
 
 // SEMVER @ v6, drop and move core ng metrics to a service
 export const AUTOMATICALLY_TRACE_CORE_NG_METRICS = new InjectionToken<boolean>('angularfire2.performance.auto_trace');
 export const INSTRUMENTATION_ENABLED = new InjectionToken<boolean>('angularfire2.performance.instrumentationEnabled');
 export const DATA_COLLECTION_ENABLED = new InjectionToken<boolean>('angularfire2.performance.dataCollectionEnabled');
+
+export interface AngularFirePerformance extends Omit<ɵPromiseProxy<performance.Performance>, 'trace'> {};
 
 export type TraceOptions = {
   metrics?: {[key:string]: number},
@@ -17,10 +20,12 @@ export type TraceOptions = {
   metric$?: {[key:string]: Observable<number>}
 };
 
-@Injectable()
+@Injectable({
+  providedIn: 'any'
+})
 export class AngularFirePerformance {
   
-  performance: Observable<performance.Performance>;
+  private readonly performance: Observable<performance.Performance>;
 
   constructor(
     app: FirebaseApp,
@@ -28,26 +33,24 @@ export class AngularFirePerformance {
     @Optional() @Inject(INSTRUMENTATION_ENABLED) instrumentationEnabled:boolean|null,
     @Optional() @Inject(DATA_COLLECTION_ENABLED) dataCollectionEnabled:boolean|null,
     appRef: ApplicationRef,
-    private zone: NgZone
+    private zone: NgZone,
+    @Inject(PLATFORM_ID) platformId:Object
   ) {
-    
-    // @ts-ignore zapping in the UMD in the build script
-    const requirePerformance = from(zone.runOutsideAngular(() => import('firebase/performance')));
 
-    this.performance = requirePerformance.pipe(
-      // SEMVER while < 6 need to type, drop next major
-      map(() => zone.runOutsideAngular(() => <performance.Performance>app.performance())),
+    this.performance = of(undefined).pipe(
+      switchMap(() => isPlatformBrowser(platformId) ? zone.runOutsideAngular(() => import('firebase/performance')) : empty()),
+      map(() => zone.runOutsideAngular(() => app.performance())),
       tap(performance => {
         if (instrumentationEnabled == false) { performance.instrumentationEnabled = false }
         if (dataCollectionEnabled == false) { performance.dataCollectionEnabled = false }
       }),
-      shareReplay(1)
+      shareReplay({ bufferSize: 1, refCount: false }),
     );
 
     if (automaticallyTraceCoreNgMetrics != false) {
 
       // TODO determine more built in metrics
-      // this leaks...
+      // this leaks... move to a service?
       appRef.isStable.pipe(
         first(it => it),
         this.traceUntilComplete('isStable')
@@ -55,9 +58,11 @@ export class AngularFirePerformance {
 
     }
 
+    return ɵlazySDKProxy(this, this.performance, zone);
+
   }
 
-  trace$ = (name:string, options?: TraceOptions) =>
+  private readonly trace$ = (name:string, options?: TraceOptions) =>
     this.performance.pipe(
       switchMap(performance =>
         new Observable<void>(emitter =>
@@ -90,7 +95,7 @@ export class AngularFirePerformance {
       )
     );
 
-  traceUntil = <T=any>(name:string, test: (a:T) => boolean, options?: TraceOptions & { orComplete?: boolean }) => (source$: Observable<T>) => new Observable<T>(subscriber => {
+  public readonly traceUntil = <T=any>(name:string, test: (a:T) => boolean, options?: TraceOptions & { orComplete?: boolean }) => (source$: Observable<T>) => new Observable<T>(subscriber => {
     const traceSubscription = this.trace$(name, options).subscribe();
     return source$.pipe(
       tap(
@@ -101,7 +106,7 @@ export class AngularFirePerformance {
     ).subscribe(subscriber);
   });
 
-  traceWhile = <T=any>(name:string, test: (a:T) => boolean, options?: TraceOptions & { orComplete?: boolean}) => (source$: Observable<T>) => new Observable<T>(subscriber => {
+  public readonly traceWhile = <T=any>(name:string, test: (a:T) => boolean, options?: TraceOptions & { orComplete?: boolean}) => (source$: Observable<T>) => new Observable<T>(subscriber => {
     let traceSubscription: Subscription|undefined;
     return source$.pipe(
       tap(
@@ -119,7 +124,7 @@ export class AngularFirePerformance {
     ).subscribe(subscriber);
   });
 
-  traceUntilComplete = <T=any>(name:string, options?: TraceOptions) => (source$: Observable<T>) => new Observable<T>(subscriber => {
+  public readonly traceUntilComplete = <T=any>(name:string, options?: TraceOptions) => (source$: Observable<T>) => new Observable<T>(subscriber => {
     const traceSubscription = this.trace$(name, options).subscribe();
     return source$.pipe(
       tap(
@@ -130,7 +135,7 @@ export class AngularFirePerformance {
     ).subscribe(subscriber);
   });
 
-  traceUntilFirst = <T=any>(name:string, options?: TraceOptions) => (source$: Observable<T>) => new Observable<T>(subscriber => {
+  public readonly traceUntilFirst = <T=any>(name:string, options?: TraceOptions) => (source$: Observable<T>) => new Observable<T>(subscriber => {
     const traceSubscription = this.trace$(name, options).subscribe();
     return source$.pipe(
       tap(
@@ -141,7 +146,7 @@ export class AngularFirePerformance {
     ).subscribe(subscriber);
   });
 
-  trace = <T=any>(name:string, options?: TraceOptions) => (source$: Observable<T>) => new Observable<T>(subscriber => {
+  public readonly trace = <T=any>(name:string, options?: TraceOptions) => (source$: Observable<T>) => new Observable<T>(subscriber => {
     const traceSubscription = this.trace$(name, options).subscribe();
     return source$.pipe(
       tap(

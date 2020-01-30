@@ -1,14 +1,15 @@
 import { TestBed, inject } from '@angular/core/testing';
 import { PlatformRef, NgModule, CompilerFactory, NgZone } from '@angular/core';
-import { FirebaseApp, AngularFireModule } from '@angular/fire';
+import { FirebaseApp, AngularFireModule } from './public_api';
 import { Subscription, Observable, Subject, of } from 'rxjs';
-import { COMMON_CONFIG } from './test-config';
+import { COMMON_CONFIG } from '../test-config';
 import { BrowserModule } from '@angular/platform-browser';
 import { database } from 'firebase/app';
 import { ɵZoneScheduler, ɵkeepUnstableUntilFirstFactory, ɵAngularFireSchedulers } from './angularfire2';
 import { ɵPLATFORM_BROWSER_ID, ɵPLATFORM_SERVER_ID } from '@angular/common';
 import { tap  } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
+import { rando } from '../firestore/utils.spec';
 
 describe('angularfire', () => {
   let subscription:Subscription;
@@ -17,13 +18,14 @@ describe('angularfire', () => {
   let questionsRef: database.Reference;
   let listOfQuestionsRef: database.Reference;
   let defaultPlatform: PlatformRef;
-
-  const APP_NAME = 'super-awesome-test-firebase-app-name';
+  let appName:string;
 
   beforeEach(() => {
 
+    appName = rando();
+
     TestBed.configureTestingModule({
-      imports: [AngularFireModule.initializeApp(COMMON_CONFIG, APP_NAME)]
+      imports: [AngularFireModule.initializeApp(COMMON_CONFIG, appName)]
     });
 
     inject([FirebaseApp, PlatformRef], (_app: FirebaseApp, _platform: PlatformRef) => {
@@ -36,12 +38,12 @@ describe('angularfire', () => {
 
   });
 
-  afterEach((done) => {
+  afterEach(() => {
     rootRef.remove()
     if(subscription && !subscription.closed) {
       subscription.unsubscribe();
     }
-    app.delete().then(done, done.fail);
+    app.delete();
   });
 
   describe('ZoneScheduler', () => {
@@ -235,34 +237,41 @@ describe('angularfire', () => {
   })
 
   describe('FirebaseApp', () => {
+
     it('should provide a FirebaseApp for the FirebaseApp binding', () => {
       expect(typeof app.delete).toBe('function');
     });
-    it('should have the provided name', () => {
-      expect(app.name).toBe(APP_NAME);
-    })
-    it('should use an already intialized firebase app if it exists', done => {
-      @NgModule({
-        imports: [
-          AngularFireModule.initializeApp(COMMON_CONFIG, APP_NAME),
-          BrowserModule
-        ]})
-      class MyModule {
-        ngDoBootstrap() {}
-      }
 
-      const compilerFactory: CompilerFactory =
-          defaultPlatform.injector.get(CompilerFactory, null);
-      const moduleFactory = compilerFactory.createCompiler().compileModuleSync(MyModule);
+    if (typeof window !== 'undefined') {
 
-      defaultPlatform.bootstrapModuleFactory(moduleFactory)
-        .then(moduleRef => {
-          const ref = moduleRef.injector.get(FirebaseApp);
-          expect(ref.name).toEqual(app.name);
-        }).then(done, e => {
-          fail(e);
-          done()
-        });
-    })
+      it('should have the provided name', () => {
+        expect(app.name).toBe(appName);
+      });
+
+      it('should use an already intialized firebase app if it exists', done => {
+        @NgModule({
+          imports: [
+            AngularFireModule.initializeApp(COMMON_CONFIG, appName),
+            BrowserModule
+          ]})
+        class MyModule {
+          ngDoBootstrap() {}
+        }
+
+        const compilerFactory: CompilerFactory =
+            defaultPlatform.injector.get(CompilerFactory, null);
+        const moduleFactory = compilerFactory.createCompiler().compileModuleSync(MyModule);
+
+        defaultPlatform.bootstrapModuleFactory(moduleFactory)
+          .then(moduleRef => {
+            const ref = moduleRef.injector.get(FirebaseApp);
+            expect(ref.name).toEqual(app.name);
+          }).then(done, e => {
+            fail(e);
+            done()
+          });
+      })
+
+    }
   });
 });

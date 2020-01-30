@@ -1,6 +1,5 @@
-import { NgModule, InjectionToken } from '@angular/core';
-import { AngularFireStorage, StorageBucket } from './storage';
-import 'firebase/storage';
+import { NgModule } from '@angular/core';
+import { AngularFireStorage } from './storage';
 
 @NgModule({
   providers: [ AngularFireStorage ]

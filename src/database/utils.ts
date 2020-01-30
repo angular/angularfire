@@ -1,6 +1,6 @@
 import { Subscription, Scheduler } from 'rxjs';
 import { PathReference, DatabaseReference, FirebaseOperation, FirebaseOperationCases } from './interfaces';
-import { FirebaseDatabase } from '@angular/fire';
+import { database } from 'firebase/app';
 
 export function isString(value: any): boolean {
   return typeof value === 'string';
@@ -24,7 +24,7 @@ export function isFirebaseRef(value: any): boolean {
  * @param app - Firebase App
  * @param path - Database path, relative or absolute
  */
-export function getRef(database: FirebaseDatabase, pathRef: PathReference): DatabaseReference {
+export function getRef(database: database.Database, pathRef: PathReference): DatabaseReference {
   // if a db ref was passed in, just return it
   return isFirebaseRef(pathRef) ? pathRef as DatabaseReference
     : database.ref(pathRef as string);

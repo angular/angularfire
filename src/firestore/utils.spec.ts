@@ -49,3 +49,5 @@ export function delayDelete<T>(collection: AngularFirestoreCollection<T>|firesto
     collection.doc(path).delete();
   }, delay);
 }
+
+export const rando = () => (Math.random() + 1).toString(36).substring(7);

@@ -15,3 +15,7 @@ yarn-error.log
 *.bak
 package-lock.json
 test/ng-build/**/yarn.lock
+tools/build.js
+coverage
+*.log
+api-*.json

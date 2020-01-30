@@ -1,17 +1,15 @@
 import { DatabaseReference } from '../interfaces';
 import { FirebaseApp, AngularFireModule, ɵZoneScheduler } from '@angular/fire';
-import { AngularFireDatabase, AngularFireDatabaseModule, fromRef } from '@angular/fire/database';
+import { AngularFireDatabase, AngularFireDatabaseModule, fromRef } from '../public_api';
 import { TestBed, inject } from '@angular/core/testing';
-import { COMMON_CONFIG } from '../test-config';
+import { COMMON_CONFIG } from '../../test-config';
 import { take } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
-
-// generate random string to test fidelity of naming
-const rando = () => (Math.random() + 1).toString(36).substring(7);
-const FIREBASE_APP_NAME = rando();
+import { rando } from '../../firestore/utils.spec';
 
 describe('fromRef', () => {
   let app: FirebaseApp;
+  let db: AngularFireDatabase;
   let ref: (path: string) => DatabaseReference;
   let batch = {};
   const items = [{ name: 'one' }, { name: 'two' }, { name: 'three' }].map(item => ({ key: rando(), ...item }));
@@ -25,19 +23,22 @@ describe('fromRef', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG, FIREBASE_APP_NAME),
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireDatabaseModule
+      ],
+      providers: [
+        { provide: URL, useValue: 'http://localhost:9000'}
       ]
     });
-    inject([FirebaseApp], (app_: FirebaseApp) => {
+    inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, db_: AngularFireDatabase) => {
       app = app_;
-      app.database().goOffline();
-      ref = (path: string) => { app.database().goOffline(); return app.database().ref(path); };
+      db = db_;
+      ref = (path: string) => db.database.ref(path);
     })();
   });
 
-  afterEach(done => {
-    app.delete().then(done, done.fail);
+  afterEach(() => {
+    app.delete();
   });
 
   it('it should be async by default', (done) => {

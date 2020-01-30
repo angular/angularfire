@@ -1,13 +1,11 @@
 import { DatabaseReference } from '../interfaces';
 import { FirebaseApp, AngularFireModule } from '@angular/fire';
-import { AngularFireDatabase, AngularFireDatabaseModule, auditTrail, ChildEvent } from '@angular/fire/database';
+import { AngularFireDatabase, AngularFireDatabaseModule, auditTrail, ChildEvent, URL } from '../public_api';
 import { TestBed, inject } from '@angular/core/testing';
-import { COMMON_CONFIG } from '../test-config';
+import { COMMON_CONFIG } from '../../test-config';
 import { skip } from 'rxjs/operators';
-
-// generate random string to test fidelity of naming
-const rando = () => (Math.random() + 1).toString(36).substring(7);
-const FIREBASE_APP_NAME = rando();
+import 'firebase/database';
+import { rando } from '../../firestore/utils.spec';
 
 describe('auditTrail', () => {
   let app: FirebaseApp;
@@ -25,20 +23,22 @@ describe('auditTrail', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG, FIREBASE_APP_NAME),
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireDatabaseModule
+      ],
+      providers: [
+        { provide: URL, useValue: 'http://localhost:9000' }
       ]
     });
     inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {
       app = app_;
       db = _db;
-      app.database().goOffline();
-      createRef = (path: string) => { app.database().goOffline(); return app.database().ref(path); };
+      createRef = (path: string) => db.database.ref(path);
     })();
   });
 
-  afterEach(done => {
-    app.delete().then(done, done.fail);
+  afterEach(() => {
+    app.delete();
   });
 
   function prepareAuditTrail(opts: { events?: ChildEvent[], skipnumber: number } = { skipnumber: 0 }) {

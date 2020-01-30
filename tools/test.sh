@@ -4,5 +4,4 @@ echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/source
 apt-get -y update
 apt-get -y install google-chrome-stable
 
-# TODO parallelize these
-npx karma start --single-run --browsers ChromeHeadlessTravis --reporters mocha
+yarn test:all

@@ -1,0 +1,12 @@
+{
+  "database": {
+    "rules": "test/database.rules.json"
+  },
+  "firestore": {
+    "rules": "test/firestore.rules",
+    "indexes": "test/firestore.indexes.json"
+  },
+  "storage": {
+    "rules": "test/storage.rules"
+  }
+}

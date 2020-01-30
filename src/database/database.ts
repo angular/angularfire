@@ -1,14 +1,19 @@
-import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
+import { Injectable, Inject, Optional, NgZone, PLATFORM_ID, InjectionToken } from '@angular/core';
 import { DatabaseQuery, PathReference, QueryFn, AngularFireList, AngularFireObject } from './interfaces';
 import { getRef } from './utils';
 import { createListReference } from './list/create-reference';
 import { createObjectReference } from './object/create-reference';
-import { FirebaseDatabase, FirebaseOptions, FirebaseAppConfig, RealtimeDatabaseURL, FIREBASE_OPTIONS, FIREBASE_APP_NAME, DATABASE_URL, _firebaseAppFactory, ɵkeepUnstableUntilFirstFactory, ɵAngularFireSchedulers } from '@angular/fire';
+import { FirebaseOptions, FirebaseAppConfig, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵfirebaseAppFactory, ɵkeepUnstableUntilFirstFactory, ɵAngularFireSchedulers } from '@angular/fire';
 import { Observable } from 'rxjs';
+import { database } from 'firebase/app';
 
-@Injectable()
+export const URL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL')
+
+@Injectable({
+  providedIn: 'any'
+})
 export class AngularFireDatabase {
-  public readonly database: FirebaseDatabase;
+  public readonly database: database.Database;
 
   public readonly schedulers: ɵAngularFireSchedulers;
   public readonly keepUnstableUntilFirst: <T>(obs$: Observable<T>) => Observable<T>;
@@ -16,7 +21,7 @@ export class AngularFireDatabase {
   constructor(
     @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
-    @Optional() @Inject(DATABASE_URL) databaseURL:string|null,
+    @Optional() @Inject(URL) databaseURL:string|null,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
@@ -24,7 +29,8 @@ export class AngularFireDatabase {
     this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers, platformId);
 
     this.database = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(options, zone, nameOrConfig);
+      const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
+      if (!app.database) { throw "You must import 'firebase/database' before using AngularFireDatabase" }
       return app.database(databaseURL || undefined);
     });
   }
@@ -61,5 +67,3 @@ export {
   Action,
   SnapshotAction
 } from './interfaces';
-
-export { RealtimeDatabaseURL, DATABASE_URL, DATABASE_URL as URL };

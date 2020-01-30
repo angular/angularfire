@@ -1,37 +1,16 @@
-import { Injectable, Inject, Optional, NgZone, InjectionToken } from '@angular/core';
-import { Observable, concat, of, pipe, OperatorFunction, MonoTypeOperatorFunction } from 'rxjs';
-import { map, switchMap, tap, shareReplay, distinctUntilChanged, filter, groupBy, mergeMap, scan, withLatestFrom, startWith, debounceTime, observeOn } from 'rxjs/operators';
-import { FirebaseAppConfig, FirebaseOptions, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire';
+import { Injectable, Inject, Optional, NgZone, InjectionToken, PLATFORM_ID } from '@angular/core';
+import { Observable, concat, of, pipe, OperatorFunction, MonoTypeOperatorFunction, empty, throwError } from 'rxjs';
+import { map, switchMap, tap, shareReplay, distinctUntilChanged, filter, groupBy, mergeMap, scan, withLatestFrom, startWith, debounceTime, observeOn, catchError } from 'rxjs/operators';
+import { ɵPromiseProxy, ɵfirebaseAppFactory, ɵAngularFireSchedulers, FirebaseAppConfig, FirebaseOptions, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire';
 import { remoteConfig } from 'firebase/app';
+import { isPlatformBrowser } from '@angular/common';
 
 export interface ConfigTemplate {[key:string]: string|number|boolean};
 
 export const SETTINGS = new InjectionToken<remoteConfig.Settings>('angularfire2.remoteConfig.settings');
 export const DEFAULTS = new InjectionToken<ConfigTemplate>('angularfire2.remoteConfig.defaultConfig');
 
-import { FirebaseRemoteConfig, _firebaseAppFactory, ɵAngularFireSchedulers } from '@angular/fire';
-
-// SEMVER: once we move to Typescript 3.6 use `PromiseProxy<remoteConfig.RemoteConfig>` rather than hardcoding
-type RemoteConfigProxy = {
-  activate: () => Promise<boolean>;
-  ensureInitialized: () => Promise<void>;
-  fetch: () => Promise<void>;
-  fetchAndActivate: () => Promise<boolean>;
-  getAll: () => Promise<{[key:string]: remoteConfig.Value}>;
-  getBoolean: (key:string) => Promise<boolean>;
-  getNumber: (key:string) => Promise<number>;
-  getString: (key:string) => Promise<string>;
-  getValue: (key:string) => Promise<remoteConfig.Value>;
-  setLogLevel: (logLevel: remoteConfig.LogLevel) => Promise<void>;
-  settings: Promise<remoteConfig.Settings>;
-  defaultConfig: Promise<{
-      [key: string]: string | number | boolean;
-  }>;
-  fetchTimeMillis: Promise<number>;
-  lastFetchStatus: Promise<remoteConfig.FetchStatus>;
-};
-
-export interface AngularFireRemoteConfig extends RemoteConfigProxy {};
+export interface AngularFireRemoteConfig extends ɵPromiseProxy<remoteConfig.RemoteConfig> {};
 
 // TODO export as implements Partial<...> so minor doesn't break us
 export class Value implements remoteConfig.Value {
@@ -59,7 +38,9 @@ export const filterRemote = () => filterTest(p => p.getSource() === 'remote');
 // filterFresh allows the developer to effectively set up a maximum cache time
 export const filterFresh = (howRecentInMillis: number) => filterTest(p => p.fetchTimeMillis + howRecentInMillis >= new Date().getTime());
 
-@Injectable()
+@Injectable({
+  providedIn: 'any'
+})
 export class AngularFireRemoteConfig {
 
   readonly changes:    Observable<Parameter>;
@@ -73,18 +54,17 @@ export class AngularFireRemoteConfig {
     @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
     @Optional() @Inject(SETTINGS) settings:remoteConfig.Settings|null,
     @Optional() @Inject(DEFAULTS) defaultConfig:ConfigTemplate|null,
-    private zone: NgZone
+    private zone: NgZone,
+    @Inject(PLATFORM_ID) platformId:Object
   ) {
 
     const schedulers = new ɵAngularFireSchedulers(zone);
     
     const remoteConfig$ = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
-      // @ts-ignore zapping in the UMD in the build script
-      switchMap(() => zone.runOutsideAngular(() => import('firebase/remote-config'))),
-      map(() => _firebaseAppFactory(options, zone, nameOrConfig)),
-      // SEMVER no need to cast once we drop older Firebase
-      map(app => <remoteConfig.RemoteConfig>app.remoteConfig()),
+      switchMap(() => isPlatformBrowser(platformId) ? import('firebase/remote-config') : empty()),
+      map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
+      map(app => app.remoteConfig()),
       tap(rc => {
         if (settings) { rc.settings = settings }
         if (defaultConfig) { rc.defaultConfig = defaultConfig }

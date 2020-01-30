@@ -1,14 +1,15 @@
 import { FirebaseApp, AngularFireModule } from '@angular/fire';
-import { AngularFirestore } from '../firestore';
+import { AngularFirestore, SETTINGS } from '../firestore';
 import { AngularFirestoreModule } from '../firestore.module';
 import { AngularFirestoreDocument } from '../document/document';
 import { Observable, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 
 import { TestBed, inject } from '@angular/core/testing';
-import { COMMON_CONFIG } from '../test-config';
+import { COMMON_CONFIG } from '../../test-config';
 
-import { Stock, randomName, FAKE_STOCK_DATA } from '../utils.spec';
+import { Stock, randomName, FAKE_STOCK_DATA, rando } from '../utils.spec';
+import 'firebase/firestore';
 
 describe('AngularFirestoreDocument', () => {
   let app: FirebaseApp;
@@ -18,8 +19,11 @@ describe('AngularFirestoreDocument', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
-        AngularFirestoreModule.enablePersistence({synchronizeTabs: true})
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
+        AngularFirestoreModule
+      ],
+      providers: [
+        { provide: SETTINGS, useValue: { host: 'localhost:8080', ssl: false } }
       ]
     });
     inject([FirebaseApp, AngularFirestore], (_app: FirebaseApp, _afs: AngularFirestore) => {
@@ -28,9 +32,8 @@ describe('AngularFirestoreDocument', () => {
     })();
   });
 
-  afterEach(done => {
+  afterEach(() => {
     app.delete();
-    done();
   });
 
   it('should get action updates', async (done: any) => {

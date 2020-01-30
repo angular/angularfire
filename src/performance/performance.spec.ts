@@ -1,7 +1,8 @@
 import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, AngularFireModule } from '@angular/fire';
-import { AngularFirePerformance, AngularFirePerformanceModule } from '@angular/fire/performance';
-import { COMMON_CONFIG } from './test-config';
+import { AngularFirePerformance, AngularFirePerformanceModule } from './public_api';
+import { COMMON_CONFIG } from '../test-config';
+import { rando } from '../firestore/utils.spec';
 
 describe('AngularFirePerformance', () => {
   let app: FirebaseApp;
@@ -10,7 +11,7 @@ describe('AngularFirePerformance', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFirePerformanceModule
       ]
     });
@@ -20,9 +21,8 @@ describe('AngularFirePerformance', () => {
     })();
   });
 
-  afterEach(done => {
+  afterEach(() => {
     app.delete();
-    done();
   });
 
   it('should exist', () => {
@@ -30,7 +30,7 @@ describe('AngularFirePerformance', () => {
   });
 
   it('should have the Performance instance', () => {
-    expect(afp.performance).toBeDefined();
+    expect(afp.dataCollectionEnabled).toBeDefined();
   });
 
 });

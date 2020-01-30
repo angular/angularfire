@@ -1,10 +1,12 @@
 import { User } from 'firebase/app';
 import { Observable, Subject } from 'rxjs'
 import { TestBed, inject } from '@angular/core/testing';
-import { FirebaseApp, FirebaseOptionsToken, AngularFireModule, FirebaseNameOrConfigToken } from '@angular/fire';
-import { AngularFireAuth, AngularFireAuthModule } from '@angular/fire/auth';
-import { COMMON_CONFIG } from './test-config';
+import { FirebaseApp, FIREBASE_OPTIONS, AngularFireModule, FIREBASE_APP_NAME } from '@angular/fire';
+import { AngularFireAuth, AngularFireAuthModule } from './public_api';
+import { COMMON_CONFIG } from '../test-config';
 import { take, skip } from 'rxjs/operators';
+import 'firebase/auth';
+import { rando } from '../firestore/utils.spec';
 
 function authTake(auth: Observable<any>, count: number): Observable<any> {
   return take.call(auth, 1);
@@ -28,7 +30,7 @@ describe('AngularFireAuth', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireAuthModule
       ]
     });
@@ -38,14 +40,16 @@ describe('AngularFireAuth', () => {
     })();
 
     mockAuthState = new Subject<User>();
+    //@ts-ignore
     spyOn(afAuth, 'authState').and.returnValue(mockAuthState);
+    //@ts-ignore
     spyOn(afAuth, 'idToken').and.returnValue(mockAuthState);
-    afAuth.authState = mockAuthState as Observable<User>;
-    afAuth.idToken = mockAuthState as Observable<User>;
+    (<any>afAuth).authState = mockAuthState as Observable<User>;
+    (<any>afAuth).idToken = mockAuthState as Observable<User>;
   });
 
-  afterEach(done => {
-    afAuth.auth.app.delete().then(done, done.fail);
+  afterEach(() => {
+    app.delete();
   });
 
   describe('Zones', () => {
@@ -75,13 +79,8 @@ describe('AngularFireAuth', () => {
     expect(afAuth instanceof AngularFireAuth).toBe(true);
   });
 
-  it('should have the Firebase Auth instance', () => {
-    expect(afAuth.auth).toBeDefined();
-  });
-
   it('should have an initialized Firebase app', () => {
-    expect(afAuth.auth.app).toBeDefined();
-    expect(afAuth.auth.app).toEqual(app);
+    expect(afAuth.app).toBeDefined();
   });
 
   it('should emit auth updates through authState', (done: any) => {
@@ -112,7 +111,7 @@ describe('AngularFireAuth', () => {
         count = count + 1;
         mockAuthState.next(firebaseUser);
       } else {
-        expect(user).toEqual(firebaseUser);
+        expect(<any>user).toEqual(firebaseUser);
         subs.unsubscribe();
         done();
       }
@@ -131,12 +130,12 @@ describe('AngularFireAuth with different app', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireAuthModule
       ],
       providers: [
-        { provide: FirebaseNameOrConfigToken, useValue: FIREBASE_APP_NAME_TOO },
-        { provide: FirebaseOptionsToken, useValue: COMMON_CONFIG }
+        { provide: FIREBASE_APP_NAME, useValue: FIREBASE_APP_NAME_TOO },
+        { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG }
       ]
     });
     inject([FirebaseApp, AngularFireAuth], (app_: FirebaseApp, _afAuth: AngularFireAuth) => {
@@ -145,8 +144,8 @@ describe('AngularFireAuth with different app', () => {
     })();
   });
 
-  afterEach(done => {
-    app.delete().then(done, done.fail);
+  afterEach(() => {
+    app.delete();
   });
 
   describe('<constructor>', () => {
@@ -156,12 +155,12 @@ describe('AngularFireAuth with different app', () => {
     });
 
     it('should have an initialized Firebase app', () => {
-      expect(afAuth.auth.app).toBeDefined();
-      expect(afAuth.auth.app).toEqual(app);
+      expect(afAuth.app).toBeDefined();
     });
 
-    it('should have an initialized Firebase app instance member', () => {
-      expect(afAuth.auth.app.name).toEqual(FIREBASE_APP_NAME_TOO);
+    it('should have an initialized Firebase app instance member', async () => {
+      const app = await afAuth.app;
+      expect(app.name).toEqual(FIREBASE_APP_NAME_TOO);
     });
   });
 

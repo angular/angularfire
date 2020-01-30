@@ -1,14 +1,11 @@
 import { Injectable, Inject, Optional, InjectionToken, NgZone, PLATFORM_ID } from '@angular/core';
-import { createStorageRef, AngularFireStorageReference } from './ref';
-import { createUploadTask, AngularFireUploadTask } from './task';
+import { createStorageRef } from './ref';
 import { Observable } from 'rxjs';
-import { FirebaseStorage, FirebaseOptions, FirebaseAppConfig, _firebaseAppFactory, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵkeepUnstableUntilFirstFactory, ɵAngularFireSchedulers } from '@angular/fire';
-
+import { FirebaseOptions, FirebaseAppConfig, ɵfirebaseAppFactory, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵkeepUnstableUntilFirstFactory, ɵAngularFireSchedulers } from '@angular/fire';
 import { UploadMetadata } from './interfaces';
+import { storage } from 'firebase/app';
 
-// SEMVER drop StorageBucket in favor of BUCKET
-export const StorageBucket = new InjectionToken<string>('angularfire2.storageBucket');
-export const BUCKET = StorageBucket;
+export const BUCKET = new InjectionToken<string>('angularfire2.storageBucket');
 
 /**
  * AngularFireStorage Service
@@ -17,9 +14,11 @@ export const BUCKET = StorageBucket;
  * an API for uploading and downloading binary files from Cloud Storage for
  * Firebase.
  */
-@Injectable()
+@Injectable({
+  providedIn: 'any'
+})
 export class AngularFireStorage {
-  public readonly storage: FirebaseStorage;
+  public readonly storage: storage.Storage;
 
   public readonly keepUnstableUntilFirst: <T>(obs: Observable<T>) => Observable<T>;
   public readonly schedulers: ɵAngularFireSchedulers;
@@ -35,7 +34,8 @@ export class AngularFireStorage {
     this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers, platformId);
 
     this.storage = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(options, zone, nameOrConfig);
+      const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
+      if (!app.storage) { throw "You must import 'firebase/database' before using AngularFireDatabase" }
       return app.storage(storageBucket || undefined);
     });
   }
