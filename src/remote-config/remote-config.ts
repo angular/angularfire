@@ -39,7 +39,7 @@ export const filterRemote = () => filterTest(p => p.getSource() === 'remote');
 export const filterFresh = (howRecentInMillis: number) => filterTest(p => p.fetchTimeMillis + howRecentInMillis >= new Date().getTime());
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'any'
 })
 export class AngularFireRemoteConfig {
 

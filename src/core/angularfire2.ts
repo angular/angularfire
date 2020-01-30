@@ -3,9 +3,6 @@ import { isPlatformServer } from '@angular/common';
 import { Observable, Subscription, SchedulerLike, SchedulerAction, queueScheduler, Operator, Subscriber, TeardownLogic, asyncScheduler } from 'rxjs';
 import { subscribeOn, observeOn, tap, share } from 'rxjs/operators';
 
-// SEMVER put in database.ts when we drop database-depreciated
-export const ɵDATABASE_URL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
-
 function noop() { }
 
 /**

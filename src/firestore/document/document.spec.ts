@@ -6,9 +6,9 @@ import { Observable, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 
 import { TestBed, inject } from '@angular/core/testing';
-import { FIRESTORE_CONFIG } from '../../test-config';
+import { COMMON_CONFIG } from '../../test-config';
 
-import { Stock, randomName, FAKE_STOCK_DATA } from '../utils.spec';
+import { Stock, randomName, FAKE_STOCK_DATA, rando } from '../utils.spec';
 import 'firebase/firestore';
 
 describe('AngularFirestoreDocument', () => {
@@ -19,8 +19,8 @@ describe('AngularFirestoreDocument', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(FIRESTORE_CONFIG),
-        AngularFirestoreModule.enablePersistence({synchronizeTabs: true})
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
+        AngularFirestoreModule
       ],
       providers: [
         { provide: SETTINGS, useValue: { host: 'localhost:8080', ssl: false } }
@@ -32,9 +32,8 @@ describe('AngularFirestoreDocument', () => {
     })();
   });
 
-  afterEach(done => {
+  afterEach(() => {
     app.delete();
-    done();
   });
 
   it('should get action updates', async (done: any) => {

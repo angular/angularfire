@@ -89,7 +89,7 @@ export function associateQuery(collectionRef: CollectionReference, queryFn = ref
  * }
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'any'
 })
 export class AngularFirestore {
   public readonly firestore: firestore.Firestore;

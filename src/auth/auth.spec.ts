@@ -6,6 +6,7 @@ import { AngularFireAuth, AngularFireAuthModule } from './public_api';
 import { COMMON_CONFIG } from '../test-config';
 import { take, skip } from 'rxjs/operators';
 import 'firebase/auth';
+import { rando } from '../firestore/utils.spec';
 
 function authTake(auth: Observable<any>, count: number): Observable<any> {
   return take.call(auth, 1);
@@ -29,7 +30,7 @@ describe('AngularFireAuth', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireAuthModule
       ]
     });
@@ -47,8 +48,8 @@ describe('AngularFireAuth', () => {
     (<any>afAuth).idToken = mockAuthState as Observable<User>;
   });
 
-  afterEach(done => {
-    afAuth.app.then(app => app.delete()).then(done, done.fail);
+  afterEach(() => {
+    app.delete();
   });
 
   describe('Zones', () => {
@@ -129,7 +130,7 @@ describe('AngularFireAuth with different app', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireAuthModule
       ],
       providers: [
@@ -143,8 +144,8 @@ describe('AngularFireAuth with different app', () => {
     })();
   });
 
-  afterEach(done => {
-    app.delete().then(done, done.fail);
+  afterEach(() => {
+    app.delete();
   });
 
   describe('<constructor>', () => {

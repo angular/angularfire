@@ -14,21 +14,10 @@ const BUILD_TARGET = `${PROJECT}:build:production`;
 describe('Deploy Angular apps', () => {
   beforeEach(() => initMocks());
 
-  it('should check if the user is authenticated by invoking list', async () => {
-    const spy = spyOn(firebaseMock, 'list');
-    const spyLogin = spyOn(firebaseMock, 'login');
+  it('should call login', async () => {
+    const spy = spyOn(firebaseMock, 'login');
     await deploy(firebaseMock, context, 'host', BUILD_TARGET, FIREBASE_PROJECT);
     expect(spy).toHaveBeenCalled();
-    expect(spyLogin).not.toHaveBeenCalled();
-  });
-
-  it('should invoke login if list rejects', async () => {
-    firebaseMock.list = () => Promise.reject();
-    const spy = spyOn(firebaseMock, 'list').and.callThrough();
-    const spyLogin = spyOn(firebaseMock, 'login');
-    await deploy(firebaseMock, context, 'host', BUILD_TARGET, FIREBASE_PROJECT);
-    expect(spy).toHaveBeenCalled();
-    expect(spyLogin).toHaveBeenCalled();
   });
 
   it('should invoke the builder', async () => {
@@ -84,7 +73,9 @@ describe('Deploy Angular apps', () => {
 const initMocks = () => {
   firebaseMock = {
     login: () => Promise.resolve(),
-    list: () => Promise.resolve([]),
+    projects: {
+      list: () => Promise.resolve([]),
+    },
     deploy: (_: FirebaseDeployConfig) => Promise.resolve(),
     use: () => Promise.resolve()
   };

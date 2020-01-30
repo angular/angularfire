@@ -9,7 +9,7 @@ import { isPlatformServer } from '@angular/common';
 export interface AngularFireMessaging extends Omit<ɵPromiseProxy<messaging.Messaging>, 'deleteToken'|'getToken'|'requestPermission'> {};
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'any'
 })
 export class AngularFireMessaging {
 

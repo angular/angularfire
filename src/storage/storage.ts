@@ -15,7 +15,7 @@ export const BUCKET = new InjectionToken<string>('angularfire2.storageBucket');
  * Firebase.
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'any'
 })
 export class AngularFireStorage {
   public readonly storage: storage.Storage;

@@ -3,6 +3,7 @@ import { FirebaseApp, FIREBASE_OPTIONS, AngularFireModule, FIREBASE_APP_NAME } f
 import { AngularFireFunctions, AngularFireFunctionsModule, REGION, ORIGIN } from './public_api';
 import { COMMON_CONFIG } from '../test-config';
 import 'firebase/functions';
+import { rando } from '../firestore/utils.spec';
 
 describe('AngularFireFunctions', () => {
   let app: FirebaseApp;
@@ -11,7 +12,7 @@ describe('AngularFireFunctions', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireFunctionsModule
       ]
     });
@@ -21,9 +22,8 @@ describe('AngularFireFunctions', () => {
     })();
   });
 
-  afterEach(done => {
+  afterEach(() => {
     app.delete();
-    done();
   });
 
   it('should exist', () => {
@@ -36,20 +36,20 @@ describe('AngularFireFunctions', () => {
 
 });
 
-const FIREBASE_APP_NAME_TOO = (Math.random() + 1).toString(36).substring(7);
-
 describe('AngularFireFunctions with different app', () => {
   let app: FirebaseApp;
   let afFns: AngularFireFunctions;
+  let firebaseAppName: string;
 
   beforeEach(() => {
+    firebaseAppName = rando();
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireFunctionsModule
       ],
       providers: [
-        { provide: FIREBASE_APP_NAME, useValue: FIREBASE_APP_NAME_TOO },
+        { provide: FIREBASE_APP_NAME, useValue: firebaseAppName },
         { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG },
         { provide: ORIGIN, useValue: 'http://0.0.0.0:9999' },
         { provide: REGION, useValue: 'asia-northeast1' }
@@ -61,9 +61,8 @@ describe('AngularFireFunctions with different app', () => {
     })();
   });
 
-  afterEach(done => {
+  afterEach(() => {
     app.delete();
-    done();
   });
 
   describe('<constructor>', () => {

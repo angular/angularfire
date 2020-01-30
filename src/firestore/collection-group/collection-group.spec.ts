@@ -4,10 +4,10 @@ import { QueryGroupFn, Query } from '../interfaces';
 import { Observable, BehaviorSubject, Subscription } from 'rxjs';
 import { skip, take, switchMap } from 'rxjs/operators';
 import { TestBed, inject } from '@angular/core/testing';
-import { FIRESTORE_CONFIG } from '../../test-config';
+import { COMMON_CONFIG } from '../../test-config';
 import 'firebase/firestore';
 
-import { Stock, randomName, FAKE_STOCK_DATA, createRandomStocks, delayAdd, delayDelete, delayUpdate, deleteThemAll } from '../utils.spec';
+import { Stock, randomName, FAKE_STOCK_DATA, createRandomStocks, delayAdd, delayDelete, delayUpdate, deleteThemAll, rando } from '../utils.spec';
 
 async function collectionHarness(afs: AngularFirestore, items: number, queryGroupFn?: QueryGroupFn) {
   const randomCollectionName = randomName(afs.firestore);
@@ -28,8 +28,8 @@ describe('AngularFirestoreCollectionGroup', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(FIRESTORE_CONFIG),
-        AngularFirestoreModule.enablePersistence({synchronizeTabs:true})
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
+        AngularFirestoreModule
       ],
       providers: [
         { provide: SETTINGS, useValue: { host: 'localhost:8080', ssl: false } }
@@ -41,9 +41,8 @@ describe('AngularFirestoreCollectionGroup', () => {
     })();
   });
 
-  afterEach(done => {
+  afterEach(() => {
     app.delete();
-    done();
   });
 
   describe('valueChanges()', () => {

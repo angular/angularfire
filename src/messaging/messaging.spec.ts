@@ -3,6 +3,7 @@ import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, FIREBASE_OPTIONS, AngularFireModule, FIREBASE_APP_NAME } from '@angular/fire';
 import { AngularFireMessaging, AngularFireMessagingModule } from './public_api';
 import { COMMON_CONFIG } from '../test-config';
+import { rando } from '../firestore/utils.spec';
 
 describe('AngularFireMessaging', () => {
   let app: FirebaseApp;
@@ -11,7 +12,7 @@ describe('AngularFireMessaging', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireMessagingModule
       ]
     });
@@ -21,9 +22,8 @@ describe('AngularFireMessaging', () => {
     })();
   });
 
-  afterEach(done => {
+  afterEach(() => {
     app.delete();
-    done();
   });
 
   it('should be exist', () => {
@@ -45,7 +45,7 @@ describe('AngularFireMessaging with different app', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireMessagingModule
       ],
       providers: [
@@ -59,9 +59,8 @@ describe('AngularFireMessaging with different app', () => {
     })();
   });
 
-  afterEach(done => {
+  afterEach(() => {
     app.delete();
-    done();
   });
 
   describe('<constructor>', () => {

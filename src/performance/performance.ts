@@ -21,7 +21,7 @@ export type TraceOptions = {
 };
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'any'
 })
 export class AngularFirePerformance {
   

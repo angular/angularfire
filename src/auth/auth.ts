@@ -7,7 +7,7 @@ import { User, auth } from 'firebase/app';
 export interface AngularFireAuth extends ɵPromiseProxy<auth.Auth> {};
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'any'
 })
 export class AngularFireAuth {
 

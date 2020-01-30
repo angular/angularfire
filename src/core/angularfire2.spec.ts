@@ -9,6 +9,7 @@ import { ɵZoneScheduler, ɵkeepUnstableUntilFirstFactory, ɵAngularFireSchedule
 import { ɵPLATFORM_BROWSER_ID, ɵPLATFORM_SERVER_ID } from '@angular/common';
 import { tap  } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
+import { rando } from '../firestore/utils.spec';
 
 describe('angularfire', () => {
   let subscription:Subscription;
@@ -17,13 +18,14 @@ describe('angularfire', () => {
   let questionsRef: database.Reference;
   let listOfQuestionsRef: database.Reference;
   let defaultPlatform: PlatformRef;
-
-  const APP_NAME = 'super-awesome-test-firebase-app-name';
+  let appName:string;
 
   beforeEach(() => {
 
+    appName = rando();
+
     TestBed.configureTestingModule({
-      imports: [AngularFireModule.initializeApp(COMMON_CONFIG, APP_NAME)]
+      imports: [AngularFireModule.initializeApp(COMMON_CONFIG, appName)]
     });
 
     inject([FirebaseApp, PlatformRef], (_app: FirebaseApp, _platform: PlatformRef) => {
@@ -36,12 +38,12 @@ describe('angularfire', () => {
 
   });
 
-  afterEach((done) => {
+  afterEach(() => {
     rootRef.remove()
     if(subscription && !subscription.closed) {
       subscription.unsubscribe();
     }
-    app.delete().then(done, done.fail);
+    app.delete();
   });
 
   describe('ZoneScheduler', () => {
@@ -243,13 +245,13 @@ describe('angularfire', () => {
     if (typeof window !== 'undefined') {
 
       it('should have the provided name', () => {
-        expect(app.name).toBe(APP_NAME);
+        expect(app.name).toBe(appName);
       });
 
       it('should use an already intialized firebase app if it exists', done => {
         @NgModule({
           imports: [
-            AngularFireModule.initializeApp(COMMON_CONFIG, APP_NAME),
+            AngularFireModule.initializeApp(COMMON_CONFIG, appName),
             BrowserModule
           ]})
         class MyModule {

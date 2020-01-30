@@ -7,8 +7,9 @@ import { AngularFirestoreCollection } from './collection/collection';
 import { Observable, Subscription } from 'rxjs';
 
 import { TestBed, inject } from '@angular/core/testing';
-import { FIRESTORE_CONFIG } from '../test-config';
+import { COMMON_CONFIG } from '../test-config';
 import 'firebase/firestore';
+import { rando } from './utils.spec';
 
 interface Stock {
   name: string;
@@ -23,8 +24,8 @@ describe('AngularFirestore', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(FIRESTORE_CONFIG),
-        AngularFirestoreModule.enablePersistence({synchronizeTabs: true})
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
+        AngularFirestoreModule.enablePersistence()
       ],
       providers: [
         { provide: SETTINGS, useValue: { host: 'localhost:8080', ssl: false } }
@@ -36,10 +37,8 @@ describe('AngularFirestore', () => {
     })();
   });
 
-  afterEach(done => {
-    // can't await here https://github.com/firebase/firebase-js-sdk/issues/605
+  afterEach(() => {
     app.delete();
-    done();
   });
 
   it('should be the properly initialized type', () => {
@@ -108,21 +107,22 @@ describe('AngularFirestore', () => {
 
 });
 
-const FIREBASE_APP_NAME_TOO = (Math.random() + 1).toString(36).substring(7);
-
 describe('AngularFirestore with different app', () => {
   let app: FirebaseApp;
   let afs: AngularFirestore;
+  let firebaseAppName: string;
 
   beforeEach(() => {
+    firebaseAppName = rando();
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(FIRESTORE_CONFIG),
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFirestoreModule
       ],
       providers: [
-        { provide: FIREBASE_APP_NAME, useValue: FIREBASE_APP_NAME_TOO },
-        { provide: FIREBASE_OPTIONS, useValue: FIRESTORE_CONFIG }
+        { provide: FIREBASE_APP_NAME, useValue: firebaseAppName },
+        { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG },
+        { provide: SETTINGS, useValue: { host: 'localhost:8080', ssl: false } }
       ]
     });
     inject([FirebaseApp, AngularFirestore], (app_: FirebaseApp, _afs: AngularFirestore) => {
@@ -131,9 +131,8 @@ describe('AngularFirestore with different app', () => {
     })();
   });
 
-  afterEach(done => {
+  afterEach(() => {
     app.delete();
-    done();
   });
 
   describe('<constructor>', () => {
@@ -147,7 +146,7 @@ describe('AngularFirestore with different app', () => {
     });
 
     it('should have an initialized Firebase app instance member', () => {
-      expect(afs.firestore.app.name).toEqual(FIREBASE_APP_NAME_TOO);
+      expect(afs.firestore.app.name).toEqual(firebaseAppName);
     });
   });
 
@@ -161,8 +160,11 @@ describe('AngularFirestore without persistance', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(FIRESTORE_CONFIG),
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFirestoreModule
+      ],
+      providers: [
+        { provide: SETTINGS, useValue: { host: 'localhost:8080', ssl: false } }
       ]
     });
     inject([FirebaseApp, AngularFirestore], (_app: FirebaseApp, _afs: AngularFirestore) => {
@@ -171,9 +173,8 @@ describe('AngularFirestore without persistance', () => {
     })();
   });
 
-  afterEach(done => {
+  afterEach(() => {
     app.delete();
-    done();
   });
 
   it('should not enable persistence', (done) => {

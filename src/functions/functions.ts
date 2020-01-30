@@ -12,7 +12,7 @@ export const REGION = new InjectionToken<string>('angularfire2.functions.region'
 export interface AngularFireFunctions extends Omit<ɵPromiseProxy<functions.Functions>, 'httpsCallable'> { };
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'any'
 })
 export class AngularFireFunctions {
 

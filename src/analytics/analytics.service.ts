@@ -30,7 +30,7 @@ const SCREEN_INSTANCE_DELIMITER = '#';
 const ANNOTATIONS = '__annotations__';
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'any'
 })
 export class ScreenTrackingService implements OnDestroy {
 
@@ -152,7 +152,7 @@ export class ScreenTrackingService implements OnDestroy {
 }
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'any'
 })
 export class UserTrackingService implements OnDestroy {
 

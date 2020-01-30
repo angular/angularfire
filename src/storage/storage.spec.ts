@@ -5,6 +5,7 @@ import { FirebaseApp, FIREBASE_OPTIONS, AngularFireModule, FIREBASE_APP_NAME } f
 import { AngularFireStorageModule, AngularFireStorage, AngularFireUploadTask, BUCKET } from './public_api';
 import { COMMON_CONFIG } from '../test-config';
 import 'firebase/storage';
+import { rando } from '../firestore/utils.spec';
 
 describe('AngularFireStorage', () => {
   let app: FirebaseApp;
@@ -13,7 +14,7 @@ describe('AngularFireStorage', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireStorageModule
       ]
     });
@@ -23,8 +24,8 @@ describe('AngularFireStorage', () => {
     })();
   });
 
-  afterEach(done => {
-    app.delete().then(done, done.fail);
+  afterEach(() => {
+    app.delete();
   });
 
   it('should exist', () => {
@@ -131,23 +132,24 @@ describe('AngularFireStorage', () => {
 
 });
 
-const FIREBASE_APP_NAME_TOO = (Math.random() + 1).toString(36).substring(7);
-const FIREBASE_STORAGE_BUCKET = 'angularfire2-test2';
-
 describe('AngularFireStorage w/options', () => {
   let app: FirebaseApp;
   let afStorage: AngularFireStorage;
+  let firebaseAppName: string;
+  let storageBucket: string;
 
   beforeEach(() => {
+    firebaseAppName = rando();
+    storageBucket = 'angularfire2-test2';
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireStorageModule
       ],
       providers: [
-        { provide: FIREBASE_APP_NAME, useValue: FIREBASE_APP_NAME_TOO },
+        { provide: FIREBASE_APP_NAME, useValue: firebaseAppName },
         { provide: FIREBASE_OPTIONS, useValue:  COMMON_CONFIG },
-        { provide: BUCKET, useValue: FIREBASE_STORAGE_BUCKET }
+        { provide: BUCKET, useValue: storageBucket }
       ]
     });
     inject([FirebaseApp, AngularFireStorage], (app_: FirebaseApp, _storage: AngularFireStorage) => {
@@ -156,8 +158,8 @@ describe('AngularFireStorage w/options', () => {
     })();
   });
 
-  afterEach(done => {
-    app.delete().then(done, done.fail);
+  afterEach(() => {
+    app.delete();
   });
 
   describe('<constructor>', () => {
@@ -175,11 +177,11 @@ describe('AngularFireStorage w/options', () => {
     });
 
     it('should be hooked up the right app', () => {
-      expect(afStorage.storage.app.name).toEqual(FIREBASE_APP_NAME_TOO);
+      expect(afStorage.storage.app.name).toEqual(firebaseAppName);
     });
 
     it('storage be pointing towards a different bucket', () => {
-      expect(afStorage.storage.ref().toString()).toEqual( `gs://${FIREBASE_STORAGE_BUCKET}/`);
+      expect(afStorage.storage.ref().toString()).toEqual( `gs://${storageBucket}/`);
     });
 
     // TODO tests for Node?
@@ -196,7 +198,7 @@ describe('AngularFireStorage w/options', () => {
             // get the url download
             mergeMap(() => ref.getDownloadURL()),
             // assert the URL
-            tap(url => expect(url).toMatch(new RegExp(`https:\\/\\/firebasestorage\\.googleapis\\.com\\/v0\\/b\\/${FIREBASE_STORAGE_BUCKET}\\/o\\/af\\.json`))),
+            tap(url => expect(url).toMatch(new RegExp(`https:\\/\\/firebasestorage\\.googleapis\\.com\\/v0\\/b\\/${storageBucket}\\/o\\/af\\.json`))),
             // Delete the file
             mergeMap(url => ref.delete())
           )

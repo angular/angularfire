@@ -1,5 +1,5 @@
 import { Injectable, Inject, Optional, NgZone, InjectionToken, PLATFORM_ID } from '@angular/core';
-import { of, empty } from 'rxjs';
+import { of, empty, Observable } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { map, tap, shareReplay, switchMap, observeOn } from 'rxjs/operators';
 import { FirebaseAppConfig, FirebaseOptions, ɵAngularFireSchedulers, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵfirebaseAppFactory, ɵPromiseProxy } from '@angular/fire';
@@ -23,16 +23,18 @@ const DATA_LAYER_NAME = 'dataLayer';
 
 export interface AngularFireAnalytics extends ɵPromiseProxy<analytics.Analytics> {};
 
+const ANALYTICS_INSTANCE_CACHE = Symbol();
+const ANALYTICS_INITIALIZED = Symbol();
+
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'any'
 })
 export class AngularFireAnalytics {
 
   private gtag: (...args: any[]) => void;
-  private analyticsInitialized: Promise<void>;
 
   async updateConfig(config: Config) {
-    await this.analyticsInitialized;
+    await global[ANALYTICS_INITIALIZED];
     this.gtag(GTAG_CONFIG_COMMAND, this.options[ANALYTICS_ID_FIELD], { ...config, update: true });
   };
 
@@ -50,23 +52,52 @@ export class AngularFireAnalytics {
 
     const schedulers = new ɵAngularFireSchedulers(zone);
 
+    // Analytics errors if it's not unique from a measurementId standpoint, so we need to cache the instances
+    if (!global[ANALYTICS_INSTANCE_CACHE]) {
+      global[ANALYTICS_INSTANCE_CACHE] = {}
+    };
+
+    let analyticsInitialized: Promise<void> = global[ANALYTICS_INITIALIZED];
+    let analyticsInstanceCache: {[key:string]: Observable<analytics.Analytics>} = global[ANALYTICS_INSTANCE_CACHE];
+    let analytics = analyticsInstanceCache[options[ANALYTICS_ID_FIELD]];
+
     if (isPlatformBrowser(platformId)) {
 
       window[DATA_LAYER_NAME] = window[DATA_LAYER_NAME] || [];
       this.gtag = window[GTAG_FUNCTION_NAME] || function() { window[DATA_LAYER_NAME].push(arguments) }
-      this.analyticsInitialized = zone.runOutsideAngular(() =>
-        new Promise(resolve => {
-          window[GTAG_FUNCTION_NAME] = (...args: any[]) => {
-            if (args[0] == 'js') { resolve() }
-            this.gtag(...args);
-          }
-        })
-      );
+
+      if (!analyticsInitialized) {
+        analyticsInitialized = zone.runOutsideAngular(() =>
+          new Promise(resolve => {
+            window[GTAG_FUNCTION_NAME] = (...args: any[]) => {
+              if (args[0] == 'js') { resolve() }
+              this.gtag(...args);
+            }
+          })
+        );
+      }
 
     } else {
 
-      this.analyticsInitialized = Promise.resolve();
+      analyticsInitialized = Promise.resolve();
       this.gtag = () => {}
+
+    }
+
+    if (!analytics) {
+
+      analytics = of(undefined).pipe(
+        observeOn(schedulers.outsideAngular),
+        switchMap(() => isPlatformBrowser(platformId) ? import('firebase/analytics') : empty()),
+        map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
+        map(app => app.analytics()),
+        tap(analytics => {
+          if (analyticsCollectionEnabled === false) { analytics.setAnalyticsCollectionEnabled(false) }
+        }),
+        shareReplay({ bufferSize: 1, refCount: false }),
+      );
+
+      analyticsInstanceCache[options[ANALYTICS_ID_FIELD]] = analytics;
 
     }
 
@@ -74,17 +105,6 @@ export class AngularFireAnalytics {
     if (providedAppName)    { this.updateConfig({ [APP_NAME_KEY]:    providedAppName }) }
     if (providedAppVersion) { this.updateConfig({ [APP_VERSION_KEY]: providedAppVersion }) }
     if (debugModeEnabled)   { this.updateConfig({ [DEBUG_MODE_KEY]:  1 }) }
-
-    const analytics = of(undefined).pipe(
-      observeOn(schedulers.outsideAngular),
-      switchMap(() => isPlatformBrowser(platformId) ? import('firebase/analytics') : empty()),
-      map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
-      map(app => app.analytics()),
-      tap(analytics => {
-        if (analyticsCollectionEnabled === false) { analytics.setAnalyticsCollectionEnabled(false) }
-      }),
-      shareReplay({ bufferSize: 1, refCount: false }),
-    );
 
     return ɵlazySDKProxy(this, analytics, zone);
 

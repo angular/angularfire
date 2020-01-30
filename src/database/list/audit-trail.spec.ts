@@ -5,10 +5,7 @@ import { TestBed, inject } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 import { skip } from 'rxjs/operators';
 import 'firebase/database';
-
-// generate random string to test fidelity of naming
-const rando = () => (Math.random() + 1).toString(36).substring(7);
-const FIREBASE_APP_NAME = rando();
+import { rando } from '../../firestore/utils.spec';
 
 describe('auditTrail', () => {
   let app: FirebaseApp;
@@ -26,19 +23,22 @@ describe('auditTrail', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG, FIREBASE_APP_NAME),
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireDatabaseModule
+      ],
+      providers: [
+        { provide: URL, useValue: 'http://localhost:9000' }
       ]
     });
     inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {
       app = app_;
       db = _db;
-      createRef = (path: string) => app.database().ref(path);
+      createRef = (path: string) => db.database.ref(path);
     })();
   });
 
-  afterEach(done => {
-    app.delete().then(done, done.fail);
+  afterEach(() => {
+    app.delete();
   });
 
   function prepareAuditTrail(opts: { events?: ChildEvent[], skipnumber: number } = { skipnumber: 0 }) {

@@ -9,7 +9,7 @@ export type AuthPipeGenerator = (next: ActivatedRouteSnapshot, state: RouterStat
 export type AuthPipe = UnaryFunction<Observable<User|null>, Observable<boolean|any[]>>;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'any'
 })
 export class AngularFireAuthGuard implements CanActivate {
 

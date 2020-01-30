@@ -3,6 +3,7 @@ import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, FIREBASE_OPTIONS, AngularFireModule, FIREBASE_APP_NAME } from '@angular/fire';
 import { AngularFireRemoteConfig, AngularFireRemoteConfigModule, SETTINGS, DEFAULTS } from './public_api';
 import { COMMON_CONFIG } from '../test-config';
+import { rando } from '../firestore/utils.spec';
 
 describe('AngularFireRemoteConfig', () => {
   let app: FirebaseApp;
@@ -11,7 +12,7 @@ describe('AngularFireRemoteConfig', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireRemoteConfigModule
       ]
     });
@@ -21,9 +22,8 @@ describe('AngularFireRemoteConfig', () => {
     })();
   });
 
-  afterEach(done => {
+  afterEach(() => {
     app.delete();
-    done();
   });
 
   it('should be exist', () => {
@@ -45,7 +45,7 @@ describe('AngularFireRemoteConfig with different app', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireRemoteConfigModule
       ],
       providers: [
@@ -61,9 +61,8 @@ describe('AngularFireRemoteConfig with different app', () => {
     })();
   });
 
-  afterEach(done => {
+  afterEach(() => {
     app.delete();
-    done();
   });
 
   describe('<constructor>', () => {
