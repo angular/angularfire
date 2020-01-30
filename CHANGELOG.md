@@ -8,14 +8,21 @@ Version 6 of AngularFire drops support for Angular version 8 and below, older ve
 * Support for `firebase-tools` less than 7.12 has been dropped
 * `angularfire2` NPM shim will no longer be updated
 * Dropped `@angular/fire/firebase-node` and `@angular/fire/database-depreciated`
-* Using `ngcc` to compile the library, bringing us back up to speed on APF
+* Using `ng-packagr` to build the library, bringing us back up to speed on APF
 * All of our `@NgModules` are now `providedIn: 'any'` rather than singletons
 * We make use of Proxy in more modules, you'll need to polyfill if you want to support IE 11
+* Fixed the `ng add` and `ng deploy` commands
+* `ng deploy` now supports a `buildTarget` option
+* We've addressed a number of memory leaks and Zone.js issues in SSR applications
 
 #### `@angular/fire`
 
 * Dropped the `RealtimeDatabaseURL` and `DATABASE_URL` DI tokens, use `import { URL } from '@angular/fire/database'` instead
 * Dropped `runOutsideAngular`, `runInZone`, `FirebaseZoneScheduler`, and the `Firebase*` type aliases
+
+#### `@angular/fire/analytics`
+
+* `AngularFireAnalytics` now memozies `analytics.Analtyics` instances keyed to the `measurementId`, this prevents exceptions if you're using more than one `FirebaseApp` with the same `measurementId`. This is also needed as we are `providedIn: 'any'`.
 
 #### `@angular/fire/auth`
 
@@ -52,6 +59,10 @@ Version 6 of AngularFire drops support for Angular version 8 and below, older ve
 #### `@angular/fire/performance`
 
 * `AngularFirePerformance` now Proxies the underlying Firebase `messaging.Messaging` instance
+
+#### `@angular/fire/remote-config`
+
+* `AngularFireRemoteConfig` now uses `ensureInitialized()` in it's observables, protecting their value emissions better against race conditions
 
 #### `@angular/fire/storage`
 
