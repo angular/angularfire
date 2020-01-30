@@ -1,8 +1,9 @@
 import { NgModule } from '@angular/core';
 import { AngularFireAuthGuard } from './auth-guard';
-import { AngularFireAuth } from '@angular/fire/auth';
+import { AngularFireAuthModule } from '@angular/fire/auth';
 
 @NgModule({
-  providers: [ AngularFireAuthGuard, AngularFireAuth ]
+  imports: [ AngularFireAuthModule ],
+  providers: [ AngularFireAuthGuard ]
 })
 export class AngularFireAuthGuardModule { }
