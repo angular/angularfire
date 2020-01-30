@@ -1,6 +1,0 @@
-{
-    "main": "./index.js",
-    "sideEffects": true,
-    "name": "@angular/fire/firebase-node"
-}
-  

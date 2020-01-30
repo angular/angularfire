@@ -7,7 +7,7 @@ import { join, dirname } from 'path';
 // TODO infer these from the package.json
 const MODULES = [
   'core', 'analytics', 'auth', 'auth-guard', 'database',
-  'database-deprecated', 'firestore', 'functions', 'remote-config',
+  'firestore', 'functions', 'remote-config',
   'storage', 'messaging', 'performance'
 ];
 const UMD_NAMES = MODULES.map(m => m === 'core' ? 'angular-fire' : `angular-fire-${m}`);
@@ -77,7 +77,6 @@ async function buildLibrary() {
     copy(join(process.cwd(), '.npmignore'), dest('.npmignore')),
     copy(join(process.cwd(), 'README.md'), dest('README.md')),
     copy(join(process.cwd(), 'docs'), dest('docs')),
-    copy(src('firebase-node'), dest('firebase-node')),
     compileSchematics(),
     replacePackageJsonVersions(),
     replacePackageCoreVersion()
@@ -131,27 +130,17 @@ async function buildDocs() {
   return writeFile(`./api-${root.version}.json`, JSON.stringify(afdoc, null, 2));
 }
 
-async function buildWrapper() {
-  await copy(src('wrapper'), join(process.cwd(), 'dist', 'wrapper-dist'));
-  const root = await rootPackage;
-  const path = join(process.cwd(), 'dist', 'wrapper-dist', 'package.json');
-  var pkg = await import(path);
-  pkg.dependencies['@angular/fire'] = pkg.version = root.version;
-  return writeFile(path, JSON.stringify(pkg, null, 2));
-}
-
 function packLibrary() {
   return spawnPromise('npm', ['pack', './dist/packages-dist']);
 }
 
 Promise.all([
-  buildWrapper(),
   buildDocs(),
   buildLibrary().then(packLibrary)
 ]).then(measureLibrary).then(stats =>
   console.log(`
-Package             Size     Gzipped
+Package         Size    Gzipped
 ------------------------------------
-${stats.map((s, i) => [MODULES[i].padEnd(20), s.size.padEnd(8), s.gzip].join("")).join("\n")}`
+${stats.map((s, i) => [MODULES[i].padEnd(16), s.size.padEnd(8), s.gzip].join("")).join("\n")}`
   )
 );
