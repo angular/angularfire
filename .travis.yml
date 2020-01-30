@@ -1,21 +1,9 @@
 language: node_js
 sudo: false
-node_js:
-  - "10"
+node_js: 10
 
 addons:
   chrome: stable
-
-cache:
-  yarn: true
-  directories:
-    - node_modules
-    - "$HOME/.npm"
-    - "$HOME/.cache"
-
-env:
-  - CANARY=false
-  - CANARY=true
 
 matrix:
   fast_finish: true
@@ -23,19 +11,8 @@ matrix:
     - env: CANARY=true
 
 branches:
-  only:
-    - master # otherwise pull requests get built twice
+  only: master # otherwise pull requests get built twice
 
-install:
-  - |
-    if $CANARY; then
-      yarn upgrade && yarn add firebase@canary
-    else
-      if [ "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_PULL_REQUEST" = "false" ]; then
-        yarn upgrade
-      else
-        yarn install --frozen-lockfile
-      fi
-    fi
+install: yarn
 
 script: yarn build && yarn test:all

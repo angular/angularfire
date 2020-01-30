@@ -1,3 +1,74 @@
+<a name="6.0.0-rc.0"></a>
+# [6.0.0-rc.0](https://github.com/angular/angularfire2/compare/5.3.0...6.0.0-rc.0) (2020-01-30)
+
+Version 6 of AngularFire drops support for Angular version 8 and below, older versions of typescript, Firebase, drops `firebase-node`, `database-deprecated`, and more.
+
+* Support for Angular versions less than 9 has been dropped
+* Support for Firebase versions less than 7.8 has been dropped
+* Support for `firebase-tools` less than 7.12 has been dropped
+* `angularfire2` NPM shim will no longer be updated
+* Dropped `@angular/fire/firebase-node` and `@angular/fire/database-depreciated`
+* Using `ng-packagr` to build the library, bringing us back up to speed on APF
+* All of our `@NgModules` are now `providedIn: 'any'` rather than singletons
+* We make use of Proxy in more modules, you'll need to polyfill if you want to support IE 11
+* Fixed the `ng add` and `ng deploy` commands
+* `ng deploy` now supports a `buildTarget` option
+* We've addressed a number of memory leaks and Zone.js issues in SSR applications
+
+#### `@angular/fire`
+
+* Dropped the `RealtimeDatabaseURL` and `DATABASE_URL` DI tokens, use `import { URL } from '@angular/fire/database'` instead
+* Dropped `runOutsideAngular`, `runInZone`, `FirebaseZoneScheduler`, and the `Firebase*` type aliases
+
+#### `@angular/fire/analytics`
+
+* `AngularFireAnalytics` now memozies `analytics.Analtyics` instances keyed to the `measurementId`, this prevents exceptions if you're using more than one `FirebaseApp` with the same `measurementId`. This is also needed as we are `providedIn: 'any'`.
+
+#### `@angular/fire/auth`
+
+* `AngularFireAuthModule` no longer imports `firebase/auth` on it's own to remain side-effect free, you'll need to `import 'firebase/auth'` on your own
+
+#### `@angular/fire/auth-guard`
+
+* `AngularFireAuthGuard` and `canActivate` have dropped (attempted) support for raw `AuthPipe`s, as they were not functioning in AOT builds; you'll want to move to `AuthPipeGenerator`s
+
+#### `@angular/fire/database`
+
+* `AngularFireDatabaseModule` no longer imports `firebase/database` on it's own to remain side-effect free, you'll need to `import 'firebase/database'` on your own
+* Dropped the `RealtimeDatabaseURL` and `DATABASE_URL` DI tokens in favor of `URL`
+
+#### `@angular/fire/firestore`
+
+* `AngularFirestoreModule` no longer imports `firebase/firestore` on it's own to remain side-effect free, you'll need to `import 'firebase/firestore'` on your own
+* Dropped the `EnablePersistenceToken` DI token in favor of `ENABLE_PERSISTENCE`
+* Dropped the `PersistenceSettingsToken` DI token in favor of `PERSISTENCE_SETTINGS`
+* Dropped the `FirestoreSettingsToken` DI token in favor of `SETTINGS`
+
+#### `@angular/fire/functions`
+
+* Dropped the `FunctionsRegionToken` and `FUNCTIONS_REGION` DI tokens in favor of `REGION`
+* Dropped the `FUNCTIONS_ORIGIN` DI token in favor of `ORIGIN`
+* `AngularFireFunctions` is now side-effect free and now lazy loads `firebase/functions` when a request is made
+* `AngularFireFunctions` has dropped the `functions` property and instead Proxies the underlying Firebase `functions.Functions` instance
+
+#### `@angular/fire/messaging`
+
+* `AngularFireMessaging`'s dynamic import of `firebase/messaging` is now lazy, if you don't call any methods the SDK will not be loaded
+* `AngularFireMessaging` has dropped the `messaging` property and instead Proxies the underlying Firebase `messaging.Messaging` instance
+
+#### `@angular/fire/performance`
+
+* `AngularFirePerformance` now Proxies the underlying Firebase `messaging.Messaging` instance
+
+#### `@angular/fire/remote-config`
+
+* `AngularFireRemoteConfig` now uses `ensureInitialized()` in it's observables, protecting their value emissions better against race conditions
+
+#### `@angular/fire/storage`
+
+* `AngularFireStorageModule` no longer imports `firebase/storage` on it's own to remain side-effect free, you'll need to `import 'firebase/storage'` on your own
+* Dropped `StorageBucket` DI token in favor of `BUCKET`
+
 <a name="5.3.0"></a>
 # [5.3.0](https://github.com/angular/angularfire2/compare/5.2.3...5.3.0) (2020-01-07)
 
