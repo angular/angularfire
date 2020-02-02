@@ -1,3 +1,9 @@
+<a name="5.3.1"></a>
+# [5.3.1](https://github.com/angular/angularfire2/compare/5.3.0...5.3.1) (2020-02-01)
+
+### Bug Fixes
+* **schematics**: The schematics should be functional again. The version of `firebase-tools` we were installing when you called `ng add @angular/fire` was using deprecated API. ([#2285](https://github.com/angular/angularfire2/issues/2285)) ([5867eeb](https://github.com/angular/angularfire2/commit/5867eebbd2ec7eaad0bbc8da94e38aca1fe7580b))
+
 <a name="5.3.0"></a>
 # [5.3.0](https://github.com/angular/angularfire2/compare/5.2.3...5.3.0) (2020-01-07)
 

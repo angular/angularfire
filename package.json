@@ -1,6 +1,6 @@
 {
   "name": "@angular/fire",
-  "version": "5.3.0",
+  "version": "5.3.1",
   "description": "The official library of Firebase and Angular.",
   "private": true,
   "scripts": {
@@ -43,7 +43,7 @@
     "@angular/platform-browser-dynamic": ">=6.0.0 <9 || ^9.0.0-0",
     "@angular/router": ">=6.0.0 <9 || ^9.0.0-0",
     "firebase": ">= 5.5.7 <8",
-    "firebase-tools": "^6.10.0",
+    "firebase-tools": "^7.12.0",
     "fuzzy": "^0.1.3",
     "inquirer": "^6.2.2",
     "inquirer-autocomplete-prompt": "^1.0.1",
