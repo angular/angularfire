@@ -3,6 +3,8 @@
 
 ### Bug Fixes
 * **schematics**: The schematics should be functional again. The version of `firebase-tools` we were installing when you called `ng add @angular/fire` was using deprecated API. ([#2285](https://github.com/angular/angularfire2/issues/2285)) ([5867eeb](https://github.com/angular/angularfire2/commit/5867eebbd2ec7eaad0bbc8da94e38aca1fe7580b))
+* **schematics**: fix issues with FS and Devkit Paths ([#2279](https://github.com/angular/angularfire2/issues/2279)) ([5ccf5db](https://github.com/angular/angularfire2/commit/5ccf5db3302be4a77529c33eda9ce39e5503b3c4))
+* **rc**: Need to `ensureInitialized()` ([#2290](https://github.com/angular/angularfire2/issues/2290)) ([0d95523](https://github.com/angular/angularfire2/commit/0d955231a0c91d8abd4effe0e02044f40451a891))
 
 <a name="5.3.0"></a>
 # [5.3.0](https://github.com/angular/angularfire2/compare/5.2.3...5.3.0) (2020-01-07)
