@@ -11,9 +11,9 @@ steps:
   - 'TAG_NAME=$TAG_NAME'
   - 'SHORT_SHA=$SHORT_SHA'
 
-- name: node:lts
-  entrypoint: bash
-  args: ["./tools/test.sh"]
+#- name: node:lts
+#  entrypoint: bash
+#  args: ["./tools/test.sh"]
 
 - name: node:lts
   entrypoint: bash
