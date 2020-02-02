@@ -1,3 +1,13 @@
+<a name="5.4.0"></a>
+# [5.4.0](https://github.com/angular/angularfire2/compare/5.3.1...5.4.0) (2020-02-01)
+
+### Features
+
+* **core:** Register AngularFire and Angular versions with the JS SDK ([6096c95](https://github.com/angular/angularfire2/commit/6096c95))
+* **ng-deploy:** add option for buildTarget ([#2281](https://github.com/angular/angularfire2/issues/2281)) ([28a4e54](https://github.com/angular/angularfire2/commit/28a4e54))
+* **core:** Major changes to the Zone.js wrapping to address SSR memory leaks and more ([#2294](https://github.com/angular/angularfire2/issues/2294)) ([56df941](https://github.com/angular/angularfire2/commit/56df941))
+
+
 <a name="5.3.1"></a>
 # [5.3.1](https://github.com/angular/angularfire2/compare/5.3.0...5.3.1) (2020-02-01)
 
