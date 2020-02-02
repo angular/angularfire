@@ -37,7 +37,7 @@ export default createBuilder<any>(
       context.target.project
     );
 
-    const buildTarget = options.buildTarget || `build:${context.target.project}:production`;
+    const buildTarget = options.buildTarget || `${context.target.project}:build:production`;
 
     try {
       await deploy(
