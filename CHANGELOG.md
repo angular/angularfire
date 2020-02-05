@@ -1,5 +1,5 @@
 <a name="6.0.0-rc.0"></a>
-# [6.0.0-rc.0](https://github.com/angular/angularfire2/compare/5.4.0...6.0.0-rc.0) (2020-01-30)
+# [6.0.0-rc.0](https://github.com/angular/angularfire2/compare/5.4.1...6.0.0-rc.0) (2020-01-30)
 
 Version 6 of AngularFire drops support for Angular version 8 and below, older versions of typescript, Firebase, drops `firebase-node`, `database-deprecated`, and more.
 
