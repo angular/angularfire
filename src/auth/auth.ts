@@ -48,7 +48,7 @@ export class AngularFireAuth {
     });
 
     this.authState = new Observable<User | null>(subscriber => {
-      return zone.runOutsideAngular(() => this.auth.onIdTokenChanged(subscriber));
+      return zone.runOutsideAngular(() => this.auth.onAuthStateChanged(subscriber));
     }).pipe(keepUnstableUntilFirst);;
 
     this.user = new Observable<User | null>(subscriber => {
