@@ -24,7 +24,7 @@ Version 6 of AngularFire drops support for Angular version 8 and below, older ve
 #### `@angular/fire/auth`
 
 * `AngularFireAuthModule` no longer imports `firebase/auth` on it's own to remain side-effect free, you'll need to `import 'firebase/auth'` on your own
-* `AngularFireAuth` has dropped the `auth` property and instead Proxies the underlying Firebase `auth.Auth` instance
+* `AngularFireAuth` has dropped the `auth` property and instead Promise Proxies the underlying Firebase `auth.Auth` instance
 
 #### `@angular/fire/auth-guard`
 
@@ -47,20 +47,16 @@ Version 6 of AngularFire drops support for Angular version 8 and below, older ve
 * Dropped the `FunctionsRegionToken` and `FUNCTIONS_REGION` DI tokens in favor of `REGION`
 * Dropped the `FUNCTIONS_ORIGIN` DI token in favor of `ORIGIN`
 * `AngularFireFunctions` is now side-effect free and now lazy loads `firebase/functions` when a request is made
-* `AngularFireFunctions` has dropped the `functions` property and instead Proxies the underlying Firebase `functions.Functions` instance
+* `AngularFireFunctions` has dropped the `functions` property and instead Promise Proxies the underlying Firebase `functions.Functions` instance
 
 #### `@angular/fire/messaging`
 
 * `AngularFireMessaging`'s dynamic import of `firebase/messaging` is now lazy, if you don't call any methods the SDK will not be loaded
-* `AngularFireMessaging` has dropped the `messaging` property and instead Proxies the underlying Firebase `messaging.Messaging` instance
+* `AngularFireMessaging` has dropped the `messaging` property and instead Promise Proxies the underlying Firebase `messaging.Messaging` instance
 
 #### `@angular/fire/performance`
 
-* `AngularFirePerformance` now Proxies the underlying Firebase `performance.Performance` instance
-
-#### `@angular/fire/remote-config`
-
-* `AngularFireRemoteConfig` now uses `ensureInitialized()` in it's observables, protecting their value emissions better against race conditions
+* `AngularFirePerformance` has dropped the `performance` property and instead Promise Proxies the underlying Firebase `performance.Performance` instance
 
 #### `@angular/fire/storage`
 
