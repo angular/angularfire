@@ -1,3 +1,10 @@
+<a name="5.4.1"></a>
+## [5.4.1](https://github.com/angular/angularfire2/compare/5.4.0...5.4.1) (2020-02-05)
+
+### Bug Fixes
+
+* **auth:** `authState` should be using `onAuthStateChanged` ([#2308](https://github.com/angular/angularfire2/issues/2308)) ([9506f85](https://github.com/angular/angularfire2/commit/9506f85))
+
 <a name="5.4.0"></a>
 # [5.4.0](https://github.com/angular/angularfire2/compare/5.3.1...5.4.0) (2020-02-01)
 
