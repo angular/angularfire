@@ -68,7 +68,7 @@ import { map } from 'rxjs/operators';
 
 // This pipe redirects a user to their "profile edit" page or the "login page" if they're unauthenticated
 // { path: 'profile', ...canActivate(redirectToProfileEditOrLogin) }
-const redirectToProfileEditOrLogin = map(user => user ? ['profiles', user.uid, 'edit'] : ['login']);
+const redirectToProfileEditOrLogin = () => map(user => user ? ['profiles', user.uid, 'edit'] : ['login']);
 ```
 
 The `auth-guard` modules provides a `customClaims` operator to reduce boiler plate when checking a user's claims:
@@ -80,7 +80,7 @@ import { customClaims } from '@angular/fire/auth-guard';
 
 // This pipe will only allow users with the editor role to access the route
 // { path: 'articles/:id/edit', component: ArticleEditComponent, ...canActivate(editorOnly) }
-const editorOnly = pipe(customClaims, map(claims => claims.role === "editor"));
+const editorOnly = () => pipe(customClaims, map(claims => claims.role === "editor"));
 ```
 
 ### Using router state

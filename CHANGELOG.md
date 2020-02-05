@@ -24,6 +24,7 @@ Version 6 of AngularFire drops support for Angular version 8 and below, older ve
 #### `@angular/fire/auth`
 
 * `AngularFireAuthModule` no longer imports `firebase/auth` on it's own to remain side-effect free, you'll need to `import 'firebase/auth'` on your own
+* `AngularFireAuth` has dropped the `auth` property and instead Proxies the underlying Firebase `auth.Auth` instance
 
 #### `@angular/fire/auth-guard`
 
