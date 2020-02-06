@@ -27,14 +27,14 @@ import 'firebase/storage';
 export class AppModule {}
 ```
 
-The `StorageBucket` injection token can be used to customise the storage bucket.
+The `BUCKET` injection token can be used to customise the storage bucket.
 
 ```ts
-import {AngularFireStorageModule, StorageBucket} from '@angular/fire/storage';
+import {AngularFireStorageModule, BUCKET } from '@angular/fire/storage';
 
 @NgModule({
   providers: [
-    { provide: StorageBucket, useValue: 'my-bucket-name' }
+    { provide: BUCKET, useValue: 'my-bucket-name' }
   ],
   ...
 })
