@@ -85,8 +85,9 @@ export function ɵkeepUnstableUntilFirstFactory(
       // Run the subscribe body outside of Angular (e.g. calling Firebase SDK to add a listener to a change event)
       subscribeOn(schedulers.outsideAngular),
       // Run operators inside the angular zone (e.g. side effects via tap())
-      observeOn(schedulers.insideAngular),
-      share()
+      observeOn(schedulers.insideAngular)
+      // INVESTIGATE https://github.com/angular/angularfire/pull/2315
+      // share()
     );
   }
 }
