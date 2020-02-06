@@ -1,3 +1,13 @@
+<a name="6.0.0-rc.1"></a>
+# [6.0.0-rc.1](https://github.com/angular/angularfire2/compare/6.0.0-rc.0...6.0.0-rc.1) (2020-02-06)
+
+Continued work on version 6.
+
+* Brought a fix in `5.4.2` ([#2315](https://github.com/angular/angularfire2/issues/2315))
+* Fixed `@angular/fire/analytics` attempting to use `global` ([#2303](https://github.com/angular/angularfire/issues/2303))
+* Fix the error message on storage ([#2313](https://github.com/angular/angularfire/issues/2313))
+* Starting on documentation for 6.0
+
 <a name="6.0.0-rc.0"></a>
 # [6.0.0-rc.0](https://github.com/angular/angularfire2/compare/5.4.1...6.0.0-rc.0) (2020-01-30)
 
@@ -62,6 +72,14 @@ Version 6 of AngularFire drops support for Angular version 8 and below, older ve
 
 * `AngularFireStorageModule` no longer imports `firebase/storage` on it's own to remain side-effect free, you'll need to `import 'firebase/storage'` on your own
 * Dropped `StorageBucket` DI token in favor of `BUCKET`
+
+<a name="5.4.2"></a>
+## [5.4.2](https://github.com/angular/angularfire2/compare/5.4.1...5.4.2) (2020-02-06)
+
+### Bug Fixes
+
+* **core:** fixing a problem with hot/cold observables resulting in missed events ([#2315](https://github.com/angular/angularfire2/issues/2315)) ([f24df35](https://github.com/angular/angularfire2/commit/f24df35))
+
 
 <a name="5.4.1"></a>
 ## [5.4.1](https://github.com/angular/angularfire2/compare/5.4.0...5.4.1) (2020-02-05)
