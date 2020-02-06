@@ -1,3 +1,12 @@
+<a name="5.4.2"></a>
+## [5.4.2](https://github.com/angular/angularfire2/compare/5.4.1...5.4.2) (2020-02-06)
+
+
+### Bug Fixes
+
+* **core:** fixing a problem with hot/cold observables resulting in missed events ([#2315](https://github.com/angular/angularfire2/issues/2315)) ([6dd0409](https://github.com/angular/angularfire2/commit/6dd0409))
+
+
 <a name="5.4.1"></a>
 ## [5.4.1](https://github.com/angular/angularfire2/compare/5.4.0...5.4.1) (2020-02-05)
 
