@@ -1,9 +1,8 @@
 <p align="center">
   <h1 align="center">AngularFire</h1>
-  <p align="center">The official library for Firebase and Angular</p>
+  <p align="center">The official Angular library for Firebase</p>
+  <pre align="center">ng add @angular/fire@next</pre>
 </p>
-
-[![Build Status](https://travis-ci.org/angular/angularfire.svg?branch=master)](https://travis-ci.org/angular/angularfire) [![Join the chat at https://gitter.im/angular/angularfire2](https://badges.gitter.im/angular/angularfire2.svg)](https://gitter.im/angular/angularfire2?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ---
 
@@ -22,22 +21,11 @@
 - **Manage binary data** - Upload, download, and delete binary files like images, videos, and other blobs.
 - **Call server code** - Directly call serverless Cloud Functions with user context automatically passed.
 - **Push notifications** - Register and listen for push notifications
-- **Modular** - Include only what's needed. No AngularFire package is above 3kb with most under 2kb (gzipped).
+- **Modular** - Include only what's needed. No AngularFire package is above 4kb with most under 2kb (gzipped).
 
-#### Quick links
-[Contributing](CONTRIBUTING.md)
+## Quickstart
 
-[Stackblitz Template](https://stackblitz.com/edit/angular-1iment) - Remember to set your Firebase configuration in `app/app.module.ts`.
-
-[Upgrading to v5.0? Check out our guide.](docs/version-5-upgrade.md)
-
-**Having troubles?** Get help on the [Firebase Mailing List](https://groups.google.com/forum/#!forum/firebase-talk) (officially supported), the [Firebase Community Slack](https://firebase.community/) (look for the `#angularfire2` room), [Gitter](https://gitter.im/angular/angularfire2), or [Stack Overflow](https://stackoverflow.com/questions/tagged/angularfire2).
-
-## Install
-
-```bash
-npm install firebase @angular/fire --save
-```
+Get your first application up and running by following [our quickstart guide](docs/install-and-setup.md).
 
 ## Example use:
 
@@ -45,6 +33,7 @@ npm install firebase @angular/fire --save
 import { Component } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
+import 'firebase/firestore';
 
 @Component({
   selector: 'app-root',
@@ -64,11 +53,17 @@ export class MyApp {
 }
 ```
 
+## Resources
+
+[Contributing](CONTRIBUTING.md)
+
+[Stackblitz Template](https://stackblitz.com/edit/angular-1iment) - Remember to set your Firebase configuration in `app/app.module.ts`.
+
+[Upgrading to v5.0? Check out our guide.](docs/version-5-upgrade.md)
+
+**Having troubles?** Get help on the [Firebase Mailing List](https://groups.google.com/forum/#!forum/firebase-talk) (officially supported), the [Firebase Community Slack](https://firebase.community/) (look for the `#angularfire2` room), [Gitter](https://gitter.im/angular/angularfire2), or [Stack Overflow](https://stackoverflow.com/questions/tagged/angularfire2).
+
 ## Developer Guide
-
-### Getting started
-
-- [Installation & Setup](docs/install-and-setup.md)
 
 ### **NEW:** Monitor usage of your application in production
 
