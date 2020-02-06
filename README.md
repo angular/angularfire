@@ -59,7 +59,7 @@ export class MyApp {
 
 [Stackblitz Template](https://stackblitz.com/edit/angular-1iment) - Remember to set your Firebase configuration in `app/app.module.ts`.
 
-[Upgrading to v5.0? Check out our guide.](docs/version-5-upgrade.md)
+[Upgrading to v6.0? Check out our guide.](docs/version-6-upgrade.md)
 
 **Having troubles?** Get help on the [Firebase Mailing List](https://groups.google.com/forum/#!forum/firebase-talk) (officially supported), the [Firebase Community Slack](https://firebase.community/) (look for the `#angularfire2` room), [Gitter](https://gitter.im/angular/angularfire2), or [Stack Overflow](https://stackoverflow.com/questions/tagged/angularfire2).
 
