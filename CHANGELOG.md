@@ -1,5 +1,15 @@
+<a name="6.0.0-rc.1"></a>
+# [6.0.0-rc.1](https://github.com/angular/angularfire2/compare/6.0.0-rc.0...6.0.0-rc.1) (2020-02-06)
+
+Continued work on version 6.
+
+* Brought a fix in `5.4.2` ([#2315](https://github.com/angular/angularfire2/issues/2315))
+* Fixed `@angular/fire/analytics` attempting to use `global` ([#2303](https://github.com/angular/angularfire/issues/2303))
+* Fix the error message on storage ([#2313](https://github.com/angular/angularfire/issues/2313))
+* Starting on documentation for 6.0
+
 <a name="6.0.0-rc.0"></a>
-# [6.0.0-rc.0](https://github.com/angular/angularfire2/compare/5.3.0...6.0.0-rc.0) (2020-01-30)
+# [6.0.0-rc.0](https://github.com/angular/angularfire2/compare/5.4.1...6.0.0-rc.0) (2020-01-30)
 
 Version 6 of AngularFire drops support for Angular version 8 and below, older versions of typescript, Firebase, drops `firebase-node`, `database-deprecated`, and more.
 
@@ -11,9 +21,6 @@ Version 6 of AngularFire drops support for Angular version 8 and below, older ve
 * Using `ng-packagr` to build the library, bringing us back up to speed on APF
 * All of our `@NgModules` are now `providedIn: 'any'` rather than singletons
 * We make use of Proxy in more modules, you'll need to polyfill if you want to support IE 11
-* Fixed the `ng add` and `ng deploy` commands
-* `ng deploy` now supports a `buildTarget` option
-* We've addressed a number of memory leaks and Zone.js issues in SSR applications
 
 #### `@angular/fire`
 
@@ -26,7 +33,8 @@ Version 6 of AngularFire drops support for Angular version 8 and below, older ve
 
 #### `@angular/fire/auth`
 
-* `AngularFireAuthModule` no longer imports `firebase/auth` on it's own to remain side-effect free, you'll need to `import 'firebase/auth'` on your own
+* `AngularFireAuthModule` is now side-effect free and `AngularFireAuth` will dynamically import `firebase/auth` when a request is made
+* `AngularFireAuth` has dropped the `auth` property and instead Promise Proxies the underlying Firebase `auth.Auth` instance
 
 #### `@angular/fire/auth-guard`
 
@@ -48,26 +56,55 @@ Version 6 of AngularFire drops support for Angular version 8 and below, older ve
 
 * Dropped the `FunctionsRegionToken` and `FUNCTIONS_REGION` DI tokens in favor of `REGION`
 * Dropped the `FUNCTIONS_ORIGIN` DI token in favor of `ORIGIN`
-* `AngularFireFunctions` is now side-effect free and now lazy loads `firebase/functions` when a request is made
-* `AngularFireFunctions` has dropped the `functions` property and instead Proxies the underlying Firebase `functions.Functions` instance
+* `AngularFireFunctionsModule` is now side-effect free and `AngularFireFunctions` will dynamically import `firebase/functions` when a request is made
+* `AngularFireFunctions` has dropped the `functions` property and instead Promise Proxies the underlying Firebase `functions.Functions` instance
 
 #### `@angular/fire/messaging`
 
 * `AngularFireMessaging`'s dynamic import of `firebase/messaging` is now lazy, if you don't call any methods the SDK will not be loaded
-* `AngularFireMessaging` has dropped the `messaging` property and instead Proxies the underlying Firebase `messaging.Messaging` instance
+* `AngularFireMessaging` has dropped the `messaging` property and instead Promise Proxies the underlying Firebase `messaging.Messaging` instance
 
 #### `@angular/fire/performance`
 
-* `AngularFirePerformance` now Proxies the underlying Firebase `messaging.Messaging` instance
-
-#### `@angular/fire/remote-config`
-
-* `AngularFireRemoteConfig` now uses `ensureInitialized()` in it's observables, protecting their value emissions better against race conditions
+* `AngularFirePerformance` has dropped the `performance` property and instead Promise Proxies the underlying Firebase `performance.Performance` instance
 
 #### `@angular/fire/storage`
 
 * `AngularFireStorageModule` no longer imports `firebase/storage` on it's own to remain side-effect free, you'll need to `import 'firebase/storage'` on your own
 * Dropped `StorageBucket` DI token in favor of `BUCKET`
+
+<a name="5.4.2"></a>
+## [5.4.2](https://github.com/angular/angularfire2/compare/5.4.1...5.4.2) (2020-02-06)
+
+### Bug Fixes
+
+* **core:** fixing a problem with hot/cold observables resulting in missed events ([#2315](https://github.com/angular/angularfire2/issues/2315)) ([f24df35](https://github.com/angular/angularfire2/commit/f24df35))
+
+
+<a name="5.4.1"></a>
+## [5.4.1](https://github.com/angular/angularfire2/compare/5.4.0...5.4.1) (2020-02-05)
+
+### Bug Fixes
+
+* **auth:** `authState` should be using `onAuthStateChanged` ([#2308](https://github.com/angular/angularfire2/issues/2308)) ([9506f85](https://github.com/angular/angularfire2/commit/9506f85))
+
+<a name="5.4.0"></a>
+# [5.4.0](https://github.com/angular/angularfire2/compare/5.3.1...5.4.0) (2020-02-01)
+
+### Features
+
+* **core:** Register AngularFire and Angular versions with the JS SDK ([6096c95](https://github.com/angular/angularfire2/commit/6096c95))
+* **ng-deploy:** add option for buildTarget ([#2281](https://github.com/angular/angularfire2/issues/2281)) ([28a4e54](https://github.com/angular/angularfire2/commit/28a4e54))
+* **core:** Major changes to the Zone.js wrapping to address SSR memory leaks and more ([#2294](https://github.com/angular/angularfire2/issues/2294)) ([56df941](https://github.com/angular/angularfire2/commit/56df941))
+
+
+<a name="5.3.1"></a>
+# [5.3.1](https://github.com/angular/angularfire2/compare/5.3.0...5.3.1) (2020-02-01)
+
+### Bug Fixes
+* **schematics**: The schematics should be functional again. The version of `firebase-tools` we were installing when you called `ng add @angular/fire` was using deprecated API. ([#2285](https://github.com/angular/angularfire2/issues/2285)) ([5867eeb](https://github.com/angular/angularfire2/commit/5867eebbd2ec7eaad0bbc8da94e38aca1fe7580b))
+* **schematics**: fix issues with FS and Devkit Paths ([#2279](https://github.com/angular/angularfire2/issues/2279)) ([5ccf5db](https://github.com/angular/angularfire2/commit/5ccf5db3302be4a77529c33eda9ce39e5503b3c4))
+* **rc**: Need to `ensureInitialized()` ([#2290](https://github.com/angular/angularfire2/issues/2290)) ([0d95523](https://github.com/angular/angularfire2/commit/0d955231a0c91d8abd4effe0e02044f40451a891))
 
 <a name="5.3.0"></a>
 # [5.3.0](https://github.com/angular/angularfire2/compare/5.2.3...5.3.0) (2020-01-07)

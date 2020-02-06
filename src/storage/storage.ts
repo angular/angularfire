@@ -35,7 +35,7 @@ export class AngularFireStorage {
 
     this.storage = zone.runOutsideAngular(() => {
       const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
-      if (!app.storage) { throw "You must import 'firebase/database' before using AngularFireDatabase" }
+      if (!app.storage) { throw "You must import 'firebase/storage' before using AngularFireDatabase" }
       return app.storage(storageBucket || undefined);
     });
   }

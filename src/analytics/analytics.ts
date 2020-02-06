@@ -23,19 +23,18 @@ const DATA_LAYER_NAME = 'dataLayer';
 
 export interface AngularFireAnalytics extends ɵPromiseProxy<analytics.Analytics> {};
 
-const ANALYTICS_INSTANCE_CACHE = Symbol();
-const ANALYTICS_INITIALIZED = Symbol();
+let gtag: (...args: any[]) => void;
+let analyticsInitialized: Promise<void>;
+const analyticsInstanceCache: {[key:string]: Observable<analytics.Analytics>} = {};
 
 @Injectable({
   providedIn: 'any'
 })
 export class AngularFireAnalytics {
 
-  private gtag: (...args: any[]) => void;
-
   async updateConfig(config: Config) {
-    await global[ANALYTICS_INITIALIZED];
-    this.gtag(GTAG_CONFIG_COMMAND, this.options[ANALYTICS_ID_FIELD], { ...config, update: true });
+    await analyticsInitialized;
+    gtag(GTAG_CONFIG_COMMAND, this.options[ANALYTICS_ID_FIELD], { ...config, update: true });
   };
 
   constructor(
@@ -50,44 +49,28 @@ export class AngularFireAnalytics {
     zone: NgZone
   ) {
 
-    const schedulers = new ɵAngularFireSchedulers(zone);
-
-    // Analytics errors if it's not unique from a measurementId standpoint, so we need to cache the instances
-    if (!global[ANALYTICS_INSTANCE_CACHE]) {
-      global[ANALYTICS_INSTANCE_CACHE] = {}
-    };
-
-    let analyticsInitialized: Promise<void> = global[ANALYTICS_INITIALIZED];
-    let analyticsInstanceCache: {[key:string]: Observable<analytics.Analytics>} = global[ANALYTICS_INSTANCE_CACHE];
-    let analytics = analyticsInstanceCache[options[ANALYTICS_ID_FIELD]];
-
-    if (isPlatformBrowser(platformId)) {
-
-      window[DATA_LAYER_NAME] = window[DATA_LAYER_NAME] || [];
-      this.gtag = window[GTAG_FUNCTION_NAME] || function() { window[DATA_LAYER_NAME].push(arguments) }
-
-      if (!analyticsInitialized) {
+    if (!analyticsInitialized) {
+      if (isPlatformBrowser(platformId)) {
+        gtag = window[GTAG_FUNCTION_NAME] || function() { window[DATA_LAYER_NAME].push(arguments) };
+        window[DATA_LAYER_NAME] = window[DATA_LAYER_NAME] || [];
         analyticsInitialized = zone.runOutsideAngular(() =>
           new Promise(resolve => {
             window[GTAG_FUNCTION_NAME] = (...args: any[]) => {
               if (args[0] == 'js') { resolve() }
-              this.gtag(...args);
+              gtag(...args);
             }
           })
         );
+      } else {
+        gtag = () => {};
+        analyticsInitialized = Promise.resolve();
       }
-
-    } else {
-
-      analyticsInitialized = Promise.resolve();
-      this.gtag = () => {}
-
     }
 
+    let analytics = analyticsInstanceCache[options[ANALYTICS_ID_FIELD]];
     if (!analytics) {
-
       analytics = of(undefined).pipe(
-        observeOn(schedulers.outsideAngular),
+        observeOn(new ɵAngularFireSchedulers(zone).outsideAngular),
         switchMap(() => isPlatformBrowser(platformId) ? import('firebase/analytics') : empty()),
         map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
         map(app => app.analytics()),
@@ -96,9 +79,7 @@ export class AngularFireAnalytics {
         }),
         shareReplay({ bufferSize: 1, refCount: false }),
       );
-
       analyticsInstanceCache[options[ANALYTICS_ID_FIELD]] = analytics;
-
     }
 
     if (providedConfig)     { this.updateConfig(providedConfig) }
