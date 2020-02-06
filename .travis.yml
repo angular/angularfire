@@ -25,6 +25,7 @@ matrix:
 branches:
   only:
     - master # otherwise pull requests get built twice
+    - v5
 
 install:
   - |
