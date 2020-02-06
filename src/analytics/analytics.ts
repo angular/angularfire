@@ -23,9 +23,9 @@ const DATA_LAYER_NAME = 'dataLayer';
 
 export interface AngularFireAnalytics extends ɵPromiseProxy<analytics.Analytics> {};
 
+let gtag: (...args: any[]) => void;
 let analyticsInitialized: Promise<void>;
 const analyticsInstanceCache: {[key:string]: Observable<analytics.Analytics>} = {};
-const gtag = window ? window[GTAG_FUNCTION_NAME] || function() { window[DATA_LAYER_NAME].push(arguments) } : () => {};
 
 @Injectable({
   providedIn: 'any'
@@ -51,6 +51,7 @@ export class AngularFireAnalytics {
 
     if (!analyticsInitialized) {
       if (isPlatformBrowser(platformId)) {
+        gtag = window[GTAG_FUNCTION_NAME] || function() { window[DATA_LAYER_NAME].push(arguments) };
         window[DATA_LAYER_NAME] = window[DATA_LAYER_NAME] || [];
         analyticsInitialized = zone.runOutsideAngular(() =>
           new Promise(resolve => {
@@ -61,6 +62,7 @@ export class AngularFireAnalytics {
           })
         );
       } else {
+        gtag = () => {};
         analyticsInitialized = Promise.resolve();
       }
     }
