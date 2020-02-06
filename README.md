@@ -1,8 +1,6 @@
-<p align="center">
-  <h1 align="center">AngularFire</h1>
-  <p align="center">The official Angular library for Firebase</p>
-  <pre align="center">ng add @angular/fire@next</pre>
-</p>
+<h1 align="center">AngularFire</h1>
+<p align="center"><small>The official Angular library for Firebase</small></p>
+<pre align="center">ng add @angular/fire@next</pre>
 
 ---
 
