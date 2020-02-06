@@ -33,7 +33,7 @@ Version 6 of AngularFire drops support for Angular version 8 and below, older ve
 
 #### `@angular/fire/auth`
 
-* `AngularFireAuthModule` no longer imports `firebase/auth` on it's own to remain side-effect free, you'll need to `import 'firebase/auth'` on your own
+* `AngularFireAuthModule` is now side-effect free and `AngularFireAuth` will dynamically import `firebase/auth` when a request is made
 * `AngularFireAuth` has dropped the `auth` property and instead Promise Proxies the underlying Firebase `auth.Auth` instance
 
 #### `@angular/fire/auth-guard`
@@ -56,7 +56,7 @@ Version 6 of AngularFire drops support for Angular version 8 and below, older ve
 
 * Dropped the `FunctionsRegionToken` and `FUNCTIONS_REGION` DI tokens in favor of `REGION`
 * Dropped the `FUNCTIONS_ORIGIN` DI token in favor of `ORIGIN`
-* `AngularFireFunctions` is now side-effect free and now lazy loads `firebase/functions` when a request is made
+* `AngularFireFunctionsModule` is now side-effect free and `AngularFireFunctions` will dynamically import `firebase/functions` when a request is made
 * `AngularFireFunctions` has dropped the `functions` property and instead Promise Proxies the underlying Firebase `functions.Functions` instance
 
 #### `@angular/fire/messaging`
