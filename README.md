@@ -1,6 +1,9 @@
-<h1 align="center">AngularFire</h1>
-<p align="center"><small>The official Angular library for Firebase</small></p>
-<pre align="center">ng add @angular/fire@next</pre>
+# AngularFire
+The official Angular library for Firebase
+
+```bash
+ng add @angular/fire@next
+```
 
 ---
 
@@ -45,8 +48,8 @@ import 'firebase/firestore';
 })
 export class MyApp {
   items: Observable<any[]>;
-  constructor(db: AngularFirestore) {
-    this.items = db.collection('items').valueChanges();
+  constructor(firestore: AngularFirestore) {
+    this.items = firestore.collection('items').valueChanges();
   }
 }
 ```
