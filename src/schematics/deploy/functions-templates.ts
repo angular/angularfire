@@ -1,3 +1,5 @@
+export const NodeVersion = 10;
+
 export const defaultPackage = `{
   "name": "functions",
   "description": "Angular Universal Application",
@@ -10,14 +12,14 @@ export const defaultPackage = `{
     "logs": "firebase functions:log"
   },
   "engines": {
-    "node": "8"
+    "node": "${NodeVersion}"
   },
   "dependencies": {
-    "firebase-admin": "~7.0.0",
-    "firebase-functions": "^2.3.0"
+    "firebase-admin": "latest",
+    "firebase-functions": "latest"
   },
   "devDependencies": {
-    "firebase-functions-test": "^0.1.6"
+    "firebase-functions-test": "latest"
   },
   "private": true
 }

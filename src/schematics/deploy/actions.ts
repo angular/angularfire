@@ -1,21 +1,33 @@
-import {BuilderContext, targetFromTargetString} from '@angular-devkit/architect';
-import {BuildTarget, FirebaseTools, FSHost} from '../interfaces';
-import {writeFileSync, renameSync} from 'fs';
-import {copySync, removeSync} from 'fs-extra';
-import {join, dirname, basename} from 'path';
-import {defaultFunction, defaultPackage} from './functions-templates';
-import {experimental} from '@angular-devkit/core';
-import {SchematicsException} from '@angular-devkit/schematics';
+import {
+  BuilderContext,
+  targetFromTargetString
+} from "@angular-devkit/architect";
+import { BuildTarget, FirebaseTools, FSHost } from "../interfaces";
+import { writeFileSync, renameSync } from "fs";
+import { copySync, removeSync } from "fs-extra";
+import { join, dirname } from "path";
+import {
+  defaultFunction,
+  defaultPackage,
+  NodeVersion
+} from "./functions-templates";
+import { experimental } from "@angular-devkit/core";
+import { SchematicsException } from "@angular-devkit/schematics";
+import { satisfies } from "semver";
 
 const moveSync = (src: string, dest: string) => {
   copySync(src, dest);
   removeSync(src);
 };
 
-const deployToHosting = (firebaseTools: FirebaseTools, context: BuilderContext, workspaceRoot: string) => {
+const deployToHosting = (
+  firebaseTools: FirebaseTools,
+  context: BuilderContext,
+  workspaceRoot: string
+) => {
   return firebaseTools.deploy({
     // tslint:disable-next-line:no-non-null-assertion
-    only: 'hosting: ' + context.target!.project,
+    only: "hosting: " + context.target!.project,
     cwd: workspaceRoot
   });
 };
@@ -23,16 +35,25 @@ const deployToHosting = (firebaseTools: FirebaseTools, context: BuilderContext, 
 const defaultFsHost: FSHost = {
   moveSync,
   writeFileSync,
-  renameSync,
+  renameSync
 };
+
+const getVersionRange = (v: number) => `^${v}.0.0`;
 
 export const deployToFunction = async (
   firebaseTools: FirebaseTools,
   context: BuilderContext,
   workspaceRoot: string,
   project: experimental.workspace.WorkspaceTool,
+  preview: boolean,
   fsHost: FSHost = defaultFsHost
 ) => {
+  if (!satisfies(process.versions.node, getVersionRange(NodeVersion))) {
+    context.logger.warn(
+      `⚠️ Your Node.js version (${process.versions.node}) does not match the Firebase Functions runtime (${NodeVersion}).`
+    );
+  }
+
   if (
     !project ||
     !project.build ||
@@ -67,16 +88,32 @@ export const deployToFunction = async (
   fsHost.moveSync(staticOut, newClientPath);
   fsHost.moveSync(serverOut, newServerPath);
 
-  fsHost.writeFileSync(join(dirname(serverOut), 'package.json'), defaultPackage);
-  fsHost.writeFileSync(join(dirname(serverOut), 'index.js'), defaultFunction(serverOut));
+  fsHost.writeFileSync(
+    join(dirname(serverOut), "package.json"),
+    defaultPackage
+  );
+  fsHost.writeFileSync(
+    join(dirname(serverOut), "index.js"),
+    defaultFunction(serverOut)
+  );
 
-  fsHost.renameSync(join(newClientPath, 'index.html'), join(newClientPath, 'index.original.html'));
+  fsHost.renameSync(
+    join(newClientPath, "index.html"),
+    join(newClientPath, "index.original.html")
+  );
 
-  context.logger.info('Deploying your Angular Universal application...');
+  context.logger.info("Deploying your Angular Universal application...");
 
-  return firebaseTools.deploy({
-    cwd: workspaceRoot
-  });
+  if (preview) {
+    context.logger.info(
+      "Your Universal application is now ready for preview. Use `firebase serve` in the output directory of your workspace to test the setup."
+    );
+    return Promise.resolve();
+  } else {
+    return firebaseTools.deploy({
+      cwd: workspaceRoot
+    });
+  }
 };
 
 export default async function deploy(
@@ -86,23 +123,26 @@ export default async function deploy(
   buildTargets: BuildTarget[],
   firebaseProject: string,
   ssr: boolean,
+  preview: boolean
 ) {
-
   await firebaseTools.login();
 
   if (!context.target) {
-    throw new Error('Cannot execute the build target');
+    throw new Error("Cannot execute the build target");
   }
 
   context.logger.info(`📦 Building "${context.target.project}"`);
 
   for (const target of buildTargets) {
-    const run = await context.scheduleTarget(targetFromTargetString(target.name), target.options);
+    const run = await context.scheduleTarget(
+      targetFromTargetString(target.name),
+      target.options
+    );
     await run.result;
   }
 
   try {
-    await firebaseTools.use(firebaseProject, {project: firebaseProject});
+    await firebaseTools.use(firebaseProject, { project: firebaseProject });
   } catch (e) {
     throw new Error(`Cannot select firebase project '${firebaseProject}'`);
   }
@@ -111,16 +151,28 @@ export default async function deploy(
     let success: { hosting: string };
 
     if (ssr) {
-      success = await deployToFunction(firebaseTools, context, context.workspaceRoot, projectTargets);
+      success = await deployToFunction(
+        firebaseTools,
+        context,
+        context.workspaceRoot,
+        projectTargets,
+        preview
+      );
     } else {
-      success = await deployToHosting(firebaseTools, context, context.workspaceRoot);
+      success = await deployToHosting(
+        firebaseTools,
+        context,
+        context.workspaceRoot
+      );
     }
 
-    context.logger.info(
-      `🚀 Your application is now available at https://${
-        success.hosting.split('/')[1]
-      }.firebaseapp.com/`
-    );
+    if (!preview) {
+      context.logger.info(
+        `🚀 Your application is now available at https://${
+          success.hosting.split("/")[1]
+        }.firebaseapp.com/`
+      );
+    }
   } catch (e) {
     context.logger.error(e.message || e);
   }

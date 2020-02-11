@@ -61,7 +61,8 @@ export default createBuilder<any>(
         projectTargets,
         targets,
         firebaseProject,
-        !!options.ssr
+        !!options.ssr,
+        !!options.preview
       );
     } catch (e) {
       console.error('Error when trying to deploy: ');
