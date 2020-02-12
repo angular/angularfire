@@ -27,7 +27,7 @@ const deployToHosting = (
 ) => {
   return firebaseTools.deploy({
     // tslint:disable-next-line:no-non-null-assertion
-    only: "hosting: " + context.target!.project,
+    only: "hosting:" + context.target!.project,
     cwd: workspaceRoot
   });
 };
