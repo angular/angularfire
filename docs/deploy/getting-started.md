@@ -77,6 +77,14 @@ If you've specified that you want a server-side rendering enabled deployment in 
 2. Create `package.json` for the firebase function with the required dependencies.
 3. Deploy the static assets to firebase hosting and your universal server as a Firebase function.
 
+If you want to preview your Angular Universal project before we deploy it as a Firebase Function you can run:
+
+```
+ng deploy --preview
+```
+
+We'll create the function and a `package.json` in your project output directory. This way, you can later run `firebase serve` in your project root so you can test everything before deploying.
+
 ## Step 3: customization
 
 To customize the deployment flow, you can use the configuration files you're already familiar with from `firebase-tools`. You can find more in the [firebase documentation](https://firebase.google.com/docs/hosting/full-config).

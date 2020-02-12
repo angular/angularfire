@@ -7,7 +7,7 @@
       },
       "ng-add-setup-project": {
         "description": "Setup ng deploy",
-	"factory": "./schematics/public_api#ngAddSetupProject"
+        "factory": "./schematics/public_api#ngAddSetupProject"
       }
     }
   }
