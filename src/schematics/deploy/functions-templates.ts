@@ -1,6 +1,10 @@
 export const NodeVersion = 10;
 
-export const defaultPackage = `{
+export const defaultPackage = (
+  firebaseAdminVersion: string,
+  firebaseFunctionsVersion: string,
+  firebaseFunctionsTestVersion: string
+) => `{
   "name": "functions",
   "description": "Angular Universal Application",
   "scripts": {
@@ -15,17 +19,19 @@ export const defaultPackage = `{
     "node": "${NodeVersion}"
   },
   "dependencies": {
-    "firebase-admin": "latest",
-    "firebase-functions": "latest"
+    "firebase-admin": "${firebaseAdminVersion}",
+    "firebase-functions": "${firebaseFunctionsVersion}"
   },
   "devDependencies": {
-    "firebase-functions-test": "latest"
+    "firebase-functions-test": "${firebaseFunctionsTestVersion}"
   },
   "private": true
 }
 `;
 
-export const defaultFunction = (path: string) => `const functions = require('firebase-functions');
+export const defaultFunction = (
+  path: string
+) => `const functions = require('firebase-functions');
 
 exports.ssr = functions.https.onRequest(require('./${path}/main').app());
 `;

@@ -3,7 +3,7 @@ import {
   targetFromTargetString
 } from "@angular-devkit/architect";
 import { BuildTarget, FirebaseTools, FSHost } from "../interfaces";
-import { writeFileSync, renameSync } from "fs";
+import { writeFileSync, renameSync, existsSync, readFileSync } from "fs";
 import { copySync, removeSync } from "fs-extra";
 import { join, dirname } from "path";
 import {
@@ -39,6 +39,23 @@ const defaultFsHost: FSHost = {
 };
 
 const getVersionRange = (v: number) => `^${v}.0.0`;
+
+const getPackageJson = (workspaceRoot: string) => {
+  const versions = {
+    'firebase-admin': 'latest',
+    'firebase-functions': 'latest',
+    'firebase-functions-test': 'latest'
+  };
+  if (existsSync(join(workspaceRoot, 'package.json'))) {
+    try {
+      const content = JSON.parse(readFileSync(join(workspaceRoot, 'package.json')).toString());
+      Object.keys(versions).forEach((p: string) => {
+        versions[p] = content.devDependencies[p] || content.dependencies[p] || versions[p];
+      });
+    } catch {}
+  }
+  return defaultPackage(versions["firebase-admin"], versions["firebase-functions"], versions["firebase-functions-test"]);
+};
 
 export const deployToFunction = async (
   firebaseTools: FirebaseTools,
@@ -90,7 +107,7 @@ export const deployToFunction = async (
 
   fsHost.writeFileSync(
     join(dirname(serverOut), "package.json"),
-    defaultPackage
+    getPackageJson(workspaceRoot)
   );
   fsHost.writeFileSync(
     join(dirname(serverOut), "index.js"),
