@@ -64,7 +64,7 @@ describe('Deploy Angular apps', () => {
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith({
       cwd: 'cwd',
-      only: 'hosting: ' + PROJECT
+      only: 'hosting:' + PROJECT
     });
   });
 
