@@ -45,7 +45,8 @@ export default createBuilder<any>(
         context,
         path.join(context.workspaceRoot, project.root),
         buildTarget,
-        firebaseProject
+        firebaseProject,
+        process.env.FIREBASE_TOKEN
       );
     } catch (e) {
       console.error("Error when trying to deploy: ");

@@ -7,12 +7,15 @@ export default async function deploy(
   projectRoot: string,
   buildTarget: string,
   firebaseProject?: string,
+  firebaseToken?: string,
 ) {
   if (!firebaseProject) {
     throw new Error("Cannot find firebase project for your app in .firebaserc");
   }
 
-  await firebaseTools.login();
+  if (!firebaseToken) {
+    await firebaseTools.login();
+  }
 
   if (!context.target) {
     throw new Error("Cannot execute the build target");
@@ -32,7 +35,8 @@ export default async function deploy(
   try {
     const success = await firebaseTools.deploy({
       only: "hosting:" + context.target.project,
-      cwd: projectRoot
+      cwd: projectRoot,
+      token: firebaseToken
     });
     context.logger.info(
       `🚀 Your application is now available at https://${

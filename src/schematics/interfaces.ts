@@ -9,6 +9,7 @@ export interface Project {
 export interface FirebaseDeployConfig {
   cwd: string;
   only?: string;
+  token?: string;
 }
 
 export interface FirebaseTools {

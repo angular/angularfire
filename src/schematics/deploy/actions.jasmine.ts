@@ -10,6 +10,7 @@ let firebaseMock: FirebaseTools;
 const FIREBASE_PROJECT = 'ikachu-aa3ef';
 const PROJECT = 'pirojok-project';
 const BUILD_TARGET = `${PROJECT}:build:production`;
+const FIREBASE_TOKEN = 'kkasllkascnkjnskjsdcskdckskdksdkjc';
 
 describe('Deploy Angular apps', () => {
   beforeEach(() => initMocks());
@@ -18,6 +19,12 @@ describe('Deploy Angular apps', () => {
     const spy = spyOn(firebaseMock, 'login');
     await deploy(firebaseMock, context, 'host', BUILD_TARGET, FIREBASE_PROJECT);
     expect(spy).toHaveBeenCalled();
+  });
+
+  it('should not call login', async () => {
+    const spy = spyOn(firebaseMock, 'login');
+    await deploy(firebaseMock, context, 'host', BUILD_TARGET, FIREBASE_PROJECT, FIREBASE_TOKEN);
+    expect(spy).not.toHaveBeenCalled();
   });
 
   it('should invoke the builder', async () => {
@@ -41,10 +48,10 @@ describe('Deploy Angular apps', () => {
 
   it('should invoke firebase.deploy', async () => {
     const spy = spyOn(firebaseMock, 'deploy').and.callThrough();
-    await deploy(firebaseMock, context, 'host', BUILD_TARGET, FIREBASE_PROJECT);
+    await deploy(firebaseMock, context, 'host', BUILD_TARGET, FIREBASE_PROJECT, FIREBASE_TOKEN);
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith({
-      cwd: 'host', only: 'hosting:' + PROJECT
+      cwd: 'host', only: 'hosting:' + PROJECT, token: FIREBASE_TOKEN
     });
   });
 
