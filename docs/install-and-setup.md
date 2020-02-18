@@ -88,7 +88,7 @@ export class AppModule {}
 
 ### 7. Inject `AngularFirestore`
 
-Open `/src/app/app.component.ts`, and make sure to modify/delete any tests to get the sample working (tests are still important, you know):
+Open `/src/app/app.component.ts`, and make sure to `import 'firebase/firestore';`. Also, modify/delete any tests to get the sample working (tests are still important, you know):
 
 ```ts
 import { Component } from '@angular/core';
