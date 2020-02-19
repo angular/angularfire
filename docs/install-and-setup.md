@@ -76,8 +76,8 @@ import { environment } from '../environments/environment';
 @NgModule({
   imports: [
     BrowserModule,
-    AngularFireModule.initializeApp(environment.firebase)
-    AngularFireAnalyticsModule
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFireAnalyticsModule,
     AngularFirestoreModule
   ],
   declarations: [ AppComponent ],
