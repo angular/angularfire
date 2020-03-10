@@ -1,7 +1,8 @@
 import { SettableMetadata, UploadMetadata, Reference, StringFormat } from './interfaces';
 import { createUploadTask, AngularFireUploadTask } from './task';
-import { Observable, from } from 'rxjs';
+import { Observable, from, of } from 'rxjs';
 import { ɵAngularFireSchedulers } from '@angular/fire';
+import { observeOn, switchMap } from 'rxjs/operators';
 
 export interface AngularFireStorageReference {
   getDownloadURL(): Observable<any>;
@@ -25,10 +26,14 @@ export function createStorageRef(
   keepUnstableUntilFirst: <T>(obs$: Observable<T>) => Observable<T>
 ): AngularFireStorageReference {
   return {
-    getDownloadURL: () => from(ref.getDownloadURL(), schedulers.outsideAngular).pipe(
+    getDownloadURL: () => of(undefined).pipe(
+      observeOn(schedulers.outsideAngular),
+      switchMap(() => ref.getDownloadURL()),
       keepUnstableUntilFirst
     ),
-    getMetadata: () => from(ref.getMetadata()).pipe(
+    getMetadata: () => of().pipe(
+      observeOn(schedulers.outsideAngular),
+      switchMap(() => ref.getMetadata()),
       keepUnstableUntilFirst
     ),
     delete: () => from(ref.delete()),
