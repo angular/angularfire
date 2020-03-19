@@ -88,7 +88,33 @@ export class AppModule {}
 
 ### 7. Inject `AngularFirestore`
 
-Open `/src/app/app.component.ts`, and make sure to modify/delete any tests to get the sample working (tests are still important, you know):
+Firstly we'll modify our tests to inject a mock version of the firestore. You do this by finding the `beforeEach` method in `/src/app/app.component.spec.ts` and adding a mock firestore collection, and a mock firestore.
+
+```ts
+  let firestoreCollection: AngularFirestoreCollection;
+  beforeEach(async(() => {
+    firestoreCollection = {
+      valueChanges: (): any => {
+      }
+    } as AngularFirestoreCollection;
+    const serviceMock: AngularFirestore = {
+      collection: (path: string): any => {
+      }
+    } as AngularFirestore;
+    spyOn(serviceMock, 'collection').and.returnValue(firestoreCollection);
+    TestBed.configureTestingModule({
+      imports: [
+        RouterTestingModule
+      ],
+      providers: [{provide: AngularFirestore, useValue: serviceMock}],
+      declarations: [
+        AppComponent
+      ],
+    }).compileComponents();
+  }));
+```
+
+Great! Now we have a way to test AngularFirestore we can inject it into the component. Open `/src/app/app.component.ts`
 
 ```ts
 import { Component } from '@angular/core';
@@ -108,6 +134,20 @@ export class AppComponent {
 ```
 
 ### 8. Bind a Firestore collection to a list
+
+Lets start by adding a test. In `/src/app/app.component.spec.ts`. When we get some data back from the collection we expect to see it on the page. So lets test for that.
+
+```ts
+  it('should show a list item', () => {
+    spyOn(firestoreCollection, 'valueChanges').and.returnValue(of([{name: 'data from collection'}]));
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement;
+    expect(compiled.querySelector('.content .text').textContent).toContain('data from collection');
+  });
+```
+
+Run the tests with `ng test`, and you should see the test fail. Great! Now we can fix this text.
 
 In `/src/app/app.component.ts`:
 
@@ -138,6 +178,13 @@ Open `/src/app/app.component.html`:
     {{item.name}}
   </li>
 </ul>
+```
+
+Run the tests again, and we can see that one has passed, but othere have failed. Lets fix them by adding in the method stub.
+
+Add the line of each test add the call
+```
+spyOn(firestoreCollection, 'valueChanges').and.returnValue(NEVER);
 ```
 
 ### 9. Run your app locally
