@@ -3,7 +3,7 @@ export interface Project {
   projectNumber: string;
   displayName: string;
   name: string;
-  resources: { [key:string]: string }
+  resources: { [key: string]: string };
 }
 
 export interface FirebaseDeployConfig {
@@ -13,11 +13,11 @@ export interface FirebaseDeployConfig {
 }
 
 export interface FirebaseTools {
-  login(): Promise<void>;
-
   projects: {
     list(): Promise<Project[]>;
-  }
+  };
+
+  login(): Promise<void>;
 
   deploy(config: FirebaseDeployConfig): Promise<any>;
 
@@ -26,11 +26,12 @@ export interface FirebaseTools {
 
 export interface FirebaseHostingRewrite {
   source: string;
-  destination: string;
+  destination?: string;
+  function?: string;
 }
 
 export interface FirebaseHostingConfig {
-  public: string;
+  public?: string;
   ignore: string[];
   target: string;
   rewrites: FirebaseHostingRewrite[];
@@ -50,4 +51,18 @@ export interface FirebaseRc {
 
 export interface DeployBuilderSchema {
   buildTarget?: string;
+  preview?: boolean;
+  universalBuildTarget?: string;
+  ssr?: boolean;
+}
+
+export interface BuildTarget {
+  name: string;
+  options?: {[name: string]: any};
+}
+
+export interface FSHost {
+  moveSync(src: string, dest: string): void;
+  writeFileSync(src: string, data: string): void;
+  renameSync(src: string, dest: string): void;
 }

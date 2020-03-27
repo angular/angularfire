@@ -1,6 +1,8 @@
-import { readFileSync } from "fs";
-import { FirebaseRc, Project } from "./interfaces";
-import { join } from "path";
+import { experimental } from '@angular-devkit/core';
+import { readFileSync } from 'fs';
+import { FirebaseRc, Project } from './interfaces';
+import { join } from 'path';
+import { isUniversalApp } from './ng-add-ssr';
 
 export async function listProjects() {
   const firebase = require('firebase-tools');
@@ -43,15 +45,26 @@ const searchProjects = (projects: Project[]) => {
 export const projectPrompt = (projects: Project[]) => {
   const inquirer = require('inquirer');
   inquirer.registerPrompt(
-    "autocomplete",
-    require("inquirer-autocomplete-prompt")
+    'autocomplete',
+    require('inquirer-autocomplete-prompt')
   );
   return inquirer.prompt({
-    type: "autocomplete",
-    name: "firebaseProject",
+    type: 'autocomplete',
+    name: 'firebaseProject',
     source: searchProjects(projects),
-    message: "Please select a project:"
+    message: 'Please select a project:'
   });
+};
+
+export const projectTypePrompt = (project: experimental.workspace.WorkspaceProject) => {
+  if (isUniversalApp(project)) {
+    return require('inquirer').prompt({
+      type: 'confirm',
+      name: 'universalProject',
+      message: 'We detected an Angular Universal project. Do you want to deploy as a Firebase Function?'
+    });
+  }
+  return Promise.resolve({ universalProject: false });
 };
 
 export function getFirebaseProjectName(
@@ -59,7 +72,7 @@ export function getFirebaseProjectName(
   target: string
 ): string | undefined {
   const { targets }: FirebaseRc = JSON.parse(
-    readFileSync(join(workspaceRoot, ".firebaserc"), "UTF-8")
+    readFileSync(join(workspaceRoot, '.firebaserc'), 'UTF-8')
   );
   const projects = Object.keys(targets!);
   return projects.find(
