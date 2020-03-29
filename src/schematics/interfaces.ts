@@ -50,6 +50,7 @@ export interface FirebaseRc {
 
 export interface DeployBuilderSchema {
   buildTarget?: string;
+  firebaseProject?: string;
   preview?: boolean;
   universalBuildTarget?: string;
   ssr?: boolean;

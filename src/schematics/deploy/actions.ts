@@ -159,7 +159,9 @@ export default async function deploy(
   }
 
   try {
-    await firebaseTools.use(firebaseProject, { project: firebaseProject });
+    await firebaseTools.use(firebaseProject, { project: firebaseProject }).then(() => {
+      console.log(`🔥 Your configured Firebase project is '${firebaseProject}'`);
+    });
   } catch (e) {
     throw new Error(`Cannot select firebase project '${firebaseProject}'`);
   }

@@ -31,7 +31,7 @@ export default createBuilder<any>(
 
     const projectTargets = workspace.getProjectTargets(context.target.project);
 
-    const firebaseProject = getFirebaseProjectName(
+    const firebaseProject = options.firebaseProject || getFirebaseProjectName(
       context.workspaceRoot,
       context.target.project
     );
