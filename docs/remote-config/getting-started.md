@@ -46,7 +46,7 @@ budget: <T>(interval: number) => MonoTypeOperatorFunction<T>
 // scanToObject is for use with .changes
 scanToObject: () => OperatorFunction<Parameter, {[key: string]: string|undefined}>
 
-// mapToObject is the same behavior are scanToObject but for use with .parameters,
+// mapToObject is the same behavior as scanToObject but for use with .parameters
 mapToObject: () => OperatorFunction<Parameter[], {[key: string]: string|undefined}>
 
 SETTINGS = InjectionToken<remoteConfig.Settings>;
@@ -61,9 +61,9 @@ Using the `SETTINGS` DI Token (*default: {}*) will allow you to [configure Fireb
 
 ### Configure default values with  `DEFAULTS`
 
-Providing `DEFAULTS ({[key: string]: string | number | boolean})` has `AngularFireRemoteConfig` emit the provided defaults first, which allows you to count on Remote Config when the user is offline or in environments that the Remote Config service does not handle (i.e, Server Side Rendering).
+Providing `DEFAULTS ({[key: string]: string | number | boolean})` tells `AngularFireRemoteConfig` to emit the provided defaults first. This allows you to count on Remote Config when the user is offline or in environments that the Remote Config service does not handle (i.e. Server Side Rendering).
 
-## Putting it all together:
+## Putting it all together
 
 ```ts
 @NgModule({
@@ -106,18 +106,20 @@ constructor(remoteConfig: AngularFireRemoteConfig) {
   remoteConfig.booleans.enableAwesome.subscribe(...); // boolean
   remoteConfig.numbers.titleBackgroundColor.subscribe(...); // number
 
-  // however those may emit more than once as the remote config cache fires and gets fresh values from the server
-  // you can filter it out of .changes for more control:
+  // however those may emit more than once as the remote config cache fires and gets fresh values
+  // from the server. You can filter it out of .changes for more control:
   remoteConfig.changes.pipe(
     filter(param => param.key === 'titleBackgroundColor'),
     map(param => param.asString())
     // budget at most 800ms and return the freshest value possible in that time
-    // our budget pipe is similar to timeout but won't error or abort the pending server fetch (it won't emit it, if the deadline is exceeded, but it will have been fetched so can use the freshest values on next subscription)
+    // our budget pipe is similar to timeout but won't error or abort the pending server fetch
+    // (it won't emit it, if the deadline is exceeded, but it will have been fetched so can use the
+    // freshest values on next subscription)
     budget(800),
     last()
   ).subscribe(...)
 
-  // just like .changes, but scanned as into an array
+  // just like .changes, but scanned into an array
   remoteConfig.parameters.subscribe(all => ...);
 
   // or make promisified firebase().remoteConfig() calls direct off AngularFireRemoteConfig

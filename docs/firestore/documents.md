@@ -11,7 +11,6 @@ The `AngularFirestoreDocument` service is a wrapper around the native Firestore 
 import { Component } from '@angular/core';
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
-import 'firebase/firestore';
 
 export interface Item { name: string; }
 

@@ -15,6 +15,5 @@ We're aiming to release 6.0 with an upgrade schematic to automate most of the re
 * Dropped `@angular/fire/firebase-node` and `@angular/fire/database-depreciated`
 * We make use of Proxy in more modules, you'll need to polyfill if you want to support IE 11
 * We've standardized our DI Token naming conventions across all modules
-* `AngularFirestoreModule` no longer imports `firebase/firestore` on it's own to remain side-effect free, you'll need to `import 'firebase/firestore'` before you inject it. A similar changes has been made to `AngularFireStorage` and `AngularFireDatabase`
 * `AngularFireAuth` has dropped the `auth` property and instead Promise Proxies the underlying Firebase `auth.Auth` instance; allowing your development experience to more closely mirror the JS SDK. Similar changes have been made to `AngularFireFunctions`, `AngularFireMessaging`, and `AngularFirePerformance`.
 * `AngularFireAuthGuard` and `canActivate` have dropped support for raw pipes, this was never working correctly in AOT

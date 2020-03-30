@@ -161,7 +161,7 @@ describe('angularfire', () => {
       })
     );
 
-    it('should block until first emission on server platform', done => {
+    it('should block until first emission', done => {
       const testScheduler = new TestScheduler(null!);
       testScheduler.run(helpers => {
         const outsideZone = Zone.current;
@@ -194,46 +194,16 @@ describe('angularfire', () => {
         s.next(123);
         helpers.flush();
 
-        // Should not be blocked after first item
-        expect(taskTrack.macroTasks.length).toBe(0);
+        // TODO drop this, it's to work around my 15ms timeout hack
+        setTimeout(() => {
+          // Should not be blocked after first item
+          expect(taskTrack.macroTasks.length).toBe(0);
+          done();
+        }, 150);
 
-        done();
       });
     })
 
-    it('should not block on client platform', done => {
-      const testScheduler = new TestScheduler(null!);
-      testScheduler.run(helpers => {
-        const outsideZone = Zone.current;
-        const taskTrack = new Zone['TaskTrackingZoneSpec']();
-        const insideZone = Zone.current.fork(taskTrack);
-        const trackingSchedulers: ɵAngularFireSchedulers = {
-          ngZone: {
-            run: insideZone.run.bind(insideZone),
-            runGuarded: insideZone.runGuarded.bind(insideZone),
-            runOutsideAngular: outsideZone.runGuarded.bind(outsideZone),
-            runTask: insideZone.run.bind(insideZone)
-          } as NgZone,
-          outsideAngular: new ɵZoneScheduler(outsideZone, testScheduler),
-          insideAngular: new ɵZoneScheduler(insideZone, testScheduler),
-        };
-        const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(trackingSchedulers, ɵPLATFORM_BROWSER_ID);
-
-        const s = new Subject();
-        s.pipe(
-          keepUnstableOp,
-        ).subscribe(() => { }, err => { fail(err); }, () => { });
-
-        // Flush to ensure all async scheduled functions are run
-        helpers.flush();
-
-        // Zone should not be blocked
-        expect(taskTrack.macroTasks.length).toBe(0);
-        expect(taskTrack.microTasks.length).toBe(0);
-
-        done();
-      });
-    })
   })
 
   describe('FirebaseApp', () => {

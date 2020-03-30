@@ -1,5 +1,5 @@
 # AngularFire
-The official Angular library for Firebase
+The official [Angular](https://angular.io/) library for [Firebase](https://firebase.google.com/).
 
 ```bash
 ng add @angular/fire@next
@@ -34,7 +34,6 @@ Get your first application up and running by following [our quickstart guide](do
 import { Component } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
-import 'firebase/firestore';
 
 @Component({
   selector: 'app-root',

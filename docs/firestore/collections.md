@@ -11,7 +11,6 @@ The `AngularFirestoreCollection` service is a wrapper around the native Firestor
 import { Component } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
-import 'firebase/firestore';
 
 export interface Item { name: string; }
 
@@ -90,7 +89,6 @@ There are multiple ways of streaming collection data from Firestore.
 import { Component } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
-import 'firebase/firestore';
 
 export interface Item { id: string; name: string; }
 
@@ -143,7 +141,6 @@ import { Component } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import 'firebase/firestore';
 
 export interface Shirt { name: string; price: number; }
 export interface ShirtId extends Shirt { id: string; }
@@ -192,7 +189,6 @@ import { Component } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import 'firebase/firestore';
 
 export interface AccountDeposit { description: string; amount: number; }
 export interface AccountDepoistId extends AccountDeposit { id: string; }
@@ -238,7 +234,6 @@ import { Component } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import 'firebase/firestore';
 
 export interface AccountLogItem { description: string; amount: number; }
 export interface AccountLogItemId extends AccountLogItem { id: string; }
@@ -288,7 +283,6 @@ There are three `DocumentChangeType`s in Firestore: `added`, `removed`, and `mod
 import { Component } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
-import 'firebase/firestore';
 
 @Component({
   selector: 'app-root',
