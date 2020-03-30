@@ -67,9 +67,9 @@ export class AngularFirestoreCollection<T=DocumentData> {
       );
     }
     return docChanges<T>(this.query, this.afs.schedulers.outsideAngular).pipe(
-      this.afs.keepUnstableUntilFirst,
       map(actions => actions.filter(change => events.indexOf(change.type) > -1)),
-      filter(changes =>  changes.length > 0)
+      filter(changes =>  changes.length > 0),
+      this.afs.keepUnstableUntilFirst
     );
   }
 
@@ -108,7 +108,6 @@ export class AngularFirestoreCollection<T=DocumentData> {
   valueChanges<K extends string>(options: {idField?: K} = {}): Observable<T[]> {
     return fromCollectionRef<T>(this.query, this.afs.schedulers.outsideAngular)
       .pipe(
-        this.afs.keepUnstableUntilFirst,
         map(actions => actions.payload.docs.map(a => {
           if (options.idField) {
             return {
@@ -118,7 +117,8 @@ export class AngularFirestoreCollection<T=DocumentData> {
           } else {
             return a.data()
           }
-        }))
+        })),
+        this.afs.keepUnstableUntilFirst
       );
   }
 

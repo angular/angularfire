@@ -7,6 +7,9 @@ import { AngularFirestoreCollectionGroup } from './collection-group/collection-g
 import { FirebaseOptions, FirebaseAppConfig, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵfirebaseAppFactory, ɵAngularFireSchedulers, ɵkeepUnstableUntilFirstFactory } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
 import { firestore } from 'firebase/app';
+import firebase from '@firebase/app';
+import { registerFirestore } from '@firebase/firestore';
+import 'firebase/firestore';
 
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
@@ -117,7 +120,10 @@ export class AngularFirestore {
 
     this.firestore = zone.runOutsideAngular(() => {
       const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
-      if (!app.firestore) { throw "You must import 'firebase/firestore' before using AngularFirestore" }
+      // INVESTIGATE this seems to be required because in the browser build registerFirestore is an Object?
+      //             seems like we're fighting ngcc. In the server firestore() isn't available, so I have to register
+      //             in the browser registerFirestore is not a function... maybe this is an underlying firebase-js-sdk issue
+      if (registerFirestore) { registerFirestore(firebase) }
       const firestore = app.firestore();
       if (settings) { firestore.settings(settings) }
       return firestore;

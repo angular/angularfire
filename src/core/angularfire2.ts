@@ -1,7 +1,6 @@
-import { InjectionToken, NgZone } from '@angular/core';
-import { isPlatformServer } from '@angular/common';
+import { NgZone } from '@angular/core';
 import { Observable, Subscription, SchedulerLike, SchedulerAction, queueScheduler, Operator, Subscriber, TeardownLogic, asyncScheduler } from 'rxjs';
-import { subscribeOn, observeOn, tap, share } from 'rxjs/operators';
+import { subscribeOn, observeOn, tap } from 'rxjs/operators';
 
 function noop() { }
 
@@ -47,10 +46,14 @@ export class ɵBlockUntilFirstOperator<T> implements Operator<T, T> {
   }
 
   private unscheduleTask() {
-    if (this.task != null && this.task.state === 'scheduled') {
-      this.task.invoke();
-      this.task = null;
-    }
+    // maybe this is a race condition, invoke in a timeout
+    // hold for 10ms while I try to figure out what is going on    
+    setTimeout(() => {
+      if (this.task != null && this.task.state === 'scheduled') {
+        this.task.invoke();
+        this.task = null;
+      }
+    }, 10);
   }
 }
 
@@ -75,11 +78,9 @@ export function ɵkeepUnstableUntilFirstFactory(
   platformId: Object
 ) {
   return function keepUnstableUntilFirst<T>(obs$: Observable<T>): Observable<T> {
-    if (isPlatformServer(platformId)) {
-      obs$ = obs$.lift(
-        new ɵBlockUntilFirstOperator(schedulers.ngZone)
-      );
-    }
+    obs$ = obs$.lift(
+      new ɵBlockUntilFirstOperator(schedulers.ngZone)
+    );
 
     return obs$.pipe(
       // Run the subscribe body outside of Angular (e.g. calling Firebase SDK to add a listener to a change event)

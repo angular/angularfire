@@ -86,7 +86,6 @@ import { Component } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import 'firebase/firestore';
 
 export interface Item {
   text: string;

@@ -51,9 +51,9 @@ export class AngularFirestoreCollectionGroup<T=DocumentData> {
     }
     return docChanges<T>(this.query, this.afs.schedulers.outsideAngular)
       .pipe(
-        this.afs.keepUnstableUntilFirst,
         map(actions => actions.filter(change => events.indexOf(change.type) > -1)),
-        filter(changes =>  changes.length > 0)
+        filter(changes =>  changes.length > 0),
+        this.afs.keepUnstableUntilFirst
       );
   }
 
@@ -86,8 +86,8 @@ export class AngularFirestoreCollectionGroup<T=DocumentData> {
     const fromCollectionRefScheduled$ = fromCollectionRef<T>(this.query, this.afs.schedulers.outsideAngular);
     return fromCollectionRefScheduled$
       .pipe(
-        this.afs.keepUnstableUntilFirst,
-        map(actions => actions.payload.docs.map(a => a.data()))
+        map(actions => actions.payload.docs.map(a => a.data())),
+        this.afs.keepUnstableUntilFirst
       );
   }
 
