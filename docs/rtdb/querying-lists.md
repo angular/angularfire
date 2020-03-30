@@ -82,7 +82,6 @@ import { Component } from '@angular/core';
 import { AngularFireDatabase, AngularFireAction } from '@angular/fire/database';
 import { Observable, Subscription, BehaviorSubject } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import 'firebase/database';
 
 @Component({
   selector: 'app-root',

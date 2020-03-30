@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import 'firebase/storage';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { Observable, of } from 'rxjs';
 import { startWith, tap } from 'rxjs/operators';

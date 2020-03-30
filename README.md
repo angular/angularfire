@@ -34,7 +34,6 @@ Get your first application up and running by following [our quickstart guide](do
 import { Component } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
-import 'firebase/firestore';
 
 @Component({
   selector: 'app-root',

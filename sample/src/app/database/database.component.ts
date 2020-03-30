@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AngularFireDatabase } from '@angular/fire/database';
 import { Observable } from 'rxjs';
 import { TransferState, makeStateKey } from '@angular/platform-browser';
-import { startWith, tap } from '../../../node_modules/rxjs/operators';
+import { startWith, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-database',
