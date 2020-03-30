@@ -46,6 +46,9 @@ async function replaceSchematicVersions() {
   Object.keys(dependencies.default).forEach(name => {
     dependencies.default[name].version = root.dependencies[name] || root.devDependencies[name];
   });
+  Object.keys(dependencies.firebaseFunctions).forEach(name => {
+    dependencies.firebaseFunctions[name].version = root.dependencies[name] || root.devDependencies[name];
+  });
   return writeFile(path, JSON.stringify(dependencies, null, 2));
 }
 

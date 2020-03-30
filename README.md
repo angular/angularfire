@@ -1,5 +1,5 @@
 # AngularFire
-The official Angular library for Firebase
+The official [Angular](https://angular.io/) library for [Firebase](https://firebase.google.com/).
 
 ```bash
 ng add @angular/fire@next
