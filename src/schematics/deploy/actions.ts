@@ -23,12 +23,14 @@ const moveSync = (src: string, dest: string) => {
 const deployToHosting = (
   firebaseTools: FirebaseTools,
   context: BuilderContext,
-  workspaceRoot: string
+  workspaceRoot: string,
+  firebaseToken?: string
 ) => {
   return firebaseTools.deploy({
     // tslint:disable-next-line:no-non-null-assertion
     only: "hosting:" + context.target!.project,
-    cwd: workspaceRoot
+    cwd: workspaceRoot,
+    token: firebaseToken
   });
 };
 
@@ -63,7 +65,8 @@ export const deployToFunction = async (
   workspaceRoot: string,
   project: experimental.workspace.WorkspaceTool,
   preview: boolean,
-  fsHost: FSHost = defaultFsHost
+  fsHost: FSHost = defaultFsHost,
+  firebaseToken?: string
 ) => {
   if (!satisfies(process.versions.node, getVersionRange(NodeVersion))) {
     context.logger.warn(
@@ -128,7 +131,8 @@ export const deployToFunction = async (
     return Promise.resolve();
   } else {
     return firebaseTools.deploy({
-      cwd: workspaceRoot
+      cwd: workspaceRoot,
+      token: firebaseToken
     });
   }
 };
@@ -176,13 +180,16 @@ export default async function deploy(
         context,
         context.workspaceRoot,
         projectTargets,
-        preview
+        preview,
+        undefined,
+        firebaseToken
       );
     } else {
       success = await deployToHosting(
         firebaseTools,
         context,
-        context.workspaceRoot
+        context.workspaceRoot,
+        firebaseToken
       );
     }
 

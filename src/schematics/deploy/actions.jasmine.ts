@@ -39,7 +39,7 @@ describe('Deploy Angular apps', () => {
 
   it('should not call login', async () => {
     const spy = spyOn(firebaseMock, 'login');
-    await deploy(firebaseMock, context, 'host', BUILD_TARGET, FIREBASE_PROJECT, FIREBASE_TOKEN);
+    await deploy(firebaseMock, context, projectTargets, [BUILD_TARGET], FIREBASE_PROJECT, undefined, undefined, FIREBASE_TOKEN);
     expect(spy).not.toHaveBeenCalled();
   });
 
