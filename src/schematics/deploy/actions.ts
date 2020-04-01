@@ -6,6 +6,7 @@ import { BuildTarget, FirebaseTools, FSHost } from "../interfaces";
 import { writeFileSync, renameSync, existsSync, readFileSync } from "fs";
 import { copySync, removeSync } from "fs-extra";
 import { join, dirname } from "path";
+import { execSync } from "child_process";
 import {
   defaultFunction,
   defaultPackage,
@@ -14,6 +15,8 @@ import {
 import { experimental } from "@angular-devkit/core";
 import { SchematicsException } from "@angular-devkit/schematics";
 import { satisfies } from "semver";
+
+const escapeRegExp = (str:String) => str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 
 const moveSync = (src: string, dest: string) => {
   copySync(src, dest);
@@ -40,21 +43,44 @@ const defaultFsHost: FSHost = {
 
 const getVersionRange = (v: number) => `^${v}.0.0`;
 
-const getPackageJson = (workspaceRoot: string) => {
-  const versions = {
+const getPackageJson = (context: BuilderContext, workspaceRoot: string) => {
+  const dependencies = {
     'firebase-admin': 'latest',
-    'firebase-functions': 'latest',
+    'firebase-functions': 'latest'
+  };
+  const devDependencies = {
     'firebase-functions-test': 'latest'
   };
-  if (existsSync(join(workspaceRoot, 'package.json'))) {
-    try {
-      const content = JSON.parse(readFileSync(join(workspaceRoot, 'package.json')).toString());
-      Object.keys(versions).forEach((p: string) => {
-        versions[p] = content.devDependencies[p] || content.dependencies[p] || versions[p];
+  const npmList = execSync('npm ls || true').toString();
+  Object.keys(dependencies).forEach((dependency: string) => {
+    const npmLsMatch = npmList.match(` ${escapeRegExp(dependency)}@.+\\w`);
+    if (npmLsMatch) { dependencies[dependency] = npmLsMatch[0].split(`${dependency}@`)[1] }
+  });
+  Object.keys(devDependencies).forEach((devDependency: string) => {
+    const npmLsMatch = npmList.match(` ${escapeRegExp(devDependency)}@.+\\w`);
+    if (npmLsMatch) { devDependencies[devDependency] = npmLsMatch[0].split(`${devDependency}@`)[1] }
+  });
+  if (existsSync(join(workspaceRoot, 'angular.json'))) {
+    const angularJson = JSON.parse(readFileSync(join(workspaceRoot, 'angular.json')).toString());
+    const server = angularJson.projects[context.target!.project].architect.server;
+    const serverOptions = server && server.options;
+    const externalDependencies = serverOptions && serverOptions.externalDependencies || [];
+    const bundleDependencies = serverOptions && serverOptions.bundleDependencies;
+    if (bundleDependencies == false) {
+      if (existsSync(join(workspaceRoot, 'package.json'))) {
+        const packageJson = JSON.parse(readFileSync(join(workspaceRoot, 'package.json')).toString());
+        Object.keys(packageJson.dependencies).forEach((dependency: string) => {
+          dependencies[dependency] = packageJson.dependencies[dependency];
+        });
+      } // TODO should we throw?
+    } else {
+      externalDependencies.forEach(externalDependency => {
+        const npmLsMatch = npmList.match(` ${escapeRegExp(externalDependency)}@.+\\w`);
+        if (npmLsMatch) { dependencies[externalDependency] = npmLsMatch[0].split(`${externalDependency}@`)[1] }
       });
-    } catch {}
-  }
-  return defaultPackage(versions["firebase-admin"], versions["firebase-functions"], versions["firebase-functions-test"]);
+    }
+  } // TODO should we throw?
+  return defaultPackage(dependencies, devDependencies);
 };
 
 export const deployToFunction = async (
@@ -107,8 +133,9 @@ export const deployToFunction = async (
 
   fsHost.writeFileSync(
     join(dirname(serverOut), "package.json"),
-    getPackageJson(workspaceRoot)
+    getPackageJson(context, workspaceRoot)
   );
+
   fsHost.writeFileSync(
     join(dirname(serverOut), "index.js"),
     defaultFunction(serverOut)
@@ -128,6 +155,7 @@ export const deployToFunction = async (
     return Promise.resolve();
   } else {
     return firebaseTools.deploy({
+      only: `hosting:${context.target!.project},functions:ssr`,
       cwd: workspaceRoot
     });
   }

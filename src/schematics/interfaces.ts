@@ -36,8 +36,11 @@ export interface FirebaseHostingConfig {
   rewrites: FirebaseHostingRewrite[];
 }
 
+export interface FirebaseFunctionsConfig { [key:string]: any }
+
 export interface FirebaseJSON {
   hosting?: FirebaseHostingConfig[] | FirebaseHostingConfig;
+  functions?: FirebaseFunctionsConfig;
 }
 
 export interface FirebaseRcTarget {

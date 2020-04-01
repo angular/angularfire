@@ -2,7 +2,7 @@
   "hosting": [
     {
       "target": "sample",
-      "public": "dist/sample/browser",
+      "public": "dist/sample/dist/sample/browser",
       "ignore": [
         "firebase.json",
         "**/.*",
@@ -11,9 +11,12 @@
       "rewrites": [
         {
           "source": "**",
-          "destination": "/index.html"
+          "function": "ssr"
         }
       ]
     }
-  ]
+  ],
+  "functions": {
+    "source": "dist/sample"
+  }
 }

@@ -41,6 +41,12 @@ function generateHostingConfig(project: string, dist: string) {
   };
 }
 
+function generateFunctionsConfig(dist: string) {
+  return {
+    source: dirname(dist)
+  };
+}
+
 export function generateFirebaseJson(
   tree: Tree,
   path: string,
@@ -71,6 +77,8 @@ export function generateFirebaseJson(
   } else {
     firebaseJson.hosting = [firebaseJson.hosting!, newConfig];
   }
+
+  firebaseJson.functions = generateFunctionsConfig(dist);
 
   overwriteIfExists(tree, path, stringifyFormatted(firebaseJson));
 }
@@ -116,6 +124,11 @@ export const setupUniversalDeployment = (config: {
 
   const staticOutput = project.architect.build.options.outputPath;
   const serverOutput = project.architect.server.options.outputPath;
+
+  // Add @firebase/firestore to externalDependencies 
+  const externalDependencies = project.architect.server.options.externalDependencies || [];
+  externalDependencies.push('@firebase/firestore');
+  project.architect.server.options.externalDependencies = externalDependencies;
 
   project.architect.deploy = {
     builder: '@angular/fire:deploy',
