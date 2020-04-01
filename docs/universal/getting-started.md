@@ -2,6 +2,66 @@
 
 Server-side rendering (SSR) is the process of converting a JavaScript app to plain HTML at request-time, allowing search engine crawlers and linkbots to understand page content reliably. 
 
+# Angular 9.0 and above instruction:
+
+## 0. Prerequisites
+
+- @angular/cli >= v9.0
+- @angular/fire >= v6.0.0-rc.2
+
+## 1. Generate the Application and add necessary library
+Base on this https://angular.io/guide/universal
+```
+ng new workspace --createApplication="false"
+cd workspace  
+ng generate application web  
+```
+for the simple angular project, you can skip `--clientProject`
+```
+ng add @nguniversal/express-engine --clientProject=web 
+ng add @angular/fire --clientProject=web
+npm i @angular/fire@6.0.0-rc.2 --save
+```
+## 1. Edit file
+Insert polyfills at the top of file 
+```
+// server.ts
+...
+// Polyfills required for Firebase
+(global as any).WebSocket = require('ws');
+(global as any).XMLHttpRequest = require('xhr2');
+...
+
+```
+
+
+```
+// angular.json
+// projects.web.architect
+...
+ "server": {
+          "builder": "@angular-devkit/build-angular:server",
+          "options": {
+            ...
+            "externalDependencies": [
+              "@firebase/firestore"
+            ]
+            ...
+          }
+
+
+...
+
+```
+
+## 2. Setup Firebase detail
+- follow this guilde https://github.com/angular/angularfire/blob/master/docs/install-and-setup.md
+
+## 3. Running
+`npm run dev:ssr`
+
+# Angular version 5.0 to 9.0 instruction:
+
 ## 0. Prerequisites
 
 - @angular/cli >= v6.0
