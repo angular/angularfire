@@ -26,13 +26,44 @@ const moveSync = (src: string, dest: string) => {
 const deployToHosting = (
   firebaseTools: FirebaseTools,
   context: BuilderContext,
-  workspaceRoot: string
+  workspaceRoot: string,
+  preview: boolean
 ) => {
-  return firebaseTools.deploy({
-    // tslint:disable-next-line:no-non-null-assertion
-    only: "hosting:" + context.target!.project,
-    cwd: workspaceRoot
-  });
+
+  if (preview) {
+    const port = 5000; // TODO make this configurable
+
+    setTimeout(() => {
+      execSync(`open http://localhost:${port} || true`);
+    }, 1500);
+
+    return firebaseTools.serve({ port, targets: ["hosting"]}).then(() =>
+      require('inquirer').prompt({
+        type: 'confirm',
+        name: 'deployProject',
+        message: "Would you like to deploy your application to Firebase Hosting?"
+      })
+    ).then(({ deployProject }: { deployProject: boolean }) => {
+      if (deployProject) {
+        return firebaseTools.deploy({
+          // tslint:disable-next-line:no-non-null-assertion
+          only: "hosting:" + context.target!.project,
+          cwd: workspaceRoot
+        });
+      } else {
+        return Promise.resolve();
+      }
+    });
+
+  } else {
+
+    return firebaseTools.deploy({
+      // tslint:disable-next-line:no-non-null-assertion
+      only: "hosting:" + context.target!.project,
+      cwd: workspaceRoot
+    });
+
+  }
 };
 
 const defaultFsHost: FSHost = {
@@ -146,13 +177,29 @@ export const deployToFunction = async (
     join(newClientPath, "index.original.html")
   );
 
-  context.logger.info("Deploying your Angular Universal application...");
-
   if (preview) {
-    context.logger.info(
-      "Your Universal application is now ready for preview. Use `firebase serve` in the output directory of your workspace to test the setup."
-    );
-    return Promise.resolve();
+    const port = 5000; // TODO make this configurable
+
+    setTimeout(() => {
+      execSync(`open http://localhost:${port} || true`);
+    }, 1500);
+
+    return firebaseTools.serve({ port, targets: ["hosting", "functions"]}).then(() =>
+      require('inquirer').prompt({
+        type: 'confirm',
+        name: 'deployProject',
+        message: "Would you like to deploy your application to Firebase Hosting & Cloud Functions?"
+      })
+    ).then(({ deployProject }: { deployProject: boolean }) => {
+      if (deployProject) {
+        return firebaseTools.deploy({
+          only: `hosting:${context.target!.project},functions:ssr`,
+          cwd: workspaceRoot
+        });
+      } else {
+        return Promise.resolve();
+      }
+    });
   } else {
     return firebaseTools.deploy({
       only: `hosting:${context.target!.project},functions:ssr`,
@@ -195,6 +242,20 @@ export default async function deploy(
   try {
     let success: { hosting: string };
 
+    const winston = require('winston');
+    const tripleBeam = require('triple-beam');
+
+    firebaseTools.logger.add(
+      new winston.transports.Console({
+        level: "info",
+        format: winston.format.printf((info) =>
+          [info.message, ...(info[tripleBeam.SPLAT] || [])]
+            .filter((chunk) => typeof chunk == "string")
+            .join(" ")
+        ),
+      })
+    );
+
     if (ssr) {
       success = await deployToFunction(
         firebaseTools,
@@ -207,17 +268,11 @@ export default async function deploy(
       success = await deployToHosting(
         firebaseTools,
         context,
-        context.workspaceRoot
+        context.workspaceRoot,
+        preview
       );
     }
 
-    if (!preview) {
-      context.logger.info(
-        `🚀 Your application is now available at https://${
-          success.hosting.split("/")[1]
-        }.firebaseapp.com/`
-      );
-    }
   } catch (e) {
     context.logger.error(e.message || e);
   }

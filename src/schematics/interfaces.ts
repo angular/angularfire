@@ -20,7 +20,13 @@ export interface FirebaseTools {
 
   deploy(config: FirebaseDeployConfig): Promise<any>;
 
+  serve(options: any): Promise<any>;
+
   use(options: any, lol: any): Promise<any>;
+  
+  logger: {
+    add(...args: any[]): any
+  };
 }
 
 export interface FirebaseHostingRewrite {

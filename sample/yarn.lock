@@ -181,7 +181,7 @@
   resolved "https://registry.yarnpkg.com/@angular/core/-/core-9.1.0.tgz#9dfc386bd1461e0fd4786031fd245da04371421c"
   integrity sha512-RVlyegdIAij0P1wLY5ObIdsBAzvmHkHfElnmfiNKhaDftP6U/3zRtaKDu0bq0jvn1WCQ8zXxFQ8AWyKZwyFS+w==
 
-"@angular/fire@../dist/packages-dist":
+"@angular/fire@file:../dist/packages-dist":
   version "6.0.0"
 
 "@angular/forms@~9.1.0":

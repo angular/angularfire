@@ -59,11 +59,12 @@ export function generateFirebaseRc(
 
   firebaseRc.targets = firebaseRc.targets || {};
 
+  /* TODO do we want to prompt?
   if (firebaseProject in firebaseRc.targets) {
     throw new SchematicsException(
       `Firebase project ${firebaseProject} already defined in .firebaserc`
     );
-  }
+  }*/
 
   firebaseRc.targets[firebaseProject] = generateFirebaseRcTarget(
     firebaseProject,
