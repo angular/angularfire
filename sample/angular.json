@@ -124,10 +124,11 @@
             "outputPath": "dist/sample/server",
             "main": "server.ts",
             "tsConfig": "tsconfig.server.json",
+            "bundleDependencies": false,
             "externalDependencies": [
+              "@firebase/firestore",
               "@firebase/firestore"
-            ],
-            "verbose": true
+            ]
           },
           "configurations": {
             "production": {
@@ -171,7 +172,9 @@
         },
         "deploy": {
           "builder": "@angular/fire:deploy",
-          "options": {}
+          "options": {
+            "ssr": true
+          }
         }
       }
     }

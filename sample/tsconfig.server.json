@@ -5,7 +5,8 @@
       "module": "commonjs",
       "types": [
         "node"
-      ]
+      ],
+      "skipLibCheck": true
     },
     "files": [
       "src/main.server.ts",
