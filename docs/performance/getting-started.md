@@ -18,7 +18,7 @@ import { environment } from '../environments/environment';
   ],
   providers: [
     PerformanceMonitoringService
-  ]
+  ],
   declarations: [ AppComponent ],
   bootstrap: [ AppComponent ]
 })

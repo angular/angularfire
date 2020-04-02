@@ -1,6 +1,6 @@
-import { Injectable, NgZone, ApplicationRef, InjectionToken, Inject, Optional, PLATFORM_ID } from '@angular/core';
+import { Injectable, NgZone, InjectionToken, Inject, Optional, PLATFORM_ID } from '@angular/core';
 import { Observable, Subscription, of, empty } from 'rxjs';
-import { first, tap, map, shareReplay, switchMap } from 'rxjs/operators';
+import { tap, map, shareReplay, switchMap } from 'rxjs/operators';
 import { performance } from 'firebase/app';
 import { FirebaseApp, ɵPromiseProxy, ɵlazySDKProxy } from '@angular/fire';
 import { isPlatformBrowser } from '@angular/common';
@@ -23,7 +23,6 @@ export class AngularFirePerformance {
     app: FirebaseApp,
     @Optional() @Inject(INSTRUMENTATION_ENABLED) instrumentationEnabled:boolean|null,
     @Optional() @Inject(DATA_COLLECTION_ENABLED) dataCollectionEnabled:boolean|null,
-    appRef: ApplicationRef,
     private zone: NgZone,
     @Inject(PLATFORM_ID) platformId:Object
   ) {
@@ -45,7 +44,7 @@ export class AngularFirePerformance {
 }
 
 const trace$ = (traceId:string) => {
-  if (window && window.performance) {
+  if (typeof window !== 'undefined' && window.performance) {
     const entries = window.performance.getEntriesByName(traceId, 'measure') || [];
     const startMarkName = `_${traceId}Start[${entries.length}]`;
     const endMarkName = `_${traceId}End[${entries.length}]`;
