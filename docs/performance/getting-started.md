@@ -6,7 +6,7 @@ Understand your Angular application's real-world performance with [Firebase Perf
 
 ```ts
 import { AngularFireModule } from '@angular/fire';
-import { AngularFirePerformanceModule } from '@angular/fire/performance';
+import { AngularFirePerformanceModule, PerformanceMonitoringService } from '@angular/fire/performance';
 import { environment } from '../environments/environment';
 
 @NgModule({
@@ -16,6 +16,9 @@ import { environment } from '../environments/environment';
     AngularFirePerformanceModule,
     ...
   ],
+  providers: [
+    PerformanceMonitoringService
+  ]
   declarations: [ AppComponent ],
   bootstrap: [ AppComponent ]
 })
@@ -30,7 +33,7 @@ The page load trace breaks down into the following default metrics:
 * [domContentLoadedEventEnd traces](https://firebase.google.com/docs/perf-mon/automatic-web#domContentLoaded) — measure the time between when the user navigates to a page and when the initial HTML document is completely loaded and parsed
 * [loadEventEnd traces](https://firebase.google.com/docs/perf-mon/automatic-web#loadEventEnd) — measure the time between when the user navigates to the page and when the current document's load event completes
 * [first input delay traces](https://firebase.google.com/docs/perf-mon/automatic-web#input-delay) — measure the time between when the user interacts with a page and when the browser is able to respond to that input
-* **Angular specific traces** - measure the time needed for `ApplicationRef.isStable` to be true, an important metric to track if you're concerned about solving Zone.js issues for proper functionality of NGSW and Server Side Rendering
+* **Angular specific traces** - `PerformanceMonitoringService` will measure the time needed for `ApplicationRef.isStable` to be true, an important metric to track if you're concerned about solving Zone.js issues for proper functionality of NGSW and Server Side Rendering
 
 ### Measuring First Input Delay
 
@@ -44,10 +47,29 @@ Then add `import 'first-input-delay';` to your `src/polyfills.ts`.
 
 ## Manual traces
 
-You can inject `AngularFirePerformance` to perform manual traces on Observables.
+You can inject `AngularFirePerformance` to perform manual traces.
 
 ```ts
-constructor(private afp: AngularFirePerformance, private afs: AngularFirestore) {}
+constructor(private performance: AngularFirePerformance) {}
+
+ngOnInit() {
+  const trace = this.performance.trace('some-trace');
+  trace.start();
+  ...
+  trace.stop();
+}
+```
+
+## RXJS operators
+
+AngularFire provides a number of RXJS operaters which wrap the User Timing API. These are picked up by performance monitoring tools such as Chrome Inspector and Firebase Performance Monitoring.
+
+```ts
+import { trace } from '@angular/fire/performance';
+
+...
+
+constructor(private performance: AngularFirePerformance, private afs: AngularFirestore) {}
 
 ngOnInit() {
   this.articles = afs.collection('articles')
@@ -55,13 +77,13 @@ ngOnInit() {
       .snapshotChanges()
       .pipe(
         // measure the amount of time between the Observable being subscribed to and first emission (or completion)
-        this.afp.trace('getArticles'),
+        trace('getArticles'),
         map(articles => ...)
       );
 }
 ```
 
-### `trace(name: string, options?: TraceOptions)`
+### `trace(name: string)`
 
 The most basic operator, `trace` will measure the amount of time it takes for your observable to either complete or emit its first value. Beyond the basic trace there are several other operators:
 
@@ -70,7 +92,7 @@ The most basic operator, `trace` will measure the amount of time it takes for yo
 traceUntil(
   name: string,
   test: (T) => Boolean,
-  options?: TraceOptions & { orComplete?: true }
+  options?: { orComplete?: true }
 )
 </pre>
 </h3>
@@ -84,7 +106,7 @@ If the `orComplete` option is passed it will complete the trace when the observa
 traceWhile(
   name: string,
   test: (T) => Boolean,
-  options?: TraceOptions & { orComplete?: true }
+  options?: { orComplete?: true }
 )
 </pre>
 </h3>
@@ -93,11 +115,11 @@ Starting with an emission that passes the provided test, trace until an emission
 
 If the `orComplete` option is passed it will complete any existing trace when the observable completes.
 
-### `traceUntilLast(name: string, options?: TraceOptions)`
+### `traceUntilLast(name: string)`
 
 Trace the observable until completion.
 
-### `traceUntilFirst(name: string, options?: TraceOptions)`
+### `traceUntilFirst(name: string)`
 
 Traces the observable until the first emission.
 
@@ -105,71 +127,4 @@ Traces the observable until the first emission.
 
 ### Configuration via Dependency Injection
 
-By default, `AngularFirePerformanceModule` traces your Angular application's time to `ApplicationRef.isStable`. `isStable` is an important metric to track if you're concerned about proper functionality of NGSW and Server Side Rendering. If you want to opt-out of the tracing of this metric use the `AUTOMATICALLY_TRACE_CORE_NG_METRICS` injection token:
-
-```ts
-import { NgModule } from '@angular/core';
-import { AngularFirePerformanceModule, AUTOMATICALLY_TRACE_CORE_NG_METRICS } from '@angular/fire/functions';
-
-@NgModule({
-  imports: [
-    ...
-    AngularFirePerformanceModule,
-    ...
-  ],
-  ...
-  providers: [
-   { provide: AUTOMATICALLY_TRACE_CORE_NG_METRICS, useValue: false }
-  ]
-})
-export class AppModule {}
-```
-
-Similarly, setting `INSTRUMENTATION_ENABLED` or `DATA_COLLECTION_ENABLED` to false disable all automatic and custom traces respectively.
-
-### Get at an observable form of trace
-
-`trace$(name:string)` provides an observable version of `firebase/perf`'s `.trace` method; the basis for `AngularFirePerfomance`'s pipes.
-
-`.subscribe()` is equivalent to calling `.start()`
-`.unsubscribe()` is equivalent to calling `.stop()`
-
-### Using `TraceOptions` to collect additional metrics
-
-`TraceOptions` can be provided to the aformentioned operators to collect custom metrics and attributes on your traces:
-
-```ts
-type TraceOptions = {
-  metrics?: { [key:string]: number },
-  attributes?: { [key:string]: string },
-  attribute$?: { [key:string]: Observable<string> },
-  incrementMetric$: { [key:string]: Observable<number|void|null|undefined> },
-  metric$?: { [key:string]: Observable<number> }
-};
-```
-
-#### Usage:
-
-```ts
-const articleLength$ = this.articles.pipe(
-  map(actions => actions.length)
-);
-
-const articleSize$ = this.articles.pipe(
-  map(actions => actions.reduce((sum, a) => sum += JSON.stringify(a.payload.doc.data()).length))
-)
-
-this.articles = afs.collection('articles')
-      .collection('articles', ref => ref.orderBy('publishedAt', 'desc'))
-      .snapshotChanges()
-      .pipe(
-        this.afp.trace('getArticles', {
-          attributes: { gitSha: '1d277f823ad98dd739fb86e9a6c440aa8237ff3a' },
-          metrics: { something: 42 },
-          metrics$: { count: articleLength$, size: articleSize$ },
-          attributes$: { user: this.afAuth.user },
-          incrementMetric$: { buttonClicks: fromEvent(button, 'click') }
-        }),
-        share()
-      );
-```
+Set `INSTRUMENTATION_ENABLED` or `DATA_COLLECTION_ENABLED` to false disable all automatic and custom traces respectively.

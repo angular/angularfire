@@ -19,7 +19,7 @@ import { AngularFirestoreModule, SETTINGS as FIRESTORE_SETTINGS } from '@angular
 import { AngularFireMessagingModule } from '@angular/fire/messaging';
 import { AngularFireFunctionsModule, ORIGIN as FUNCTIONS_ORIGIN } from '@angular/fire/functions';
 import { AngularFireRemoteConfigModule, SETTINGS as REMOTE_CONFIG_SETTINGS } from '@angular/fire/remote-config';
-import { AngularFirePerformanceModule } from '@angular/fire/performance';
+import { AngularFirePerformanceModule, PerformanceMonitoringService } from '@angular/fire/performance';
 import { AngularFireAuthGuardModule } from '@angular/fire/auth-guard';
 import { DatabaseComponent } from './database/database.component';
 import { StorageComponent } from './storage/storage.component';
@@ -49,6 +49,7 @@ const shouldUseEmulator = () => false;
   providers: [
     UserTrackingService,
     ScreenTrackingService,
+    PerformanceMonitoringService,
     { provide: ANALYTICS_DEBUG_MODE,   useFactory: () => isDevMode() },
     { provide: DATABASE_URL,           useFactory: () => shouldUseEmulator() ? `http://localhost:9000?ns=${environment.firebase.projectId}` : undefined },
     { provide: FIRESTORE_SETTINGS,     useFactory: () => shouldUseEmulator() ? { host: 'localhost:8080', ssl: false } : {} },

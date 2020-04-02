@@ -13,3 +13,4 @@ Intended to be run with Angular 9; version 6 of AngularFire drops support for An
 * We've standardized our DI Token naming conventions across all modules
 * `AngularFireAuth` has dropped the `auth` property and instead Promise Proxies the underlying Firebase `auth.Auth` instance; allowing your development experience to more closely mirror the JS SDK. Similar changes have been made to `AngularFireFunctions`, `AngularFireMessaging`, and `AngularFirePerformance`.
 * `AngularFireAuthGuard` and `canActivate` have dropped support for raw pipes, this was never working correctly in AOT
+* `AngularFirePerformance` has been simplified, the RXJS pipes are now exported as pure-functions outside the class. Automatic tracking of `isStable` timing has now been moved into `PerformanceMonitoringService` and we've dropped the `AUTOMATICALLY_TRACE_CORE_NG_METRICS` DI token.
