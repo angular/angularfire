@@ -74,6 +74,11 @@ const defaultFsHost: FSHost = {
 
 const getVersionRange = (v: number) => `^${v}.0.0`;
 
+const findPackageVersion = (name: string) => {
+  const match = execSync(`npm list ${name}`).toString().match(` ${escapeRegExp(name)}@.+\\w`);
+  return match ? match[0].split(`${name}@`)[1] : null;
+}
+
 const getPackageJson = (context: BuilderContext, workspaceRoot: string) => {
   const dependencies = {
     'firebase-admin': 'latest',
@@ -82,14 +87,13 @@ const getPackageJson = (context: BuilderContext, workspaceRoot: string) => {
   const devDependencies = {
     'firebase-functions-test': 'latest'
   };
-  const npmList = execSync('npm ls || true').toString();
   Object.keys(dependencies).forEach((dependency: string) => {
-    const npmLsMatch = npmList.match(` ${escapeRegExp(dependency)}@.+\\w`);
-    if (npmLsMatch) { dependencies[dependency] = npmLsMatch[0].split(`${dependency}@`)[1] }
+    const packageVersion = findPackageVersion(dependency);
+    if (packageVersion) { dependencies[dependency] = packageVersion }
   });
   Object.keys(devDependencies).forEach((devDependency: string) => {
-    const npmLsMatch = npmList.match(` ${escapeRegExp(devDependency)}@.+\\w`);
-    if (npmLsMatch) { devDependencies[devDependency] = npmLsMatch[0].split(`${devDependency}@`)[1] }
+    const packageVersion = findPackageVersion(devDependency);
+    if (packageVersion) { devDependencies[devDependency] = packageVersion }
   });
   if (existsSync(join(workspaceRoot, 'angular.json'))) {
     const angularJson = JSON.parse(readFileSync(join(workspaceRoot, 'angular.json')).toString());
@@ -106,8 +110,8 @@ const getPackageJson = (context: BuilderContext, workspaceRoot: string) => {
       } // TODO should we throw?
     } else {
       externalDependencies.forEach(externalDependency => {
-        const npmLsMatch = npmList.match(` ${escapeRegExp(externalDependency)}@.+\\w`);
-        if (npmLsMatch) { dependencies[externalDependency] = npmLsMatch[0].split(`${externalDependency}@`)[1] }
+        const packageVersion = findPackageVersion(externalDependency);
+        if (packageVersion) { dependencies[externalDependency] = packageVersion }
       });
     }
   } // TODO should we throw?
