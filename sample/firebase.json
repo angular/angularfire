@@ -4,9 +4,7 @@
       "target": "sample",
       "public": "dist/sample/dist/sample/browser",
       "ignore": [
-        "firebase.json",
-        "**/.*",
-        "**/node_modules/**"
+        "**/.*"
       ],
       "rewrites": [
         {

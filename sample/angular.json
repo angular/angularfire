@@ -126,7 +126,6 @@
             "tsConfig": "tsconfig.server.json",
             "bundleDependencies": false,
             "externalDependencies": [
-              "@firebase/firestore",
               "@firebase/firestore"
             ]
           },

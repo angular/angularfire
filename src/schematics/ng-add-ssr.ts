@@ -7,7 +7,7 @@ import {
   stringifyFormatted,
   addDependencies, NgAddNormalizedOptions
 } from './ng-add-common';
-import { FirebaseJSON, FirebaseHostingConfig } from './interfaces';
+import { FirebaseJSON } from './interfaces';
 
 import { default as defaultDependencies, firebaseFunctions as firebaseFunctionsDependencies } from './versions.json';
 import {dirname, join} from 'path';
@@ -31,7 +31,7 @@ function generateHostingConfig(project: string, dist: string) {
   return {
     target: project,
     public: join(dirname(dist), dist),
-    ignore: ['firebase.json', '**/.*', '**/node_modules/**'],
+    ignore: ['**/.*'],
     rewrites: [
       {
         source: '**',
@@ -74,7 +74,12 @@ export function generateFirebaseJson(
   if (firebaseJson.hosting === undefined) {
     firebaseJson.hosting = newConfig;
   } else if (Array.isArray(firebaseJson.hosting)) {
-    firebaseJson.hosting.push(newConfig);
+    const existingConfigIndex = firebaseJson.hosting.findIndex(config => config.target == newConfig.target);
+    if (existingConfigIndex > -1) {
+      firebaseJson.hosting.splice(existingConfigIndex, 1, newConfig)
+    } else {
+      firebaseJson.hosting.push(newConfig);
+    }
   } else {
     firebaseJson.hosting = [firebaseJson.hosting!, newConfig];
   }
@@ -127,8 +132,8 @@ export const setupUniversalDeployment = (config: {
   const serverOutput = project.architect.server.options.outputPath;
 
   // Add @firebase/firestore to externalDependencies 
-  const externalDependencies = project.architect.server.options.externalDependencies || [];
-  externalDependencies.push('@firebase/firestore');
+  const externalDependencies: string[] = project.architect.server.options.externalDependencies || [];
+  if (!externalDependencies.includes('@firebase/firestore')) { externalDependencies.push('@firebase/firestore') }
   project.architect.server.options.externalDependencies = externalDependencies;
 
   project.architect.deploy = {
