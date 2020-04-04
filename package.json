@@ -34,7 +34,7 @@
   },
   "homepage": "https://github.com/angular/angularfire2#readme",
   "dependencies": {
-    "@angular-devkit/architect": "~0.900",
+    "@angular-devkit/architect": ">= 0.900 < 0.1000",
     "@angular-devkit/core": "^9.0.0",
     "@angular-devkit/schematics": "^9.0.0",
     "@angular/common": "^9.0.0",
@@ -64,8 +64,8 @@
     "utf-8-validate": "^5.0.2"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~0.900",
-    "@angular-devkit/build-ng-packagr": "~0.900",
+    "@angular-devkit/build-angular": ">= 0.900 < 0.1000",
+    "@angular-devkit/build-ng-packagr": ">= 0.900 < 0.1000",
     "@angular/animations": " ^9.0.0",
     "@angular/cli": "^9.0.0",
     "@angular/compiler-cli": "^9.0.0",
@@ -80,7 +80,7 @@
     "codelyzer": "^5.0.0",
     "concurrently": "^2.2.0",
     "conventional-changelog-cli": "^1.2.0",
-    "firebase-functions-test": "^0.1.7",
+    "firebase-functions-test": "^0.2.0",
     "gzip-size": "^5.1.1",
     "jasmine": "^3.4.0",
     "jasmine-core": "^3.4.0",

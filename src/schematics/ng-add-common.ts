@@ -1,6 +1,6 @@
-import { SchematicsException, Tree } from '@angular-devkit/schematics';
-
+import { SchematicsException, Tree, SchematicContext } from '@angular-devkit/schematics';
 import { FirebaseRc } from './interfaces';
+import * as semver from 'semver';
 
 export interface NgAddOptions {
   firebaseProject: string;
@@ -85,6 +85,7 @@ export function safeReadJSON(path: string, tree: Tree) {
 export const addDependencies = (
   host: Tree,
   deps: { [name: string]: { dev?: boolean, version: string } },
+  context: SchematicContext
 ) => {
   const packageJson =
     host.exists('package.json') && safeReadJSON('package.json', host);
@@ -96,11 +97,25 @@ export const addDependencies = (
   Object.keys(deps).forEach(depName => {
     const dep = deps[depName];
     if (dep.dev) {
-      packageJson.devDependencies[depName] =
-      packageJson.devDependencies[depName] || dep.version;
+      const existingVersion = packageJson.devDependencies[depName];
+      if (existingVersion) {
+        if (!semver.intersects(existingVersion, dep.version)) {
+          context.logger.warn(`⚠️ The ${depName} devDependency specified in your package.json (${existingVersion}) does not fulfill AngularFire's dependency (${dep.version})`);
+          // TODO offer to fix
+        }
+      } else {
+        packageJson.devDependencies[depName] = dep.version;
+      }
     } else {
-      packageJson.dependencies[depName] =
-      packageJson.dependencies[depName] || deps.version;
+      const existingVersion = packageJson.dependencies[depName];
+      if (existingVersion) {
+        if (!semver.intersects(existingVersion, dep.version)) {
+          context.logger.warn(`⚠️ The ${depName} dependency specified in your package.json (${existingVersion}) does not fulfill AngularFire's dependency (${dep.version})`);
+          // TODO offer to fix
+        }
+      } else {
+        packageJson.dependencies[depName] = dep.version;
+      }
     }
   });
 

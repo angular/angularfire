@@ -27,7 +27,7 @@
     "@angular/router": "~9.1.0",
     "@angular/service-worker": "~9.1.0",
     "@nguniversal/express-engine": "~9.1.0",
-    "firebase": "^7.13.1",
+    "firebase": "^7.13.2",
     "rxjs": "~6.5.4",
     "tslib": "^1.10.0",
     "zone.js": "~0.10.2"

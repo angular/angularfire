@@ -1,4 +1,4 @@
-import { SchematicsException, Tree } from '@angular-devkit/schematics';
+import { SchematicsException, Tree, SchematicContext } from '@angular-devkit/schematics';
 import { experimental } from '@angular-devkit/core';
 import {
   generateFirebaseRc,
@@ -67,10 +67,11 @@ export function generateFirebaseJson(
   overwriteIfExists(tree, path, stringifyFormatted(firebaseJson));
 }
 
-export const addFirebaseHostingDependencies = (tree: Tree) => {
+export const addFirebaseHostingDependencies = (tree: Tree, context: SchematicContext) => {
   addDependencies(
     tree,
-    defaultDependencies
+    defaultDependencies,
+    context
   );
 };
 
