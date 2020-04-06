@@ -23,7 +23,7 @@ function generateHostingConfig(project: string, dist: string) {
   return {
     target: project,
     public: dist,
-    ignore: ['firebase.json', '**/.*', '**/node_modules/**'],
+    ignore: ['**/.*'],
     rewrites: [
       {
         source: '**',

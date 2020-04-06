@@ -560,9 +560,7 @@ const universalFirebaseJson = {
     target: 'pie-ka-chu',
     public: 'dist/dist/ikachu',
     ignore: [
-      'firebase.json',
-      '**/.*',
-      '**/node_modules/**'
+      '**/.*'
     ],
     rewrites: [
       {
