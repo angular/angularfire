@@ -343,9 +343,18 @@ const initialFirebaseJson = `{
       \"target\": \"pie-ka-chu\",
       \"public\": \"dist/ikachu\",
       \"ignore\": [
-        \"firebase.json\",
-        \"**/.*\",
-        \"**/node_modules/**\"
+        \"**/.*\"
+      ],
+      \"headers\": [
+        {
+          \"source\": \"*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].+(css|js)\",
+          \"headers\": [
+            {
+              \"key\": \"Cache-Control\",
+              \"value\": \"public,max-age=31536000,immutable\"
+            }
+          ]
+        }
       ],
       \"rewrites\": [
         {
@@ -407,9 +416,18 @@ const overwriteFirebaseJson = `{
       \"target\": \"pie-ka-chu\",
       \"public\": \"dist/ikachu\",
       \"ignore\": [
-        \"firebase.json\",
-        \"**/.*\",
-        \"**/node_modules/**\"
+        \"**/.*\"
+      ],
+      \"headers\": [
+        {
+          \"source\": \"*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].+(css|js)\",
+          \"headers\": [
+            {
+              \"key\": \"Cache-Control\",
+              \"value\": \"public,max-age=31536000,immutable\"
+            }
+          ]
+        }
       ],
       \"rewrites\": [
         {
@@ -471,9 +489,18 @@ const projectFirebaseJson = `{
       \"target\": \"pie-ka-chu\",
       \"public\": \"dist/ikachu\",
       \"ignore\": [
-        \"firebase.json\",
-        \"**/.*\",
-        \"**/node_modules/**\"
+        \"**/.*\"
+      ],
+      \"headers\": [
+        {
+          \"source\": \"*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].+(css|js)\",
+          \"headers\": [
+            {
+              \"key\": \"Cache-Control\",
+              \"value\": \"public,max-age=31536000,immutable\"
+            }
+          ]
+        }
       ],
       \"rewrites\": [
         {
@@ -486,9 +513,18 @@ const projectFirebaseJson = `{
       \"target\": \"pi-catch-you\",
       \"public\": \"dist/ikachu\",
       \"ignore\": [
-        \"firebase.json\",
-        \"**/.*\",
-        \"**/node_modules/**\"
+        \"**/.*\"
+      ],
+      \"headers\": [
+        {
+          \"source\": \"*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].+(css|js)\",
+          \"headers\": [
+            {
+              \"key\": \"Cache-Control\",
+              \"value\": \"public,max-age=31536000,immutable\"
+            }
+          ]
+        }
       ],
       \"rewrites\": [
         {
