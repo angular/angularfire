@@ -563,7 +563,7 @@ const universalFirebaseJson = {
       '**/.*'
     ],
     headers: [{
-      source: "*.+([0-9a-f]).+(css|js)",
+      source: "*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].+(css|js)",
       headers: [{
         key: "Cache-Control",
         value: "public,max-age=31536000,immutable"
