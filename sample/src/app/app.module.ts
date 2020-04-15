@@ -24,11 +24,13 @@ import { AngularFireAuthGuardModule } from '@angular/fire/auth-guard';
 import { DatabaseComponent } from './database/database.component';
 import { StorageComponent } from './storage/storage.component';
 import { RemoteConfigComponent } from './remote-config/remote-config.component';
+import { HomeComponent } from './home/home.component';
+import { AuthComponent } from './auth/auth.component';
 
 const shouldUseEmulator = () => false;
 
 @NgModule({
-  declarations: [ AppComponent, StorageComponent, FirestoreComponent, DatabaseComponent, RemoteConfigComponent ],
+  declarations: [ AppComponent, StorageComponent, FirestoreComponent, DatabaseComponent, RemoteConfigComponent, HomeComponent, AuthComponent ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),
     BrowserTransferStateModule,

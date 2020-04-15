@@ -73,10 +73,7 @@ export class ɵAngularFireSchedulers {
  * value from firebase but doesn't block the zone forever since the firebase subscription
  * is still alive.
  */
-export function ɵkeepUnstableUntilFirstFactory(
-  schedulers: ɵAngularFireSchedulers,
-  platformId: Object
-) {
+export function ɵkeepUnstableUntilFirstFactory(schedulers: ɵAngularFireSchedulers) {
   return function keepUnstableUntilFirst<T>(obs$: Observable<T>): Observable<T> {
     obs$ = obs$.lift(
       new ɵBlockUntilFirstOperator(schedulers.ngZone)

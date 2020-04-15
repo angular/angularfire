@@ -6,7 +6,6 @@ import { COMMON_CONFIG } from '../test-config';
 import { BrowserModule } from '@angular/platform-browser';
 import { database } from 'firebase/app';
 import { ɵZoneScheduler, ɵkeepUnstableUntilFirstFactory, ɵAngularFireSchedulers } from './angularfire2';
-import { ɵPLATFORM_BROWSER_ID, ɵPLATFORM_SERVER_ID } from '@angular/common';
 import { tap  } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
 import { rando } from '../firestore/utils.spec';
@@ -124,7 +123,7 @@ describe('angularfire', () => {
     })
 
     it('should re-schedule emissions asynchronously', done => {
-      const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(schedulers, ɵPLATFORM_SERVER_ID);
+      const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(schedulers);
 
       let ran = false;
       of(null).pipe(
@@ -140,7 +139,7 @@ describe('angularfire', () => {
 
     [ɵPLATFORM_SERVER_ID, ɵPLATFORM_BROWSER_ID].map(platformId =>
       it(`should subscribe outside angular and observe inside angular (${platformId})`, done => {
-        const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(schedulers, platformId);
+        const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(schedulers);
 
         insideZone.run(() => {
           new Observable(s => {
@@ -177,7 +176,7 @@ describe('angularfire', () => {
           outsideAngular: new ɵZoneScheduler(outsideZone, testScheduler),
           insideAngular: new ɵZoneScheduler(insideZone, testScheduler),
         };
-        const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(trackingSchedulers, ɵPLATFORM_SERVER_ID);
+        const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(trackingSchedulers);
 
         const s = new Subject();
         s.pipe(

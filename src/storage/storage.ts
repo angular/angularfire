@@ -32,7 +32,7 @@ export class AngularFireStorage {
     zone: NgZone
   ) {
     this.schedulers = new ɵAngularFireSchedulers(zone);
-    this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers, platformId);
+    this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers);
 
     this.storage = zone.runOutsideAngular(() => {
       const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
