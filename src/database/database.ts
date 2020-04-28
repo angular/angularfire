@@ -21,8 +21,8 @@ export class AngularFireDatabase {
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
-    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string|FirebaseAppConfig|null|undefined,
-    @Optional() @Inject(URL) databaseURL: string|null,
+    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string | FirebaseAppConfig | null | undefined,
+    @Optional() @Inject(URL) databaseURL: string | null,
     // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
@@ -45,7 +45,7 @@ export class AngularFireDatabase {
     return createListReference<T>(query, this);
   }
 
-  object<T>(pathOrRef: PathReference): AngularFireObject<T>  {
+  object<T>(pathOrRef: PathReference): AngularFireObject<T> {
     const ref = getRef(this.database, pathOrRef);
     return createObjectReference<T>(ref, this);
   }

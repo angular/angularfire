@@ -11,22 +11,28 @@ interface SnapshotPrevKey<T> {
  * Create an observable from a Database Reference or Database Query.
  * @param ref Database Reference
  * @param event Listen event type ('value', 'added', 'changed', 'removed', 'moved')
+ * @param listenType 'on' or 'once'
+ * @param scheduler - Rxjs scheduler
  */
-export function fromRef<T>(ref: DatabaseQuery, event: ListenEvent, listenType = 'on', scheduler: SchedulerLike = asyncScheduler): Observable<AngularFireAction<DatabaseSnapshot<T>>> {
+export function fromRef<T>(ref: DatabaseQuery,
+                           event: ListenEvent,
+                           listenType = 'on',
+                           scheduler: SchedulerLike = asyncScheduler
+): Observable<AngularFireAction<DatabaseSnapshot<T>>> {
   return new Observable<SnapshotPrevKey<T>>(subscriber => {
     let fn: any | null = null;
     fn = ref[listenType](event, (snapshot, prevKey) => {
       scheduler.schedule(() => {
         subscriber.next({ snapshot, prevKey });
       });
-      if (listenType == 'once') {
+      if (listenType === 'once') {
         scheduler.schedule(() => subscriber.complete());
       }
     }, err => {
       scheduler.schedule(() => subscriber.error(err));
     });
 
-    if (listenType == 'on') {
+    if (listenType === 'on') {
       return {
         unsubscribe() {
           if (fn != null) {
@@ -35,13 +41,18 @@ export function fromRef<T>(ref: DatabaseQuery, event: ListenEvent, listenType = 
         }
       };
     } else {
-      return { unsubscribe() { } };
+      return {
+        unsubscribe() {
+        }
+      };
     }
   }).pipe(
     map(payload => {
       const { snapshot, prevKey } = payload;
       let key: string | null = null;
-      if (snapshot.exists()) { key = snapshot.key; }
+      if (snapshot.exists()) {
+        key = snapshot.key;
+      }
       return { type: event, payload: snapshot, prevKey, key };
     }),
     share()

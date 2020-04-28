@@ -1,11 +1,10 @@
 import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire';
 import { AngularFireDatabase, AngularFireDatabaseModule, URL } from './public_api';
-import { inject, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../test-config';
 import { NgZone } from '@angular/core';
 import 'firebase/database';
 import { rando } from '../firestore/utils.spec';
-import { Test } from 'tslint';
 
 describe('AngularFireDatabase', () => {
   let app: FirebaseApp;
@@ -21,7 +20,7 @@ describe('AngularFireDatabase', () => {
         AngularFireDatabaseModule
       ],
       providers: [
-        { provide: URL, useValue: 'http://localhost:9000'}
+        { provide: URL, useValue: 'http://localhost:9000' }
       ]
     });
 
@@ -80,10 +79,9 @@ describe('AngularFireDatabase w/options', () => {
         { provide: URL, useValue: url }
       ]
     });
-    inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {
-      app = app_;
-      db = _db;
-    })();
+
+    app = TestBed.inject(FirebaseApp);
+    db = TestBed.inject(AngularFireDatabase);
   });
 
   afterEach(() => {
@@ -104,20 +102,20 @@ describe('AngularFireDatabase w/options', () => {
       expect(db.database.app.name).toEqual(firebaseAppName);
     });
 
-/* INVESTIGATE database(url) does not seem to be working
+    /* INVESTIGATE database(url) does not seem to be working
 
-    it('database be pointing to the provided DB instance', () => {
-      expect(db.database.ref().toString()).toEqual(url);
-    });
+        it('database be pointing to the provided DB instance', () => {
+          expect(db.database.ref().toString()).toEqual(url);
+        });
 
-    it('list should be using the provided DB instance', () => {
-      expect(db.list(query).query.toString()).toEqual(`${url}/${query}`);
-    });
+        it('list should be using the provided DB instance', () => {
+          expect(db.list(query).query.toString()).toEqual(`${url}/${query}`);
+        });
 
-    it('object should be using the provided DB instance', () => {
-      expect(db.object(query).query.toString()).toEqual(`${url}/${query}`);
-    });
-*/
+        it('object should be using the provided DB instance', () => {
+          expect(db.object(query).query.toString()).toEqual(`${url}/${query}`);
+        });
+    */
   });
 
 });
