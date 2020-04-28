@@ -9,7 +9,7 @@ import { experimental } from '@angular-devkit/core';
 import { SchematicsException } from '@angular-devkit/schematics';
 import { satisfies } from 'semver';
 
-const escapeRegExp = (str: String) => str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
+const escapeRegExp = (str: string) => str.replace(/[\-\[\]\/{}()*+?.\\^$|]/g, '\\$&');
 
 const moveSync = (src: string, dest: string) => {
   copySync(src, dest);
@@ -30,7 +30,7 @@ const deployToHosting = (
       execSync(`open http://localhost:${port} || true`);
     }, 1500);
 
-    return firebaseTools.serve({ port, targets: ['hosting']}).then(() =>
+    return firebaseTools.serve({ port, targets: ['hosting'] }).then(() =>
       require('inquirer').prompt({
         type: 'confirm',
         name: 'deployProject',
@@ -78,19 +78,24 @@ const getPackageJson = (context: BuilderContext, workspaceRoot: string) => {
   const npmList = execSync('npm ls || true').toString();
   Object.keys(dependencies).forEach((dependency: string) => {
     const npmLsMatch = npmList.match(` ${escapeRegExp(dependency)}@.+\\w`);
-    if (npmLsMatch) { dependencies[dependency] = npmLsMatch[0].split(`${dependency}@`)[1]; }
+    if (npmLsMatch) {
+      dependencies[dependency] = npmLsMatch[0].split(`${dependency}@`)[1];
+    }
   });
   Object.keys(devDependencies).forEach((devDependency: string) => {
     const npmLsMatch = npmList.match(` ${escapeRegExp(devDependency)}@.+\\w`);
-    if (npmLsMatch) { devDependencies[devDependency] = npmLsMatch[0].split(`${devDependency}@`)[1]; }
+    if (npmLsMatch) {
+      devDependencies[devDependency] = npmLsMatch[0].split(`${devDependency}@`)[1];
+    }
   });
   if (existsSync(join(workspaceRoot, 'angular.json'))) {
     const angularJson = JSON.parse(readFileSync(join(workspaceRoot, 'angular.json')).toString());
+    // tslint:disable-next-line:no-non-null-assertion
     const server = angularJson.projects[context.target!.project].architect.server;
     const serverOptions = server && server.options;
     const externalDependencies = serverOptions && serverOptions.externalDependencies || [];
     const bundleDependencies = serverOptions && serverOptions.bundleDependencies;
-    if (bundleDependencies == false) {
+    if (bundleDependencies !== true) {
       if (existsSync(join(workspaceRoot, 'package.json'))) {
         const packageJson = JSON.parse(readFileSync(join(workspaceRoot, 'package.json')).toString());
         Object.keys(packageJson.dependencies).forEach((dependency: string) => {
@@ -100,7 +105,9 @@ const getPackageJson = (context: BuilderContext, workspaceRoot: string) => {
     } else {
       externalDependencies.forEach(externalDependency => {
         const npmLsMatch = npmList.match(` ${escapeRegExp(externalDependency)}@.+\\w`);
-        if (npmLsMatch) { dependencies[externalDependency] = npmLsMatch[0].split(`${externalDependency}@`)[1]; }
+        if (npmLsMatch) {
+          dependencies[externalDependency] = npmLsMatch[0].split(`${externalDependency}@`)[1];
+        }
       });
     }
   } // TODO should we throw?
@@ -177,7 +184,7 @@ export const deployToFunction = async (
       execSync(`open http://localhost:${port} || true`);
     }, 1500);
 
-    return firebaseTools.serve({ port, targets: ['hosting', 'functions']}).then(() =>
+    return firebaseTools.serve({ port, targets: ['hosting', 'functions'] }).then(() =>
       require('inquirer').prompt({
         type: 'confirm',
         name: 'deployProject',
@@ -186,6 +193,7 @@ export const deployToFunction = async (
     ).then(({ deployProject }: { deployProject: boolean }) => {
       if (deployProject) {
         return firebaseTools.deploy({
+          // tslint:disable-next-line:no-non-null-assertion
           only: `hosting:${context.target!.project},functions:ssr`,
           cwd: workspaceRoot
         });
@@ -195,6 +203,7 @@ export const deployToFunction = async (
     });
   } else {
     return firebaseTools.deploy({
+      // tslint:disable-next-line:no-non-null-assertion
       only: `hosting:${context.target!.project},functions:ssr`,
       cwd: workspaceRoot
     });
@@ -233,8 +242,6 @@ export default async function deploy(
   }
 
   try {
-    let success: { hosting: string };
-
     const winston = require('winston');
     const tripleBeam = require('triple-beam');
 
@@ -243,14 +250,14 @@ export default async function deploy(
         level: 'info',
         format: winston.format.printf((info) =>
           [info.message, ...(info[tripleBeam.SPLAT] || [])]
-            .filter((chunk) => typeof chunk == 'string')
+            .filter((chunk) => typeof chunk === 'string')
             .join(' ')
-        ),
+        )
       })
     );
 
     if (ssr) {
-      success = await deployToFunction(
+      await deployToFunction(
         firebaseTools,
         context,
         context.workspaceRoot,
@@ -258,7 +265,7 @@ export default async function deploy(
         preview
       );
     } else {
-      success = await deployToHosting(
+      await deployToHosting(
         firebaseTools,
         context,
         context.workspaceRoot,

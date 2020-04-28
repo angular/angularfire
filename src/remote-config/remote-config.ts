@@ -14,6 +14,16 @@ export const DEFAULTS = new InjectionToken<ConfigTemplate>('angularfire2.remoteC
 
 export interface AngularFireRemoteConfig extends ɵPromiseProxy<remoteConfig.RemoteConfig> {
 }
+// TODO look into the types here, I don't like the anys
+const proxyAll = (observable: Observable<Parameter[]>, as: 'numbers' | 'booleans' | 'strings') => new Proxy(
+  observable.pipe(mapToObject(as as any)), {
+    get: (self, name: string) => self[name] || observable.pipe(
+      map(all => all.find(p => p.key === name)),
+      map(param => param ? param[AS_TO_FN[as]]() : STATIC_VALUES[as]),
+      distinctUntilChanged()
+    )
+  }
+) as any;
 
 // TODO export as implements Partial<...> so minor doesn't break us
 export class Value implements remoteConfig.Value {
@@ -266,13 +276,3 @@ export function mapToObject<T extends ConfigTemplate>(to: 'numbers' | 'booleans'
   );
 }
 
-// TODO look into the types here, I don't like the anys
-const proxyAll = (observable: Observable<Parameter[]>, as: 'numbers' | 'booleans' | 'strings') => new Proxy(
-  observable.pipe(mapToObject(as as any)), {
-    get: (self, name: string) => self[name] || observable.pipe(
-      map(all => all.find(p => p.key === name)),
-      map(param => param ? param[AS_TO_FN[as]]() : STATIC_VALUES[as]),
-      distinctUntilChanged()
-    )
-  }
-) as any;

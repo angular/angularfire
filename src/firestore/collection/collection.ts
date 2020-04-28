@@ -9,7 +9,7 @@ import { AngularFirestoreDocument } from '../document/document';
 import { AngularFirestore } from '../firestore';
 
 export function validateEventsArray(events?: DocumentChangeType[]) {
-  if (!events || events!.length === 0) {
+  if (!events || events.length === 0) {
     events = ['added', 'removed', 'modified'];
   }
   return events;
@@ -98,6 +98,7 @@ export class AngularFirestoreCollection<T= DocumentData> {
    * provided `idField` property name.
    */
   valueChanges(): Observable<T[]>;
+  // tslint:disable-next-line:unified-signatures
   valueChanges({}): Observable<T[]>;
   valueChanges<K extends string>(options: {idField: K}): Observable<(T & { [T in K]: string })[]>;
   valueChanges<K extends string>(options: {idField?: K} = {}): Observable<T[]> {
@@ -106,7 +107,7 @@ export class AngularFirestoreCollection<T= DocumentData> {
         map(actions => actions.payload.docs.map(a => {
           if (options.idField) {
             return {
-              ...a.data() as Object,
+              ...a.data() as {},
               ...{ [options.idField]: a.id }
             } as T & { [T in K]: string };
           } else {

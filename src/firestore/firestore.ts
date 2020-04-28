@@ -110,6 +110,7 @@ export class AngularFirestore {
     @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string|FirebaseAppConfig|null|undefined,
     @Optional() @Inject(ENABLE_PERSISTENCE) shouldEnablePersistence: boolean|null,
     @Optional() @Inject(SETTINGS) settings: Settings|null,
+    // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
     @Optional() @Inject(PERSISTENCE_SETTINGS) persistenceSettings: PersistenceSettings|null,
@@ -149,8 +150,7 @@ export class AngularFirestore {
    * CollectionReference and an optional query function to narrow the result
    * set.
    */
-  collection<T>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<T>;
-  collection<T>(ref: CollectionReference, queryFn?: QueryFn): AngularFirestoreCollection<T>;
+  collection<T>(path: string| CollectionReference, queryFn?: QueryFn): AngularFirestoreCollection<T>;
   collection<T>(pathOrRef: string | CollectionReference, queryFn?: QueryFn): AngularFirestoreCollection<T> {
     let collectionRef: CollectionReference;
     if (typeof pathOrRef === 'string') {
