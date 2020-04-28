@@ -29,6 +29,27 @@ const SCREEN_INSTANCE_DELIMITER = '#';
 
 const ANNOTATIONS = '__annotations__';
 
+
+// this is an INT64 in iOS/Android but use INT32 cause javascript
+let nextScreenInstanceID = Math.floor(Math.random() * (2 ** 32 - 1)) - 2 ** 31;
+
+const knownScreenInstanceIDs: { [key: string]: number } = {};
+
+const getScreenInstanceID = (params: { [key: string]: any }) => {
+  // unique the screen class against the outlet name
+  const screenInstanceKey = [
+    params[SCREEN_CLASS_KEY],
+    params[OUTLET_KEY]
+  ].join(SCREEN_INSTANCE_DELIMITER);
+  if (knownScreenInstanceIDs.hasOwnProperty(screenInstanceKey)) {
+    return knownScreenInstanceIDs[screenInstanceKey];
+  } else {
+    const ret = nextScreenInstanceID++;
+    knownScreenInstanceIDs[screenInstanceKey] = ret;
+    return ret;
+  }
+};
+
 @Injectable({
   providedIn: 'any'
 })
@@ -195,23 +216,3 @@ export class UserTrackingService implements OnDestroy {
     }
   }
 }
-
-// this is an INT64 in iOS/Android but use INT32 cause javascript
-let nextScreenInstanceID = Math.floor(Math.random() * (2 ** 32 - 1)) - 2 ** 31;
-
-const knownScreenInstanceIDs: { [key: string]: number } = {};
-
-const getScreenInstanceID = (params: { [key: string]: any }) => {
-  // unique the screen class against the outlet name
-  const screenInstanceKey = [
-    params[SCREEN_CLASS_KEY],
-    params[OUTLET_KEY]
-  ].join(SCREEN_INSTANCE_DELIMITER);
-  if (knownScreenInstanceIDs.hasOwnProperty(screenInstanceKey)) {
-    return knownScreenInstanceIDs[screenInstanceKey];
-  } else {
-    const ret = nextScreenInstanceID++;
-    knownScreenInstanceIDs[screenInstanceKey] = ret;
-    return ret;
-  }
-};

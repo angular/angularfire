@@ -12,6 +12,7 @@ export class AngularFireAnalyticsModule {
     @Optional() userTracking: UserTrackingService
   ) {
     // calling anything on analytics will eagerly load the SDK
+    // tslint:disable-next-line:no-unused-expression
     analytics.app;
   }
 }

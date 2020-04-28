@@ -8,6 +8,8 @@ import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseAppConfig, FirebaseOptions
 export type AuthPipeGenerator = (next: ActivatedRouteSnapshot, state: RouterStateSnapshot) => AuthPipe;
 export type AuthPipe = UnaryFunction<Observable<User|null>, Observable<boolean|any[]>>;
 
+export const loggedIn: AuthPipe = map(user => !!user);
+
 @Injectable({
   providedIn: 'any'
 })
@@ -50,7 +52,7 @@ export const canActivate = (pipe: AuthPipeGenerator) => ({
     canActivate: [ AngularFireAuthGuard ], data: { authGuardPipe: pipe }
 });
 
-export const loggedIn: AuthPipe = map(user => !!user);
+
 export const isNotAnonymous: AuthPipe = map(user => !!user && !user.isAnonymous);
 export const idTokenResult = switchMap((user: User|null) => user ? user.getIdTokenResult() : of(null));
 export const emailVerified: AuthPipe = map(user => !!user && user.emailVerified);
