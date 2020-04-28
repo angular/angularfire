@@ -6,7 +6,7 @@ import { isNil } from '../utils';
 
 import { distinctUntilChanged, scan, switchMap } from 'rxjs/operators';
 
-export function listChanges<T= any>(ref: DatabaseQuery, events: ChildEvent[], scheduler?: SchedulerLike): Observable<SnapshotAction<T>[]> {
+export function listChanges<T = any>(ref: DatabaseQuery, events: ChildEvent[], scheduler?: SchedulerLike): Observable<SnapshotAction<T>[]> {
   return fromRef(ref, 'value', 'once', scheduler).pipe(
     switchMap(snapshotAction => {
       const childEvent$ = [of(snapshotAction)];
@@ -32,7 +32,7 @@ function positionAfter<T>(changes: SnapshotAction<T>[], prevKey?: string) {
     return 0;
   } else {
     const i = positionFor(changes, prevKey);
-    if ( i === -1) {
+    if (i === -1) {
       return changes.length;
     } else {
       return i + 1;
@@ -41,7 +41,7 @@ function positionAfter<T>(changes: SnapshotAction<T>[], prevKey?: string) {
 }
 
 function buildView(current, action) {
-  const { payload, type, prevKey, key } = action;
+  const { payload, prevKey, key } = action;
   const currentKeyPosition = positionFor(current, key);
   const afterPreviousKeyPosition = positionAfter(current, prevKey);
   switch (action.type) {
@@ -49,7 +49,7 @@ function buildView(current, action) {
       if (action.payload && action.payload.exists()) {
         let prevKey = null;
         action.payload.forEach(payload => {
-          const action = {payload, type: 'value', prevKey, key: payload.key};
+          const action = { payload, type: 'value', prevKey, key: payload.key };
           prevKey = payload.key;
           current = [...current, action];
           return false;
@@ -60,7 +60,7 @@ function buildView(current, action) {
       if (currentKeyPosition > -1) {
         // check that the previouskey is what we expect, else reorder
         const previous = current[currentKeyPosition - 1];
-        if ((previous && previous.key || null) != prevKey) {
+        if ((previous && previous.key || null) !== prevKey) {
           current = current.filter(x => x.payload.key !== payload.key);
           current.splice(afterPreviousKeyPosition, 0, action);
         }
