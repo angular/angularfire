@@ -85,7 +85,9 @@ export class ScreenTrackingService implements OnDestroy {
             return of({ ...params, [SCREEN_CLASS_KEY]: componentFactory.selector });
           } else if (loadChildren) {
             const loadedChildren = loadChildren();
-            const loadedChildren$: Observable<any> = (loadedChildren instanceof Observable) ? loadedChildren : from(Promise.resolve(loadedChildren));
+            const loadedChildren$: Observable<any> = (loadedChildren instanceof Observable) ?
+              loadedChildren :
+              from(Promise.resolve(loadedChildren));
             return loadedChildren$.pipe(
               map(lazyModule => {
                 if (lazyModule instanceof NgModuleFactory) {
@@ -95,7 +97,7 @@ export class ScreenTrackingService implements OnDestroy {
                   const routes = moduleRef.injector.get(ROUTES);
                   const component = routes[0][0].component; // should i just be grabbing 0-0 here?
                   try {
-                    const componentFactory = moduleRef.componentFactoryResolver.resolveComponentFactory(component!);
+                    const componentFactory = moduleRef.componentFactoryResolver.resolveComponentFactory(component);
                     return { ...params, [SCREEN_CLASS_KEY]: componentFactory.selector };
                   } catch (_) {
                     return { ...params, [SCREEN_CLASS_KEY]: DEFAULT_SCREEN_CLASS };
@@ -140,8 +142,9 @@ export class ScreenTrackingService implements OnDestroy {
           [FIREBASE_PREVIOUS_SCREEN_CLASS_KEY]: prior[SCREEN_CLASS_KEY],
           [FIREBASE_PREVIOUS_SCREEN_NAME_KEY]: prior[SCREEN_NAME_KEY],
           [FIREBASE_PREVIOUS_SCREEN_INSTANCE_ID_KEY]: prior[FIREBASE_SCREEN_INSTANCE_ID_KEY],
-          ...current!
-        } : current!),
+          ...current
+        } : current),
+        // tslint:disable-next-line:no-console
         tap(params => debugModeEnabled && console.info(SCREEN_VIEW_EVENT, params)),
         tap(params => zone.runOutsideAngular(() => analytics.logEvent(SCREEN_VIEW_EVENT, params)))
       ).subscribe();
@@ -167,6 +170,7 @@ export class UserTrackingService implements OnDestroy {
   constructor(
     analytics: AngularFireAnalytics,
     zone: NgZone,
+    // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object
   ) {
     const schedulers = new ɵAngularFireSchedulers(zone);
@@ -179,7 +183,7 @@ export class UserTrackingService implements OnDestroy {
           switchMap(() => analytics.app),
           map(app => app.auth()),
           switchMap(auth => new Observable<User | null>(auth.onAuthStateChanged.bind(auth))),
-          switchMap(user => analytics.setUserId(user ? user.uid : null!))
+          switchMap(user => analytics.setUserId(user ? user.uid : null))
         ).subscribe();
       });
     }
