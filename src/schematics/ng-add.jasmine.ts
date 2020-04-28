@@ -332,9 +332,9 @@ describe('ng-add', () => {
         isUniversalProject: false,
         project: PROJECT_NAME
       });
-      expect(result.read('firebase.json')!.toString()).toEqual(initialFirebaseJson);
-      expect(result.read('.firebaserc')!.toString()).toEqual(initialFirebaserc);
-      expect(result.read('angular.json')!.toString()).toEqual(initialAngularJson);
+      expect(result.read('firebase.json').toString()).toEqual(initialFirebaseJson);
+      expect(result.read('.firebaserc').toString()).toEqual(initialFirebaserc);
+      expect(result.read('angular.json').toString()).toEqual(initialAngularJson);
     });
 
     it('uses default project', async () => {
@@ -343,9 +343,9 @@ describe('ng-add', () => {
         isUniversalProject: false,
         project: undefined
       });
-      expect(result.read('firebase.json')!.toString()).toEqual(overwriteFirebaseJson);
-      expect(result.read('.firebaserc')!.toString()).toEqual(overwriteFirebaserc);
-      expect(result.read('angular.json')!.toString()).toEqual(overwriteAngularJson);
+      expect(result.read('firebase.json').toString()).toEqual(overwriteFirebaseJson);
+      expect(result.read('.firebaserc').toString()).toEqual(overwriteFirebaserc);
+      expect(result.read('angular.json').toString()).toEqual(overwriteAngularJson);
     });
 
     it('overrides existing files', async () => {
@@ -358,9 +358,9 @@ describe('ng-add', () => {
         project: OTHER_PROJECT_NAME,
         isUniversalProject: false
       });
-      expect(result.read('firebase.json')!.toString()).toEqual(projectFirebaseJson);
-      expect(result.read('.firebaserc')!.toString()).toEqual(projectFirebaserc);
-      expect(result.read('angular.json')!.toString()).toEqual(projectAngularJson);
+      expect(result.read('firebase.json').toString()).toEqual(projectFirebaseJson);
+      expect(result.read('.firebaserc').toString()).toEqual(projectFirebaserc);
+      expect(result.read('angular.json').toString()).toEqual(projectAngularJson);
     });
   });
 

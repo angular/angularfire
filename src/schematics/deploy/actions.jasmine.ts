@@ -14,6 +14,56 @@ const BUILD_TARGET: BuildTarget = {
   name: `${PROJECT}:build:production`
 };
 
+
+const initMocks = () => {
+  fsHost = {
+    moveSync(_: string, __: string) {
+    },
+    renameSync(_: string, __: string) {
+    },
+    writeFileSync(_: string, __: string) {
+    }
+  };
+
+  firebaseMock = {
+    login: () => Promise.resolve(),
+    projects: {
+      list: () => Promise.resolve([]),
+    },
+    deploy: (_: FirebaseDeployConfig) => Promise.resolve(),
+    use: () => Promise.resolve(),
+    logger: {
+      add: () => {}
+    },
+    serve: () => Promise.resolve()
+  };
+
+  context = ({
+    target: {
+      configuration: 'production',
+      project: PROJECT,
+      target: 'foo'
+    },
+    builder: {
+      builderName: 'mock',
+      description: 'mock',
+      optionSchema: false
+    },
+    currentDirectory: 'cwd',
+    id: 1,
+    logger: new logging.NullLogger() as any,
+    workspaceRoot: 'cwd',
+    getTargetOptions: (_: Target) => Promise.resolve({}),
+    reportProgress: (_: number, __?: number, ___?: string) => {
+    },
+    reportStatus: (_: string) => {},
+    reportRunning: () => {},
+    scheduleBuilder: (_: string, __?: JsonObject, ___?: ScheduleOptions) => Promise.resolve({} as BuilderRun),
+    scheduleTarget: (_: Target, __?: JsonObject, ___?: ScheduleOptions) => Promise.resolve({} as BuilderRun)
+  } as any);
+};
+
+
 const projectTargets: experimental.workspace.WorkspaceTool = {
   build: {
     options: {
@@ -133,51 +183,3 @@ describe('universal deployment', () => {
     expect(spy).not.toHaveBeenCalled();
   });*/
 });
-
-const initMocks = () => {
-  fsHost = {
-    moveSync(_: string, __: string) {
-    },
-    renameSync(_: string, __: string) {
-    },
-    writeFileSync(_: string, __: string) {
-    }
-  };
-
-  firebaseMock = {
-    login: () => Promise.resolve(),
-    projects: {
-      list: () => Promise.resolve([]),
-    },
-    deploy: (_: FirebaseDeployConfig) => Promise.resolve(),
-    use: () => Promise.resolve(),
-    logger: {
-      add: () => {}
-    },
-    serve: () => Promise.resolve()
-  };
-
-  context = ({
-    target: {
-      configuration: 'production',
-      project: PROJECT,
-      target: 'foo'
-    },
-    builder: {
-      builderName: 'mock',
-      description: 'mock',
-      optionSchema: false
-    },
-    currentDirectory: 'cwd',
-    id: 1,
-    logger: new logging.NullLogger() as any,
-    workspaceRoot: 'cwd',
-    getTargetOptions: (_: Target) => Promise.resolve({}),
-      reportProgress: (_: number, __?: number, ___?: string) => {
-    },
-    reportStatus: (_: string) => {},
-    reportRunning: () => {},
-    scheduleBuilder: (_: string, __?: JsonObject, ___?: ScheduleOptions) => Promise.resolve({} as BuilderRun),
-    scheduleTarget: (_: Target, __?: JsonObject, ___?: ScheduleOptions) => Promise.resolve({} as BuilderRun)
-  } as any);
-};
