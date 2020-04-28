@@ -1,9 +1,9 @@
 import { AngularFireModule, FirebaseApp } from '@angular/fire';
 import { AngularFirestore, AngularFirestoreCollectionGroup, AngularFirestoreModule, SETTINGS } from '../public_api';
 import { Query, QueryGroupFn } from '../interfaces';
-import { BehaviorSubject, Subscription } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { skip, switchMap, take } from 'rxjs/operators';
-import { inject, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 import 'firebase/firestore';
 
@@ -23,7 +23,6 @@ async function collectionHarness(afs: AngularFirestore, items: number, queryGrou
 describe('AngularFirestoreCollectionGroup', () => {
   let app: FirebaseApp;
   let afs: AngularFirestore;
-  let sub: Subscription;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -35,10 +34,9 @@ describe('AngularFirestoreCollectionGroup', () => {
         { provide: SETTINGS, useValue: { host: 'localhost:8080', ssl: false } }
       ]
     });
-    inject([FirebaseApp, AngularFirestore], (_app: FirebaseApp, _afs: AngularFirestore) => {
-      app = _app;
-      afs = _afs;
-    })();
+
+    app = TestBed.inject(FirebaseApp);
+    afs = TestBed.inject(AngularFirestore);
   });
 
   afterEach(() => {
@@ -49,7 +47,7 @@ describe('AngularFirestoreCollectionGroup', () => {
 
     it('should get unwrapped snapshot', async (done: any) => {
       const ITEMS = 4;
-      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
 
       const sub = stocks.valueChanges().subscribe(data => {
         // unsub immediately as we will be deleting data at the bottom
@@ -73,9 +71,10 @@ describe('AngularFirestoreCollectionGroup', () => {
 
     it('should handle multiple subscriptions (hot)', async (done: any) => {
       const ITEMS = 4;
-      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
       const changes = stocks.valueChanges();
-      const sub = changes.subscribe(() => {}).add(
+      const sub = changes.subscribe(() => {
+      }).add(
         changes.pipe(take(1)).subscribe(data => {
           expect(data.length).toEqual(ITEMS);
           sub.unsubscribe();
@@ -87,10 +86,11 @@ describe('AngularFirestoreCollectionGroup', () => {
 
     it('should handle multiple subscriptions (warm)', async (done: any) => {
       const ITEMS = 4;
-      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
       const changes = stocks.valueChanges();
-      changes.pipe(take(1)).subscribe(() => {}).add(() => {
-        const sub = changes.pipe(take(1)).subscribe(data => {
+      changes.pipe(take(1)).subscribe(() => {
+      }).add(() => {
+        changes.pipe(take(1)).subscribe(data => {
           expect(data.length).toEqual(ITEMS);
         }).add(() => {
           deleteThemAll(names, ref).then(done).catch(done.fail);
@@ -101,8 +101,8 @@ describe('AngularFirestoreCollectionGroup', () => {
     it('should handle dynamic queries that return empty sets', async (done) => {
       const ITEMS = 10;
       let count = 0;
-      const firstIndex = 0;
-      const pricefilter$ = new BehaviorSubject<number|null>(null);
+
+      const pricefilter$ = new BehaviorSubject<number | null>(null);
       const randomCollectionName = randomName(afs.firestore);
       const ref = afs.firestore.collection(`${randomCollectionName}`);
       const names = await createRandomStocks(afs.firestore, ref, ITEMS);
@@ -131,14 +131,13 @@ describe('AngularFirestoreCollectionGroup', () => {
     it('should listen to all snapshotChanges() by default', async (done) => {
       const ITEMS = 10;
       let count = 0;
-      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
       const sub = stocks.snapshotChanges().subscribe(data => {
-        const ids = data.map(d => d.payload.doc.id);
         count = count + 1;
         // the first time should all be 'added'
         if (count === 1) {
           // make an update
-          ref.doc(names[0]).update({ price: 2});
+          ref.doc(names[0]).update({ price: 2 });
         }
         // on the second round, make sure the array is still the same
         // length but the updated item is now modified
@@ -154,9 +153,10 @@ describe('AngularFirestoreCollectionGroup', () => {
 
     it('should handle multiple subscriptions (hot)', async (done: any) => {
       const ITEMS = 4;
-      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
       const changes = stocks.snapshotChanges();
-      const sub = changes.subscribe(() => {}).add(
+      const sub = changes.subscribe(() => {
+      }).add(
         changes.pipe(take(1)).subscribe(data => {
           expect(data.length).toEqual(ITEMS);
           sub.unsubscribe();
@@ -168,10 +168,11 @@ describe('AngularFirestoreCollectionGroup', () => {
 
     it('should handle multiple subscriptions (warm)', async (done: any) => {
       const ITEMS = 4;
-      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
       const changes = stocks.snapshotChanges();
-      changes.pipe(take(1)).subscribe(() => {}).add(() => {
-        const sub = changes.pipe(take(1)).subscribe(data => {
+      changes.pipe(take(1)).subscribe(() => {
+      }).add(() => {
+        changes.pipe(take(1)).subscribe(data => {
           expect(data.length).toEqual(ITEMS);
         }).add(() => {
           deleteThemAll(names, ref).then(done).catch(done.fail);
@@ -183,7 +184,7 @@ describe('AngularFirestoreCollectionGroup', () => {
       const ITEMS = 10;
       let count = 0;
       let firstIndex = 0;
-      const { randomCollectionName, ref, stocks, names } =
+      const { ref, stocks, names } =
         await collectionHarness(afs, ITEMS, ref => ref.orderBy('price', 'desc'));
       const sub = stocks.snapshotChanges().subscribe(data => {
         count = count + 1;
@@ -208,7 +209,7 @@ describe('AngularFirestoreCollectionGroup', () => {
 
     it('should be able to filter snapshotChanges() types - modified', async (done) => {
       const ITEMS = 10;
-      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
 
       const sub = stocks.snapshotChanges(['modified']).pipe(skip(1)).subscribe(data => {
         sub.unsubscribe();
@@ -224,7 +225,9 @@ describe('AngularFirestoreCollectionGroup', () => {
 
     it('should be able to filter snapshotChanges() types - added', async (done) => {
       const ITEMS = 10;
-      let { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const harness = await collectionHarness(afs, ITEMS);
+      const { randomCollectionName, ref, stocks } = harness;
+      let { names } = harness;
       const nextId = ref.doc('a').id;
 
       const sub = stocks.snapshotChanges(['added']).pipe(skip(1)).subscribe(data => {
@@ -265,20 +268,24 @@ describe('AngularFirestoreCollectionGroup', () => {
 
     it('should be able to filter snapshotChanges() types - added/modified', async (done) => {
       const ITEMS = 10;
-      let { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+
+      const harness = await collectionHarness(afs, ITEMS);
+      const { ref, stocks } = harness;
+      let { names } = harness;
+
       const nextId = ref.doc('a').id;
       let count = 0;
 
-      const sub = stocks.snapshotChanges(['added', 'modified']).pipe(skip(1), take(2)).subscribe(data => {
+      stocks.snapshotChanges(['added', 'modified']).pipe(skip(1), take(2)).subscribe(data => {
         count += 1;
-        if (count == 1) {
+        if (count === 1) {
           const change = data.filter(x => x.payload.doc.id === nextId)[0];
           expect(data.length).toEqual(ITEMS + 1);
           expect(change.payload.doc.data().price).toEqual(2);
           expect(change.type).toEqual('added');
           delayUpdate(ref, names[0], { price: 2 });
         }
-        if (count == 2) {
+        if (count === 2) {
           const change = data.filter(x => x.payload.doc.id === names[0])[0];
           expect(data.length).toEqual(ITEMS + 1);
           expect(change.payload.doc.data().price).toEqual(2);
@@ -294,7 +301,7 @@ describe('AngularFirestoreCollectionGroup', () => {
 
     it('should be able to filter snapshotChanges() types - removed', async (done) => {
       const ITEMS = 10;
-      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
 
       const sub = stocks.snapshotChanges(['added', 'removed']).pipe(skip(1)).subscribe(data => {
         sub.unsubscribe();
@@ -314,7 +321,7 @@ describe('AngularFirestoreCollectionGroup', () => {
 
     it('should get stateChanges() updates', async (done: any) => {
       const ITEMS = 10;
-      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
 
       const sub = stocks.stateChanges().subscribe(data => {
         // unsub immediately as we will be deleting data at the bottom
@@ -337,11 +344,11 @@ describe('AngularFirestoreCollectionGroup', () => {
     it('should listen to all stateChanges() by default', async (done) => {
       const ITEMS = 10;
       let count = 0;
-      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
-      const sub = stocks.stateChanges().subscribe(data => {
+      const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      stocks.stateChanges().subscribe(data => {
         count = count + 1;
         if (count === 1) {
-          ref.doc(names[0]).update({ price: 2});
+          ref.doc(names[0]).update({ price: 2 });
         }
         if (count === 2) {
           expect(data.length).toEqual(1);
@@ -353,9 +360,10 @@ describe('AngularFirestoreCollectionGroup', () => {
 
     it('should handle multiple subscriptions (hot)', async (done: any) => {
       const ITEMS = 4;
-      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
       const changes = stocks.stateChanges();
-      const sub = changes.subscribe(() => {}).add(
+      const sub = changes.subscribe(() => {
+      }).add(
         changes.pipe(take(1)).subscribe(data => {
           expect(data.length).toEqual(ITEMS);
           sub.unsubscribe();
@@ -367,10 +375,11 @@ describe('AngularFirestoreCollectionGroup', () => {
 
     it('should handle multiple subscriptions (warm)', async (done: any) => {
       const ITEMS = 4;
-      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
       const changes = stocks.stateChanges();
-      changes.pipe(take(1)).subscribe(() => {}).add(() => {
-        const sub = changes.pipe(take(1)).subscribe(data => {
+      changes.pipe(take(1)).subscribe(() => {
+      }).add(() => {
+        changes.pipe(take(1)).subscribe(data => {
           expect(data.length).toEqual(ITEMS);
         }).add(() => {
           deleteThemAll(names, ref).then(done).catch(done.fail);
@@ -380,8 +389,7 @@ describe('AngularFirestoreCollectionGroup', () => {
 
     it('should be able to filter stateChanges() types - modified', async (done) => {
       const ITEMS = 10;
-      const count = 0;
-      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
 
       const sub = stocks.stateChanges(['modified']).subscribe(data => {
         sub.unsubscribe();
@@ -397,8 +405,11 @@ describe('AngularFirestoreCollectionGroup', () => {
 
     it('should be able to filter stateChanges() types - added', async (done) => {
       const ITEMS = 10;
-      const count = 0;
-      let { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+
+      const harness = await collectionHarness(afs, ITEMS);
+      const { ref, stocks } = harness;
+      let { names } = harness;
+
 
       const sub = stocks.stateChanges(['added']).pipe(skip(1)).subscribe(data => {
         sub.unsubscribe();
@@ -416,7 +427,7 @@ describe('AngularFirestoreCollectionGroup', () => {
 
     it('should be able to filter stateChanges() types - removed', async (done) => {
       const ITEMS = 10;
-      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
 
       const sub = stocks.stateChanges(['removed']).subscribe(data => {
         sub.unsubscribe();
@@ -434,11 +445,11 @@ describe('AngularFirestoreCollectionGroup', () => {
     it('should listen to all events for auditTrail() by default', async (done) => {
       const ITEMS = 10;
       let count = 0;
-      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
       const sub = stocks.auditTrail().subscribe(data => {
         count = count + 1;
         if (count === 1) {
-          ref.doc(names[0]).update({ price: 2});
+          ref.doc(names[0]).update({ price: 2 });
         }
         if (count === 2) {
           sub.unsubscribe();
@@ -451,7 +462,7 @@ describe('AngularFirestoreCollectionGroup', () => {
 
     it('should be able to filter auditTrail() types - removed', async (done) => {
       const ITEMS = 10;
-      const { randomCollectionName, ref, stocks, names } = await collectionHarness(afs, ITEMS);
+      const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
 
       const sub = stocks.auditTrail(['removed']).subscribe(data => {
         sub.unsubscribe();

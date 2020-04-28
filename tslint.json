@@ -9,6 +9,7 @@
       "component-class-suffix": true,
       "contextual-lifecycle": true,
       "directive-class-suffix": true,
+      "no-shadowed-variable": false,
       "directive-selector": [
         true,
         "attribute",

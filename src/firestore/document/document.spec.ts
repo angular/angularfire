@@ -1,11 +1,10 @@
 import { AngularFireModule, FirebaseApp } from '@angular/fire';
 import { AngularFirestore, SETTINGS } from '../firestore';
 import { AngularFirestoreModule } from '../firestore.module';
-import { AngularFirestoreDocument } from '../document/document';
-import { Subscription } from 'rxjs';
+import { AngularFirestoreDocument } from './document';
 import { take } from 'rxjs/operators';
 
-import { inject, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 
 import { FAKE_STOCK_DATA, rando, randomName, Stock } from '../utils.spec';
@@ -14,7 +13,6 @@ import 'firebase/firestore';
 describe('AngularFirestoreDocument', () => {
   let app: FirebaseApp;
   let afs: AngularFirestore;
-  let sub: Subscription;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -26,10 +24,9 @@ describe('AngularFirestoreDocument', () => {
         { provide: SETTINGS, useValue: { host: 'localhost:8080', ssl: false } }
       ]
     });
-    inject([FirebaseApp, AngularFirestore], (_app: FirebaseApp, _afs: AngularFirestore) => {
-      app = _app;
-      afs = _afs;
-    })();
+
+    app = TestBed.inject(FirebaseApp);
+    afs = TestBed.inject(AngularFirestore);
   });
 
   afterEach(() => {
