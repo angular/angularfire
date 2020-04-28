@@ -1,4 +1,4 @@
-import { DatabaseQuery, AngularFireList, ChildEvent } from '../interfaces';
+import { AngularFireList, ChildEvent, DatabaseQuery } from '../interfaces';
 import { snapshotChanges } from './snapshot-changes';
 import { stateChanges } from './state-changes';
 import { auditTrail } from './audit-trail';

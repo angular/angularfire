@@ -1,9 +1,9 @@
-import { Observable, from } from 'rxjs';
+import { from, Observable } from 'rxjs';
 import { fromCollectionRef } from '../observable/fromRef';
-import { map, filter, scan, observeOn } from 'rxjs/operators';
+import { filter, map, observeOn, scan } from 'rxjs/operators';
 import { firestore } from 'firebase/app';
 
-import { DocumentChangeType, CollectionReference, Query, DocumentReference, DocumentData, DocumentChangeAction } from '../interfaces';
+import { CollectionReference, DocumentChangeAction, DocumentChangeType, DocumentData, DocumentReference, Query } from '../interfaces';
 import { docChanges, sortedChanges } from './changes';
 import { AngularFirestoreDocument } from '../document/document';
 import { AngularFirestore } from '../firestore';

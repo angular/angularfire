@@ -1,6 +1,6 @@
-import { SettableMetadata, UploadMetadata, Reference, StringFormat, ListResult} from './interfaces';
-import { createUploadTask, AngularFireUploadTask } from './task';
-import { Observable, from, of } from 'rxjs';
+import { ListResult, Reference, SettableMetadata, StringFormat, UploadMetadata } from './interfaces';
+import { AngularFireUploadTask, createUploadTask } from './task';
+import { from, Observable, of } from 'rxjs';
 import { ɵAngularFireSchedulers } from '@angular/fire';
 import { observeOn, switchMap } from 'rxjs/operators';
 

@@ -1,8 +1,8 @@
-import { TestBed, inject } from '@angular/core/testing';
-import { FirebaseApp, AngularFireModule } from '@angular/fire';
+import { inject, TestBed } from '@angular/core/testing';
+import { AngularFireModule, FirebaseApp } from '@angular/fire';
 import { COMMON_CONFIG } from '../test-config';
-import { AngularFireAuthGuardModule, AngularFireAuthGuard } from './public_api';
-import { RouterModule, Router } from '@angular/router';
+import { AngularFireAuthGuard, AngularFireAuthGuardModule } from './public_api';
+import { Router, RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
 import { rando } from '../firestore/utils.spec';
 

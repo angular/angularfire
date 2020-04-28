@@ -1,8 +1,7 @@
-import { Injectable, Inject, Optional, NgZone, InjectionToken } from '@angular/core';
-import { of, from, Observable } from 'rxjs';
-import { map, switchMap, shareReplay, tap, observeOn } from 'rxjs/operators';
-import { FirebaseOptions, FirebaseAppConfig, FIREBASE_APP_NAME, ɵlazySDKProxy, ɵPromiseProxy, ɵAngularFireSchedulers } from '@angular/fire';
-import { FIREBASE_OPTIONS, ɵfirebaseAppFactory } from '@angular/fire';
+import { Inject, Injectable, InjectionToken, NgZone, Optional } from '@angular/core';
+import { from, Observable, of } from 'rxjs';
+import { map, observeOn, shareReplay, switchMap, tap } from 'rxjs/operators';
+import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseAppConfig, FirebaseOptions, ɵAngularFireSchedulers, ɵfirebaseAppFactory, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
 import { functions } from 'firebase/app';
 
 export const ORIGIN = new InjectionToken<string>('angularfire2.functions.origin');

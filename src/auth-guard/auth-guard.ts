@@ -1,9 +1,9 @@
-import { Injectable, Inject, Optional, NgZone } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
+import { Inject, Injectable, NgZone, Optional } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import { Observable, of, pipe, UnaryFunction } from 'rxjs';
-import { map, switchMap, take, observeOn, shareReplay } from 'rxjs/operators';
+import { map, observeOn, shareReplay, switchMap, take } from 'rxjs/operators';
 import { User } from 'firebase/app';
-import { ɵAngularFireSchedulers, FirebaseOptions, FirebaseAppConfig, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵfirebaseAppFactory } from '@angular/fire';
+import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseAppConfig, FirebaseOptions, ɵAngularFireSchedulers, ɵfirebaseAppFactory } from '@angular/fire';
 
 export type AuthPipeGenerator = (next: ActivatedRouteSnapshot, state: RouterStateSnapshot) => AuthPipe;
 export type AuthPipe = UnaryFunction<Observable<User|null>, Observable<boolean|any[]>>;

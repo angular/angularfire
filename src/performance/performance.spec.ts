@@ -1,5 +1,5 @@
-import { TestBed, inject } from '@angular/core/testing';
-import { FirebaseApp, AngularFireModule } from '@angular/fire';
+import { inject, TestBed } from '@angular/core/testing';
+import { AngularFireModule, FirebaseApp } from '@angular/fire';
 import { AngularFirePerformance, AngularFirePerformanceModule } from './public_api';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../firestore/utils.spec';

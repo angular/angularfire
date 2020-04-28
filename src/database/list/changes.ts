@@ -1,10 +1,10 @@
 import { fromRef } from '../observable/fromRef';
-import { Observable, of, merge, SchedulerLike } from 'rxjs';
+import { merge, Observable, of, SchedulerLike } from 'rxjs';
 
-import { DatabaseQuery, ChildEvent, SnapshotAction } from '../interfaces';
+import { ChildEvent, DatabaseQuery, SnapshotAction } from '../interfaces';
 import { isNil } from '../utils';
 
-import { switchMap, distinctUntilChanged, scan } from 'rxjs/operators';
+import { distinctUntilChanged, scan, switchMap } from 'rxjs/operators';
 
 export function listChanges<T= any>(ref: DatabaseQuery, events: ChildEvent[], scheduler?: SchedulerLike): Observable<SnapshotAction<T>[]> {
   return fromRef(ref, 'value', 'once', scheduler).pipe(

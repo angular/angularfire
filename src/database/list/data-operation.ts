@@ -1,5 +1,4 @@
-
-import { DatabaseReference, FirebaseOperation, DatabaseSnapshot } from '../interfaces';
+import { DatabaseReference, DatabaseSnapshot, FirebaseOperation } from '../interfaces';
 import { checkOperationCases } from '../utils';
 
 export function createDataOperationMethod<T>(ref: DatabaseReference, operation: string) {

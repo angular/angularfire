@@ -1,7 +1,7 @@
-import { Injectable, Inject, Optional, NgZone, InjectionToken, PLATFORM_ID } from '@angular/core';
-import { Observable, concat, of, pipe, OperatorFunction, MonoTypeOperatorFunction, empty, throwError } from 'rxjs';
-import { map, switchMap, tap, shareReplay, distinctUntilChanged, filter, groupBy, mergeMap, scan, withLatestFrom, startWith, debounceTime, observeOn, catchError } from 'rxjs/operators';
-import { ɵPromiseProxy, ɵfirebaseAppFactory, ɵAngularFireSchedulers, FirebaseAppConfig, FirebaseOptions, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire';
+import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
+import { concat, empty, MonoTypeOperatorFunction, Observable, of, OperatorFunction, pipe } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, groupBy, map, mergeMap, observeOn, scan, shareReplay, startWith, switchMap, tap, withLatestFrom } from 'rxjs/operators';
+import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseAppConfig, FirebaseOptions, ɵAngularFireSchedulers, ɵfirebaseAppFactory, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
 import { remoteConfig } from 'firebase/app';
 import { isPlatformBrowser } from '@angular/common';
 

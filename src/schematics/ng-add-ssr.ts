@@ -1,16 +1,10 @@
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
 import { experimental } from '@angular-devkit/core';
-import {
-  generateFirebaseRc,
-  safeReadJSON,
-  overwriteIfExists,
-  stringifyFormatted,
-  addDependencies, NgAddNormalizedOptions
-} from './ng-add-common';
-import { FirebaseJSON, FirebaseHostingConfig } from './interfaces';
+import { addDependencies, generateFirebaseRc, NgAddNormalizedOptions, overwriteIfExists, safeReadJSON, stringifyFormatted } from './ng-add-common';
+import { FirebaseJSON } from './interfaces';
 
 import { default as defaultDependencies, firebaseFunctions as firebaseFunctionsDependencies } from './versions.json';
-import {dirname, join} from 'path';
+import { dirname, join } from 'path';
 
 // We consider a project to be a universal project if it has a `server` architect
 // target. If it does, it knows how to build the application's server.

@@ -1,8 +1,18 @@
-import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
-import { Observable, of, from } from 'rxjs';
-import { switchMap, map, observeOn, shareReplay } from 'rxjs/operators';
-import { FIREBASE_OPTIONS, FIREBASE_APP_NAME, FirebaseOptions, FirebaseAppConfig, ɵPromiseProxy, ɵlazySDKProxy, ɵfirebaseAppFactory, ɵAngularFireSchedulers, ɵkeepUnstableUntilFirstFactory } from '@angular/fire';
-import { User, auth } from 'firebase/app';
+import { Inject, Injectable, NgZone, Optional, PLATFORM_ID } from '@angular/core';
+import { from, Observable, of } from 'rxjs';
+import { map, observeOn, shareReplay, switchMap } from 'rxjs/operators';
+import {
+  FIREBASE_APP_NAME,
+  FIREBASE_OPTIONS,
+  FirebaseAppConfig,
+  FirebaseOptions,
+  ɵAngularFireSchedulers,
+  ɵfirebaseAppFactory,
+  ɵkeepUnstableUntilFirstFactory,
+  ɵlazySDKProxy,
+  ɵPromiseProxy
+} from '@angular/fire';
+import { auth, User } from 'firebase/app';
 
 export interface AngularFireAuth extends ɵPromiseProxy<auth.Auth> {}
 

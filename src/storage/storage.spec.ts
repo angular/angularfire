@@ -1,8 +1,8 @@
-import { Observable, forkJoin } from 'rxjs';
-import { map, mergeMap, tap } from 'rxjs/operators';
-import { TestBed, inject } from '@angular/core/testing';
-import { FirebaseApp, FIREBASE_OPTIONS, AngularFireModule, FIREBASE_APP_NAME } from '@angular/fire';
-import { AngularFireStorageModule, AngularFireStorage, AngularFireUploadTask, BUCKET } from './public_api';
+import { forkJoin } from 'rxjs';
+import { mergeMap, tap } from 'rxjs/operators';
+import { inject, TestBed } from '@angular/core/testing';
+import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire';
+import { AngularFireStorage, AngularFireStorageModule, AngularFireUploadTask, BUCKET } from './public_api';
 import { COMMON_CONFIG } from '../test-config';
 import 'firebase/storage';
 import { rando } from '../firestore/utils.spec';

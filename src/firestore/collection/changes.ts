@@ -2,7 +2,7 @@ import { fromCollectionRef } from '../observable/fromRef';
 import { Observable, SchedulerLike } from 'rxjs';
 import { map, scan } from 'rxjs/operators';
 
-import { Query, DocumentChangeType, DocumentChange, DocumentChangeAction } from '../interfaces';
+import { DocumentChange, DocumentChangeAction, DocumentChangeType, Query } from '../interfaces';
 
 /**
  * Return a stream of document changes on a query. These results are not in sort order but in

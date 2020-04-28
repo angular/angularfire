@@ -1,10 +1,10 @@
 import { database } from 'firebase/app';
-import { FirebaseApp, AngularFireModule } from '@angular/fire';
-import { AngularFireDatabase, AngularFireDatabaseModule, snapshotChanges, ChildEvent, URL } from '../public_api';
-import { TestBed, inject } from '@angular/core/testing';
+import { AngularFireModule, FirebaseApp } from '@angular/fire';
+import { AngularFireDatabase, AngularFireDatabaseModule, ChildEvent, snapshotChanges, URL } from '../public_api';
+import { inject, TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 import { BehaviorSubject } from 'rxjs';
-import { skip, take, switchMap } from 'rxjs/operators';
+import { skip, switchMap, take } from 'rxjs/operators';
 import 'firebase/database';
 import { rando } from '../../firestore/utils.spec';
 

@@ -1,8 +1,8 @@
 import { spawn } from 'child_process';
-import { copy, writeFile, readFile } from 'fs-extra';
+import { copy, readFile, writeFile } from 'fs-extra';
 import { prettySize } from 'pretty-size';
 import { sync as gzipSync } from 'gzip-size';
-import { join, dirname } from 'path';
+import { dirname, join } from 'path';
 
 // TODO infer these from the package.json
 const MODULES = [

@@ -1,5 +1,5 @@
 import { map } from 'rxjs/operators';
-import { DatabaseQuery, AngularFireObject } from '../interfaces';
+import { AngularFireObject, DatabaseQuery } from '../interfaces';
 import { createObjectSnapshotChanges } from './snapshot-changes';
 import { AngularFireDatabase } from '../database';
 

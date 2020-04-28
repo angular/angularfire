@@ -1,8 +1,8 @@
-import { Injectable, NgZone, InjectionToken, Inject, Optional, PLATFORM_ID } from '@angular/core';
-import { Observable, Subscription, of, empty } from 'rxjs';
-import { tap, map, shareReplay, switchMap } from 'rxjs/operators';
+import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
+import { empty, Observable, of, Subscription } from 'rxjs';
+import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { performance } from 'firebase/app';
-import { FirebaseApp, ɵPromiseProxy, ɵlazySDKProxy } from '@angular/fire';
+import { FirebaseApp, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
 import { isPlatformBrowser } from '@angular/common';
 
 // SEMVER @ v6, drop and move core ng metrics to a service

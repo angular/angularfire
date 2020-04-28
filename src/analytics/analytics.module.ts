@@ -1,5 +1,5 @@
 import { NgModule, Optional } from '@angular/core';
-import { UserTrackingService, ScreenTrackingService } from './analytics.service';
+import { ScreenTrackingService, UserTrackingService } from './analytics.service';
 import { AngularFireAnalytics } from './analytics';
 
 @NgModule({

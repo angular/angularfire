@@ -1,7 +1,7 @@
 import { database } from 'firebase/app';
-import { FirebaseApp, AngularFireModule } from '@angular/fire';
-import { AngularFireDatabase, AngularFireDatabaseModule, stateChanges, ChildEvent, URL } from '../public_api';
-import { TestBed, inject } from '@angular/core/testing';
+import { AngularFireModule, FirebaseApp } from '@angular/fire';
+import { AngularFireDatabase, AngularFireDatabaseModule, ChildEvent, stateChanges, URL } from '../public_api';
+import { inject, TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 import { skip } from 'rxjs/operators';
 import 'firebase/database';

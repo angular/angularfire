@@ -1,6 +1,5 @@
-import { DatabaseReference, DataSnapshot, FirebaseOperation, DatabaseSnapshot } from '../interfaces';
+import { DatabaseReference, DatabaseSnapshot, FirebaseOperation } from '../interfaces';
 import { checkOperationCases } from '../utils';
-import { database } from 'firebase/app';
 
 // TODO(davideast): Find out why TS thinks this returns firebase.Primise
 // instead of Promise.

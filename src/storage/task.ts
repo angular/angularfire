@@ -1,4 +1,4 @@
-import { UploadTaskSnapshot, UploadTask } from './interfaces';
+import { UploadTask, UploadTaskSnapshot } from './interfaces';
 import { fromTask } from './observable/fromTask';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';

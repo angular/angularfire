@@ -1,17 +1,9 @@
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
 import { experimental } from '@angular-devkit/core';
-import {
-  generateFirebaseRc,
-  overwriteIfExists,
-  safeReadJSON,
-  stringifyFormatted,
-  addDependencies, NgAddNormalizedOptions
-} from './ng-add-common';
-import { FirebaseJSON, FirebaseHostingConfig } from './interfaces';
+import { addDependencies, generateFirebaseRc, NgAddNormalizedOptions, overwriteIfExists, safeReadJSON, stringifyFormatted } from './ng-add-common';
+import { FirebaseJSON } from './interfaces';
 
-import {
-  default as defaultDependencies
-} from './versions.json';
+import { default as defaultDependencies } from './versions.json';
 
 function emptyFirebaseJson() {
   return {

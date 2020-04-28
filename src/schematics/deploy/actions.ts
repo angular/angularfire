@@ -1,17 +1,10 @@
-import {
-  BuilderContext,
-  targetFromTargetString
-} from '@angular-devkit/architect';
+import { BuilderContext, targetFromTargetString } from '@angular-devkit/architect';
 import { BuildTarget, FirebaseTools, FSHost } from '../interfaces';
-import { writeFileSync, renameSync, existsSync, readFileSync } from 'fs';
+import { existsSync, readFileSync, renameSync, writeFileSync } from 'fs';
 import { copySync, removeSync } from 'fs-extra';
-import { join, dirname } from 'path';
+import { dirname, join } from 'path';
 import { execSync } from 'child_process';
-import {
-  defaultFunction,
-  defaultPackage,
-  NodeVersion
-} from './functions-templates';
+import { defaultFunction, defaultPackage, NodeVersion } from './functions-templates';
 import { experimental } from '@angular-devkit/core';
 import { SchematicsException } from '@angular-devkit/schematics';
 import { satisfies } from 'semver';

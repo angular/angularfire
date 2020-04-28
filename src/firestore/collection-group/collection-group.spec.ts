@@ -1,13 +1,13 @@
-import { FirebaseApp, AngularFireModule } from '@angular/fire';
-import { AngularFirestore, AngularFirestoreModule, AngularFirestoreDocument, AngularFirestoreCollectionGroup, SETTINGS } from '../public_api';
-import { QueryGroupFn, Query } from '../interfaces';
-import { Observable, BehaviorSubject, Subscription } from 'rxjs';
-import { skip, take, switchMap } from 'rxjs/operators';
-import { TestBed, inject } from '@angular/core/testing';
+import { AngularFireModule, FirebaseApp } from '@angular/fire';
+import { AngularFirestore, AngularFirestoreCollectionGroup, AngularFirestoreModule, SETTINGS } from '../public_api';
+import { Query, QueryGroupFn } from '../interfaces';
+import { BehaviorSubject, Subscription } from 'rxjs';
+import { skip, switchMap, take } from 'rxjs/operators';
+import { inject, TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 import 'firebase/firestore';
 
-import { Stock, randomName, FAKE_STOCK_DATA, createRandomStocks, delayAdd, delayDelete, delayUpdate, deleteThemAll, rando } from '../utils.spec';
+import { createRandomStocks, delayAdd, delayDelete, delayUpdate, deleteThemAll, FAKE_STOCK_DATA, rando, randomName, Stock } from '../utils.spec';
 
 async function collectionHarness(afs: AngularFirestore, items: number, queryGroupFn?: QueryGroupFn) {
   const randomCollectionName = randomName(afs.firestore);

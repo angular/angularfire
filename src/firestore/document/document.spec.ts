@@ -1,14 +1,14 @@
-import { FirebaseApp, AngularFireModule } from '@angular/fire';
+import { AngularFireModule, FirebaseApp } from '@angular/fire';
 import { AngularFirestore, SETTINGS } from '../firestore';
 import { AngularFirestoreModule } from '../firestore.module';
 import { AngularFirestoreDocument } from '../document/document';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 
-import { TestBed, inject } from '@angular/core/testing';
+import { inject, TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 
-import { Stock, randomName, FAKE_STOCK_DATA, rando } from '../utils.spec';
+import { FAKE_STOCK_DATA, rando, randomName, Stock } from '../utils.spec';
 import 'firebase/firestore';
 
 describe('AngularFirestoreDocument', () => {

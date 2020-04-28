@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy, ApplicationRef } from '@angular/core';
+import { ApplicationRef, Injectable, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { first, tap } from 'rxjs/operators';
 

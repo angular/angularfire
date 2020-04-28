@@ -1,9 +1,8 @@
-import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
+import { Inject, Injectable, NgZone, Optional, PLATFORM_ID } from '@angular/core';
 import { messaging } from 'firebase/app';
-import { Observable, empty, of, throwError } from 'rxjs';
-import { mergeMap, catchError, map, switchMap, concat, observeOn, defaultIfEmpty } from 'rxjs/operators';
-import { FirebaseOptions, FirebaseAppConfig, ɵAngularFireSchedulers, FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
-import { ɵfirebaseAppFactory } from '@angular/fire';
+import { empty, Observable, of, throwError } from 'rxjs';
+import { catchError, concat, defaultIfEmpty, map, mergeMap, observeOn, switchMap } from 'rxjs/operators';
+import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseAppConfig, FirebaseOptions, ɵAngularFireSchedulers, ɵfirebaseAppFactory, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
 
 export interface AngularFireMessaging extends Omit<ɵPromiseProxy<messaging.Messaging>, 'deleteToken'|'getToken'|'requestPermission'> {}

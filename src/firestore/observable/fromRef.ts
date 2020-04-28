@@ -1,5 +1,5 @@
-import { Observable, SchedulerLike, asyncScheduler } from 'rxjs';
-import { DocumentReference, Query, Action, Reference, DocumentSnapshot, QuerySnapshot } from '../interfaces';
+import { asyncScheduler, Observable, SchedulerLike } from 'rxjs';
+import { Action, DocumentReference, DocumentSnapshot, Query, QuerySnapshot, Reference } from '../interfaces';
 import { map } from 'rxjs/operators';
 
 function _fromRef<T, R>(ref: Reference<T>, scheduler: SchedulerLike = asyncScheduler): Observable<R> {

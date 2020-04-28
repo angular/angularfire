@@ -1,10 +1,10 @@
 import { User } from 'firebase/app';
 import { Observable, Subject } from 'rxjs';
-import { TestBed, inject } from '@angular/core/testing';
-import { FirebaseApp, FIREBASE_OPTIONS, AngularFireModule, FIREBASE_APP_NAME } from '@angular/fire';
+import { inject, TestBed } from '@angular/core/testing';
+import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule } from './public_api';
 import { COMMON_CONFIG } from '../test-config';
-import { take, skip } from 'rxjs/operators';
+import { skip, take } from 'rxjs/operators';
 import 'firebase/auth';
 import { rando } from '../firestore/utils.spec';
 

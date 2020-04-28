@@ -1,9 +1,9 @@
-import { DataSnapshot, DatabaseQuery, ChildEvent, DatabaseSnapshot, AngularFireAction, SnapshotAction } from '../interfaces';
+import { AngularFireAction, ChildEvent, DatabaseQuery, DataSnapshot, SnapshotAction } from '../interfaces';
 import { stateChanges } from './state-changes';
 import { Observable, SchedulerLike } from 'rxjs';
 import { fromRef } from '../observable/fromRef';
 
-import { skipWhile, withLatestFrom, map, scan } from 'rxjs/operators';
+import { map, scan, skipWhile, withLatestFrom } from 'rxjs/operators';
 
 export function auditTrail<T>(query: DatabaseQuery, events?: ChildEvent[], scheduler?: SchedulerLike): Observable<SnapshotAction<T>[]> {
   const auditTrail$ = stateChanges<T>(query, events)

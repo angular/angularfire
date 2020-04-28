@@ -1,5 +1,4 @@
-import { Subscription, Scheduler } from 'rxjs';
-import { PathReference, DatabaseReference, FirebaseOperation, FirebaseOperationCases } from './interfaces';
+import { DatabaseReference, FirebaseOperation, FirebaseOperationCases, PathReference } from './interfaces';
 import { database } from 'firebase/app';
 
 export function isString(value: any): boolean {

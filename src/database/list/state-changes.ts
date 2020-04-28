@@ -1,8 +1,7 @@
-import { DatabaseQuery, ChildEvent, AngularFireAction, SnapshotAction } from '../interfaces';
+import { ChildEvent, DatabaseQuery } from '../interfaces';
 import { fromRef } from '../observable/fromRef';
 import { validateEventsArray } from './utils';
-import { SchedulerLike, Observable, merge } from 'rxjs';
-import { DatabaseSnapshot } from '../interfaces';
+import { merge, SchedulerLike } from 'rxjs';
 
 export function stateChanges<T>(query: DatabaseQuery, events?: ChildEvent[], scheduler?: SchedulerLike) {
   events = validateEventsArray(events)!;

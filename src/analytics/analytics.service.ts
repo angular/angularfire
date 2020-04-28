@@ -1,7 +1,7 @@
-import { Injectable, Optional, NgZone, OnDestroy, ComponentFactoryResolver, Inject, PLATFORM_ID, Injector, NgModuleFactory } from '@angular/core';
-import { Subscription, from, Observable, of } from 'rxjs';
-import { filter, withLatestFrom, switchMap, map, tap, pairwise, startWith, groupBy, mergeMap, observeOn } from 'rxjs/operators';
-import { Router, NavigationEnd, ActivationEnd, ROUTES } from '@angular/router';
+import { ComponentFactoryResolver, Inject, Injectable, Injector, NgModuleFactory, NgZone, OnDestroy, Optional, PLATFORM_ID } from '@angular/core';
+import { from, Observable, of, Subscription } from 'rxjs';
+import { filter, groupBy, map, mergeMap, observeOn, pairwise, startWith, switchMap, tap, withLatestFrom } from 'rxjs/operators';
+import { ActivationEnd, NavigationEnd, Router, ROUTES } from '@angular/router';
 import { ɵAngularFireSchedulers } from '@angular/fire';
 import { AngularFireAnalytics, DEBUG_MODE } from './analytics';
 import { User } from 'firebase/app';

@@ -1,9 +1,9 @@
 import { database } from 'firebase/app';
-import { FirebaseApp, AngularFireModule } from '@angular/fire';
+import { AngularFireModule, FirebaseApp } from '@angular/fire';
 import { AngularFireDatabase, AngularFireDatabaseModule, listChanges, URL } from '../public_api';
-import { TestBed, inject } from '@angular/core/testing';
+import { inject, TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
-import { skip, take, tap } from 'rxjs/operators';
+import { skip, take } from 'rxjs/operators';
 import 'firebase/database';
 import { rando } from '../../firestore/utils.spec';
 

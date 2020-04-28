@@ -1,13 +1,13 @@
-import { TestBed, inject } from '@angular/core/testing';
-import { PlatformRef, NgModule, CompilerFactory, NgZone } from '@angular/core';
-import { FirebaseApp, AngularFireModule } from './public_api';
-import { Subscription, Observable, Subject, of } from 'rxjs';
+import { inject, TestBed } from '@angular/core/testing';
+import { CompilerFactory, NgModule, NgZone, PlatformRef } from '@angular/core';
+import { AngularFireModule, FirebaseApp } from './public_api';
+import { Observable, of, Subject, Subscription } from 'rxjs';
 import { COMMON_CONFIG } from '../test-config';
 import { BrowserModule } from '@angular/platform-browser';
 import { database } from 'firebase/app';
-import { ɵZoneScheduler, ɵkeepUnstableUntilFirstFactory, ɵAngularFireSchedulers } from './angularfire2';
+import { ɵAngularFireSchedulers, ɵkeepUnstableUntilFirstFactory, ɵZoneScheduler } from './angularfire2';
 import { ɵPLATFORM_BROWSER_ID, ɵPLATFORM_SERVER_ID } from '@angular/common';
-import { tap  } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
 import { rando } from '../firestore/utils.spec';
 

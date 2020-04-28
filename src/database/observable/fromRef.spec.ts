@@ -1,7 +1,7 @@
 import { DatabaseReference } from '../interfaces';
-import { FirebaseApp, AngularFireModule, ɵZoneScheduler } from '@angular/fire';
+import { AngularFireModule, FirebaseApp, ɵZoneScheduler } from '@angular/fire';
 import { AngularFireDatabase, AngularFireDatabaseModule, fromRef } from '../public_api';
-import { TestBed, inject } from '@angular/core/testing';
+import { inject, TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 import { take } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
