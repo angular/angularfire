@@ -1,4 +1,4 @@
-import { inject, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire';
 import { AngularFireMessaging, AngularFireMessagingModule } from './public_api';
 import { COMMON_CONFIG } from '../test-config';
@@ -15,10 +15,9 @@ describe('AngularFireMessaging', () => {
         AngularFireMessagingModule
       ]
     });
-    inject([FirebaseApp, AngularFireMessaging], (app_: FirebaseApp, _afm: AngularFireMessaging) => {
-      app = app_;
-      afm = _afm;
-    })();
+
+    app = TestBed.inject(FirebaseApp);
+    afm = TestBed.inject(AngularFireMessaging);
   });
 
   afterEach(() => {
@@ -52,10 +51,9 @@ describe('AngularFireMessaging with different app', () => {
         { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG }
       ]
     });
-    inject([FirebaseApp, AngularFireMessaging], (app_: FirebaseApp, _afm: AngularFireMessaging) => {
-      app = app_;
-      afm = _afm;
-    })();
+
+    app = TestBed.inject(FirebaseApp);
+    afm = TestBed.inject(AngularFireMessaging);
   });
 
   afterEach(() => {
