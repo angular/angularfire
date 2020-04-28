@@ -9,8 +9,10 @@ import { APP_BASE_HREF } from '@angular/common';
 import { existsSync } from 'fs';
 
 // Polyfill XMLHttpRequest and WS for Firebase
-global.XMLHttpRequest = require('xhr2');
-global.WebSocket = require('ws');
+/* tslint:disable:no-string-literal */
+global['XMLHttpRequest'] = require('xhr2');
+global['WebSocket'] = require('ws');
+/* tslint:enable:no-string-literal */
 
 // The Express app is exported so that it can be used by serverless Functions.
 export function app() {

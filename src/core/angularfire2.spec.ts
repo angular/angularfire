@@ -165,7 +165,8 @@ describe('angularfire', () => {
       const testScheduler = new TestScheduler(null!);
       testScheduler.run(helpers => {
         const outsideZone = Zone.current;
-        const taskTrack = new Zone.TaskTrackingZoneSpec();
+        // tslint:disable-next-line:no-string-literal
+        const taskTrack = new Zone['TaskTrackingZoneSpec']();
         const insideZone = Zone.current.fork(taskTrack);
         const trackingSchedulers: ɵAngularFireSchedulers = {
           ngZone: {
