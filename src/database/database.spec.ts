@@ -5,6 +5,7 @@ import { COMMON_CONFIG } from '../test-config';
 import { NgZone } from '@angular/core';
 import 'firebase/database';
 import { rando } from '../firestore/utils.spec';
+import { Test } from 'tslint';
 
 describe('AngularFireDatabase', () => {
   let app: FirebaseApp;
@@ -23,11 +24,10 @@ describe('AngularFireDatabase', () => {
         { provide: URL, useValue: 'http://localhost:9000'}
       ]
     });
-    inject([FirebaseApp, AngularFireDatabase, NgZone], (app_: FirebaseApp, _db: AngularFireDatabase, _zone: NgZone) => {
-      app = app_;
-      db = _db;
-      zone = _zone;
-    })();
+
+    app = TestBed.inject(FirebaseApp);
+    db = TestBed.inject(AngularFireDatabase);
+    zone = TestBed.inject(NgZone);
   });
 
   afterEach(() => {
@@ -45,9 +45,9 @@ describe('AngularFireDatabase', () => {
     });
 
     it('should accept a Firebase App in the constructor', (done) => {
-      const __db = new AngularFireDatabase(app.options, rando(), undefined!, {}, zone);
-      expect(__db instanceof AngularFireDatabase).toEqual(true);
-      __db.database.app.delete().then(done, done);
+      const database = new AngularFireDatabase(app.options, rando(), undefined, {}, zone);
+      expect(database instanceof AngularFireDatabase).toEqual(true);
+      database.database.app.delete().then(done, done);
     });
 
     it('should have an initialized Firebase app instance member', () => {
