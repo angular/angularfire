@@ -76,17 +76,21 @@ describe('AngularFireAuth', () => {
     let count = 0;
 
     // Check that the first value is null and second is the auth user
-    const subs = afAuth.authState.subscribe(user => {
-      if (count === 0) {
-        expect(user).toBe(null);
-        count = count + 1;
-        mockAuthState.next(firebaseUser);
-      } else {
-        expect(user).toEqual(firebaseUser);
-        subs.unsubscribe();
-        done();
-      }
-    }, done, done.fail);
+    const subs = afAuth.authState.subscribe({
+      next: (user => {
+        if (count === 0) {
+          expect(user).toBe(null);
+          count = count + 1;
+          mockAuthState.next(firebaseUser);
+        } else {
+          expect(user).toEqual(firebaseUser);
+          subs.unsubscribe();
+          done();
+        }
+      }),
+      error: done,
+      complete: done.fail
+    });
     mockAuthState.next(null);
   });
 
@@ -94,17 +98,21 @@ describe('AngularFireAuth', () => {
     let count = 0;
 
     // Check that the first value is null and second is the auth user
-    const subs = afAuth.idToken.subscribe(user => {
-      if (count === 0) {
-        expect(user).toBe(null);
-        count = count + 1;
-        mockAuthState.next(firebaseUser);
-      } else {
-        expect(user as any).toEqual(firebaseUser);
-        subs.unsubscribe();
-        done();
-      }
-    }, done, done.fail);
+    const subs = afAuth.idToken.subscribe({
+      next: user => {
+        if (count === 0) {
+          expect(user).toBe(null);
+          count = count + 1;
+          mockAuthState.next(firebaseUser);
+        } else {
+          expect(user as any).toEqual(firebaseUser);
+          subs.unsubscribe();
+          done();
+        }
+      },
+      error: done,
+      complete: done.fail
+    });
     mockAuthState.next(null);
   });
 

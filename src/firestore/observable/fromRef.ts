@@ -13,7 +13,7 @@ function _fromRef<T, R>(ref: Reference<T>, scheduler: SchedulerLike = asyncSched
       unsubscribe = ref.onSnapshot(subscriber);
     }
 
-    return function() {
+    return () => {
       if (unsubscribe != null) {
         unsubscribe();
       }

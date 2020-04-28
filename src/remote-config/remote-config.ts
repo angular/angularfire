@@ -15,6 +15,9 @@ export const DEFAULTS = new InjectionToken<ConfigTemplate>('angularfire2.remoteC
 export interface AngularFireRemoteConfig extends ɵPromiseProxy<remoteConfig.RemoteConfig> {
 }
 
+const AS_TO_FN = { strings: 'asString', numbers: 'asNumber', booleans: 'asBoolean' };
+const STATIC_VALUES = { numbers: 0, booleans: false, strings: undefined };
+
 // TODO look into the types here, I don't like the anys
 const proxyAll = (observable: Observable<Parameter[]>, as: 'numbers' | 'booleans' | 'strings') => new Proxy(
   observable.pipe(mapToObject(as as any)), {
@@ -65,6 +68,30 @@ export const filterRemote = () => filterTest(p => p.getSource() === 'remote');
 
 // filterFresh allows the developer to effectively set up a maximum cache time
 export const filterFresh = (howRecentInMillis: number) => filterTest(p => p.fetchTimeMillis + howRecentInMillis >= new Date().getTime());
+
+
+// I ditched loading the defaults into RC and a simple map for scan since we already have our own defaults implementation.
+// The idea here being that if they have a default that never loads from the server, they will be able to tell via fetchTimeMillis
+// on the Parameter. Also if it doesn't come from the server it won't emit again in .changes, due to the distinctUntilChanged,
+// which we can simplify to === rather than deep comparison
+const scanToParametersArray = (
+  remoteConfig: Observable<remoteConfig.RemoteConfig | undefined>
+): OperatorFunction<{ [key: string]: remoteConfig.Value }, Parameter[]> => pipe(
+  withLatestFrom(remoteConfig),
+  scan((existing, [all, rc]) => {
+    // SEMVER use "new Set" to unique once we're only targeting es6
+    // at the scale we expect remote config to be at, we probably won't see a performance hit from this unoptimized uniqueness
+    // implementation.
+    // const allKeys = [...new Set([...existing.map(p => p.key), ...Object.keys(all)])];
+    const allKeys = [...existing.map(p => p.key), ...Object.keys(all)].filter((v, i, a) => a.indexOf(v) === i);
+    return allKeys.map(key => {
+      const updatedValue = all[key];
+      return updatedValue ? new Parameter(key, rc ? rc.fetchTimeMillis : -1, updatedValue.getSource(), updatedValue.asString())
+        : existing.find(p => p.key === key);
+    });
+  }, [] as Array<Parameter>)
+);
+
 
 @Injectable({
   providedIn: 'any'
@@ -162,28 +189,6 @@ export class AngularFireRemoteConfig {
 
 }
 
-// I ditched loading the defaults into RC and a simple map for scan since we already have our own defaults implementation.
-// The idea here being that if they have a default that never loads from the server, they will be able to tell via fetchTimeMillis
-// on the Parameter. Also if it doesn't come from the server it won't emit again in .changes, due to the distinctUntilChanged,
-// which we can simplify to === rather than deep comparison
-const scanToParametersArray = (
-  remoteConfig: Observable<remoteConfig.RemoteConfig | undefined>
-): OperatorFunction<{ [key: string]: remoteConfig.Value }, Parameter[]> => pipe(
-  withLatestFrom(remoteConfig),
-  scan((existing, [all, rc]) => {
-    // SEMVER use "new Set" to unique once we're only targeting es6
-    // at the scale we expect remote config to be at, we probably won't see a performance hit from this unoptimized uniqueness
-    // implementation.
-    // const allKeys = [...new Set([...existing.map(p => p.key), ...Object.keys(all)])];
-    const allKeys = [...existing.map(p => p.key), ...Object.keys(all)].filter((v, i, a) => a.indexOf(v) === i);
-    return allKeys.map(key => {
-      const updatedValue = all[key];
-      return updatedValue ? new Parameter(key, rc ? rc.fetchTimeMillis : -1, updatedValue.getSource(), updatedValue.asString())
-        : existing.find(p => p.key === key);
-    });
-  }, [] as Array<Parameter>)
-);
-
 
 export const budget = <T>(interval: number): MonoTypeOperatorFunction<T> => (source: Observable<T>) => new Observable<T>(observer => {
   let timedOut = false;
@@ -226,8 +231,6 @@ const typedMethod = (it: any) => {
   }
 };
 
-const AS_TO_FN = { strings: 'asString', numbers: 'asNumber', booleans: 'asBoolean' };
-const STATIC_VALUES = { numbers: 0, booleans: false, strings: undefined };
 
 export function scanToObject(): OperatorFunction<Parameter, { [key: string]: string | undefined }>;
 export function scanToObject(to: 'numbers'): OperatorFunction<Parameter, { [key: string]: number | undefined }>;
