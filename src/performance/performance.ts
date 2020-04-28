@@ -1,5 +1,5 @@
 import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
-import { empty, Observable, of, Subscription } from 'rxjs';
+import { EMPTY, empty, Observable, of, Subscription } from 'rxjs';
 import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { performance } from 'firebase/app';
 import { FirebaseApp, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
@@ -10,7 +10,8 @@ export const AUTOMATICALLY_TRACE_CORE_NG_METRICS = new InjectionToken<boolean>('
 export const INSTRUMENTATION_ENABLED = new InjectionToken<boolean>('angularfire2.performance.instrumentationEnabled');
 export const DATA_COLLECTION_ENABLED = new InjectionToken<boolean>('angularfire2.performance.dataCollectionEnabled');
 
-export interface AngularFirePerformance extends ɵPromiseProxy<performance.Performance> {}
+export interface AngularFirePerformance extends ɵPromiseProxy<performance.Performance> {
+}
 
 @Injectable({
   providedIn: 'any'
@@ -21,20 +22,25 @@ export class AngularFirePerformance {
 
   constructor(
     app: FirebaseApp,
-    @Optional() @Inject(INSTRUMENTATION_ENABLED) instrumentationEnabled: boolean|null,
-    @Optional() @Inject(DATA_COLLECTION_ENABLED) dataCollectionEnabled: boolean|null,
+    @Optional() @Inject(INSTRUMENTATION_ENABLED) instrumentationEnabled: boolean | null,
+    @Optional() @Inject(DATA_COLLECTION_ENABLED) dataCollectionEnabled: boolean | null,
     private zone: NgZone,
+    // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object
   ) {
 
     this.performance = of(undefined).pipe(
-      switchMap(() => isPlatformBrowser(platformId) ? zone.runOutsideAngular(() => import('firebase/performance')) : empty()),
+      switchMap(() => isPlatformBrowser(platformId) ? zone.runOutsideAngular(() => import('firebase/performance')) : EMPTY),
       map(() => zone.runOutsideAngular(() => app.performance())),
       tap(performance => {
-        if (instrumentationEnabled == false) { performance.instrumentationEnabled = false; }
-        if (dataCollectionEnabled == false) { performance.dataCollectionEnabled = false; }
+        if (instrumentationEnabled !== true) {
+          performance.instrumentationEnabled = false;
+        }
+        if (dataCollectionEnabled !== true) {
+          performance.dataCollectionEnabled = false;
+        }
       }),
-      shareReplay({ bufferSize: 1, refCount: false }),
+      shareReplay({ bufferSize: 1, refCount: false })
     );
 
     return ɵlazySDKProxy(this, this.performance, zone);
@@ -51,73 +57,93 @@ const trace$ = (traceId: string) => {
     return new Observable<void>(emitter => {
       window.performance.mark(startMarkName);
       emitter.next();
-      return { unsubscribe: () => {
-        window.performance.mark(endMarkName);
-        window.performance.measure(traceId, startMarkName, endMarkName);
-      }};
+      return {
+        unsubscribe: () => {
+          window.performance.mark(endMarkName);
+          window.performance.measure(traceId, startMarkName, endMarkName);
+        }
+      };
     });
   } else {
     return empty();
   }
 };
 
-export const traceUntil = <T= any>(name: string, test: (a: T) => boolean, options?: { orComplete?: boolean }) => (source$: Observable<T>) => new Observable<T>(subscriber => {
+export const traceUntil = <T = any>(
+  name: string,
+  test: (a: T) => boolean,
+  options?: { orComplete?: boolean }
+) => (source$: Observable<T>) => new Observable<T>(subscriber => {
   const traceSubscription = trace$(name).subscribe();
   return source$.pipe(
     tap(
-      a  => test(a) && traceSubscription.unsubscribe(),
-      () => {},
+      a => test(a) && traceSubscription.unsubscribe(),
+      () => {
+      },
       () => options && options.orComplete && traceSubscription.unsubscribe()
     )
   ).subscribe(subscriber);
 });
 
-export const traceWhile = <T= any>(name: string, test: (a: T) => boolean, options?: { orComplete?: boolean}) => (source$: Observable<T>) => new Observable<T>(subscriber => {
-  let traceSubscription: Subscription|undefined;
+export const traceWhile = <T = any>(
+  name: string,
+  test: (a: T) => boolean,
+  options?: { orComplete?: boolean }
+) => (source$: Observable<T>) => new Observable<T>(subscriber => {
+  let traceSubscription: Subscription | undefined;
   return source$.pipe(
     tap(
-      a  => {
+      a => {
         if (test(a)) {
           traceSubscription = traceSubscription || trace$(name).subscribe();
         } else {
-          traceSubscription && traceSubscription.unsubscribe();
+          if (traceSubscription) {
+            traceSubscription.unsubscribe();
+          }
+
           traceSubscription = undefined;
         }
       },
-      () => {},
+      () => {
+      },
       () => options && options.orComplete && traceSubscription && traceSubscription.unsubscribe()
     )
   ).subscribe(subscriber);
 });
 
-export const traceUntilComplete = <T= any>(name: string) => (source$: Observable<T>) => new Observable<T>(subscriber => {
+export const traceUntilComplete = <T = any>(name: string) => (source$: Observable<T>) => new Observable<T>(subscriber => {
   const traceSubscription = trace$(name).subscribe();
   return source$.pipe(
     tap(
-      () => {},
-      () => {},
+      () => {
+      },
+      () => {
+      },
       () => traceSubscription.unsubscribe()
     )
   ).subscribe(subscriber);
 });
 
-export const traceUntilFirst = <T= any>(name: string) => (source$: Observable<T>) => new Observable<T>(subscriber => {
+export const traceUntilFirst = <T = any>(name: string) => (source$: Observable<T>) => new Observable<T>(subscriber => {
   const traceSubscription = trace$(name).subscribe();
   return source$.pipe(
     tap(
       () => traceSubscription.unsubscribe(),
-      () => {},
-      () => {}
+      () => {
+      },
+      () => {
+      }
     )
   ).subscribe(subscriber);
 });
 
-export const trace = <T= any>(name: string) => (source$: Observable<T>) => new Observable<T>(subscriber => {
+export const trace = <T = any>(name: string) => (source$: Observable<T>) => new Observable<T>(subscriber => {
   const traceSubscription = trace$(name).subscribe();
   return source$.pipe(
     tap(
       () => traceSubscription.unsubscribe(),
-      () => {},
+      () => {
+      },
       () => traceSubscription.unsubscribe()
     )
   ).subscribe(subscriber);
