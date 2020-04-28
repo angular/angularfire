@@ -1,5 +1,5 @@
 import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
-import { empty, Observable, of } from 'rxjs';
+import { EMPTY, Observable, of } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { map, observeOn, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseAppConfig, FirebaseOptions, ɵAngularFireSchedulers, ɵfirebaseAppFactory, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
@@ -80,7 +80,7 @@ export class AngularFireAnalytics {
     if (!analytics) {
       analytics = of(undefined).pipe(
         observeOn(new ɵAngularFireSchedulers(zone).outsideAngular),
-        switchMap(() => isPlatformBrowser(platformId) ? import('firebase/analytics') : empty()),
+        switchMap(() => isPlatformBrowser(platformId) ? import('firebase/analytics') : EMPTY),
         map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
         map(app => app.analytics()),
         tap(analytics => {

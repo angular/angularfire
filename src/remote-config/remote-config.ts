@@ -1,5 +1,5 @@
 import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
-import { concat, empty, MonoTypeOperatorFunction, Observable, of, OperatorFunction, pipe } from 'rxjs';
+import { concat, EMPTY, MonoTypeOperatorFunction, Observable, of, OperatorFunction, pipe } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter, groupBy, map, mergeMap, observeOn, scan, shareReplay, startWith, switchMap, tap, withLatestFrom } from 'rxjs/operators';
 import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseAppConfig, FirebaseOptions, ɵAngularFireSchedulers, ɵfirebaseAppFactory, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
 import { remoteConfig } from 'firebase/app';
@@ -14,6 +14,7 @@ export const DEFAULTS = new InjectionToken<ConfigTemplate>('angularfire2.remoteC
 
 export interface AngularFireRemoteConfig extends ɵPromiseProxy<remoteConfig.RemoteConfig> {
 }
+
 // TODO look into the types here, I don't like the anys
 const proxyAll = (observable: Observable<Parameter[]>, as: 'numbers' | 'booleans' | 'strings') => new Proxy(
   observable.pipe(mapToObject(as as any)), {
@@ -90,7 +91,7 @@ export class AngularFireRemoteConfig {
 
     const remoteConfig$ = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
-      switchMap(() => isPlatformBrowser(platformId) ? import('firebase/remote-config') : empty()),
+      switchMap(() => isPlatformBrowser(platformId) ? import('firebase/remote-config') : EMPTY),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
       map(app => app.remoteConfig()),
       tap(rc => {
@@ -183,8 +184,6 @@ const scanToParametersArray = (
   }, [] as Array<Parameter>)
 );
 
-const AS_TO_FN = { strings: 'asString', numbers: 'asNumber', booleans: 'asBoolean' };
-const STATIC_VALUES = { numbers: 0, booleans: false, strings: undefined };
 
 export const budget = <T>(interval: number): MonoTypeOperatorFunction<T> => (source: Observable<T>) => new Observable<T>(observer => {
   let timedOut = false;
@@ -226,6 +225,9 @@ const typedMethod = (it: any) => {
       return 'asString';
   }
 };
+
+const AS_TO_FN = { strings: 'asString', numbers: 'asNumber', booleans: 'asBoolean' };
+const STATIC_VALUES = { numbers: 0, booleans: false, strings: undefined };
 
 export function scanToObject(): OperatorFunction<Parameter, { [key: string]: string | undefined }>;
 export function scanToObject(to: 'numbers'): OperatorFunction<Parameter, { [key: string]: number | undefined }>;

@@ -1,5 +1,5 @@
 import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
-import { EMPTY, empty, Observable, of, Subscription } from 'rxjs';
+import { EMPTY, Observable, of, Subscription } from 'rxjs';
 import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { performance } from 'firebase/app';
 import { FirebaseApp, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
@@ -65,7 +65,7 @@ const trace$ = (traceId: string) => {
       };
     });
   } else {
-    return empty();
+    return EMPTY;
   }
 };
 

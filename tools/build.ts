@@ -31,7 +31,7 @@ async function replacePackageCoreVersion() {
 async function replacePackageJsonVersions() {
   const path = dest('package.json');
   const root = await rootPackage;
-  let pkg = await import(path);
+  const pkg = await import(path);
   Object.keys(pkg.peerDependencies).forEach(peer => {
     pkg.peerDependencies[peer] = root.dependencies[peer];
   });
@@ -53,7 +53,7 @@ async function replaceSchematicVersions() {
 }
 
 function spawnPromise(command: string, args: string[]) {
-  return new Promise(resolve => spawn(command, args, {stdio: 'inherit'}).on('close', resolve));
+  return new Promise(resolve => spawn(command, args, { stdio: 'inherit' }).on('close', resolve));
 }
 
 async function compileSchematics() {
@@ -93,19 +93,19 @@ function measureLibrary() {
 async function buildDocs() {
   // INVESTIGATE json to stdout rather than FS?
   await Promise.all(MODULES.map(module => spawnPromise('npx', ['typedoc', `./src/${module}`, '--json', `./dist/typedocs/${module}.json`])));
-  const entries = await Promise.all(MODULES.map(async (module, index) => {
+  const entries = await Promise.all(MODULES.map(async (module) => {
     const buffer = await readFile(`./dist/typedocs/${module}.json`);
     const typedoc = JSON.parse(buffer.toString());
     // TODO infer the entryPoint from the package.json
     const entryPoint = typedoc.children.find((c: any) => c.name === '"public_api"');
     const allChildren = [].concat(...typedoc.children.map(child =>
       // TODO chop out the working directory and filename
-      child.children ? child.children.map(c => ({...c, path: dirname(child.originalName.split(process.cwd())[1])})) : []
+      child.children ? child.children.map(c => ({ ...c, path: dirname(child.originalName.split(process.cwd())[1]) })) : []
     ));
     return entryPoint.children
       .filter(c => c.name[0] !== 'ɵ' && c.name[0] !== '_' /* private */)
-      .map(child => ({...allChildren.find(c => child.target === c.id)}))
-      .reduce((acc, child) => ({...acc, [encodeURIComponent(child.name)]: child}), {});
+      .map(child => ({ ...allChildren.find(c => child.target === c.id) }))
+      .reduce((acc, child) => ({ ...acc, [encodeURIComponent(child.name)]: child }), {});
   }));
   const root = await rootPackage;
   const pipes = ['MonoTypeOperatorFunction', 'OperatorFunction', 'AuthPipe', 'UnaryFunction'];
@@ -125,11 +125,16 @@ async function buildDocs() {
       return child.kindString;
     }
   };
-  const table_of_contents = entries.reduce((acc, entry, index) =>
-    ({...acc, [MODULES[index]]: {name: ENTRY_NAMES[index], exports: Object.keys(entry).reduce((acc, key) => ({...acc, [key]: tocType(entry[key])}), {})}}),
+  const tableOfContents = entries.reduce((acc, entry, index) =>
+      ({
+        ...acc, [MODULES[index]]: {
+          name: ENTRY_NAMES[index],
+          exports: Object.keys(entry).reduce((acc, key) => ({ ...acc, [key]: tocType(entry[key]) }), {})
+        }
+      }),
     {}
   );
-  const afdoc = entries.reduce((acc, entry, index) => ({...acc, [MODULES[index]]: entry }), { table_of_contents });
+  const afdoc = entries.reduce((acc, entry, index) => ({ ...acc, [MODULES[index]]: entry }), { table_of_contents: tableOfContents });
   return writeFile(`./api-${root.version}.json`, JSON.stringify(afdoc, null, 2));
 }
 

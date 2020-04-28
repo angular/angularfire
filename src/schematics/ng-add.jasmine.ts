@@ -1,7 +1,6 @@
 import { Tree } from '@angular-devkit/schematics';
 import { setupProject } from './ng-add';
 
-
 const PROJECT_NAME = 'pie-ka-chu';
 const PROJECT_ROOT = 'pirojok';
 const FIREBASE_PROJECT = 'pirojok-111e3';
@@ -555,7 +554,7 @@ describe('ng-add', () => {
           project: PROJECT_NAME
         });
 
-        const workspace = JSON.parse((await result.read('angular.json'))!.toString());
+        const workspace = JSON.parse((await result.read('angular.json')).toString());
         expect(workspace.projects['pie-ka-chu'].architect.deploy.options.ssr).toBeTrue();
       });
 
@@ -569,7 +568,7 @@ describe('ng-add', () => {
           project: PROJECT_NAME
         });
 
-        const firebaseJson = JSON.parse((await result.read('firebase.json'))!.toString());
+        const firebaseJson = JSON.parse((await result.read('firebase.json')).toString());
         expect(firebaseJson).toEqual(universalFirebaseJson);
       });
     });

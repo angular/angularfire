@@ -1,11 +1,12 @@
 import { Inject, Injectable, NgZone, Optional, PLATFORM_ID } from '@angular/core';
 import { messaging } from 'firebase/app';
-import { empty, Observable, of, throwError } from 'rxjs';
+import { EMPTY, Observable, of, throwError } from 'rxjs';
 import { catchError, concat, defaultIfEmpty, map, mergeMap, observeOn, switchMap } from 'rxjs/operators';
 import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseAppConfig, FirebaseOptions, ɵAngularFireSchedulers, ɵfirebaseAppFactory, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
 
-export interface AngularFireMessaging extends Omit<ɵPromiseProxy<messaging.Messaging>, 'deleteToken'|'getToken'|'requestPermission'> {}
+export interface AngularFireMessaging extends Omit<ɵPromiseProxy<messaging.Messaging>, 'deleteToken' | 'getToken' | 'requestPermission'> {
+}
 
 @Injectable({
   providedIn: 'any'
@@ -13,15 +14,16 @@ export interface AngularFireMessaging extends Omit<ɵPromiseProxy<messaging.Mess
 export class AngularFireMessaging {
 
   public readonly requestPermission: Observable<void>;
-  public readonly getToken: Observable<string|null>;
-  public readonly tokenChanges: Observable<string|null>;
+  public readonly getToken: Observable<string | null>;
+  public readonly tokenChanges: Observable<string | null>;
   public readonly messages: Observable<{}>;
-  public readonly requestToken: Observable<string|null>;
+  public readonly requestToken: Observable<string | null>;
   public readonly deleteToken: (token: string) => Observable<boolean>;
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
-    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string|FirebaseAppConfig|null|undefined,
+    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string | FirebaseAppConfig | null | undefined,
+    // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
@@ -29,7 +31,7 @@ export class AngularFireMessaging {
 
     const messaging = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
-      switchMap(() => isPlatformServer(platformId) ? empty() : import('firebase/messaging')),
+      switchMap(() => isPlatformServer(platformId) ? EMPTY : import('firebase/messaging')),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
       map(app => app.messaging())
     );
@@ -38,7 +40,7 @@ export class AngularFireMessaging {
 
       this.requestPermission = messaging.pipe(
         observeOn(schedulers.outsideAngular),
-        switchMap(messaging => messaging.requestPermission()),
+        switchMap(messaging => messaging.requestPermission())
       );
 
     } else {
