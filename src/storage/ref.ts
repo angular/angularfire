@@ -31,7 +31,7 @@ export function createStorageRef(
       switchMap(() => ref.getDownloadURL()),
       keepUnstableUntilFirst
     ),
-    getMetadata: () => of().pipe(
+    getMetadata: () => of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
       switchMap(() => ref.getMetadata()),
       keepUnstableUntilFirst
