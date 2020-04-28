@@ -13,7 +13,7 @@ describe('fromRef', () => {
   let ref: (path: string) => DatabaseReference;
   let batch = {};
   const items = [{ name: 'one' }, { name: 'two' }, { name: 'three' }].map(item => ({ key: rando(), ...item }));
-  Object.keys(items).forEach(function (key) {
+  Object.keys(items).forEach(function(key) {
     const itemValue = items[key];
     batch[itemValue.key] = itemValue;
   });
@@ -73,11 +73,11 @@ describe('fromRef', () => {
       done();
     }, err => {
       console.error(err);
-      expect(false).toEqual(true, "Shouldnt error");
+      expect(false).toEqual(true, 'Shouldnt error');
       done();
     }, () => {
       expect(testScheduler.schedule).toHaveBeenCalled();
-      done()
+      done();
     });
     testScheduler.flush();
   });
@@ -97,11 +97,11 @@ describe('fromRef', () => {
       testScheduler
     );
     errorObservable.subscribe(() => {
-      fail("Should not emit");
+      fail('Should not emit');
     }, () => {
       expect(testScheduler.schedule).toHaveBeenCalled();
     }, () => {
-      fail("Should not complete");
+      fail('Should not complete');
     });
 
     testScheduler.flush();
@@ -121,8 +121,8 @@ describe('fromRef', () => {
     );
     completeObservable.subscribe(
       () => { },
-      () => fail("Should not error"),
-      () => expect(Zone.current.name).toEqual("ExpectedZone")
+      () => fail('Should not error'),
+      () => expect(Zone.current.name).toEqual('ExpectedZone')
     );
     testScheduler.flush();
     done();

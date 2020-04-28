@@ -32,7 +32,7 @@ describe('AngularFireAuthGuard', () => {
     afterEach(done => {
         app.delete().then(done, done);
     });
-    
+
     it('should be injectable', () => {
         expect(router).toBeTruthy();
     });

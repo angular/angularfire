@@ -6,7 +6,7 @@ import { FirebaseOptions, FirebaseAppConfig, ɵAngularFireSchedulers, FIREBASE_A
 import { ɵfirebaseAppFactory } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
 
-export interface AngularFireMessaging extends Omit<ɵPromiseProxy<messaging.Messaging>, 'deleteToken'|'getToken'|'requestPermission'> {};
+export interface AngularFireMessaging extends Omit<ɵPromiseProxy<messaging.Messaging>, 'deleteToken'|'getToken'|'requestPermission'> {}
 
 @Injectable({
   providedIn: 'any'
@@ -21,8 +21,8 @@ export class AngularFireMessaging {
   public readonly deleteToken: (token: string) => Observable<boolean>;
 
   constructor(
-    @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
-    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
+    @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
+    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string|FirebaseAppConfig|null|undefined,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
@@ -41,18 +41,18 @@ export class AngularFireMessaging {
         observeOn(schedulers.outsideAngular),
         switchMap(messaging => messaging.requestPermission()),
       );
-    
+
     } else {
-    
+
       this.requestPermission = throwError('Not available on server platform.');
-    
+
     }
 
     this.getToken = messaging.pipe(
       observeOn(schedulers.outsideAngular),
       switchMap(messaging => messaging.getToken()),
       defaultIfEmpty(null)
-    )
+    );
 
     const tokenChanges = messaging.pipe(
       observeOn(schedulers.outsideAngular),

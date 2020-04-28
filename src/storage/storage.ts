@@ -25,9 +25,9 @@ export class AngularFireStorage {
   public readonly schedulers: ɵAngularFireSchedulers;
 
   constructor(
-    @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
-    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
-    @Optional() @Inject(BUCKET) storageBucket:string|null,
+    @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
+    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string|FirebaseAppConfig|null|undefined,
+    @Optional() @Inject(BUCKET) storageBucket: string|null,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {

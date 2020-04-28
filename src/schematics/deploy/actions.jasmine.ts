@@ -81,7 +81,7 @@ describe('Deploy Angular apps', () => {
     it('throws if there is no target project', async () => {
       context.target = undefined;
       try {
-        await deploy(firebaseMock, context, projectTargets, [BUILD_TARGET], FIREBASE_PROJECT, false, false)
+        await deploy(firebaseMock, context, projectTargets, [BUILD_TARGET], FIREBASE_PROJECT, false, false);
       } catch (e) {
         expect(e.message).toMatch(/Cannot execute the build target/);
       }
@@ -152,12 +152,12 @@ const initMocks = () => {
     deploy: (_: FirebaseDeployConfig) => Promise.resolve(),
     use: () => Promise.resolve(),
     logger: {
-      add: () => {} 
+      add: () => {}
     },
     serve: () => Promise.resolve()
   };
 
-  context = <any>{
+  context = ({
     target: {
       configuration: 'production',
       project: PROJECT,
@@ -179,5 +179,5 @@ const initMocks = () => {
     reportRunning: () => {},
     scheduleBuilder: (_: string, __?: JsonObject, ___?: ScheduleOptions) => Promise.resolve({} as BuilderRun),
     scheduleTarget: (_: Target, __?: JsonObject, ___?: ScheduleOptions) => Promise.resolve({} as BuilderRun)
-  };
+  } as any);
 };

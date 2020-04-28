@@ -7,7 +7,7 @@ import { createRemoveMethod } from './remove';
 import { AngularFireDatabase } from '../database';
 import { map } from 'rxjs/operators';
 
-export function createListReference<T=any>(query: DatabaseQuery, afDatabase: AngularFireDatabase): AngularFireList<T> {
+export function createListReference<T= any>(query: DatabaseQuery, afDatabase: AngularFireDatabase): AngularFireList<T> {
   const outsideAngularScheduler = afDatabase.schedulers.outsideAngular;
   return {
     query,
@@ -31,5 +31,5 @@ export function createListReference<T=any>(query: DatabaseQuery, afDatabase: Ang
         afDatabase.keepUnstableUntilFirst
       );
     }
-  }
+  };
 }

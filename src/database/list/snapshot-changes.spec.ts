@@ -14,7 +14,7 @@ describe('snapshotChanges', () => {
   let createRef: (path: string) => database.Reference;
   let batch = {};
   const items = [{ name: 'zero' }, { name: 'one' }, { name: 'two' }].map((item, i) => ( { key: i.toString(), ...item } ));
-  Object.keys(items).forEach(function (key, i) {
+  Object.keys(items).forEach(function(key, i) {
     const itemValue = items[key];
     batch[i] = itemValue;
   });
@@ -34,7 +34,7 @@ describe('snapshotChanges', () => {
     inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {
       app = app_;
       db = _db;
-      createRef = (path: string) => db.database.ref(path);;
+      createRef = (path: string) => db.database.ref(path);
     })();
   });
 
@@ -82,7 +82,7 @@ describe('snapshotChanges', () => {
     ref.set(batch);
   });
 
- it('should listen to only child_added events', (done) => {
+  it('should listen to only child_added events', (done) => {
     const { snapChanges, ref } = prepareSnapshotChanges({ events: ['child_added'], skipnumber: 0 });
     snapChanges.pipe(take(1)).subscribe(actions => {
       const data = actions.map(a => a.payload!.val());
@@ -120,22 +120,22 @@ describe('snapshotChanges', () => {
   it('should handle dynamic queries that return empty sets', done => {
     const ITEMS = 10;
     let count = 0;
-    let firstIndex = 0;
-    let namefilter$ = new BehaviorSubject<number|null>(null);
+    const firstIndex = 0;
+    const namefilter$ = new BehaviorSubject<number|null>(null);
     const aref = createRef(rando());
     aref.set(batch);
     namefilter$.pipe(switchMap(name => {
-      const filteredRef = name ? aref.child('name').equalTo(name) : aref
+      const filteredRef = name ? aref.child('name').equalTo(name) : aref;
       return snapshotChanges(filteredRef);
-    }),take(2)).subscribe(data => {
+    }), take(2)).subscribe(data => {
       count = count + 1;
       // the first time should all be 'added'
-      if(count === 1) {
+      if (count === 1) {
         expect(Object.keys(data).length).toEqual(3);
         namefilter$.next(-1);
       }
       // on the second round, we should have filtered out everything
-      if(count === 2) {
+      if (count === 2) {
         expect(Object.keys(data).length).toEqual(0);
       }
     }).add(done);

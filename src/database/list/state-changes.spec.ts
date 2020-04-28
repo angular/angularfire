@@ -13,7 +13,7 @@ describe('stateChanges', () => {
   let createRef: (path: string) => database.Reference;
   let batch = {};
   const items = [{ name: 'zero' }, { name: 'one' }, { name: 'two' }].map((item, i) => ( { key: i.toString(), ...item } ));
-  Object.keys(items).forEach(function (key, i) {
+  Object.keys(items).forEach(function(key, i) {
     const itemValue = items[key];
     batch[i] = itemValue;
   });

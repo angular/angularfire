@@ -35,18 +35,18 @@ const ANNOTATIONS = '__annotations__';
 export class ScreenTrackingService implements OnDestroy {
 
     private disposable: Subscription|undefined;
-  
+
     constructor(
       analytics: AngularFireAnalytics,
-      @Optional() router:Router,
-      @Optional() title:Title,
+      @Optional() router: Router,
+      @Optional() title: Title,
       componentFactoryResolver: ComponentFactoryResolver,
-      @Inject(PLATFORM_ID) platformId:Object,
-      @Optional() @Inject(DEBUG_MODE) debugModeEnabled:boolean|null,
+      @Inject(PLATFORM_ID) platformId: Object,
+      @Optional() @Inject(DEBUG_MODE) debugModeEnabled: boolean|null,
       zone: NgZone,
       injector: Injector
     ) {
-        if (!router || !isPlatformBrowser(platformId)) { return this }
+        if (!router || !isPlatformBrowser(platformId)) { return this; }
         zone.runOutsideAngular(() => {
             const activationEndEvents = router.events.pipe(filter<ActivationEnd>(e => e instanceof ActivationEnd));
             const navigationEndEvents = router.events.pipe(filter<NavigationEnd>(e => e instanceof NavigationEnd));
@@ -64,13 +64,13 @@ export class ScreenTrackingService implements OnDestroy {
                         [OUTLET_KEY]: activationEnd.snapshot.outlet
                     };
                     if (title) {
-                        params[PAGE_TITLE_KEY] = title.getTitle()
+                        params[PAGE_TITLE_KEY] = title.getTitle();
                     }
                     const component = activationEnd.snapshot.component;
                     const routeConfig = activationEnd.snapshot.routeConfig;
                     const loadChildren = routeConfig && routeConfig.loadChildren;
                     // TODO figure out how to handle minification
-                    if (typeof loadChildren === "string") {
+                    if (typeof loadChildren === 'string') {
                         // SEMVER: this is the older lazy load style "./path#ClassName", drop this when we drop old ng
                         // TODO is it worth seeing if I can look up the component factory selector from the module name?
                         // it's lazy so it's not registered with componentFactoryResolver yet... seems a pain for a depreciated style
@@ -82,7 +82,7 @@ export class ScreenTrackingService implements OnDestroy {
                         return of({...params, [SCREEN_CLASS_KEY]: componentFactory.selector });
                     } else if (loadChildren) {
                         const loadedChildren = loadChildren();
-                        var loadedChildren$: Observable<any> = (loadedChildren instanceof Observable) ? loadedChildren : from(Promise.resolve(loadedChildren));
+                        const loadedChildren$: Observable<any> = (loadedChildren instanceof Observable) ? loadedChildren : from(Promise.resolve(loadedChildren));
                         return loadedChildren$.pipe(
                           map(lazyModule => {
                             if (lazyModule instanceof NgModuleFactory) {
@@ -94,14 +94,14 @@ export class ScreenTrackingService implements OnDestroy {
                               try {
                                 const componentFactory = moduleRef.componentFactoryResolver.resolveComponentFactory(component!);
                                 return {...params, [SCREEN_CLASS_KEY]: componentFactory.selector};
-                              } catch(_) {
+                              } catch (_) {
                                 return {...params, [SCREEN_CLASS_KEY]: DEFAULT_SCREEN_CLASS};
                               }
                             } else {
                               // JIT look at the annotations
                               // INVESTIGATE are there public APIs for this stuff?
-                              const declarations = [].concat.apply([], (lazyModule[ANNOTATIONS] || []).map((f:any) => f.declarations));
-                              const selectors = [].concat.apply([], declarations.map((c:any) => (c[ANNOTATIONS] || []).map((f:any) => f.selector)));
+                              const declarations = [].concat.apply([], (lazyModule[ANNOTATIONS] || []).map((f: any) => f.declarations));
+                              const selectors = [].concat.apply([], declarations.map((c: any) => (c[ANNOTATIONS] || []).map((f: any) => f.selector)));
                               // should I just be grabbing the selector like this or should i match against the route component?
                               //   const routerModule = lazyModule.ngInjectorDef.imports.find(i => i.ngModule && ....);
                               //   const route = routerModule.providers[0].find(p => p.provide == ROUTES).useValue[0];
@@ -127,7 +127,7 @@ export class ScreenTrackingService implements OnDestroy {
                             [SCREEN_CLASS_KEY]: params[SCREEN_CLASS_KEY]
                         });
                         if (title) {
-                            analytics.updateConfig({ [PAGE_TITLE_KEY]: params[PAGE_TITLE_KEY] })
+                            analytics.updateConfig({ [PAGE_TITLE_KEY]: params[PAGE_TITLE_KEY] });
                         }
                     }
                 }),
@@ -144,11 +144,11 @@ export class ScreenTrackingService implements OnDestroy {
             ).subscribe();
         });
     }
-  
+
     ngOnDestroy() {
       if (this.disposable) { this.disposable.unsubscribe(); }
     }
-  
+
 }
 
 @Injectable({
@@ -162,7 +162,7 @@ export class UserTrackingService implements OnDestroy {
     constructor(
         analytics: AngularFireAnalytics,
         zone: NgZone,
-        @Inject(PLATFORM_ID) platformId:Object
+        @Inject(PLATFORM_ID) platformId: Object
     ) {
         const schedulers = new ɵAngularFireSchedulers(zone);
 
@@ -186,11 +186,11 @@ export class UserTrackingService implements OnDestroy {
 }
 
 // this is an INT64 in iOS/Android but use INT32 cause javascript
-let nextScreenInstanceID = Math.floor(Math.random() * (2**32 - 1)) - 2**31;
+let nextScreenInstanceID = Math.floor(Math.random() * (2 ** 32 - 1)) - 2 ** 31;
 
-const knownScreenInstanceIDs: {[key:string]: number} = {};
+const knownScreenInstanceIDs: {[key: string]: number} = {};
 
-const getScreenInstanceID = (params:{[key:string]: any}) => {
+const getScreenInstanceID = (params: {[key: string]: any}) => {
     // unique the screen class against the outlet name
     const screenInstanceKey = [
         params[SCREEN_CLASS_KEY],
@@ -203,4 +203,4 @@ const getScreenInstanceID = (params:{[key:string]: any}) => {
         knownScreenInstanceIDs[screenInstanceKey] = ret;
         return ret;
     }
-}
+};

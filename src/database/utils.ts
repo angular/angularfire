@@ -30,7 +30,7 @@ export function getRef(database: database.Database, pathRef: PathReference): Dat
     : database.ref(pathRef as string);
 }
 
-export function checkOperationCases(item: FirebaseOperation, cases: FirebaseOperationCases) : Promise<void> {
+export function checkOperationCases(item: FirebaseOperation, cases: FirebaseOperationCases): Promise<void> {
   if (isString(item)) {
     return cases.stringCase();
   } else if (isFirebaseRef(item)) {

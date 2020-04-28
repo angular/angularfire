@@ -86,7 +86,7 @@ describe('AngularFirestore', () => {
   });
 
   if (typeof window == 'undefined') {
-    
+
     it('should not enable persistence (Node.js)', (done) => {
       const sub = afs.persistenceEnabled$.subscribe(isEnabled => {
         expect(isEnabled).toBe(false);
@@ -95,7 +95,7 @@ describe('AngularFirestore', () => {
     });
 
   } else {
-    
+
     it('should enable persistence', (done) => {
       const sub = afs.persistenceEnabled$.subscribe(isEnabled => {
         expect(isEnabled).toBe(true);

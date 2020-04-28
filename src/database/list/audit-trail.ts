@@ -46,10 +46,10 @@ function waitForLoaded<T>(query: DatabaseQuery, action$: Observable<SnapshotActi
       // We can use both datasets to form an array of the latest values.
       map(([loaded, actions]) => {
         // Store the last key in the data set
-        let lastKeyToLoad = loaded.lastKeyToLoad;
+        const lastKeyToLoad = loaded.lastKeyToLoad;
         // Store all child keys loaded at this point
         const loadedKeys = actions.map(snap => snap.key);
-        return { actions, lastKeyToLoad, loadedKeys }
+        return { actions, lastKeyToLoad, loadedKeys };
       }),
       // This is the magical part, only emit when the last load key
       // in the dataset has been loaded by a child event. At this point

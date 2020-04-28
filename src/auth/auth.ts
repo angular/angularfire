@@ -4,7 +4,7 @@ import { switchMap, map, observeOn, shareReplay } from 'rxjs/operators';
 import { FIREBASE_OPTIONS, FIREBASE_APP_NAME, FirebaseOptions, FirebaseAppConfig, ɵPromiseProxy, ɵlazySDKProxy, ɵfirebaseAppFactory, ɵAngularFireSchedulers, ɵkeepUnstableUntilFirstFactory } from '@angular/fire';
 import { User, auth } from 'firebase/app';
 
-export interface AngularFireAuth extends ɵPromiseProxy<auth.Auth> {};
+export interface AngularFireAuth extends ɵPromiseProxy<auth.Auth> {}
 
 @Injectable({
   providedIn: 'any'
@@ -34,8 +34,8 @@ export class AngularFireAuth {
   public readonly idTokenResult: Observable<auth.IdTokenResult|null>;
 
   constructor(
-    @Inject(FIREBASE_OPTIONS) options:FirebaseOptions,
-    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
+    @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
+    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string|FirebaseAppConfig|null|undefined,
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {

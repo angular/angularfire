@@ -12,13 +12,13 @@ import { TestScheduler } from 'rxjs/testing';
 import { rando } from '../firestore/utils.spec';
 
 describe('angularfire', () => {
-  let subscription:Subscription;
+  let subscription: Subscription;
   let app: FirebaseApp;
   let rootRef: database.Reference;
   let questionsRef: database.Reference;
   let listOfQuestionsRef: database.Reference;
   let defaultPlatform: PlatformRef;
-  let appName:string;
+  let appName: string;
 
   beforeEach(() => {
 
@@ -39,8 +39,8 @@ describe('angularfire', () => {
   });
 
   afterEach(() => {
-    rootRef.remove()
-    if(subscription && !subscription.closed) {
+    rootRef.remove();
+    if (subscription && !subscription.closed) {
       subscription.unsubscribe();
     }
     app.delete();
@@ -48,7 +48,7 @@ describe('angularfire', () => {
 
   describe('ZoneScheduler', () => {
     it('should execute the scheduled work inside the specified zone', done => {
-      let ngZone = Zone.current.fork({
+      const ngZone = Zone.current.fork({
         name: 'ngZone'
       });
       const rootZone = Zone.current;
@@ -68,7 +68,7 @@ describe('angularfire', () => {
       testScheduler.run(helpers => {
         const outsideAngularScheduler = new ɵZoneScheduler(Zone.current, testScheduler);
 
-        let ngZone = Zone.current.fork({
+        const ngZone = Zone.current.fork({
           name: 'ngZone'
         });
 
@@ -97,13 +97,13 @@ describe('angularfire', () => {
               helpers.flush();
               done();
               expect(callbacksRan).toEqual(3);
-            })
+            });
           });
           helpers.flush();
         });
       });
-    })
-  })
+    });
+  });
 
   describe('keepUnstableUntilFirstFactory', () => {
     let schedulers: ɵAngularFireSchedulers;
@@ -121,7 +121,7 @@ describe('angularfire', () => {
         runTask: insideZone.run.bind(insideZone)
       } as NgZone;
       schedulers = new ɵAngularFireSchedulers(ngZone);
-    })
+    });
 
     it('should re-schedule emissions asynchronously', done => {
       const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(schedulers, ɵPLATFORM_SERVER_ID);
@@ -133,7 +133,7 @@ describe('angularfire', () => {
       ).subscribe(() => {
         expect(ran).toEqual(true);
         done();
-      }, () => fail("Should not error"));
+      }, () => fail('Should not error'));
 
       expect(ran).toEqual(false);
     });
@@ -145,7 +145,7 @@ describe('angularfire', () => {
         insideZone.run(() => {
           new Observable(s => {
             expect(Zone.current).toEqual(outsideZone);
-            s.next("test");
+            s.next('test');
           }).pipe(
             keepUnstableOp,
             tap(() => {
@@ -165,7 +165,7 @@ describe('angularfire', () => {
       const testScheduler = new TestScheduler(null!);
       testScheduler.run(helpers => {
         const outsideZone = Zone.current;
-        const taskTrack = new Zone['TaskTrackingZoneSpec']();
+        const taskTrack = new Zone.TaskTrackingZoneSpec();
         const insideZone = Zone.current.fork(taskTrack);
         const trackingSchedulers: ɵAngularFireSchedulers = {
           ngZone: {
@@ -202,9 +202,9 @@ describe('angularfire', () => {
         }, 150);
 
       });
-    })
+    });
 
-  })
+  });
 
   describe('FirebaseApp', () => {
 
@@ -238,9 +238,9 @@ describe('angularfire', () => {
             expect(ref.name).toEqual(app.name);
           }).then(done, e => {
             fail(e);
-            done()
+            done();
           });
-      })
+      });
 
     }
   });

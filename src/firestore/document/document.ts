@@ -28,7 +28,7 @@ import { firestore } from 'firebase/app';
  * // OR! Transform using Observable.from() and the data is unwrapped for you
  * Observable.from(fakeStock).subscribe(value => console.log(value));
  */
-export class AngularFirestoreDocument<T=DocumentData> {
+export class AngularFirestoreDocument<T= DocumentData> {
 
   /**
    * The contstuctor takes in a DocumentReference to provide wrapper methods
@@ -67,7 +67,7 @@ export class AngularFirestoreDocument<T=DocumentData> {
    * @param path
    * @param queryFn
    */
-  collection<R=DocumentData>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<R> {
+  collection<R= DocumentData>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<R> {
     const collectionRef = this.ref.collection(path);
     const { ref, query } = associateQuery(collectionRef, queryFn);
     return new AngularFirestoreCollection<R>(ref, query, this.afs);
@@ -80,7 +80,7 @@ export class AngularFirestoreDocument<T=DocumentData> {
     const scheduledFromDocRef$ = fromDocRef<T>(this.ref, this.afs.schedulers.outsideAngular);
     return scheduledFromDocRef$.pipe(
       this.afs.keepUnstableUntilFirst
-    )
+    );
   }
 
   /**

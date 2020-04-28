@@ -11,6 +11,6 @@ export class AngularFirePerformanceModule {
     @Optional() _: PerformanceMonitoringService
   ) {
     // call anything here to get perf loading
-    perf.dataCollectionEnabled
+    perf.dataCollectionEnabled;
   }
 }

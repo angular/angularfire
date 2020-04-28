@@ -10,29 +10,29 @@ export const AUTOMATICALLY_TRACE_CORE_NG_METRICS = new InjectionToken<boolean>('
 export const INSTRUMENTATION_ENABLED = new InjectionToken<boolean>('angularfire2.performance.instrumentationEnabled');
 export const DATA_COLLECTION_ENABLED = new InjectionToken<boolean>('angularfire2.performance.dataCollectionEnabled');
 
-export interface AngularFirePerformance extends ɵPromiseProxy<performance.Performance> {};
+export interface AngularFirePerformance extends ɵPromiseProxy<performance.Performance> {}
 
 @Injectable({
   providedIn: 'any'
 })
 export class AngularFirePerformance {
-  
+
   private readonly performance: Observable<performance.Performance>;
 
   constructor(
     app: FirebaseApp,
-    @Optional() @Inject(INSTRUMENTATION_ENABLED) instrumentationEnabled:boolean|null,
-    @Optional() @Inject(DATA_COLLECTION_ENABLED) dataCollectionEnabled:boolean|null,
+    @Optional() @Inject(INSTRUMENTATION_ENABLED) instrumentationEnabled: boolean|null,
+    @Optional() @Inject(DATA_COLLECTION_ENABLED) dataCollectionEnabled: boolean|null,
     private zone: NgZone,
-    @Inject(PLATFORM_ID) platformId:Object
+    @Inject(PLATFORM_ID) platformId: Object
   ) {
 
     this.performance = of(undefined).pipe(
       switchMap(() => isPlatformBrowser(platformId) ? zone.runOutsideAngular(() => import('firebase/performance')) : empty()),
       map(() => zone.runOutsideAngular(() => app.performance())),
       tap(performance => {
-        if (instrumentationEnabled == false) { performance.instrumentationEnabled = false }
-        if (dataCollectionEnabled == false) { performance.dataCollectionEnabled = false }
+        if (instrumentationEnabled == false) { performance.instrumentationEnabled = false; }
+        if (dataCollectionEnabled == false) { performance.dataCollectionEnabled = false; }
       }),
       shareReplay({ bufferSize: 1, refCount: false }),
     );
@@ -43,7 +43,7 @@ export class AngularFirePerformance {
 
 }
 
-const trace$ = (traceId:string) => {
+const trace$ = (traceId: string) => {
   if (typeof window !== 'undefined' && window.performance) {
     const entries = window.performance.getEntriesByName(traceId, 'measure') || [];
     const startMarkName = `_${traceId}Start[${entries.length}]`;
@@ -59,9 +59,9 @@ const trace$ = (traceId:string) => {
   } else {
     return empty();
   }
-}
+};
 
-export const traceUntil = <T=any>(name:string, test: (a:T) => boolean, options?: { orComplete?: boolean }) => (source$: Observable<T>) => new Observable<T>(subscriber => {
+export const traceUntil = <T= any>(name: string, test: (a: T) => boolean, options?: { orComplete?: boolean }) => (source$: Observable<T>) => new Observable<T>(subscriber => {
   const traceSubscription = trace$(name).subscribe();
   return source$.pipe(
     tap(
@@ -72,7 +72,7 @@ export const traceUntil = <T=any>(name:string, test: (a:T) => boolean, options?:
   ).subscribe(subscriber);
 });
 
-export const traceWhile = <T=any>(name:string, test: (a:T) => boolean, options?: { orComplete?: boolean}) => (source$: Observable<T>) => new Observable<T>(subscriber => {
+export const traceWhile = <T= any>(name: string, test: (a: T) => boolean, options?: { orComplete?: boolean}) => (source$: Observable<T>) => new Observable<T>(subscriber => {
   let traceSubscription: Subscription|undefined;
   return source$.pipe(
     tap(
@@ -90,7 +90,7 @@ export const traceWhile = <T=any>(name:string, test: (a:T) => boolean, options?:
   ).subscribe(subscriber);
 });
 
-export const traceUntilComplete = <T=any>(name:string) => (source$: Observable<T>) => new Observable<T>(subscriber => {
+export const traceUntilComplete = <T= any>(name: string) => (source$: Observable<T>) => new Observable<T>(subscriber => {
   const traceSubscription = trace$(name).subscribe();
   return source$.pipe(
     tap(
@@ -101,7 +101,7 @@ export const traceUntilComplete = <T=any>(name:string) => (source$: Observable<T
   ).subscribe(subscriber);
 });
 
-export const traceUntilFirst = <T=any>(name:string) => (source$: Observable<T>) => new Observable<T>(subscriber => {
+export const traceUntilFirst = <T= any>(name: string) => (source$: Observable<T>) => new Observable<T>(subscriber => {
   const traceSubscription = trace$(name).subscribe();
   return source$.pipe(
     tap(
@@ -112,7 +112,7 @@ export const traceUntilFirst = <T=any>(name:string) => (source$: Observable<T>) 
   ).subscribe(subscriber);
 });
 
-export const trace = <T=any>(name:string) => (source$: Observable<T>) => new Observable<T>(subscriber => {
+export const trace = <T= any>(name: string) => (source$: Observable<T>) => new Observable<T>(subscriber => {
   const traceSubscription = trace$(name).subscribe();
   return source$.pipe(
     tap(

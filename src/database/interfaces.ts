@@ -38,7 +38,7 @@ export type ListenEvent = 'value' | ChildEvent;
 export interface Action<T> {
   type: ListenEvent;
   payload: T;
-};
+}
 
 export interface AngularFireAction<T> extends Action<T> {
   prevKey: string | null | undefined;

@@ -3,8 +3,8 @@ import { app, auth, database, messaging, storage, firestore, functions, analytic
 import * as firebase from 'firebase/app';
 
 // INVESTIGATE Public types don't expose FirebaseOptions or FirebaseAppConfig, is this the case anylonger?
-export interface FirebaseOptions {[key:string]: any};
-export interface FirebaseAppConfig {[key:string]: any};
+export interface FirebaseOptions {[key: string]: any; }
+export interface FirebaseAppConfig {[key: string]: any; }
 
 export const FIREBASE_OPTIONS = new InjectionToken<FirebaseOptions>('angularfire2.app.options');
 export const FIREBASE_APP_NAME = new InjectionToken<string|FirebaseAppConfig|undefined>('angularfire2.app.nameOrConfig');
@@ -48,7 +48,7 @@ const FirebaseAppProvider = {
         [new Optional(), FIREBASE_APP_NAME]
     ]
 };
- 
+
 @NgModule({
     providers: [ FirebaseAppProvider ],
 })
@@ -60,9 +60,9 @@ export class AngularFireModule {
                 { provide: FIREBASE_OPTIONS, useValue: options },
                 { provide: FIREBASE_APP_NAME, useValue: nameOrConfig }
             ]
-        }
+        };
     }
-    constructor(@Inject(PLATFORM_ID) platformId:Object ) {
+    constructor(@Inject(PLATFORM_ID) platformId: Object ) {
         firebase.registerVersion('angularfire', VERSION.full, platformId.toString());
         firebase.registerVersion('angular', NG_VERSION.full);
     }

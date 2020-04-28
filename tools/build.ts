@@ -13,8 +13,8 @@ const MODULES = [
 const UMD_NAMES = MODULES.map(m => m === 'core' ? 'angular-fire' : `angular-fire-${m}`);
 const ENTRY_NAMES = MODULES.map(m => m === 'core' ? '@angular/fire' : `@angular/fire/${m}`);
 
-const src = (...args:string[]) => join(process.cwd(), 'src', ...args);
-const dest = (...args:string[]) => join(process.cwd(), 'dist', 'packages-dist', ...args);
+const src = (...args: string[]) => join(process.cwd(), 'src', ...args);
+const dest = (...args: string[]) => join(process.cwd(), 'dist', 'packages-dist', ...args);
 
 const rootPackage = import(join(process.cwd(), 'package.json'));
 
@@ -31,7 +31,7 @@ async function replacePackageCoreVersion() {
 async function replacePackageJsonVersions() {
   const path = dest('package.json');
   const root = await rootPackage;
-  var pkg = await import(path);
+  let pkg = await import(path);
   Object.keys(pkg.peerDependencies).forEach(peer => {
     pkg.peerDependencies[peer] = root.dependencies[peer];
   });
@@ -97,7 +97,7 @@ async function buildDocs() {
     const buffer = await readFile(`./dist/typedocs/${module}.json`);
     const typedoc = JSON.parse(buffer.toString());
     // TODO infer the entryPoint from the package.json
-    const entryPoint = typedoc.children.find((c:any) => c.name === "\"public_api\"");
+    const entryPoint = typedoc.children.find((c: any) => c.name === '"public_api"');
     const allChildren = [].concat(...typedoc.children.map(child =>
       // TODO chop out the working directory and filename
       child.children ? child.children.map(c => ({...c, path: dirname(child.originalName.split(process.cwd())[1])})) : []
@@ -112,11 +112,11 @@ async function buildDocs() {
   const tocType = child => {
     const decorators: string[] = child.decorators && child.decorators.map(d => d.name) || [];
     if (decorators.includes('NgModule')) {
-      return 'NgModule'
+      return 'NgModule';
     } else if (child.kindString === 'Type alias') {
       return 'Type alias';
     } else if (child.kindString === 'Variable' && child.defaultValue && child.defaultValue.startsWith('new InjectionToken')) {
-      return 'InjectionToken'
+      return 'InjectionToken';
     } else if (child.type) {
       return pipes.includes(child.type.name) ? 'Pipe' : child.type.name;
     } else if (child.signatures && child.signatures[0] && child.signatures[0].type && pipes.includes(child.signatures[0].type.name)) {
@@ -124,7 +124,7 @@ async function buildDocs() {
     } else {
       return child.kindString;
     }
-  }
+  };
   const table_of_contents = entries.reduce((acc, entry, index) =>
     ({...acc, [MODULES[index]]: {name: ENTRY_NAMES[index], exports: Object.keys(entry).reduce((acc, key) => ({...acc, [key]: tocType(entry[key])}), {})}}),
     {}
@@ -144,6 +144,6 @@ Promise.all([
   console.log(`
 Package         Size    Gzipped
 ------------------------------------
-${stats.map((s, i) => [MODULES[i].padEnd(16), s.size.padEnd(8), s.gzip].join("")).join("\n")}`
+${stats.map((s, i) => [MODULES[i].padEnd(16), s.size.padEnd(8), s.gzip].join('')).join('\n')}`
   )
 );

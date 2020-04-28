@@ -1,5 +1,5 @@
 import { User } from 'firebase/app';
-import { Observable, Subject } from 'rxjs'
+import { Observable, Subject } from 'rxjs';
 import { TestBed, inject } from '@angular/core/testing';
 import { FirebaseApp, FIREBASE_OPTIONS, AngularFireModule, FIREBASE_APP_NAME } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule } from './public_api';
@@ -16,10 +16,10 @@ function authSkip(auth: Observable<any>, count: number): Observable<any> {
   return skip.call(auth, 1);
 }
 
-const firebaseUser = <User> {
+const firebaseUser = {
   uid: '12345',
   providerData: [{ displayName: 'jeffbcrossyface' }]
-};
+} as User;
 
 describe('AngularFireAuth', () => {
   let app: FirebaseApp;
@@ -40,12 +40,12 @@ describe('AngularFireAuth', () => {
     })();
 
     mockAuthState = new Subject<User>();
-    //@ts-ignore
+    // @ts-ignore
     spyOn(afAuth, 'authState').and.returnValue(mockAuthState);
-    //@ts-ignore
+    // @ts-ignore
     spyOn(afAuth, 'idToken').and.returnValue(mockAuthState);
-    (<any>afAuth).authState = mockAuthState as Observable<User>;
-    (<any>afAuth).idToken = mockAuthState as Observable<User>;
+    (afAuth as any).authState = mockAuthState as Observable<User>;
+    (afAuth as any).idToken = mockAuthState as Observable<User>;
   });
 
   afterEach(() => {
@@ -55,7 +55,7 @@ describe('AngularFireAuth', () => {
   describe('Zones', () => {
     it('should call operators and subscriber in the same zone as when service was initialized', (done) => {
       // Initialize the app outside of the zone, to mimick real life behavior.
-      let ngZone = Zone.current.fork({
+      const ngZone = Zone.current.fork({
         name: 'ngZone'
       });
       ngZone.run(() => {
@@ -111,7 +111,7 @@ describe('AngularFireAuth', () => {
         count = count + 1;
         mockAuthState.next(firebaseUser);
       } else {
-        expect(<any>user).toEqual(firebaseUser);
+        expect(user as any).toEqual(firebaseUser);
         subs.unsubscribe();
         done();
       }

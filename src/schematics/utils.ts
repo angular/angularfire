@@ -13,7 +13,7 @@ export async function listProjects() {
 // `fuzzy` passes either the original list of projects or an internal object
 // which contains the project as a property.
 const isProject = (elem: Project | { original: Project }): elem is Project => {
-  return (<{ original: Project }>elem).original === undefined;
+  return (elem as { original: Project }).original === undefined;
 };
 
 const searchProjects = (projects: Project[]) => {

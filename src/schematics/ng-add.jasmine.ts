@@ -204,7 +204,7 @@ describe('ng-add', () => {
         })
       ).toThrowError(/ already defined in .firebaserc/);
     });
-  
+
     it('Should throw if firebase.json is broken', async () => {
       const tree = Tree.empty();
       tree.create('angular.json', JSON.stringify(generateAngularJson()));

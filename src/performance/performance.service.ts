@@ -6,7 +6,7 @@ const IS_STABLE_START_MARK = '_isStableStart';
 const IS_STABLE_END_MARK = '_isStableEnd';
 
 function markStarts() {
-    if (typeof(window) !== "undefined" && window.performance) {
+    if (typeof(window) !== 'undefined' && window.performance) {
         window.performance.mark(IS_STABLE_START_MARK);
         return true;
     } else {

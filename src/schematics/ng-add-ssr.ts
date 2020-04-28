@@ -126,7 +126,7 @@ export const setupUniversalDeployment = (config: {
   const staticOutput = project.architect.build.options.outputPath;
   const serverOutput = project.architect.server.options.outputPath;
 
-  // Add @firebase/firestore to externalDependencies 
+  // Add @firebase/firestore to externalDependencies
   const externalDependencies = project.architect.server.options.externalDependencies || [];
   externalDependencies.push('@firebase/firestore');
   project.architect.server.options.externalDependencies = externalDependencies;

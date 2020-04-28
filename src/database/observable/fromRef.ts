@@ -23,7 +23,7 @@ export function fromRef<T>(ref: DatabaseQuery, event: ListenEvent, listenType = 
         scheduler.schedule(() => subscriber.complete());
       }
     }, err => {
-      scheduler.schedule(() => subscriber.error(err))
+      scheduler.schedule(() => subscriber.error(err));
     });
 
     if (listenType == 'on') {

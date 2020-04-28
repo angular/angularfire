@@ -9,7 +9,7 @@ import { AngularFirestoreDocument } from '../document/document';
 import { AngularFirestore } from '../firestore';
 
 export function validateEventsArray(events?: DocumentChangeType[]) {
-  if(!events || events!.length === 0) {
+  if (!events || events!.length === 0) {
     events = ['added', 'removed', 'modified'];
   }
   return events;
@@ -38,7 +38,7 @@ export function validateEventsArray(events?: DocumentChangeType[]) {
  * // Subscribe to changes as snapshots. This provides you data updates as well as delta updates.
  * fakeStock.valueChanges().subscribe(value => console.log(value));
  */
-export class AngularFirestoreCollection<T=DocumentData> {
+export class AngularFirestoreCollection<T= DocumentData> {
   /**
    * The constructor takes in a CollectionReference and Query to provide wrapper methods
    * for data operations and data streaming.
@@ -61,7 +61,7 @@ export class AngularFirestoreCollection<T=DocumentData> {
    * @param events
    */
   stateChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction<T>[]> {
-    if(!events || events.length === 0) {
+    if (!events || events.length === 0) {
       return docChanges<T>(this.query, this.afs.schedulers.outsideAngular).pipe(
         this.afs.keepUnstableUntilFirst
       );
@@ -102,9 +102,9 @@ export class AngularFirestoreCollection<T=DocumentData> {
    * provided `idField` property name.
    * @param options
    */
-  valueChanges(): Observable<T[]>
-  valueChanges({}): Observable<T[]>
-  valueChanges<K extends string>(options: {idField: K}): Observable<(T & { [T in K]: string })[]>
+  valueChanges(): Observable<T[]>;
+  valueChanges({}): Observable<T[]>;
+  valueChanges<K extends string>(options: {idField: K}): Observable<(T & { [T in K]: string })[]>;
   valueChanges<K extends string>(options: {idField?: K} = {}): Observable<T[]> {
     return fromCollectionRef<T>(this.query, this.afs.schedulers.outsideAngular)
       .pipe(
@@ -115,7 +115,7 @@ export class AngularFirestoreCollection<T=DocumentData> {
               ...{ [options.idField]: a.id }
             } as T & { [T in K]: string };
           } else {
-            return a.data()
+            return a.data();
           }
         })),
         this.afs.keepUnstableUntilFirst

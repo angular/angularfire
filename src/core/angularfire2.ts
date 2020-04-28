@@ -18,16 +18,16 @@ export class ɵZoneScheduler implements SchedulerLike {
     const targetZone = this.zone;
     // Wrap the specified work function to make sure that if nested scheduling takes place the
     // work is executed in the correct zone
-    const workInZone = function (this: SchedulerAction<any>, state: any) {
+    const workInZone = function(this: SchedulerAction<any>, state: any) {
       targetZone.runGuarded(() => {
         work.apply(this, [state]);
       });
-    }
+    };
 
     // Scheduling itself needs to be run in zone to ensure setInterval calls for async scheduling are done
     // inside the correct zone. This scheduler needs to schedule asynchronously always to ensure that
     // firebase emissions are never synchronous. Specifying a delay causes issues with the queueScheduler delegate.
-    return this.delegate.schedule(workInZone, delay, state)
+    return this.delegate.schedule(workInZone, delay, state);
   }
 }
 
@@ -47,7 +47,7 @@ export class ɵBlockUntilFirstOperator<T> implements Operator<T, T> {
 
   private unscheduleTask() {
     // maybe this is a race condition, invoke in a timeout
-    // hold for 10ms while I try to figure out what is going on    
+    // hold for 10ms while I try to figure out what is going on
     setTimeout(() => {
       if (this.task != null && this.task.state === 'scheduled') {
         this.task.invoke();
@@ -90,7 +90,7 @@ export function ɵkeepUnstableUntilFirstFactory(
       // INVESTIGATE https://github.com/angular/angularfire/pull/2315
       // share()
     );
-  }
+  };
 }
 
 type FunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? K : never }[keyof T];
@@ -117,16 +117,16 @@ const noopFunctions = ['ngOnDestroy'];
 //             right now it's fairly simple but I'm sure this will grow in complexity
 export const ɵlazySDKProxy = (klass: any, observable: Observable<any>, zone: NgZone) => {
   return new Proxy(klass, {
-    get: (_, name:string) => zone.runOutsideAngular(() => {
-      if (klass[name]) { return klass[name] }
-      if (noopFunctions.includes(name)) { return () => {} }
-      let promise = observable.toPromise().then(mod => {
+    get: (_, name: string) => zone.runOutsideAngular(() => {
+      if (klass[name]) { return klass[name]; }
+      if (noopFunctions.includes(name)) { return () => {}; }
+      const promise = observable.toPromise().then(mod => {
         const ret = mod && mod[name];
         // TODO move to proper type guards
         if (typeof ret == 'function') {
           return ret.bind(mod);
         } else if (ret && ret.then) {
-          return ret.then((res:any) => zone.run(() => res));
+          return ret.then((res: any) => zone.run(() => res));
         } else {
           return zone.run(() => ret);
         }
@@ -134,10 +134,10 @@ export const ɵlazySDKProxy = (klass: any, observable: Observable<any>, zone: Ng
       // recurse the proxy
       return new Proxy(() => undefined, {
           get: (_, name) => promise[name],
-          // TODO handle callbacks as transparently as I can 
+          // TODO handle callbacks as transparently as I can
           apply: (self, _, args) => promise.then(it => it && it(...args))
         }
-      )
+      );
     })
-  })
+  });
 };

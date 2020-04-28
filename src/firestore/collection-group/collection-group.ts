@@ -26,7 +26,7 @@ import { AngularFirestore } from '../firestore';
  * // Subscribe to changes as snapshots. This provides you data updates as well as delta updates.
  * fakeStock.valueChanges().subscribe(value => console.log(value));
  */
-export class AngularFirestoreCollectionGroup<T=DocumentData> {
+export class AngularFirestoreCollectionGroup<T= DocumentData> {
   /**
    * The constructor takes in a CollectionGroupQuery to provide wrapper methods
    * for data operations and data streaming.
@@ -44,7 +44,7 @@ export class AngularFirestoreCollectionGroup<T=DocumentData> {
    * @param events
    */
   stateChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction<T>[]> {
-    if(!events || events.length === 0) {
+    if (!events || events.length === 0) {
       return docChanges<T>(this.query, this.afs.schedulers.outsideAngular).pipe(
         this.afs.keepUnstableUntilFirst
       );

@@ -17,7 +17,7 @@ function _fromRef<T, R>(ref: Reference<T>, scheduler: SchedulerLike = asyncSched
       if (unsubscribe != null) {
         unsubscribe();
       }
-    }
+    };
   });
 }
 
@@ -25,7 +25,7 @@ export function fromRef<R>(ref: DocumentReference | Query, scheduler?: Scheduler
   return _fromRef<typeof ref, R>(ref, scheduler);
 }
 
-export function fromDocRef<T>(ref: DocumentReference, scheduler?: SchedulerLike): Observable<Action<DocumentSnapshot<T>>>{
+export function fromDocRef<T>(ref: DocumentReference, scheduler?: SchedulerLike): Observable<Action<DocumentSnapshot<T>>> {
   return fromRef<DocumentSnapshot<T>>(ref, scheduler)
     .pipe(
       map(payload => ({ payload, type: 'value' }))

@@ -6,12 +6,12 @@ import { isNil } from '../utils';
 
 import { switchMap, distinctUntilChanged, scan } from 'rxjs/operators';
 
-export function listChanges<T=any>(ref: DatabaseQuery, events: ChildEvent[], scheduler?: SchedulerLike): Observable<SnapshotAction<T>[]> {
+export function listChanges<T= any>(ref: DatabaseQuery, events: ChildEvent[], scheduler?: SchedulerLike): Observable<SnapshotAction<T>[]> {
   return fromRef(ref, 'value', 'once', scheduler).pipe(
     switchMap(snapshotAction => {
       const childEvent$ = [of(snapshotAction)];
       events.forEach(event => childEvent$.push(fromRef(ref, event, 'on', scheduler)));
-      return merge(...childEvent$).pipe(scan(buildView, []))
+      return merge(...childEvent$).pipe(scan(buildView, []));
     }),
     distinctUntilChanged()
   );
@@ -19,8 +19,8 @@ export function listChanges<T=any>(ref: DatabaseQuery, events: ChildEvent[], sch
 
 function positionFor<T>(changes: SnapshotAction<T>[], key) {
   const len = changes.length;
-  for(let i=0; i<len; i++) {
-    if(changes[i].payload.key === key) {
+  for (let i = 0; i < len; i++) {
+    if (changes[i].payload.key === key) {
       return i;
     }
   }
@@ -28,11 +28,11 @@ function positionFor<T>(changes: SnapshotAction<T>[], key) {
 }
 
 function positionAfter<T>(changes: SnapshotAction<T>[], prevKey?: string) {
-  if(isNil(prevKey)) {
+  if (isNil(prevKey)) {
     return 0;
   } else {
     const i = positionFor(changes, prevKey);
-    if( i === -1) {
+    if ( i === -1) {
       return changes.length;
     } else {
       return i + 1;
@@ -67,7 +67,7 @@ function buildView(current, action) {
       } else if (prevKey == null) {
         return [action, ...current];
       } else {
-        current = current.slice()
+        current = current.slice();
         current.splice(afterPreviousKeyPosition, 0, action);
       }
       return current;
@@ -76,9 +76,9 @@ function buildView(current, action) {
     case 'child_changed':
       return current.map(x => x.payload.key === key ? action : x);
     case 'child_moved':
-      if(currentKeyPosition > -1) {
+      if (currentKeyPosition > -1) {
         const data = current.splice(currentKeyPosition, 1)[0];
-        current = current.slice()
+        current = current.slice();
         current.splice(afterPreviousKeyPosition, 0, data);
         return current;
       }

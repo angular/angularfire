@@ -9,7 +9,7 @@ import { rando } from '../firestore/utils.spec';
 describe('AngularFireDatabase', () => {
   let app: FirebaseApp;
   let db: AngularFireDatabase;
-  let zone: NgZone
+  let zone: NgZone;
   let firebaseAppName: string;
 
   beforeEach(() => {
@@ -68,7 +68,7 @@ describe('AngularFireDatabase w/options', () => {
   beforeEach(() => {
     query = rando();
     firebaseAppName = rando();
-    url = `http://localhost:${Math.floor(Math.random()*9999)}`;
+    url = `http://localhost:${Math.floor(Math.random() * 9999)}`;
     TestBed.configureTestingModule({
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
@@ -104,7 +104,7 @@ describe('AngularFireDatabase w/options', () => {
       expect(db.database.app.name).toEqual(firebaseAppName);
     });
 
-/* INVESTIGATE database(url) does not seem to be working 
+/* INVESTIGATE database(url) does not seem to be working
 
     it('database be pointing to the provided DB instance', () => {
       expect(db.database.ref().toString()).toEqual(url);
