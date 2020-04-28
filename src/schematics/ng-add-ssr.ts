@@ -70,7 +70,7 @@ export function generateFirebaseJson(
   } else if (Array.isArray(firebaseJson.hosting)) {
     firebaseJson.hosting.push(newConfig);
   } else {
-    firebaseJson.hosting = [firebaseJson.hosting!, newConfig];
+    firebaseJson.hosting = [firebaseJson.hosting, newConfig];
   }
 
   firebaseJson.functions = generateFunctionsConfig(dist);
