@@ -1,7 +1,7 @@
-import { inject, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { CompilerFactory, NgModule, NgZone, PlatformRef } from '@angular/core';
 import { AngularFireModule, FirebaseApp } from './public_api';
-import { Observable, of, Subject, Subscription } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
 import { COMMON_CONFIG } from '../test-config';
 import { BrowserModule } from '@angular/platform-browser';
 import { database } from 'firebase/app';
@@ -12,7 +12,6 @@ import { TestScheduler } from 'rxjs/testing';
 import { rando } from '../firestore/utils.spec';
 
 describe('angularfire', () => {
-  let subscription: Subscription;
   let app: FirebaseApp;
   let rootRef: database.Reference;
   let questionsRef: database.Reference;
@@ -28,21 +27,15 @@ describe('angularfire', () => {
       imports: [AngularFireModule.initializeApp(COMMON_CONFIG, appName)]
     });
 
-    inject([FirebaseApp, PlatformRef], (_app: FirebaseApp, _platform: PlatformRef) => {
-      app = _app;
-      rootRef = app.database!().ref();
-      questionsRef = rootRef.child('questions');
-      listOfQuestionsRef = rootRef.child('list-of-questions');
-      defaultPlatform = _platform;
-    })();
-
+    app = TestBed.inject(FirebaseApp);
+    defaultPlatform = TestBed.inject(PlatformRef);
+    rootRef = app.database().ref();
+    questionsRef = rootRef.child('questions');
+    listOfQuestionsRef = rootRef.child('list-of-questions');
   });
 
   afterEach(() => {
     rootRef.remove();
-    if (subscription && !subscription.closed) {
-      subscription.unsubscribe();
-    }
     app.delete();
   });
 
@@ -64,7 +57,7 @@ describe('angularfire', () => {
     });
 
     it('should execute nested scheduled work inside the specified zone', done => {
-      const testScheduler = new TestScheduler(null!);
+      const testScheduler = new TestScheduler(null);
       testScheduler.run(helpers => {
         const outsideAngularScheduler = new ɵZoneScheduler(Zone.current, testScheduler);
 
@@ -162,7 +155,7 @@ describe('angularfire', () => {
     );
 
     it('should block until first emission', done => {
-      const testScheduler = new TestScheduler(null!);
+      const testScheduler = new TestScheduler(null);
       testScheduler.run(helpers => {
         const outsideZone = Zone.current;
         // tslint:disable-next-line:no-string-literal
@@ -176,14 +169,18 @@ describe('angularfire', () => {
             runTask: insideZone.run.bind(insideZone)
           } as NgZone,
           outsideAngular: new ɵZoneScheduler(outsideZone, testScheduler),
-          insideAngular: new ɵZoneScheduler(insideZone, testScheduler),
+          insideAngular: new ɵZoneScheduler(insideZone, testScheduler)
         };
         const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(trackingSchedulers, ɵPLATFORM_SERVER_ID);
 
         const s = new Subject();
         s.pipe(
-          keepUnstableOp,
-        ).subscribe(() => { }, err => { fail(err); }, () => { });
+          keepUnstableOp
+        ).subscribe(() => {
+        }, err => {
+          fail(err);
+        }, () => {
+        });
 
         // Flush to ensure all async scheduled functions are run
         helpers.flush();
@@ -224,13 +221,15 @@ describe('angularfire', () => {
           imports: [
             AngularFireModule.initializeApp(COMMON_CONFIG, appName),
             BrowserModule
-          ]})
+          ]
+        })
         class MyModule {
-          ngDoBootstrap() {}
+          ngDoBootstrap() {
+          }
         }
 
         const compilerFactory: CompilerFactory =
-            defaultPlatform.injector.get(CompilerFactory, null);
+          defaultPlatform.injector.get(CompilerFactory, null);
         const moduleFactory = compilerFactory.createCompiler().compileModuleSync(MyModule);
 
         defaultPlatform.bootstrapModuleFactory(moduleFactory)
@@ -238,9 +237,9 @@ describe('angularfire', () => {
             const ref = moduleRef.injector.get(FirebaseApp);
             expect(ref.name).toEqual(app.name);
           }).then(done, e => {
-            fail(e);
-            done();
-          });
+          fail(e);
+          done();
+        });
       });
 
     }

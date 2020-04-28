@@ -2,13 +2,16 @@ import { NgZone } from '@angular/core';
 import { asyncScheduler, Observable, Operator, queueScheduler, SchedulerAction, SchedulerLike, Subscriber, Subscription, TeardownLogic } from 'rxjs';
 import { observeOn, subscribeOn, tap } from 'rxjs/operators';
 
-function noop() { }
+function noop() {
+}
 
 /**
  * Schedules tasks so that they are invoked inside the Zone that is passed in the constructor.
  */
+// tslint:disable-next-line:class-name
 export class ɵZoneScheduler implements SchedulerLike {
-  constructor(private zone: any, private delegate: any = queueScheduler) { }
+  constructor(private zone: any, private delegate: any = queueScheduler) {
+  }
 
   now() {
     return this.delegate.now();
@@ -31,17 +34,19 @@ export class ɵZoneScheduler implements SchedulerLike {
   }
 }
 
+// tslint:disable-next-line:class-name
 export class ɵBlockUntilFirstOperator<T> implements Operator<T, T> {
   private task: MacroTask | null = null;
 
-  constructor(private zone: any) { }
+  constructor(private zone: any) {
+  }
 
   call(subscriber: Subscriber<T>, source: Observable<T>): TeardownLogic {
     const unscheduleTask = this.unscheduleTask.bind(this);
     this.task = this.zone.run(() => Zone.current.scheduleMacroTask('firebaseZoneBlock', noop, {}, noop, noop));
 
     return source.pipe(
-      tap(unscheduleTask, unscheduleTask, unscheduleTask)
+      tap({ next: unscheduleTask, complete: unscheduleTask, error: unscheduleTask })
     ).subscribe(subscriber).add(unscheduleTask);
   }
 
@@ -57,6 +62,7 @@ export class ɵBlockUntilFirstOperator<T> implements Operator<T, T> {
   }
 }
 
+// tslint:disable-next-line:class-name
 export class ɵAngularFireSchedulers {
   public readonly outsideAngular: ɵZoneScheduler;
   public readonly insideAngular: ɵZoneScheduler;
@@ -75,6 +81,7 @@ export class ɵAngularFireSchedulers {
  */
 export function ɵkeepUnstableUntilFirstFactory(
   schedulers: ɵAngularFireSchedulers,
+  // tslint:disable-next-line:ban-types
   platformId: Object
 ) {
   return function keepUnstableUntilFirst<T>(obs$: Observable<T>): Observable<T> {
@@ -93,14 +100,20 @@ export function ɵkeepUnstableUntilFirstFactory(
   };
 }
 
+// tslint:disable:ban-types
 type FunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? K : never }[keyof T];
-type PromiseReturningFunctionPropertyNames<T> = { [K in FunctionPropertyNames<T>]: ReturnType<T[K]> extends Promise<any> ? K : never }[FunctionPropertyNames<T>];
-type NonPromiseReturningFunctionPropertyNames<T> = { [K in FunctionPropertyNames<T>]: ReturnType<T[K]> extends Promise<any> ? never : K }[FunctionPropertyNames<T>];
+type PromiseReturningFunctionPropertyNames<T> = {
+  [K in FunctionPropertyNames<T>]: ReturnType<T[K]> extends Promise<any> ? K : never
+}[FunctionPropertyNames<T>];
+type NonPromiseReturningFunctionPropertyNames<T> = {
+  [K in FunctionPropertyNames<T>]: ReturnType<T[K]> extends Promise<any> ? never : K
+}[FunctionPropertyNames<T>];
 type NonFunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof T];
+// tslint:enable:ban-types
 
 export type ɵPromiseProxy<T> = { [K in NonFunctionPropertyNames<T>]: Promise<T[K]> } &
   { [K in NonPromiseReturningFunctionPropertyNames<T>]: (...args: Parameters<T[K]>) => Promise<ReturnType<T[K]>> } &
-  { [K in PromiseReturningFunctionPropertyNames<T>   ]: (...args: Parameters<T[K]>) => ReturnType<T[K]> };
+  { [K in PromiseReturningFunctionPropertyNames<T>]: (...args: Parameters<T[K]>) => ReturnType<T[K]> };
 
 
 // DEBUG quick debugger function for inline logging that typescript doesn't complain about
@@ -118,12 +131,17 @@ const noopFunctions = ['ngOnDestroy'];
 export const ɵlazySDKProxy = (klass: any, observable: Observable<any>, zone: NgZone) => {
   return new Proxy(klass, {
     get: (_, name: string) => zone.runOutsideAngular(() => {
-      if (klass[name]) { return klass[name]; }
-      if (noopFunctions.includes(name)) { return () => {}; }
+      if (klass[name]) {
+        return klass[name];
+      }
+      if (noopFunctions.includes(name)) {
+        return () => {
+        };
+      }
       const promise = observable.toPromise().then(mod => {
         const ret = mod && mod[name];
         // TODO move to proper type guards
-        if (typeof ret == 'function') {
+        if (typeof ret === 'function') {
           return ret.bind(mod);
         } else if (ret && ret.then) {
           return ret.then((res: any) => zone.run(() => res));
