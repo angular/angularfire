@@ -21,7 +21,6 @@ export interface AngularFireUploadTask {
  * Create an AngularFireUploadTask from a regular UploadTask from the Storage SDK.
  * This method creates an observable of the upload and returns on object that provides
  * multiple methods for controlling and monitoring the file upload.
- * @param task
  */
 export function createUploadTask(task: UploadTask): AngularFireUploadTask {
   const inner$ = fromTask(task);

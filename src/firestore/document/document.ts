@@ -33,14 +33,11 @@ export class AngularFirestoreDocument<T= DocumentData> {
   /**
    * The contstuctor takes in a DocumentReference to provide wrapper methods
    * for data operations, data streaming, and Symbol.observable.
-   * @param ref
    */
   constructor(public ref: DocumentReference, private afs: AngularFirestore) { }
 
   /**
    * Create or overwrite a single document.
-   * @param data
-   * @param options
    */
   set(data: T, options?: SetOptions): Promise<void> {
     return this.ref.set(data, options);
@@ -48,7 +45,6 @@ export class AngularFirestoreDocument<T= DocumentData> {
 
   /**
    * Update some fields of a document without overwriting the entire document.
-   * @param data
    */
   update(data: Partial<T>): Promise<void> {
     return this.ref.update(data);
@@ -64,8 +60,6 @@ export class AngularFirestoreDocument<T= DocumentData> {
   /**
    * Create a reference to a sub-collection given a path and an optional query
    * function.
-   * @param path
-   * @param queryFn
    */
   collection<R= DocumentData>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<R> {
     const collectionRef = this.ref.collection(path);
@@ -96,7 +90,6 @@ export class AngularFirestoreDocument<T= DocumentData> {
 
   /**
    * Retrieve the document once.
-   * @param options
    */
   get(options?: firestore.GetOptions) {
     return from(this.ref.get(options)).pipe(

@@ -18,7 +18,6 @@ export interface AngularFireStorageReference {
 /**
  * Create an AngularFire wrapped Storage Reference. This object
  * creates observable methods from promise based methods.
- * @param ref
  */
 export function createStorageRef(
   ref: Reference,

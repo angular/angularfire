@@ -104,7 +104,6 @@ export class AngularFirestore {
    * Each Feature of AngularFire has a FirebaseApp injected. This way we
    * don't rely on the main Firebase App instance and we can create named
    * apps and use multiple apps.
-   * @param app
    */
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
@@ -149,8 +148,6 @@ export class AngularFirestore {
    * Create a reference to a Firestore Collection based on a path or
    * CollectionReference and an optional query function to narrow the result
    * set.
-   * @param pathOrRef
-   * @param queryFn
    */
   collection<T>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<T>;
   collection<T>(ref: CollectionReference, queryFn?: QueryFn): AngularFirestoreCollection<T>;
@@ -169,8 +166,6 @@ export class AngularFirestore {
    * Create a reference to a Firestore Collection Group based on a collectionId
    * and an optional query function to narrow the result
    * set.
-   * @param collectionId
-   * @param queryGroupFn
    */
   collectionGroup<T>(collectionId: string, queryGroupFn?: QueryGroupFn): AngularFirestoreCollectionGroup<T> {
     const queryFn = queryGroupFn || (ref => ref);
@@ -183,7 +178,6 @@ export class AngularFirestore {
    * DocumentReference. Note that documents are not queryable because they are
    * simply objects. However, documents have sub-collections that return a
    * Collection reference and can be queried.
-   * @param pathOrRef
    */
   doc<T>(path: string): AngularFirestoreDocument<T>;
   doc<T>(ref: DocumentReference): AngularFirestoreDocument<T>;
