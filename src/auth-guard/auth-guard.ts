@@ -3,7 +3,14 @@ import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from
 import { Observable, of, pipe, UnaryFunction } from 'rxjs';
 import { map, observeOn, shareReplay, switchMap, take } from 'rxjs/operators';
 import { User } from 'firebase/app';
-import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseAppConfig, FirebaseOptions, ɵAngularFireSchedulers, ɵfirebaseAppFactory } from '@angular/fire';
+import {
+  FIREBASE_APP_NAME,
+  FIREBASE_OPTIONS,
+  FirebaseAppConfig,
+  FirebaseOptions,
+  ɵAngularFireSchedulers,
+  ɵfirebaseAppFactory
+} from '@angular/fire';
 
 export type AuthPipeGenerator = (next: ActivatedRouteSnapshot, state: RouterStateSnapshot) => AuthPipe;
 export type AuthPipe = UnaryFunction<Observable<User|null>, Observable<boolean|any[]>>;

@@ -1,4 +1,14 @@
-import { ComponentFactoryResolver, Inject, Injectable, Injector, NgModuleFactory, NgZone, OnDestroy, Optional, PLATFORM_ID } from '@angular/core';
+import {
+  ComponentFactoryResolver,
+  Inject,
+  Injectable,
+  Injector,
+  NgModuleFactory,
+  NgZone,
+  OnDestroy,
+  Optional,
+  PLATFORM_ID
+} from '@angular/core';
 import { from, Observable, of, Subscription } from 'rxjs';
 import { filter, groupBy, map, mergeMap, observeOn, pairwise, startWith, switchMap, tap, withLatestFrom } from 'rxjs/operators';
 import { ActivationEnd, NavigationEnd, Router, ROUTES } from '@angular/router';

@@ -10,7 +10,17 @@ import 'firebase/firestore';
 import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 
-import { createRandomStocks, delayAdd, delayDelete, delayUpdate, deleteThemAll, FAKE_STOCK_DATA, rando, randomName, Stock } from '../utils.spec';
+import {
+  createRandomStocks,
+  delayAdd,
+  delayDelete,
+  delayUpdate,
+  deleteThemAll,
+  FAKE_STOCK_DATA,
+  rando,
+  randomName,
+  Stock
+} from '../utils.spec';
 
 async function collectionHarness(afs: AngularFirestore, items: number, queryFn?: QueryFn) {
   const randomCollectionName = randomName(afs.firestore);
