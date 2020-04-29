@@ -64,8 +64,8 @@ export class AngularFireAnalytics {
 
     if (!analyticsInitialized) {
       if (isPlatformBrowser(platformId)) {
-        gtag = window[GTAG_FUNCTION_NAME] || (() => {
-          window[DATA_LAYER_NAME].push(arguments);
+        gtag = window[GTAG_FUNCTION_NAME] || ((...args: any[]) => {
+          window[DATA_LAYER_NAME].push(args);
         });
         window[DATA_LAYER_NAME] = window[DATA_LAYER_NAME] || [];
         analyticsInitialized = zone.runOutsideAngular(() =>
