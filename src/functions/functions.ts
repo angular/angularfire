@@ -4,6 +4,7 @@ import { map, switchMap, shareReplay, tap, observeOn } from 'rxjs/operators';
 import { FirebaseOptions, FirebaseAppConfig, FIREBASE_APP_NAME, ɵlazySDKProxy, ɵPromiseProxy, ɵAngularFireSchedulers } from '@angular/fire';
 import { FIREBASE_OPTIONS, ɵfirebaseAppFactory } from '@angular/fire';
 import { functions } from 'firebase/app';
+import { HttpsCallableOptions } from '@firebase/functions-types';
 
 export const ORIGIN = new InjectionToken<string>('angularfire2.functions.origin');
 export const REGION = new InjectionToken<string>('angularfire2.functions.region');
@@ -38,12 +39,12 @@ export class AngularFireFunctions {
       shareReplay({ bufferSize: 1, refCount: false }),
     );
 
-    this.httpsCallable = <T=any, R=any>(name: string) =>
+    this.httpsCallable = <T = any, R = any>(name: string, options?: HttpsCallableOptions) =>
       (data: T) => from(functions).pipe(
         observeOn(schedulers.outsideAngular),
-        switchMap(functions => functions.httpsCallable(name)(data)),
+        switchMap(functions => functions.httpsCallable(name, options)(data)),
         map(r => r.data as R)
-      )
+      );
 
     return ɵlazySDKProxy(this, functions, zone);
 
