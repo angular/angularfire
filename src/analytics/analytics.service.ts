@@ -158,6 +158,7 @@ export class ScreenTrackingService implements OnDestroy {
           }
         }),
         groupBy(params => params[OUTLET_KEY]),
+        // tslint:disable-next-line
         mergeMap(group => group.pipe(startWith(undefined), pairwise())),
         map(([prior, current]) => prior ? {
           [FIREBASE_PREVIOUS_SCREEN_CLASS_KEY]: prior[SCREEN_CLASS_KEY],

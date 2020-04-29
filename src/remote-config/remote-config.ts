@@ -152,6 +152,7 @@ export class AngularFireRemoteConfig {
           rc.defaultConfig = defaultConfig;
         }
       }),
+      // tslint:disable-next-line
       startWith(undefined),
       shareReplay({ bufferSize: 1, refCount: false })
     );

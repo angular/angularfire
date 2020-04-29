@@ -49,6 +49,7 @@ export class AngularFireMessaging {
 
       this.requestPermission = messaging.pipe(
         observeOn(schedulers.outsideAngular),
+        // tslint:disable-next-line
         switchMap(messaging => messaging.requestPermission())
       );
 
