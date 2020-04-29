@@ -3,7 +3,15 @@ import { AngularFireList, AngularFireObject, DatabaseQuery, PathReference, Query
 import { getRef } from './utils';
 import { createListReference } from './list/create-reference';
 import { createObjectReference } from './object/create-reference';
-import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseAppConfig, FirebaseOptions, ɵAngularFireSchedulers, ɵfirebaseAppFactory, ɵkeepUnstableUntilFirstFactory } from '@angular/fire';
+import {
+  FIREBASE_APP_NAME,
+  FIREBASE_OPTIONS,
+  FirebaseAppConfig,
+  FirebaseOptions,
+  ɵAngularFireSchedulers,
+  ɵfirebaseAppFactory,
+  ɵkeepUnstableUntilFirstFactory
+} from '@angular/fire';
 import { Observable } from 'rxjs';
 import { database } from 'firebase/app';
 import 'firebase/database';

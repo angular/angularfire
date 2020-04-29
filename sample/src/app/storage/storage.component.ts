@@ -5,14 +5,15 @@ import { startWith, tap } from 'rxjs/operators';
 import { makeStateKey, TransferState } from '@angular/platform-browser';
 import { trace } from '@angular/fire/performance';
 
-const TRANSPARENT_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+const TRANSPARENT_PNG
+  = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
 @Component({
   selector: 'app-storage',
   template: `
     <p>
       Storage!
-      <img [src]="downloadUrl$ | async" width="64" height="64" />
+      <img [src]="downloadUrl$ | async" width="64" height="64"/>
     </p>
   `,
   styles: []

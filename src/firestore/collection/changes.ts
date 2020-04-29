@@ -19,7 +19,10 @@ export function docChanges<T>(query: Query, scheduler?: SchedulerLike): Observab
 /**
  * Return a stream of document changes on a query. These results are in sort order.
  */
-export function sortedChanges<T>(query: Query, events: DocumentChangeType[], scheduler?: SchedulerLike): Observable<DocumentChangeAction<T>[]> {
+export function sortedChanges<T>(
+  query: Query,
+  events: DocumentChangeType[],
+  scheduler?: SchedulerLike): Observable<DocumentChangeAction<T>[]> {
   return fromCollectionRef(query, scheduler)
     .pipe(
       map(changes => changes.payload.docChanges()),

@@ -1,8 +1,17 @@
 import { Inject, Injectable, NgZone, Optional, PLATFORM_ID } from '@angular/core';
 import { messaging } from 'firebase/app';
-import { EMPTY, Observable, of, throwError } from 'rxjs';
-import { catchError, concat, defaultIfEmpty, map, mergeMap, observeOn, switchMap } from 'rxjs/operators';
-import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseAppConfig, FirebaseOptions, ɵAngularFireSchedulers, ɵfirebaseAppFactory, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
+import { concat, EMPTY, Observable, of, throwError } from 'rxjs';
+import { catchError, defaultIfEmpty, map, mergeMap, observeOn, switchMap } from 'rxjs/operators';
+import {
+  FIREBASE_APP_NAME,
+  FIREBASE_OPTIONS,
+  FirebaseAppConfig,
+  FirebaseOptions,
+  ɵAngularFireSchedulers,
+  ɵfirebaseAppFactory,
+  ɵlazySDKProxy,
+  ɵPromiseProxy
+} from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
 
 export interface AngularFireMessaging extends Omit<ɵPromiseProxy<messaging.Messaging>, 'deleteToken' | 'getToken' | 'requestPermission'> {
@@ -62,10 +71,12 @@ export class AngularFireMessaging {
       ))
     );
 
-    this.tokenChanges = messaging.pipe(
-      observeOn(schedulers.outsideAngular),
-      switchMap(messaging => messaging.getToken()),
-      concat(tokenChanges)
+    this.tokenChanges = concat(
+      messaging.pipe(
+        observeOn(schedulers.outsideAngular),
+        switchMap(messaging => messaging.getToken())
+      ),
+      tokenChanges
     );
 
     this.messages = messaging.pipe(

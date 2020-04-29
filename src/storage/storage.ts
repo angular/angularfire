@@ -1,7 +1,15 @@
 import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
 import { createStorageRef } from './ref';
 import { Observable } from 'rxjs';
-import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseAppConfig, FirebaseOptions, ɵAngularFireSchedulers, ɵfirebaseAppFactory, ɵkeepUnstableUntilFirstFactory } from '@angular/fire';
+import {
+  FIREBASE_APP_NAME,
+  FIREBASE_OPTIONS,
+  FirebaseAppConfig,
+  FirebaseOptions,
+  ɵAngularFireSchedulers,
+  ɵfirebaseAppFactory,
+  ɵkeepUnstableUntilFirstFactory
+} from '@angular/fire';
 import { UploadMetadata } from './interfaces';
 import { storage } from 'firebase/app';
 import 'firebase/storage';
@@ -26,8 +34,9 @@ export class AngularFireStorage {
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
-    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string|FirebaseAppConfig|null|undefined,
-    @Optional() @Inject(BUCKET) storageBucket: string|null,
+    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string | FirebaseAppConfig | null | undefined,
+    @Optional() @Inject(BUCKET) storageBucket: string | null,
+    // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
