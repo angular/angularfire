@@ -15,4 +15,4 @@ branches:
 
 install: yarn
 
-script: yarn build && yarn test:all
+script: yarn build && yarn test:all && yarn lint
