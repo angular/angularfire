@@ -171,7 +171,9 @@ export class AngularFirestore {
    * CollectionReference and an optional query function to narrow the result
    * set.
    */
-  collection<T>(path: string | CollectionReference, queryFn?: QueryFn): AngularFirestoreCollection<T>;
+  collection<T>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<T>;
+  // tslint:disable-next-line:unified-signatures
+  collection<T>(ref: CollectionReference, queryFn?: QueryFn): AngularFirestoreCollection<T>;
   collection<T>(pathOrRef: string | CollectionReference, queryFn?: QueryFn): AngularFirestoreCollection<T> {
     let collectionRef: CollectionReference;
     if (typeof pathOrRef === 'string') {
