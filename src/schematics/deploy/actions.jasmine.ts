@@ -2,7 +2,7 @@ import { experimental, JsonObject, logging } from '@angular-devkit/core';
 import { BuilderContext, BuilderRun, ScheduleOptions, Target } from '@angular-devkit/architect';
 import { BuildTarget, FirebaseDeployConfig, FirebaseTools, FSHost } from '../interfaces';
 import deploy, { deployToFunction } from './actions';
-
+import 'jasmine';
 
 let context: BuilderContext;
 let firebaseMock: FirebaseTools;
@@ -13,7 +13,6 @@ const PROJECT = 'pirojok-project';
 const BUILD_TARGET: BuildTarget = {
   name: `${PROJECT}:build:production`
 };
-
 
 const initMocks = () => {
   fsHost = {
@@ -28,12 +27,13 @@ const initMocks = () => {
   firebaseMock = {
     login: () => Promise.resolve(),
     projects: {
-      list: () => Promise.resolve([]),
+      list: () => Promise.resolve([])
     },
     deploy: (_: FirebaseDeployConfig) => Promise.resolve(),
     use: () => Promise.resolve(),
     logger: {
-      add: () => {}
+      add: () => {
+      }
     },
     serve: () => Promise.resolve()
   };
@@ -56,8 +56,10 @@ const initMocks = () => {
     getTargetOptions: (_: Target) => Promise.resolve({}),
     reportProgress: (_: number, __?: number, ___?: string) => {
     },
-    reportStatus: (_: string) => {},
-    reportRunning: () => {},
+    reportStatus: (_: string) => {
+    },
+    reportRunning: () => {
+    },
     scheduleBuilder: (_: string, __?: JsonObject, ___?: ScheduleOptions) => Promise.resolve({} as BuilderRun),
     scheduleTarget: (_: Target, __?: JsonObject, ___?: ScheduleOptions) => Promise.resolve({} as BuilderRun)
   } as any);
@@ -118,7 +120,7 @@ describe('Deploy Angular apps', () => {
     });
   });
 
-  describe('error handling',  () => {
+  describe('error handling', () => {
     it('throws if there is no firebase project', async () => {
       try {
         await deploy(firebaseMock, context, projectTargets, [BUILD_TARGET], undefined, false, false);

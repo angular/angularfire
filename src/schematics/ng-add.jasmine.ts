@@ -1,5 +1,6 @@
 import { Tree } from '@angular-devkit/schematics';
 import { setupProject } from './ng-add';
+import 'jasmine';
 
 const PROJECT_NAME = 'pie-ka-chu';
 const PROJECT_ROOT = 'pirojok';
@@ -337,7 +338,7 @@ describe('ng-add', () => {
     });
 
     it('uses default project', async () => {
-      const result = await setupProject(tree,  {
+      const result = await setupProject(tree, {
         firebaseProject: FIREBASE_PROJECT,
         isUniversalProject: false,
         project: undefined
@@ -404,7 +405,7 @@ describe('ng-add', () => {
 
     it('Should throw if specified project does not exist ', async () => {
       const tree = Tree.empty();
-      tree.create('angular.json', JSON.stringify({projects: {}}));
+      tree.create('angular.json', JSON.stringify({ projects: {} }));
       expect(() =>
         setupProject(tree, {
           firebaseProject: FIREBASE_PROJECT,
@@ -419,7 +420,7 @@ describe('ng-add', () => {
       tree.create(
         'angular.json',
         JSON.stringify({
-          projects: {[PROJECT_NAME]: {projectType: 'pokemon'}}
+          projects: { [PROJECT_NAME]: { projectType: 'pokemon' } }
         })
       );
       expect(() =>
@@ -436,7 +437,7 @@ describe('ng-add', () => {
       tree.create(
         'angular.json',
         JSON.stringify({
-          projects: {[PROJECT_NAME]: {projectType: 'application'}}
+          projects: { [PROJECT_NAME]: { projectType: 'application' } }
         })
       );
       expect(() =>
@@ -485,7 +486,7 @@ describe('ng-add', () => {
       tree.create('angular.json', JSON.stringify(generateAngularJson()));
       tree.create('.firebaserc', `I'm broken 😔`);
       expect(() =>
-          setupProject(tree, {
+        setupProject(tree, {
           firebaseProject: FIREBASE_PROJECT,
           isUniversalProject: false,
           project: PROJECT_NAME
@@ -532,7 +533,7 @@ describe('ng-add', () => {
       ).toThrowError(/ already defined in .firebaserc/);
     }); */
 
-    describe('universal app',  () => {
+    describe('universal app', () => {
       it('should fail without a server project', async () => {
         const tree = Tree.empty();
         tree.create('angular.json', JSON.stringify(generateAngularJson()));
