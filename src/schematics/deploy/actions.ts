@@ -15,6 +15,7 @@ import {
 import { experimental } from "@angular-devkit/core";
 import { SchematicsException } from "@angular-devkit/schematics";
 import { satisfies } from "semver";
+import * as open from 'open';
 
 const escapeRegExp = (str:String) => str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 
@@ -34,7 +35,7 @@ const deployToHosting = (
     const port = 5000; // TODO make this configurable
 
     setTimeout(() => {
-      execSync(`open http://localhost:${port} || true`);
+      open(`http://localhost:${port}`);
     }, 1500);
 
     return firebaseTools.serve({ port, targets: ["hosting"]}).then(() =>
@@ -181,7 +182,7 @@ export const deployToFunction = async (
     const port = 5000; // TODO make this configurable
 
     setTimeout(() => {
-      execSync(`open http://localhost:${port} || true`);
+      open(`http://localhost:${port}`);
     }, 1500);
 
     return firebaseTools.serve({ port, targets: ["hosting", "functions"]}).then(() =>
