@@ -57,6 +57,7 @@
     "husky": "^4.2.5",
     "inquirer": "^6.2.2",
     "inquirer-autocomplete-prompt": "^1.0.1",
+    "open": "^7.0.3",
     "rxfire": "^3.9.7",
     "rxjs": "^6.5.3",
     "semver": "^7.1.3",
