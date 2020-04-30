@@ -3,7 +3,7 @@ import { fromCollectionRef } from '../observable/fromRef';
 import { map, filter, scan, observeOn } from 'rxjs/operators';
 import { firestore } from 'firebase/app';
 
-import { DocumentChangeType, CollectionReference, Query, DocumentReference, DocumentData, DocumentChangeAction } from '../interfaces';
+import { DocumentChangeType, CollectionReference, Query, DocumentReference, DocumentData, DocumentChangeAction, QuerySnapshot } from '../interfaces';
 import { docChanges, sortedChanges } from './changes';
 import { AngularFirestoreDocument } from '../document/document';
 import { AngularFirestore } from '../firestore';
@@ -51,7 +51,7 @@ export class AngularFirestoreCollection<T=DocumentData> {
    */
   constructor(
     public readonly ref: CollectionReference,
-    private readonly query: Query,
+    private readonly query: Query<T>,
     private readonly afs: AngularFirestore) { }
 
   /**
@@ -127,7 +127,7 @@ export class AngularFirestoreCollection<T=DocumentData> {
    * @param options
    */
   get(options?: firestore.GetOptions): Observable<firestore.QuerySnapshot<T>> {
-    return from(this.query.get(options)).pipe(
+    return from<Promise<firestore.QuerySnapshot<T>>>(this.query.get(options)).pipe(
       observeOn(this.afs.schedulers.insideAngular),
     );
   }
