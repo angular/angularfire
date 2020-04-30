@@ -54,9 +54,9 @@ export interface Reference<T> {
 
 // A convience type for making a query.
 // Example: const query = (ref) => ref.where('name', == 'david');
-export type QueryFn = (ref: CollectionReference) => Query;
+export type QueryFn = (ref: CollectionReference) => Query<DocumentData>;
 
-export type QueryGroupFn = (query: Query) => Query;
+export type QueryGroupFn = (query: Query<DocumentData>) => Query<DocumentData>;
 
 /**
  * A structure that provides an association between a reference
@@ -82,5 +82,5 @@ export type QueryGroupFn = (query: Query) => Query;
  */
 export interface AssociatedReference {
   ref: CollectionReference;
-  query: Query;
+  query: Query<DocumentData>;
 }
