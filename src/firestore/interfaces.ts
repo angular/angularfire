@@ -8,7 +8,7 @@ export type PersistenceSettings = firestore.PersistenceSettings;
 export type DocumentChangeType = firestore.DocumentChangeType;
 export type SnapshotOptions = firestore.SnapshotOptions;
 export type FieldPath = firestore.FieldPath;
-export type Query = firestore.Query;
+export type Query<T> = firestore.Query<T>;
 
 export type SetOptions = firestore.SetOptions;
 export type DocumentData = firestore.DocumentData;
