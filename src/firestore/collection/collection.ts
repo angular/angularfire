@@ -126,7 +126,7 @@ export class AngularFirestoreCollection<T=DocumentData> {
    * Retrieve the results of the query once.
    * @param options
    */
-  get(options?: firestore.GetOptions) {
+  get(options?: firestore.GetOptions): Observable<firestore.QuerySnapshot<T>> {
     return from(this.query.get(options)).pipe(
       observeOn(this.afs.schedulers.insideAngular),
     );
