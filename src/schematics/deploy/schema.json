@@ -11,7 +11,7 @@
     },
     "firebaseProject": {
       "type": "string",
-      "description": "The firebase project name or project alias to use when deploying"
+      "description": "The Firebase project name or project alias to use when deploying"
     },
     "preview": {
       "type": "boolean",
