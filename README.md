@@ -1,15 +1,9 @@
 # AngularFire
-The official Angular library for Firebase
+The official [Angular](https://angular.io/) library for [Firebase](https://firebase.google.com/).
 
 ```bash
-ng add @angular/fire@next
+ng add @angular/fire
 ```
-
----
-
-> **WARNING**: Master branch is the work in progress for version 6 of AngularFire. [You can find version 5 here](https://github.com/angular/angularfire/tree/v5), if you're looking for documentation or to contribute to stable. [Learn more about the road toward version 6 here](https://github.com/angular/angularfire/issues/2267).
-
----
 
 ## What is AngularFire?
 
@@ -34,7 +28,6 @@ Get your first application up and running by following [our quickstart guide](do
 import { Component } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
-import 'firebase/firestore';
 
 @Component({
   selector: 'app-root',

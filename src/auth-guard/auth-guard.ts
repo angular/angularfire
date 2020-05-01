@@ -24,6 +24,7 @@ export class AngularFireAuthGuard implements CanActivate {
     const auth = of(undefined).pipe(
       observeOn(new ɵAngularFireSchedulers(zone).outsideAngular),
       switchMap(() => zone.runOutsideAngular(() => import('firebase/auth'))),
+      observeOn(new ɵAngularFireSchedulers(zone).insideAngular),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
       map(app => app.auth()),
       shareReplay({ bufferSize: 1, refCount: false }),

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { FirebaseOptions, FirebaseAppConfig, ɵfirebaseAppFactory, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵkeepUnstableUntilFirstFactory, ɵAngularFireSchedulers } from '@angular/fire';
 import { UploadMetadata } from './interfaces';
 import { storage } from 'firebase/app';
+import 'firebase/storage';
 
 export const BUCKET = new InjectionToken<string>('angularfire2.storageBucket');
 
@@ -35,7 +36,6 @@ export class AngularFireStorage {
 
     this.storage = zone.runOutsideAngular(() => {
       const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
-      if (!app.storage) { throw "You must import 'firebase/storage' before using AngularFireStorage" }
       return app.storage(storageBucket || undefined);
     });
   }

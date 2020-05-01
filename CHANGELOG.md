@@ -1,3 +1,28 @@
+<a name="6.0.0"></a>
+# [6.0.0](https://github.com/angular/angularfire2/compare/6.0.0-rc.2...6.0.0) (2020-04-01)
+
+Final relase of version 6.
+
+* Updating peer dependencies
+* `ng add @angular/fire` now will overwrite firebase config, if present
+* `ng add @angular/fire` now adds `@firebase/firestore` to the server schematic `externalDependencies` if present
+* `ng deploy --preview` is now interactive and functions on non-SSR
+* `ng deploy` will respect the `bundleDependencies` and `externalDependencies` server schematic options
+* `ng deploy` now defaults to 1GB of ram on Cloud Functions
+* Fixed various issues with functions deploy
+* Simplified `AngularPerformanceMonitoring`
+
+<a name="6.0.0-rc.2"></a>
+# [6.0.0-rc.2](https://github.com/angular/angularfire2/compare/6.0.0-rc.1...6.0.0-rc.2) (2020-03-29)
+
+Continued work on 6.0.
+
+* Update peers
+* No longer require developer add bare imports themselves (e.g, `import 'firebase/firestore'`)
+* Zone.js fixes
+* Angular Universal deploy schematic
+* Storage listAll()
+
 <a name="6.0.0-rc.1"></a>
 # [6.0.0-rc.1](https://github.com/angular/angularfire2/compare/6.0.0-rc.0...6.0.0-rc.1) (2020-02-06)
 
@@ -74,7 +99,7 @@ Version 6 of AngularFire drops support for Angular version 8 and below, older ve
 * Dropped `StorageBucket` DI token in favor of `BUCKET`
 
 <a name="5.4.2"></a>
-## [5.4.2](https://github.com/angular/angularfire2/compare/5.4.1...5.4.2) (2020-02-06)
+# [5.4.2](https://github.com/angular/angularfire2/compare/5.4.1...5.4.2) (2020-02-06)
 
 ### Bug Fixes
 
@@ -82,7 +107,7 @@ Version 6 of AngularFire drops support for Angular version 8 and below, older ve
 
 
 <a name="5.4.1"></a>
-## [5.4.1](https://github.com/angular/angularfire2/compare/5.4.0...5.4.1) (2020-02-05)
+# [5.4.1](https://github.com/angular/angularfire2/compare/5.4.0...5.4.1) (2020-02-05)
 
 ### Bug Fixes
 

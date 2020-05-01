@@ -43,6 +43,7 @@ export function generateFirebaseJson(
     ? safeReadJSON(path, tree)
     : emptyFirebaseJson();
 
+  /* TODO do we want to prompt for override?
   if (
     firebaseJson.hosting &&
     ((Array.isArray(firebaseJson.hosting) &&
@@ -52,7 +53,7 @@ export function generateFirebaseJson(
     throw new SchematicsException(
       `Target ${project} already exists in firebase.json`
     );
-  }
+  }*/
 
   const newConfig = generateHostingConfig(project, dist);
   if (firebaseJson.hosting === undefined) {

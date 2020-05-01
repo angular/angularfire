@@ -93,7 +93,6 @@ Open `/src/app/app.component.ts`, and make sure to modify/delete any tests to ge
 ```ts
 import { Component } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
-import 'firebase/firestore';
 
 @Component({
   selector: 'app-root',
@@ -115,7 +114,6 @@ In `/src/app/app.component.ts`:
 import { Component } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
-import 'firebase/firestore';
 
 @Component({
   selector: 'app-root',

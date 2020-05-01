@@ -6,6 +6,7 @@ import { createObjectReference } from './object/create-reference';
 import { FirebaseOptions, FirebaseAppConfig, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵfirebaseAppFactory, ɵkeepUnstableUntilFirstFactory, ɵAngularFireSchedulers } from '@angular/fire';
 import { Observable } from 'rxjs';
 import { database } from 'firebase/app';
+import 'firebase/database';
 
 export const URL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL')
 
@@ -30,7 +31,6 @@ export class AngularFireDatabase {
 
     this.database = zone.runOutsideAngular(() => {
       const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
-      if (!app.database) { throw "You must import 'firebase/database' before using AngularFireDatabase" }
       return app.database(databaseURL || undefined);
     });
   }
