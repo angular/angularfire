@@ -27,13 +27,13 @@ import { auth } from 'firebase/app';
   `,
 })
 export class AppComponent {
-  constructor(public auth: AngularFireAuth) {
+  constructor(public afAuth: AngularFireAuth) {
   }
   login() {
-    this.auth.signInWithPopup(new auth.GoogleAuthProvider());
+    this.afAuth.auth.signInWithPopup(new auth.GoogleAuthProvider());
   }
   logout() {
-    this.auth.signOut();
+    this.afAuth.auth.signOut();
   }
 }
 ```
