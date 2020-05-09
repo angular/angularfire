@@ -13,7 +13,7 @@ import {
 } from '@angular/fire';
 
 export type AuthPipeGenerator = (next: ActivatedRouteSnapshot, state: RouterStateSnapshot) => AuthPipe;
-export type AuthPipe = UnaryFunction<Observable<User|null>, Observable<boolean|any[]>>;
+export type AuthPipe = UnaryFunction<Observable<User|null>, Observable<boolean|string|any[]>>;
 
 export const loggedIn: AuthPipe = map(user => !!user);
 
@@ -49,14 +49,16 @@ export class AngularFireAuthGuard implements CanActivate {
     return this.authState.pipe(
       take(1),
       authPipeFactory(next, state),
-      map(can => typeof can === 'boolean' ? can : this.router.createUrlTree(can as any[]))
+      map(can => typeof can === 'boolean' ? can :
+        Array.isArray(can) ? this.router.createUrlTree(can) : this.router.parseUrl(can)
+      )
     );
   }
 
 }
 
 export const canActivate = (pipe: AuthPipeGenerator) => ({
-    canActivate: [ AngularFireAuthGuard ], data: { authGuardPipe: pipe }
+  canActivate: [ AngularFireAuthGuard ], data: { authGuardPipe: pipe }
 });
 
 
@@ -65,5 +67,5 @@ export const idTokenResult = switchMap((user: User|null) => user ? user.getIdTok
 export const emailVerified: AuthPipe = map(user => !!user && user.emailVerified);
 export const customClaims = pipe(idTokenResult, map(idTokenResult => idTokenResult ? idTokenResult.claims : []));
 export const hasCustomClaim = (claim: string) => pipe(customClaims, map(claims =>  claims.hasOwnProperty(claim)));
-export const redirectUnauthorizedTo = (redirect: any[]) => pipe(loggedIn, map(loggedIn => loggedIn || redirect));
-export const redirectLoggedInTo = (redirect: any[]) =>  pipe(loggedIn, map(loggedIn => loggedIn && redirect || true));
+export const redirectUnauthorizedTo = (redirect: string|any[]) => pipe(loggedIn, map(loggedIn => loggedIn || redirect));
+export const redirectLoggedInTo = (redirect: string|any[]) =>  pipe(loggedIn, map(loggedIn => loggedIn && redirect || true));
