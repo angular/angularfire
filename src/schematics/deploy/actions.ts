@@ -31,7 +31,7 @@ const deployToHosting = (
       open(`http://localhost:${port}`);
     }, 1500);
 
-    return firebaseTools.serve({ port, targets: ['hosting'] }).then(() =>
+    return firebaseTools.serve({ port, targets: ['hosting'], host: 'localhost' }).then(() =>
       require('inquirer').prompt({
         type: 'confirm',
         name: 'deployProject',
@@ -183,7 +183,11 @@ export const deployToFunction = async (
       open(`http://localhost:${port}`);
     }, 1500);
 
+<<<<<<< HEAD
     return firebaseTools.serve({ port, targets: ['hosting', 'functions'] }).then(() =>
+=======
+    return firebaseTools.serve({ port, targets: ["hosting", "functions"], host: 'localhost'}).then(() =>
+>>>>>>> 074c477... fix(deploy): undefined:5000 -> localhost:5000
       require('inquirer').prompt({
         type: 'confirm',
         name: 'deployProject',
