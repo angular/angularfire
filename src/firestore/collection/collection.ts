@@ -139,8 +139,8 @@ export class AngularFirestoreCollection<T=DocumentData> {
    * when you update data it is not updating data to the window of your query unless
    * the data fits the criteria of the query.
    */
-  add(data: T): Promise<DocumentReference> {
-    return this.ref.add(data);
+  add(data: T): Promise<AngularFirestoreDocument<T>> {
+    return this.ref.add(data).then(doc => new AngularFirestoreDocument<T>(doc, this.afs));
   }
 
   /**

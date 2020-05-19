@@ -312,7 +312,7 @@ For example, a user updates the third item in a list. In a state based method li
 
 ## Adding documents to a collection
 
-To add a new document to a collection with a generated id use the `add()` method. This method uses the type provided by the generic class to validate it's type structure.
+To add a new document to a collection with a generated id use the `add()` method. This method uses the type provided by the generic class to validate it's type structure.  This method returns an `AngularFirestoreDocument`, which provides methods for streaming, updating, and deleting. [See Using Documents with AngularFirestore for more information on how to use documents](documents.md).
 
 #### Basic example
 
