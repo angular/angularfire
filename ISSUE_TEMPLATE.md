@@ -60,7 +60,7 @@ Plunker (http://plnkr.co/) or JSFiddle (https://jsfiddle.net/).
 
 **Sample data and security rules**
 
-<-- include/attach/link to some json sample data (or provide credentials to a sanitized, test Firebase project) -->
+<!-- include/attach/link to some json sample data (or provide credentials to a sanitized, test Firebase project) -->
 
 ### Debug output
 

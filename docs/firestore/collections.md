@@ -191,7 +191,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 export interface AccountDeposit { description: string; amount: number; }
-export interface AccountDepoistId extends AccountDeposit { id: string; }
+export interface AccountDepositId extends AccountDeposit { id: string; }
 
 @Component({
   selector: 'app-root',
