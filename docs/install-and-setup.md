@@ -20,7 +20,7 @@ Now that you have a new project setup, install AngularFire and Firebase from npm
 
 ### 3. Add Firebase config to environments variable
 
-Open `/src/environments/environment.ts` and add your Firebase configuration. You can find your project configuration in [the Firebase Console](https://console.firebase.google.com). From the project overview page, click **Add Firebase to your web app**.
+Open `/src/environments/environment.ts` and add your Firebase configuration. You can find your project configuration in [the Firebase Console](https://console.firebase.google.com). Click the Gear icon next to Project Overview, then click Project Settings and under "Firebase SDK snippet" click Cofnig.
 
 ```ts
 export const environment = {
