@@ -1,5 +1,12 @@
 # 5. Getting started with Firebase Authentication
 
+your `app.module.ts` file should look something like this.
+
+`import { AngularFireAuthModule } from '@angular/fire/auth';`
+
+` imports: [
+     AngularFireAuthModule]`
+
 `AngularFireAuth.user` provides you an `Observable<User|null>` to monitor your application's authentication State.
 
 `AngularFireAuth` promise proxies an initialized
