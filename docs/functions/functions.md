@@ -110,7 +110,7 @@ import { AngularFireFunctionsModule, ORIGIN } from '@angular/fire/functions';
   ],
   ...
   providers: [
-   { provide: ORIGIN, useValue: 'http://localhost:5005' }
+   { provide: ORIGIN, useValue: 'http://localhost:5001' }
   ]
 })
 export class AppModule {}
