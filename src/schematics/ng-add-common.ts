@@ -101,7 +101,7 @@ export const addDependencies = (
       packageJson.devDependencies[depName] || dep.version;
     } else {
       packageJson.dependencies[depName] =
-      packageJson.dependencies[depName] || deps.version;
+      packageJson.dependencies[depName] || dep.version;
     }
   });
 
