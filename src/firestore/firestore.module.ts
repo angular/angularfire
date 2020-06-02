@@ -16,6 +16,6 @@ export class AngularFirestoreModule {
         { provide: ENABLE_PERSISTENCE, useValue: true },
         { provide: PERSISTENCE_SETTINGS, useValue: persistenceSettings },
       ]
-    }
+    };
   }
 }

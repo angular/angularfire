@@ -1,5 +1,4 @@
-import { Subscription, Scheduler } from 'rxjs';
-import { PathReference, DatabaseReference, FirebaseOperation, FirebaseOperationCases } from './interfaces';
+import { DatabaseReference, FirebaseOperation, FirebaseOperationCases, PathReference } from './interfaces';
 import { database } from 'firebase/app';
 
 export function isString(value: any): boolean {
@@ -21,8 +20,8 @@ export function isFirebaseRef(value: any): boolean {
 /**
  * Returns a database reference given a Firebase App and an
  * absolute or relative path.
- * @param app - Firebase App
- * @param path - Database path, relative or absolute
+ * @param database - Firebase Database
+ * @param pathRef - Database path, relative or absolute
  */
 export function getRef(database: database.Database, pathRef: PathReference): DatabaseReference {
   // if a db ref was passed in, just return it
@@ -30,13 +29,13 @@ export function getRef(database: database.Database, pathRef: PathReference): Dat
     : database.ref(pathRef as string);
 }
 
-export function checkOperationCases(item: FirebaseOperation, cases: FirebaseOperationCases) : Promise<void> {
+export function checkOperationCases(item: FirebaseOperation, cases: FirebaseOperationCases): Promise<void> {
   if (isString(item)) {
     return cases.stringCase();
   } else if (isFirebaseRef(item)) {
-    return cases.firebaseCase!();
+    return cases.firebaseCase();
   } else if (isFirebaseDataSnapshot(item)) {
-    return cases.snapshotCase!();
+    return cases.snapshotCase();
   }
   throw new Error(`Expects a string, snapshot, or reference. Got: ${typeof item}`);
 }

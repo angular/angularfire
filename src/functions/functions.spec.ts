@@ -1,6 +1,6 @@
-import { TestBed, inject } from '@angular/core/testing';
-import { FirebaseApp, FIREBASE_OPTIONS, AngularFireModule, FIREBASE_APP_NAME } from '@angular/fire';
-import { AngularFireFunctions, AngularFireFunctionsModule, REGION, ORIGIN } from './public_api';
+import { TestBed } from '@angular/core/testing';
+import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire';
+import { AngularFireFunctions, AngularFireFunctionsModule, ORIGIN, REGION } from './public_api';
 import { COMMON_CONFIG } from '../test-config';
 import 'firebase/functions';
 import { rando } from '../firestore/utils.spec';
@@ -16,10 +16,9 @@ describe('AngularFireFunctions', () => {
         AngularFireFunctionsModule
       ]
     });
-    inject([FirebaseApp, AngularFireFunctions], (app_: FirebaseApp, _fn: AngularFireFunctions) => {
-      app = app_;
-      afFns = _fn;
-    })();
+
+    app = TestBed.inject(FirebaseApp);
+    afFns = TestBed.inject(AngularFireFunctions);
   });
 
   afterEach(() => {
@@ -55,10 +54,9 @@ describe('AngularFireFunctions with different app', () => {
         { provide: REGION, useValue: 'asia-northeast1' }
       ]
     });
-    inject([FirebaseApp, AngularFireFunctions], (app_: FirebaseApp, _fns: AngularFireFunctions) => {
-      app = app_;
-      afFns = _fns;
-    })();
+
+    app = TestBed.inject(FirebaseApp);
+    afFns = TestBed.inject(AngularFireFunctions);
   });
 
   afterEach(() => {

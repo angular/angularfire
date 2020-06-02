@@ -16,6 +16,11 @@
     "build": "tsc tools/build.ts; node ./tools/build.js",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 1"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
+  },
   "schematics": "./dist/packages-dist/collection.json",
   "builders": "./dist/packages-dist/builders.json",
   "keywords": [
@@ -49,6 +54,7 @@
     "firebase-tools": "^8.0.0",
     "fs-extra": "^8.0.1",
     "fuzzy": "^0.1.3",
+    "husky": "^4.2.5",
     "inquirer": "^6.2.2",
     "inquirer-autocomplete-prompt": "^1.0.1",
     "rxfire": "^3.9.7",

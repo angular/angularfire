@@ -1,16 +1,17 @@
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
 import { experimental } from '@angular-devkit/core';
 import {
+  addDependencies,
   generateFirebaseRc,
-  safeReadJSON,
+  NgAddNormalizedOptions,
   overwriteIfExists,
-  stringifyFormatted,
-  addDependencies, NgAddNormalizedOptions
+  safeReadJSON,
+  stringifyFormatted
 } from './ng-add-common';
-import { FirebaseJSON, FirebaseHostingConfig } from './interfaces';
+import { FirebaseJSON } from './interfaces';
 
 import { default as defaultDependencies, firebaseFunctions as firebaseFunctionsDependencies } from './versions.json';
-import {dirname, join} from 'path';
+import { dirname, join } from 'path';
 
 // We consider a project to be a universal project if it has a `server` architect
 // target. If it does, it knows how to build the application's server.
@@ -76,7 +77,7 @@ export function generateFirebaseJson(
   } else if (Array.isArray(firebaseJson.hosting)) {
     firebaseJson.hosting.push(newConfig);
   } else {
-    firebaseJson.hosting = [firebaseJson.hosting!, newConfig];
+    firebaseJson.hosting = [firebaseJson.hosting, newConfig];
   }
 
   firebaseJson.functions = generateFunctionsConfig(dist);
@@ -126,7 +127,7 @@ export const setupUniversalDeployment = (config: {
   const staticOutput = project.architect.build.options.outputPath;
   const serverOutput = project.architect.server.options.outputPath;
 
-  // Add @firebase/firestore to externalDependencies 
+  // Add @firebase/firestore to externalDependencies
   const externalDependencies = project.architect.server.options.externalDependencies || [];
   externalDependencies.push('@firebase/firestore');
   project.architect.server.options.externalDependencies = externalDependencies;
