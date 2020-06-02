@@ -60,7 +60,7 @@ StackBlitz (https://stackblitz.com/edit/angular-fire-start).
 
 **Sample data and security rules**
 
-<-- include/attach/link to some json sample data (or provide credentials to a sanitized, test Firebase project) -->
+<!-- include/attach/link to some json sample data (or provide credentials to a sanitized, test Firebase project) -->
 
 ### Debug output
 
