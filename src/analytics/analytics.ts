@@ -1,11 +1,22 @@
-import { Injectable, Inject, Optional, NgZone, InjectionToken, PLATFORM_ID } from '@angular/core';
-import { of, empty, Observable } from 'rxjs';
+import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
+import { EMPTY, Observable, of } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
-import { map, tap, shareReplay, switchMap, observeOn } from 'rxjs/operators';
-import { FirebaseAppConfig, FirebaseOptions, ɵAngularFireSchedulers, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵfirebaseAppFactory, ɵPromiseProxy } from '@angular/fire';
+import { map, observeOn, shareReplay, switchMap, tap } from 'rxjs/operators';
+import {
+  FIREBASE_APP_NAME,
+  FIREBASE_OPTIONS,
+  FirebaseAppConfig,
+  FirebaseOptions,
+  ɵAngularFireSchedulers,
+  ɵfirebaseAppFactory,
+  ɵlazySDKProxy,
+  ɵPromiseProxy
+} from '@angular/fire';
 import { analytics } from 'firebase';
 
-export interface Config {[key:string]: any};
+export interface Config {
+  [key: string]: any;
+}
 
 export const COLLECTION_ENABLED = new InjectionToken<boolean>('angularfire2.analytics.analyticsCollectionEnabled');
 export const APP_VERSION = new InjectionToken<string>('angularfire2.analytics.appVersion');
@@ -21,11 +32,12 @@ const GTAG_CONFIG_COMMAND = 'config';
 const GTAG_FUNCTION_NAME = 'gtag';
 const DATA_LAYER_NAME = 'dataLayer';
 
-export interface AngularFireAnalytics extends ɵPromiseProxy<analytics.Analytics> {};
+export interface AngularFireAnalytics extends ɵPromiseProxy<analytics.Analytics> {
+}
 
 let gtag: (...args: any[]) => void;
 let analyticsInitialized: Promise<void>;
-const analyticsInstanceCache: {[key:string]: Observable<analytics.Analytics>} = {};
+const analyticsInstanceCache: { [key: string]: Observable<analytics.Analytics> } = {};
 
 @Injectable({
   providedIn: 'any'
@@ -35,34 +47,40 @@ export class AngularFireAnalytics {
   async updateConfig(config: Config) {
     await analyticsInitialized;
     gtag(GTAG_CONFIG_COMMAND, this.options[ANALYTICS_ID_FIELD], { ...config, update: true });
-  };
+  }
 
   constructor(
-    @Inject(FIREBASE_OPTIONS) private options:FirebaseOptions,
-    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
-    @Optional() @Inject(COLLECTION_ENABLED) analyticsCollectionEnabled:boolean|null,
-    @Optional() @Inject(APP_VERSION) providedAppVersion:string|null,
-    @Optional() @Inject(APP_NAME) providedAppName:string|null,
-    @Optional() @Inject(DEBUG_MODE) debugModeEnabled:boolean|null,
-    @Optional() @Inject(CONFIG) providedConfig:Config|null,
-    @Inject(PLATFORM_ID) platformId:Object,
+    @Inject(FIREBASE_OPTIONS) private options: FirebaseOptions,
+    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string | FirebaseAppConfig | null | undefined,
+    @Optional() @Inject(COLLECTION_ENABLED) analyticsCollectionEnabled: boolean | null,
+    @Optional() @Inject(APP_VERSION) providedAppVersion: string | null,
+    @Optional() @Inject(APP_NAME) providedAppName: string | null,
+    @Optional() @Inject(DEBUG_MODE) debugModeEnabled: boolean | null,
+    @Optional() @Inject(CONFIG) providedConfig: Config | null,
+    // tslint:disable-next-line:ban-types
+    @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
 
     if (!analyticsInitialized) {
       if (isPlatformBrowser(platformId)) {
-        gtag = window[GTAG_FUNCTION_NAME] || function() { window[DATA_LAYER_NAME].push(arguments) };
+        gtag = window[GTAG_FUNCTION_NAME] || ((...args: any[]) => {
+          window[DATA_LAYER_NAME].push(args);
+        });
         window[DATA_LAYER_NAME] = window[DATA_LAYER_NAME] || [];
         analyticsInitialized = zone.runOutsideAngular(() =>
           new Promise(resolve => {
             window[GTAG_FUNCTION_NAME] = (...args: any[]) => {
-              if (args[0] == 'js') { resolve() }
+              if (args[0] === 'js') {
+                resolve();
+              }
               gtag(...args);
-            }
+            };
           })
         );
       } else {
-        gtag = () => {};
+        gtag = () => {
+        };
         analyticsInitialized = Promise.resolve();
       }
     }
@@ -71,21 +89,31 @@ export class AngularFireAnalytics {
     if (!analytics) {
       analytics = of(undefined).pipe(
         observeOn(new ɵAngularFireSchedulers(zone).outsideAngular),
-        switchMap(() => isPlatformBrowser(platformId) ? import('firebase/analytics') : empty()),
+        switchMap(() => isPlatformBrowser(platformId) ? import('firebase/analytics') : EMPTY),
         map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
         map(app => app.analytics()),
         tap(analytics => {
-          if (analyticsCollectionEnabled === false) { analytics.setAnalyticsCollectionEnabled(false) }
+          if (analyticsCollectionEnabled === false) {
+            analytics.setAnalyticsCollectionEnabled(false);
+          }
         }),
-        shareReplay({ bufferSize: 1, refCount: false }),
+        shareReplay({ bufferSize: 1, refCount: false })
       );
       analyticsInstanceCache[options[ANALYTICS_ID_FIELD]] = analytics;
     }
 
-    if (providedConfig)     { this.updateConfig(providedConfig) }
-    if (providedAppName)    { this.updateConfig({ [APP_NAME_KEY]:    providedAppName }) }
-    if (providedAppVersion) { this.updateConfig({ [APP_VERSION_KEY]: providedAppVersion }) }
-    if (debugModeEnabled)   { this.updateConfig({ [DEBUG_MODE_KEY]:  1 }) }
+    if (providedConfig) {
+      this.updateConfig(providedConfig);
+    }
+    if (providedAppName) {
+      this.updateConfig({ [APP_NAME_KEY]: providedAppName });
+    }
+    if (providedAppVersion) {
+      this.updateConfig({ [APP_VERSION_KEY]: providedAppVersion });
+    }
+    if (debugModeEnabled) {
+      this.updateConfig({ [DEBUG_MODE_KEY]: 1 });
+    }
 
     return ɵlazySDKProxy(this, analytics, zone);
 

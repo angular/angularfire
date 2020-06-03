@@ -5,11 +5,11 @@ const FUNCTION_REGION = 'us-central1';
 const RUNTIME_OPTIONS = {
   timeoutSeconds: 60,
   memory: '1GB'
-}
+};
 
 export const defaultPackage = (
-  dependencies: {[key:string]: string},
-  devDependencies: {[key:string]: string}
+  dependencies: {[key: string]: string},
+  devDependencies: {[key: string]: string}
 ) => `{
   "name": "functions",
   "description": "Angular Universal Application",

@@ -1,5 +1,5 @@
-import { TestBed, inject } from '@angular/core/testing';
-import { FirebaseApp, AngularFireModule } from '@angular/fire';
+import { TestBed } from '@angular/core/testing';
+import { AngularFireModule, FirebaseApp } from '@angular/fire';
 import { AngularFirePerformance, AngularFirePerformanceModule } from './public_api';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../firestore/utils.spec';
@@ -15,10 +15,9 @@ describe('AngularFirePerformance', () => {
         AngularFirePerformanceModule
       ]
     });
-    inject([FirebaseApp, AngularFirePerformance], (app_: FirebaseApp, _perf: AngularFirePerformance) => {
-      app = app_;
-      afp = _perf;
-    })();
+
+    app = TestBed.inject(FirebaseApp);
+    afp = TestBed.inject(AngularFirePerformance);
   });
 
   afterEach(() => {

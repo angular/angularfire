@@ -1,6 +1,5 @@
 import { Observable } from 'rxjs';
 import { UploadTask, UploadTaskSnapshot } from '../interfaces';
-import { storage } from 'firebase/app';
 
 export function fromTask(task: UploadTask) {
   return new Observable<UploadTaskSnapshot>(subscriber => {

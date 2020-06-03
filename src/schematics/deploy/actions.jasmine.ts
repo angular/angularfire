@@ -1,8 +1,8 @@
-import {experimental, JsonObject, logging} from '@angular-devkit/core';
-import { BuilderContext, BuilderRun, ScheduleOptions, Target, } from '@angular-devkit/architect';
-import {FirebaseTools, FirebaseDeployConfig, BuildTarget, FSHost} from '../interfaces';
-import deploy, {deployToFunction} from './actions';
-
+import { experimental, JsonObject, logging } from '@angular-devkit/core';
+import { BuilderContext, BuilderRun, ScheduleOptions, Target } from '@angular-devkit/architect';
+import { BuildTarget, FirebaseDeployConfig, FirebaseTools, FSHost } from '../interfaces';
+import deploy, { deployToFunction } from './actions';
+import 'jasmine';
 
 let context: BuilderContext;
 let firebaseMock: FirebaseTools;
@@ -13,6 +13,58 @@ const PROJECT = 'pirojok-project';
 const BUILD_TARGET: BuildTarget = {
   name: `${PROJECT}:build:production`
 };
+
+const initMocks = () => {
+  fsHost = {
+    moveSync(_: string, __: string) {
+    },
+    renameSync(_: string, __: string) {
+    },
+    writeFileSync(_: string, __: string) {
+    }
+  };
+
+  firebaseMock = {
+    login: () => Promise.resolve(),
+    projects: {
+      list: () => Promise.resolve([])
+    },
+    deploy: (_: FirebaseDeployConfig) => Promise.resolve(),
+    use: () => Promise.resolve(),
+    logger: {
+      add: () => {
+      }
+    },
+    serve: () => Promise.resolve()
+  };
+
+  context = ({
+    target: {
+      configuration: 'production',
+      project: PROJECT,
+      target: 'foo'
+    },
+    builder: {
+      builderName: 'mock',
+      description: 'mock',
+      optionSchema: false
+    },
+    currentDirectory: 'cwd',
+    id: 1,
+    logger: new logging.NullLogger() as any,
+    workspaceRoot: 'cwd',
+    getTargetOptions: (_: Target) => Promise.resolve({}),
+    reportProgress: (_: number, __?: number, ___?: string) => {
+    },
+    reportStatus: (_: string) => {
+    },
+    reportRunning: () => {
+    },
+    scheduleBuilder: (_: string, __?: JsonObject, ___?: ScheduleOptions) => Promise.resolve({} as BuilderRun),
+    scheduleTarget: (_: Target, __?: JsonObject, ___?: ScheduleOptions) => Promise.resolve({} as BuilderRun)
+  } as any);
+};
+
 
 const projectTargets: experimental.workspace.WorkspaceTool = {
   build: {
@@ -68,7 +120,7 @@ describe('Deploy Angular apps', () => {
     });
   });
 
-  describe('error handling',  () => {
+  describe('error handling', () => {
     it('throws if there is no firebase project', async () => {
       try {
         await deploy(firebaseMock, context, projectTargets, [BUILD_TARGET], undefined, false, false);
@@ -81,7 +133,7 @@ describe('Deploy Angular apps', () => {
     it('throws if there is no target project', async () => {
       context.target = undefined;
       try {
-        await deploy(firebaseMock, context, projectTargets, [BUILD_TARGET], FIREBASE_PROJECT, false, false)
+        await deploy(firebaseMock, context, projectTargets, [BUILD_TARGET], FIREBASE_PROJECT, false, false);
       } catch (e) {
         expect(e.message).toMatch(/Cannot execute the build target/);
       }
@@ -133,51 +185,3 @@ describe('universal deployment', () => {
     expect(spy).not.toHaveBeenCalled();
   });*/
 });
-
-const initMocks = () => {
-  fsHost = {
-    moveSync(_: string, __: string) {
-    },
-    renameSync(_: string, __: string) {
-    },
-    writeFileSync(_: string, __: string) {
-    }
-  };
-
-  firebaseMock = {
-    login: () => Promise.resolve(),
-    projects: {
-      list: () => Promise.resolve([]),
-    },
-    deploy: (_: FirebaseDeployConfig) => Promise.resolve(),
-    use: () => Promise.resolve(),
-    logger: {
-      add: () => {} 
-    },
-    serve: () => Promise.resolve()
-  };
-
-  context = <any>{
-    target: {
-      configuration: 'production',
-      project: PROJECT,
-      target: 'foo'
-    },
-    builder: {
-      builderName: 'mock',
-      description: 'mock',
-      optionSchema: false
-    },
-    currentDirectory: 'cwd',
-    id: 1,
-    logger: new logging.NullLogger() as any,
-    workspaceRoot: 'cwd',
-    getTargetOptions: (_: Target) => Promise.resolve({}),
-      reportProgress: (_: number, __?: number, ___?: string) => {
-    },
-    reportStatus: (_: string) => {},
-    reportRunning: () => {},
-    scheduleBuilder: (_: string, __?: JsonObject, ___?: ScheduleOptions) => Promise.resolve({} as BuilderRun),
-    scheduleTarget: (_: Target, __?: JsonObject, ___?: ScheduleOptions) => Promise.resolve({} as BuilderRun)
-  };
-};

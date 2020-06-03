@@ -37,6 +37,6 @@ export class AppComponent {
   ) {
     const authArgs = canActivate(() => loggedIn);
     console.log(analytics, app, db, auth, afStore, storage, messaging, functions, remoteConfig, performance, authArgs);
-    appRef.isStable.subscribe(it => console.log("isStable", it));
+    appRef.isStable.subscribe(it => console.log('isStable', it));
   }
 }

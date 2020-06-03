@@ -1,24 +1,23 @@
-import { TestBed, inject } from '@angular/core/testing';
-import { PlatformRef, NgModule, CompilerFactory, NgZone } from '@angular/core';
-import { FirebaseApp, AngularFireModule } from './public_api';
-import { Subscription, Observable, Subject, of } from 'rxjs';
+import { TestBed } from '@angular/core/testing';
+import { CompilerFactory, NgModule, NgZone, PlatformRef } from '@angular/core';
+import { AngularFireModule, FirebaseApp } from './public_api';
+import { Observable, of, Subject } from 'rxjs';
 import { COMMON_CONFIG } from '../test-config';
 import { BrowserModule } from '@angular/platform-browser';
 import { database } from 'firebase/app';
-import { ɵZoneScheduler, ɵkeepUnstableUntilFirstFactory, ɵAngularFireSchedulers } from './angularfire2';
+import { ɵAngularFireSchedulers, ɵkeepUnstableUntilFirstFactory, ɵZoneScheduler } from './angularfire2';
 import { ɵPLATFORM_BROWSER_ID, ɵPLATFORM_SERVER_ID } from '@angular/common';
-import { tap  } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
 import { rando } from '../firestore/utils.spec';
 
 describe('angularfire', () => {
-  let subscription:Subscription;
   let app: FirebaseApp;
   let rootRef: database.Reference;
   let questionsRef: database.Reference;
   let listOfQuestionsRef: database.Reference;
   let defaultPlatform: PlatformRef;
-  let appName:string;
+  let appName: string;
 
   beforeEach(() => {
 
@@ -28,27 +27,21 @@ describe('angularfire', () => {
       imports: [AngularFireModule.initializeApp(COMMON_CONFIG, appName)]
     });
 
-    inject([FirebaseApp, PlatformRef], (_app: FirebaseApp, _platform: PlatformRef) => {
-      app = _app;
-      rootRef = app.database!().ref();
-      questionsRef = rootRef.child('questions');
-      listOfQuestionsRef = rootRef.child('list-of-questions');
-      defaultPlatform = _platform;
-    })();
-
+    app = TestBed.inject(FirebaseApp);
+    defaultPlatform = TestBed.inject(PlatformRef);
+    rootRef = app.database().ref();
+    questionsRef = rootRef.child('questions');
+    listOfQuestionsRef = rootRef.child('list-of-questions');
   });
 
   afterEach(() => {
-    rootRef.remove()
-    if(subscription && !subscription.closed) {
-      subscription.unsubscribe();
-    }
+    rootRef.remove();
     app.delete();
   });
 
   describe('ZoneScheduler', () => {
     it('should execute the scheduled work inside the specified zone', done => {
-      let ngZone = Zone.current.fork({
+      const ngZone = Zone.current.fork({
         name: 'ngZone'
       });
       const rootZone = Zone.current;
@@ -64,11 +57,11 @@ describe('angularfire', () => {
     });
 
     it('should execute nested scheduled work inside the specified zone', done => {
-      const testScheduler = new TestScheduler(null!);
+      const testScheduler = new TestScheduler(null);
       testScheduler.run(helpers => {
         const outsideAngularScheduler = new ɵZoneScheduler(Zone.current, testScheduler);
 
-        let ngZone = Zone.current.fork({
+        const ngZone = Zone.current.fork({
           name: 'ngZone'
         });
 
@@ -97,13 +90,13 @@ describe('angularfire', () => {
               helpers.flush();
               done();
               expect(callbacksRan).toEqual(3);
-            })
+            });
           });
           helpers.flush();
         });
       });
-    })
-  })
+    });
+  });
 
   describe('keepUnstableUntilFirstFactory', () => {
     let schedulers: ɵAngularFireSchedulers;
@@ -121,7 +114,7 @@ describe('angularfire', () => {
         runTask: insideZone.run.bind(insideZone)
       } as NgZone;
       schedulers = new ɵAngularFireSchedulers(ngZone);
-    })
+    });
 
     it('should re-schedule emissions asynchronously', done => {
       const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(schedulers, ɵPLATFORM_SERVER_ID);
@@ -133,7 +126,7 @@ describe('angularfire', () => {
       ).subscribe(() => {
         expect(ran).toEqual(true);
         done();
-      }, () => fail("Should not error"));
+      }, () => fail('Should not error'));
 
       expect(ran).toEqual(false);
     });
@@ -145,7 +138,7 @@ describe('angularfire', () => {
         insideZone.run(() => {
           new Observable(s => {
             expect(Zone.current).toEqual(outsideZone);
-            s.next("test");
+            s.next('test');
           }).pipe(
             keepUnstableOp,
             tap(() => {
@@ -162,9 +155,10 @@ describe('angularfire', () => {
     );
 
     it('should block until first emission', done => {
-      const testScheduler = new TestScheduler(null!);
+      const testScheduler = new TestScheduler(null);
       testScheduler.run(helpers => {
         const outsideZone = Zone.current;
+        // tslint:disable-next-line:no-string-literal
         const taskTrack = new Zone['TaskTrackingZoneSpec']();
         const insideZone = Zone.current.fork(taskTrack);
         const trackingSchedulers: ɵAngularFireSchedulers = {
@@ -175,14 +169,18 @@ describe('angularfire', () => {
             runTask: insideZone.run.bind(insideZone)
           } as NgZone,
           outsideAngular: new ɵZoneScheduler(outsideZone, testScheduler),
-          insideAngular: new ɵZoneScheduler(insideZone, testScheduler),
+          insideAngular: new ɵZoneScheduler(insideZone, testScheduler)
         };
         const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(trackingSchedulers, ɵPLATFORM_SERVER_ID);
 
         const s = new Subject();
         s.pipe(
-          keepUnstableOp,
-        ).subscribe(() => { }, err => { fail(err); }, () => { });
+          keepUnstableOp
+        ).subscribe(() => {
+        }, err => {
+          fail(err);
+        }, () => {
+        });
 
         // Flush to ensure all async scheduled functions are run
         helpers.flush();
@@ -202,9 +200,9 @@ describe('angularfire', () => {
         }, 150);
 
       });
-    })
+    });
 
-  })
+  });
 
   describe('FirebaseApp', () => {
 
@@ -223,13 +221,15 @@ describe('angularfire', () => {
           imports: [
             AngularFireModule.initializeApp(COMMON_CONFIG, appName),
             BrowserModule
-          ]})
+          ]
+        })
         class MyModule {
-          ngDoBootstrap() {}
+          ngDoBootstrap() {
+          }
         }
 
         const compilerFactory: CompilerFactory =
-            defaultPlatform.injector.get(CompilerFactory, null);
+          defaultPlatform.injector.get(CompilerFactory, null);
         const moduleFactory = compilerFactory.createCompiler().compileModuleSync(MyModule);
 
         defaultPlatform.bootstrapModuleFactory(moduleFactory)
@@ -237,10 +237,10 @@ describe('angularfire', () => {
             const ref = moduleRef.injector.get(FirebaseApp);
             expect(ref.name).toEqual(app.name);
           }).then(done, e => {
-            fail(e);
-            done()
-          });
-      })
+          fail(e);
+          done();
+        });
+      });
 
     }
   });

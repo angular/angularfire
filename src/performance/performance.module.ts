@@ -11,6 +11,7 @@ export class AngularFirePerformanceModule {
     @Optional() _: PerformanceMonitoringService
   ) {
     // call anything here to get perf loading
-    perf.dataCollectionEnabled
+    // tslint:disable-next-line:no-unused-expression
+    perf.dataCollectionEnabled;
   }
 }
