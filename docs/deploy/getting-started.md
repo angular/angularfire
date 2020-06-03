@@ -28,25 +28,25 @@ The schematics will do the following:
 
 In the end, your `angular.json` project will look like below:
 
-```js
+```json5
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
     "sample-app": {
-        // ...
-        "deploy": {
-          "builder": "@angular/fire:deploy",
-          "options": {} // Here you may find an "ssr": true option if you've
-                        // selected that you want to deploy your Angular universal project
-                        // as a firebase function.
+      // ...
+      "deploy": {
+        "builder": "@angular/fire:deploy",
+        "options": {} // Here you may find an "ssr": true option if you've
+                      // selected that you want to deploy your Angular universal project
+                      // as a firebase function.
         }
       }
-    }
-    // ...
   },
+    // ...
   "defaultProject": "sample-app"
+  
 }
 ```
 
