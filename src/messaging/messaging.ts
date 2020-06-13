@@ -80,9 +80,9 @@ export class AngularFireMessaging {
       tokenChanges
     );
 
-    this.messages = new Observable(subscriber => {
+    this.messages = new Observable(observer => {
       if (navigator && navigator.serviceWorker) {
-        navigator.serviceWorker.addEventListener('message', this.onReceiveMsg.bind(this));
+        navigator.serviceWorker.addEventListener('message', observer.next);
       }
     });
 
