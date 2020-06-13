@@ -80,10 +80,11 @@ export class AngularFireMessaging {
       tokenChanges
     );
 
-    this.messages = messaging.pipe(
-      observeOn(schedulers.outsideAngular),
-      switchMap(messaging => new Observable(messaging.onMessage.bind(messaging)))
-    );
+    this.messages = new Observable(subscriber => {
+      if (navigator && navigator.serviceWorker) {
+        navigator.serviceWorker.addEventListener('message', this.onReceiveMsg.bind(this));
+      }
+    });
 
     this.requestToken = of(undefined).pipe(
       switchMap(() => this.requestPermission),
