@@ -49,9 +49,16 @@ export class AngularFireAuthGuard implements CanActivate {
     return this.authState.pipe(
       take(1),
       authPipeFactory(next, state),
-      map(can => typeof can === 'boolean' ? can :
-        Array.isArray(can) ? this.router.createUrlTree(can) : this.router.parseUrl(can)
-      )
+      map(can => {
+        if (typeof can === 'boolean') {
+          return can;
+        } else if (Array.isArray(can)) {
+          return this.router.createUrlTree(can);
+        } else {
+          // TODO(EdricChan03): Add tests
+          return this.router.parseUrl(can);
+        }
+      })
     );
   }
 
