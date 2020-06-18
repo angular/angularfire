@@ -66,15 +66,19 @@ Providing `DEFAULTS ({[key: string]: string | number | boolean})` tells `Angular
 ## Putting it all together
 
 ```ts
+import { AngularFireRemoteConfigModule } from '@angular/fire/remote-config';
+import { DEFAULTS } from '@angular/fire/remote-config';
+import { SETTINGS } from '@angular/fire/remote-config';
+
 @NgModule({
   imports: [
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireRemoteConfigModule
   ],
   providers: [
-    { provide: DEFAULT_CONFIG, useValue: { enableAwesome: true } },
+    { provide: DEFAULTS, useValue: { enableAwesome: true } },
     {
-      provide: REMOTE_CONFIG_SETTINGS,
+      provide: SETTINGS,
       useFactory: () => isDevMode() ? { minimumFetchIntervalMillis: 10_000 } : {}
     }
   ]
