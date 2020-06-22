@@ -62,7 +62,7 @@ export class AppModule {}
 
 After adding the AngularFireModule you also need to add modules for the individual @NgModules that your application needs.
 
-For example if your application was using both Google Analtyics and the Firestore you would add `AngularFireAnalyticsModule` and `AngularFirestoreModule`:
+For example if your application was using both Google Analytics and the Firestore you would add `AngularFireAnalyticsModule` and `AngularFirestoreModule`:
 
 ```ts
 import { BrowserModule } from '@angular/platform-browser';
