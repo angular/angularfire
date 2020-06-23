@@ -129,7 +129,7 @@ describe('angularfire', () => {
 
       expect(ran).toEqual(false);
     });
-  
+
     it(`should subscribe outside angular and observe inside angular`, done => {
 
       const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(schedulers);
