@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { auth } from 'firebase/app';
+import { auth as rawAuth } from 'firebase/app';
 import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { trace } from '@angular/fire/performance';
@@ -21,19 +21,16 @@ export class AuthComponent implements OnInit, OnDestroy {
 
   private readonly userDisposable: Subscription;
 
-  private _showLoginButton = false;
-  private _showLogoutButton = false;
-
-  public get showLoginButton() { return this._showLoginButton; }
-  public get showLogoutButton() { return this._showLogoutButton; }
+  showLoginButton = false;
+  showLogoutButton = false;
 
   constructor(public readonly auth: AngularFireAuth) {
     this.userDisposable = this.auth.authState.pipe(
       trace('auth'),
       map(u => !!u)
     ).subscribe(isLoggedIn => {
-      this._showLoginButton = !isLoggedIn;
-      this._showLogoutButton = isLoggedIn;
+      this.showLoginButton = !isLoggedIn;
+      this.showLogoutButton = isLoggedIn;
     });
   }
 
@@ -44,7 +41,7 @@ export class AuthComponent implements OnInit, OnDestroy {
   }
 
   login() {
-    this.auth.signInWithPopup(new auth.GoogleAuthProvider);
+    this.auth.signInWithPopup(new rawAuth.GoogleAuthProvider());
   }
 
   logout() {

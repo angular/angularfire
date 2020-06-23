@@ -1,15 +1,15 @@
 // TODO allow these to be configured
-export const NodeVersion = 10;
+export const NODE_VERSION = 10;
 const FUNCTION_NAME = 'ssr';
 const FUNCTION_REGION = 'us-central1';
 const RUNTIME_OPTIONS = {
   timeoutSeconds: 60,
   memory: '1GB'
-}
+};
 
 export const defaultPackage = (
-  dependencies: {[key:string]: string},
-  devDependencies: {[key:string]: string}
+  dependencies: {[key: string]: string},
+  devDependencies: {[key: string]: string}
 ) => `{
   "name": "functions",
   "description": "Angular Universal Application",
@@ -22,7 +22,7 @@ export const defaultPackage = (
     "logs": "firebase functions:log"
   },
   "engines": {
-    "node": "${NodeVersion}"
+    "node": "${NODE_VERSION}"
   },
   "dependencies": ${JSON.stringify(dependencies, null, 4)},
   "devDependencies": ${JSON.stringify(devDependencies, null, 4)},

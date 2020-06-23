@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
-import { tap, startWith } from 'rxjs/operators';
-import { TransferState, makeStateKey } from '@angular/platform-browser';
+import { startWith, tap } from 'rxjs/operators';
+import { makeStateKey, TransferState } from '@angular/platform-browser';
 import { trace } from '@angular/fire/performance';
 
 @Component({

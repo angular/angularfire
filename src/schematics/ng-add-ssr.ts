@@ -1,16 +1,17 @@
 import { SchematicsException, Tree, SchematicContext } from '@angular-devkit/schematics';
 import { experimental } from '@angular-devkit/core';
 import {
+  addDependencies,
   generateFirebaseRc,
-  safeReadJSON,
+  NgAddNormalizedOptions,
   overwriteIfExists,
-  stringifyFormatted,
-  addDependencies, NgAddNormalizedOptions
+  safeReadJSON,
+  stringifyFormatted
 } from './ng-add-common';
 import { FirebaseJSON } from './interfaces';
 
 import { default as defaultDependencies, firebaseFunctions as firebaseFunctionsDependencies } from './versions.json';
-import {dirname, join} from 'path';
+import { dirname, join } from 'path';
 
 // We consider a project to be a universal project if it has a `server` architect
 // target. If it does, it knows how to build the application's server.
@@ -33,10 +34,10 @@ function generateHostingConfig(project: string, dist: string) {
     public: join(dirname(dist), dist),
     ignore: ['**/.*'],
     headers: [{
-      source: "*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].+(css|js)",
+      source: '*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].+(css|js)',
       headers: [{
-        key: "Cache-Control",
-        value: "public,max-age=31536000,immutable"
+        key: 'Cache-Control',
+        value: 'public,max-age=31536000,immutable'
       }]
     }],
     rewrites: [
@@ -81,14 +82,14 @@ export function generateFirebaseJson(
   if (firebaseJson.hosting === undefined) {
     firebaseJson.hosting = newConfig;
   } else if (Array.isArray(firebaseJson.hosting)) {
-    const existingConfigIndex = firebaseJson.hosting.findIndex(config => config.target == newConfig.target);
+    const existingConfigIndex = firebaseJson.hosting.findIndex(config => config.target === newConfig.target);
     if (existingConfigIndex > -1) {
-      firebaseJson.hosting.splice(existingConfigIndex, 1, newConfig)
+      firebaseJson.hosting.splice(existingConfigIndex, 1, newConfig);
     } else {
       firebaseJson.hosting.push(newConfig);
     }
   } else {
-    firebaseJson.hosting = [firebaseJson.hosting!, newConfig];
+    firebaseJson.hosting = [firebaseJson.hosting, newConfig];
   }
 
   firebaseJson.functions = generateFunctionsConfig(dist);
@@ -139,9 +140,9 @@ export const setupUniversalDeployment = (config: {
   const staticOutput = project.architect.build.options.outputPath;
   const serverOutput = project.architect.server.options.outputPath;
 
-  // Add @firebase/firestore to externalDependencies 
+  // Add @firebase/firestore to externalDependencies
   const externalDependencies: string[] = project.architect.server.options.externalDependencies || [];
-  if (!externalDependencies.includes('@firebase/firestore')) { externalDependencies.push('@firebase/firestore') }
+  if (!externalDependencies.includes('@firebase/firestore')) { externalDependencies.push('@firebase/firestore'); }
   project.architect.server.options.externalDependencies = externalDependencies;
 
   project.architect.deploy = {

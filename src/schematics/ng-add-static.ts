@@ -1,17 +1,16 @@
 import { SchematicsException, Tree, SchematicContext } from '@angular-devkit/schematics';
 import { experimental } from '@angular-devkit/core';
 import {
+  addDependencies,
   generateFirebaseRc,
+  NgAddNormalizedOptions,
   overwriteIfExists,
   safeReadJSON,
-  stringifyFormatted,
-  addDependencies, NgAddNormalizedOptions
+  stringifyFormatted
 } from './ng-add-common';
-import { FirebaseJSON, FirebaseHostingConfig } from './interfaces';
+import { FirebaseJSON } from './interfaces';
 
-import {
-  default as defaultDependencies
-} from './versions.json';
+import { default as defaultDependencies } from './versions.json';
 
 function emptyFirebaseJson() {
   return {
@@ -25,10 +24,10 @@ function generateHostingConfig(project: string, dist: string) {
     public: dist,
     ignore: ['**/.*'],
     headers: [{
-      source: "*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].+(css|js)",
+      source: '*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].+(css|js)',
       headers: [{
-        key: "Cache-Control",
-        value: "public,max-age=31536000,immutable"
+        key: 'Cache-Control',
+        value: 'public,max-age=31536000,immutable'
       }]
     }],
     rewrites: [

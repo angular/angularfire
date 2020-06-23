@@ -1,6 +1,6 @@
-import { FirebaseApp, AngularFireModule, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire';
+import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire';
 import { AngularFireDatabase, AngularFireDatabaseModule, URL } from './public_api';
-import { TestBed, inject } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../test-config';
 import { NgZone } from '@angular/core';
 import 'firebase/database';
@@ -9,7 +9,7 @@ import { rando } from '../firestore/utils.spec';
 describe('AngularFireDatabase', () => {
   let app: FirebaseApp;
   let db: AngularFireDatabase;
-  let zone: NgZone
+  let zone: NgZone;
   let firebaseAppName: string;
 
   beforeEach(() => {
@@ -20,14 +20,13 @@ describe('AngularFireDatabase', () => {
         AngularFireDatabaseModule
       ],
       providers: [
-        { provide: URL, useValue: 'http://localhost:9000'}
+        { provide: URL, useValue: 'http://localhost:9000' }
       ]
     });
-    inject([FirebaseApp, AngularFireDatabase, NgZone], (app_: FirebaseApp, _db: AngularFireDatabase, _zone: NgZone) => {
-      app = app_;
-      db = _db;
-      zone = _zone;
-    })();
+
+    app = TestBed.inject(FirebaseApp);
+    db = TestBed.inject(AngularFireDatabase);
+    zone = TestBed.inject(NgZone);
   });
 
   afterEach(() => {
@@ -45,9 +44,9 @@ describe('AngularFireDatabase', () => {
     });
 
     it('should accept a Firebase App in the constructor', (done) => {
-      const __db = new AngularFireDatabase(app.options, rando(), undefined!, {}, zone);
-      expect(__db instanceof AngularFireDatabase).toEqual(true);
-      __db.database.app.delete().then(done, done);
+      const database = new AngularFireDatabase(app.options, rando(), undefined, {}, zone);
+      expect(database instanceof AngularFireDatabase).toEqual(true);
+      database.database.app.delete().then(done, done);
     });
 
     it('should have an initialized Firebase app instance member', () => {
@@ -68,7 +67,7 @@ describe('AngularFireDatabase w/options', () => {
   beforeEach(() => {
     query = rando();
     firebaseAppName = rando();
-    url = `http://localhost:${Math.floor(Math.random()*9999)}`;
+    url = `http://localhost:${Math.floor(Math.random() * 9999)}`;
     TestBed.configureTestingModule({
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
@@ -80,10 +79,9 @@ describe('AngularFireDatabase w/options', () => {
         { provide: URL, useValue: url }
       ]
     });
-    inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {
-      app = app_;
-      db = _db;
-    })();
+
+    app = TestBed.inject(FirebaseApp);
+    db = TestBed.inject(AngularFireDatabase);
   });
 
   afterEach(() => {
@@ -104,20 +102,20 @@ describe('AngularFireDatabase w/options', () => {
       expect(db.database.app.name).toEqual(firebaseAppName);
     });
 
-/* INVESTIGATE database(url) does not seem to be working 
+    /* INVESTIGATE database(url) does not seem to be working
 
-    it('database be pointing to the provided DB instance', () => {
-      expect(db.database.ref().toString()).toEqual(url);
-    });
+        it('database be pointing to the provided DB instance', () => {
+          expect(db.database.ref().toString()).toEqual(url);
+        });
 
-    it('list should be using the provided DB instance', () => {
-      expect(db.list(query).query.toString()).toEqual(`${url}/${query}`);
-    });
+        it('list should be using the provided DB instance', () => {
+          expect(db.list(query).query.toString()).toEqual(`${url}/${query}`);
+        });
 
-    it('object should be using the provided DB instance', () => {
-      expect(db.object(query).query.toString()).toEqual(`${url}/${query}`);
-    });
-*/
+        it('object should be using the provided DB instance', () => {
+          expect(db.object(query).query.toString()).toEqual(`${url}/${query}`);
+        });
+    */
   });
 
 });

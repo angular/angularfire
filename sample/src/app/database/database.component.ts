@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFireDatabase } from '@angular/fire/database';
 import { Observable } from 'rxjs';
-import { TransferState, makeStateKey } from '@angular/platform-browser';
+import { makeStateKey, TransferState } from '@angular/platform-browser';
 import { startWith, tap } from 'rxjs/operators';
 import { trace } from '@angular/fire/performance';
 

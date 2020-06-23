@@ -46,12 +46,12 @@ be fixed in the latest versions. -->
 
 ### How to reproduce these conditions
 
-**Failing test unit, Plunkr, or JSFiddle demonstrating the problem**
+**Failing test unit, Stackblitz demonstrating the problem**
 
 <!-- 
 Provide a failing test unit, or create a minimal, complete, and 
-verifiable example (http://stackoverflow.com/help/mcve) using either 
-Plunker (http://plnkr.co/) or JSFiddle (https://jsfiddle.net/).
+verifiable example (http://stackoverflow.com/help/mcve) using 
+StackBlitz (https://stackblitz.com/edit/angular-fire-start).
 -->
 
 **Steps to set up and reproduce**
@@ -60,7 +60,7 @@ Plunker (http://plnkr.co/) or JSFiddle (https://jsfiddle.net/).
 
 **Sample data and security rules**
 
-<-- include/attach/link to some json sample data (or provide credentials to a sanitized, test Firebase project) -->
+<!-- include/attach/link to some json sample data (or provide credentials to a sanitized, test Firebase project) -->
 
 ### Debug output
 
