@@ -64,6 +64,9 @@ export const isNotAnonymous: AuthPipe = map(user => !!user && !user.isAnonymous)
 export const idTokenResult = switchMap((user: User|null) => user ? user.getIdTokenResult() : of(null));
 export const emailVerified: AuthPipe = map(user => !!user && user.emailVerified);
 export const customClaims = pipe(idTokenResult, map(idTokenResult => idTokenResult ? idTokenResult.claims : []));
-export const hasCustomClaim = (claim: string) => pipe(customClaims, map(claims =>  claims.hasOwnProperty(claim)));
-export const redirectUnauthorizedTo = (redirect: any[]) => pipe(loggedIn, map(loggedIn => loggedIn || redirect));
-export const redirectLoggedInTo = (redirect: any[]) =>  pipe(loggedIn, map(loggedIn => loggedIn && redirect || true));
+export const hasCustomClaim: (claim: string) => AuthPipe =
+  (claim) => pipe(customClaims, map(claims =>  claims.hasOwnProperty(claim)));
+export const redirectUnauthorizedTo: (redirect: any[]) => AuthPipe =
+  (redirect) => pipe(loggedIn, map(loggedIn => loggedIn || redirect));
+export const redirectLoggedInTo: (redirect: any[]) => AuthPipe =
+  (redirect) => pipe(loggedIn, map(loggedIn => loggedIn && redirect || true));
