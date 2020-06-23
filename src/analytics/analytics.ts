@@ -3,7 +3,7 @@ import { of, empty, Observable } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { map, tap, shareReplay, switchMap, observeOn } from 'rxjs/operators';
 import { FirebaseAppConfig, FirebaseOptions, ɵAngularFireSchedulers, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵfirebaseAppFactory, ɵPromiseProxy } from '@angular/fire';
-import { analytics } from 'firebase';
+import { analytics } from 'firebase/app';
 
 export interface Config {[key:string]: any};
 
