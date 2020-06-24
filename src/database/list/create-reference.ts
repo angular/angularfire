@@ -9,12 +9,13 @@ import { map } from 'rxjs/operators';
 
 export function createListReference<T= any>(query: DatabaseQuery, afDatabase: AngularFireDatabase): AngularFireList<T> {
   const outsideAngularScheduler = afDatabase.schedulers.outsideAngular;
+  const refInZone = afDatabase.schedulers.ngZone.run(() => query.ref);
   return {
     query,
-    update: createDataOperationMethod<Partial<T>>(query.ref, 'update'),
-    set: createDataOperationMethod<T>(query.ref, 'set'),
-    push: (data: T) => query.ref.push(data),
-    remove: createRemoveMethod(query.ref),
+    update: createDataOperationMethod<Partial<T>>(refInZone, 'update'),
+    set: createDataOperationMethod<T>(refInZone, 'set'),
+    push: (data: T) => refInZone.push(data),
+    remove: createRemoveMethod(refInZone),
     snapshotChanges(events?: ChildEvent[]) {
       return snapshotChanges<T>(query, events, outsideAngularScheduler).pipe(afDatabase.keepUnstableUntilFirst);
     },

@@ -182,7 +182,8 @@ export class AngularFirestore {
       collectionRef = pathOrRef;
     }
     const { ref, query } = associateQuery(collectionRef, queryFn);
-    return new AngularFirestoreCollection<T>(ref, query, this);
+    const refInZone = this.schedulers.ngZone.run(() => ref);
+    return new AngularFirestoreCollection<T>(refInZone, query, this);
   }
 
   /**
@@ -212,7 +213,8 @@ export class AngularFirestore {
     } else {
       ref = pathOrRef;
     }
-    return new AngularFirestoreDocument<T>(ref, this);
+    const refInZone = this.schedulers.ngZone.run(() => ref);
+    return new AngularFirestoreDocument<T>(refInZone, this);
   }
 
   /**
