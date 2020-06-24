@@ -44,7 +44,7 @@ export function ɵfirebaseAppFactory(options: FirebaseOptions, zone: NgZone, nam
   return (existingApp || zone.runOutsideAngular(() => firebase.initializeApp(options, config as any))) as FirebaseApp;
 }
 
-const FirebaseAppProvider = {
+const FIREBASE_APP_PROVIDER = {
   provide: FirebaseApp,
   useFactory: ɵfirebaseAppFactory,
   deps: [
@@ -55,7 +55,7 @@ const FirebaseAppProvider = {
 };
 
 @NgModule({
-  providers: [FirebaseAppProvider]
+  providers: [FIREBASE_APP_PROVIDER]
 })
 export class AngularFireModule {
   static initializeApp(options: FirebaseOptions, nameOrConfig?: string | FirebaseAppConfig) {

@@ -19,7 +19,7 @@
     "@angular/common": "~9.1.0",
     "@angular/compiler": "~9.1.0",
     "@angular/core": "~9.1.0",
-    "@angular/fire": "file:../dist/packages-dist",
+    "@angular/fire": "../dist/packages-dist",
     "@angular/forms": "~9.1.0",
     "@angular/platform-browser": "~9.1.0",
     "@angular/platform-browser-dynamic": "~9.1.0",
@@ -27,7 +27,8 @@
     "@angular/router": "~9.1.0",
     "@angular/service-worker": "~9.1.0",
     "@nguniversal/express-engine": "~9.1.0",
-    "firebase": "^7.13.1",
+    "firebase": "^7.13.2",
+    "proxy-polyfill": "^0.3.1",
     "rxjs": "~6.5.4",
     "tslib": "^1.10.0",
     "zone.js": "~0.10.2"

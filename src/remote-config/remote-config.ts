@@ -22,6 +22,7 @@ import {
   FirebaseOptions,
   ɵAngularFireSchedulers,
   ɵfirebaseAppFactory,
+  ɵkeepUnstableUntilFirstFactory,
   ɵlazySDKProxy,
   ɵPromiseProxy
 } from '@angular/fire';
@@ -193,6 +194,7 @@ export class AngularFireRemoteConfig {
 
     this.parameters = concat(default$, existing$, fresh$).pipe(
       scanToParametersArray(remoteConfig$),
+      ɵkeepUnstableUntilFirstFactory(schedulers),
       shareReplay({ bufferSize: 1, refCount: true })
     );
 

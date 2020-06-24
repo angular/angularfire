@@ -108,9 +108,9 @@ export const ngAdd = (options: DeployOptions) => (
   return projectTypePrompt(project).then(
     ({ universalProject }: { universalProject: boolean }) => {
       if (universalProject) {
-        addFirebaseFunctionsDependencies(host);
+        addFirebaseFunctionsDependencies(host, context);
       } else {
-        addFirebaseHostingDependencies(host);
+        addFirebaseHostingDependencies(host, context);
       }
       const projectOptions: DeployOptions & { isUniversalProject: boolean } = {
         ...options,

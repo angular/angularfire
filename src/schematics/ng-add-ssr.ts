@@ -1,4 +1,4 @@
-import { SchematicsException, Tree } from '@angular-devkit/schematics';
+import { SchematicsException, Tree, SchematicContext } from '@angular-devkit/schematics';
 import { experimental } from '@angular-devkit/core';
 import {
   addDependencies,
@@ -32,7 +32,14 @@ function generateHostingConfig(project: string, dist: string) {
   return {
     target: project,
     public: join(dirname(dist), dist),
-    ignore: ['firebase.json', '**/.*', '**/node_modules/**'],
+    ignore: ['**/.*'],
+    headers: [{
+      source: '*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].+(css|js)',
+      headers: [{
+        key: 'Cache-Control',
+        value: 'public,max-age=31536000,immutable'
+      }]
+    }],
     rewrites: [
       {
         source: '**',
@@ -75,7 +82,12 @@ export function generateFirebaseJson(
   if (firebaseJson.hosting === undefined) {
     firebaseJson.hosting = newConfig;
   } else if (Array.isArray(firebaseJson.hosting)) {
-    firebaseJson.hosting.push(newConfig);
+    const existingConfigIndex = firebaseJson.hosting.findIndex(config => config.target === newConfig.target);
+    if (existingConfigIndex > -1) {
+      firebaseJson.hosting.splice(existingConfigIndex, 1, newConfig);
+    } else {
+      firebaseJson.hosting.push(newConfig);
+    }
   } else {
     firebaseJson.hosting = [firebaseJson.hosting, newConfig];
   }
@@ -85,10 +97,11 @@ export function generateFirebaseJson(
   overwriteIfExists(tree, path, stringifyFormatted(firebaseJson));
 }
 
-export const addFirebaseFunctionsDependencies = (tree: Tree) => {
+export const addFirebaseFunctionsDependencies = (tree: Tree, context: SchematicContext) => {
   addDependencies(
     tree,
     {...defaultDependencies, ...firebaseFunctionsDependencies},
+    context
   );
 };
 
@@ -128,8 +141,8 @@ export const setupUniversalDeployment = (config: {
   const serverOutput = project.architect.server.options.outputPath;
 
   // Add @firebase/firestore to externalDependencies
-  const externalDependencies = project.architect.server.options.externalDependencies || [];
-  externalDependencies.push('@firebase/firestore');
+  const externalDependencies: string[] = project.architect.server.options.externalDependencies || [];
+  if (!externalDependencies.includes('@firebase/firestore')) { externalDependencies.push('@firebase/firestore'); }
   project.architect.server.options.externalDependencies = externalDependencies;
 
   project.architect.deploy = {

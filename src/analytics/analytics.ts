@@ -1,18 +1,18 @@
 import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
 import { EMPTY, Observable, of } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
-import { map, observeOn, shareReplay, switchMap, tap } from 'rxjs/operators';
+import { map, tap, shareReplay, switchMap, observeOn } from 'rxjs/operators';
 import {
-  FIREBASE_APP_NAME,
-  FIREBASE_OPTIONS,
   FirebaseAppConfig,
   FirebaseOptions,
   ɵAngularFireSchedulers,
-  ɵfirebaseAppFactory,
   ɵlazySDKProxy,
+  FIREBASE_OPTIONS,
+  FIREBASE_APP_NAME,
+  ɵfirebaseAppFactory,
   ɵPromiseProxy
 } from '@angular/fire';
-import { analytics } from 'firebase';
+import { analytics } from 'firebase/app';
 
 export interface Config {
   [key: string]: any;

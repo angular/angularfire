@@ -4,10 +4,11 @@ import { existsSync, readFileSync, renameSync, writeFileSync } from 'fs';
 import { copySync, removeSync } from 'fs-extra';
 import { dirname, join } from 'path';
 import { execSync } from 'child_process';
-import { defaultFunction, defaultPackage, NodeVersion } from './functions-templates';
+import { defaultFunction, defaultPackage, NODE_VERSION } from './functions-templates';
 import { experimental } from '@angular-devkit/core';
 import { SchematicsException } from '@angular-devkit/schematics';
 import { satisfies } from 'semver';
+import * as open from 'open';
 
 const escapeRegExp = (str: string) => str.replace(/[\-\[\]\/{}()*+?.\\^$|]/g, '\\$&');
 
@@ -27,10 +28,10 @@ const deployToHosting = (
     const port = 5000; // TODO make this configurable
 
     setTimeout(() => {
-      execSync(`open http://localhost:${port} || true`);
+      open(`http://localhost:${port}`);
     }, 1500);
 
-    return firebaseTools.serve({ port, targets: ['hosting'] }).then(() =>
+    return firebaseTools.serve({ port, targets: ['hosting'], host: 'localhost' }).then(() =>
       require('inquirer').prompt({
         type: 'confirm',
         name: 'deployProject',
@@ -67,6 +68,11 @@ const defaultFsHost: FSHost = {
 
 const getVersionRange = (v: number) => `^${v}.0.0`;
 
+const findPackageVersion = (name: string) => {
+  const match = execSync(`npm list ${name}`).toString().match(` ${escapeRegExp(name)}@.+\\w`);
+  return match ? match[0].split(`${name}@`)[1] : null;
+};
+
 const getPackageJson = (context: BuilderContext, workspaceRoot: string) => {
   const dependencies = {
     'firebase-admin': 'latest',
@@ -75,18 +81,13 @@ const getPackageJson = (context: BuilderContext, workspaceRoot: string) => {
   const devDependencies = {
     'firebase-functions-test': 'latest'
   };
-  const npmList = execSync('npm ls || true').toString();
   Object.keys(dependencies).forEach((dependency: string) => {
-    const npmLsMatch = npmList.match(` ${escapeRegExp(dependency)}@.+\\w`);
-    if (npmLsMatch) {
-      dependencies[dependency] = npmLsMatch[0].split(`${dependency}@`)[1];
-    }
+    const packageVersion = findPackageVersion(dependency);
+    if (packageVersion) { dependencies[dependency] = packageVersion; }
   });
   Object.keys(devDependencies).forEach((devDependency: string) => {
-    const npmLsMatch = npmList.match(` ${escapeRegExp(devDependency)}@.+\\w`);
-    if (npmLsMatch) {
-      devDependencies[devDependency] = npmLsMatch[0].split(`${devDependency}@`)[1];
-    }
+    const packageVersion = findPackageVersion(devDependency);
+    if (packageVersion) { devDependencies[devDependency] = packageVersion; }
   });
   if (existsSync(join(workspaceRoot, 'angular.json'))) {
     const angularJson = JSON.parse(readFileSync(join(workspaceRoot, 'angular.json')).toString());
@@ -104,10 +105,8 @@ const getPackageJson = (context: BuilderContext, workspaceRoot: string) => {
       } // TODO should we throw?
     } else {
       externalDependencies.forEach(externalDependency => {
-        const npmLsMatch = npmList.match(` ${escapeRegExp(externalDependency)}@.+\\w`);
-        if (npmLsMatch) {
-          dependencies[externalDependency] = npmLsMatch[0].split(`${externalDependency}@`)[1];
-        }
+        const packageVersion = findPackageVersion(externalDependency);
+        if (packageVersion) { dependencies[externalDependency] = packageVersion; }
       });
     }
   } // TODO should we throw?
@@ -122,9 +121,9 @@ export const deployToFunction = async (
   preview: boolean,
   fsHost: FSHost = defaultFsHost
 ) => {
-  if (!satisfies(process.versions.node, getVersionRange(NodeVersion))) {
+  if (!satisfies(process.versions.node, getVersionRange(NODE_VERSION))) {
     context.logger.warn(
-      `⚠️ Your Node.js version (${process.versions.node}) does not match the Firebase Functions runtime (${NodeVersion}).`
+      `⚠️ Your Node.js version (${process.versions.node}) does not match the Firebase Functions runtime (${NODE_VERSION}).`
     );
   }
 
@@ -181,10 +180,14 @@ export const deployToFunction = async (
     const port = 5000; // TODO make this configurable
 
     setTimeout(() => {
-      execSync(`open http://localhost:${port} || true`);
+      open(`http://localhost:${port}`);
     }, 1500);
 
+<<<<<<< HEAD
     return firebaseTools.serve({ port, targets: ['hosting', 'functions'] }).then(() =>
+=======
+    return firebaseTools.serve({ port, targets: ["hosting", "functions"], host: 'localhost'}).then(() =>
+>>>>>>> 074c477... fix(deploy): undefined:5000 -> localhost:5000
       require('inquirer').prompt({
         type: 'confirm',
         name: 'deployProject',

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFireRemoteConfig } from '@angular/fire/remote-config';
+import { AngularFireRemoteConfig, mapToObject } from '@angular/fire/remote-config';
 import { trace } from '@angular/fire/performance';
 import { Observable } from 'rxjs';
 
@@ -18,7 +18,7 @@ export class RemoteConfigComponent implements OnInit {
   readonly change$: Observable<any>;
 
   constructor(public readonly remoteConfig: AngularFireRemoteConfig) {
-    this.change$ = remoteConfig.changes.pipe(trace('remote-config'));
+    this.change$ = remoteConfig.parameters.pipe(trace('remote-config'), mapToObject({}));
   }
 
   ngOnInit(): void {

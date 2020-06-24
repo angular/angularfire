@@ -4,12 +4,13 @@ import { Observable, of, pipe, UnaryFunction } from 'rxjs';
 import { map, observeOn, shareReplay, switchMap, take } from 'rxjs/operators';
 import { User } from 'firebase/app';
 import {
-  FIREBASE_APP_NAME,
-  FIREBASE_OPTIONS,
-  FirebaseAppConfig,
-  FirebaseOptions,
   ɵAngularFireSchedulers,
-  ɵfirebaseAppFactory
+  FirebaseOptions,
+  FirebaseAppConfig,
+  FIREBASE_OPTIONS,
+  FIREBASE_APP_NAME,
+  ɵfirebaseAppFactory,
+  ɵkeepUnstableUntilFirstFactory
 } from '@angular/fire';
 
 export type AuthPipeGenerator = (next: ActivatedRouteSnapshot, state: RouterStateSnapshot) => AuthPipe;
@@ -30,17 +31,21 @@ export class AngularFireAuthGuard implements CanActivate {
     zone: NgZone,
     private router: Router
   ) {
+
+    const schedulers = new ɵAngularFireSchedulers(zone);
+    const keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(schedulers);
+
     const auth = of(undefined).pipe(
       observeOn(new ɵAngularFireSchedulers(zone).outsideAngular),
       switchMap(() => zone.runOutsideAngular(() => import('firebase/auth'))),
-      observeOn(new ɵAngularFireSchedulers(zone).insideAngular),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
-      map(app => app.auth()),
+      map(app => zone.runOutsideAngular(() => app.auth())),
       shareReplay({ bufferSize: 1, refCount: false }),
     );
 
     this.authState = auth.pipe(
-      switchMap(auth => new Observable<User|null>(auth.onAuthStateChanged.bind(auth)))
+      switchMap(auth => new Observable<User|null>(auth.onAuthStateChanged.bind(auth))),
+      keepUnstableUntilFirst
     );
   }
 

@@ -1,4 +1,4 @@
-import { SchematicsException, Tree } from '@angular-devkit/schematics';
+import { SchematicsException, Tree, SchematicContext } from '@angular-devkit/schematics';
 import { experimental } from '@angular-devkit/core';
 import {
   addDependencies,
@@ -22,7 +22,14 @@ function generateHostingConfig(project: string, dist: string) {
   return {
     target: project,
     public: dist,
-    ignore: ['firebase.json', '**/.*', '**/node_modules/**'],
+    ignore: ['**/.*'],
+    headers: [{
+      source: '*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].+(css|js)',
+      headers: [{
+        key: 'Cache-Control',
+        value: 'public,max-age=31536000,immutable'
+      }]
+    }],
     rewrites: [
       {
         source: '**',
@@ -66,10 +73,11 @@ export function generateFirebaseJson(
   overwriteIfExists(tree, path, stringifyFormatted(firebaseJson));
 }
 
-export const addFirebaseHostingDependencies = (tree: Tree) => {
+export const addFirebaseHostingDependencies = (tree: Tree, context: SchematicContext) => {
   addDependencies(
     tree,
-    defaultDependencies
+    defaultDependencies,
+    context
   );
 };
 
