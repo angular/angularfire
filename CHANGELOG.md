@@ -1,3 +1,15 @@
+<a name="6.0.1"></a>
+# [6.0.1](https://github.com/angular/angularfire2/compare/6.0.0...6.0.1) (2020-06-24)
+
+* Updating peer dependencies to allow for Angular 10
+* `ng add @angular/fire` should correctly add the `firebase` peer
+* `ng add @angular/fire` will not duplicate settings entries, if they're already present
+* `ng add @angular/fire` will error if there are peer incompatabilities
+* `ng deploy` should function correctly on Windows devices
+* `ng deploy` will now mark the Angular assets as immutable on Firebase Hosting
+* RTDB and Firestore CRUD operations should return in the ngZone
+* Use of `AngularFireAuthGuard` should no longer destablize Zone.js
+
 <a name="6.0.0"></a>
 # [6.0.0](https://github.com/angular/angularfire2/compare/6.0.0-rc.2...6.0.0) (2020-04-01)
 
