@@ -1,3 +1,8 @@
+<a name="6.0.2"></a>
+# [6.0.2](https://github.com/angular/angularfire2/compare/6.0.1...6.0.2) (2020-06-24)
+
+* Quick fix to peers so `ng add @angular/fire` installs the correct version on Angular 10
+
 <a name="6.0.1"></a>
 # [6.0.1](https://github.com/angular/angularfire2/compare/6.0.0...6.0.1) (2020-06-24)
 
