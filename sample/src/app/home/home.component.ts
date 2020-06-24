@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { FirebaseApp } from '@angular/fire';
 
 @Component({
-  selector: 'home',
+  selector: 'app-home',
   template: `
     Hello world!
     {{ firebaseApp.name }}
