@@ -76,12 +76,20 @@ export class AngularFireMessaging {
     );
 
     // TODO 6.1 add observable for clicks
-    this.messages = fromEvent(navigator.serviceWorker, 'message').pipe(
-      map((event: MessageEvent) => event.data.firebaseMessaging),
-      filter((message: any) => !!message && message.type === 'push-received'),
-      map((message: any) => message.payload),
-      filter((payload: any) => !!payload)
-    );
+    if (isPlatformServer(platformId)) {
+
+      this.messages = EMPTY;
+
+    } else {
+
+      this.messages = fromEvent(navigator.serviceWorker, 'message').pipe(
+        map((event: MessageEvent) => event.data.firebaseMessaging),
+        filter((message: any) => !!message && message.type === 'push-received'),
+        map((message: any) => message.payload),
+        filter((payload: any) => !!payload)
+      );
+
+    }
 
     this.requestToken = of(undefined).pipe(
       switchMap(() => this.requestPermission),
