@@ -1,6 +1,6 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
 import { Observable, of, from } from 'rxjs';
-import { switchMap, map, observeOn, shareReplay, first } from 'rxjs/operators';
+import { switchMap, map, observeOn, shareReplay, first, tap } from 'rxjs/operators';
 import {
   FIREBASE_OPTIONS,
   FIREBASE_APP_NAME,
@@ -56,6 +56,7 @@ export class AngularFireAuth {
     const auth = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
       switchMap(() => zone.runOutsideAngular(() => import('firebase/auth'))),
+      tap((it: any) => it), // It seems I need to touch the import for it to do anything... race maybe?
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
       map(app => zone.runOutsideAngular(() => app.auth())),
       shareReplay({ bufferSize: 1, refCount: false }),

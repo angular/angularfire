@@ -3,7 +3,9 @@
   "ngPackage": {
     "lib": {
       "umdModuleIds": {
-        "firebase/app": "firebase"
+        "firebase/app": "firebase",
+        "@firebase/app": "firebase-app",
+        "@firebase/remote-config": "firebase-remote-config"
       },
       "entryFile": "public_api.ts"
     }

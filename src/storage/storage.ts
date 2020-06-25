@@ -13,6 +13,8 @@ import {
 import { UploadMetadata } from './interfaces';
 import { storage } from 'firebase/app';
 import 'firebase/storage';
+import firebase from '@firebase/app';
+import { registerStorage } from '@firebase/storage';
 
 export const BUCKET = new InjectionToken<string>('angularfire2.storageBucket');
 
@@ -45,6 +47,9 @@ export class AngularFireStorage {
 
     this.storage = zone.runOutsideAngular(() => {
       const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
+      if (registerStorage) {
+        registerStorage(firebase as any);
+      }
       return app.storage(storageBucket || undefined);
     });
   }

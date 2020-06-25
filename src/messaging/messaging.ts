@@ -1,7 +1,7 @@
 import { Inject, Injectable, NgZone, Optional, PLATFORM_ID } from '@angular/core';
-import { messaging } from 'firebase/app';
-import { concat, EMPTY, Observable, of, throwError } from 'rxjs';
-import { catchError, defaultIfEmpty, map, mergeMap, observeOn, switchMap } from 'rxjs/operators';
+import { messaging as rawMessaging } from 'firebase/app';
+import { concat, EMPTY, Observable, of, throwError, fromEvent } from 'rxjs';
+import { catchError, defaultIfEmpty, map, mergeMap, observeOn, switchMap, switchMapTo, tap, shareReplay, filter } from 'rxjs/operators';
 import {
   FIREBASE_APP_NAME,
   FIREBASE_OPTIONS,
@@ -14,7 +14,10 @@ import {
 } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
 
-export interface AngularFireMessaging extends Omit<ɵPromiseProxy<messaging.Messaging>, 'deleteToken' | 'getToken' | 'requestPermission'> {
+export interface AngularFireMessaging extends Omit<
+  ɵPromiseProxy<rawMessaging.Messaging>,
+  'deleteToken' | 'getToken' | 'requestPermission'
+> {
 }
 
 @Injectable({
@@ -41,48 +44,43 @@ export class AngularFireMessaging {
     const messaging = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
       switchMap(() => isPlatformServer(platformId) ? EMPTY : import('firebase/messaging')),
+      tap((it: any) => it), // It seems I need to touch the import for it to do anything... race maybe?
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
-      map(app => app.messaging())
+      map(app => app.messaging()),
+      shareReplay({ bufferSize: 1, refCount: false })
     );
 
-    if (!isPlatformServer(platformId)) {
-
-      this.requestPermission = messaging.pipe(
-        observeOn(schedulers.outsideAngular),
-        // tslint:disable-next-line
-        switchMap(messaging => messaging.requestPermission())
-      );
-
-    } else {
-
-      this.requestPermission = throwError('Not available on server platform.');
-
-    }
+    this.requestPermission = messaging.pipe(
+      observeOn(schedulers.outsideAngular),
+      // tslint:disable-next-line
+      switchMap(messaging => rawMessaging.isSupported() ? messaging.requestPermission() : throwError('Not supported.'))
+    );
 
     this.getToken = messaging.pipe(
       observeOn(schedulers.outsideAngular),
-      switchMap(messaging => messaging.getToken()),
+      switchMap(messaging => rawMessaging.isSupported() && Notification.permission === 'granted' ? messaging.getToken() : EMPTY),
       defaultIfEmpty(null)
     );
 
     const tokenChanges = messaging.pipe(
       observeOn(schedulers.outsideAngular),
-      switchMap(messaging => new Observable(messaging.onTokenRefresh.bind(messaging)).pipe(
-        switchMap(() => messaging.getToken())
-      ))
+      switchMap(messaging => rawMessaging.isSupported() ? new Observable<string>(emitter =>
+        messaging.onTokenRefresh(emitter.next, emitter.error, emitter.complete)
+      ) : EMPTY),
+      switchMapTo(this.getToken)
     );
 
-    this.tokenChanges = concat(
-      messaging.pipe(
-        observeOn(schedulers.outsideAngular),
-        switchMap(messaging => messaging.getToken())
-      ),
-      tokenChanges
-    );
-
-    this.messages = messaging.pipe(
+    this.tokenChanges = messaging.pipe(
       observeOn(schedulers.outsideAngular),
-      switchMap(messaging => new Observable(messaging.onMessage.bind(messaging)))
+      switchMap(messaging => rawMessaging.isSupported() ? concat(this.getToken, tokenChanges) : EMPTY)
+    );
+
+    // TODO 6.1 add observable for clicks
+    this.messages = fromEvent(navigator.serviceWorker, 'message').pipe(
+      map((event: MessageEvent) => event.data.firebaseMessaging),
+      filter((message: any) => !!message && message.type === 'push-received'),
+      map((message: any) => message.payload),
+      filter((payload: any) => !!payload)
     );
 
     this.requestToken = of(undefined).pipe(

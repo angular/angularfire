@@ -2,7 +2,12 @@
   "$schema": "../../node_modules/ng-packagr/package.schema.json",
   "ngPackage": {
     "lib": {
-      "entryFile": "public_api.ts"
+      "entryFile": "public_api.ts",
+      "umdModuleIds": {
+        "firebase/app": "firebase",
+        "@firebase/app": "firebase-app",
+        "@firebase/messaging": "firebase-messaging"
+      }
     }
   }
 }
