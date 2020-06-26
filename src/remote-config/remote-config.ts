@@ -28,6 +28,7 @@ import {
 } from '@angular/fire';
 import { remoteConfig } from 'firebase/app';
 import { isPlatformBrowser } from '@angular/common';
+import firebase from 'firebase/app';
 
 export interface ConfigTemplate {
   [key: string]: string | number | boolean;
@@ -143,6 +144,8 @@ export class AngularFireRemoteConfig {
     const remoteConfig$ = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
       switchMap(() => isPlatformBrowser(platformId) ? import('firebase/remote-config') : EMPTY),
+      switchMap(() => import('@firebase/remote-config')),
+      tap(rc => rc.registerRemoteConfig && rc.registerRemoteConfig(firebase as any)),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
       map(app => app.remoteConfig()),
       tap(rc => {
