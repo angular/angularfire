@@ -42,6 +42,8 @@ const deployToHosting = (
         return firebaseTools.deploy({
           // tslint:disable-next-line:no-non-null-assertion
           only: 'hosting:' + context.target!.project,
+          token: process.env.FIREBASE_TOKEN,
+          force: true,
           cwd: workspaceRoot
         });
       } else {
@@ -54,6 +56,8 @@ const deployToHosting = (
     return firebaseTools.deploy({
       // tslint:disable-next-line:no-non-null-assertion
       only: 'hosting:' + context.target!.project,
+      token: process.env.FIREBASE_TOKEN,
+      force: true,
       cwd: workspaceRoot
     });
 
@@ -194,6 +198,8 @@ export const deployToFunction = async (
         return firebaseTools.deploy({
           // tslint:disable-next-line:no-non-null-assertion
           only: `hosting:${context.target!.project},functions:ssr`,
+          token: process.env.FIREBASE_TOKEN,
+          force: true,
           cwd: workspaceRoot
         });
       } else {
@@ -204,6 +210,8 @@ export const deployToFunction = async (
     return firebaseTools.deploy({
       // tslint:disable-next-line:no-non-null-assertion
       only: `hosting:${context.target!.project},functions:ssr`,
+      token: process.env.FIREBASE_TOKEN,
+      force: true,
       cwd: workspaceRoot
     });
   }

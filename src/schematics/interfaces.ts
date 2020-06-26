@@ -8,6 +8,8 @@ export interface Project {
 
 export interface FirebaseDeployConfig {
   cwd: string;
+  token?: string;
+  force: boolean;
   only?: string;
 }
 
