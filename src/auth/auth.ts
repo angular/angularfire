@@ -14,6 +14,7 @@ import {
 } from '@angular/fire';
 import { User, auth } from 'firebase/app';
 import { isPlatformServer } from '@angular/common';
+import firebase from 'firebase/app';
 
 export interface AngularFireAuth extends ɵPromiseProxy<auth.Auth> {}
 

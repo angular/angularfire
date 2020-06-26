@@ -129,9 +129,23 @@
             "outputPath": "dist/sample/server",
             "main": "server.ts",
             "tsConfig": "tsconfig.server.json",
-            "bundleDependencies": false,
+            "bundleDependencies": true,
             "externalDependencies": [
-              "@firebase/firestore"
+              "firebase",
+              "@firebase/app",
+              "@firebase/analytics",
+              "@firebase/app",
+              "@firebase/auth",
+              "@firebase/component",
+              "@firebase/database",
+              "@firebase/firestore",
+              "@firebase/functions",
+              "@firebase/installations",
+              "@firebase/messaging",
+              "@firebase/storage",
+              "@firebase/performance",
+              "@firebase/remote-config",
+              "@firebase/util"
             ]
           },
           "configurations": {

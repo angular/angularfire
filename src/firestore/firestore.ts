@@ -25,6 +25,8 @@ import {
 import { isPlatformServer } from '@angular/common';
 import { firestore } from 'firebase/app';
 import 'firebase/firestore';
+const atFirestore = require('@firebase/firestore');
+import firebase from 'firebase/app';
 
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
@@ -138,9 +140,9 @@ export class AngularFirestore {
       // INVESTIGATE this seems to be required because in the browser build registerFirestore is an Object?
       //             seems like we're fighting ngcc. In the server firestore() isn't available, so I have to register
       //             in the browser registerFirestore is not a function... maybe this is an underlying firebase-js-sdk issue
-      // if (registerFirestore) {
-      //  registerFirestore(firebase as any);
-      // }
+      if ('registerFirestore' in atFirestore) {
+        (atFirestore as any).registerFirestore(firebase as any);
+      }
       const firestore = app.firestore();
       if (settings) {
         firestore.settings(settings);
