@@ -213,7 +213,7 @@
     tslib "^2.0.0"
 
 "@angular/fire@../dist/packages-dist":
-  version "6.0.2"
+  version "6.0.3"
   dependencies:
     tslib "^1.10.0"
 

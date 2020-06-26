@@ -13,8 +13,6 @@ import {
   ɵPromiseProxy
 } from '@angular/fire';
 import { analytics } from 'firebase/app';
-import { registerAnalytics } from '@firebase/analytics';
-import firebase from '@firebase/app';
 
 export interface Config {
   [key: string]: any;
@@ -92,13 +90,9 @@ export class AngularFireAnalytics {
       analytics = of(undefined).pipe(
         observeOn(new ɵAngularFireSchedulers(zone).outsideAngular),
         switchMap(() => isPlatformBrowser(platformId) ? import('firebase/analytics') : EMPTY),
+        tap((it: any) => it),
         map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
-        map(app => {
-          if (registerAnalytics) {
-            registerAnalytics(firebase as any);
-          }
-          return app.analytics();
-        }),
+        map(app => app.analytics()),
         tap(analytics => {
           if (analyticsCollectionEnabled === false) {
             analytics.setAnalyticsCollectionEnabled(false);

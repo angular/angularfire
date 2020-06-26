@@ -4,9 +4,6 @@
     "lib": {
       "entryFile": "public_api.ts",
       "umdModuleIds": {
-        "firebase/app": "firebase",
-        "@firebase/app": "firebase-app",
-        "@firebase/performance": "firebase-performance"
       }
     }
   }

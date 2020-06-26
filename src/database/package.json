@@ -4,7 +4,6 @@
     "lib": {
       "umdModuleIds": {
         "firebase/app": "firebase",
-        "@firebase/app": "firebase-app",
         "@firebase/database": "firebase-database"
       },
       "entryFile": "public_api.ts"

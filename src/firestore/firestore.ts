@@ -24,8 +24,6 @@ import {
 } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
 import { firestore } from 'firebase/app';
-import firebase from '@firebase/app';
-import { registerFirestore } from '@firebase/firestore';
 import 'firebase/firestore';
 
 /**
@@ -140,9 +138,9 @@ export class AngularFirestore {
       // INVESTIGATE this seems to be required because in the browser build registerFirestore is an Object?
       //             seems like we're fighting ngcc. In the server firestore() isn't available, so I have to register
       //             in the browser registerFirestore is not a function... maybe this is an underlying firebase-js-sdk issue
-      if (registerFirestore) {
-        registerFirestore(firebase);
-      }
+      // if (registerFirestore) {
+      //  registerFirestore(firebase as any);
+      // }
       const firestore = app.firestore();
       if (settings) {
         firestore.settings(settings);

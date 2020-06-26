@@ -5,7 +5,6 @@
       "entryFile": "public_api.ts",
       "umdModuleIds": {
         "firebase/app": "firebase",
-        "@firebase/app": "firebase-app",
         "@firebase/storage": "firebase-storage"
       }
     }

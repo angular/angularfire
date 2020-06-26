@@ -16,7 +16,7 @@ import { Observable } from 'rxjs';
 import { database } from 'firebase/app';
 import 'firebase/database';
 import { registerDatabase } from '@firebase/database';
-import firebase from '@firebase/app';
+import firebase from 'firebase/app';
 
 export const URL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
 
@@ -43,7 +43,7 @@ export class AngularFireDatabase {
     this.database = zone.runOutsideAngular(() => {
       const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
       if (registerDatabase) {
-        registerDatabase(firebase);
+        registerDatabase(firebase as any);
       }
       return app.database(databaseURL || undefined);
     });

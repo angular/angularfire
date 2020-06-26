@@ -4,8 +4,6 @@ import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { performance } from 'firebase/app';
 import { FirebaseApp, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
 import { isPlatformBrowser } from '@angular/common';
-import { registerPerformance } from '@firebase/performance';
-import firebase from '@firebase/app';
 
 // SEMVER @ v6, drop and move core ng metrics to a service
 export const AUTOMATICALLY_TRACE_CORE_NG_METRICS = new InjectionToken<boolean>('angularfire2.performance.auto_trace');
@@ -33,12 +31,8 @@ export class AngularFirePerformance {
 
     this.performance = of(undefined).pipe(
       switchMap(() => isPlatformBrowser(platformId) ? zone.runOutsideAngular(() => import('firebase/performance')) : EMPTY),
-      map(() => zone.runOutsideAngular(() => {
-        if (registerPerformance) {
-          registerPerformance(firebase);
-        }
-        return app.performance();
-      })),
+      tap((it: any) => it),
+      map(() => zone.runOutsideAngular(() => app.performance())),
       tap(performance => {
         if (instrumentationEnabled !== true) {
           performance.instrumentationEnabled = false;

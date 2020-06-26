@@ -3,10 +3,7 @@
   "ngPackage": {
     "lib": {
       "umdModuleIds": {
-        "firebase/app": "firebase",
-        "tslib": "tslib",
-        "@firebase/app": "firebase-app",
-        "@firebase/analytics": "firebase-analytics"
+        "firebase/app": "firebase"
       },
       "entryFile": "public_api.ts"
     }

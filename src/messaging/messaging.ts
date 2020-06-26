@@ -1,5 +1,6 @@
 import { Inject, Injectable, NgZone, Optional, PLATFORM_ID } from '@angular/core';
-import { messaging as rawMessaging } from 'firebase/app';
+import { messaging } from 'firebase/app';
+import firebase from 'firebase/app';
 import { concat, EMPTY, Observable, of, throwError, fromEvent } from 'rxjs';
 import { catchError, defaultIfEmpty, map, mergeMap, observeOn, switchMap, switchMapTo, tap, shareReplay, filter } from 'rxjs/operators';
 import {
@@ -14,10 +15,7 @@ import {
 } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
 
-export interface AngularFireMessaging extends Omit<
-  ɵPromiseProxy<rawMessaging.Messaging>,
-  'deleteToken' | 'getToken' | 'requestPermission'
-> {
+export interface AngularFireMessaging extends Omit<ɵPromiseProxy<messaging.Messaging>, 'deleteToken' | 'getToken' | 'requestPermission'> {
 }
 
 @Injectable({
@@ -53,18 +51,18 @@ export class AngularFireMessaging {
     this.requestPermission = messaging.pipe(
       observeOn(schedulers.outsideAngular),
       // tslint:disable-next-line
-      switchMap(messaging => rawMessaging.isSupported() ? messaging.requestPermission() : throwError('Not supported.'))
+      switchMap(messaging => firebase.messaging.isSupported() ? messaging.requestPermission() : throwError('Not supported.'))
     );
 
     this.getToken = messaging.pipe(
       observeOn(schedulers.outsideAngular),
-      switchMap(messaging => rawMessaging.isSupported() && Notification.permission === 'granted' ? messaging.getToken() : EMPTY),
+      switchMap(messaging => firebase.messaging.isSupported() && Notification.permission === 'granted' ? messaging.getToken() : EMPTY),
       defaultIfEmpty(null)
     );
 
     const tokenChanges = messaging.pipe(
       observeOn(schedulers.outsideAngular),
-      switchMap(messaging => rawMessaging.isSupported() ? new Observable<string>(emitter =>
+      switchMap(messaging => firebase.messaging.isSupported() ? new Observable<string>(emitter =>
         messaging.onTokenRefresh(emitter.next, emitter.error, emitter.complete)
       ) : EMPTY),
       switchMapTo(this.getToken)
@@ -72,7 +70,7 @@ export class AngularFireMessaging {
 
     this.tokenChanges = messaging.pipe(
       observeOn(schedulers.outsideAngular),
-      switchMap(messaging => rawMessaging.isSupported() ? concat(this.getToken, tokenChanges) : EMPTY)
+      switchMap(messaging => firebase.messaging.isSupported() ? concat(this.getToken, tokenChanges) : EMPTY)
     );
 
     // TODO 6.1 add observable for clicks

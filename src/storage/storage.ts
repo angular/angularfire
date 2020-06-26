@@ -13,7 +13,7 @@ import {
 import { UploadMetadata } from './interfaces';
 import { storage } from 'firebase/app';
 import 'firebase/storage';
-import firebase from '@firebase/app';
+import firebase from 'firebase/app';
 import { registerStorage } from '@firebase/storage';
 
 export const BUCKET = new InjectionToken<string>('angularfire2.storageBucket');
