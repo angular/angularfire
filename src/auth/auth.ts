@@ -1,6 +1,6 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
 import { Observable, of, from } from 'rxjs';
-import { switchMap, map, observeOn, shareReplay, first } from 'rxjs/operators';
+import { switchMap, map, observeOn, shareReplay, first, tap } from 'rxjs/operators';
 import {
   FIREBASE_OPTIONS,
   FIREBASE_APP_NAME,
@@ -13,6 +13,8 @@ import {
   ɵkeepUnstableUntilFirstFactory
 } from '@angular/fire';
 import { User, auth } from 'firebase/app';
+import { isPlatformServer } from '@angular/common';
+import firebase from 'firebase/app';
 
 export interface AngularFireAuth extends ɵPromiseProxy<auth.Auth> {}
 
@@ -56,35 +58,46 @@ export class AngularFireAuth {
     const auth = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
       switchMap(() => zone.runOutsideAngular(() => import('firebase/auth'))),
+      tap((it: any) => it), // It seems I need to touch the import for it to do anything... race maybe?
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
       map(app => zone.runOutsideAngular(() => app.auth())),
       shareReplay({ bufferSize: 1, refCount: false }),
     );
 
-    // HACK, as we're exporting auth.Auth, rather than auth, developers importing firebase.auth
-    //       (e.g, `import { auth } from 'firebase/app'`) are getting an undefined auth object unexpectedly
-    //       as we're completely lazy. Let's eagerly load the Auth SDK here.
-    //       There could potentially be race conditions still... but this greatly decreases the odds while
-    //       we reevaluate the API.
-    const _ = auth.pipe(first()).subscribe();
+    if (isPlatformServer(platformId)) {
 
-    this.authState = auth.pipe(
-      switchMap(auth => zone.runOutsideAngular(() => new Observable<User|null>(auth.onAuthStateChanged.bind(auth)))),
-      keepUnstableUntilFirst
-    );
+      this.authState = this.user = this.idToken = this.idTokenResult = of(null);
 
-    this.user = auth.pipe(
-      switchMap(auth => zone.runOutsideAngular(() => new Observable<User|null>(auth.onIdTokenChanged.bind(auth)))),
-      keepUnstableUntilFirst
-    );
+    } else {
 
-    this.idToken = this.user.pipe(
-      switchMap(user => user ? from(user.getIdToken()) : of(null))
-    );
+      // HACK, as we're exporting auth.Auth, rather than auth, developers importing firebase.auth
+      //       (e.g, `import { auth } from 'firebase/app'`) are getting an undefined auth object unexpectedly
+      //       as we're completely lazy. Let's eagerly load the Auth SDK here.
+      //       There could potentially be race conditions still... but this greatly decreases the odds while
+      //       we reevaluate the API.
+      const _ = auth.pipe(first()).subscribe();
 
-    this.idTokenResult = this.user.pipe(
-      switchMap(user => user ? from(user.getIdTokenResult()) : of(null))
-    );
+      this.authState = auth.pipe(
+        switchMap(auth => auth.getRedirectResult().then(() => auth)),
+        switchMap(auth => zone.runOutsideAngular(() => new Observable<User|null>(auth.onAuthStateChanged.bind(auth)))),
+        keepUnstableUntilFirst
+      );
+
+      this.user = auth.pipe(
+        switchMap(auth => auth.getRedirectResult().then(() => auth)),
+        switchMap(auth => zone.runOutsideAngular(() => new Observable<User|null>(auth.onIdTokenChanged.bind(auth)))),
+        keepUnstableUntilFirst
+      );
+
+      this.idToken = this.user.pipe(
+        switchMap(user => user ? from(user.getIdToken()) : of(null))
+      );
+
+      this.idTokenResult = this.user.pipe(
+        switchMap(user => user ? from(user.getIdTokenResult()) : of(null))
+      );
+
+    }
 
     return ɵlazySDKProxy(this, auth, zone);
 

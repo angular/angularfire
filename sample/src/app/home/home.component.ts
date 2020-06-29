@@ -11,6 +11,7 @@ import { FirebaseApp } from '@angular/fire';
     <app-remote-config></app-remote-config>
     <app-storage></app-storage>
     <app-auth></app-auth>
+    <app-messaging></app-messaging>
   `,
   styles: [``]
 })

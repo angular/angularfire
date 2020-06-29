@@ -1,7 +1,7 @@
 import { Inject, Injectable, NgZone, Optional } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import { Observable, of, pipe, UnaryFunction } from 'rxjs';
-import { map, observeOn, shareReplay, switchMap, take } from 'rxjs/operators';
+import { map, observeOn, shareReplay, switchMap, take, tap } from 'rxjs/operators';
 import { User } from 'firebase/app';
 import {
   ɵAngularFireSchedulers,
@@ -38,6 +38,7 @@ export class AngularFireAuthGuard implements CanActivate {
     const auth = of(undefined).pipe(
       observeOn(new ɵAngularFireSchedulers(zone).outsideAngular),
       switchMap(() => zone.runOutsideAngular(() => import('firebase/auth'))),
+      tap((it: any) => it), // It seems I need to touch the import for it to do anything... race maybe?
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
       map(app => zone.runOutsideAngular(() => app.auth())),
       shareReplay({ bufferSize: 1, refCount: false }),

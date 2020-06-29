@@ -13,6 +13,7 @@ import {
   ɵPromiseProxy
 } from '@angular/fire';
 import { analytics } from 'firebase/app';
+import firebase from 'firebase/app';
 
 export interface Config {
   [key: string]: any;
@@ -64,8 +65,8 @@ export class AngularFireAnalytics {
 
     if (!analyticsInitialized) {
       if (isPlatformBrowser(platformId)) {
-        gtag = window[GTAG_FUNCTION_NAME] || ((...args: any[]) => {
-          window[DATA_LAYER_NAME].push(args);
+        gtag = (window[GTAG_FUNCTION_NAME] as any) || ((...args: any[]) => {
+          (window[DATA_LAYER_NAME] as any).push(args);
         });
         window[DATA_LAYER_NAME] = window[DATA_LAYER_NAME] || [];
         analyticsInitialized = zone.runOutsideAngular(() =>
@@ -90,6 +91,8 @@ export class AngularFireAnalytics {
       analytics = of(undefined).pipe(
         observeOn(new ɵAngularFireSchedulers(zone).outsideAngular),
         switchMap(() => isPlatformBrowser(platformId) ? import('firebase/analytics') : EMPTY),
+        switchMap(() => import('@firebase/analytics')),
+        tap(analytics => analytics.registerAnalytics && analytics.registerAnalytics(firebase as any)),
         map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
         map(app => app.analytics()),
         tap(analytics => {
