@@ -5,6 +5,9 @@ The official [Angular](https://angular.io/) library for [Firebase](https://fireb
 ng add @angular/fire
 ```
 
+[Spanish version](README_es.md)
+
+
 ## What is AngularFire?
 
 - **Observable based** - Use the power of RxJS, Angular, and Firebase.
