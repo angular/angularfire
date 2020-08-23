@@ -2,7 +2,7 @@ import { AngularFireModule, FirebaseApp } from '@angular/fire';
 import { AngularFirestore, SETTINGS } from '../firestore';
 import { AngularFirestoreModule } from '../firestore.module';
 import { AngularFirestoreCollection } from './collection';
-import { QueryFn } from '../interfaces';
+import { QueryFn, CollectionReference } from '../interfaces';
 import { BehaviorSubject } from 'rxjs';
 import { skip, switchMap, take } from 'rxjs/operators';
 import 'firebase/firestore';
@@ -22,9 +22,9 @@ import {
   Stock
 } from '../utils.spec';
 
-async function collectionHarness(afs: AngularFirestore, items: number, queryFn?: QueryFn) {
+async function collectionHarness(afs: AngularFirestore, items: number, queryFn?: QueryFn<Stock>) {
   const randomCollectionName = randomName(afs.firestore);
-  const ref = afs.firestore.collection(`${randomCollectionName}`);
+  const ref = afs.firestore.collection(`${randomCollectionName}`) as CollectionReference<Stock>;
   if (!queryFn) {
     queryFn = (ref) => ref;
   }

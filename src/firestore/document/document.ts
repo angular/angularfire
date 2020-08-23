@@ -28,13 +28,13 @@ import { firestore } from 'firebase/app';
  * // OR! Transform using Observable.from() and the data is unwrapped for you
  * Observable.from(fakeStock).subscribe(value => console.log(value));
  */
-export class AngularFirestoreDocument<T= DocumentData> {
+export class AngularFirestoreDocument<T = DocumentData> {
 
   /**
-   * The contstuctor takes in a DocumentReference to provide wrapper methods
+   * The constructor takes in a DocumentReference to provide wrapper methods
    * for data operations, data streaming, and Symbol.observable.
    */
-  constructor(public ref: DocumentReference, private afs: AngularFirestore) { }
+  constructor(public ref: DocumentReference<T>, private afs: AngularFirestore) { }
 
   /**
    * Create or overwrite a single document.
@@ -61,10 +61,10 @@ export class AngularFirestoreDocument<T= DocumentData> {
    * Create a reference to a sub-collection given a path and an optional query
    * function.
    */
-  collection<R= DocumentData>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<R> {
-    const collectionRef = this.ref.collection(path);
-    const { ref, query } = associateQuery(collectionRef, queryFn);
-    return new AngularFirestoreCollection<R>(ref, query, this.afs);
+  collection(path: string, queryFn?: QueryFn<T>): AngularFirestoreCollection<T> {
+    const collectionRef = this.ref.collection(path) as firestore.CollectionReference<T>;
+    const { ref, query } = associateQuery<T>(collectionRef, queryFn);
+    return new AngularFirestoreCollection<T>(ref, query, this.afs);
   }
 
   /**

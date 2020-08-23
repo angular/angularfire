@@ -2,6 +2,7 @@ import { AngularFireModule, FirebaseApp } from '@angular/fire';
 import { AngularFirestore, SETTINGS } from '../firestore';
 import { AngularFirestoreModule } from '../firestore.module';
 import { AngularFirestoreDocument } from './document';
+import { DocumentReference } from '../interfaces';
 import { take } from 'rxjs/operators';
 
 import { TestBed } from '@angular/core/testing';
@@ -35,7 +36,7 @@ describe('AngularFirestoreDocument', () => {
 
   it('should get action updates', async (done: any) => {
     const randomCollectionName = randomName(afs.firestore);
-    const ref = afs.firestore.doc(`${randomCollectionName}/FAKE`);
+    const ref = afs.firestore.doc(`${randomCollectionName}/FAKE`) as DocumentReference<Stock>;
     const stock = new AngularFirestoreDocument<Stock>(ref, afs);
     await stock.set(FAKE_STOCK_DATA);
     const sub = stock
@@ -51,7 +52,7 @@ describe('AngularFirestoreDocument', () => {
 
   it('should get unwrapped snapshot', async (done: any) => {
     const randomCollectionName = afs.firestore.collection('a').doc().id;
-    const ref = afs.firestore.doc(`${randomCollectionName}/FAKE`);
+    const ref = afs.firestore.doc(`${randomCollectionName}/FAKE`) as DocumentReference<Stock>;
     const stock = new AngularFirestoreDocument<Stock>(ref, afs);
     await stock.set(FAKE_STOCK_DATA);
     const obs$ = stock.valueChanges();

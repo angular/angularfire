@@ -2,13 +2,13 @@ import { Subscriber } from 'rxjs';
 import { firestore } from 'firebase/app';
 
 export type Settings =  firestore.Settings;
-export type CollectionReference = firestore.CollectionReference;
-export type DocumentReference = firestore.DocumentReference;
+export type CollectionReference<T = DocumentData> = firestore.CollectionReference<T>;
+export type DocumentReference<T = DocumentData> = firestore.DocumentReference<T>;
 export type PersistenceSettings = firestore.PersistenceSettings;
 export type DocumentChangeType = firestore.DocumentChangeType;
 export type SnapshotOptions = firestore.SnapshotOptions;
 export type FieldPath = firestore.FieldPath;
-export type Query = firestore.Query;
+export type Query<T = DocumentData> = firestore.Query<T>;
 
 export type SetOptions = firestore.SetOptions;
 export type DocumentData = firestore.DocumentData;
@@ -54,9 +54,9 @@ export interface Reference<T> {
 
 // A convience type for making a query.
 // Example: const query = (ref) => ref.where('name', == 'david');
-export type QueryFn = (ref: CollectionReference) => Query;
+export type QueryFn<T = DocumentData> = (ref: CollectionReference<T>) => Query<T>;
 
-export type QueryGroupFn = (query: Query) => Query;
+export type QueryGroupFn<T = DocumentData> = (query: Query<T>) => Query<T>;
 
 /**
  * A structure that provides an association between a reference
@@ -80,7 +80,7 @@ export type QueryGroupFn = (query: Query) => Query;
  *  publisher: 'SportsPublisher'
  * });
  */
-export interface AssociatedReference {
-  ref: CollectionReference;
-  query: Query;
+export interface AssociatedReference<T = DocumentData> {
+  ref: CollectionReference<T>;
+  query: Query<T>;
 }
