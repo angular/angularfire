@@ -30,10 +30,10 @@ export class AppComponent {
   constructor(public auth: AngularFireAuth) {
   }
   login() {
-    this.auth.signInWithPopup(new auth.GoogleAuthProvider());
+    this.auth.auth.signInWithPopup(new auth.GoogleAuthProvider());
   }
   logout() {
-    this.auth.signOut();
+    this.auth.auth.signOut();
   }
 }
 ```
