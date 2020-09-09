@@ -138,7 +138,7 @@ export class AppComponent {
       this.colorFilter$
     ).pipe(
       switchMap(([size, color]) => 
-        afs.collection('items', ref => {
+        afs.collection<Item>('items', ref => {
           let query : firebase.firestore.CollectionReference | firebase.firestore.Query = ref;
           if (size) { query = query.where('size', '==', size) };
           if (color) { query = query.where('color', '==', color) };
