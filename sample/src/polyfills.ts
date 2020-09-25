@@ -63,3 +63,4 @@ import 'zone.js/dist/zone'; // Included with Angular CLI.
  */
 
 import 'proxy-polyfill/proxy.min.js';
+import 'first-input-delay';
