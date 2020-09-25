@@ -92,8 +92,6 @@ export class AngularFireAnalytics {
       analytics = of(undefined).pipe(
         observeOn(new ɵAngularFireSchedulers(zone).outsideAngular),
         switchMap(() => isPlatformBrowser(platformId) ? import('firebase/analytics') : EMPTY),
-        switchMap(() => import('@firebase/analytics')),
-        tap(analytics => analytics.registerAnalytics && analytics.registerAnalytics(firebase as any)),
         map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
         map(app => app.analytics()),
         tap(analytics => {
