@@ -4,6 +4,7 @@ import { trace } from '@angular/fire/performance';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { SwPush } from '@angular/service-worker';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-messaging',
@@ -25,7 +26,7 @@ export class MessagingComponent implements OnInit {
 
   constructor(public readonly messaging: AngularFireMessaging, readonly swpush: SwPush) {
     swpush.messages.subscribe(it => console.log('swpush', it));
-    messaging.usePublicVapidKey('BIDPctnXHQDIjcOXxDS6qQcz-QTws7bL8v7UPgFnS1Ky5BZL3jS3-XXfxwRHmAUMOk7pXme7ttOBvVoIfX57PEo').then(async () => {
+    messaging.usePublicVapidKey(environment.vapidKey).then(async () => {
       if (navigator && navigator.serviceWorker) {
         const registration = await navigator.serviceWorker.getRegistration();
         if (registration) {
