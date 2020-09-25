@@ -14,7 +14,6 @@ import {
 } from '@angular/fire';
 import { User, auth } from 'firebase/app';
 import { isPlatformServer } from '@angular/common';
-import firebase from 'firebase/app';
 
 export interface AngularFireAuth extends ɵPromiseProxy<auth.Auth> {}
 
@@ -58,13 +57,12 @@ export class AngularFireAuth {
     const auth = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
       switchMap(() => zone.runOutsideAngular(() => import('firebase/auth'))),
-      tap((it: any) => it), // It seems I need to touch the import for it to do anything... race maybe?
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
       map(app => zone.runOutsideAngular(() => app.auth())),
       shareReplay({ bufferSize: 1, refCount: false }),
     );
 
-    if (isPlatformServer(platformId)) {
+    if ( isPlatformServer(platformId)) {
 
       this.authState = this.user = this.idToken = this.idTokenResult = of(null);
 
