@@ -36,10 +36,10 @@ export class AngularFirePerformance {
       tap(perf => perf.registerPerformance && perf.registerPerformance(firebase as any)),
       map(() => zone.runOutsideAngular(() => app.performance())),
       tap(performance => {
-        if (instrumentationEnabled !== true) {
+        if (instrumentationEnabled === false) {
           performance.instrumentationEnabled = false;
         }
-        if (dataCollectionEnabled !== true) {
+        if (dataCollectionEnabled === false) {
           performance.dataCollectionEnabled = false;
         }
       }),
