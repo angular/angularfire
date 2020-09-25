@@ -62,7 +62,7 @@ export class AngularFireAuth {
       shareReplay({ bufferSize: 1, refCount: false }),
     );
 
-    if ( isPlatformServer(platformId)) {
+    if (isPlatformServer(platformId)) {
 
       this.authState = this.user = this.idToken = this.idTokenResult = of(null);
 
