@@ -51,7 +51,7 @@ export class AngularFireFunctions {
 
     this.httpsCallable = <T = any, R = any>(name: string) =>
       (data: T) => from(functions).pipe(
-        observeOn(schedulers.outsideAngular),
+        observeOn(schedulers.insideAngular),
         switchMap(functions => functions.httpsCallable(name)(data)),
         map(r => r.data as R)
       );

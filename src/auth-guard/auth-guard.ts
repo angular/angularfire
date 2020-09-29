@@ -1,7 +1,7 @@
 import { Inject, Injectable, NgZone, Optional } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import { Observable, of, pipe, UnaryFunction } from 'rxjs';
-import { map, observeOn, shareReplay, switchMap, take } from 'rxjs/operators';
+import { map, observeOn, shareReplay, switchMap, take, tap } from 'rxjs/operators';
 import { User } from 'firebase/app';
 import {
   ɵAngularFireSchedulers,

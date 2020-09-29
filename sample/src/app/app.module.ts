@@ -31,6 +31,7 @@ import { StorageComponent } from './storage/storage.component';
 import { RemoteConfigComponent } from './remote-config/remote-config.component';
 import { HomeComponent } from './home/home.component';
 import { AuthComponent } from './auth/auth.component';
+import { MessagingComponent } from './messaging/messaging.component';
 
 const shouldUseEmulator = () => false;
 
@@ -42,7 +43,8 @@ const shouldUseEmulator = () => false;
     DatabaseComponent,
     RemoteConfigComponent,
     HomeComponent,
-    AuthComponent
+    AuthComponent,
+    MessagingComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),

@@ -26,6 +26,9 @@
     "firebase": "FIREBASE_VERSION",
     "rxjs": "RXJS_VERSION"
   },
+  "dependencies": {
+    "tslib": "^2.0.0"
+  },
   "ngPackage": {
     "lib": {
       "umdModuleIds": {

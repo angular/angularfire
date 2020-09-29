@@ -13,6 +13,7 @@ import {
   ɵPromiseProxy
 } from '@angular/fire';
 import { analytics } from 'firebase/app';
+import firebase from 'firebase/app';
 
 export interface Config {
   [key: string]: any;
@@ -64,10 +65,11 @@ export class AngularFireAnalytics {
 
     if (!analyticsInitialized) {
       if (isPlatformBrowser(platformId)) {
-        gtag = window[GTAG_FUNCTION_NAME] || ((...args: any[]) => {
-          window[DATA_LAYER_NAME].push(args);
-        });
         window[DATA_LAYER_NAME] = window[DATA_LAYER_NAME] || [];
+        // tslint:disable-next-line: only-arrow-functions
+        gtag = (window[GTAG_FUNCTION_NAME] as any) || (function(..._args: any[]) {
+          (window[DATA_LAYER_NAME] as any).push(arguments);
+        });
         analyticsInitialized = zone.runOutsideAngular(() =>
           new Promise(resolve => {
             window[GTAG_FUNCTION_NAME] = (...args: any[]) => {

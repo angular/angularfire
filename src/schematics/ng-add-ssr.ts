@@ -140,9 +140,30 @@ export const setupUniversalDeployment = (config: {
   const staticOutput = project.architect.build.options.outputPath;
   const serverOutput = project.architect.server.options.outputPath;
 
-  // Add @firebase/firestore to externalDependencies
+  // Add firebase libraries to externalDependencies. For older versions of @firebase/firestore grpc native would cause issues when
+  // bundled. While, it's using grpc-js now and doesn't have issues, ngcc tends to bundle the esm version of the libraries; which
+  // is problematic for SSR (references to Window, etc.) Let's just mark all of them as external so we know the CJS is used.
   const externalDependencies: string[] = project.architect.server.options.externalDependencies || [];
-  if (!externalDependencies.includes('@firebase/firestore')) { externalDependencies.push('@firebase/firestore'); }
+  [
+    'firebase',
+    '@firebase/app',
+    '@firebase/analytics',
+    '@firebase/app',
+    '@firebase/auth',
+    '@firebase/component',
+    '@firebase/database',
+    '@firebase/firestore',
+    '@firebase/functions',
+    '@firebase/installations',
+    '@firebase/messaging',
+    '@firebase/storage',
+    '@firebase/performance',
+    '@firebase/remote-config',
+    '@firebase/util'
+  ].forEach(dep => {
+    if (!externalDependencies.includes(dep)) { externalDependencies.push(dep); }
+  });
+
   project.architect.server.options.externalDependencies = externalDependencies;
 
   project.architect.deploy = {

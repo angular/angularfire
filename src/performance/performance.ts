@@ -33,10 +33,10 @@ export class AngularFirePerformance {
       switchMap(() => isPlatformBrowser(platformId) ? zone.runOutsideAngular(() => import('firebase/performance')) : EMPTY),
       map(() => zone.runOutsideAngular(() => app.performance())),
       tap(performance => {
-        if (instrumentationEnabled !== true) {
+        if (instrumentationEnabled === false) {
           performance.instrumentationEnabled = false;
         }
-        if (dataCollectionEnabled !== true) {
+        if (dataCollectionEnabled === false) {
           performance.dataCollectionEnabled = false;
         }
       }),
