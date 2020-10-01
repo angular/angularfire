@@ -60,9 +60,7 @@ const getScreenInstanceID = (params: { [key: string]: any }) => {
   }
 };
 
-@Injectable({
-  providedIn: 'any'
-})
+@Injectable()
 export class ScreenTrackingService implements OnDestroy {
 
   private disposable: Subscription | undefined;
@@ -191,9 +189,7 @@ export class ScreenTrackingService implements OnDestroy {
 
 }
 
-@Injectable({
-  providedIn: 'any'
-})
+@Injectable()
 export class UserTrackingService implements OnDestroy {
 
   private disposable: Subscription | undefined;
