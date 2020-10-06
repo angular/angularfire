@@ -44,6 +44,93 @@ export class AngularFireAuth {
    */
   public readonly idTokenResult: Observable<auth.IdTokenResult|null>;
 
+
+  public applyActionCode: (code: string) => Promise<void> = null;
+
+  public checkActionCode: (code: string) => Promise<firebase.auth.ActionCodeInfo> = null;
+
+  public confirmPasswordReset: (code: string, newPassword: string) => Promise<void> = null;
+
+  public createUserWithEmailAndPassword: (
+    email: string,
+    password: string
+  ) => Promise<firebase.auth.UserCredential> = null;
+
+  public fetchSignInMethodsForEmail: (email: string) => Promise<Array<string>> = null;
+
+  public isSignInWithEmailLink: (emailLink: string) => Promise<boolean> = null;
+
+  public getRedirectResult: () => Promise<firebase.auth.UserCredential> = null;
+
+  public onAuthStateChanged: (
+    nextOrObserver:
+     |firebase.Observer<any>
+     |((a: firebase.User|null) => any),
+    error?: (a: firebase.auth.Error) => any,
+    completed?: firebase.Unsubscribe
+  ) => Promise<firebase.Unsubscribe> = null;
+
+  public onIdTokenChanged: (
+    nextOrObserver:
+     |firebase.Observer<any>
+     |((a: firebase.User|null) => any),
+    error?: (a: firebase.auth.Error) => any,
+    completed?: firebase.Unsubscribe
+  ) => Promise<firebase.Unsubscribe> = null;
+
+  public sendSignInLinkToEmail: (
+    email: string,
+    actionCodeSettings: firebase.auth.ActionCodeSettings
+  ) => Promise<void> = null;
+
+  public sendPasswordResetEmail: (
+    email: string,
+    actionCodeSettings?: firebase.auth.ActionCodeSettings|null
+  ) => Promise<void> = null;
+
+  public setPersistence: (persistence: firebase.auth.Auth.Persistence) => Promise<void> = null;
+
+  public signInAndRetrieveDataWithCredential: (
+    credential: firebase.auth.AuthCredential
+  ) => Promise<firebase.auth.UserCredential> = null;
+
+  public signInAnonymously: () => Promise<firebase.auth.UserCredential> = null;
+
+  public signInWithCredential: (
+    credential: firebase.auth.AuthCredential
+  ) => Promise<firebase.auth.UserCredential> = null;
+
+  public signInWithCustomToken: (token: string) => Promise<firebase.auth.UserCredential> = null;
+
+  public signInWithEmailAndPassword: (
+    email: string,
+    password: string
+  ) => Promise<firebase.auth.UserCredential> = null;
+
+  public signInWithPhoneNumber: (
+    phoneNumber: string,
+    applicationVerifier: firebase.auth.ApplicationVerifier
+  ) => Promise<firebase.auth.ConfirmationResult> = null;
+
+  public signInWithEmailLink: (
+    email: string,
+    emailLink?: string
+  ) => Promise<firebase.auth.UserCredential> = null;
+
+  public signInWithPopup: (
+    provider: firebase.auth.AuthProvider
+  ) => Promise<firebase.auth.UserCredential> = null;
+
+  public signInWithRedirect: (provider: firebase.auth.AuthProvider) => Promise<void> = null;
+
+  public signOut: () => Promise<void> = null;
+
+  public updateCurrentUser: (user: firebase.User|null) => Promise<void> = null;
+
+  public useDeviceLanguage: () => Promise<void> = null;
+
+  public verifyPasswordResetCode: (code: string) => Promise<string> = null;
+
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string|FirebaseAppConfig|null|undefined,
