@@ -14,7 +14,7 @@ export const createRandomStocks = async (firestore: firestore.Firestore, collect
   // Create a batch to update everything at once
   const batch = firestore.batch();
   // Store the random names to delete them later
-  let count = 0;
+  const count = 0;
   let names: string[] = [];
   Array.from(Array(numberOfItems)).forEach((a, i) => {
     const name = randomName(firestore);
@@ -25,7 +25,7 @@ export const createRandomStocks = async (firestore: firestore.Firestore, collect
   // Commit!
   await batch.commit();
   return names;
-}
+};
 
 export function deleteThemAll(names, ref) {
   const promises = names.map(name => ref.doc(name).delete());

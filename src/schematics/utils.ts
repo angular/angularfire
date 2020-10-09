@@ -13,7 +13,7 @@ export async function listProjects() {
 // `fuzzy` passes either the original list of projects or an internal object
 // which contains the project as a property.
 const isProject = (elem: Project | { original: Project }): elem is Project => {
-  return (<{ original: Project }>elem).original === undefined;
+  return (elem as { original: Project }).original === undefined;
 };
 
 const searchProjects = (projects: Project[]) => {
@@ -71,11 +71,12 @@ export function getFirebaseProjectName(
   workspaceRoot: string,
   target: string
 ): string | undefined {
-  const { targets }: FirebaseRc = JSON.parse(
+  const rc: FirebaseRc = JSON.parse(
     readFileSync(join(workspaceRoot, '.firebaserc'), 'UTF-8')
   );
-  const projects = Object.keys(targets!);
+  const targets = rc.targets || {};
+  const projects = Object.keys(targets || {});
   return projects.find(
-    project => !!Object.keys(targets![project].hosting).find(t => t === target)
+    project => !!Object.keys(targets[project].hosting).find(t => t === target)
   );
 }

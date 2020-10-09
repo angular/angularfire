@@ -110,7 +110,7 @@ import { AngularFireFunctionsModule, ORIGIN } from '@angular/fire/functions';
   ],
   ...
   providers: [
-   { provide: ORIGIN, useValue: 'http://localhost:5005' }
+   { provide: ORIGIN, useValue: 'http://localhost:5001' }
   ]
 })
 export class AppModule {}
@@ -145,7 +145,7 @@ Next, configure functions origin to point at your app domain:
 
 ```ts
 import { NgModule } from '@angular/core';
-import { AngularFireFunctionsModule, FUNCTIONS_ORIGIN } from '@angular/fire/functions';
+import { AngularFireFunctionsModule, ORIGIN } from '@angular/fire/functions';
 
 @NgModule({
   imports: [

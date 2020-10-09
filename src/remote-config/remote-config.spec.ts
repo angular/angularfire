@@ -1,7 +1,6 @@
-import { ReflectiveInjector, Provider } from '@angular/core';
-import { TestBed, inject } from '@angular/core/testing';
-import { FirebaseApp, FIREBASE_OPTIONS, AngularFireModule, FIREBASE_APP_NAME } from '@angular/fire';
-import { AngularFireRemoteConfig, AngularFireRemoteConfigModule, SETTINGS, DEFAULTS } from './public_api';
+import { TestBed } from '@angular/core/testing';
+import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire';
+import { AngularFireRemoteConfig, AngularFireRemoteConfigModule, DEFAULTS, SETTINGS } from './public_api';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../firestore/utils.spec';
 
@@ -16,10 +15,9 @@ describe('AngularFireRemoteConfig', () => {
         AngularFireRemoteConfigModule
       ]
     });
-    inject([FirebaseApp, AngularFireRemoteConfig], (app_: FirebaseApp, _rc: AngularFireRemoteConfig) => {
-      app = app_;
-      rc = _rc;
-    })();
+
+    app = TestBed.inject(FirebaseApp);
+    rc = TestBed.inject(AngularFireRemoteConfig);
   });
 
   afterEach(() => {
@@ -55,10 +53,9 @@ describe('AngularFireRemoteConfig with different app', () => {
         { provide: DEFAULTS, useValue: {} }
       ]
     });
-    inject([FirebaseApp, AngularFireRemoteConfig], (app_: FirebaseApp, _rc: AngularFireRemoteConfig) => {
-      app = app_;
-      rc = _rc;
-    })();
+
+    app = TestBed.inject(FirebaseApp);
+    rc = TestBed.inject(AngularFireRemoteConfig);
   });
 
   afterEach(() => {

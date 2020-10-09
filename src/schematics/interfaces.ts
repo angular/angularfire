@@ -16,6 +16,10 @@ export interface FirebaseTools {
     list(): Promise<Project[]>;
   };
 
+  logger: {
+    add(...args: any[]): any
+  };
+
   login(): Promise<void>;
 
   deploy(config: FirebaseDeployConfig): Promise<any>;
@@ -23,10 +27,6 @@ export interface FirebaseTools {
   serve(options: any): Promise<any>;
 
   use(options: any, lol: any): Promise<any>;
-  
-  logger: {
-    add(...args: any[]): any
-  };
 }
 
 export interface FirebaseHostingRewrite {
@@ -42,7 +42,7 @@ export interface FirebaseHostingConfig {
   rewrites: FirebaseHostingRewrite[];
 }
 
-export interface FirebaseFunctionsConfig { [key:string]: any }
+export interface FirebaseFunctionsConfig { [key: string]: any; }
 
 export interface FirebaseJSON {
   hosting?: FirebaseHostingConfig[] | FirebaseHostingConfig;

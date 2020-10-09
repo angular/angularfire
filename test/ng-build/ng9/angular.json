@@ -119,6 +119,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "ng8"
+    }
+  },
+  "defaultProject": "ng8",
+  "cli": {
+    "analytics": "edddc081-ec1f-41d8-8ac3-31ada51cee23"
+  }
 }

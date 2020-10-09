@@ -1,5 +1,5 @@
 import { BrowserModule, BrowserTransferStateModule } from '@angular/platform-browser';
-import { NgModule, isDevMode } from '@angular/core';
+import { isDevMode, NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -9,7 +9,12 @@ import { environment } from '../environments/environment';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireStorageModule } from '@angular/fire/storage';
 
-import { AngularFireAnalyticsModule, UserTrackingService, ScreenTrackingService, DEBUG_MODE as ANALYTICS_DEBUG_MODE } from '@angular/fire/analytics';
+import {
+  AngularFireAnalyticsModule,
+  DEBUG_MODE as ANALYTICS_DEBUG_MODE,
+  ScreenTrackingService,
+  UserTrackingService
+} from '@angular/fire/analytics';
 
 import { FirestoreComponent } from './firestore/firestore.component';
 
@@ -24,11 +29,23 @@ import { AngularFireAuthGuardModule } from '@angular/fire/auth-guard';
 import { DatabaseComponent } from './database/database.component';
 import { StorageComponent } from './storage/storage.component';
 import { RemoteConfigComponent } from './remote-config/remote-config.component';
+import { HomeComponent } from './home/home.component';
+import { AuthComponent } from './auth/auth.component';
+import { MessagingComponent } from './messaging/messaging.component';
 
 const shouldUseEmulator = () => false;
 
 @NgModule({
-  declarations: [ AppComponent, StorageComponent, FirestoreComponent, DatabaseComponent, RemoteConfigComponent ],
+  declarations: [
+    AppComponent,
+    StorageComponent,
+    FirestoreComponent,
+    DatabaseComponent,
+    RemoteConfigComponent,
+    HomeComponent,
+    AuthComponent,
+    MessagingComponent
+  ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),
     BrowserTransferStateModule,
@@ -50,12 +67,19 @@ const shouldUseEmulator = () => false;
     UserTrackingService,
     ScreenTrackingService,
     PerformanceMonitoringService,
-    { provide: ANALYTICS_DEBUG_MODE,   useFactory: () => isDevMode() },
-    { provide: DATABASE_URL,           useFactory: () => shouldUseEmulator() ? `http://localhost:9000?ns=${environment.firebase.projectId}` : undefined },
-    { provide: FIRESTORE_SETTINGS,     useFactory: () => shouldUseEmulator() ? { host: 'localhost:8080', ssl: false } : {} },
-    { provide: FUNCTIONS_ORIGIN,       useFactory: () => shouldUseEmulator() ? 'http://localhost:9999' : undefined },
+    {
+      provide: ANALYTICS_DEBUG_MODE,
+      useFactory: () => isDevMode()
+    },
+    {
+      provide: DATABASE_URL,
+      useFactory: () => shouldUseEmulator() ? `http://localhost:9000?ns=${environment.firebase.projectId}` : undefined
+    },
+    { provide: FIRESTORE_SETTINGS, useFactory: () => shouldUseEmulator() ? { host: 'localhost:8080', ssl: false } : {} },
+    { provide: FUNCTIONS_ORIGIN, useFactory: () => shouldUseEmulator() ? 'http://localhost:9999' : undefined },
     { provide: REMOTE_CONFIG_SETTINGS, useFactory: () => isDevMode() ? { minimumFetchIntervalMillis: 10_000 } : {} }
   ],
-  bootstrap: [ AppComponent ]
+  bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}
