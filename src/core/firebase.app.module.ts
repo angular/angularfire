@@ -1,4 +1,6 @@
-import { Inject, InjectionToken, NgModule, NgZone, Optional, PLATFORM_ID, VERSION as NG_VERSION, Version } from '@angular/core';
+import {
+  Inject, InjectionToken, ModuleWithProviders, NgModule, NgZone, Optional, PLATFORM_ID, VERSION as NG_VERSION, Version
+} from '@angular/core';
 import firebase from 'firebase/app';
 import { analytics, app, auth, database, firestore, functions, messaging, performance, remoteConfig, storage } from 'firebase/app';
 
@@ -58,12 +60,12 @@ const FIREBASE_APP_PROVIDER = {
   providers: [FIREBASE_APP_PROVIDER]
 })
 export class AngularFireModule {
-  static initializeApp(options: FirebaseOptions, nameOrConfig?: string | FirebaseAppConfig) {
+  static initializeApp(options: FirebaseOptions, nameOrConfig?: string | FirebaseAppConfig): ModuleWithProviders<AngularFireModule> {
     return {
       ngModule: AngularFireModule,
       providers: [
-        { provide: FIREBASE_OPTIONS, useValue: options },
-        { provide: FIREBASE_APP_NAME, useValue: nameOrConfig }
+        {provide: FIREBASE_OPTIONS, useValue: options},
+        {provide: FIREBASE_APP_NAME, useValue: nameOrConfig}
       ]
     };
   }

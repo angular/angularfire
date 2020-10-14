@@ -39,7 +39,6 @@ export class AngularFireFunctions {
     const functions = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
       switchMap(() => import('firebase/functions')),
-      tap((it: any) => it),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
       map(app => app.functions(region || undefined)),
       tap(functions => {
