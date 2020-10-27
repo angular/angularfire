@@ -66,6 +66,12 @@ export class AngularFireAnalytics {
     if (!analyticsInitialized) {
       if (isPlatformBrowser(platformId)) {
         window[DATA_LAYER_NAME] = window[DATA_LAYER_NAME] || [];
+        /**
+         * According to the gtag documentation, this function that defines a custom data layer cannot be
+         * an arrow function because 'arguments' is not an array. It is actually an object that behaves
+         * like an array and contains more information then just indexes. Transforming this into arrow function
+         * caused issue #2505 where analytics no longer sent any data.
+         */
         // tslint:disable-next-line: only-arrow-functions
         gtag = (window[GTAG_FUNCTION_NAME] as any) || (function(..._args: any[]) {
           (window[DATA_LAYER_NAME] as any).push(arguments);
