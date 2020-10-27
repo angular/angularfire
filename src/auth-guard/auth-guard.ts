@@ -2,7 +2,7 @@ import { Inject, Injectable, NgZone, Optional } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import { Observable, of, pipe, UnaryFunction } from 'rxjs';
 import { map, observeOn, shareReplay, switchMap, take, tap } from 'rxjs/operators';
-import { User } from 'firebase/app';
+import firebase from 'firebase/app';
 import {
   ɵAngularFireSchedulers,
   FirebaseOptions,
@@ -14,7 +14,7 @@ import {
 } from '@angular/fire';
 
 export type AuthPipeGenerator = (next: ActivatedRouteSnapshot, state: RouterStateSnapshot) => AuthPipe;
-export type AuthPipe = UnaryFunction<Observable<User|null>, Observable<boolean|any[]>>;
+export type AuthPipe = UnaryFunction<Observable<firebase.User|null>, Observable<boolean|any[]>>;
 
 export const loggedIn: AuthPipe = map(user => !!user);
 
@@ -23,7 +23,7 @@ export const loggedIn: AuthPipe = map(user => !!user);
 })
 export class AngularFireAuthGuard implements CanActivate {
 
-  authState: Observable<User|null>;
+  authState: Observable<firebase.User|null>;
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
@@ -44,7 +44,7 @@ export class AngularFireAuthGuard implements CanActivate {
     );
 
     this.authState = auth.pipe(
-      switchMap(auth => new Observable<User|null>(auth.onAuthStateChanged.bind(auth))),
+      switchMap(auth => new Observable<firebase.User|null>(auth.onAuthStateChanged.bind(auth))),
       keepUnstableUntilFirst
     );
   }
@@ -66,7 +66,7 @@ export const canActivate = (pipe: AuthPipeGenerator) => ({
 
 
 export const isNotAnonymous: AuthPipe = map(user => !!user && !user.isAnonymous);
-export const idTokenResult = switchMap((user: User|null) => user ? user.getIdTokenResult() : of(null));
+export const idTokenResult = switchMap((user: firebase.User|null) => user ? user.getIdTokenResult() : of(null));
 export const emailVerified: AuthPipe = map(user => !!user && user.emailVerified);
 export const customClaims = pipe(idTokenResult, map(idTokenResult => idTokenResult ? idTokenResult.claims : []));
 export const hasCustomClaim: (claim: string) => AuthPipe =

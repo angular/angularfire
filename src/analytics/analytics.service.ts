@@ -14,7 +14,7 @@ import { filter, groupBy, map, mergeMap, observeOn, pairwise, startWith, switchM
 import { ActivationEnd, NavigationEnd, Router, ROUTES } from '@angular/router';
 import { ɵAngularFireSchedulers } from '@angular/fire';
 import { AngularFireAnalytics, DEBUG_MODE } from './analytics';
-import { User } from 'firebase/app';
+import firebase from 'firebase/app';
 import { Title } from '@angular/platform-browser';
 import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 
@@ -214,7 +214,7 @@ export class UserTrackingService implements OnDestroy {
           observeOn(schedulers.outsideAngular),
           switchMap(() => analytics.app),
           map(app => app.auth()),
-          switchMap(auth => new Observable<User | null>(auth.onAuthStateChanged.bind(auth))),
+          switchMap(auth => new Observable<firebase.User | null>(auth.onAuthStateChanged.bind(auth))),
           switchMap(user => analytics.setUserId(user ? user.uid : null))
         ).subscribe();
       });
