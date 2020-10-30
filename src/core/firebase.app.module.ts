@@ -2,7 +2,6 @@ import {
   Inject, InjectionToken, ModuleWithProviders, NgModule, NgZone, Optional, PLATFORM_ID, VERSION as NG_VERSION, Version
 } from '@angular/core';
 import firebase from 'firebase/app';
-import { analytics, app, auth, database, firestore, functions, messaging, performance, remoteConfig, storage } from 'firebase/app';
 
 // INVESTIGATE Public types don't expose FirebaseOptions or FirebaseAppConfig, is this the case anylonger?
 export interface FirebaseOptions {
@@ -18,19 +17,19 @@ export const FIREBASE_APP_NAME = new InjectionToken<string | FirebaseAppConfig |
 
 // Have to implement as we need to return a class from the provider, we should consider exporting
 // this in the firebase/app types as this is our highest risk of breaks
-export class FirebaseApp implements Partial<app.App> {
+export class FirebaseApp implements Partial<firebase.app.App> {
   name: string;
   options: {};
-  analytics: () => analytics.Analytics;
-  auth: () => auth.Auth;
-  database: (databaseURL?: string) => database.Database;
-  messaging: () => messaging.Messaging;
-  performance: () => performance.Performance;
-  storage: (storageBucket?: string) => storage.Storage;
+  analytics: () => firebase.analytics.Analytics;
+  auth: () => firebase.auth.Auth;
+  database: (databaseURL?: string) => firebase.database.Database;
+  messaging: () => firebase.messaging.Messaging;
+  performance: () => firebase.performance.Performance;
+  storage: (storageBucket?: string) => firebase.storage.Storage;
   delete: () => Promise<void>;
-  firestore: () => firestore.Firestore;
-  functions: (region?: string) => functions.Functions;
-  remoteConfig: () => remoteConfig.RemoteConfig;
+  firestore: () => firebase.firestore.Firestore;
+  functions: (region?: string) => firebase.functions.Functions;
+  remoteConfig: () => firebase.remoteConfig.RemoteConfig;
 }
 
 export const VERSION = new Version('ANGULARFIRE2_VERSION');

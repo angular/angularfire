@@ -1,7 +1,7 @@
 import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
 import { EMPTY, Observable, of, Subscription } from 'rxjs';
 import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
-import { performance } from 'firebase/app';
+import firebase from 'firebase/app';
 import { FirebaseApp, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
 import { isPlatformBrowser } from '@angular/common';
 
@@ -10,7 +10,7 @@ export const AUTOMATICALLY_TRACE_CORE_NG_METRICS = new InjectionToken<boolean>('
 export const INSTRUMENTATION_ENABLED = new InjectionToken<boolean>('angularfire2.performance.instrumentationEnabled');
 export const DATA_COLLECTION_ENABLED = new InjectionToken<boolean>('angularfire2.performance.dataCollectionEnabled');
 
-export interface AngularFirePerformance extends ɵPromiseProxy<performance.Performance> {
+export interface AngularFirePerformance extends ɵPromiseProxy<firebase.performance.Performance> {
 }
 
 @Injectable({
@@ -18,7 +18,7 @@ export interface AngularFirePerformance extends ɵPromiseProxy<performance.Perfo
 })
 export class AngularFirePerformance {
 
-  private readonly performance: Observable<performance.Performance>;
+  private readonly performance: Observable<firebase.performance.Performance>;
 
   constructor(
     app: FirebaseApp,
