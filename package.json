@@ -48,7 +48,7 @@
     "@angular/platform-browser": "^9.0.0 || ^10.0.0",
     "@angular/platform-browser-dynamic": "^9.0.0 || ^10.0.0",
     "@angular/router": "^9.0.0 || ^10.0.0",
-    "firebase": "^8.0.0",
+    "firebase": "^7.0.0 || ^8.0.0",
     "firebase-admin": "^8.10.0",
     "firebase-functions": "^3.6.0",
     "firebase-tools": "^8.0.0",
