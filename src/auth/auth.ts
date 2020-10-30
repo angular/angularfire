@@ -1,6 +1,6 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
 import { Observable, of, from } from 'rxjs';
-import { switchMap, map, observeOn, shareReplay, first, tap } from 'rxjs/operators';
+import { switchMap, map, observeOn, shareReplay, first } from 'rxjs/operators';
 import {
   FIREBASE_OPTIONS,
   FIREBASE_APP_NAME,
@@ -76,13 +76,13 @@ export class AngularFireAuth {
       const _ = auth.pipe(first()).subscribe();
 
       this.authState = auth.pipe(
-        switchMap(auth => auth.getRedirectResult().then(() => auth)),
+        switchMap(auth => auth.getRedirectResult().then(() => auth, () => auth)),
         switchMap(auth => zone.runOutsideAngular(() => new Observable<firebase.User|null>(auth.onAuthStateChanged.bind(auth)))),
         keepUnstableUntilFirst
       );
 
       this.user = auth.pipe(
-        switchMap(auth => auth.getRedirectResult().then(() => auth)),
+        switchMap(auth => auth.getRedirectResult().then(() => auth, () => auth)),
         switchMap(auth => zone.runOutsideAngular(() => new Observable<firebase.User|null>(auth.onIdTokenChanged.bind(auth)))),
         keepUnstableUntilFirst
       );
