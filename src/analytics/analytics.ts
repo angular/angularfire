@@ -12,7 +12,6 @@ import {
   ɵfirebaseAppFactory,
   ɵPromiseProxy
 } from '@angular/fire';
-import { analytics } from 'firebase/app';
 import firebase from 'firebase/app';
 
 export interface Config {
@@ -33,12 +32,12 @@ const GTAG_CONFIG_COMMAND = 'config';
 const GTAG_FUNCTION_NAME = 'gtag';
 const DATA_LAYER_NAME = 'dataLayer';
 
-export interface AngularFireAnalytics extends ɵPromiseProxy<analytics.Analytics> {
+export interface AngularFireAnalytics extends ɵPromiseProxy<firebase.analytics.Analytics> {
 }
 
 let gtag: (...args: any[]) => void;
 let analyticsInitialized: Promise<void>;
-const analyticsInstanceCache: { [key: string]: Observable<analytics.Analytics> } = {};
+const analyticsInstanceCache: { [key: string]: Observable<firebase.analytics.Analytics> } = {};
 
 @Injectable({
   providedIn: 'any'

@@ -1,4 +1,4 @@
-import { firestore } from 'firebase/app';
+import firebase from 'firebase/app';
 import { AngularFirestoreCollection } from './collection/collection';
 
 export interface Stock {
@@ -10,7 +10,11 @@ export const FAKE_STOCK_DATA = { name: 'FAKE', price: 1 };
 
 export const randomName = (firestore): string => firestore.collection('a').doc().id;
 
-export const createRandomStocks = async (firestore: firestore.Firestore, collectionRef: firestore.CollectionReference, numberOfItems) => {
+export const createRandomStocks = async (
+  firestore: firebase.firestore.Firestore,
+  collectionRef: firebase.firestore.CollectionReference,
+  numberOfItems
+) => {
   // Create a batch to update everything at once
   const batch = firestore.batch();
   // Store the random names to delete them later
@@ -32,19 +36,19 @@ export function deleteThemAll(names, ref) {
   return Promise.all(promises);
 }
 
-export function delayUpdate<T>(collection: AngularFirestoreCollection<T>|firestore.CollectionReference, path, data, delay = 250) {
+export function delayUpdate<T>(collection: AngularFirestoreCollection<T>|firebase.firestore.CollectionReference, path, data, delay = 250) {
   setTimeout(() => {
     collection.doc(path).update(data);
   }, delay);
 }
 
-export function delayAdd<T>(collection: AngularFirestoreCollection<T>|firestore.CollectionReference, path, data, delay = 250) {
+export function delayAdd<T>(collection: AngularFirestoreCollection<T>|firebase.firestore.CollectionReference, path, data, delay = 250) {
   setTimeout(() => {
     collection.doc(path).set(data);
   }, delay);
 }
 
-export function delayDelete<T>(collection: AngularFirestoreCollection<T>|firestore.CollectionReference, path, delay = 250) {
+export function delayDelete<T>(collection: AngularFirestoreCollection<T>|firebase.firestore.CollectionReference, path, delay = 250) {
   setTimeout(() => {
     collection.doc(path).delete();
   }, delay);

@@ -1,5 +1,4 @@
 import { Inject, Injectable, NgZone, Optional, PLATFORM_ID } from '@angular/core';
-import { messaging } from 'firebase/app';
 import firebase from 'firebase/app';
 import { concat, EMPTY, Observable, of, throwError, fromEvent } from 'rxjs';
 import { catchError, defaultIfEmpty, map, mergeMap, observeOn, switchMap, switchMapTo, shareReplay, filter, subscribeOn } from 'rxjs/operators';
@@ -15,7 +14,7 @@ import {
 } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
 
-export interface AngularFireMessaging extends Omit<ɵPromiseProxy<messaging.Messaging>, 'deleteToken' | 'getToken' | 'requestPermission'> {
+export interface AngularFireMessaging extends Omit<ɵPromiseProxy<firebase.messaging.Messaging>, 'deleteToken' | 'getToken' | 'requestPermission'> {
 }
 
 @Injectable({
