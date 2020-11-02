@@ -1,0 +1,16 @@
+export const proxyPolyfillCompat = {
+  settings: undefined,
+  defaultConfig: undefined,
+  fetchTimeMillis: undefined,
+  lastFetchStatus: undefined,
+  activate: undefined,
+  ensureInitialized: undefined,
+  fetch: undefined,
+  fetchAndActivate: undefined,
+  getAll: undefined,
+  getBoolean: undefined,
+  getNumber: undefined,
+  getString: undefined,
+  getValue: undefined,
+  setLogLevel: undefined,
+};

@@ -165,3 +165,15 @@ export const ɵlazySDKProxy = (klass: any, observable: Observable<any>, zone: Ng
     })
   });
 };
+
+export const ɵapplyMixins = (derivedCtor: any, constructors: any[]) => {
+  constructors.forEach((baseCtor) => {
+    Object.getOwnPropertyNames(baseCtor.prototype || baseCtor).forEach((name) => {
+      Object.defineProperty(
+        derivedCtor.prototype,
+        name,
+        Object.getOwnPropertyDescriptor(baseCtor.prototype || baseCtor, name)
+      );
+    });
+  });
+};

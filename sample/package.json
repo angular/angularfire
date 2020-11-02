@@ -8,6 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "dev:ssr": "ng run sample:serve-ssr",
+    "bust": "rm -rf node_modules/@angular/fire && yarn cache clean @angular/fire && yarn add ../dist/packages-dist",
     "serve:ssr": "node dist/sample/server/main.js",
     "build:ssr": "ng build --prod && ng run sample:server:production",
     "prerender": "ng run sample:prerender"
