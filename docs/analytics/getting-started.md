@@ -122,7 +122,7 @@ See the gtag.js documentation to learn of the different configuration options at
 
 ### Use DebugView `DEBUG_MODE`
 
-To use [DebugView in Analtyics](https://console.firebase.google.com/project/_/analytics/debugview) set `DEBUG_MODE` to `true` (*default: false*).
+To use [DebugView in Analytics](https://console.firebase.google.com/project/_/analytics/debugview) set `DEBUG_MODE` to `true` (*default: false*).
 
 ### Track deployments with `APP_NAME` and `APP_VERSION`
 

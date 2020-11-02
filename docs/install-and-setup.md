@@ -1,44 +1,26 @@
-# 1. Installation and Setup
-
-> Using Ionic and the Ionic CLI? Check out these [specific instructions](ionic/cli.md) for Ionic and their CLI.
-
-### 0. Prerequisites
-
-AngularFire provides multiple module formats for different types of builds. The guide is based on the Angular CLI. It is possible to do a manual setup with Webpack or a SystemJS build as well.
-
-```bash
-npm install @angular/cli
-```
+# AngularFire Quickstart
 
 ### 1. Create a new project
 
 ```bash
+npm install -g @angular/cli
 ng new <project-name>
 cd <project-name>
 ```
 
 The Angular CLI's `new` command will set up the latest Angular build in a new project structure.
 
-### 2. Test your setup
+### 2. Install AngularFire and Firebase
 
 ```bash
-ng serve
-open http://localhost:4200
-```
-
-You should see a message on the page that says *App works!*
-
-### 3. Install AngularFire and Firebase
-
-```bash
-npm install @angular/fire firebase --save
+ng add @angular/fire
 ```
 
 Now that you have a new project setup, install AngularFire and Firebase from npm.
 
-### 4. Add Firebase config to environments variable
+### 3. Add Firebase config to environments variable
 
-Open `/src/environments/environment.ts` and add your Firebase configuration. You can find your project configuration in [the Firebase Console](https://console.firebase.google.com). From the project overview page, click **Add Firebase to your web app**.
+Open `/src/environments/environment.ts` and add your Firebase configuration. You can find your project configuration in [the Firebase Console](https://console.firebase.google.com). Click the Gear icon next to Project Overview, then click Project Settings and under "Firebase SDK snippet" click Config.
 
 ```ts
 export const environment = {
@@ -54,7 +36,7 @@ export const environment = {
 };
 ```
 
-### 5. Setup @NgModule for the AngularFireModule
+### 4. Setup `@NgModule` for the `AngularFireModule`
 
 Open `/src/app/app.module.ts`, inject the Firebase providers, and specify your Firebase configuration.
 
@@ -76,39 +58,11 @@ import { environment } from '../environments/environment';
 export class AppModule {}
 ```
 
-#### Custom `FirebaseApp` names
-
-You can optionally provide a custom FirebaseApp name with `initializeApp`.
-
-```ts
-@NgModule({
-  imports: [
-    BrowserModule,
-    AngularFireModule.initializeApp(environment.firebase, 'my-app-name')
-  ],
-  declarations: [ AppComponent ],
-  bootstrap: [ AppComponent ]
-})
-export class AppModule {}
-```
-
-### 6. Setup individual `@NgModules`
+### 5. Setup individual `@NgModule`s
 
 After adding the AngularFireModule you also need to add modules for the individual @NgModules that your application needs.
 
- - `AngularFireAnalytics`
- - `AngularFireAuthModule`
- - `AngularFireDatabaseModule`
- - `AngularFireFunctionsModule`
- - `AngularFirestoreModule`
- - `AngularFireRemoteConfigModule`
- - `AngularFireStorageModule`
- - `AngularFireMessagingModule`
- - `AngularFirePerformanceModule`
-
-#### Adding the Firebase Database and Auth Modules
-
-For example if your application was using both Firebase authentication and the Firebase database you would add:
+For example if your application was using both Google Analytics and the Firestore you would add `AngularFireAnalyticsModule` and `AngularFirestoreModule`:
 
 ```ts
 import { BrowserModule } from '@angular/platform-browser';
@@ -117,18 +71,14 @@ import { AppComponent } from './app.component';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAnalyticsModule } from '@angular/fire/analytics';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
-import { AngularFireStorageModule } from '@angular/fire/storage';
-import { AngularFireAuthModule } from '@angular/fire/auth';
 import { environment } from '../environments/environment';
 
 @NgModule({
   imports: [
     BrowserModule,
-    AngularFireModule.initializeApp(environment.firebase, 'my-app-name'), // imports firebase/app needed for everything
-    AngularFireAnalyticsModule, // dynamically imports firebase/analytics
-    AngularFirestoreModule, // imports firebase/firestore, only needed for database features
-    AngularFireAuthModule, // imports firebase/auth, only needed for auth features,
-    AngularFireStorageModule // imports firebase/storage only needed for storage features
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFireAnalyticsModule,
+    AngularFirestoreModule
   ],
   declarations: [ AppComponent ],
   bootstrap: [ AppComponent ]
@@ -150,7 +100,7 @@ import { AngularFirestore } from '@angular/fire/firestore';
   styleUrls: ['app.component.css']
 })
 export class AppComponent {
-  constructor(db: AngularFirestore) {
+  constructor(firestore: AngularFirestore) {
 
   }
 }
@@ -172,8 +122,8 @@ import { Observable } from 'rxjs';
 })
 export class AppComponent {
   items: Observable<any[]>;
-  constructor(db: AngularFirestore) {
-    this.items = db.collection('items').valueChanges();
+  constructor(firestore: AngularFirestore) {
+    this.items = firestore.collection('items').valueChanges();
   }
 }
 ```
@@ -188,14 +138,22 @@ Open `/src/app/app.component.html`:
 </ul>
 ```
 
-### 9. Run your app
+### 9. Run your app locally
 
 ```bash
 ng serve
 ```
 
-Run the serve command and navigate to `localhost:4200` in your browser.
+Your Angular app will compile and serve locally, visit it we should see an empty list.
 
-And that's it! If it's totally *borked*, file an issue and let us know.
+In another tab [start adding data to an `items` collection in Firestore](https://firebase.google.com/docs/firestore/manage-data/add-data). *As we're not authenticating users yet, be sure to start Firestore in **test mode** or allow reading from the `items` collection in Security Rules (`allow read: if true`).*
 
-### [Next Step: Documents in AngularFirestore](firestore/documents.md)
+Once you've created a `items` collection and are inserting documents, you should see data streaming into your Angular application.
+
+### 10. Deploy your app
+
+Finally, we can deploy the application to Firebase hosting:
+
+```bash
+ng deploy
+```

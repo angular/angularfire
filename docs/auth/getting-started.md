@@ -2,7 +2,7 @@
 
 `AngularFireAuth.user` provides you an `Observable<User|null>` to monitor your application's authentication State.
 
-`AngularFireAuth.auth` returns an initialized
+`AngularFireAuth` promise proxies an initialized
 `firebase.auth.Auth` instance, allowing you to log users in, out, etc. [See
 the Firebase docs for more information on what methods are available.](https://firebase.google.com/docs/reference/js/firebase.auth.Auth)
 
@@ -11,12 +11,12 @@ the Firebase docs for more information on what methods are available.](https://f
 ```ts
 import { Component } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { auth } from 'firebase/app';
+import firebase from 'firebase/app';
 
 @Component({
   selector: 'app-root',
   template: `
-    <div *ngIf="afAuth.user | async as user; else showLogin">
+    <div *ngIf="auth.user | async as user; else showLogin">
       <h1>Hello {{ user.displayName }}!</h1>
       <button (click)="logout()">Logout</button>
     </div>
@@ -27,13 +27,13 @@ import { auth } from 'firebase/app';
   `,
 })
 export class AppComponent {
-  constructor(public afAuth: AngularFireAuth) {
+  constructor(public auth: AngularFireAuth) {
   }
   login() {
-    this.afAuth.auth.signInWithPopup(new auth.GoogleAuthProvider());
+    this.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
   }
   logout() {
-    this.afAuth.auth.signOut();
+    this.auth.signOut();
   }
 }
 ```

@@ -8,6 +8,10 @@
       "type": "string",
       "description": "Target to build.",
       "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
+    },
+    "preview": {
+      "type": "boolean",
+      "description": "Do not deploy the application, just set up the Firebase Function in the project output directory. Can be used for testing the Firebase Function with `firebase serve`."
     }
   }
 }

@@ -1,9 +1,10 @@
-import { storage } from 'firebase/app';
+import firebase from 'firebase/app';
 
-export type UploadTask = storage.UploadTask;
-export type UploadTaskSnapshot = storage.UploadTaskSnapshot;
-export type UploadMetadata = storage.UploadMetadata;
+export type UploadTask = firebase.storage.UploadTask;
+export type UploadTaskSnapshot = firebase.storage.UploadTaskSnapshot;
+export type UploadMetadata = firebase.storage.UploadMetadata;
 
-export type SettableMetadata = storage.SettableMetadata;
-export type Reference = storage.Reference;
-export type StringFormat = storage.StringFormat;
+export type SettableMetadata = firebase.storage.SettableMetadata;
+export type Reference = firebase.storage.Reference;
+export type StringFormat = firebase.storage.StringFormat;
+export type ListResult = firebase.storage.ListResult;

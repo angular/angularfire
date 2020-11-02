@@ -9,13 +9,13 @@ export class AngularFirestoreModule {
   /**
    * Attempt to enable persistent storage, if possible
    */
-  static enablePersistence(persistenceSettings?: PersistenceSettings): ModuleWithProviders {
+  static enablePersistence(persistenceSettings?: PersistenceSettings): ModuleWithProviders<AngularFirestoreModule> {
     return {
       ngModule: AngularFirestoreModule,
       providers: [
         { provide: ENABLE_PERSISTENCE, useValue: true },
         { provide: PERSISTENCE_SETTINGS, useValue: persistenceSettings },
       ]
-    }
+    };
   }
 }

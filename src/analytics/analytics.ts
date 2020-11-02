@@ -1,11 +1,22 @@
-import { Injectable, Inject, Optional, NgZone, InjectionToken, PLATFORM_ID } from '@angular/core';
-import { of, empty, Observable } from 'rxjs';
+import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
+import { EMPTY, Observable, of } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { map, tap, shareReplay, switchMap, observeOn } from 'rxjs/operators';
-import { FirebaseAppConfig, FirebaseOptions, ɵAngularFireSchedulers, ɵlazySDKProxy, FIREBASE_OPTIONS, FIREBASE_APP_NAME, ɵfirebaseAppFactory, ɵPromiseProxy } from '@angular/fire';
-import { analytics } from 'firebase';
+import {
+  FirebaseAppConfig,
+  FirebaseOptions,
+  ɵAngularFireSchedulers,
+  ɵlazySDKProxy,
+  FIREBASE_OPTIONS,
+  FIREBASE_APP_NAME,
+  ɵfirebaseAppFactory,
+  ɵPromiseProxy
+} from '@angular/fire';
+import firebase from 'firebase/app';
 
-export interface Config {[key:string]: any};
+export interface Config {
+  [key: string]: any;
+}
 
 export const COLLECTION_ENABLED = new InjectionToken<boolean>('angularfire2.analytics.analyticsCollectionEnabled');
 export const APP_VERSION = new InjectionToken<string>('angularfire2.analytics.appVersion');
@@ -21,90 +32,95 @@ const GTAG_CONFIG_COMMAND = 'config';
 const GTAG_FUNCTION_NAME = 'gtag';
 const DATA_LAYER_NAME = 'dataLayer';
 
-export interface AngularFireAnalytics extends ɵPromiseProxy<analytics.Analytics> {};
+export interface AngularFireAnalytics extends ɵPromiseProxy<firebase.analytics.Analytics> {
+}
 
-const ANALYTICS_INSTANCE_CACHE = Symbol();
-const ANALYTICS_INITIALIZED = Symbol();
+let gtag: (...args: any[]) => void;
+let analyticsInitialized: Promise<void>;
+const analyticsInstanceCache: { [key: string]: Observable<firebase.analytics.Analytics> } = {};
 
 @Injectable({
   providedIn: 'any'
 })
 export class AngularFireAnalytics {
 
-  private gtag: (...args: any[]) => void;
-
   async updateConfig(config: Config) {
-    await global[ANALYTICS_INITIALIZED];
-    this.gtag(GTAG_CONFIG_COMMAND, this.options[ANALYTICS_ID_FIELD], { ...config, update: true });
-  };
+    await analyticsInitialized;
+    gtag(GTAG_CONFIG_COMMAND, this.options[ANALYTICS_ID_FIELD], { ...config, update: true });
+  }
 
   constructor(
-    @Inject(FIREBASE_OPTIONS) private options:FirebaseOptions,
-    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig:string|FirebaseAppConfig|null|undefined,
-    @Optional() @Inject(COLLECTION_ENABLED) analyticsCollectionEnabled:boolean|null,
-    @Optional() @Inject(APP_VERSION) providedAppVersion:string|null,
-    @Optional() @Inject(APP_NAME) providedAppName:string|null,
-    @Optional() @Inject(DEBUG_MODE) debugModeEnabled:boolean|null,
-    @Optional() @Inject(CONFIG) providedConfig:Config|null,
-    @Inject(PLATFORM_ID) platformId:Object,
+    @Inject(FIREBASE_OPTIONS) private options: FirebaseOptions,
+    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string | FirebaseAppConfig | null | undefined,
+    @Optional() @Inject(COLLECTION_ENABLED) analyticsCollectionEnabled: boolean | null,
+    @Optional() @Inject(APP_VERSION) providedAppVersion: string | null,
+    @Optional() @Inject(APP_NAME) providedAppName: string | null,
+    @Optional() @Inject(DEBUG_MODE) debugModeEnabled: boolean | null,
+    @Optional() @Inject(CONFIG) providedConfig: Config | null,
+    // tslint:disable-next-line:ban-types
+    @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
 
-    const schedulers = new ɵAngularFireSchedulers(zone);
-
-    // Analytics errors if it's not unique from a measurementId standpoint, so we need to cache the instances
-    if (!global[ANALYTICS_INSTANCE_CACHE]) {
-      global[ANALYTICS_INSTANCE_CACHE] = {}
-    };
-
-    let analyticsInitialized: Promise<void> = global[ANALYTICS_INITIALIZED];
-    let analyticsInstanceCache: {[key:string]: Observable<analytics.Analytics>} = global[ANALYTICS_INSTANCE_CACHE];
-    let analytics = analyticsInstanceCache[options[ANALYTICS_ID_FIELD]];
-
-    if (isPlatformBrowser(platformId)) {
-
-      window[DATA_LAYER_NAME] = window[DATA_LAYER_NAME] || [];
-      this.gtag = window[GTAG_FUNCTION_NAME] || function() { window[DATA_LAYER_NAME].push(arguments) }
-
-      if (!analyticsInitialized) {
+    if (!analyticsInitialized) {
+      if (isPlatformBrowser(platformId)) {
+        window[DATA_LAYER_NAME] = window[DATA_LAYER_NAME] || [];
+        /**
+         * According to the gtag documentation, this function that defines a custom data layer cannot be
+         * an arrow function because 'arguments' is not an array. It is actually an object that behaves
+         * like an array and contains more information then just indexes. Transforming this into arrow function
+         * caused issue #2505 where analytics no longer sent any data.
+         */
+        // tslint:disable-next-line: only-arrow-functions
+        gtag = (window[GTAG_FUNCTION_NAME] as any) || (function(..._args: any[]) {
+          (window[DATA_LAYER_NAME] as any).push(arguments);
+        });
         analyticsInitialized = zone.runOutsideAngular(() =>
           new Promise(resolve => {
             window[GTAG_FUNCTION_NAME] = (...args: any[]) => {
-              if (args[0] == 'js') { resolve() }
-              this.gtag(...args);
-            }
+              if (args[0] === 'js') {
+                resolve();
+              }
+              gtag(...args);
+            };
           })
         );
+      } else {
+        gtag = () => {
+        };
+        analyticsInitialized = Promise.resolve();
       }
-
-    } else {
-
-      analyticsInitialized = Promise.resolve();
-      this.gtag = () => {}
-
     }
 
+    let analytics = analyticsInstanceCache[options[ANALYTICS_ID_FIELD]];
     if (!analytics) {
-
       analytics = of(undefined).pipe(
-        observeOn(schedulers.outsideAngular),
-        switchMap(() => isPlatformBrowser(platformId) ? import('firebase/analytics') : empty()),
+        observeOn(new ɵAngularFireSchedulers(zone).outsideAngular),
+        switchMap(() => isPlatformBrowser(platformId) ? import('firebase/analytics') : EMPTY),
         map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
         map(app => app.analytics()),
         tap(analytics => {
-          if (analyticsCollectionEnabled === false) { analytics.setAnalyticsCollectionEnabled(false) }
+          if (analyticsCollectionEnabled === false) {
+            analytics.setAnalyticsCollectionEnabled(false);
+          }
         }),
-        shareReplay({ bufferSize: 1, refCount: false }),
+        shareReplay({ bufferSize: 1, refCount: false })
       );
-
       analyticsInstanceCache[options[ANALYTICS_ID_FIELD]] = analytics;
-
     }
 
-    if (providedConfig)     { this.updateConfig(providedConfig) }
-    if (providedAppName)    { this.updateConfig({ [APP_NAME_KEY]:    providedAppName }) }
-    if (providedAppVersion) { this.updateConfig({ [APP_VERSION_KEY]: providedAppVersion }) }
-    if (debugModeEnabled)   { this.updateConfig({ [DEBUG_MODE_KEY]:  1 }) }
+    if (providedConfig) {
+      this.updateConfig(providedConfig);
+    }
+    if (providedAppName) {
+      this.updateConfig({ [APP_NAME_KEY]: providedAppName });
+    }
+    if (providedAppVersion) {
+      this.updateConfig({ [APP_VERSION_KEY]: providedAppVersion });
+    }
+    if (debugModeEnabled) {
+      this.updateConfig({ [DEBUG_MODE_KEY]: 1 });
+    }
 
     return ɵlazySDKProxy(this, analytics, zone);
 

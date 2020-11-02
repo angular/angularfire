@@ -2,9 +2,10 @@
     "extends": "./tsconfig.base.json",
     "compilerOptions": {
       "outDir": "dist/out-tsc/jasmine",
-      "module": "none",
+      "module": "commonjs",
       "target": "es2015",
       "allowJs": true,
+      "resolveJsonModule": true,
       "types": [
         "jasmine",
         "node"
@@ -17,4 +18,3 @@
         "node_modules/zone.js/dist/zone.js.d.ts"
     ]
   }
-  
