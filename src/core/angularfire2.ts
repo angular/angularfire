@@ -140,7 +140,7 @@ export const ɵlazySDKProxy = (klass: any, observable: Observable<any>, zone: Ng
       if (klass[name]) {
         return klass[name];
       }
-      if (noopFunctions.includes(name)) {
+      if (noopFunctions.indexOf(name) > -1) {
         return () => {
         };
       }
