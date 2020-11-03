@@ -8,10 +8,10 @@ import { FirebaseApp } from '@angular/fire';
     {{ firebaseApp.name }}
     <app-database></app-database>
     <app-firestore></app-firestore>
-    <app-remote-config></app-remote-config>
     <app-storage></app-storage>
     <app-auth></app-auth>
-    <app-messaging></app-messaging>
+    <app-remote-config></app-remote-config>
+    <!-- TODO get working with Firebase 8 <app-messaging></app-messaging>-->
   `,
   styles: [``]
 })

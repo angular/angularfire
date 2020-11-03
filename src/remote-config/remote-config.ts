@@ -24,11 +24,13 @@ import {
   ɵfirebaseAppFactory,
   ɵkeepUnstableUntilFirstFactory,
   ɵlazySDKProxy,
-  ɵPromiseProxy
+  ɵPromiseProxy,
+  ɵapplyMixins
 } from '@angular/fire';
 import { isPlatformBrowser } from '@angular/common';
 import firebase from 'firebase/app';
 import { Settings } from './interfaces';
+import { proxyPolyfillCompat } from './base';
 
 export interface ConfigTemplate {
   [key: string]: string | number | boolean;
@@ -310,3 +312,4 @@ export function mapToObject<T extends ConfigTemplate>(to: 'numbers' | 'booleans'
   );
 }
 
+ɵapplyMixins(AngularFireRemoteConfig, [proxyPolyfillCompat]);

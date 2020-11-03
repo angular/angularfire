@@ -10,9 +10,11 @@ import {
   ɵAngularFireSchedulers,
   ɵfirebaseAppFactory,
   ɵlazySDKProxy,
-  ɵPromiseProxy
+  ɵPromiseProxy,
+  ɵapplyMixins
 } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
+import { proxyPolyfillCompat } from './base';
 
 export interface AngularFireMessaging extends Omit<ɵPromiseProxy<firebase.messaging.Messaging>, 'deleteToken' | 'getToken' | 'requestPermission'> {
 }
@@ -102,3 +104,5 @@ export class AngularFireMessaging {
   }
 
 }
+
+ɵapplyMixins(AngularFireMessaging, [proxyPolyfillCompat]);
