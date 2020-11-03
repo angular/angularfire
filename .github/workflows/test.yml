@@ -23,7 +23,7 @@ jobs:
           ${{ runner.os }}-
     - name: yarn test
       run: |
-        yarn install --frozen-lockfile
+        yarn install --frozen-lockfile --prefer-offline
         yarn lint
         yarn build
         yarn test:all
