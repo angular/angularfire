@@ -1,27 +1,16 @@
-name: Test all
+name: Unit tests
 
-on:
-  push:
-    branches:
-      - '**'
-  pull_request:
-    branches: 
-      - '**'
-  schedule:
-    - cron: '0 15 * * *'
+on: [push]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - name: Set up Node (10)
-      uses: actions/setup-node@v1
+    - uses: actions/setup-node@v1
       with:
-        node-version: 10.x
-    - name: YARN INSTALL
-      run: yarn install --frozen-lockfile
-    - name: YARN BUILD
-      run: yarn build
-    - name: TEST ALL
-      run: yarn test:all
+        node-version: 12.x
+    - run: yarn install --frozen-lockfile
+    - run: yarn build
+    - run: yarn test:all
+    - run: yarn lint
