@@ -22,7 +22,7 @@ import { AngularFireStorageModule } from '@angular/fire/storage';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFireMessagingModule } from '@angular/fire/messaging';
 import { AngularFireFunctionsModule, ORIGIN as FUNCTIONS_ORIGIN } from '@angular/fire/functions';
-import { AngularFireRemoteConfigModule, SETTINGS as REMOTE_CONFIG_SETTINGS } from '@angular/fire/remote-config';
+import { AngularFireRemoteConfigModule, SETTINGS as REMOTE_CONFIG_SETTINGS, DEFAULTS as REMOTE_CONFIG_DEFAULTS } from '@angular/fire/remote-config';
 import { AngularFirePerformanceModule, PerformanceMonitoringService } from '@angular/fire/performance';
 import { AngularFireAuthGuardModule } from '@angular/fire/auth-guard';
 import { DatabaseComponent } from './database/database.component';
@@ -79,7 +79,8 @@ const shouldUseEmulator = () => false;
     },
     { provide: FIRESTORE_SETTINGS, useFactory: () => shouldUseEmulator() ? { host: 'localhost:8080', ssl: false } : {} },
     { provide: FUNCTIONS_ORIGIN, useFactory: () => shouldUseEmulator() ? 'http://localhost:9999' : undefined },
-    { provide: REMOTE_CONFIG_SETTINGS, useFactory: () => isDevMode() ? { minimumFetchIntervalMillis: 10_000 } : {} }
+    { provide: REMOTE_CONFIG_SETTINGS, useFactory: () => isDevMode() ? { minimumFetchIntervalMillis: 10_000 } : {} },
+    { provide: REMOTE_CONFIG_DEFAULTS, useValue: { background_color: 'red' } },
   ],
   bootstrap: [AppComponent]
 })
