@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/setup-node@v1
+    - uses: actions/setup-node@v2
       with:
         node-version: '12'
         check-latest: true
@@ -17,9 +17,9 @@ jobs:
     - uses: actions/cache@v2
       with:
         path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-        key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.json') }}
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.json') }}
         restore-keys: |
-          ${{ runner.os }}-yarn-${{ hashFiles('yarn.json') }}
+          ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.json') }}
           ${{ runner.os }}-yarn-
           ${{ runner.os }}-
     - name: yarn test
