@@ -156,7 +156,7 @@ export const ɵlazySDKProxy = (klass: any, observable: Observable<any>, zone: Ng
         }
       });
       // recurse the proxy
-      return new Proxy(() => undefined, {
+      return new Proxy(() => {}, {
           get: (_, name) => promise[name],
           // TODO handle callbacks as transparently as I can
           apply: (self, _, args) => promise.then(it => it && it(...args))

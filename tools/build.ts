@@ -28,7 +28,7 @@ function proxyPolyfillCompat() {
 
   return Promise.all(Object.keys(defaultObject).map(module =>
     writeFile(`./src/${module}/base.ts`, `export const proxyPolyfillCompat = {
-${defaultObject[module].map(it => `  ${it}: undefined,`).join('\n')}
+${defaultObject[module].map(it => `  ${it}: null,`).join('\n')}
 };\n`)
   ));
 }

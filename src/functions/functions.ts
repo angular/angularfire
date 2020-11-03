@@ -9,9 +9,11 @@ import {
   ɵAngularFireSchedulers,
   ɵfirebaseAppFactory,
   ɵlazySDKProxy,
-  ɵPromiseProxy
+  ɵPromiseProxy,
+  ɵapplyMixins
 } from '@angular/fire';
 import firebase from 'firebase/app';
+import { proxyPolyfillCompat } from './base';
 
 export const ORIGIN = new InjectionToken<string>('angularfire2.functions.origin');
 export const REGION = new InjectionToken<string>('angularfire2.functions.region');
@@ -61,3 +63,5 @@ export class AngularFireFunctions {
   }
 
 }
+
+ɵapplyMixins(AngularFireFunctions, [proxyPolyfillCompat]);
