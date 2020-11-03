@@ -10,10 +10,12 @@ import {
   ɵlazySDKProxy,
   ɵfirebaseAppFactory,
   ɵAngularFireSchedulers,
-  ɵkeepUnstableUntilFirstFactory
+  ɵkeepUnstableUntilFirstFactory,
+  ɵapplyMixins
 } from '@angular/fire';
 import firebase from 'firebase/app';
 import { isPlatformServer } from '@angular/common';
+import { proxyPolyfillCompat } from './base';
 
 export interface AngularFireAuth extends ɵPromiseProxy<firebase.auth.Auth> {}
 
@@ -102,3 +104,5 @@ export class AngularFireAuth {
   }
 
 }
+
+ɵapplyMixins(AngularFireAuth, [proxyPolyfillCompat]);

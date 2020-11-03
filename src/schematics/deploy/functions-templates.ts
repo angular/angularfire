@@ -34,6 +34,9 @@ export const defaultFunction = (
   path: string
 ) => `const functions = require('firebase-functions');
 
+// Increase readability in Cloud Logging
+require("firebase-functions/lib/logger/compat");
+
 const expressApp = require('./${path}/main').app();
 
 exports.${FUNCTION_NAME} = functions

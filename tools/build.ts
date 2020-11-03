@@ -3,6 +3,8 @@ import { copy, readFile, writeFile } from 'fs-extra';
 import { prettySize } from 'pretty-size';
 import { sync as gzipSync } from 'gzip-size';
 import { dirname, join } from 'path';
+import { keys as tsKeys } from 'ts-transformer-keys';
+import firebase from 'firebase/app';
 
 // TODO infer these from the package.json
 const MODULES = [
@@ -10,8 +12,26 @@ const MODULES = [
   'firestore', 'functions', 'remote-config',
   'storage', 'messaging', 'performance'
 ];
+const LAZY_MODULES = ['analytics', 'auth', 'functions', 'messaging', 'remote-config'];
 const UMD_NAMES = MODULES.map(m => m === 'core' ? 'angular-fire' : `angular-fire-${m}`);
 const ENTRY_NAMES = MODULES.map(m => m === 'core' ? '@angular/fire' : `@angular/fire/${m}`);
+
+function proxyPolyfillCompat() {
+  const defaultObject = {
+    analytics: tsKeys<firebase.analytics.Analytics>(),
+    auth: tsKeys<firebase.auth.Auth>(),
+    functions: tsKeys<firebase.functions.Functions>(),
+    messaging: tsKeys<firebase.messaging.Messaging>(),
+    performance: tsKeys<firebase.performance.Performance>(),
+    'remote-config': tsKeys<firebase.remoteConfig.RemoteConfig>(),
+  };
+
+  return Promise.all(Object.keys(defaultObject).map(module =>
+    writeFile(`./src/${module}/base.ts`, `export const proxyPolyfillCompat = {
+${defaultObject[module].map(it => `  ${it}: null,`).join('\n')}
+};\n`)
+  ));
+}
 
 const src = (...args: string[]) => join(process.cwd(), 'src', ...args);
 const dest = (...args: string[]) => join(process.cwd(), 'dist', 'packages-dist', ...args);
@@ -75,6 +95,7 @@ async function measure(module: string) {
 }
 
 async function buildLibrary() {
+  await proxyPolyfillCompat();
   await spawnPromise('npx', ['ng', 'build']);
   await Promise.all([
     copy(join(process.cwd(), '.npmignore'), dest('.npmignore')),
