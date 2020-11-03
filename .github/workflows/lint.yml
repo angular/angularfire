@@ -11,8 +11,6 @@ jobs:
       with:
         node-version: '12'
         check-latest: true
-    - name: yarn test
-      run: |
+    - run: |
         yarn install --frozen-lockfile
-        yarn build
-        yarn test:all
+        yarn lint
