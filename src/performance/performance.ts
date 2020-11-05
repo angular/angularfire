@@ -2,8 +2,9 @@ import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } fro
 import { EMPTY, Observable, of, Subscription } from 'rxjs';
 import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import firebase from 'firebase/app';
-import { FirebaseApp, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
+import { FirebaseApp, ɵapplyMixins, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
 import { isPlatformBrowser } from '@angular/common';
+import { proxyPolyfillCompat } from './base';
 
 // SEMVER @ v6, drop and move core ng metrics to a service
 export const AUTOMATICALLY_TRACE_CORE_NG_METRICS = new InjectionToken<boolean>('angularfire2.performance.auto_trace');
@@ -148,3 +149,5 @@ export const trace = <T = any>(name: string) => (source$: Observable<T>) => new 
     )
   ).subscribe(subscriber);
 });
+
+ɵapplyMixins(AngularFirePerformance, [proxyPolyfillCompat]);

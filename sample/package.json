@@ -7,7 +7,9 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
+    "deploy": "ng deploy",
     "dev:ssr": "ng run sample:serve-ssr",
+    "bust": "rm -rf node_modules/@angular/fire && yarn cache clean @angular/fire && yarn add ../dist/packages-dist",
     "serve:ssr": "node dist/sample/server/main.js",
     "build:ssr": "ng build --prod && ng run sample:server:production",
     "prerender": "ng run sample:prerender"
@@ -26,11 +28,13 @@
     "@angular/router": "~10.2.1",
     "@angular/service-worker": "^10.2.1",
     "@nguniversal/express-engine": "~10.1.0",
+    "core-js": "^3.6.5",
     "firebase": "^8.0.0",
     "first-input-delay": "^0.1.3",
     "proxy-polyfill": "^0.3.2",
     "rxjs": "~6.6.3",
     "tslib": "^2.0.1",
+    "whatwg-fetch": "^3.4.1",
     "zone.js": "0.10.3"
   },
   "devDependencies": {

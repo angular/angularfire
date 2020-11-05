@@ -1,0 +1,29 @@
+name: Unit tests
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2-beta
+      with:
+        node-version: '12'
+        check-latest: true
+    - name: yarn cache dir
+      id: yarn-cache-dir-path
+      run: echo "::set-output name=dir::$(yarn cache dir)"
+    - uses: actions/cache@v2
+      with:
+        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+          ${{ runner.os }}-
+    - name: yarn test
+      run: |
+        yarn install --frozen-lockfile --prefer-offline
+        yarn lint
+        yarn build
+        yarn test:all
