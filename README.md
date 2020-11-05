@@ -64,9 +64,7 @@ export class MyApp {
 
 **Having troubles?** Get help on the official [Firebase Mailing List](https://groups.google.com/forum/#!forum/firebase-talk), the [Firebase Community Slack](https://firebase.community/) (`#angularfire2`), the [Angular Community Discord](http://discord.gg/angular) (`#firebase`), [Gitter](https://gitter.im/angular/angularfire2), or [Stack Overflow](https://stackoverflow.com/questions/tagged/angularfire2).
 
-AngularFire is maintained by Googlers but is not a supported Firebase product. Questions on the mailing list and issues filed here are answered on a <strong>best-effort basis</strong> by maintainers and other community members.
-
-If you can reproduce a problem with Firebase outside of AngularFire's implementation, please [file an issue on the Firebase JS SDK's GitHub repo](https://github.com/firebase/firebase-js-sdk/issues) or reach out to the personalized [Firebase support channel](https://firebase.google.com/support/).
+> **NOTE:** AngularFire is maintained by Googlers but is not a supported Firebase product. Questions on the mailing list and issues filed here are answered on a <strong>best-effort basis</strong> by maintainers and other community members. If you are able to reproduce a problem with Firebase <em>outside of AngularFire's implementation</em>, please [file an issue on the Firebase JS SDK](https://github.com/firebase/firebase-js-sdk/issues) or reach out to the personalized [Firebase support channel](https://firebase.google.com/support/).
 
 ## Developer Guide
 
