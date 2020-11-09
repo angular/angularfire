@@ -1,0 +1,12 @@
+{
+    "files": [
+        "tools/build.ts"
+    ],
+    "compilerOptions": {
+        "outDir": "tools",
+        "plugins": [
+            { "transform": "ts-transformer-keys/transformer" }
+        ],
+        "baseUrl": "./"
+    }
+}

@@ -10,9 +10,11 @@ import {
   FIREBASE_OPTIONS,
   FIREBASE_APP_NAME,
   ɵfirebaseAppFactory,
-  ɵPromiseProxy
+  ɵPromiseProxy,
+  ɵapplyMixins
 } from '@angular/fire';
 import firebase from 'firebase/app';
+import { proxyPolyfillCompat } from './base';
 
 export interface Config {
   [key: string]: any;
@@ -127,3 +129,5 @@ export class AngularFireAnalytics {
   }
 
 }
+
+ɵapplyMixins(AngularFireAnalytics, [proxyPolyfillCompat]);
