@@ -30,14 +30,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/angular/angularfire2.git"
+    "url": "git+https://github.com/angular/angularfire.git"
   },
   "author": "davideast",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/angular/angularfire2/issues"
+    "url": "https://github.com/angular/angularfire/issues"
   },
-  "homepage": "https://github.com/angular/angularfire2#readme",
+  "homepage": "https://github.com/angular/angularfire#readme",
   "dependencies": {
     "@angular-devkit/architect": ">= 0.900 < 0.1100",
     "@angular-devkit/core": "^9.0.0 || ^10.0.0",
