@@ -1,3 +1,27 @@
+<a name="6.1.0-rc.0"></a>
+# [6.1.0-rc.0](https://github.com/angular/angularfire/compare/6.0.5...6.1.0-rc.0) (2020-11-11)
+
+
+### Bug Fixes
+
+* **deploy:** remove direct workspace access ([#2643](https://github.com/angular/angularfire/issues/2643)) ([7e1918a](https://github.com/angular/angularfire/commit/7e1918a))
+* **schematics:** remove experimental workspace API type usage ([#2644](https://github.com/angular/angularfire/issues/2644)) ([b976c58](https://github.com/angular/angularfire/commit/b976c58))
+
+
+### Features
+
+* **core:** Support Angular 11
+
+
+<a name="6.0.5"></a>
+## [6.0.5](https://github.com/angular/angularfire/compare/6.0.4...6.0.5) (2020-11-10)
+
+
+### Bug Fixes
+
+* **core:** proxy-polyfill support and various other small fixes ([#2633](https://github.com/angular/angularfire/issues/2633)) ([af238cd](https://github.com/angular/angularfire/commit/af238cd))
+
+
 <a name="6.0.4"></a>
 ## [6.0.4](https://github.com/angular/angularfire2/compare/6.0.3...6.0.4) (2020-10-30)
 
