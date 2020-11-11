@@ -121,8 +121,8 @@ export const deployToFunction = async (
   staticBuildTarget: BuildTarget,
   serverBuildTarget: BuildTarget,
   preview: boolean,
+  firebaseToken?: string,
   fsHost: FSHost = defaultFsHost,
-  firebaseToken?: string
 ) => {
   if (!satisfies(process.versions.node, getVersionRange(NODE_VERSION))) {
     context.logger.warn(
