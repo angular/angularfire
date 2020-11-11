@@ -1,5 +1,4 @@
 import { SchematicsException, Tree, SchematicContext } from '@angular-devkit/schematics';
-import { experimental } from '@angular-devkit/core';
 import {
   addDependencies,
   generateFirebaseRc,
@@ -8,7 +7,7 @@ import {
   safeReadJSON,
   stringifyFormatted
 } from './ng-add-common';
-import { FirebaseJSON } from './interfaces';
+import { FirebaseJSON, Workspace, WorkspaceProject } from './interfaces';
 
 import { default as defaultDependencies, firebaseFunctions as firebaseFunctionsDependencies } from './versions.json';
 import { dirname, join } from 'path';
@@ -16,7 +15,7 @@ import { dirname, join } from 'path';
 // We consider a project to be a universal project if it has a `server` architect
 // target. If it does, it knows how to build the application's server.
 export const isUniversalApp = (
-  project: experimental.workspace.WorkspaceProject
+  project: WorkspaceProject
 ) => project.architect && project.architect.server;
 
 function emptyFirebaseJson(source: string) {
@@ -106,10 +105,10 @@ export const addFirebaseFunctionsDependencies = (tree: Tree, context: SchematicC
 };
 
 export const setupUniversalDeployment = (config: {
-  project: experimental.workspace.WorkspaceProject;
+  project: WorkspaceProject;
   options: NgAddNormalizedOptions;
   workspacePath: string;
-  workspace: experimental.workspace.WorkspaceSchema;
+  workspace: Workspace;
   tree: Tree;
 }) => {
   const { tree, workspacePath, workspace, options } = config;
