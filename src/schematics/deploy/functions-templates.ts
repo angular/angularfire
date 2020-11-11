@@ -1,15 +1,18 @@
+import { DeployBuilderOptions } from './actions';
+
 // TODO allow these to be configured
-export const NODE_VERSION = 10;
-const FUNCTION_NAME = 'ssr';
-const FUNCTION_REGION = 'us-central1';
-const RUNTIME_OPTIONS = {
+const DEFAULT_NODE_VERSION = 10;
+const DEFAULT_FUNCTION_NAME = 'ssr';
+const DEFAULT_FUNCTION_REGION = 'us-central1';
+const DEFAULT_RUNTIME_OPTIONS = {
   timeoutSeconds: 60,
   memory: '1GB'
 };
 
 export const defaultPackage = (
   dependencies: {[key: string]: string},
-  devDependencies: {[key: string]: string}
+  devDependencies: {[key: string]: string},
+  options: DeployBuilderOptions,
 ) => `{
   "name": "functions",
   "description": "Angular Universal Application",
@@ -22,7 +25,7 @@ export const defaultPackage = (
     "logs": "firebase functions:log"
   },
   "engines": {
-    "node": "${NODE_VERSION}"
+    "node": "${options.functionsNodeVersion || DEFAULT_NODE_VERSION}"
   },
   "dependencies": ${JSON.stringify(dependencies, null, 4)},
   "devDependencies": ${JSON.stringify(devDependencies, null, 4)},
@@ -31,7 +34,8 @@ export const defaultPackage = (
 `;
 
 export const defaultFunction = (
-  path: string
+  path: string,
+  options: DeployBuilderOptions,
 ) => `const functions = require('firebase-functions');
 
 // Increase readability in Cloud Logging
@@ -39,9 +43,9 @@ require("firebase-functions/lib/logger/compat");
 
 const expressApp = require('./${path}/main').app();
 
-exports.${FUNCTION_NAME} = functions
-  .region('${FUNCTION_REGION}')
-  .runWith(${JSON.stringify(RUNTIME_OPTIONS)})
+exports.${DEFAULT_FUNCTION_NAME} = functions
+  .region('${DEFAULT_FUNCTION_REGION}')
+  .runWith(${JSON.stringify(options.functionsRuntimeOptions || DEFAULT_RUNTIME_OPTIONS)})
   .https
   .onRequest(expressApp);
 `;
