@@ -89,7 +89,7 @@ export class AngularFirestoreDocument<T = DocumentData> {
     return this.snapshotChanges().pipe(
       map(({ payload }) =>
         options.idField ? {
-          ...payload.data() as object,
+          ...payload.data(),
           ...{ [options.idField]: payload.id }
         } as T & { [T in K]: string } : payload.data()
       )
