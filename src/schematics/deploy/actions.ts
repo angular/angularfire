@@ -5,8 +5,6 @@ import { copySync, removeSync } from 'fs-extra';
 import { dirname, join } from 'path';
 import { execSync } from 'child_process';
 import { defaultFunction, defaultPackage, NODE_VERSION } from './functions-templates';
-import { experimental } from '@angular-devkit/core';
-import { SchematicsException } from '@angular-devkit/schematics';
 import { satisfies } from 'semver';
 import * as open from 'open';
 
@@ -117,7 +115,8 @@ export const deployToFunction = async (
   firebaseTools: FirebaseTools,
   context: BuilderContext,
   workspaceRoot: string,
-  project: experimental.workspace.WorkspaceTool,
+  staticBuildTarget: BuildTarget,
+  serverBuildTarget: BuildTarget,
   preview: boolean,
   fsHost: FSHost = defaultFsHost
 ) => {
@@ -127,30 +126,22 @@ export const deployToFunction = async (
     );
   }
 
-  if (
-    !project ||
-    !project.build ||
-    !project.build.options ||
-    !project.build.options.outputPath
-  ) {
-    throw new SchematicsException(
-      `Cannot read the output path (architect.build.options.outputPath) of the Angular project in angular.json`
+  const staticBuildOptions = await context.getTargetOptions(targetFromTargetString(staticBuildTarget.name));
+  if (!staticBuildOptions.outputPath || typeof staticBuildOptions.outputPath !== 'string') {
+    throw new Error(
+      `Cannot read the output path option of the Angular project '${staticBuildTarget.name}' in angular.json`
     );
   }
 
-  if (
-    !project ||
-    !project.server ||
-    !project.server.options ||
-    !project.server.options.outputPath
-  ) {
-    throw new SchematicsException(
-      `Cannot read the output path (architect.server.options.outputPath) of the Angular project in angular.json`
+  const serverBuildOptions = await context.getTargetOptions(targetFromTargetString(serverBuildTarget.name));
+  if (!serverBuildOptions.outputPath || typeof serverBuildOptions.outputPath !== 'string') {
+    throw new Error(
+      `Cannot read the output path option of the Angular project '${serverBuildTarget.name}' in angular.json`
     );
   }
 
-  const staticOut = project.build.options.outputPath;
-  const serverOut = project.server.options.outputPath;
+  const staticOut = staticBuildOptions.outputPath;
+  const serverOut = serverBuildOptions.outputPath;
   const newClientPath = join(dirname(staticOut), staticOut);
   const newServerPath = join(dirname(serverOut), serverOut);
 
@@ -212,10 +203,9 @@ export const deployToFunction = async (
 export default async function deploy(
   firebaseTools: FirebaseTools,
   context: BuilderContext,
-  projectTargets: experimental.workspace.WorkspaceTool,
-  buildTargets: BuildTarget[],
+  staticBuildTarget: BuildTarget,
+  serverBuildTarget: BuildTarget | undefined,
   firebaseProject: string,
-  ssr: boolean,
   preview: boolean
 ) {
   await firebaseTools.login();
@@ -226,10 +216,16 @@ export default async function deploy(
 
   context.logger.info(`📦 Building "${context.target.project}"`);
 
-  for (const target of buildTargets) {
+  const run = await context.scheduleTarget(
+    targetFromTargetString(staticBuildTarget.name),
+    staticBuildTarget.options
+  );
+  await run.result;
+
+  if (serverBuildTarget) {
     const run = await context.scheduleTarget(
-      targetFromTargetString(target.name),
-      target.options
+      targetFromTargetString(serverBuildTarget.name),
+      serverBuildTarget.options
     );
     await run.result;
   }
@@ -255,12 +251,13 @@ export default async function deploy(
       })
     );
 
-    if (ssr) {
+    if (serverBuildTarget) {
       await deployToFunction(
         firebaseTools,
         context,
         context.workspaceRoot,
-        projectTargets,
+        staticBuildTarget,
+        serverBuildTarget,
         preview
       );
     } else {
