@@ -24,6 +24,7 @@
 import 'proxy-polyfill/proxy.min.js';
 import 'core-js/stable';
 import 'whatwg-fetch';
+import 'first-input-delay/dist/first-input-delay.js';
 
 /**
  * Web Animations `@angular/platform-browser/animations`
