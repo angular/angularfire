@@ -1,3 +1,12 @@
+<a name="6.0.5"></a>
+## [6.0.5](https://github.com/angular/angularfire/compare/6.0.4...6.0.5) (2020-11-11)
+
+
+### Bug Fixes
+
+* **core:** proxy-polyfill support and various other small fixes ([#2633](https://github.com/angular/angularfire/issues/2633)) ([af238cd](https://github.com/angular/angularfire/commit/af238cd))
+
+
 <a name="6.0.4"></a>
 ## [6.0.4](https://github.com/angular/angularfire2/compare/6.0.3...6.0.4) (2020-10-30)
 

@@ -43,6 +43,7 @@ export class MyApp {
 
 | Angular | Firebase | AngularFire  |
 | --------|----------|--------------|
+| 11      | 7,8      | @next        |
 | 10      | 8        | ^6.0.4       |
 | 10      | 7        | ^6.0.3       |
 | 9       | 8        | ^6.0.4       |
