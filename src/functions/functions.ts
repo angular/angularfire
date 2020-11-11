@@ -14,6 +14,7 @@ import {
 } from '@angular/fire';
 import firebase from 'firebase/app';
 import { proxyPolyfillCompat } from './base';
+import { HttpsCallableOptions } from '@firebase/functions-types';
 
 export const ORIGIN = new InjectionToken<string>('angularfire2.functions.origin');
 export const REGION = new InjectionToken<string>('angularfire2.functions.region');
@@ -51,10 +52,10 @@ export class AngularFireFunctions {
       shareReplay({ bufferSize: 1, refCount: false })
     );
 
-    this.httpsCallable = <T = any, R = any>(name: string) =>
+    this.httpsCallable = <T = any, R = any>(name: string, options?: HttpsCallableOptions) =>
       (data: T) => from(functions).pipe(
         observeOn(schedulers.insideAngular),
-        switchMap(functions => functions.httpsCallable(name)(data)),
+        switchMap(functions => functions.httpsCallable(name, options)(data)),
         map(r => r.data as R)
       );
 
