@@ -82,16 +82,14 @@ export class AngularFirestoreDocument<T = DocumentData> {
    *
    * If the `idField` option is provided, document IDs are included and mapped to the
    * provided `idField` property name.
-   * @param options
    */
-  valueChanges(): Observable<T | undefined>
-  valueChanges({ }): Observable<T | undefined>
-  valueChanges<K extends string>(options: { idField: K }): Observable<(T & { [T in K]: string }) | undefined>
+  valueChanges(options?: { }): Observable<T | undefined>;
+  valueChanges<K extends string>(options: { idField: K }): Observable<(T & { [T in K]: string }) | undefined>;
   valueChanges<K extends string>(options: { idField?: K } = {}): Observable<T | undefined> {
     return this.snapshotChanges().pipe(
       map(({ payload }) =>
         options.idField ? {
-          ...payload.data() as Object,
+          ...payload.data() as object,
           ...{ [options.idField]: payload.id }
         } as T & { [T in K]: string } : payload.data()
       )
