@@ -176,7 +176,7 @@ export class AngularFirestore {
   collection<T>(pathOrRef: string | CollectionReference<T>, queryFn?: QueryFn): AngularFirestoreCollection<T> {
     let collectionRef: CollectionReference<T>;
     if (typeof pathOrRef === 'string') {
-      collectionRef = this.firestore.collection(pathOrRef) as firestore.CollectionReference<T>;
+      collectionRef = this.firestore.collection(pathOrRef) as firebase.firestore.CollectionReference<T>;
     } else {
       collectionRef = pathOrRef;
     }
@@ -192,7 +192,7 @@ export class AngularFirestore {
    */
   collectionGroup<T>(collectionId: string, queryGroupFn?: QueryGroupFn<T>): AngularFirestoreCollectionGroup<T> {
     const queryFn = queryGroupFn || (ref => ref);
-    const collectionGroup: Query<T> = this.firestore.collectionGroup(collectionId) as firestore.Query<T>;
+    const collectionGroup: Query<T> = this.firestore.collectionGroup(collectionId) as firebase.firestore.Query<T>;
     return new AngularFirestoreCollectionGroup<T>(queryFn(collectionGroup), this);
   }
 
@@ -208,7 +208,7 @@ export class AngularFirestore {
   doc<T>(pathOrRef: string | DocumentReference<T>): AngularFirestoreDocument<T> {
     let ref: DocumentReference<T>;
     if (typeof pathOrRef === 'string') {
-      ref = this.firestore.doc(pathOrRef) as firestore.DocumentReference<T>;
+      ref = this.firestore.doc(pathOrRef) as firebase.firestore.DocumentReference<T>;
     } else {
       ref = pathOrRef;
     }
