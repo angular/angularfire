@@ -6,7 +6,7 @@ import { AngularFireStorage, AngularFireStorageModule, AngularFireUploadTask, BU
 import { COMMON_CONFIG } from '../test-config';
 import 'firebase/storage';
 import { rando } from '../firestore/utils.spec';
-import { AngularFirestoreStorageUrl } from './pipes/storageUrl.pipe'
+import { AngularFirestoreStorageUrl } from './pipes/storageUrl.pipe';
 
 describe('AngularFireStorage', () => {
   let app: FirebaseApp;
@@ -138,14 +138,14 @@ describe('AngularFireStorage', () => {
 
   describe('pipes', () => {
     it('ngfbStorageUrl should download a url', (done) => {
-      const data = { angular: "fire" };
+      const data = { angular: 'fire' };
       const blob = new Blob([JSON.stringify(data)], { type : 'application/json' });
       const ref = afStorage.ref('af.json');
       const task = ref.put(blob);
-      const ngfbStorageUrl = new AngularFirestoreStorageUrl( afStorage )
-      
+      const ngfbStorageUrl = new AngularFirestoreStorageUrl( afStorage );
+
       // Wait for the upload
-      task.then(()=>{
+      task.then(() => {
         ngfbStorageUrl.transform('af.json')
         .subscribe(
           url => {
@@ -153,9 +153,9 @@ describe('AngularFireStorage', () => {
             done();
           },
           done.fail
-        )        
+        );
       })
-      .catch( done.fail )
+      .catch( done.fail );
     });
   });
 
