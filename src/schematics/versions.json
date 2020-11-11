@@ -5,7 +5,8 @@
         "firebase-tools": { "dev": true, "version": "0.0.0" },
         "fuzzy": { "dev": true, "version": "0.0.0"},
         "inquirer": { "dev": true, "version": "0.0.0"},
-        "inquirer-autocomplete-prompt": { "dev": true, "version": "0.0.0"}
+        "inquirer-autocomplete-prompt": { "dev": true, "version": "0.0.0"},
+        "open": { "dev": true, "version": "0.0.0"}
     },
     "firebaseFunctions": {
         "firebase-admin": { "dev": true, "version": "0.0.0" },

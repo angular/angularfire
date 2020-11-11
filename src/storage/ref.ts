@@ -1,6 +1,6 @@
-import { SettableMetadata, UploadMetadata, Reference, StringFormat, ListResult} from './interfaces';
-import { createUploadTask, AngularFireUploadTask } from './task';
-import { Observable, from, of } from 'rxjs';
+import { ListResult, Reference, SettableMetadata, StringFormat, UploadMetadata } from './interfaces';
+import { AngularFireUploadTask, createUploadTask } from './task';
+import { from, Observable, of } from 'rxjs';
 import { ɵAngularFireSchedulers } from '@angular/fire';
 import { observeOn, switchMap } from 'rxjs/operators';
 
@@ -18,7 +18,6 @@ export interface AngularFireStorageReference {
 /**
  * Create an AngularFire wrapped Storage Reference. This object
  * creates observable methods from promise based methods.
- * @param ref
  */
 export function createStorageRef(
   ref: Reference,
@@ -31,7 +30,7 @@ export function createStorageRef(
       switchMap(() => ref.getDownloadURL()),
       keepUnstableUntilFirst
     ),
-    getMetadata: () => of().pipe(
+    getMetadata: () => of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
       switchMap(() => ref.getMetadata()),
       keepUnstableUntilFirst

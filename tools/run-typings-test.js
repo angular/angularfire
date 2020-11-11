@@ -35,7 +35,7 @@ ncp(pathToTestSrcFolder, pathToTestFolder, () => {
     .replace('{{TYPESCRIPT_VERSION}}', rootPackage.devDependencies.typescript)
     .replace(/\{\{ANGULAR_VERSION\}\}/g, rootPackage.dependencies['@angular/core']));
 
-    spawnIt('yarn', ['install'])
+    spawnIt('yarn', ['install', '--prefer-offline'])
       .then(_ => spawnIt(`${pathToTestFolder}/node_modules/.bin/tsc`, ['--version']))
       .then(_ => new Promise((res, rej) => {
         child_process.exec(`${pathToTestFolder}/node_modules/.bin/tsc --diagnostics -p ${pathToTestFolder}/tsconfig-test.json`, (err, stdout, stderr) => {

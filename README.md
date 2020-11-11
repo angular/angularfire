@@ -1,34 +1,20 @@
 # AngularFire
 The official [Angular](https://angular.io/) library for [Firebase](https://firebase.google.com/).
 
-```bash
-ng add @angular/fire@next
-```
+<strong><pre>ng add @angular/fire</pre></strong>
 
----
+AngularFire smooths over the rough edges an Angular developer might encounter when implementing the framework-agnostic [Firebase JS SDK](https://github.com/firebase/firebase-js-sdk) & aims to provide a more natural developer expirience by conforming to Angular conventions.
 
-> **WARNING**: Master branch is the work in progress for version 6 of AngularFire. [You can find version 5 here](https://github.com/angular/angularfire/tree/v5), if you're looking for documentation or to contribute to stable. [Learn more about the road toward version 6 here](https://github.com/angular/angularfire/issues/2267).
+- **Dependency injection** - Provide and Inject Firebase services in your components
+- **Zone.js wrappers** - Stable zones allow proper functionality of service workers, forms, SSR, and pre-rendering
+- **Observable based** - Utilize RxJS rather than callbacks for realtime streams
+- **NgRx friendly API** - Integrate with NgRx using AngularFire's action based APIs.
+- **Lazy-loading** - AngularFire dynamically imports much of Firebase, reducing time to load your app
+- **Deploy schematics** - Get your Angular application deployed on Firebase Hosting with a single command
+- **Google Analytics** - Zero-effort Angular Router awareness in Google Analytics
+- **Router Guards** - Guard your Angular routes with built-in Firebase Authentication checks
 
----
-
-## What is AngularFire?
-
-- **Observable based** - Use the power of RxJS, Angular, and Firebase.
-- **Realtime bindings** - Synchronize data in realtime.
-- **Authentication** - Log users in with a variety of providers and monitor authentication state.
-- **Offline Data** - Store data offline automatically with AngularFirestore.
-- **Server-side Render** - Generate static HTML to boost perceived performance or create static sites.
-- **ngrx friendly** - Integrate with ngrx using AngularFire's action based APIs.
-- **Manage binary data** - Upload, download, and delete binary files like images, videos, and other blobs.
-- **Call server code** - Directly call serverless Cloud Functions with user context automatically passed.
-- **Push notifications** - Register and listen for push notifications
-- **Modular** - Include only what's needed. No AngularFire package is above 4kb with most under 2kb (gzipped).
-
-## Quickstart
-
-Get your first application up and running by following [our quickstart guide](docs/install-and-setup.md).
-
-## Example use:
+## Example use
 
 ```ts
 import { Component } from '@angular/core';
@@ -39,29 +25,47 @@ import { Observable } from 'rxjs';
   selector: 'app-root',
   template: `
   <ul>
-    <li *ngFor="let item of items | async">
+    <li *ngFor="let item of item$ | async">
       {{ item.name }}
     </li>
   </ul>
   `
 })
 export class MyApp {
-  items: Observable<any[]>;
+  item$: Observable<any[]>;
   constructor(firestore: AngularFirestore) {
-    this.items = firestore.collection('items').valueChanges();
+    this.item$ = firestore.collection('items').valueChanges();
   }
 }
 ```
 
+## Compatibility
+
+| Angular | Firebase | AngularFire  |
+| --------|----------|--------------|
+| 11      | 7,8      | @next        |
+| 10      | 8        | ^6.0.4       |
+| 10      | 7        | ^6.0.3       |
+| 9       | 8        | ^6.0.4       |
+| 9       | 7        | ^6.0         |
+| 8       | 7        | ^5.2.3       |
+| 8       | 6        | ^5.2.0       |
+
+<sub>Version combinations not documented here __may__ work but are untested and you will see NPM peer warnings.</sub>
+
 ## Resources
+
+[Quickstart](docs/install-and-setup.md) - Get your first application up and running by following our quickstart guide.
 
 [Contributing](CONTRIBUTING.md)
 
-[Stackblitz Template](https://stackblitz.com/edit/angular-1iment) - Remember to set your Firebase configuration in `app/app.module.ts`.
+[Stackblitz Template](https://stackblitz.com/edit/angular-fire-start) - Remember to set your Firebase configuration in `app/app.module.ts`.
 
 [Upgrading to v6.0? Check out our guide.](docs/version-6-upgrade.md)
 
-**Having troubles?** Get help on the [Firebase Mailing List](https://groups.google.com/forum/#!forum/firebase-talk) (officially supported), the [Firebase Community Slack](https://firebase.community/) (look for the `#angularfire2` room), [Gitter](https://gitter.im/angular/angularfire2), or [Stack Overflow](https://stackoverflow.com/questions/tagged/angularfire2).
+**Having troubles?** Get help on the official [Firebase Mailing List](https://groups.google.com/forum/#!forum/firebase-talk), the [Firebase Community Slack](https://firebase.community/) (`#angularfire2`), the [Angular Community Discord](http://discord.gg/angular) (`#firebase`), [Gitter](https://gitter.im/angular/angularfire2), or [Stack Overflow](https://stackoverflow.com/questions/tagged/angularfire2).
+
+> **NOTE:** AngularFire is maintained by Googlers but is not a supported Firebase product. Questions on the mailing list and issues filed here are answered on a <strong>best-effort basis</strong> by maintainers and other community members. If you are able to reproduce a problem with Firebase <em>outside of AngularFire's implementation</em>, please [file an issue on the Firebase JS SDK](https://github.com/firebase/firebase-js-sdk/issues) or reach out to the personalized [Firebase support channel](https://firebase.google.com/support/).
 
 ## Developer Guide
 

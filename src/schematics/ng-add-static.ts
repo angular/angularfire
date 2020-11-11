@@ -1,17 +1,15 @@
-import { SchematicsException, Tree } from '@angular-devkit/schematics';
-import { experimental } from '@angular-devkit/core';
+import { SchematicsException, Tree, SchematicContext } from '@angular-devkit/schematics';
 import {
+  addDependencies,
   generateFirebaseRc,
+  NgAddNormalizedOptions,
   overwriteIfExists,
   safeReadJSON,
-  stringifyFormatted,
-  addDependencies, NgAddNormalizedOptions
+  stringifyFormatted
 } from './ng-add-common';
-import { FirebaseJSON, FirebaseHostingConfig } from './interfaces';
+import { FirebaseJSON, Workspace, WorkspaceProject } from './interfaces';
 
-import {
-  default as defaultDependencies
-} from './versions.json';
+import { default as defaultDependencies } from './versions.json';
 
 function emptyFirebaseJson() {
   return {
@@ -23,7 +21,14 @@ function generateHostingConfig(project: string, dist: string) {
   return {
     target: project,
     public: dist,
-    ignore: ['firebase.json', '**/.*', '**/node_modules/**'],
+    ignore: ['**/.*'],
+    headers: [{
+      source: '*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].+(css|js)',
+      headers: [{
+        key: 'Cache-Control',
+        value: 'public,max-age=31536000,immutable'
+      }]
+    }],
     rewrites: [
       {
         source: '**',
@@ -43,6 +48,7 @@ export function generateFirebaseJson(
     ? safeReadJSON(path, tree)
     : emptyFirebaseJson();
 
+  /* TODO do we want to prompt for override?
   if (
     firebaseJson.hosting &&
     ((Array.isArray(firebaseJson.hosting) &&
@@ -52,7 +58,7 @@ export function generateFirebaseJson(
     throw new SchematicsException(
       `Target ${project} already exists in firebase.json`
     );
-  }
+  }*/
 
   const newConfig = generateHostingConfig(project, dist);
   if (firebaseJson.hosting === undefined) {
@@ -66,18 +72,19 @@ export function generateFirebaseJson(
   overwriteIfExists(tree, path, stringifyFormatted(firebaseJson));
 }
 
-export const addFirebaseHostingDependencies = (tree: Tree) => {
+export const addFirebaseHostingDependencies = (tree: Tree, context: SchematicContext) => {
   addDependencies(
     tree,
-    defaultDependencies
+    defaultDependencies,
+    context
   );
 };
 
 export const setupStaticDeployment = (config: {
-  project: experimental.workspace.WorkspaceProject;
+  project: WorkspaceProject;
   options: NgAddNormalizedOptions;
   workspacePath: string;
-  workspace: experimental.workspace.WorkspaceSchema;
+  workspace: Workspace;
   tree: Tree;
 }) => {
   const { tree, workspacePath, workspace, options } = config;

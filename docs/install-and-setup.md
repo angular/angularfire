@@ -13,14 +13,14 @@ The Angular CLI's `new` command will set up the latest Angular build in a new pr
 ### 2. Install AngularFire and Firebase
 
 ```bash
-ng add @angular/fire@next
+ng add @angular/fire
 ```
 
 Now that you have a new project setup, install AngularFire and Firebase from npm.
 
 ### 3. Add Firebase config to environments variable
 
-Open `/src/environments/environment.ts` and add your Firebase configuration. You can find your project configuration in [the Firebase Console](https://console.firebase.google.com). From the project overview page, click **Add Firebase to your web app**.
+Open `/src/environments/environment.ts` and add your Firebase configuration. You can find your project configuration in [the Firebase Console](https://console.firebase.google.com). Click the Gear icon next to Project Overview, then click Project Settings and under "Firebase SDK snippet" click Config.
 
 ```ts
 export const environment = {
@@ -62,7 +62,7 @@ export class AppModule {}
 
 After adding the AngularFireModule you also need to add modules for the individual @NgModules that your application needs.
 
-For example if your application was using both Google Analtyics and the Firestore you would add `AngularFireAnalyticsModule` and `AngularFirestoreModule`:
+For example if your application was using both Google Analytics and the Firestore you would add `AngularFireAnalyticsModule` and `AngularFirestoreModule`:
 
 ```ts
 import { BrowserModule } from '@angular/platform-browser';
@@ -146,7 +146,7 @@ ng serve
 
 Your Angular app will compile and serve locally, visit it we should see an empty list.
 
-In another tab [start adding data to an `items` collection in Firestore](https://firebase.corp.google.com/project/_/database/firestore/data). *As we're not authenticating users yet, be sure to start Firestore in **test mode** or allow reading from the `items` collection in Security Rules (`allow read: if true`).*
+In another tab [start adding data to an `items` collection in Firestore](https://firebase.google.com/docs/firestore/manage-data/add-data). *As we're not authenticating users yet, be sure to start Firestore in **test mode** or allow reading from the `items` collection in Security Rules (`allow read: if true`).*
 
 Once you've created a `items` collection and are inserting documents, you should see data streaming into your Angular application.
 

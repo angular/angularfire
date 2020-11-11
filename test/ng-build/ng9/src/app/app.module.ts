@@ -23,15 +23,15 @@ import { AngularFireAuthGuardModule } from '@angular/fire/auth-guard';
   imports: [
     BrowserModule,
     AngularFireModule.initializeApp({
-      apiKey: "AIzaSyBVSy3YpkVGiKXbbxeK0qBnu3-MNZ9UIjA",
-      authDomain: "angularfire2-test.firebaseapp.com",
-      databaseURL: "https://angularfire2-test.firebaseio.com",
-      projectId: "angularfire2-test",
-      storageBucket: "angularfire2-test.appspot.com",
-      messagingSenderId: "920323787688",
-      appId: "1:920323787688:web:2253a0e5eb5b9a8b",
+      apiKey: 'AIzaSyBVSy3YpkVGiKXbbxeK0qBnu3-MNZ9UIjA',
+      authDomain: 'angularfire2-test.firebaseapp.com',
+      databaseURL: 'https://angularfire2-test.firebaseio.com',
+      projectId: 'angularfire2-test',
+      storageBucket: 'angularfire2-test.appspot.com',
+      messagingSenderId: '920323787688',
+      appId: '1:920323787688:web:2253a0e5eb5b9a8b',
       databaseName: 'angularfire2-test',
-      measurementId: "G-W20QDV5CZP"
+      measurementId: 'G-W20QDV5CZP'
     }),
     AngularFireAnalyticsModule,
     AngularFireAuthModule,

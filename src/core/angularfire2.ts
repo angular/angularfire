@@ -1,14 +1,27 @@
 import { NgZone } from '@angular/core';
-import { Observable, Subscription, SchedulerLike, SchedulerAction, queueScheduler, Operator, Subscriber, TeardownLogic, asyncScheduler } from 'rxjs';
-import { subscribeOn, observeOn, tap } from 'rxjs/operators';
+import {
+  asyncScheduler,
+  Observable,
+  Operator,
+  queueScheduler,
+  SchedulerAction,
+  SchedulerLike,
+  Subscriber,
+  Subscription,
+  TeardownLogic
+} from 'rxjs';
+import { observeOn, subscribeOn, tap } from 'rxjs/operators';
 
-function noop() { }
+function noop() {
+}
 
 /**
  * Schedules tasks so that they are invoked inside the Zone that is passed in the constructor.
  */
+// tslint:disable-next-line:class-name
 export class ɵZoneScheduler implements SchedulerLike {
-  constructor(private zone: any, private delegate: any = queueScheduler) { }
+  constructor(private zone: any, private delegate: any = queueScheduler) {
+  }
 
   now() {
     return this.delegate.now();
@@ -18,36 +31,38 @@ export class ɵZoneScheduler implements SchedulerLike {
     const targetZone = this.zone;
     // Wrap the specified work function to make sure that if nested scheduling takes place the
     // work is executed in the correct zone
-    const workInZone = function (this: SchedulerAction<any>, state: any) {
+    const workInZone = function(this: SchedulerAction<any>, state: any) {
       targetZone.runGuarded(() => {
         work.apply(this, [state]);
       });
-    }
+    };
 
     // Scheduling itself needs to be run in zone to ensure setInterval calls for async scheduling are done
     // inside the correct zone. This scheduler needs to schedule asynchronously always to ensure that
     // firebase emissions are never synchronous. Specifying a delay causes issues with the queueScheduler delegate.
-    return this.delegate.schedule(workInZone, delay, state)
+    return this.delegate.schedule(workInZone, delay, state);
   }
 }
 
+// tslint:disable-next-line:class-name
 export class ɵBlockUntilFirstOperator<T> implements Operator<T, T> {
   private task: MacroTask | null = null;
 
-  constructor(private zone: any) { }
+  constructor(private zone: any) {
+  }
 
   call(subscriber: Subscriber<T>, source: Observable<T>): TeardownLogic {
     const unscheduleTask = this.unscheduleTask.bind(this);
     this.task = this.zone.run(() => Zone.current.scheduleMacroTask('firebaseZoneBlock', noop, {}, noop, noop));
 
     return source.pipe(
-      tap(unscheduleTask, unscheduleTask, unscheduleTask)
+      tap({ next: unscheduleTask, complete: unscheduleTask, error: unscheduleTask })
     ).subscribe(subscriber).add(unscheduleTask);
   }
 
   private unscheduleTask() {
     // maybe this is a race condition, invoke in a timeout
-    // hold for 10ms while I try to figure out what is going on    
+    // hold for 10ms while I try to figure out what is going on
     setTimeout(() => {
       if (this.task != null && this.task.state === 'scheduled') {
         this.task.invoke();
@@ -57,6 +72,7 @@ export class ɵBlockUntilFirstOperator<T> implements Operator<T, T> {
   }
 }
 
+// tslint:disable-next-line:class-name
 export class ɵAngularFireSchedulers {
   public readonly outsideAngular: ɵZoneScheduler;
   public readonly insideAngular: ɵZoneScheduler;
@@ -73,10 +89,7 @@ export class ɵAngularFireSchedulers {
  * value from firebase but doesn't block the zone forever since the firebase subscription
  * is still alive.
  */
-export function ɵkeepUnstableUntilFirstFactory(
-  schedulers: ɵAngularFireSchedulers,
-  platformId: Object
-) {
+export function ɵkeepUnstableUntilFirstFactory(schedulers: ɵAngularFireSchedulers) {
   return function keepUnstableUntilFirst<T>(obs$: Observable<T>): Observable<T> {
     obs$ = obs$.lift(
       new ɵBlockUntilFirstOperator(schedulers.ngZone)
@@ -90,17 +103,23 @@ export function ɵkeepUnstableUntilFirstFactory(
       // INVESTIGATE https://github.com/angular/angularfire/pull/2315
       // share()
     );
-  }
+  };
 }
 
+// tslint:disable:ban-types
 type FunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? K : never }[keyof T];
-type PromiseReturningFunctionPropertyNames<T> = { [K in FunctionPropertyNames<T>]: ReturnType<T[K]> extends Promise<any> ? K : never }[FunctionPropertyNames<T>];
-type NonPromiseReturningFunctionPropertyNames<T> = { [K in FunctionPropertyNames<T>]: ReturnType<T[K]> extends Promise<any> ? never : K }[FunctionPropertyNames<T>];
+type PromiseReturningFunctionPropertyNames<T> = {
+  [K in FunctionPropertyNames<T>]: ReturnType<T[K]> extends Promise<any> ? K : never
+}[FunctionPropertyNames<T>];
+type NonPromiseReturningFunctionPropertyNames<T> = {
+  [K in FunctionPropertyNames<T>]: ReturnType<T[K]> extends Promise<any> ? never : K
+}[FunctionPropertyNames<T>];
 type NonFunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof T];
+// tslint:enable:ban-types
 
 export type ɵPromiseProxy<T> = { [K in NonFunctionPropertyNames<T>]: Promise<T[K]> } &
   { [K in NonPromiseReturningFunctionPropertyNames<T>]: (...args: Parameters<T[K]>) => Promise<ReturnType<T[K]>> } &
-  { [K in PromiseReturningFunctionPropertyNames<T>   ]: (...args: Parameters<T[K]>) => ReturnType<T[K]> };
+  { [K in PromiseReturningFunctionPropertyNames<T>]: (...args: Parameters<T[K]>) => ReturnType<T[K]> };
 
 
 // DEBUG quick debugger function for inline logging that typescript doesn't complain about
@@ -117,27 +136,44 @@ const noopFunctions = ['ngOnDestroy'];
 //             right now it's fairly simple but I'm sure this will grow in complexity
 export const ɵlazySDKProxy = (klass: any, observable: Observable<any>, zone: NgZone) => {
   return new Proxy(klass, {
-    get: (_, name:string) => zone.runOutsideAngular(() => {
-      if (klass[name]) { return klass[name] }
-      if (noopFunctions.includes(name)) { return () => {} }
-      let promise = observable.toPromise().then(mod => {
+    get: (_, name: string) => zone.runOutsideAngular(() => {
+      if (klass[name]) {
+        return klass[name];
+      }
+      if (noopFunctions.indexOf(name) > -1) {
+        return () => {
+        };
+      }
+      const promise = observable.toPromise().then(mod => {
         const ret = mod && mod[name];
         // TODO move to proper type guards
-        if (typeof ret == 'function') {
+        if (typeof ret === 'function') {
           return ret.bind(mod);
         } else if (ret && ret.then) {
-          return ret.then((res:any) => zone.run(() => res));
+          return ret.then((res: any) => zone.run(() => res));
         } else {
           return zone.run(() => ret);
         }
       });
       // recurse the proxy
-      return new Proxy(() => undefined, {
+      return new Proxy(() => {}, {
           get: (_, name) => promise[name],
-          // TODO handle callbacks as transparently as I can 
+          // TODO handle callbacks as transparently as I can
           apply: (self, _, args) => promise.then(it => it && it(...args))
         }
-      )
+      );
     })
-  })
+  });
+};
+
+export const ɵapplyMixins = (derivedCtor: any, constructors: any[]) => {
+  constructors.forEach((baseCtor) => {
+    Object.getOwnPropertyNames(baseCtor.prototype || baseCtor).forEach((name) => {
+      Object.defineProperty(
+        derivedCtor.prototype,
+        name,
+        Object.getOwnPropertyDescriptor(baseCtor.prototype || baseCtor, name)
+      );
+    });
+  });
 };

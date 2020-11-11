@@ -1,6 +1,6 @@
-import { TestBed, inject } from '@angular/core/testing';
-import { FirebaseApp, FIREBASE_OPTIONS, AngularFireModule, FIREBASE_APP_NAME } from '@angular/fire';
-import { AngularFireAnalytics, AngularFireAnalyticsModule, COLLECTION_ENABLED, APP_VERSION, APP_NAME } from './public_api';
+import { TestBed } from '@angular/core/testing';
+import { AngularFireModule, FirebaseApp } from '@angular/fire';
+import { AngularFireAnalytics, AngularFireAnalyticsModule } from './public_api';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../firestore/utils.spec';
 
@@ -16,10 +16,9 @@ describe('AngularFireAnalytics', () => {
         AngularFireAnalyticsModule
       ]
     });
-    inject([FirebaseApp, AngularFireAnalytics], (app_: FirebaseApp, _analytics: AngularFireAnalytics) => {
-      app = app_;
-      analytics = _analytics;
-    })();
+
+    app = TestBed.inject(FirebaseApp);
+    analytics = TestBed.inject(AngularFireAnalytics);
   });
 
   afterEach(() => {

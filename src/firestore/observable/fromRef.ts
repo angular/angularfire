@@ -1,5 +1,5 @@
-import { Observable, SchedulerLike, asyncScheduler } from 'rxjs';
-import { DocumentReference, Query, Action, Reference, DocumentSnapshot, QuerySnapshot } from '../interfaces';
+import { asyncScheduler, Observable, SchedulerLike } from 'rxjs';
+import { Action, DocumentReference, DocumentSnapshot, Query, QuerySnapshot, Reference } from '../interfaces';
 import { map } from 'rxjs/operators';
 
 function _fromRef<T, R>(ref: Reference<T>, scheduler: SchedulerLike = asyncScheduler): Observable<R> {
@@ -13,11 +13,11 @@ function _fromRef<T, R>(ref: Reference<T>, scheduler: SchedulerLike = asyncSched
       unsubscribe = ref.onSnapshot(subscriber);
     }
 
-    return function() {
+    return () => {
       if (unsubscribe != null) {
         unsubscribe();
       }
-    }
+    };
   });
 }
 
@@ -25,7 +25,7 @@ export function fromRef<R>(ref: DocumentReference | Query, scheduler?: Scheduler
   return _fromRef<typeof ref, R>(ref, scheduler);
 }
 
-export function fromDocRef<T>(ref: DocumentReference, scheduler?: SchedulerLike): Observable<Action<DocumentSnapshot<T>>>{
+export function fromDocRef<T>(ref: DocumentReference, scheduler?: SchedulerLike): Observable<Action<DocumentSnapshot<T>>> {
   return fromRef<DocumentSnapshot<T>>(ref, scheduler)
     .pipe(
       map(payload => ({ payload, type: 'value' }))

@@ -43,7 +43,7 @@ The `AngularFirestoreCollection` is a service you use to create streams of the c
 
 With the exception of the `valueChanges()`, each streaming method returns an Observable of `DocumentChangeAction[]`.
 
-A `DocumentChangeAction` gives you the `type` and `payload` properties. The `type` tells when what `DocumentChangeType` operation occured (`added`, `modified`, `removed`). The `payload` property is a `DocumentChange` which provides you important metdata about the change and a `doc` property which is the `DocumentSnapshot`.
+A `DocumentChangeAction` gives you the `type` and `payload` properties. The `type` tells when what `DocumentChangeType` operation occured (`added`, `modified`, `removed`). The `payload` property is a `DocumentChange` which provides you important metadata about the change and a `doc` property which is the `DocumentSnapshot`.
 
 ```ts
 interface DocumentChangeAction {
@@ -191,7 +191,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 export interface AccountDeposit { description: string; amount: number; }
-export interface AccountDepoistId extends AccountDeposit { id: string; }
+export interface AccountDepositId extends AccountDeposit { id: string; }
 
 @Component({
   selector: 'app-root',
