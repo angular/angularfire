@@ -1,66 +1,59 @@
-import { User } from 'firebase/app';
-import { Observable, Subject } from 'rxjs'
-import { TestBed, inject } from '@angular/core/testing';
-import { FirebaseApp, FirebaseOptionsToken, AngularFireModule, FirebaseNameOrConfigToken } from '@angular/fire';
-import { AngularFireAuth, AngularFireAuthModule } from '@angular/fire/auth';
-import { COMMON_CONFIG } from './test-config';
-import { take, skip } from 'rxjs/operators';
+import firebase from 'firebase/app';
+import { Observable, Subject } from 'rxjs';
+import { TestBed } from '@angular/core/testing';
+import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire';
+import { AngularFireAuth, AngularFireAuthModule } from './public_api';
+import { COMMON_CONFIG } from '../test-config';
+import 'firebase/auth';
+import { rando } from '../firestore/utils.spec';
 
-function authTake(auth: Observable<any>, count: number): Observable<any> {
-  return take.call(auth, 1);
-}
-
-function authSkip(auth: Observable<any>, count: number): Observable<any> {
-  return skip.call(auth, 1);
-}
-
-const firebaseUser = <User> {
+const firebaseUser = {
   uid: '12345',
   providerData: [{ displayName: 'jeffbcrossyface' }]
-};
+} as firebase.User;
 
 describe('AngularFireAuth', () => {
   let app: FirebaseApp;
   let afAuth: AngularFireAuth;
-  let authSpy: jasmine.Spy;
-  let mockAuthState: Subject<User>;
+  let mockAuthState: Subject<firebase.User>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireAuthModule
       ]
     });
-    inject([FirebaseApp, AngularFireAuth], (app_: FirebaseApp, _auth: AngularFireAuth) => {
-      app = app_;
-      afAuth = _auth;
-    })();
 
-    mockAuthState = new Subject<User>();
+    app = TestBed.inject(FirebaseApp);
+    afAuth = TestBed.inject(AngularFireAuth);
+
+    mockAuthState = new Subject<firebase.User>();
+    // @ts-ignore
     spyOn(afAuth, 'authState').and.returnValue(mockAuthState);
+    // @ts-ignore
     spyOn(afAuth, 'idToken').and.returnValue(mockAuthState);
-    afAuth.authState = mockAuthState as Observable<User>;
-    afAuth.idToken = mockAuthState as Observable<User>;
+    (afAuth as any).authState = mockAuthState as Observable<firebase.User>;
+    (afAuth as any).idToken = mockAuthState as Observable<firebase.User>;
   });
 
-  afterEach(done => {
-    afAuth.auth.app.delete().then(done, done.fail);
+  afterEach(() => {
+    app.delete();
   });
 
   describe('Zones', () => {
     it('should call operators and subscriber in the same zone as when service was initialized', (done) => {
       // Initialize the app outside of the zone, to mimick real life behavior.
-      let ngZone = Zone.current.fork({
+      const ngZone = Zone.current.fork({
         name: 'ngZone'
       });
       ngZone.run(() => {
         const subs = [
-          afAuth.authState.subscribe(user => {
+          afAuth.authState.subscribe(() => {
             expect(Zone.current.name).toBe('ngZone');
             done();
           }, done.fail),
-          afAuth.authState.subscribe(user => {
+          afAuth.authState.subscribe(() => {
             expect(Zone.current.name).toBe('ngZone');
             done();
           }, done.fail)
@@ -71,53 +64,56 @@ describe('AngularFireAuth', () => {
     });
   });
 
-  it('should be exist', () => {
+  it('should exist', () => {
     expect(afAuth instanceof AngularFireAuth).toBe(true);
   });
 
-  it('should have the Firebase Auth instance', () => {
-    expect(afAuth.auth).toBeDefined();
-  });
-
   it('should have an initialized Firebase app', () => {
-    expect(afAuth.auth.app).toBeDefined();
-    expect(afAuth.auth.app).toEqual(app);
+    expect(afAuth.app).toBeDefined();
   });
 
   it('should emit auth updates through authState', (done: any) => {
     let count = 0;
 
     // Check that the first value is null and second is the auth user
-    const subs = afAuth.authState.subscribe(user => {
-      if (count === 0) {
-        expect(user).toBe(null!);
-        count = count + 1;
-        mockAuthState.next(firebaseUser);
-      } else {
-        expect(user).toEqual(firebaseUser);
-        subs.unsubscribe();
-        done();
-      }
-    }, done, done.fail);
-    mockAuthState.next(null!);
+    const subs = afAuth.authState.subscribe({
+      next: (user => {
+        if (count === 0) {
+          expect(user).toBe(null);
+          count = count + 1;
+          mockAuthState.next(firebaseUser);
+        } else {
+          expect(user).toEqual(firebaseUser);
+          subs.unsubscribe();
+          done();
+        }
+      }),
+      error: done,
+      complete: done.fail
+    });
+    mockAuthState.next(null);
   });
 
   it('should emit auth updates through idToken', (done: any) => {
     let count = 0;
 
     // Check that the first value is null and second is the auth user
-    const subs = afAuth.idToken.subscribe(user => {
-      if (count === 0) {
-        expect(user).toBe(null!);
-        count = count + 1;
-        mockAuthState.next(firebaseUser);
-      } else {
-        expect(user).toEqual(firebaseUser);
-        subs.unsubscribe();
-        done();
-      }
-    }, done, done.fail);
-    mockAuthState.next(null!);
+    const subs = afAuth.idToken.subscribe({
+      next: user => {
+        if (count === 0) {
+          expect(user).toBe(null);
+          count = count + 1;
+          mockAuthState.next(firebaseUser);
+        } else {
+          expect(user as any).toEqual(firebaseUser);
+          subs.unsubscribe();
+          done();
+        }
+      },
+      error: done,
+      complete: done.fail
+    });
+    mockAuthState.next(null);
   });
 
 });
@@ -131,22 +127,21 @@ describe('AngularFireAuth with different app', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireAuthModule
       ],
       providers: [
-        { provide: FirebaseNameOrConfigToken, useValue: FIREBASE_APP_NAME_TOO },
-        { provide: FirebaseOptionsToken, useValue: COMMON_CONFIG }
+        { provide: FIREBASE_APP_NAME, useValue: FIREBASE_APP_NAME_TOO },
+        { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG }
       ]
     });
-    inject([FirebaseApp, AngularFireAuth], (app_: FirebaseApp, _afAuth: AngularFireAuth) => {
-      app = app_;
-      afAuth = _afAuth;
-    })();
+
+    app = TestBed.inject(FirebaseApp);
+    afAuth = TestBed.inject(AngularFireAuth);
   });
 
-  afterEach(done => {
-    app.delete().then(done, done.fail);
+  afterEach(() => {
+    app.delete();
   });
 
   describe('<constructor>', () => {
@@ -156,12 +151,12 @@ describe('AngularFireAuth with different app', () => {
     });
 
     it('should have an initialized Firebase app', () => {
-      expect(afAuth.auth.app).toBeDefined();
-      expect(afAuth.auth.app).toEqual(app);
+      expect(afAuth.app).toBeDefined();
     });
 
-    it('should have an initialized Firebase app instance member', () => {
-      expect(afAuth.auth.app.name).toEqual(FIREBASE_APP_NAME_TOO);
+    it('should have an initialized Firebase app instance member', async () => {
+      const app = await afAuth.app;
+      expect(app.name).toEqual(FIREBASE_APP_NAME_TOO);
     });
   });
 

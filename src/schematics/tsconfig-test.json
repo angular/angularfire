@@ -1,8 +1,0 @@
-{
-  "extends": "./tsconfig-esm.json",
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {}
-  },
-  "files": ["index.spec.ts", "../../node_modules/zone.js/dist/zone.js.d.ts"]
-}

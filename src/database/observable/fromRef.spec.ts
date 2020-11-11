@@ -1,20 +1,19 @@
 import { DatabaseReference } from '../interfaces';
-import { FirebaseApp, AngularFireModule } from '@angular/fire';
-import { AngularFireDatabase, AngularFireDatabaseModule, fromRef } from '@angular/fire/database';
-import { TestBed, inject } from '@angular/core/testing';
-import { COMMON_CONFIG } from '../test-config';
+import { AngularFireModule, FirebaseApp, ɵZoneScheduler } from '@angular/fire';
+import { AngularFireDatabase, AngularFireDatabaseModule, fromRef } from '../public_api';
+import { TestBed } from '@angular/core/testing';
+import { COMMON_CONFIG } from '../../test-config';
 import { take } from 'rxjs/operators';
-
-// generate random string to test fidelity of naming
-const rando = () => (Math.random() + 1).toString(36).substring(7);
-const FIREBASE_APP_NAME = rando();
+import { TestScheduler } from 'rxjs/testing';
+import { rando } from '../../firestore/utils.spec';
 
 describe('fromRef', () => {
   let app: FirebaseApp;
+  let db: AngularFireDatabase;
   let ref: (path: string) => DatabaseReference;
   let batch = {};
-  const items = [{ name: 'one' }, { name: 'two' }, { name: 'three' }].map(item => ( { key: rando(), ...item } ));
-  Object.keys(items).forEach(function (key) {
+  const items = [{ name: 'one' }, { name: 'two' }, { name: 'three' }].map(item => ({ key: rando(), ...item }));
+  Object.keys(items).forEach((key) => {
     const itemValue = items[key];
     batch[itemValue.key] = itemValue;
   });
@@ -24,41 +23,117 @@ describe('fromRef', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG, FIREBASE_APP_NAME),
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireDatabaseModule
+      ],
+      providers: [
+        { provide: URL, useValue: 'http://localhost:9000' }
       ]
     });
-    inject([FirebaseApp], (app_: FirebaseApp) => {
-      app = app_;
-      app.database().goOffline();
-      ref = (path: string) => { app.database().goOffline(); return app.database().ref(path); };
-    })();
+
+    app = TestBed.inject(FirebaseApp);
+    db = TestBed.inject(AngularFireDatabase);
+    ref = (path: string) => db.database.ref(path);
   });
 
-  afterEach(done => {
-    app.delete().then(done, done.fail);
+  afterEach(() => {
+    app.delete();
   });
 
-  it('it should be async', (done) => {
+  it('it should be async by default', (done) => {
     const itemRef = ref(rando());
     itemRef.set(batch);
     const obs = fromRef(itemRef, 'value');
     let count = 0;
     expect(count).toEqual(0);
-    const sub = obs.subscribe(change => {
+    const sub = obs.subscribe(() => {
       count = count + 1;
       expect(count).toEqual(1);
-      done();
       sub.unsubscribe();
+      done();
     });
     expect(count).toEqual(0);
   });
+
+  it('should take a scheduler', done => {
+    const itemRef = ref(rando());
+    itemRef.set(batch);
+
+    const testScheduler = new TestScheduler((actual, expected) => {
+      expect(actual).toEqual(expected);
+    });
+    spyOn(testScheduler, 'schedule').and.callThrough();
+
+    const obs = fromRef(itemRef, 'value', 'once', testScheduler);
+    expect(testScheduler.schedule).not.toHaveBeenCalled();
+
+    obs.subscribe(() => {
+      expect(testScheduler.schedule).toHaveBeenCalled();
+      done();
+    }, err => {
+      console.error(err);
+      expect(false).toEqual(true, 'Shouldnt error');
+      done();
+    }, () => {
+      expect(testScheduler.schedule).toHaveBeenCalled();
+      done();
+    });
+    testScheduler.flush();
+  });
+
+  it('should schedule completed and error correctly', done => {
+    const testScheduler = new TestScheduler((actual, expected) => {
+      expect(actual).toEqual(expected);
+    });
+    spyOn(testScheduler, 'schedule').and.callThrough();
+
+    // Error
+    const errorObservable = fromRef({
+        once: (event, snap, err) => err()
+      } as any,
+      'value',
+      'once',
+      testScheduler
+    );
+    errorObservable.subscribe(() => {
+      fail('Should not emit');
+    }, () => {
+      expect(testScheduler.schedule).toHaveBeenCalled();
+    }, () => {
+      fail('Should not complete');
+    });
+
+    testScheduler.flush();
+
+    // Completed
+    const itemRef = ref(rando());
+    itemRef.set(batch);
+
+    const scheduler = new ɵZoneScheduler(Zone.current.fork({
+      name: 'ExpectedZone'
+    }));
+    const completeObservable = fromRef(
+      itemRef,
+      'value',
+      'once',
+      scheduler
+    );
+    completeObservable.subscribe(
+      () => {
+      },
+      () => fail('Should not error'),
+      () => expect(Zone.current.name).toEqual('ExpectedZone')
+    );
+    testScheduler.flush();
+    done();
+  });
+
 
   it('it should should handle non-existence', (done) => {
     const itemRef = ref(rando());
     itemRef.set({});
     const obs = fromRef(itemRef, 'value');
-    const sub = obs.pipe(take(1)).subscribe(change => {
+    obs.pipe(take(1)).subscribe(change => {
       expect(change.payload.exists()).toEqual(false);
       expect(change.payload.val()).toEqual(null);
     }).add(done);
@@ -68,7 +143,9 @@ describe('fromRef', () => {
     const itemRef = ref(rando());
     itemRef.set(batch);
     const obs = fromRef(itemRef, 'value', 'once');
-    obs.subscribe(change => {}, () => {}, done);
+    obs.subscribe(() => {
+    }, () => {
+    }, done);
   });
 
   it('it should listen and then unsubscribe', (done) => {
@@ -76,7 +153,7 @@ describe('fromRef', () => {
     itemRef.set(batch);
     const obs = fromRef(itemRef, 'value');
     let count = 0;
-    const sub = obs.subscribe(change => {
+    const sub = obs.subscribe(() => {
       count = count + 1;
       // hard coding count to one will fail if the unsub
       // doesn't actually unsub
@@ -98,7 +175,7 @@ describe('fromRef', () => {
         count = count + 1;
         const { type, payload } = change;
         expect(type).toEqual('child_added');
-        expect(payload.val()).toEqual(batch[payload.key!]);
+        expect(payload.val()).toEqual(batch[payload.key]);
         if (count === items.length) {
           done();
           sub.unsubscribe();
@@ -155,7 +232,8 @@ describe('fromRef', () => {
         sub.unsubscribe();
         done();
       });
-      itemRef.child(key).setPriority(-100, () => {});
+      itemRef.child(key).setPriority(-100, () => {
+      });
     });
 
     it('should stream back a value event', (done: any) => {
@@ -177,9 +255,12 @@ describe('fromRef', () => {
       itemRef.set(batch);
       const query = itemRef.orderByChild('name').equalTo(items[0].name);
       const obs = fromRef(query, 'value');
-      const sub = obs.subscribe(change => {
-        let child;
-        change.payload.forEach(snap => { child = snap.val(); return true; });
+      obs.subscribe(change => {
+        let child = null;
+        change.payload.forEach(snap => {
+          child = snap.val();
+          return true;
+        });
         expect(child).toEqual(items[0]);
         done();
       });

@@ -1,8 +1,9 @@
-import { ReflectiveInjector, Provider } from '@angular/core';
-import { TestBed, inject } from '@angular/core/testing';
-import { FirebaseApp, FirebaseOptionsToken, AngularFireModule, FirebaseNameOrConfigToken } from '@angular/fire';
-import { AngularFireFunctions, AngularFireFunctionsModule, FUNCTIONS_REGION, FUNCTIONS_ORIGIN } from '@angular/fire/functions';
-import { COMMON_CONFIG } from './test-config';
+import { TestBed } from '@angular/core/testing';
+import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire';
+import { AngularFireFunctions, AngularFireFunctionsModule, ORIGIN, REGION } from './public_api';
+import { COMMON_CONFIG } from '../test-config';
+import 'firebase/functions';
+import { rando } from '../firestore/utils.spec';
 
 describe('AngularFireFunctions', () => {
   let app: FirebaseApp;
@@ -11,59 +12,55 @@ describe('AngularFireFunctions', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireFunctionsModule
       ]
     });
-    inject([FirebaseApp, AngularFireFunctions], (app_: FirebaseApp, _fn: AngularFireFunctions) => {
-      app = app_;
-      afFns = _fn;
-    })();
+
+    app = TestBed.inject(FirebaseApp);
+    afFns = TestBed.inject(AngularFireFunctions);
   });
 
-  afterEach(done => {
+  afterEach(() => {
     app.delete();
-    done();
   });
 
-  it('should be exist', () => {
+  it('should exist', () => {
     expect(afFns instanceof AngularFireFunctions).toBe(true);
   });
 
   it('should have the Firebase Functions instance', () => {
-    expect(afFns.functions).toBeDefined();
+    expect(afFns.useFunctionsEmulator).toBeDefined();
   });
 
 });
 
-const FIREBASE_APP_NAME_TOO = (Math.random() + 1).toString(36).substring(7);
-
 describe('AngularFireFunctions with different app', () => {
   let app: FirebaseApp;
   let afFns: AngularFireFunctions;
+  let firebaseAppName: string;
 
   beforeEach(() => {
+    firebaseAppName = rando();
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG),
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireFunctionsModule
       ],
       providers: [
-        { provide: FirebaseNameOrConfigToken, useValue: FIREBASE_APP_NAME_TOO },
-        { provide: FirebaseOptionsToken, useValue: COMMON_CONFIG },
-        { provide: FUNCTIONS_ORIGIN, useValue: 'http://0.0.0.0:9999' },
-        { provide: FUNCTIONS_REGION, useValue: 'asia-northeast1' }
+        { provide: FIREBASE_APP_NAME, useValue: firebaseAppName },
+        { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG },
+        { provide: ORIGIN, useValue: 'http://0.0.0.0:9999' },
+        { provide: REGION, useValue: 'asia-northeast1' }
       ]
     });
-    inject([FirebaseApp, AngularFireFunctions], (app_: FirebaseApp, _fns: AngularFireFunctions) => {
-      app = app_;
-      afFns = _fns;
-    })();
+
+    app = TestBed.inject(FirebaseApp);
+    afFns = TestBed.inject(AngularFireFunctions);
   });
 
-  afterEach(done => {
+  afterEach(() => {
     app.delete();
-    done();
   });
 
   describe('<constructor>', () => {
@@ -73,7 +70,7 @@ describe('AngularFireFunctions with different app', () => {
     });
 
     it('should have the Firebase Functions instance', () => {
-      expect(afFns.functions).toBeDefined();
+      expect(afFns.useFunctionsEmulator).toBeDefined();
     });
 
   });

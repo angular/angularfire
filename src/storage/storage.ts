@@ -1,12 +1,21 @@
-import { Injectable, Inject, Optional, InjectionToken, NgZone, PLATFORM_ID } from '@angular/core';
-import { createStorageRef, AngularFireStorageReference } from './ref';
-import { createUploadTask, AngularFireUploadTask } from './task';
+import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
+import { createStorageRef } from './ref';
 import { Observable } from 'rxjs';
-import { FirebaseStorage, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, FirebaseZoneScheduler, _firebaseAppFactory } from '@angular/fire';
-
+import {
+  FIREBASE_APP_NAME,
+  FIREBASE_OPTIONS,
+  FirebaseAppConfig,
+  FirebaseOptions,
+  ɵAngularFireSchedulers,
+  ɵfirebaseAppFactory,
+  ɵkeepUnstableUntilFirstFactory
+} from '@angular/fire';
 import { UploadMetadata } from './interfaces';
+import 'firebase/storage';
+import firebase from 'firebase/app';
+import { registerStorage } from '@firebase/storage';
 
-export const StorageBucket = new InjectionToken<string>('angularfire2.storageBucket');
+export const BUCKET = new InjectionToken<string>('angularfire2.storageBucket');
 
 /**
  * AngularFireStorage Service
@@ -15,32 +24,42 @@ export const StorageBucket = new InjectionToken<string>('angularfire2.storageBuc
  * an API for uploading and downloading binary files from Cloud Storage for
  * Firebase.
  */
-@Injectable()
+@Injectable({
+  providedIn: 'any'
+})
 export class AngularFireStorage {
-  public readonly storage: FirebaseStorage;
-  public readonly scheduler: FirebaseZoneScheduler;
+  public readonly storage: firebase.storage.Storage;
+
+  public readonly keepUnstableUntilFirst: <T>(obs: Observable<T>) => Observable<T>;
+  public readonly schedulers: ɵAngularFireSchedulers;
 
   constructor(
-    @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|null|undefined,
-    @Optional() @Inject(StorageBucket) storageBucket:string|null,
+    @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
+    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string | FirebaseAppConfig | null | undefined,
+    @Optional() @Inject(BUCKET) storageBucket: string | null,
+    // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
-    this.scheduler = new FirebaseZoneScheduler(zone, platformId);
+    this.schedulers = new ɵAngularFireSchedulers(zone);
+    this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers);
+
     this.storage = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(options, nameOrConfig);
+      const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
+      if (registerStorage) {
+        registerStorage(firebase as any);
+      }
       return app.storage(storageBucket || undefined);
     });
   }
 
   ref(path: string) {
-    return createStorageRef(this.storage.ref(path), this.scheduler);
+    return createStorageRef(this.storage.ref(path), this.schedulers, this.keepUnstableUntilFirst);
   }
 
   upload(path: string, data: any, metadata?: UploadMetadata) {
     const storageRef = this.storage.ref(path);
-    const ref = createStorageRef(storageRef, this.scheduler);
+    const ref = createStorageRef(storageRef, this.schedulers, this.keepUnstableUntilFirst);
     return ref.put(data, metadata);
   }
 

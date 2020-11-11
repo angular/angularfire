@@ -1,47 +1,51 @@
-import {
-  BuilderContext,
-  BuilderOutput,
-  createBuilder
-} from "@angular-devkit/architect";
-import { NodeJsSyncHost } from "@angular-devkit/core/node";
-import deploy from "./actions";
-import { experimental, join, normalize } from "@angular-devkit/core";
-import { getFirebaseProjectName } from "../utils";
+import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
+import deploy from './actions';
+import { BuildTarget, DeployBuilderSchema } from '../interfaces';
+import { getFirebaseProjectName } from '../utils';
+
+type DeployBuilderOptions = DeployBuilderSchema & Record<string, string>;
 
 // Call the createBuilder() function to create a builder. This mirrors
 // createJobHandler() but add typings specific to Architect Builders.
-export default createBuilder<any>(
-  async (_: any, context: BuilderContext): Promise<BuilderOutput> => {
-    // The project root is added to a BuilderContext.
-    const root = normalize(context.workspaceRoot);
-    const workspace = new experimental.workspace.Workspace(
-      root,
-      new NodeJsSyncHost()
-    );
-    await workspace
-      .loadWorkspaceFromHost(normalize("angular.json"))
-      .toPromise();
-
+export default createBuilder(
+  async (options: DeployBuilderOptions, context: BuilderContext): Promise<BuilderOutput> => {
     if (!context.target) {
-      throw new Error("Cannot deploy the application without a target");
+      throw new Error('Cannot deploy the application without a target');
     }
 
-    const project = workspace.getProject(context.target.project);
-
     const firebaseProject = getFirebaseProjectName(
-      workspace.root,
+      context.workspaceRoot,
       context.target.project
     );
 
+    if (!firebaseProject) {
+      throw new Error('Cannot find firebase project for your app in .firebaserc');
+    }
+
+    const staticBuildTarget = { name: options.buildTarget || `${context.target.project}:build:production` };
+
+    let serverBuildTarget: BuildTarget | undefined;
+    if (options.ssr) {
+      serverBuildTarget = {
+        name: options.universalBuildTarget || `${context.target.project}:server:production`,
+        options: {
+          bundleDependencies: 'all'
+        }
+      };
+    }
+
     try {
       await deploy(
-        require("firebase-tools"),
+        require('firebase-tools'),
         context,
-        join(workspace.root, project.root),
-        firebaseProject
+        staticBuildTarget,
+        serverBuildTarget,
+        firebaseProject,
+        !!options.preview,
+        process.env.FIREBASE_TOKEN,
       );
     } catch (e) {
-      console.error("Error when trying to deploy: ");
+      console.error('Error when trying to deploy: ');
       console.error(e.message);
       return { success: false };
     }

@@ -1,55 +1,68 @@
-import { Injectable, Inject, Optional, NgZone, PLATFORM_ID, InjectionToken } from '@angular/core';
-import { Observable, from } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { FirebaseOptions, FirebaseAppConfig } from '@angular/fire';
-import { FirebaseFunctions, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
+import { Inject, Injectable, InjectionToken, NgZone, Optional } from '@angular/core';
+import { from, Observable, of } from 'rxjs';
+import { map, observeOn, shareReplay, switchMap, tap } from 'rxjs/operators';
+import {
+  FIREBASE_APP_NAME,
+  FIREBASE_OPTIONS,
+  FirebaseAppConfig,
+  FirebaseOptions,
+  ɵAngularFireSchedulers,
+  ɵfirebaseAppFactory,
+  ɵlazySDKProxy,
+  ɵPromiseProxy,
+  ɵapplyMixins
+} from '@angular/fire';
+import firebase from 'firebase/app';
+import { proxyPolyfillCompat } from './base';
+import { HttpsCallableOptions } from '@firebase/functions-types';
 
-// SEMVER: @ v6 remove FunctionsRegionToken in favor of FUNCTIONS_REGION
-export const FunctionsRegionToken = new InjectionToken<string>('angularfire2.functions.region');
-export const FUNCTIONS_ORIGIN = new InjectionToken<string>('angularfire2.functions.origin');
-export const FUNCTIONS_REGION = FunctionsRegionToken;
+export const ORIGIN = new InjectionToken<string>('angularfire2.functions.origin');
+export const REGION = new InjectionToken<string>('angularfire2.functions.region');
 
-@Injectable()
+// override httpsCallable for compatibility with 5.x
+export interface AngularFireFunctions extends Omit<ɵPromiseProxy<firebase.functions.Functions>, 'httpsCallable'> {
+}
+
+@Injectable({
+  providedIn: 'any'
+})
 export class AngularFireFunctions {
 
-  /**
-   * Firebase Functions instance
-   */
-  public readonly functions: FirebaseFunctions;
-
-  public readonly scheduler: FirebaseZoneScheduler;
+  public readonly httpsCallable: <T = any, R = any>(name: string) => (data: T) => Observable<R>;
 
   constructor(
-    @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|null|undefined,
-    @Inject(PLATFORM_ID) platformId: Object,
+    @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
+    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string | FirebaseAppConfig | null | undefined,
     zone: NgZone,
-    @Optional() @Inject(FUNCTIONS_REGION) region:string|null,
-    @Optional() @Inject(FUNCTIONS_ORIGIN) origin:string|null
+    @Optional() @Inject(REGION) region: string | null,
+    @Optional() @Inject(ORIGIN) origin: string | null
   ) {
-    this.scheduler = new FirebaseZoneScheduler(zone, platformId);
-    
-    this.functions = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(options, nameOrConfig);
-      return app.functions(region || undefined);
-    });
+    const schedulers = new ɵAngularFireSchedulers(zone);
 
-    if (origin) {
-      this.functions.useFunctionsEmulator(origin);
-    }
+    const functions = of(undefined).pipe(
+      observeOn(schedulers.outsideAngular),
+      switchMap(() => import('firebase/functions')),
+      map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
+      map(app => app.functions(region || undefined)),
+      tap(functions => {
+        if (origin) {
+          functions.useFunctionsEmulator(origin);
+        }
+      }),
+      shareReplay({ bufferSize: 1, refCount: false })
+    );
 
-  }
+    this.httpsCallable = <T = any, R = any>(name: string, options?: HttpsCallableOptions) =>
+      (data: T) => from(functions).pipe(
+        observeOn(schedulers.insideAngular),
+        switchMap(functions => functions.httpsCallable(name, options)(data)),
+        map(r => r.data as R)
+      );
 
-  public httpsCallable<T=any, R=any>(name: string) {
-    const callable = this.functions.httpsCallable(name);
-    return (data: T) => {
-      const callable$ = from(callable(data));
-      return this.scheduler.runOutsideAngular(
-        callable$.pipe(
-          map(r => r.data as R)
-        )
-      )
-    }
+    return ɵlazySDKProxy(this, functions, zone);
+
   }
 
 }
+
+ɵapplyMixins(AngularFireFunctions, [proxyPolyfillCompat]);

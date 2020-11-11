@@ -1,0 +1,11 @@
+{
+    "tsconfig": "./tsconfig.json",
+    "ignoreCompilerErrors": true,
+    "mode": "modules",
+    "excludeExternals": true,
+    "excludeNotExported": true,
+    "excludePrivate": true,
+    "excludeProtected": true,
+    "includeDeclarations": true,
+    "disableOutputCheck": true
+}

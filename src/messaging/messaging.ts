@@ -1,82 +1,108 @@
-import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
+import { Inject, Injectable, NgZone, Optional, PLATFORM_ID } from '@angular/core';
+import firebase from 'firebase/app';
+import { concat, EMPTY, Observable, of, throwError, fromEvent } from 'rxjs';
+import { catchError, defaultIfEmpty, map, mergeMap, observeOn, switchMap, switchMapTo, shareReplay, filter, subscribeOn } from 'rxjs/operators';
+import {
+  FIREBASE_APP_NAME,
+  FIREBASE_OPTIONS,
+  FirebaseAppConfig,
+  FirebaseOptions,
+  ɵAngularFireSchedulers,
+  ɵfirebaseAppFactory,
+  ɵlazySDKProxy,
+  ɵPromiseProxy,
+  ɵapplyMixins
+} from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
-import { messaging } from 'firebase/app';
-import { Observable, empty, from, of, throwError } from 'rxjs';
-import { mergeMap, catchError, map, switchMap, concat, defaultIfEmpty } from 'rxjs/operators';
-import { FirebaseOptions, FirebaseAppConfig, runOutsideAngular } from '@angular/fire';
-import { FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
+import { proxyPolyfillCompat } from './base';
 
-@Injectable()
+export interface AngularFireMessaging extends Omit<ɵPromiseProxy<firebase.messaging.Messaging>, 'deleteToken' | 'getToken' | 'requestPermission'> {
+}
+
+@Injectable({
+  providedIn: 'any'
+})
 export class AngularFireMessaging {
-  messaging: Observable<messaging.Messaging>;
-  requestPermission: Observable<void>;
-  getToken: Observable<string|null>;
-  tokenChanges: Observable<string|null>;
-  messages: Observable<{}>;
-  requestToken: Observable<string|null>;
-  deleteToken: (token: string) => Observable<boolean>;
+
+  public readonly requestPermission: Observable<void>;
+  public readonly getToken: Observable<string | null>;
+  public readonly tokenChanges: Observable<string | null>;
+  public readonly messages: Observable<{}>;
+  public readonly requestToken: Observable<string | null>;
+  public readonly deleteToken: (token: string) => Observable<boolean>;
 
   constructor(
-    @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|null|undefined,
+    @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
+    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string | FirebaseAppConfig | null | undefined,
+    // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone
   ) {
+    const schedulers = new ɵAngularFireSchedulers(zone);
 
-    // @ts-ignore zapping in the UMD in the build script
-    const requireMessaging = from(import('firebase/messaging'));
-
-    this.messaging = requireMessaging.pipe(
-      map(() => _firebaseAppFactory(options, nameOrConfig)),
+    const messaging = of(undefined).pipe(
+      subscribeOn(schedulers.outsideAngular),
+      observeOn(schedulers.insideAngular),
+      switchMap(() => isPlatformServer(platformId) ? EMPTY : import('firebase/messaging')),
+      map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
       map(app => app.messaging()),
-      runOutsideAngular(zone)
+      shareReplay({ bufferSize: 1, refCount: false })
     );
 
-    if (!isPlatformServer(platformId)) {
-
-      this.requestPermission = this.messaging.pipe(
-        switchMap(messaging => messaging.requestPermission()),
-        runOutsideAngular(zone)
-      );
-
-    } else {
-
-      this.requestPermission = throwError('Not available on server platform.');
-
-    }
-
-    this.getToken = this.messaging.pipe(
-      switchMap(messaging => messaging.getToken()),
-      defaultIfEmpty(null),
-      runOutsideAngular(zone)
+    this.requestPermission = messaging.pipe(
+      subscribeOn(schedulers.outsideAngular),
+      observeOn(schedulers.insideAngular),
+      // tslint:disable-next-line
+      switchMap(messaging => firebase.messaging.isSupported() ? messaging.requestPermission() : throwError('Not supported.'))
     );
 
-    const tokenChanges = this.messaging.pipe(
-      switchMap(messaging => new Observable(messaging.onTokenRefresh.bind(messaging)).pipe(
-        switchMap(() => messaging.getToken())
-      )),
-      runOutsideAngular(zone)
+    this.getToken = messaging.pipe(
+      subscribeOn(schedulers.outsideAngular),
+      observeOn(schedulers.insideAngular),
+      switchMap(messaging => firebase.messaging.isSupported() && Notification.permission === 'granted' ? messaging.getToken() : EMPTY),
+      defaultIfEmpty(null)
     );
 
-    this.tokenChanges = this.getToken.pipe(
-      concat(tokenChanges)
+    const tokenChanges = messaging.pipe(
+      subscribeOn(schedulers.outsideAngular),
+      observeOn(schedulers.insideAngular),
+      switchMap(messaging => firebase.messaging.isSupported() ? new Observable<string>(emitter =>
+        messaging.onTokenRefresh(emitter.next, emitter.error, emitter.complete)
+      ) : EMPTY),
+      switchMapTo(this.getToken)
     );
 
-    this.messages = this.messaging.pipe(
-      switchMap(messaging => new Observable(messaging.onMessage.bind(messaging))),
-      runOutsideAngular(zone)
+    this.tokenChanges = messaging.pipe(
+      subscribeOn(schedulers.outsideAngular),
+      observeOn(schedulers.insideAngular),
+      switchMap(messaging => firebase.messaging.isSupported() ? concat(this.getToken, tokenChanges) : EMPTY)
     );
 
-    this.requestToken = this.requestPermission.pipe(
+
+    this.messages = messaging.pipe(
+      subscribeOn(schedulers.outsideAngular),
+      observeOn(schedulers.insideAngular),
+      switchMap(messaging => firebase.messaging.isSupported() ? new Observable<string>(emitter =>
+        messaging.onMessage(next => emitter.next(next), err => emitter.error(err), () => emitter.complete())
+      ) : EMPTY),
+    );
+
+    this.requestToken = of(undefined).pipe(
+      switchMap(() => this.requestPermission),
       catchError(() => of(null)),
       mergeMap(() => this.tokenChanges)
     );
 
-    this.deleteToken = (token: string) => this.messaging.pipe(
+    this.deleteToken = (token: string) => messaging.pipe(
+      subscribeOn(schedulers.outsideAngular),
+      observeOn(schedulers.insideAngular),
       switchMap(messaging => messaging.deleteToken(token)),
-      defaultIfEmpty(false),
-      runOutsideAngular(zone)
+      defaultIfEmpty(false)
     );
+
+    return ɵlazySDKProxy(this, messaging, zone);
   }
 
 }
+
+ɵapplyMixins(AngularFireMessaging, [proxyPolyfillCompat]);

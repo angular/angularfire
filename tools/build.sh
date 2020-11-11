@@ -1,13 +1,11 @@
-apt-get -y update
-apt-get -y install rsync
 yarn
 
 if test $TAG_NAME; then
-    export VERSION=$(echo $TAG_NAME | sed 's/^v\(.*\)$/\1/')
+    export VERSION=$TAG_NAME
 else
-    export VERSION=$(npm version | head -n 1 |  sed "s/^.*: '\([^']*\).*/\1/")-canary.$SHORT_SHA
+    export VERSION=$(npm version | sed -n "s/. '@angular\/fire': '\(.*\)',/\1/p")-canary.$SHORT_SHA
 fi
 
-npm version $VERSION
+echo $VERSION &&
+npm --no-git-tag-version -f version $VERSION --allow-same-version &&
 yarn build
-yarn build:wrapper
