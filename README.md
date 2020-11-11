@@ -3,7 +3,7 @@ The official [Angular](https://angular.io/) library for [Firebase](https://fireb
 
 <strong><pre>ng add @angular/fire</pre></strong>
 
-AngularFire smooths over the rough edges an Angular developer might encounter when implementing the framework-agnostic [Firebase JS SDK](https://github.com/firebase/firebase-js-sdk) & aims to provide a more natural developer expirience by conforming to Angular conventions.
+AngularFire smooths over the rough edges an Angular developer might encounter when implementing the framework-agnostic [Firebase JS SDK](https://github.com/firebase/firebase-js-sdk) & aims to provide a more natural developer experience by conforming to Angular conventions.
 
 - **Dependency injection** - Provide and Inject Firebase services in your components
 - **Zone.js wrappers** - Stable zones allow proper functionality of service workers, forms, SSR, and pre-rendering
@@ -71,7 +71,7 @@ export class MyApp {
 
 ### **NEW:** Monitor usage of your application in production
 
-> `AngularFireAnalytics` provides a convient method of interacting with Google Analytics in your Angular application. The provided `ScreenTrackingService` and `UserTrackingService` automatically log events when you're using the Angular Router or Firebase Authentication respectively. [Learn more about Google Analytics](https://firebase.google.com/docs/analytics).
+> `AngularFireAnalytics` provides a convenient method of interacting with Google Analytics in your Angular application. The provided `ScreenTrackingService` and `UserTrackingService` automatically log events when you're using the Angular Router or Firebase Authentication respectively. [Learn more about Google Analytics](https://firebase.google.com/docs/analytics).
 
 - [Getting started with Google Analytics](docs/analytics/getting-started.md)
 
@@ -133,7 +133,7 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 
 #### Server-side rendering
 
-> Angular Universal is a technology that allows you to run your Angular application on a server. This allows you to generate your HTML in a process called server-side rendering (SSR). Angularfire is compatible with server-side rendering; allowing you to take advantage of the Search Engine Optimization, link previews, the performance gains granted by the technology, and more. [Learn more about Angular Universal](https://angular.io/guide/universal).
+> Angular Universal is a technology that allows you to run your Angular application on a server. This allows you to generate your HTML in a process called server-side rendering (SSR). AngularFire is compatible with server-side rendering; allowing you to take advantage of the Search Engine Optimization, link previews, the performance gains granted by the technology, and more. [Learn more about Angular Universal](https://angular.io/guide/universal).
 
 - [Getting started with Angular Universal](docs/universal/getting-started.md)
 - [Deploying your Universal application on Cloud Functions for Firebase](docs/universal/cloud-functions.md)

@@ -38,6 +38,7 @@ export default createBuilder(
         serverBuildTarget,
         firebaseProject,
         options,
+        process.env.FIREBASE_TOKEN,
       );
     } catch (e) {
       console.error('Error when trying to deploy: ');

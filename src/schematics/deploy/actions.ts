@@ -8,7 +8,7 @@ import { defaultFunction, defaultPackage } from './functions-templates';
 import { satisfies } from 'semver';
 import * as open from 'open';
 
-export type DeployBuilderOptions = DeployBuilderSchema & Record<string, string>;
+export type DeployBuilderOptions = DeployBuilderSchema | Record<string, string>;
 
 const escapeRegExp = (str: string) => str.replace(/[\-\[\]\/{}()*+?.\\^$|]/g, '\\$&');
 
@@ -21,7 +21,8 @@ const deployToHosting = (
   firebaseTools: FirebaseTools,
   context: BuilderContext,
   workspaceRoot: string,
-  options: DeployBuilderOptions
+  options: DeployBuilderOptions,
+  firebaseToken?: string,
 ) => {
 
   if (options.preview) {
@@ -42,7 +43,8 @@ const deployToHosting = (
         return firebaseTools.deploy({
           // tslint:disable-next-line:no-non-null-assertion
           only: 'hosting:' + context.target!.project,
-          cwd: workspaceRoot
+          cwd: workspaceRoot,
+          token: firebaseToken,
         });
       } else {
         return Promise.resolve();
@@ -54,7 +56,8 @@ const deployToHosting = (
     return firebaseTools.deploy({
       // tslint:disable-next-line:no-non-null-assertion
       only: 'hosting:' + context.target!.project,
-      cwd: workspaceRoot
+      cwd: workspaceRoot,
+      token: firebaseToken,
     });
 
   }
@@ -120,6 +123,7 @@ export const deployToFunction = async (
   staticBuildTarget: BuildTarget,
   serverBuildTarget: BuildTarget,
   options: DeployBuilderOptions,
+  firebaseToken?: string,
   fsHost: FSHost = defaultFsHost
 ) => {
 
@@ -201,7 +205,8 @@ export const deployToFunction = async (
     return firebaseTools.deploy({
       // tslint:disable-next-line:no-non-null-assertion
       only: `hosting:${context.target!.project},functions:ssr`,
-      cwd: workspaceRoot
+      cwd: workspaceRoot,
+      token: firebaseToken,
     });
   }
 };
@@ -212,9 +217,12 @@ export default async function deploy(
   staticBuildTarget: BuildTarget,
   serverBuildTarget: BuildTarget | undefined,
   firebaseProject: string,
-  options: DeployBuilderOptions
+  options: DeployBuilderOptions,
+  firebaseToken?: string,
 ) {
-  await firebaseTools.login();
+  if (!firebaseToken) {
+    await firebaseTools.login();
+  }
 
   if (!context.target) {
     throw new Error('Cannot execute the build target');
@@ -264,14 +272,16 @@ export default async function deploy(
         context.workspaceRoot,
         staticBuildTarget,
         serverBuildTarget,
-        options
+        options,
+        firebaseToken,
       );
     } else {
       await deployToHosting(
         firebaseTools,
         context,
         context.workspaceRoot,
-        options
+        options,
+        firebaseToken,
       );
     }
 
