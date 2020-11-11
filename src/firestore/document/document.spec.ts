@@ -81,16 +81,17 @@ describe('AngularFirestoreDocument', () => {
           }
         });
     });
-    
-  it('should get unwrapped snapshot', async (done: any) => {
-    const randomCollectionName = afs.firestore.collection('a').doc().id;
-    const ref = afs.firestore.doc(`${randomCollectionName}/FAKE`);
-    const stock = new AngularFirestoreDocument<Stock>(ref, afs);
-    await stock.set(FAKE_STOCK_DATA);
-    const obs$ = stock.valueChanges();
-    obs$.pipe(take(1)).subscribe(async data => {
-      expect(data).toEqual(FAKE_STOCK_DATA);
-      stock.delete().then(done).catch(done.fail);
+
+    it('should get unwrapped snapshot', async (done: any) => {
+      const randomCollectionName = afs.firestore.collection('a').doc().id;
+      const ref = afs.firestore.doc(`${randomCollectionName}/FAKE`);
+      const stock = new AngularFirestoreDocument<Stock>(ref, afs);
+      await stock.set(FAKE_STOCK_DATA);
+      const obs$ = stock.valueChanges();
+      obs$.pipe(take(1)).subscribe(async data => {
+        expect(data).toEqual(FAKE_STOCK_DATA);
+        stock.delete().then(done).catch(done.fail);
+      });
     });
 
   });
