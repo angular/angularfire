@@ -1,17 +1,17 @@
 import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
 import { EMPTY, Observable, of, Subscription } from 'rxjs';
 import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
-import { performance } from 'firebase/app';
-import { FirebaseApp, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
-import { isPlatformBrowser } from '@angular/common';
 import firebase from 'firebase/app';
+import { FirebaseApp, ɵapplyMixins, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
+import { isPlatformBrowser } from '@angular/common';
+import { proxyPolyfillCompat } from './base';
 
 // SEMVER @ v6, drop and move core ng metrics to a service
 export const AUTOMATICALLY_TRACE_CORE_NG_METRICS = new InjectionToken<boolean>('angularfire2.performance.auto_trace');
 export const INSTRUMENTATION_ENABLED = new InjectionToken<boolean>('angularfire2.performance.instrumentationEnabled');
 export const DATA_COLLECTION_ENABLED = new InjectionToken<boolean>('angularfire2.performance.dataCollectionEnabled');
 
-export interface AngularFirePerformance extends ɵPromiseProxy<performance.Performance> {
+export interface AngularFirePerformance extends ɵPromiseProxy<firebase.performance.Performance> {
 }
 
 @Injectable({
@@ -19,7 +19,7 @@ export interface AngularFirePerformance extends ɵPromiseProxy<performance.Perfo
 })
 export class AngularFirePerformance {
 
-  private readonly performance: Observable<performance.Performance>;
+  private readonly performance: Observable<firebase.performance.Performance>;
 
   constructor(
     app: FirebaseApp,
@@ -32,14 +32,12 @@ export class AngularFirePerformance {
 
     this.performance = of(undefined).pipe(
       switchMap(() => isPlatformBrowser(platformId) ? zone.runOutsideAngular(() => import('firebase/performance')) : EMPTY),
-      switchMap(() => import('@firebase/performance')),
-      tap(perf => perf.registerPerformance && perf.registerPerformance(firebase as any)),
       map(() => zone.runOutsideAngular(() => app.performance())),
       tap(performance => {
-        if (instrumentationEnabled !== true) {
+        if (instrumentationEnabled === false) {
           performance.instrumentationEnabled = false;
         }
-        if (dataCollectionEnabled !== true) {
+        if (dataCollectionEnabled === false) {
           performance.dataCollectionEnabled = false;
         }
       }),
@@ -151,3 +149,5 @@ export const trace = <T = any>(name: string) => (source$: Observable<T>) => new 
     )
   ).subscribe(subscriber);
 });
+
+ɵapplyMixins(AngularFirePerformance, [proxyPolyfillCompat]);

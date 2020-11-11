@@ -1,4 +1,4 @@
-import { experimental, JsonObject, logging } from '@angular-devkit/core';
+import { JsonObject, logging } from '@angular-devkit/core';
 import { BuilderContext, BuilderRun, ScheduleOptions, Target } from '@angular-devkit/architect';
 import { BuildTarget, FirebaseDeployConfig, FirebaseTools, FSHost } from '../interfaces';
 import deploy, { deployToFunction } from './actions';
@@ -10,8 +10,14 @@ let fsHost: FSHost;
 
 const FIREBASE_PROJECT = 'ikachu-aa3ef';
 const PROJECT = 'pirojok-project';
-const BUILD_TARGET: BuildTarget = {
+const STATIC_BUILD_TARGET: BuildTarget = {
   name: `${PROJECT}:build:production`
+};
+
+const FIREBASE_TOKEN = 'kkasllkascnkjnskjsdcskdckskdksdkjc';
+
+const SERVER_BUILD_TARGET: BuildTarget = {
+  name: `${PROJECT}:server:production`
 };
 
 const initMocks = () => {
@@ -53,7 +59,13 @@ const initMocks = () => {
     id: 1,
     logger: new logging.NullLogger() as any,
     workspaceRoot: 'cwd',
-    getTargetOptions: (_: Target) => Promise.resolve({}),
+    getTargetOptions: async (target: Target) => {
+      if (target.target === 'build') {
+        return { outputPath: 'dist/browser' };
+      } else if (target.target === 'server') {
+        return { outputPath: 'dist/server' };
+      }
+    },
     reportProgress: (_: number, __?: number, ___?: string) => {
     },
     reportStatus: (_: string) => {
@@ -65,32 +77,24 @@ const initMocks = () => {
   } as any);
 };
 
-
-const projectTargets: experimental.workspace.WorkspaceTool = {
-  build: {
-    options: {
-      outputPath: 'dist/browser'
-    }
-  },
-  server: {
-    options: {
-      outputPath: 'dist/server'
-    }
-  }
-};
-
 describe('Deploy Angular apps', () => {
   beforeEach(() => initMocks());
 
   it('should call login', async () => {
     const spy = spyOn(firebaseMock, 'login');
-    await deploy(firebaseMock, context, projectTargets, [BUILD_TARGET], FIREBASE_PROJECT, false, false);
+    await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, FIREBASE_PROJECT, false);
     expect(spy).toHaveBeenCalled();
+  });
+
+  it('should not call login', async () => {
+    const spy = spyOn(firebaseMock, 'login');
+    await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, FIREBASE_PROJECT, false, FIREBASE_TOKEN);
+    expect(spy).not.toHaveBeenCalled();
   });
 
   it('should invoke the builder', async () => {
     const spy = spyOn(context, 'scheduleTarget').and.callThrough();
-    await deploy(firebaseMock, context, projectTargets, [BUILD_TARGET], FIREBASE_PROJECT, false, false);
+    await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, FIREBASE_PROJECT, false);
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith({
       target: 'build',
@@ -105,25 +109,26 @@ describe('Deploy Angular apps', () => {
       options: {}
     };
     const spy = spyOn(context, 'scheduleTarget').and.callThrough();
-    await deploy(firebaseMock, context, projectTargets, [buildTarget], FIREBASE_PROJECT, false, false);
+    await deploy(firebaseMock, context, buildTarget, undefined, FIREBASE_PROJECT, false);
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith({ target: 'prerender', project: PROJECT }, {});
   });
 
   it('should invoke firebase.deploy', async () => {
     const spy = spyOn(firebaseMock, 'deploy').and.callThrough();
-    await deploy(firebaseMock, context, projectTargets, [BUILD_TARGET], FIREBASE_PROJECT, false, false);
+    await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, FIREBASE_PROJECT, false, FIREBASE_TOKEN);
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith({
       cwd: 'cwd',
-      only: 'hosting:' + PROJECT
+      only: 'hosting:' + PROJECT,
+      token: FIREBASE_TOKEN
     });
   });
 
   describe('error handling', () => {
     it('throws if there is no firebase project', async () => {
       try {
-        await deploy(firebaseMock, context, projectTargets, [BUILD_TARGET], undefined, false, false);
+        await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, undefined, false);
       } catch (e) {
         console.log(e);
         expect(e.message).toMatch(/Cannot find firebase project/);
@@ -133,7 +138,7 @@ describe('Deploy Angular apps', () => {
     it('throws if there is no target project', async () => {
       context.target = undefined;
       try {
-        await deploy(firebaseMock, context, projectTargets, [BUILD_TARGET], FIREBASE_PROJECT, false, false);
+        await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, FIREBASE_PROJECT, false);
       } catch (e) {
         expect(e.message).toMatch(/Cannot execute the build target/);
       }
@@ -146,7 +151,7 @@ describe('universal deployment', () => {
 
   it('should create a firebase function', async () => {
     const spy = spyOn(fsHost, 'writeFileSync');
-    await deployToFunction(firebaseMock, context, '/home/user', projectTargets, false, fsHost);
+    await deployToFunction(firebaseMock, context, '/home/user', STATIC_BUILD_TARGET, SERVER_BUILD_TARGET, false, undefined, fsHost);
 
     expect(spy).toHaveBeenCalledTimes(2);
 
@@ -159,7 +164,7 @@ describe('universal deployment', () => {
 
   it('should rename the index.html file in the nested dist', async () => {
     const spy = spyOn(fsHost, 'renameSync');
-    await deployToFunction(firebaseMock, context, '/home/user', projectTargets, false, fsHost);
+    await deployToFunction(firebaseMock, context, '/home/user', STATIC_BUILD_TARGET, SERVER_BUILD_TARGET, false, undefined, fsHost);
 
     expect(spy).toHaveBeenCalledTimes(1);
 
@@ -173,7 +178,7 @@ describe('universal deployment', () => {
 
   it('should invoke firebase.deploy', async () => {
     const spy = spyOn(firebaseMock, 'deploy');
-    await deployToFunction(firebaseMock, context, '/home/user', projectTargets, false, fsHost);
+    await deployToFunction(firebaseMock, context, '/home/user', STATIC_BUILD_TARGET, SERVER_BUILD_TARGET, false, undefined, fsHost);
 
     expect(spy).toHaveBeenCalledTimes(1);
   });

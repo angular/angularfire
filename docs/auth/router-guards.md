@@ -80,7 +80,7 @@ import { customClaims } from '@angular/fire/auth-guard';
 
 // This pipe will only allow users with the editor role to access the route
 // { path: 'articles/:id/edit', component: ArticleEditComponent, ...canActivate(editorOnly) }
-const editorOnly = () => pipe(customClaims, map(claims => claims.role === "editor"));
+const editorOnly = () => pipe(customClaims, map(claims => claims.role === 'editor'));
 ```
 
 ### Using router state
@@ -98,5 +98,5 @@ const onlyAllowSelf = (next) => map(user => !!user && next.params.userId === use
 
 // Only allow navigation to the route if the user has a custom claim matching  :accountId
 // { path: 'accounts/:accountId/billing', component: BillingDetailsComponent, ...canActivate(accountAdmin) }
-const accountAdmin = (next) => pipe(customClaims, map(claims => claims[`account-${next.params.accountId}-role`] === "admin"));
+const accountAdmin = (next) => pipe(customClaims, map(claims => claims[`account-${next.params.accountId}-role`] === 'admin'));
 ```

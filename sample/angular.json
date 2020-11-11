@@ -23,6 +23,7 @@
               "src/favicon.ico",
               "src/assets",
               "src/manifest.webmanifest",
+              "src/main-sw.js",
               "src/firebase-messaging-sw.js"
             ],
             "styles": [
@@ -103,24 +104,12 @@
           "options": {
             "tsConfig": [
               "tsconfig.app.json",
-              "tsconfig.spec.json",
-              "e2e/tsconfig.json"
+              "tsconfig.server.json",
+              "tsconfig.spec.json"
             ],
             "exclude": [
               "**/node_modules/**"
             ]
-          }
-        },
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "sample:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "sample:serve:production"
-            }
           }
         },
         "server": {
@@ -132,20 +121,34 @@
             "bundleDependencies": true,
             "externalDependencies": [
               "firebase",
-              "@firebase/app",
               "@firebase/analytics",
+              "@firebase/analytics-types",
               "@firebase/app",
+              "@firebase/app-types",
               "@firebase/auth",
+              "@firebase/auth-interop-types",
+              "@firebase/auth-types",
               "@firebase/component",
               "@firebase/database",
+              "@firebase/database-types",
               "@firebase/firestore",
+              "@firebase/firestore-types",
               "@firebase/functions",
+              "@firebase/functions-types",
               "@firebase/installations",
+              "@firebase/installations-types",
+              "@firebase/logger",
               "@firebase/messaging",
-              "@firebase/storage",
+              "@firebase/messaging-types",
               "@firebase/performance",
+              "@firebase/performance-types",
+              "@firebase/polyfill",
               "@firebase/remote-config",
-              "@firebase/util"
+              "@firebase/remote-config-types",
+              "@firebase/storage",
+              "@firebase/storage-types",
+              "@firebase/util",
+              "@firebase/webchannel-wrapper"
             ]
           },
           "configurations": {
@@ -197,5 +200,8 @@
       }
     }
   },
-  "defaultProject": "sample"
+  "defaultProject": "sample",
+  "cli": {
+    "analytics": "cf8320c3-bce0-480d-a971-68484635f481"
+  }
 }

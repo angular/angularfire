@@ -1,3 +1,55 @@
+<a name="6.1.0-rc.0"></a>
+# [6.1.0-rc.0](https://github.com/angular/angularfire/compare/6.0.5...6.1.0-rc.0) (2020-11-11)
+
+
+### Bug Fixes
+
+* **deploy:** remove direct workspace access ([#2643](https://github.com/angular/angularfire/issues/2643)) ([7e1918a](https://github.com/angular/angularfire/commit/7e1918a))
+* **schematics:** remove experimental workspace API type usage ([#2644](https://github.com/angular/angularfire/issues/2644)) ([b976c58](https://github.com/angular/angularfire/commit/b976c58))
+
+
+### Features
+
+* **core:** Support Angular 11
+
+
+<a name="6.0.5"></a>
+## [6.0.5](https://github.com/angular/angularfire/compare/6.0.4...6.0.5) (2020-11-10)
+
+
+### Bug Fixes
+
+* **core:** proxy-polyfill support and various other small fixes ([#2633](https://github.com/angular/angularfire/issues/2633)) ([af238cd](https://github.com/angular/angularfire/commit/af238cd))
+
+
+<a name="6.0.4"></a>
+## [6.0.4](https://github.com/angular/angularfire2/compare/6.0.3...6.0.4) (2020-10-30)
+
+
+### Bug Fixes
+
+* **analytics:** `UserTrackingService` and `ScreenTrackingService` should be opt-in, rather than opt-out ([#2605](https://github.com/angular/angularfire2/issues/2605)) ([92f7aaf](https://github.com/angular/angularfire2/commit/92f7aaf))
+* **auth:** addressing observable errors in non-browser environments ([#2626](https://github.com/angular/angularfire2/issues/2626)) ([120c854](https://github.com/angular/angularfire2/commit/120c854))
+
+
+### Features
+
+* **core:** Support Firebase v8 ([#2624](https://github.com/angular/angularfire2/issues/2624)) ([082c0de](https://github.com/angular/angularfire2/commit/082c0de))
+
+
+
+<a name="6.0.3"></a>
+## [6.0.3](https://github.com/angular/angularfire2/compare/6.0.2...6.0.3) (2020-09-25)
+
+
+### Bug Fixes
+
+* **perf:** Fixing configuration regression with performance monitoring ([#2597](https://github.com/angular/angularfire2/issues/2597)) ([1608676](https://github.com/angular/angularfire2/commit/1608676))
+* **fcm:** Fixing Zone.js and other various regressions ([#2597](https://github.com/angular/angularfire2/issues/2597)) ([1608676](https://github.com/angular/angularfire2/commit/1608676))
+* **analytics:** Fix custom data layer function keeping Analytics from functioning ([#2594](https://github.com/angular/angularfire2/issues/2594)) ([77a9a15](https://github.com/angular/angularfire2/commit/77a9a15)), closes [#2505](https://github.com/angular/angularfire2/issues/2505)
+* **core:** NG10-style ModuleWithProviders ([#2527](https://github.com/angular/angularfire2/issues/2527)) ([93912bc](https://github.com/angular/angularfire2/commit/93912bc))
+* **core:** NG 10 support and various fixes ([#2522](https://github.com/angular/angularfire2/issues/2522)) ([7cb6c03](https://github.com/angular/angularfire2/commit/7cb6c03))
+
 <a name="6.0.2"></a>
 # [6.0.2](https://github.com/angular/angularfire2/compare/6.0.1...6.0.2) (2020-06-24)
 

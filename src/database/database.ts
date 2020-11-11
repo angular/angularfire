@@ -13,7 +13,6 @@ import {
   ɵkeepUnstableUntilFirstFactory
 } from '@angular/fire';
 import { Observable } from 'rxjs';
-import { database } from 'firebase/app';
 import 'firebase/database';
 import { registerDatabase } from '@firebase/database';
 import firebase from 'firebase/app';
@@ -24,7 +23,7 @@ export const URL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL'
   providedIn: 'any'
 })
 export class AngularFireDatabase {
-  public readonly database: database.Database;
+  public readonly database: firebase.database.Database;
 
   public readonly schedulers: ɵAngularFireSchedulers;
   public readonly keepUnstableUntilFirst: <T>(obs$: Observable<T>) => Observable<T>;

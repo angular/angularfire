@@ -1,6 +1,5 @@
-import { experimental } from '@angular-devkit/core';
 import { readFileSync } from 'fs';
-import { FirebaseRc, Project } from './interfaces';
+import { FirebaseRc, Project, WorkspaceProject } from './interfaces';
 import { join } from 'path';
 import { isUniversalApp } from './ng-add-ssr';
 
@@ -56,7 +55,7 @@ export const projectPrompt = (projects: Project[]) => {
   });
 };
 
-export const projectTypePrompt = (project: experimental.workspace.WorkspaceProject) => {
+export const projectTypePrompt = (project: WorkspaceProject) => {
   if (isUniversalApp(project)) {
     return require('inquirer').prompt({
       type: 'confirm',

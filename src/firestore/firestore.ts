@@ -23,7 +23,6 @@ import {
   ɵkeepUnstableUntilFirstFactory
 } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
-import { firestore } from 'firebase/app';
 import 'firebase/firestore';
 const atFirestore = require('@firebase/firestore');
 import firebase from 'firebase/app';
@@ -112,7 +111,7 @@ export function associateQuery<T>(collectionRef: CollectionReference<T>, queryFn
   providedIn: 'any'
 })
 export class AngularFirestore {
-  public readonly firestore: firestore.Firestore;
+  public readonly firestore: firebase.firestore.Firestore;
   public readonly persistenceEnabled$: Observable<boolean>;
   public readonly schedulers: ɵAngularFireSchedulers;
   public readonly keepUnstableUntilFirst: <T>(obs: Observable<T>) => Observable<T>;

@@ -4,7 +4,7 @@ import { fromDocRef } from '../observable/fromRef';
 import { map, observeOn } from 'rxjs/operators';
 import { AngularFirestore, associateQuery } from '../firestore';
 import { AngularFirestoreCollection } from '../collection/collection';
-import { firestore } from 'firebase/app';
+import firebase from 'firebase/app';
 
 /**
  * AngularFirestoreDocument service
@@ -91,7 +91,7 @@ export class AngularFirestoreDocument<T = DocumentData> {
   /**
    * Retrieve the document once.
    */
-  get(options?: firestore.GetOptions) {
+  get(options?: firebase.firestore.GetOptions) {
     return from(this.ref.get(options)).pipe(
       observeOn(this.afs.schedulers.insideAngular),
     );

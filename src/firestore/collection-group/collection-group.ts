@@ -1,7 +1,7 @@
 import { from, Observable } from 'rxjs';
 import { fromCollectionRef } from '../observable/fromRef';
 import { filter, map, observeOn, scan } from 'rxjs/operators';
-import { firestore } from 'firebase/app';
+import firebase from 'firebase/app';
 
 import { DocumentChangeAction, DocumentChangeType, DocumentData, Query } from '../interfaces';
 import { validateEventsArray } from '../collection/collection';
@@ -76,12 +76,28 @@ export class AngularFirestoreCollectionGroup<T = DocumentData> {
 
   /**
    * Listen to all documents in the collection and its possible query as an Observable.
+   *
+   * If the `idField` option is provided, document IDs are included and mapped to the
+   * provided `idField` property name.
    */
-  valueChanges(): Observable<T[]> {
+  valueChanges(): Observable<T[]>;
+  // tslint:disable-next-line:unified-signatures
+  valueChanges({}): Observable<T[]>;
+  valueChanges<K extends string>(options: {idField: K}): Observable<(T & { [T in K]: string })[]>;
+  valueChanges<K extends string>(options: {idField?: K} = {}): Observable<T[]> {
     const fromCollectionRefScheduled$ = fromCollectionRef<T>(this.query, this.afs.schedulers.outsideAngular);
     return fromCollectionRefScheduled$
       .pipe(
-        map(actions => actions.payload.docs.map(a => a.data())),
+        map(actions => actions.payload.docs.map(a => {
+          if (options.idField) {
+            return {
+              [options.idField]: a.id,
+              ...a.data()
+            } as T & { [T in K]: string };
+          } else {
+            return a.data();
+          }
+        })),
         this.afs.keepUnstableUntilFirst
       );
   }
@@ -89,7 +105,7 @@ export class AngularFirestoreCollectionGroup<T = DocumentData> {
   /**
    * Retrieve the results of the query once.
    */
-  get(options?: firestore.GetOptions) {
+  get(options?: firebase.firestore.GetOptions) {
     return from(this.query.get(options)).pipe(
       observeOn(this.afs.schedulers.insideAngular)
     );

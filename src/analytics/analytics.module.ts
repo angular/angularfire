@@ -13,6 +13,6 @@ export class AngularFireAnalyticsModule {
   ) {
     // calling anything on analytics will eagerly load the SDK
     // tslint:disable-next-line:no-unused-expression
-    analytics.app;
+    analytics.app.then(() => {});
   }
 }

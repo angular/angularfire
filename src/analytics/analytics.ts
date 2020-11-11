@@ -10,10 +10,11 @@ import {
   FIREBASE_OPTIONS,
   FIREBASE_APP_NAME,
   ɵfirebaseAppFactory,
-  ɵPromiseProxy
+  ɵPromiseProxy,
+  ɵapplyMixins
 } from '@angular/fire';
-import { analytics } from 'firebase/app';
 import firebase from 'firebase/app';
+import { proxyPolyfillCompat } from './base';
 
 export interface Config {
   [key: string]: any;
@@ -33,12 +34,12 @@ const GTAG_CONFIG_COMMAND = 'config';
 const GTAG_FUNCTION_NAME = 'gtag';
 const DATA_LAYER_NAME = 'dataLayer';
 
-export interface AngularFireAnalytics extends ɵPromiseProxy<analytics.Analytics> {
+export interface AngularFireAnalytics extends ɵPromiseProxy<firebase.analytics.Analytics> {
 }
 
 let gtag: (...args: any[]) => void;
 let analyticsInitialized: Promise<void>;
-const analyticsInstanceCache: { [key: string]: Observable<analytics.Analytics> } = {};
+const analyticsInstanceCache: { [key: string]: Observable<firebase.analytics.Analytics> } = {};
 
 @Injectable({
   providedIn: 'any'
@@ -65,10 +66,17 @@ export class AngularFireAnalytics {
 
     if (!analyticsInitialized) {
       if (isPlatformBrowser(platformId)) {
-        gtag = (window[GTAG_FUNCTION_NAME] as any) || ((...args: any[]) => {
-          (window[DATA_LAYER_NAME] as any).push(args);
-        });
         window[DATA_LAYER_NAME] = window[DATA_LAYER_NAME] || [];
+        /**
+         * According to the gtag documentation, this function that defines a custom data layer cannot be
+         * an arrow function because 'arguments' is not an array. It is actually an object that behaves
+         * like an array and contains more information then just indexes. Transforming this into arrow function
+         * caused issue #2505 where analytics no longer sent any data.
+         */
+        // tslint:disable-next-line: only-arrow-functions
+        gtag = (window[GTAG_FUNCTION_NAME] as any) || (function(..._args: any[]) {
+          (window[DATA_LAYER_NAME] as any).push(arguments);
+        });
         analyticsInitialized = zone.runOutsideAngular(() =>
           new Promise(resolve => {
             window[GTAG_FUNCTION_NAME] = (...args: any[]) => {
@@ -91,8 +99,6 @@ export class AngularFireAnalytics {
       analytics = of(undefined).pipe(
         observeOn(new ɵAngularFireSchedulers(zone).outsideAngular),
         switchMap(() => isPlatformBrowser(platformId) ? import('firebase/analytics') : EMPTY),
-        switchMap(() => import('@firebase/analytics')),
-        tap(analytics => analytics.registerAnalytics && analytics.registerAnalytics(firebase as any)),
         map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
         map(app => app.analytics()),
         tap(analytics => {
@@ -123,3 +129,5 @@ export class AngularFireAnalytics {
   }
 
 }
+
+ɵapplyMixins(AngularFireAnalytics, [proxyPolyfillCompat]);

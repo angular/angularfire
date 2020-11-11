@@ -4,7 +4,7 @@ import { AngularFireModule, FirebaseApp } from './public_api';
 import { Observable, of, Subject } from 'rxjs';
 import { COMMON_CONFIG } from '../test-config';
 import { BrowserModule } from '@angular/platform-browser';
-import { database } from 'firebase/app';
+import firebase from 'firebase/app';
 import { ɵAngularFireSchedulers, ɵkeepUnstableUntilFirstFactory, ɵZoneScheduler } from './angularfire2';
 import { tap } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
@@ -12,9 +12,9 @@ import { rando } from '../firestore/utils.spec';
 
 describe('angularfire', () => {
   let app: FirebaseApp;
-  let rootRef: database.Reference;
-  let questionsRef: database.Reference;
-  let listOfQuestionsRef: database.Reference;
+  let rootRef: firebase.database.Reference;
+  let questionsRef: firebase.database.Reference;
+  let listOfQuestionsRef: firebase.database.Reference;
   let defaultPlatform: PlatformRef;
   let appName: string;
 

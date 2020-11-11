@@ -193,7 +193,7 @@ ngOnInit() {
   ...
   // Get all the user's comments, no matter how deeply nested
   this.comments$ = afs.collectionGroup('Comments', ref => ref.where('user', '==', userId))
-                      .valueChanges({ idField });
+                      .valueChanges({ idField: 'docId' });
 }
 ```
 
