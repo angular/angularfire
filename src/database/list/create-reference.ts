@@ -25,10 +25,21 @@ export function createListReference<T= any>(query: DatabaseQuery, afDatabase: An
     auditTrail(events?: ChildEvent[]) {
       return auditTrail<T>(query, events, outsideAngularScheduler).pipe(afDatabase.keepUnstableUntilFirst);
     },
-    valueChanges(events?: ChildEvent[]) {
+    valueChanges<K extends string>(events?: ChildEvent[], options?: {idField?: K}) {
       const snapshotChanges$ = snapshotChanges<T>(query, events, outsideAngularScheduler);
       return snapshotChanges$.pipe(
-        map(actions => actions.map(a => a.payload.val() as T)),
+        map(actions => actions.map(a => {
+          if (options && options.idField) {
+            return {
+              ...a.payload.val() as T,
+              ...{
+                [options.idField]: a.key
+              }
+            };
+          } else {
+            return a.payload.val() as T;
+          }
+        })),
         afDatabase.keepUnstableUntilFirst
       );
     }
