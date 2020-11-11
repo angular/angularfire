@@ -13,6 +13,9 @@ const PROJECT = 'pirojok-project';
 const STATIC_BUILD_TARGET: BuildTarget = {
   name: `${PROJECT}:build:production`
 };
+
+const FIREBASE_TOKEN = 'kkasllkascnkjnskjsdcskdckskdksdkjc';
+
 const SERVER_BUILD_TARGET: BuildTarget = {
   name: `${PROJECT}:server:production`
 };
@@ -83,6 +86,12 @@ describe('Deploy Angular apps', () => {
     expect(spy).toHaveBeenCalled();
   });
 
+  it('should not call login', async () => {
+    const spy = spyOn(firebaseMock, 'login');
+    await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, FIREBASE_PROJECT, false, FIREBASE_TOKEN);
+    expect(spy).not.toHaveBeenCalled();
+  });
+
   it('should invoke the builder', async () => {
     const spy = spyOn(context, 'scheduleTarget').and.callThrough();
     await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, FIREBASE_PROJECT, false);
@@ -107,11 +116,12 @@ describe('Deploy Angular apps', () => {
 
   it('should invoke firebase.deploy', async () => {
     const spy = spyOn(firebaseMock, 'deploy').and.callThrough();
-    await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, FIREBASE_PROJECT, false);
+    await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, FIREBASE_PROJECT, false, FIREBASE_TOKEN);
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith({
       cwd: 'cwd',
-      only: 'hosting:' + PROJECT
+      only: 'hosting:' + PROJECT,
+      token: FIREBASE_TOKEN
     });
   });
 
@@ -141,7 +151,7 @@ describe('universal deployment', () => {
 
   it('should create a firebase function', async () => {
     const spy = spyOn(fsHost, 'writeFileSync');
-    await deployToFunction(firebaseMock, context, '/home/user', STATIC_BUILD_TARGET, SERVER_BUILD_TARGET, false, fsHost);
+    await deployToFunction(firebaseMock, context, '/home/user', STATIC_BUILD_TARGET, SERVER_BUILD_TARGET, false, undefined, fsHost);
 
     expect(spy).toHaveBeenCalledTimes(2);
 
@@ -154,7 +164,7 @@ describe('universal deployment', () => {
 
   it('should rename the index.html file in the nested dist', async () => {
     const spy = spyOn(fsHost, 'renameSync');
-    await deployToFunction(firebaseMock, context, '/home/user', STATIC_BUILD_TARGET, SERVER_BUILD_TARGET, false, fsHost);
+    await deployToFunction(firebaseMock, context, '/home/user', STATIC_BUILD_TARGET, SERVER_BUILD_TARGET, false, undefined, fsHost);
 
     expect(spy).toHaveBeenCalledTimes(1);
 
@@ -168,7 +178,7 @@ describe('universal deployment', () => {
 
   it('should invoke firebase.deploy', async () => {
     const spy = spyOn(firebaseMock, 'deploy');
-    await deployToFunction(firebaseMock, context, '/home/user', STATIC_BUILD_TARGET, SERVER_BUILD_TARGET, false, fsHost);
+    await deployToFunction(firebaseMock, context, '/home/user', STATIC_BUILD_TARGET, SERVER_BUILD_TARGET, false, undefined, fsHost);
 
     expect(spy).toHaveBeenCalledTimes(1);
   });

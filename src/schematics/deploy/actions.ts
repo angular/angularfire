@@ -19,7 +19,8 @@ const deployToHosting = (
   firebaseTools: FirebaseTools,
   context: BuilderContext,
   workspaceRoot: string,
-  preview: boolean
+  preview: boolean,
+  firebaseToken?: string,
 ) => {
 
   if (preview) {
@@ -40,7 +41,8 @@ const deployToHosting = (
         return firebaseTools.deploy({
           // tslint:disable-next-line:no-non-null-assertion
           only: 'hosting:' + context.target!.project,
-          cwd: workspaceRoot
+          cwd: workspaceRoot,
+          token: firebaseToken,
         });
       } else {
         return Promise.resolve();
@@ -52,7 +54,8 @@ const deployToHosting = (
     return firebaseTools.deploy({
       // tslint:disable-next-line:no-non-null-assertion
       only: 'hosting:' + context.target!.project,
-      cwd: workspaceRoot
+      cwd: workspaceRoot,
+      token: firebaseToken,
     });
 
   }
@@ -118,7 +121,8 @@ export const deployToFunction = async (
   staticBuildTarget: BuildTarget,
   serverBuildTarget: BuildTarget,
   preview: boolean,
-  fsHost: FSHost = defaultFsHost
+  firebaseToken?: string,
+  fsHost: FSHost = defaultFsHost,
 ) => {
   if (!satisfies(process.versions.node, getVersionRange(NODE_VERSION))) {
     context.logger.warn(
@@ -195,7 +199,8 @@ export const deployToFunction = async (
     return firebaseTools.deploy({
       // tslint:disable-next-line:no-non-null-assertion
       only: `hosting:${context.target!.project},functions:ssr`,
-      cwd: workspaceRoot
+      cwd: workspaceRoot,
+      token: firebaseToken,
     });
   }
 };
@@ -206,9 +211,12 @@ export default async function deploy(
   staticBuildTarget: BuildTarget,
   serverBuildTarget: BuildTarget | undefined,
   firebaseProject: string,
-  preview: boolean
+  preview: boolean,
+  firebaseToken?: string,
 ) {
-  await firebaseTools.login();
+  if (!firebaseToken) {
+    await firebaseTools.login();
+  }
 
   if (!context.target) {
     throw new Error('Cannot execute the build target');
@@ -258,14 +266,16 @@ export default async function deploy(
         context.workspaceRoot,
         staticBuildTarget,
         serverBuildTarget,
-        preview
+        preview,
+        firebaseToken,
       );
     } else {
       await deployToHosting(
         firebaseTools,
         context,
         context.workspaceRoot,
-        preview
+        preview,
+        firebaseToken,
       );
     }
 
