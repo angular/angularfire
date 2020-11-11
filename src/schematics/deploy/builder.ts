@@ -1,9 +1,8 @@
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
-import deploy from './actions';
-import { BuildTarget, DeployBuilderSchema } from '../interfaces';
+import deploy, { DeployBuilderOptions } from './actions';
+import { BuildTarget } from '../interfaces';
 import { getFirebaseProjectName } from '../utils';
 
-type DeployBuilderOptions = DeployBuilderSchema & Record<string, string>;
 
 // Call the createBuilder() function to create a builder. This mirrors
 // createJobHandler() but add typings specific to Architect Builders.
@@ -13,7 +12,7 @@ export default createBuilder(
       throw new Error('Cannot deploy the application without a target');
     }
 
-    const firebaseProject = getFirebaseProjectName(
+    const firebaseProject = options.firebaseProject || getFirebaseProjectName(
       context.workspaceRoot,
       context.target.project
     );
@@ -27,10 +26,7 @@ export default createBuilder(
     let serverBuildTarget: BuildTarget | undefined;
     if (options.ssr) {
       serverBuildTarget = {
-        name: options.universalBuildTarget || `${context.target.project}:server:production`,
-        options: {
-          bundleDependencies: 'all'
-        }
+        name: options.universalBuildTarget || `${context.target.project}:server:production`
       };
     }
 
@@ -41,7 +37,7 @@ export default createBuilder(
         staticBuildTarget,
         serverBuildTarget,
         firebaseProject,
-        !!options.preview,
+        options,
         process.env.FIREBASE_TOKEN,
       );
     } catch (e) {

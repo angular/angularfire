@@ -194,7 +194,11 @@
         "deploy": {
           "builder": "@angular/fire:deploy",
           "options": {
-            "ssr": true
+            "ssr": true,
+            "functionsNodeVersion": 12,
+            "functionsRuntimeOptions": {
+              "memory": "1GB"
+            }
           }
         }
       }

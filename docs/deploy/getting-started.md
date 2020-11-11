@@ -88,3 +88,56 @@ We'll create the function and a `package.json` in your project output directory.
 ## Step 3: customization
 
 To customize the deployment flow, you can use the configuration files you're already familiar with from `firebase-tools`. You can find more in the [firebase documentation](https://firebase.google.com/docs/hosting/full-config).
+
+### Configuring Cloud Functions
+
+Setting `functionsNodeVersion` and `functionsRuntimeOptions` in your `angular.json` allow you to custimze the version of Node.js Cloud Functions is running and run-time settings like timeout, VPC connectors, and memory.
+
+```json
+"deploy": {
+    "builder": "@angular/fire:deploy",
+    "options": {
+        "functionsNodeVersion": 12,
+        "functionsRuntimeOptions": {
+          "memory": "2GB",
+          "timeoutSeconds": 10,
+          "vpcConnector": "my-vpc-connector",
+          "vpcConnectorEgressSettings": "PRIVATE_RANGES_ONLY"
+        }
+    }
+}
+```
+
+### Working with multiple Firebase Projects
+
+If you have multiple build targets and deploy targets, it is possible to specify them in your `angular.json` or `workspace.json`.
+
+It is possible to use either your project name or project alias in `firebaseProject`. The setting provided here is equivalent to passing a project name or alias to `firebase deploy --project projectNameOrAlias`.
+
+The `buildTarget` simply points to an existing build configuration for your project. Most projects have a default configuration and a production configuration (commonly activated by using the `--prod` flag) but it is possible to specify as many build configurations as needed.
+
+You may specify a `buildTarget` and `firebaseProject` in your `options` as follows:
+
+```json
+"deploy": {
+    "builder": "@angular/fire:deploy",
+    "options": {
+        "buildTarget": "projectName:build",
+        "firebaseProject": "developmentProject"
+    },
+    "configurations": {
+        "production": {
+            "buildTarget": "projectName:build:production",
+            "firebaseProject": "productionProject"
+        }
+    }
+}
+```
+
+The above configuration specifies the following:
+
+1. `ng deploy` will deploy the default project with default configuration.
+2. `ng deploy projectName` will deploy the specified project with default configuration.
+3. `ng deploy projectName --prod` or `ng deploy projectName --configuration='production'` will deploy `projectName` with production build settings to your production environment.
+
+All of the options are optional. If you do not specify a `buildTarget`, it defaults to a production build (`projectName:build:production`). If you do not specify a `firebaseProject`, it defaults to the first matching deploy target found in your `.firebaserc` (where your projectName is the same as your Firebase deploy target name). The `configurations` section is also optional.

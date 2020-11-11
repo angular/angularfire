@@ -1,12 +1,14 @@
 import { BuilderContext, targetFromTargetString } from '@angular-devkit/architect';
-import { BuildTarget, FirebaseTools, FSHost } from '../interfaces';
+import { BuildTarget, DeployBuilderSchema, FirebaseTools, FSHost } from '../interfaces';
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'fs';
 import { copySync, removeSync } from 'fs-extra';
 import { dirname, join } from 'path';
 import { execSync } from 'child_process';
-import { defaultFunction, defaultPackage, NODE_VERSION } from './functions-templates';
+import { defaultFunction, defaultPackage } from './functions-templates';
 import { satisfies } from 'semver';
 import * as open from 'open';
+
+export type DeployBuilderOptions = DeployBuilderSchema | Record<string, string>;
 
 const escapeRegExp = (str: string) => str.replace(/[\-\[\]\/{}()*+?.\\^$|]/g, '\\$&');
 
@@ -19,11 +21,11 @@ const deployToHosting = (
   firebaseTools: FirebaseTools,
   context: BuilderContext,
   workspaceRoot: string,
-  preview: boolean,
+  options: DeployBuilderOptions,
   firebaseToken?: string,
 ) => {
 
-  if (preview) {
+  if (options.preview) {
     const port = 5000; // TODO make this configurable
 
     setTimeout(() => {
@@ -71,10 +73,10 @@ const getVersionRange = (v: number) => `^${v}.0.0`;
 
 const findPackageVersion = (name: string) => {
   const match = execSync(`npm list ${name}`).toString().match(` ${escapeRegExp(name)}@.+\\w`);
-  return match ? match[0].split(`${name}@`)[1] : null;
+  return match ? match[0].split(`${name}@`)[1].split(/\s/)[0] : null;
 };
 
-const getPackageJson = (context: BuilderContext, workspaceRoot: string) => {
+const getPackageJson = (context: BuilderContext, workspaceRoot: string, options: DeployBuilderOptions) => {
   const dependencies = {
     'firebase-admin': 'latest',
     'firebase-functions': 'latest'
@@ -111,7 +113,7 @@ const getPackageJson = (context: BuilderContext, workspaceRoot: string) => {
       });
     }
   } // TODO should we throw?
-  return defaultPackage(dependencies, devDependencies);
+  return defaultPackage(dependencies, devDependencies, options);
 };
 
 export const deployToFunction = async (
@@ -120,15 +122,10 @@ export const deployToFunction = async (
   workspaceRoot: string,
   staticBuildTarget: BuildTarget,
   serverBuildTarget: BuildTarget,
-  preview: boolean,
+  options: DeployBuilderOptions,
   firebaseToken?: string,
-  fsHost: FSHost = defaultFsHost,
+  fsHost: FSHost = defaultFsHost
 ) => {
-  if (!satisfies(process.versions.node, getVersionRange(NODE_VERSION))) {
-    context.logger.warn(
-      `⚠️ Your Node.js version (${process.versions.node}) does not match the Firebase Functions runtime (${NODE_VERSION}).`
-    );
-  }
 
   const staticBuildOptions = await context.getTargetOptions(targetFromTargetString(staticBuildTarget.name));
   if (!staticBuildOptions.outputPath || typeof staticBuildOptions.outputPath !== 'string') {
@@ -156,14 +153,23 @@ export const deployToFunction = async (
   fsHost.moveSync(staticOut, newClientPath);
   fsHost.moveSync(serverOut, newServerPath);
 
+  const packageJson = getPackageJson(context, workspaceRoot, options);
+  const nodeVersion = JSON.parse(packageJson).engines.node;
+
+  if (!satisfies(process.versions.node, getVersionRange(nodeVersion))) {
+    context.logger.warn(
+      `⚠️ Your Node.js version (${process.versions.node}) does not match the Firebase Functions runtime (${nodeVersion}).`
+    );
+  }
+
   fsHost.writeFileSync(
     join(dirname(serverOut), 'package.json'),
-    getPackageJson(context, workspaceRoot)
+    packageJson
   );
 
   fsHost.writeFileSync(
     join(dirname(serverOut), 'index.js'),
-    defaultFunction(serverOut)
+    defaultFunction(serverOut, options)
   );
 
   fsHost.renameSync(
@@ -171,7 +177,7 @@ export const deployToFunction = async (
     join(newClientPath, 'index.original.html')
   );
 
-  if (preview) {
+  if (options.preview) {
     const port = 5000; // TODO make this configurable
 
     setTimeout(() => {
@@ -211,7 +217,7 @@ export default async function deploy(
   staticBuildTarget: BuildTarget,
   serverBuildTarget: BuildTarget | undefined,
   firebaseProject: string,
-  preview: boolean,
+  options: DeployBuilderOptions,
   firebaseToken?: string,
 ) {
   if (!firebaseToken) {
@@ -266,7 +272,7 @@ export default async function deploy(
         context.workspaceRoot,
         staticBuildTarget,
         serverBuildTarget,
-        preview,
+        options,
         firebaseToken,
       );
     } else {
@@ -274,7 +280,7 @@ export default async function deploy(
         firebaseTools,
         context,
         context.workspaceRoot,
-        preview,
+        options,
         firebaseToken,
       );
     }
