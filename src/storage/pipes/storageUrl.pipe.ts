@@ -1,13 +1,13 @@
-import { Pipe } from '@angular/core'
+import { Pipe } from '@angular/core';
 import { AngularFireStorage } from '../storage';
 
 /** to be used with in combination with | async */
 @Pipe({
   name: 'ngfbStorageUrl'
-}) export class AngularFirestoreStorageUrl {
-  constructor(public storage:AngularFireStorage){}
+}) export class AngularFirestoreStorageUrl implements PipeTransform {
+  constructor(public storage: AngularFireStorage) {}
 
   transform(path) {
-    return this.storage.ref(path).getDownloadURL()
+    return this.storage.ref(path).getDownloadURL();
   }
 }
