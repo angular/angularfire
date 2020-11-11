@@ -61,10 +61,10 @@ export class AngularFirestoreDocument<T = DocumentData> {
    * Create a reference to a sub-collection given a path and an optional query
    * function.
    */
-  collection(path: string, queryFn?: QueryFn<T>): AngularFirestoreCollection<T> {
-    const collectionRef = this.ref.collection(path) as firestore.CollectionReference<T>;
-    const { ref, query } = associateQuery<T>(collectionRef, queryFn);
-    return new AngularFirestoreCollection<T>(ref, query, this.afs);
+  collection<R = DocumentData>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<R> {
+    const collectionRef = this.ref.collection(path);
+    const { ref, query } = associateQuery(collectionRef, queryFn);
+    return new AngularFirestoreCollection<R>(ref, query, this.afs);
   }
 
   /**
@@ -79,12 +79,20 @@ export class AngularFirestoreDocument<T = DocumentData> {
 
   /**
    * Listen to unwrapped snapshot updates from the document.
+   *
+   * If the `idField` option is provided, document IDs are included and mapped to the
+   * provided `idField` property name.
    */
-  valueChanges(): Observable<T|undefined> {
+  valueChanges(options?: { }): Observable<T | undefined>;
+  valueChanges<K extends string>(options: { idField: K }): Observable<(T & { [T in K]: string }) | undefined>;
+  valueChanges<K extends string>(options: { idField?: K } = {}): Observable<T | undefined> {
     return this.snapshotChanges().pipe(
-      map(action => {
-        return action.payload.data();
-      })
+      map(({ payload }) =>
+        options.idField ? {
+          ...payload.data(),
+          ...{ [options.idField]: payload.id }
+        } as T & { [T in K]: string } : payload.data()
+      )
     );
   }
 
