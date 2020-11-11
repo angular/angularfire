@@ -1,7 +1,7 @@
 import { from, Observable } from 'rxjs';
 import { fromCollectionRef } from '../observable/fromRef';
 import { filter, map, observeOn, scan } from 'rxjs/operators';
-import { firestore } from 'firebase/app';
+import firebase from 'firebase/app';
 
 import { CollectionReference, DocumentChangeAction, DocumentChangeType, DocumentData, DocumentReference, Query } from '../interfaces';
 import { docChanges, sortedChanges } from './changes';
@@ -121,7 +121,7 @@ export class AngularFirestoreCollection<T= DocumentData> {
   /**
    * Retrieve the results of the query once.
    */
-  get(options?: firestore.GetOptions) {
+  get(options?: firebase.firestore.GetOptions) {
     return from(this.query.get(options)).pipe(
       observeOn(this.afs.schedulers.insideAngular),
     );
@@ -141,7 +141,7 @@ export class AngularFirestoreCollection<T= DocumentData> {
   /**
    * Create a reference to a single document in a collection.
    */
-  doc<T>(path?: string): AngularFirestoreDocument<T> {
-    return new AngularFirestoreDocument<T>(this.ref.doc(path), this.afs);
+  doc<T2 = T>(path?: string): AngularFirestoreDocument<T2> {
+    return new AngularFirestoreDocument<T2>(this.ref.doc(path), this.afs);
   }
 }

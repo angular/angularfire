@@ -4,18 +4,17 @@ import { AngularFireModule, FirebaseApp } from './public_api';
 import { Observable, of, Subject } from 'rxjs';
 import { COMMON_CONFIG } from '../test-config';
 import { BrowserModule } from '@angular/platform-browser';
-import { database } from 'firebase/app';
+import firebase from 'firebase/app';
 import { ɵAngularFireSchedulers, ɵkeepUnstableUntilFirstFactory, ɵZoneScheduler } from './angularfire2';
-import { ɵPLATFORM_BROWSER_ID, ɵPLATFORM_SERVER_ID } from '@angular/common';
 import { tap } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
 import { rando } from '../firestore/utils.spec';
 
 describe('angularfire', () => {
   let app: FirebaseApp;
-  let rootRef: database.Reference;
-  let questionsRef: database.Reference;
-  let listOfQuestionsRef: database.Reference;
+  let rootRef: firebase.database.Reference;
+  let questionsRef: firebase.database.Reference;
+  let listOfQuestionsRef: firebase.database.Reference;
   let defaultPlatform: PlatformRef;
   let appName: string;
 
@@ -117,7 +116,7 @@ describe('angularfire', () => {
     });
 
     it('should re-schedule emissions asynchronously', done => {
-      const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(schedulers, ɵPLATFORM_SERVER_ID);
+      const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(schedulers);
 
       let ran = false;
       of(null).pipe(
@@ -131,28 +130,28 @@ describe('angularfire', () => {
       expect(ran).toEqual(false);
     });
 
-    [ɵPLATFORM_SERVER_ID, ɵPLATFORM_BROWSER_ID].map(platformId =>
-      it(`should subscribe outside angular and observe inside angular (${platformId})`, done => {
-        const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(schedulers, platformId);
+    it(`should subscribe outside angular and observe inside angular`, done => {
 
-        insideZone.run(() => {
-          new Observable(s => {
-            expect(Zone.current).toEqual(outsideZone);
-            s.next('test');
-          }).pipe(
-            keepUnstableOp,
-            tap(() => {
-              expect(Zone.current).toEqual(insideZone);
-            })
-          ).subscribe(() => {
+      const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(schedulers);
+
+      insideZone.run(() => {
+        new Observable(s => {
+          expect(Zone.current).toEqual(outsideZone);
+          s.next('test');
+        }).pipe(
+          keepUnstableOp,
+          tap(() => {
             expect(Zone.current).toEqual(insideZone);
-            done();
-          }, err => {
-            fail(err);
-          });
+          })
+        ).subscribe(() => {
+          expect(Zone.current).toEqual(insideZone);
+          done();
+        }, err => {
+          fail(err);
         });
-      })
-    );
+      });
+
+    });
 
     it('should block until first emission', done => {
       const testScheduler = new TestScheduler(null);
@@ -171,7 +170,7 @@ describe('angularfire', () => {
           outsideAngular: new ɵZoneScheduler(outsideZone, testScheduler),
           insideAngular: new ɵZoneScheduler(insideZone, testScheduler)
         };
-        const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(trackingSchedulers, ɵPLATFORM_SERVER_ID);
+        const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(trackingSchedulers);
 
         const s = new Subject();
         s.pipe(

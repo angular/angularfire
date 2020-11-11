@@ -145,7 +145,7 @@ Next, configure functions origin to point at your app domain:
 
 ```ts
 import { NgModule } from '@angular/core';
-import { AngularFireFunctionsModule, FUNCTIONS_ORIGIN } from '@angular/fire/functions';
+import { AngularFireFunctionsModule, ORIGIN } from '@angular/fire/functions';
 
 @NgModule({
   imports: [

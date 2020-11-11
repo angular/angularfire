@@ -23,10 +23,9 @@ import {
   ɵkeepUnstableUntilFirstFactory
 } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
-import { firestore } from 'firebase/app';
-import firebase from '@firebase/app';
-import { registerFirestore } from '@firebase/firestore';
 import 'firebase/firestore';
+const atFirestore = require('@firebase/firestore');
+import firebase from 'firebase/app';
 
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
@@ -112,7 +111,7 @@ export function associateQuery(collectionRef: CollectionReference, queryFn = ref
   providedIn: 'any'
 })
 export class AngularFirestore {
-  public readonly firestore: firestore.Firestore;
+  public readonly firestore: firebase.firestore.Firestore;
   public readonly persistenceEnabled$: Observable<boolean>;
   public readonly schedulers: ɵAngularFireSchedulers;
   public readonly keepUnstableUntilFirst: <T>(obs: Observable<T>) => Observable<T>;
@@ -133,15 +132,15 @@ export class AngularFirestore {
     @Optional() @Inject(PERSISTENCE_SETTINGS) persistenceSettings: PersistenceSettings | null
   ) {
     this.schedulers = new ɵAngularFireSchedulers(zone);
-    this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers, platformId);
+    this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers);
 
     this.firestore = zone.runOutsideAngular(() => {
       const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
       // INVESTIGATE this seems to be required because in the browser build registerFirestore is an Object?
       //             seems like we're fighting ngcc. In the server firestore() isn't available, so I have to register
       //             in the browser registerFirestore is not a function... maybe this is an underlying firebase-js-sdk issue
-      if (registerFirestore) {
-        registerFirestore(firebase);
+      if ('registerFirestore' in atFirestore) {
+        (atFirestore as any).registerFirestore(firebase as any);
       }
       const firestore = app.firestore();
       if (settings) {
@@ -182,7 +181,8 @@ export class AngularFirestore {
       collectionRef = pathOrRef;
     }
     const { ref, query } = associateQuery(collectionRef, queryFn);
-    return new AngularFirestoreCollection<T>(ref, query, this);
+    const refInZone = this.schedulers.ngZone.run(() => ref);
+    return new AngularFirestoreCollection<T>(refInZone, query, this);
   }
 
   /**
@@ -212,7 +212,8 @@ export class AngularFirestore {
     } else {
       ref = pathOrRef;
     }
-    return new AngularFirestoreDocument<T>(ref, this);
+    const refInZone = this.schedulers.ngZone.run(() => ref);
+    return new AngularFirestoreDocument<T>(refInZone, this);
   }
 
   /**

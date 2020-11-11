@@ -16,9 +16,7 @@ function markStarts() {
 
 const started = markStarts();
 
-@Injectable({
-    providedIn: 'any'
-})
+@Injectable()
 export class PerformanceMonitoringService implements OnDestroy {
 
     private disposable: Subscription|undefined;

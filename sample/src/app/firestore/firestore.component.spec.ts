@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { FirestoreComponent } from './firestore.component';
 
@@ -6,7 +6,7 @@ describe('FirestoreComponent', () => {
   let component: FirestoreComponent;
   let fixture: ComponentFixture<FirestoreComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ FirestoreComponent ]
     })

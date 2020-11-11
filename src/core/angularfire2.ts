@@ -89,11 +89,7 @@ export class ɵAngularFireSchedulers {
  * value from firebase but doesn't block the zone forever since the firebase subscription
  * is still alive.
  */
-export function ɵkeepUnstableUntilFirstFactory(
-  schedulers: ɵAngularFireSchedulers,
-  // tslint:disable-next-line:ban-types
-  platformId: Object
-) {
+export function ɵkeepUnstableUntilFirstFactory(schedulers: ɵAngularFireSchedulers) {
   return function keepUnstableUntilFirst<T>(obs$: Observable<T>): Observable<T> {
     obs$ = obs$.lift(
       new ɵBlockUntilFirstOperator(schedulers.ngZone)
@@ -144,7 +140,7 @@ export const ɵlazySDKProxy = (klass: any, observable: Observable<any>, zone: Ng
       if (klass[name]) {
         return klass[name];
       }
-      if (noopFunctions.includes(name)) {
+      if (noopFunctions.indexOf(name) > -1) {
         return () => {
         };
       }
@@ -160,12 +156,24 @@ export const ɵlazySDKProxy = (klass: any, observable: Observable<any>, zone: Ng
         }
       });
       // recurse the proxy
-      return new Proxy(() => undefined, {
+      return new Proxy(() => {}, {
           get: (_, name) => promise[name],
           // TODO handle callbacks as transparently as I can
           apply: (self, _, args) => promise.then(it => it && it(...args))
         }
       );
     })
+  });
+};
+
+export const ɵapplyMixins = (derivedCtor: any, constructors: any[]) => {
+  constructors.forEach((baseCtor) => {
+    Object.getOwnPropertyNames(baseCtor.prototype || baseCtor).forEach((name) => {
+      Object.defineProperty(
+        derivedCtor.prototype,
+        name,
+        Object.getOwnPropertyDescriptor(baseCtor.prototype || baseCtor, name)
+      );
+    });
   });
 };

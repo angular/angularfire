@@ -1,4 +1,4 @@
-import { database } from 'firebase/app';
+import firebase from 'firebase/app';
 import { AngularFireModule, FirebaseApp } from '@angular/fire';
 import { AngularFireDatabase, AngularFireDatabaseModule, ChildEvent, snapshotChanges, URL } from '../public_api';
 import { TestBed } from '@angular/core/testing';
@@ -11,7 +11,7 @@ import { rando } from '../../firestore/utils.spec';
 describe('snapshotChanges', () => {
   let app: FirebaseApp;
   let db: AngularFireDatabase;
-  let createRef: (path: string) => database.Reference;
+  let createRef: (path: string) => firebase.database.Reference;
   let batch = {};
   const items = [{ name: 'zero' }, { name: 'one' }, { name: 'two' }].map((item, i) => ({ key: i.toString(), ...item }));
   Object.keys(items).forEach((key, i) => {

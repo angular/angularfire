@@ -1,24 +1,24 @@
 import { Subscriber } from 'rxjs';
-import { firestore } from 'firebase/app';
+import firebase from 'firebase/app';
 
-export type Settings =  firestore.Settings;
-export type CollectionReference = firestore.CollectionReference;
-export type DocumentReference = firestore.DocumentReference;
-export type PersistenceSettings = firestore.PersistenceSettings;
-export type DocumentChangeType = firestore.DocumentChangeType;
-export type SnapshotOptions = firestore.SnapshotOptions;
-export type FieldPath = firestore.FieldPath;
-export type Query = firestore.Query;
+export type Settings =  firebase.firestore.Settings;
+export type CollectionReference = firebase.firestore.CollectionReference;
+export type DocumentReference = firebase.firestore.DocumentReference;
+export type PersistenceSettings = firebase.firestore.PersistenceSettings;
+export type DocumentChangeType = firebase.firestore.DocumentChangeType;
+export type SnapshotOptions = firebase.firestore.SnapshotOptions;
+export type FieldPath = firebase.firestore.FieldPath;
+export type Query = firebase.firestore.Query;
 
-export type SetOptions = firestore.SetOptions;
-export type DocumentData = firestore.DocumentData;
+export type SetOptions = firebase.firestore.SetOptions;
+export type DocumentData = firebase.firestore.DocumentData;
 
-export interface DocumentSnapshotExists<T> extends firestore.DocumentSnapshot {
+export interface DocumentSnapshotExists<T> extends firebase.firestore.DocumentSnapshot {
   readonly exists: true;
   data(options?: SnapshotOptions): T;
 }
 
-export interface DocumentSnapshotDoesNotExist extends firestore.DocumentSnapshot {
+export interface DocumentSnapshotDoesNotExist extends firebase.firestore.DocumentSnapshot {
   readonly exists: false;
   data(options?: SnapshotOptions): undefined;
   get(fieldPath: string | FieldPath, options?: SnapshotOptions): undefined;
@@ -26,15 +26,15 @@ export interface DocumentSnapshotDoesNotExist extends firestore.DocumentSnapshot
 
 export type DocumentSnapshot<T> = DocumentSnapshotExists<T> | DocumentSnapshotDoesNotExist;
 
-export interface QueryDocumentSnapshot<T> extends firestore.QueryDocumentSnapshot {
+export interface QueryDocumentSnapshot<T> extends firebase.firestore.QueryDocumentSnapshot {
   data(options?: SnapshotOptions): T;
 }
 
-export interface QuerySnapshot<T> extends firestore.QuerySnapshot {
+export interface QuerySnapshot<T> extends firebase.firestore.QuerySnapshot {
   readonly docs: QueryDocumentSnapshot<T>[];
 }
 
-export interface DocumentChange<T> extends firestore.DocumentChange {
+export interface DocumentChange<T> extends firebase.firestore.DocumentChange {
   readonly doc: QueryDocumentSnapshot<T>;
 }
 

@@ -7,5 +7,5 @@ else
 fi
 
 echo $VERSION &&
-npm version $VERSION --allow-same-version &&
+npm --no-git-tag-version -f version $VERSION --allow-same-version &&
 yarn build

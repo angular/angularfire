@@ -11,8 +11,9 @@ import {
   ɵkeepUnstableUntilFirstFactory
 } from '@angular/fire';
 import { UploadMetadata } from './interfaces';
-import { storage } from 'firebase/app';
 import 'firebase/storage';
+import firebase from 'firebase/app';
+import { registerStorage } from '@firebase/storage';
 
 export const BUCKET = new InjectionToken<string>('angularfire2.storageBucket');
 
@@ -27,7 +28,7 @@ export const BUCKET = new InjectionToken<string>('angularfire2.storageBucket');
   providedIn: 'any'
 })
 export class AngularFireStorage {
-  public readonly storage: storage.Storage;
+  public readonly storage: firebase.storage.Storage;
 
   public readonly keepUnstableUntilFirst: <T>(obs: Observable<T>) => Observable<T>;
   public readonly schedulers: ɵAngularFireSchedulers;
@@ -41,10 +42,13 @@ export class AngularFireStorage {
     zone: NgZone
   ) {
     this.schedulers = new ɵAngularFireSchedulers(zone);
-    this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers, platformId);
+    this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers);
 
     this.storage = zone.runOutsideAngular(() => {
       const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
+      if (registerStorage) {
+        registerStorage(firebase as any);
+      }
       return app.storage(storageBucket || undefined);
     });
   }

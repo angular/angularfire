@@ -13,8 +13,9 @@ import {
   ɵkeepUnstableUntilFirstFactory
 } from '@angular/fire';
 import { Observable } from 'rxjs';
-import { database } from 'firebase/app';
 import 'firebase/database';
+import { registerDatabase } from '@firebase/database';
+import firebase from 'firebase/app';
 
 export const URL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
 
@@ -22,7 +23,7 @@ export const URL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL'
   providedIn: 'any'
 })
 export class AngularFireDatabase {
-  public readonly database: database.Database;
+  public readonly database: firebase.database.Database;
 
   public readonly schedulers: ɵAngularFireSchedulers;
   public readonly keepUnstableUntilFirst: <T>(obs$: Observable<T>) => Observable<T>;
@@ -36,10 +37,13 @@ export class AngularFireDatabase {
     zone: NgZone
   ) {
     this.schedulers = new ɵAngularFireSchedulers(zone);
-    this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers, platformId);
+    this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers);
 
     this.database = zone.runOutsideAngular(() => {
       const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
+      if (registerDatabase) {
+        registerDatabase(firebase as any);
+      }
       return app.database(databaseURL || undefined);
     });
   }
