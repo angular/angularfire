@@ -73,7 +73,7 @@ const getVersionRange = (v: number) => `^${v}.0.0`;
 
 const findPackageVersion = (name: string) => {
   const match = execSync(`npm list ${name}`).toString().match(` ${escapeRegExp(name)}@.+\\w`);
-  return match ? match[0].split(`${name}@`)[1] : null;
+  return match ? match[0].split(`${name}@`)[1].split(/\s/)[0] : null;
 };
 
 const getPackageJson = (context: BuilderContext, workspaceRoot: string, options: DeployBuilderOptions) => {
