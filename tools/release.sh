@@ -1,16 +1,13 @@
 echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
 cd dist/packages-dist
 
-LATEST_TEST="^v[^-]*$"
+PRODUCTION_TEST="^[^-]*$"
 
 if test $TAG_NAME; then
-    if [[ ! $TAG_NAME =~ $LATEST_TEST ]]; then
-        npm publish . --tag next
+    if [[ $TAG_NAME =~ $PRODUCTION_TEST ]]; then
+        npm publish .
     else
-        npm publish . &&
-        cd ../wrapper-dist &&
-        npm publish . &&
-        npm deprecate angularfire2 "AngularFire has moved, we're now @angular/fire"
+        npm publish . --tag next
     fi
 else
     npm publish . --tag canary

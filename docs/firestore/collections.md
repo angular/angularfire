@@ -43,7 +43,7 @@ The `AngularFirestoreCollection` is a service you use to create streams of the c
 
 With the exception of the `valueChanges()`, each streaming method returns an Observable of `DocumentChangeAction[]`.
 
-A `DocumentChangeAction` gives you the `type` and `payload` properties. The `type` tells when what `DocumentChangeType` operation occured (`added`, `modified`, `removed`). The `payload` property is a `DocumentChange` which provides you important metdata about the change and a `doc` property which is the `DocumentSnapshot`.
+A `DocumentChangeAction` gives you the `type` and `payload` properties. The `type` tells when what `DocumentChangeType` operation occured (`added`, `modified`, `removed`). The `payload` property is a `DocumentChange` which provides you important metadata about the change and a `doc` property which is the `DocumentSnapshot`.
 
 ```ts
 interface DocumentChangeAction {
@@ -73,7 +73,7 @@ interface DocumentSnapshot {
 
 There are multiple ways of streaming collection data from Firestore. 
 
-### `valueChanges({idField?: string})`
+### `valueChanges({ idField?: string })`
 
 **What is it?** - The current state of your collection. Returns an Observable of data as a synchronized array of JSON objects. All Snapshot metadata is stripped and just the document data is included. Optionally, you can pass an options object with an `idField` key containing a string. If provided, the returned JSON objects will include their document ID mapped to a property with the name provided by `idField`.  
 
@@ -107,13 +107,7 @@ export class AppComponent {
   items: Observable<Item[]>;
   constructor(private readonly afs: AngularFirestore) {
     this.itemsCollection = afs.collection<Item>('items');
-    // .valueChanges() is simple. It just returns the 
-    // JSON data without metadata. If you need the 
-    // doc.id() in the value you must persist it your self
-    // or use .snapshotChanges() instead. See the addItem()
-    // method below for how to persist the id with
-    // valueChanges()
-    this.items = this.itemsCollection.valueChanges();
+    this.items = this.itemsCollection.valueChanges({ idField: 'customID' });
   }
   addItem(name: string) {
     // Persist a document id
@@ -191,7 +185,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 export interface AccountDeposit { description: string; amount: number; }
-export interface AccountDepoistId extends AccountDeposit { id: string; }
+export interface AccountDepositId extends AccountDeposit { id: string; }
 
 @Component({
   selector: 'app-root',

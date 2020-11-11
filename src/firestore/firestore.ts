@@ -1,33 +1,38 @@
-import { InjectionToken, NgZone, PLATFORM_ID, Injectable, Inject, Optional } from '@angular/core';
-
-import { Observable, of, from } from 'rxjs';
-
-import { Settings, PersistenceSettings, CollectionReference, DocumentReference, QueryFn, Query, QueryGroupFn, AssociatedReference } from './interfaces';
+import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
+import { from, Observable, of } from 'rxjs';
+import {
+  AssociatedReference,
+  CollectionReference,
+  DocumentReference,
+  PersistenceSettings,
+  Query,
+  QueryFn,
+  QueryGroupFn,
+  Settings
+} from './interfaces';
 import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 import { AngularFirestoreCollectionGroup } from './collection-group/collection-group';
-
-import { FirebaseFirestore, FirebaseOptions, FirebaseAppConfig, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
+import {
+  FIREBASE_APP_NAME,
+  FIREBASE_OPTIONS,
+  FirebaseAppConfig,
+  FirebaseOptions,
+  ɵAngularFireSchedulers,
+  ɵfirebaseAppFactory,
+  ɵkeepUnstableUntilFirstFactory
+} from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
-
-// Workaround for Nodejs build
-// @ts-ignore
+import 'firebase/firestore';
+const atFirestore = require('@firebase/firestore');
 import firebase from 'firebase/app';
-
-// SEMVER: have to import here while we target ng 6, as the version of typescript doesn't allow dynamic import of types
-import { firestore } from 'firebase/app';
 
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
  */
-export const EnablePersistenceToken = new InjectionToken<boolean>('angularfire2.enableFirestorePersistence');
-export const PersistenceSettingsToken = new InjectionToken<PersistenceSettings|undefined>('angularfire2.firestore.persistenceSettings');
-export const FirestoreSettingsToken = new InjectionToken<Settings>('angularfire2.firestore.settings');
-
-// timestampsInSnapshots was depreciated in 5.8.0
-const major = parseInt(firebase.SDK_VERSION.split('.')[0]);
-const minor = parseInt(firebase.SDK_VERSION.split('.')[1]);
-export const DefaultFirestoreSettings = ((major < 5 || (major == 5 && minor < 8)) ? {timestampsInSnapshots: true} : {}) as Settings;
+export const ENABLE_PERSISTENCE = new InjectionToken<boolean>('angularfire2.enableFirestorePersistence');
+export const PERSISTENCE_SETTINGS = new InjectionToken<PersistenceSettings | undefined>('angularfire2.firestore.persistenceSettings');
+export const SETTINGS = new InjectionToken<Settings>('angularfire2.firestore.settings');
 
 /**
  * A utility methods for associating a collection reference with
@@ -59,7 +64,7 @@ export function associateQuery(collectionRef: CollectionReference, queryFn = ref
  * import { Component } from '@angular/core';
  * import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from '@angular/fire/firestore';
  * import { Observable } from 'rxjs/Observable';
- * import { from } from 'rxjs/observable/from';
+ * import { from } from 'rxjs/observable';
  *
  * @Component({
  *   selector: 'app-my-component',
@@ -102,32 +107,45 @@ export function associateQuery(collectionRef: CollectionReference, queryFn = ref
  *   }
  * }
  */
-@Injectable()
+@Injectable({
+  providedIn: 'any'
+})
 export class AngularFirestore {
-  public readonly firestore: FirebaseFirestore;
+  public readonly firestore: firebase.firestore.Firestore;
   public readonly persistenceEnabled$: Observable<boolean>;
-  public readonly scheduler: FirebaseZoneScheduler;
+  public readonly schedulers: ɵAngularFireSchedulers;
+  public readonly keepUnstableUntilFirst: <T>(obs: Observable<T>) => Observable<T>;
 
   /**
    * Each Feature of AngularFire has a FirebaseApp injected. This way we
    * don't rely on the main Firebase App instance and we can create named
    * apps and use multiple apps.
-   * @param app
    */
   constructor(
-    @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|null|undefined,
-    @Optional() @Inject(EnablePersistenceToken) shouldEnablePersistence: boolean|null,
-    @Optional() @Inject(FirestoreSettingsToken) settings: Settings|null,
+    @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
+    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string | FirebaseAppConfig | null | undefined,
+    @Optional() @Inject(ENABLE_PERSISTENCE) shouldEnablePersistence: boolean | null,
+    @Optional() @Inject(SETTINGS) settings: Settings | null,
+    // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
-    @Optional() @Inject(PersistenceSettingsToken) persistenceSettings: PersistenceSettings|null,
+    @Optional() @Inject(PERSISTENCE_SETTINGS) persistenceSettings: PersistenceSettings | null
   ) {
-    this.scheduler = new FirebaseZoneScheduler(zone, platformId);
+    this.schedulers = new ɵAngularFireSchedulers(zone);
+    this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers);
+
     this.firestore = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(options, nameOrConfig);
+      const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
+      // INVESTIGATE this seems to be required because in the browser build registerFirestore is an Object?
+      //             seems like we're fighting ngcc. In the server firestore() isn't available, so I have to register
+      //             in the browser registerFirestore is not a function... maybe this is an underlying firebase-js-sdk issue
+      if ('registerFirestore' in atFirestore) {
+        (atFirestore as any).registerFirestore(firebase as any);
+      }
       const firestore = app.firestore();
-      firestore.settings(settings || DefaultFirestoreSettings);
+      if (settings) {
+        firestore.settings(settings);
+      }
       return firestore;
     });
 
@@ -137,7 +155,7 @@ export class AngularFirestore {
       const enablePersistence = () => {
         try {
           return from(this.firestore.enablePersistence(persistenceSettings || undefined).then(() => true, () => false));
-        } catch(e) {
+        } catch (e) {
           return of(false);
         }
       };
@@ -151,11 +169,10 @@ export class AngularFirestore {
    * Create a reference to a Firestore Collection based on a path or
    * CollectionReference and an optional query function to narrow the result
    * set.
-   * @param pathOrRef
-   * @param queryFn
    */
-  collection<T>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<T>
-  collection<T>(ref: CollectionReference, queryFn?: QueryFn): AngularFirestoreCollection<T>
+  collection<T>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<T>;
+  // tslint:disable-next-line:unified-signatures
+  collection<T>(ref: CollectionReference, queryFn?: QueryFn): AngularFirestoreCollection<T>;
   collection<T>(pathOrRef: string | CollectionReference, queryFn?: QueryFn): AngularFirestoreCollection<T> {
     let collectionRef: CollectionReference;
     if (typeof pathOrRef === 'string') {
@@ -164,21 +181,18 @@ export class AngularFirestore {
       collectionRef = pathOrRef;
     }
     const { ref, query } = associateQuery(collectionRef, queryFn);
-    return new AngularFirestoreCollection<T>(ref, query, this);
+    const refInZone = this.schedulers.ngZone.run(() => ref);
+    return new AngularFirestoreCollection<T>(refInZone, query, this);
   }
 
   /**
    * Create a reference to a Firestore Collection Group based on a collectionId
    * and an optional query function to narrow the result
    * set.
-   * @param collectionId
-   * @param queryGroupFn
    */
   collectionGroup<T>(collectionId: string, queryGroupFn?: QueryGroupFn): AngularFirestoreCollectionGroup<T> {
-    if (major < 6) { throw "collection group queries require Firebase JS SDK >= 6.0"}
     const queryFn = queryGroupFn || (ref => ref);
-    const firestore: any = this.firestore; // SEMVER: ditch any once targeting >= 6.0
-    const collectionGroup: Query = firestore.collectionGroup(collectionId);
+    const collectionGroup: Query = this.firestore.collectionGroup(collectionId);
     return new AngularFirestoreCollectionGroup<T>(queryFn(collectionGroup), this);
   }
 
@@ -187,10 +201,10 @@ export class AngularFirestore {
    * DocumentReference. Note that documents are not queryable because they are
    * simply objects. However, documents have sub-collections that return a
    * Collection reference and can be queried.
-   * @param pathOrRef
    */
-  doc<T>(path: string): AngularFirestoreDocument<T>
-  doc<T>(ref: DocumentReference): AngularFirestoreDocument<T>
+  doc<T>(path: string): AngularFirestoreDocument<T>;
+  // tslint:disable-next-line:unified-signatures
+  doc<T>(ref: DocumentReference): AngularFirestoreDocument<T>;
   doc<T>(pathOrRef: string | DocumentReference): AngularFirestoreDocument<T> {
     let ref: DocumentReference;
     if (typeof pathOrRef === 'string') {
@@ -198,13 +212,14 @@ export class AngularFirestore {
     } else {
       ref = pathOrRef;
     }
-    return new AngularFirestoreDocument<T>(ref, this);
+    const refInZone = this.schedulers.ngZone.run(() => ref);
+    return new AngularFirestoreDocument<T>(refInZone, this);
   }
 
   /**
    * Returns a generated Firestore Document Id.
    */
   createId() {
-    return this.firestore.collection('_').doc().id
+    return this.firestore.collection('_').doc().id;
   }
 }

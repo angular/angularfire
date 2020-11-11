@@ -1,6 +1,29 @@
 {
+  "$schema": "http://json-schema.org/draft-07/schema",
   "id": "FirebaseDeploySchema",
   "title": "Firebase Deploy",
-  "description": "TBD",
-  "properties": {}
+  "description": "Ng Deploy target options for Firebase.",
+  "properties": {
+    "buildTarget": {
+      "type": "string",
+      "description": "Target to build.",
+      "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
+    },
+    "firebaseProject": {
+      "type": "string",
+      "description": "The Firebase project name or project alias to use when deploying"
+    },
+    "functionsNodeVersion": {
+      "type": "number",
+      "description": "Version of Node.js to run Cloud Functions on"
+    },
+    "functionsRuntimeOptions": {
+      "type": "object",
+      "description": "Runtime options for Cloud Functions"
+    },
+    "preview": {
+      "type": "boolean",
+      "description": "Do not deploy the application, just set up the Firebase Function in the project output directory. Can be used for testing the Firebase Function with `firebase serve`."
+    }
+  }
 }

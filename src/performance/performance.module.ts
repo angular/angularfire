@@ -1,9 +1,17 @@
-import { NgModule } from '@angular/core';
+import { NgModule, Optional } from '@angular/core';
 import { AngularFirePerformance } from './performance';
-
-import 'firebase/performance';
+import { PerformanceMonitoringService } from './performance.service';
 
 @NgModule({
   providers: [ AngularFirePerformance ]
 })
-export class AngularFirePerformanceModule { }
+export class AngularFirePerformanceModule {
+  constructor(
+    perf: AngularFirePerformance,
+    @Optional() _: PerformanceMonitoringService
+  ) {
+    // call anything here to get perf loading
+    // tslint:disable-next-line:no-unused-expression
+    perf.dataCollectionEnabled.then(() => {});
+  }
+}

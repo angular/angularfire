@@ -73,11 +73,11 @@ Notice that calling `httpsCallable()` does not initiate the request. It creates 
 
 ### Functions Region
 
-Allow configuration of the Function's region by adding `FUNCTIONS_REGION` to the `providers` section of your `NgModule`. The default is `us-central1`.
+Allow configuration of the Function's region by adding `REGION` to the `providers` section of your `NgModule`. The default is `us-central1`.
 
 ```ts
 import { NgModule } from '@angular/core';
-import { AngularFireFunctionsModule, FUNCTIONS_REGION } from '@angular/fire/functions';
+import { AngularFireFunctionsModule, REGION } from '@angular/fire/functions';
 
 @NgModule({
   imports: [
@@ -87,7 +87,7 @@ import { AngularFireFunctionsModule, FUNCTIONS_REGION } from '@angular/fire/func
   ],
   ...
   providers: [
-   { provide: FUNCTIONS_REGION, useValue: 'asia-northeast1' }
+   { provide: REGION, useValue: 'asia-northeast1' }
   ]
 })
 export class AppModule {}
@@ -96,11 +96,11 @@ export class AppModule {}
 
 ### Cloud Functions emulator
 
-Point callable Functions to the Cloud Function emulator by adding `FUNCTIONS_ORIGIN` to the `providers` section of your `NgModule`.
+Point callable Functions to the Cloud Function emulator by adding `ORIGIN` to the `providers` section of your `NgModule`.
 
 ```ts
 import { NgModule } from '@angular/core';
-import { AngularFireFunctionsModule, FUNCTIONS_ORIGIN } from '@angular/fire/functions';
+import { AngularFireFunctionsModule, ORIGIN } from '@angular/fire/functions';
 
 @NgModule({
   imports: [
@@ -110,7 +110,52 @@ import { AngularFireFunctionsModule, FUNCTIONS_ORIGIN } from '@angular/fire/func
   ],
   ...
   providers: [
-   { provide: FUNCTIONS_ORIGIN, useValue: 'http://localhost:5005' }
+   { provide: ORIGIN, useValue: 'http://localhost:5001' }
+  ]
+})
+export class AppModule {}
+
+```
+
+### Firebase Hosting integration
+
+If you serve your app using [Firebase Hosting](https://firebase.google.com/docs/hosting/), you can configure Functions to be served from the same domain as your app. This will avoid an extra round-trip per function call due to [CORS preflight request](https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request). This only applies to sites hosted via firebase on `us-central1`.
+
+To set this up, you first need to update your `hosting` section in `firebase.json` and add one `rewrite` rule per function:
+
+```json
+  "hosting": {
+    "rewrites": [
+      {
+        "source": "/project-name/us-central1/someFunction",
+        "function": "someFunction"
+      },
+      {
+        "source": "/project-name/us-central1/anotherFunction",
+        "function": "anotherFunction"
+      },
+      ...
+    ]
+  }
+```
+
+Replace `project-name` with your Firebase project id (you can find it by looking at the value of `projectId` field in the Firebase app config). Then deploy your hosting project so that the new settings go into effect.
+
+Next, configure functions origin to point at your app domain:
+
+```ts
+import { NgModule } from '@angular/core';
+import { AngularFireFunctionsModule, ORIGIN } from '@angular/fire/functions';
+
+@NgModule({
+  imports: [
+    ...
+    AngularFireFunctionsModule,
+    ...
+  ],
+  ...
+  providers: [
+   { provide: ORIGIN, useValue: 'https://project-name.web.app' }
   ]
 })
 export class AppModule {}

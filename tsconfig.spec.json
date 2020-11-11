@@ -1,0 +1,19 @@
+{
+    "extends": "./tsconfig.base.json",
+    "compilerOptions": {
+      "outDir": "dist/out-tsc/spec",
+      "types": [
+        "jasmine",
+        "node"
+      ]
+    },
+    "files": [
+      "src/test.ts"
+    ],
+    "include": [
+      "src/root.spec.ts",
+      "src/**/*.d.ts",
+      "node_modules/zone.js/dist/zone.js.d.ts"
+    ]
+  }
+  

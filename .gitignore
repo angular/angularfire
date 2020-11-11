@@ -6,6 +6,7 @@ typings/
 npm-debug.log
 .idea/
 .vscode/settings.json
+angular-fire-*.tgz
 angularfire2-*.tgz
 *.ngfactory.ts
 *.ngsummary.json
@@ -13,3 +14,9 @@ angularfire2-*.tgz
 yarn-error.log
 *.bak
 package-lock.json
+test/ng-build/**/yarn.lock
+tools/build.js
+coverage
+*.log
+api-*.json
+src/**/base.ts

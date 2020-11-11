@@ -1,8 +1,6 @@
-import { NgModule, InjectionToken } from '@angular/core';
-import { AngularFireStorage, StorageBucket } from './storage';
-import 'firebase/storage';
+import { NgModule } from '@angular/core';
+import { AngularFireStorage } from './storage';
 import { AngularFirestoreStorageUrl } from './pipes/storageUrl.pipe'
-
 
 @NgModule({
   declarations: [ AngularFirestoreStorageUrl ],

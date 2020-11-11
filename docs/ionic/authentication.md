@@ -10,7 +10,7 @@ ionic cordova plugin add cordova-plugin-customurlscheme
 
 # Step 2: Add Firebase to your Ionic
 
- **Install firebase to angular project**
+ **Install Firebase to Angular project**
 
 Follow [this tutorial](https://github.com/angular/angularfire2/blob/master/docs/install-and-setup.md) to make a basic setup for your Ionic project.
 
@@ -19,7 +19,9 @@ Follow [this tutorial](https://github.com/angular/angularfire2/blob/master/docs/
 Go to [Firebase console](https://console.firebase.google.com/) then click **Add Firebase to your Android app** and follow the setup steps.
 
 
-# Step 3: Set up Firebase Authentication for Cordova ( summary from [firebase instruction](https://firebase.google.com/docs/auth/web/cordova))
+# Step 3: Set up Firebase Authentication for Cordova
+
+*This is a summary from the [Firebase instructions](https://firebase.google.com/docs/auth/web/cordova).*
 
  **Setup Dynamic Link**
  In the Firebase console, open the **Dynamic Links** section at bottom left panel, setup by their instruction
@@ -39,11 +41,11 @@ Go to [Firebase console](https://console.firebase.google.com/) then click **Add 
     <preference name="AndroidLaunchMode" value="singleTask" />
 ```
 
-  *Make sure your `<widget id="com.yourandroid.id" ... >` the same with android app's id you 
-  added in firebase*
+  *Make sure your `<widget id="com.yourandroid.id" ... >` the same with Android app's id you 
+  added in Firebase.*
 
-# Step 4: Add login code:
-at `login.service.ts` add this function: 
+# Step 4: Add login code
+In `login.service.ts` add this function: 
 ```ts
 
 import { AngularFireAuth } from '@angular/fire/auth';
@@ -59,12 +61,12 @@ export class AuthService {
 	}
   
   signInWithFacebook() {
-		console.log('Sign in with google');
+		console.log('Sign in with Facebook');
 		return this.oauthSignIn(new firebase.auth.FacebookAuthProvider());
 	}
 
   signInWithGoogle() {
-		console.log('Sign in with google');
+		console.log('Sign in with Google');
 		return this.oauthSignIn(new firebase.auth.GoogleAuthProvider());
 	}
 
@@ -75,8 +77,7 @@ export class AuthService {
 			return this.afAuth.auth.signInWithRedirect(provider)
 			.then(() => {
 				return this.afAuth.auth.getRedirectResult().then( result => {
-					// This gives you a Google Access Token.
-					// You can use it to access the Google API.
+					// This gives you an Access Token. You can use it to access the associated APIs.
 					let token = result.credential.accessToken;
 					// The signed-in user info.
 					let user = result.user;
@@ -93,9 +94,11 @@ export class AuthService {
 
 # Common problems
 
-If you got error when build code like this:
-`UnhandledPromiseRejectionWarning: Unhandled promise rejection (rejection id: 1): TypeError: Cannot read property 'manifest' of undefined`
+If you get an error, when you build the code, that looks like this:
+```
+UnhandledPromiseRejectionWarning: Unhandled promise rejection (rejection id: 1): TypeError: Cannot read property 'manifest' of undefined
+```
 
-Please, using this fix from [issue](https://github.com/nordnet/cordova-universal-links-plugin/issues/134):
+Please take a look at the fix from [this issue](https://github.com/nordnet/cordova-universal-links-plugin/issues/134):
 > Making this change in 'cordova-universal-links-plugin/hooks/lib/android/manifestWriter.js' fixed this issue for me:
 > [b2c5784#diff-d5955d9f4d88b42e5efd7a3385be79e9](https://github.com/nordnet/cordova-universal-links-plugin/commit/b2c5784764225319648e26aa5d3f42ede6d1b289#diff-d5955d9f4d88b42e5efd7a3385be79e9)

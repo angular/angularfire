@@ -1,0 +1,20 @@
+{
+    "extends": "./tsconfig.base.json",
+    "compilerOptions": {
+      "outDir": "dist/out-tsc/jasmine",
+      "module": "commonjs",
+      "target": "es2015",
+      "allowJs": true,
+      "resolveJsonModule": true,
+      "types": [
+        "jasmine",
+        "node"
+      ]
+    },
+    "include": [
+        "src/**/*.jasmine.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.d.ts",
+        "node_modules/zone.js/dist/zone.js.d.ts"
+    ]
+  }

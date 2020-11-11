@@ -1,1 +1,0 @@
-npm pack ../../dist/packages-dist
