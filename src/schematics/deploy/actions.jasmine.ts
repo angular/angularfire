@@ -151,7 +151,7 @@ describe('universal deployment', () => {
 
   it('should create a firebase function', async () => {
     const spy = spyOn(fsHost, 'writeFileSync');
-    await deployToFunction(firebaseMock, context, '/home/user', STATIC_BUILD_TARGET, SERVER_BUILD_TARGET, false, fsHost);
+    await deployToFunction(firebaseMock, context, '/home/user', STATIC_BUILD_TARGET, SERVER_BUILD_TARGET, false, undefined, fsHost);
 
     expect(spy).toHaveBeenCalledTimes(2);
 
@@ -164,7 +164,7 @@ describe('universal deployment', () => {
 
   it('should rename the index.html file in the nested dist', async () => {
     const spy = spyOn(fsHost, 'renameSync');
-    await deployToFunction(firebaseMock, context, '/home/user', STATIC_BUILD_TARGET, SERVER_BUILD_TARGET, false, fsHost);
+    await deployToFunction(firebaseMock, context, '/home/user', STATIC_BUILD_TARGET, SERVER_BUILD_TARGET, false, undefined, fsHost);
 
     expect(spy).toHaveBeenCalledTimes(1);
 
@@ -178,7 +178,7 @@ describe('universal deployment', () => {
 
   it('should invoke firebase.deploy', async () => {
     const spy = spyOn(firebaseMock, 'deploy');
-    await deployToFunction(firebaseMock, context, '/home/user', STATIC_BUILD_TARGET, SERVER_BUILD_TARGET, false, fsHost);
+    await deployToFunction(firebaseMock, context, '/home/user', STATIC_BUILD_TARGET, SERVER_BUILD_TARGET, false, undefined, fsHost);
 
     expect(spy).toHaveBeenCalledTimes(1);
   });
