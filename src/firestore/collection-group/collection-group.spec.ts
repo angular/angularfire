@@ -134,6 +134,19 @@ describe('AngularFirestoreCollectionGroup', () => {
       });
     });
 
+    it('should return the document\'s id along with the data if the idField option is provided.', async () => {
+      const ITEMS = 4;
+      const DOC_ID = 'docId';
+      const { stocks } = await collectionHarness(afs, ITEMS);
+
+      const sub = stocks.valueChanges({idField: DOC_ID}).subscribe(data => {
+        const allDocumentsHaveId = data.every(d => d.docId !== undefined);
+
+        expect(allDocumentsHaveId).toBe(true);
+        sub.unsubscribe();
+      });
+    });
+
   });
 
   describe('snapshotChanges()', () => {
