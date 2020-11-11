@@ -1,7 +1,7 @@
 import { from, Observable } from 'rxjs';
 import { fromCollectionRef } from '../observable/fromRef';
 import { filter, map, observeOn, scan } from 'rxjs/operators';
-import { firestore } from 'firebase/app';
+import firebase from 'firebase/app';
 
 import { DocumentChangeAction, DocumentChangeType, DocumentData, Query } from '../interfaces';
 import { validateEventsArray } from '../collection/collection';
@@ -105,7 +105,7 @@ export class AngularFirestoreCollectionGroup<T= DocumentData> {
   /**
    * Retrieve the results of the query once.
    */
-  get(options?: firestore.GetOptions) {
+  get(options?: firebase.firestore.GetOptions) {
     return from(this.query.get(options)).pipe(
       observeOn(this.afs.schedulers.insideAngular)
     );

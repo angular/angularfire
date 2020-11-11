@@ -1,5 +1,4 @@
 import { SchematicsException, Tree, SchematicContext } from '@angular-devkit/schematics';
-import { experimental } from '@angular-devkit/core';
 import {
   addDependencies,
   generateFirebaseRc,
@@ -8,7 +7,7 @@ import {
   safeReadJSON,
   stringifyFormatted
 } from './ng-add-common';
-import { FirebaseJSON } from './interfaces';
+import { FirebaseJSON, Workspace, WorkspaceProject } from './interfaces';
 
 import { default as defaultDependencies } from './versions.json';
 
@@ -82,10 +81,10 @@ export const addFirebaseHostingDependencies = (tree: Tree, context: SchematicCon
 };
 
 export const setupStaticDeployment = (config: {
-  project: experimental.workspace.WorkspaceProject;
+  project: WorkspaceProject;
   options: NgAddNormalizedOptions;
   workspacePath: string;
-  workspace: experimental.workspace.WorkspaceSchema;
+  workspace: Workspace;
   tree: Tree;
 }) => {
   const { tree, workspacePath, workspace, options } = config;

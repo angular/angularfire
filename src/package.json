@@ -2,7 +2,7 @@
   "$schema": "../node_modules/ng-packagr/package.schema.json",
   "name": "@angular/fire",
   "version": "ANGULARFIRE2_VERSION",
-  "description": "The official library for Firebase and Angular",
+  "description": "The official Angular library for Firebase.",
   "schematics": "./collection.json",
   "builders": "./builders.json",
   "keywords": [
@@ -14,8 +14,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/angular/angularfire2.git"
+    "url": "git+https://github.com/angular/angularfire.git"
   },
+  "bugs": {
+    "url": "https://github.com/angular/angularfire/issues"
+  },
+  "homepage": "https://github.com/angular/angularfire#readme",
   "author": "angular,firebase",
   "license": "MIT",
   "peerDependencies": {

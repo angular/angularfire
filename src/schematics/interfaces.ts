@@ -74,3 +74,13 @@ export interface FSHost {
   writeFileSync(src: string, data: string): void;
   renameSync(src: string, dest: string): void;
 }
+
+export interface WorkspaceProject {
+  projectType?: string;
+  architect?: Record<string, { builder: string; options?: Record<string, any> }>;
+}
+
+export interface Workspace {
+  defaultProject?: string;
+  projects: Record<string, WorkspaceProject>;
+}

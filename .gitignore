@@ -19,3 +19,4 @@ tools/build.js
 coverage
 *.log
 api-*.json
+src/**/base.ts

@@ -1,4 +1,4 @@
-import { User } from 'firebase/app';
+import firebase from 'firebase/app';
 import { Observable, Subject } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
 import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire';
@@ -10,12 +10,12 @@ import { rando } from '../firestore/utils.spec';
 const firebaseUser = {
   uid: '12345',
   providerData: [{ displayName: 'jeffbcrossyface' }]
-} as User;
+} as firebase.User;
 
 describe('AngularFireAuth', () => {
   let app: FirebaseApp;
   let afAuth: AngularFireAuth;
-  let mockAuthState: Subject<User>;
+  let mockAuthState: Subject<firebase.User>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -28,13 +28,13 @@ describe('AngularFireAuth', () => {
     app = TestBed.inject(FirebaseApp);
     afAuth = TestBed.inject(AngularFireAuth);
 
-    mockAuthState = new Subject<User>();
+    mockAuthState = new Subject<firebase.User>();
     // @ts-ignore
     spyOn(afAuth, 'authState').and.returnValue(mockAuthState);
     // @ts-ignore
     spyOn(afAuth, 'idToken').and.returnValue(mockAuthState);
-    (afAuth as any).authState = mockAuthState as Observable<User>;
-    (afAuth as any).idToken = mockAuthState as Observable<User>;
+    (afAuth as any).authState = mockAuthState as Observable<firebase.User>;
+    (afAuth as any).idToken = mockAuthState as Observable<firebase.User>;
   });
 
   afterEach(() => {

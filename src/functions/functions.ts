@@ -9,15 +9,17 @@ import {
   ɵAngularFireSchedulers,
   ɵfirebaseAppFactory,
   ɵlazySDKProxy,
-  ɵPromiseProxy
+  ɵPromiseProxy,
+  ɵapplyMixins
 } from '@angular/fire';
-import { functions } from 'firebase/app';
+import firebase from 'firebase/app';
+import { proxyPolyfillCompat } from './base';
 
 export const ORIGIN = new InjectionToken<string>('angularfire2.functions.origin');
 export const REGION = new InjectionToken<string>('angularfire2.functions.region');
 
 // override httpsCallable for compatibility with 5.x
-export interface AngularFireFunctions extends Omit<ɵPromiseProxy<functions.Functions>, 'httpsCallable'> {
+export interface AngularFireFunctions extends Omit<ɵPromiseProxy<firebase.functions.Functions>, 'httpsCallable'> {
 }
 
 @Injectable({
@@ -61,3 +63,5 @@ export class AngularFireFunctions {
   }
 
 }
+
+ɵapplyMixins(AngularFireFunctions, [proxyPolyfillCompat]);
