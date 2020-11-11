@@ -25,9 +25,7 @@ export function createListReference<T= any>(query: DatabaseQuery, afDatabase: An
     auditTrail(events?: ChildEvent[]) {
       return auditTrail<T>(query, events, outsideAngularScheduler).pipe(afDatabase.keepUnstableUntilFirst);
     },
-    valueChanges(events?: ChildEvent[], options?: {}): Observable<T[]>;
-    valueChanges<K extends string>(events?: ChildEvent[], options: {idField: K}): Observable<(T & { [T in K]: string })[]>;
-    valueChanges(events?: ChildEvent[], options?: {idField?: K}) {
+    valueChanges<K extends string>(events?: ChildEvent[], options?: {idField?: K}) {
       const snapshotChanges$ = snapshotChanges<T>(query, events, outsideAngularScheduler);
       return snapshotChanges$.pipe(
         map(actions => actions.map(a => {
