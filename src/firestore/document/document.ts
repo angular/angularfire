@@ -1,10 +1,10 @@
-import { Observable, from } from 'rxjs';
-import { DocumentReference, SetOptions, DocumentData, QueryFn, Action, DocumentSnapshot } from '../interfaces';
+import { from, Observable } from 'rxjs';
+import { Action, DocumentData, DocumentReference, DocumentSnapshot, QueryFn, SetOptions } from '../interfaces';
 import { fromDocRef } from '../observable/fromRef';
 import { map, observeOn } from 'rxjs/operators';
 import { AngularFirestore, associateQuery } from '../firestore';
 import { AngularFirestoreCollection } from '../collection/collection';
-import { firestore } from 'firebase/app';
+import firebase from 'firebase/app';
 
 /**
  * AngularFirestoreDocument service
@@ -28,19 +28,16 @@ import { firestore } from 'firebase/app';
  * // OR! Transform using Observable.from() and the data is unwrapped for you
  * Observable.from(fakeStock).subscribe(value => console.log(value));
  */
-export class AngularFirestoreDocument<T=DocumentData> {
+export class AngularFirestoreDocument<T= DocumentData> {
 
   /**
    * The contstuctor takes in a DocumentReference to provide wrapper methods
    * for data operations, data streaming, and Symbol.observable.
-   * @param ref
    */
   constructor(public ref: DocumentReference, private afs: AngularFirestore) { }
 
   /**
    * Create or overwrite a single document.
-   * @param data
-   * @param options
    */
   set(data: T, options?: SetOptions): Promise<void> {
     return this.ref.set(data, options);
@@ -48,7 +45,6 @@ export class AngularFirestoreDocument<T=DocumentData> {
 
   /**
    * Update some fields of a document without overwriting the entire document.
-   * @param data
    */
   update(data: Partial<T>): Promise<void> {
     return this.ref.update(data);
@@ -64,10 +60,8 @@ export class AngularFirestoreDocument<T=DocumentData> {
   /**
    * Create a reference to a sub-collection given a path and an optional query
    * function.
-   * @param path
-   * @param queryFn
    */
-  collection<R=DocumentData>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<R> {
+  collection<R= DocumentData>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<R> {
     const collectionRef = this.ref.collection(path);
     const { ref, query } = associateQuery(collectionRef, queryFn);
     return new AngularFirestoreCollection<R>(ref, query, this.afs);
@@ -80,7 +74,7 @@ export class AngularFirestoreDocument<T=DocumentData> {
     const scheduledFromDocRef$ = fromDocRef<T>(this.ref, this.afs.schedulers.outsideAngular);
     return scheduledFromDocRef$.pipe(
       this.afs.keepUnstableUntilFirst
-    )
+    );
   }
 
   /**
@@ -96,9 +90,8 @@ export class AngularFirestoreDocument<T=DocumentData> {
 
   /**
    * Retrieve the document once.
-   * @param options
    */
-  get(options?: firestore.GetOptions) {
+  get(options?: firebase.firestore.GetOptions) {
     return from(this.ref.get(options)).pipe(
       observeOn(this.afs.schedulers.insideAngular),
     );

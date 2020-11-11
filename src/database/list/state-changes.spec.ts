@@ -1,7 +1,7 @@
-import { database } from 'firebase/app';
-import { FirebaseApp, AngularFireModule } from '@angular/fire';
-import { AngularFireDatabase, AngularFireDatabaseModule, stateChanges, ChildEvent, URL } from '../public_api';
-import { TestBed, inject } from '@angular/core/testing';
+import firebase from 'firebase/app';
+import { AngularFireModule, FirebaseApp } from '@angular/fire';
+import { AngularFireDatabase, AngularFireDatabaseModule, ChildEvent, stateChanges, URL } from '../public_api';
+import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 import { skip } from 'rxjs/operators';
 import 'firebase/database';
@@ -10,12 +10,11 @@ import { rando } from '../../firestore/utils.spec';
 describe('stateChanges', () => {
   let app: FirebaseApp;
   let db: AngularFireDatabase;
-  let createRef: (path: string) => database.Reference;
+  let createRef: (path: string) => firebase.database.Reference;
   let batch = {};
-  const items = [{ name: 'zero' }, { name: 'one' }, { name: 'two' }].map((item, i) => ( { key: i.toString(), ...item } ));
-  Object.keys(items).forEach(function (key, i) {
-    const itemValue = items[key];
-    batch[i] = itemValue;
+  const items = [{ name: 'zero' }, { name: 'one' }, { name: 'two' }].map((item, i) => ({ key: i.toString(), ...item }));
+  Object.keys(items).forEach((key, i) => {
+    batch[i] = items[key];
   });
   // make batch immutable to preserve integrity
   batch = Object.freeze(batch);
@@ -30,11 +29,10 @@ describe('stateChanges', () => {
         { provide: URL, useValue: 'http://localhost:9000' }
       ]
     });
-    inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {
-      app = app_;
-      db = _db;
-      createRef = (path: string) =>  db.database.ref(path);
-    })();
+
+    app = TestBed.inject(FirebaseApp);
+    db = TestBed.inject(AngularFireDatabase);
+    createRef = (path: string) => db.database.ref(path);
   });
 
   afterEach(() => {

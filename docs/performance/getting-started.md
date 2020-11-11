@@ -52,12 +52,12 @@ You can inject `AngularFirePerformance` to perform manual traces.
 ```ts
 constructor(private performance: AngularFirePerformance) {}
 
-ngOnInit() {
-  const trace = this.performance.trace('some-trace');
-  trace.start();
-  ...
-  trace.stop();
-}
+...
+
+const trace = await this.performance.trace('some-trace');
+trace.start();
+...
+trace.stop();
 ```
 
 ## RXJS operators

@@ -1,30 +1,15 @@
-import {
-  SchematicsException,
-  Tree,
-  SchematicContext,
-  chain,
-  mergeWith
-} from '@angular-devkit/schematics';
-import {
-  NodePackageInstallTask,
-  RunSchematicTask
-} from '@angular-devkit/schematics/tasks';
-import { experimental, JsonParseMode, parseJson } from '@angular-devkit/core';
+import { SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
+import { NodePackageInstallTask, RunSchematicTask } from '@angular-devkit/schematics/tasks';
+import { JsonParseMode, parseJson } from '@angular-devkit/core';
 import { listProjects, projectPrompt, projectTypePrompt } from './utils';
-
-import {DeployOptions, NgAddNormalizedOptions} from './ng-add-common';
-import {
-  setupUniversalDeployment,
-  addFirebaseFunctionsDependencies
-} from './ng-add-ssr';
-import {
-  setupStaticDeployment,
-  addFirebaseHostingDependencies
-} from './ng-add-static';
+import { Workspace } from './interfaces';
+import { DeployOptions, NgAddNormalizedOptions } from './ng-add-common';
+import { addFirebaseFunctionsDependencies, setupUniversalDeployment } from './ng-add-ssr';
+import { addFirebaseHostingDependencies, setupStaticDeployment } from './ng-add-static';
 
 function getWorkspace(
   host: Tree
-): { path: string; workspace: experimental.workspace.WorkspaceSchema } {
+): { path: string; workspace: Workspace } {
   const possibleFiles = ['/angular.json', '/.angular.json'];
   const path = possibleFiles.filter(p => host.exists(p))[0];
 
@@ -34,12 +19,12 @@ function getWorkspace(
   }
   const content = configBuffer.toString();
 
-  let workspace: experimental.workspace.WorkspaceSchema;
+  let workspace: Workspace;
   try {
     workspace = (parseJson(
       content,
       JsonParseMode.Loose
-    ) as {}) as experimental.workspace.WorkspaceSchema;
+    ) as {}) as Workspace;
   } catch (e) {
     throw new SchematicsException(`Could not parse angular.json: ` + e.message);
   }
@@ -123,9 +108,9 @@ export const ngAdd = (options: DeployOptions) => (
   return projectTypePrompt(project).then(
     ({ universalProject }: { universalProject: boolean }) => {
       if (universalProject) {
-        addFirebaseFunctionsDependencies(host);
+        addFirebaseFunctionsDependencies(host, context);
       } else {
-        addFirebaseHostingDependencies(host);
+        addFirebaseHostingDependencies(host, context);
       }
       const projectOptions: DeployOptions & { isUniversalProject: boolean } = {
         ...options,

@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy, ApplicationRef } from '@angular/core';
+import { ApplicationRef, Injectable, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { first, tap } from 'rxjs/operators';
 
@@ -6,7 +6,7 @@ const IS_STABLE_START_MARK = '_isStableStart';
 const IS_STABLE_END_MARK = '_isStableEnd';
 
 function markStarts() {
-    if (typeof(window) !== "undefined" && window.performance) {
+    if (typeof(window) !== 'undefined' && window.performance) {
         window.performance.mark(IS_STABLE_START_MARK);
         return true;
     } else {
@@ -16,9 +16,7 @@ function markStarts() {
 
 const started = markStarts();
 
-@Injectable({
-    providedIn: 'any'
-})
+@Injectable()
 export class PerformanceMonitoringService implements OnDestroy {
 
     private disposable: Subscription|undefined;

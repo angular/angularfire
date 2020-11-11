@@ -5,4 +5,4 @@ export * from './list/snapshot-changes';
 export * from './list/state-changes';
 export * from './list/audit-trail';
 export * from './observable/fromRef';
-export * from './database.module'
+export * from './database.module';
