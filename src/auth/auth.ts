@@ -1,23 +1,33 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
 import { Observable, of, from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
-import { FirebaseAppConfig, FirebaseOptions } from '@angular/fire';
-import { User, auth } from 'firebase/app';
+import { switchMap, map, observeOn, shareReplay, first } from 'rxjs/operators';
+import {
+  FIREBASE_OPTIONS,
+  FIREBASE_APP_NAME,
+  FirebaseOptions,
+  FirebaseAppConfig,
+  ɵPromiseProxy,
+  ɵlazySDKProxy,
+  ɵfirebaseAppFactory,
+  ɵAngularFireSchedulers,
+  ɵkeepUnstableUntilFirstFactory,
+  ɵapplyMixins
+} from '@angular/fire';
+import firebase from 'firebase/app';
+import { isPlatformServer } from '@angular/common';
+import { proxyPolyfillCompat } from './base';
 
-import { FirebaseAuth, FirebaseOptionsToken, FirebaseNameOrConfigToken, _firebaseAppFactory, FirebaseZoneScheduler } from '@angular/fire';
+export interface AngularFireAuth extends ɵPromiseProxy<firebase.auth.Auth> {}
 
-@Injectable()
+@Injectable({
+  providedIn: 'any'
+})
 export class AngularFireAuth {
-
-  /**
-   * Firebase Auth instance
-   */
-  public readonly auth: FirebaseAuth;
 
   /**
    * Observable of authentication state; as of Firebase 4.0 this is only triggered via sign-in/out
    */
-  public readonly authState: Observable<User|null>;
+  public readonly authState: Observable<firebase.User|null>;
 
   /**
    * Observable of the currently signed-in user's JWT token used to identify the user to a Firebase service (or null).
@@ -27,52 +37,72 @@ export class AngularFireAuth {
   /**
    * Observable of the currently signed-in user (or null).
    */
-  public readonly user: Observable<User|null>;
+  public readonly user: Observable<firebase.User|null>;
 
   /**
    * Observable of the currently signed-in user's IdTokenResult object which contains the ID token JWT string and other
    * helper properties for getting different data associated with the token as well as all the decoded payload claims
    * (or null).
    */
-  public readonly idTokenResult: Observable<auth.IdTokenResult|null>;
+  public readonly idTokenResult: Observable<firebase.auth.IdTokenResult|null>;
 
   constructor(
-    @Inject(FirebaseOptionsToken) options:FirebaseOptions,
-    @Optional() @Inject(FirebaseNameOrConfigToken) nameOrConfig:string|FirebaseAppConfig|null|undefined,
+    @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
+    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string|FirebaseAppConfig|null|undefined,
+    // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
-    private zone: NgZone
+    zone: NgZone
   ) {
-    const scheduler = new FirebaseZoneScheduler(zone, platformId);
-    this.auth = zone.runOutsideAngular(() => {
-      const app = _firebaseAppFactory(options, nameOrConfig);
-      return app.auth();
-    });
+    const schedulers = new ɵAngularFireSchedulers(zone);
+    const keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(schedulers);
 
-    this.authState = scheduler.keepUnstableUntilFirst(
-      scheduler.runOutsideAngular(
-        new Observable(subscriber => {
-          const unsubscribe = this.auth.onAuthStateChanged(subscriber);
-          return { unsubscribe };
-        })
-      )
+    const auth = of(undefined).pipe(
+      observeOn(schedulers.outsideAngular),
+      switchMap(() => zone.runOutsideAngular(() => import('firebase/auth'))),
+      map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
+      map(app => zone.runOutsideAngular(() => app.auth())),
+      shareReplay({ bufferSize: 1, refCount: false }),
     );
 
-    this.user = scheduler.keepUnstableUntilFirst(
-      scheduler.runOutsideAngular(
-        new Observable(subscriber => {
-          const unsubscribe = this.auth.onIdTokenChanged(subscriber);
-          return { unsubscribe };
-        })
-      )
-    );
+    if (isPlatformServer(platformId)) {
 
-    this.idToken = this.user.pipe(switchMap(user => {
-      return user ? from(user.getIdToken()) : of(null)
-    }));
+      this.authState = this.user = this.idToken = this.idTokenResult = of(null);
 
-    this.idTokenResult = this.user.pipe(switchMap(user => {
-      return user ? from(user.getIdTokenResult()) : of(null)
-    }));
+    } else {
+
+      // HACK, as we're exporting auth.Auth, rather than auth, developers importing firebase.auth
+      //       (e.g, `import { auth } from 'firebase/app'`) are getting an undefined auth object unexpectedly
+      //       as we're completely lazy. Let's eagerly load the Auth SDK here.
+      //       There could potentially be race conditions still... but this greatly decreases the odds while
+      //       we reevaluate the API.
+      const _ = auth.pipe(first()).subscribe();
+
+      this.authState = auth.pipe(
+        switchMap(auth => auth.getRedirectResult().then(() => auth, () => auth)),
+        switchMap(auth => zone.runOutsideAngular(() => new Observable<firebase.User|null>(auth.onAuthStateChanged.bind(auth)))),
+        keepUnstableUntilFirst
+      );
+
+      this.user = auth.pipe(
+        switchMap(auth => auth.getRedirectResult().then(() => auth, () => auth)),
+        switchMap(auth => zone.runOutsideAngular(() => new Observable<firebase.User|null>(auth.onIdTokenChanged.bind(auth)))),
+        keepUnstableUntilFirst
+      );
+
+      this.idToken = this.user.pipe(
+        switchMap(user => user ? from(user.getIdToken()) : of(null))
+      );
+
+      this.idTokenResult = this.user.pipe(
+        switchMap(user => user ? from(user.getIdTokenResult()) : of(null))
+      );
+
+    }
+
+    return ɵlazySDKProxy(this, auth, zone);
+
   }
 
 }
+
+ɵapplyMixins(AngularFireAuth, [proxyPolyfillCompat]);

@@ -1,23 +1,20 @@
 import { DatabaseReference } from '../interfaces';
-import { FirebaseApp, AngularFireModule } from '@angular/fire';
-import { AngularFireDatabase, AngularFireDatabaseModule, auditTrail, ChildEvent } from '@angular/fire/database';
-import { TestBed, inject } from '@angular/core/testing';
-import { COMMON_CONFIG } from '../test-config';
+import { AngularFireModule, FirebaseApp } from '@angular/fire';
+import { AngularFireDatabase, AngularFireDatabaseModule, auditTrail, ChildEvent, URL } from '../public_api';
+import { TestBed } from '@angular/core/testing';
+import { COMMON_CONFIG } from '../../test-config';
 import { skip } from 'rxjs/operators';
-
-// generate random string to test fidelity of naming
-const rando = () => (Math.random() + 1).toString(36).substring(7);
-const FIREBASE_APP_NAME = rando();
+import 'firebase/database';
+import { rando } from '../../firestore/utils.spec';
 
 describe('auditTrail', () => {
   let app: FirebaseApp;
   let db: AngularFireDatabase;
   let createRef: (path: string) => DatabaseReference;
   let batch = {};
-  const items = [{ name: 'zero' }, { name: 'one' }, { name: 'two' }].map((item, i) => ( { key: i.toString(), ...item } ));
-  Object.keys(items).forEach(function (key, i) {
-    const itemValue = items[key];
-    batch[i] = itemValue;
+  const items = [{ name: 'zero' }, { name: 'one' }, { name: 'two' }].map((item, i) => ({ key: i.toString(), ...item }));
+  Object.keys(items).forEach((key, i) => {
+    batch[i] = items[key];
   });
   // make batch immutable to preserve integrity
   batch = Object.freeze(batch);
@@ -25,20 +22,21 @@ describe('auditTrail', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG, FIREBASE_APP_NAME),
+        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireDatabaseModule
+      ],
+      providers: [
+        { provide: URL, useValue: 'http://localhost:9000' }
       ]
     });
-    inject([FirebaseApp, AngularFireDatabase], (app_: FirebaseApp, _db: AngularFireDatabase) => {
-      app = app_;
-      db = _db;
-      app.database().goOffline();
-      createRef = (path: string) => { app.database().goOffline(); return app.database().ref(path); };
-    })();
+
+    app = TestBed.inject(FirebaseApp);
+    db = TestBed.inject(AngularFireDatabase);
+    createRef = (path: string) => db.database.ref(path);
   });
 
-  afterEach(done => {
-    app.delete().then(done, done.fail);
+  afterEach(() => {
+    app.delete();
   });
 
   function prepareAuditTrail(opts: { events?: ChildEvent[], skipnumber: number } = { skipnumber: 0 }) {

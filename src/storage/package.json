@@ -1,8 +1,12 @@
 {
-  "name": "@angular/fire/storage",
-  "main": "../bundles/storage.umd.js",
-  "module": "index.js",
-  "es2015": "./es2015/index.js",
-  "typings": "index.d.ts",
-  "sideEffects": false
+  "$schema": "../../node_modules/ng-packagr/package.schema.json",
+  "ngPackage": {
+    "lib": {
+      "entryFile": "public_api.ts",
+      "umdModuleIds": {
+        "firebase/app": "firebase",
+        "@firebase/storage": "firebase-storage"
+      }
+    }
+  }
 }

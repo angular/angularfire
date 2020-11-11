@@ -31,15 +31,15 @@ Example use:
 ```ts
 import { AngularFireAuthGuard, hasCustomClaim, redirectUnauthorizedTo, redirectLoggedInTo } from '@angular/fire/auth-guard';
 
-const adminOnly = hasCustomClaim('admin');
-const redirectUnauthorizedToLogin = redirectUnauthorizedTo(['login']);
-const redirectLoggedInToItems = redirectLoggedInTo(['items']);
+const adminOnly = () => hasCustomClaim('admin');
+const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['login']);
+const redirectLoggedInToItems = () => redirectLoggedInTo(['items']);
 const belongsToAccount = (next) => hasCustomClaim(`account-${next.params.id}`);
 
 export const routes: Routes = [
     { path: '',      component: AppComponent },
     { path: 'login', component: LoginComponent,        canActivate: [AngularFireAuthGuard], data: { authGuardPipe: redirectLoggedInToItems }},
-    { path: 'items', component: ItemListComponent,     canActivate: [AngularFireAuthGuard], data: { authGuardPipe: redirectUnauthorizedToLogin },
+    { path: 'items', component: ItemListComponent,     canActivate: [AngularFireAuthGuard], data: { authGuardPipe: redirectUnauthorizedToLogin }},
     { path: 'admin', component: AdminComponent,        canActivate: [AngularFireAuthGuard], data: { authGuardPipe: adminOnly }},
     { path: 'accounts/:id', component: AdminComponent, canActivate: [AngularFireAuthGuard], data: { authGuardPipe: belongsToAccount }}
 ];
@@ -61,14 +61,14 @@ export const routes: Routes = [
 
 ### Compose your own pipes
 
-`AngularFireAuthGuard` pipes are RXJS operators which transform an optional User to a boolean or Array (for redirects). You can build easily build your own to customize behavior further:
+`AngularFireAuthGuard` pipes are RXJS operators which transform an optional User to a boolean or Array (for redirects). You can easily build your own to customize behavior further:
 
 ```ts
 import { map } from 'rxjs/operators';
 
 // This pipe redirects a user to their "profile edit" page or the "login page" if they're unauthenticated
 // { path: 'profile', ...canActivate(redirectToProfileEditOrLogin) }
-const redirectToProfileEditOrLogin = map(user => user ? ['profiles', user.uid, 'edit'] : ['login']);
+const redirectToProfileEditOrLogin = () => map(user => user ? ['profiles', user.uid, 'edit'] : ['login']);
 ```
 
 The `auth-guard` modules provides a `customClaims` operator to reduce boiler plate when checking a user's claims:
@@ -80,7 +80,7 @@ import { customClaims } from '@angular/fire/auth-guard';
 
 // This pipe will only allow users with the editor role to access the route
 // { path: 'articles/:id/edit', component: ArticleEditComponent, ...canActivate(editorOnly) }
-const editorOnly = pipe(customClaims, map(claims => claims.role === "editor"));
+const editorOnly = () => pipe(customClaims, map(claims => claims.role === "editor"));
 ```
 
 ### Using router state

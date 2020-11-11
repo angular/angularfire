@@ -1,153 +1,153 @@
-import { Injectable, NgZone, ApplicationRef, InjectionToken, Inject, Optional } from '@angular/core';
-import { Observable, Subscription, from } from 'rxjs';
-import { first, tap, map, shareReplay, switchMap } from 'rxjs/operators';
-import { performance } from 'firebase/app';
-import { FirebaseApp } from '@angular/fire';
+import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
+import { EMPTY, Observable, of, Subscription } from 'rxjs';
+import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
+import firebase from 'firebase/app';
+import { FirebaseApp, ɵapplyMixins, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
+import { isPlatformBrowser } from '@angular/common';
+import { proxyPolyfillCompat } from './base';
 
+// SEMVER @ v6, drop and move core ng metrics to a service
 export const AUTOMATICALLY_TRACE_CORE_NG_METRICS = new InjectionToken<boolean>('angularfire2.performance.auto_trace');
 export const INSTRUMENTATION_ENABLED = new InjectionToken<boolean>('angularfire2.performance.instrumentationEnabled');
 export const DATA_COLLECTION_ENABLED = new InjectionToken<boolean>('angularfire2.performance.dataCollectionEnabled');
 
-export type TraceOptions = {
-  metrics?: {[key:string]: number},
-  attributes?: {[key:string]:string},
-  attribute$?: {[key:string]:Observable<string>},
-  incrementMetric$?: {[key:string]: Observable<number|void|null|undefined>},
-  metric$?: {[key:string]: Observable<number>}
-};
+export interface AngularFirePerformance extends ɵPromiseProxy<firebase.performance.Performance> {
+}
 
-@Injectable()
+@Injectable({
+  providedIn: 'any'
+})
 export class AngularFirePerformance {
-  
-  performance: Observable<performance.Performance>;
+
+  private readonly performance: Observable<firebase.performance.Performance>;
 
   constructor(
     app: FirebaseApp,
-    @Optional() @Inject(AUTOMATICALLY_TRACE_CORE_NG_METRICS) automaticallyTraceCoreNgMetrics:boolean|null,
-    @Optional() @Inject(INSTRUMENTATION_ENABLED) instrumentationEnabled:boolean|null,
-    @Optional() @Inject(DATA_COLLECTION_ENABLED) dataCollectionEnabled:boolean|null,
-    appRef: ApplicationRef,
-    private zone: NgZone
+    @Optional() @Inject(INSTRUMENTATION_ENABLED) instrumentationEnabled: boolean | null,
+    @Optional() @Inject(DATA_COLLECTION_ENABLED) dataCollectionEnabled: boolean | null,
+    private zone: NgZone,
+    // tslint:disable-next-line:ban-types
+    @Inject(PLATFORM_ID) platformId: Object
   ) {
-    
-    // @ts-ignore zapping in the UMD in the build script
-    const requirePerformance = from(import('firebase/performance'));
 
-    this.performance = requirePerformance.pipe(
-      // SEMVER while < 6 need to type, drop next major
-      map(() => zone.runOutsideAngular(() => <performance.Performance>app.performance())),
+    this.performance = of(undefined).pipe(
+      switchMap(() => isPlatformBrowser(platformId) ? zone.runOutsideAngular(() => import('firebase/performance')) : EMPTY),
+      map(() => zone.runOutsideAngular(() => app.performance())),
       tap(performance => {
-        if (instrumentationEnabled == false) { performance.instrumentationEnabled = false }
-        if (dataCollectionEnabled == false) { performance.dataCollectionEnabled = false }
+        if (instrumentationEnabled === false) {
+          performance.instrumentationEnabled = false;
+        }
+        if (dataCollectionEnabled === false) {
+          performance.dataCollectionEnabled = false;
+        }
       }),
-      shareReplay(1)
+      shareReplay({ bufferSize: 1, refCount: false })
     );
 
-    if (automaticallyTraceCoreNgMetrics != false) {
-
-      // TODO determine more built in metrics
-      appRef.isStable.pipe(
-        first(it => it),
-        this.traceUntilComplete('isStable')
-      ).subscribe();
-
-    }
+    return ɵlazySDKProxy(this, this.performance, zone);
 
   }
 
-  trace$ = (name:string, options?: TraceOptions) =>
-    this.performance.pipe(
-      switchMap(performance =>
-        new Observable<void>(emitter =>
-          this.zone.runOutsideAngular(() => {
-            const trace = performance.trace(name);
-            options && options.metrics && Object.keys(options.metrics).forEach(metric => {
-              trace.putMetric(metric, options!.metrics![metric])
-            });
-            options && options.attributes && Object.keys(options.attributes).forEach(attribute => {
-              trace.putAttribute(attribute, options!.attributes![attribute])
-            });
-            const attributeSubscriptions = options && options.attribute$ ? Object.keys(options.attribute$).map(attribute =>
-              options!.attribute$![attribute].subscribe(next => trace.putAttribute(attribute, next))
-            ) : [];
-            const metricSubscriptions = options && options.metric$ ? Object.keys(options.metric$).map(metric =>
-              options!.metric$![metric].subscribe(next => trace.putMetric(metric, next))
-            ) : [];
-            const incrementOnSubscriptions = options && options.incrementMetric$ ? Object.keys(options.incrementMetric$).map(metric =>
-              options!.incrementMetric$![metric].subscribe(next => trace.incrementMetric(metric, next || undefined))
-            ) : [];
-            emitter.next(trace.start());
-            return { unsubscribe: () => {
-              trace.stop();
-              metricSubscriptions.forEach(m => m.unsubscribe());
-              incrementOnSubscriptions.forEach(m => m.unsubscribe());
-              attributeSubscriptions.forEach(m => m.unsubscribe());
-            }};
-          })
-        )
-      )
-    );
-
-  traceUntil = <T=any>(name:string, test: (a:T) => boolean, options?: TraceOptions & { orComplete?: boolean }) => (source$: Observable<T>) => new Observable<T>(subscriber => {
-    const traceSubscription = this.trace$(name, options).subscribe();
-    return source$.pipe(
-      tap(
-        a  => test(a) && traceSubscription.unsubscribe(),
-        () => {},
-        () => options && options.orComplete && traceSubscription.unsubscribe()
-      )
-    ).subscribe(subscriber);
-  });
-
-  traceWhile = <T=any>(name:string, test: (a:T) => boolean, options?: TraceOptions & { orComplete?: boolean}) => (source$: Observable<T>) => new Observable<T>(subscriber => {
-    let traceSubscription: Subscription|undefined;
-    return source$.pipe(
-      tap(
-        a  => {
-          if (test(a)) {
-            traceSubscription = traceSubscription || this.trace$(name, options).subscribe();
-          } else {
-            traceSubscription && traceSubscription.unsubscribe();
-            traceSubscription = undefined;
-          }
-        },
-        () => {},
-        () => options && options.orComplete && traceSubscription && traceSubscription.unsubscribe()
-      )
-    ).subscribe(subscriber);
-  });
-
-  traceUntilComplete = <T=any>(name:string, options?: TraceOptions) => (source$: Observable<T>) => new Observable<T>(subscriber => {
-    const traceSubscription = this.trace$(name, options).subscribe();
-    return source$.pipe(
-      tap(
-        () => {},
-        () => {},
-        () => traceSubscription.unsubscribe()
-      )
-    ).subscribe(subscriber);
-  });
-
-  traceUntilFirst = <T=any>(name:string, options?: TraceOptions) => (source$: Observable<T>) => new Observable<T>(subscriber => {
-    const traceSubscription = this.trace$(name, options).subscribe();
-    return source$.pipe(
-      tap(
-        () => traceSubscription.unsubscribe(),
-        () => {},
-        () => {}
-      )
-    ).subscribe(subscriber);
-  });
-
-  trace = <T=any>(name:string, options?: TraceOptions) => (source$: Observable<T>) => new Observable<T>(subscriber => {
-    const traceSubscription = this.trace$(name, options).subscribe();
-    return source$.pipe(
-      tap(
-        () => traceSubscription.unsubscribe(),
-        () => {},
-        () => traceSubscription.unsubscribe()
-      )
-    ).subscribe(subscriber);
-  });
-
 }
+
+const trace$ = (traceId: string) => {
+  if (typeof window !== 'undefined' && window.performance) {
+    const entries = window.performance.getEntriesByName(traceId, 'measure') || [];
+    const startMarkName = `_${traceId}Start[${entries.length}]`;
+    const endMarkName = `_${traceId}End[${entries.length}]`;
+    return new Observable<void>(emitter => {
+      window.performance.mark(startMarkName);
+      emitter.next();
+      return {
+        unsubscribe: () => {
+          window.performance.mark(endMarkName);
+          window.performance.measure(traceId, startMarkName, endMarkName);
+        }
+      };
+    });
+  } else {
+    return EMPTY;
+  }
+};
+
+export const traceUntil = <T = any>(
+  name: string,
+  test: (a: T) => boolean,
+  options?: { orComplete?: boolean }
+) => (source$: Observable<T>) => new Observable<T>(subscriber => {
+  const traceSubscription = trace$(name).subscribe();
+  return source$.pipe(
+    tap(
+      a => test(a) && traceSubscription.unsubscribe(),
+      () => {
+      },
+      () => options && options.orComplete && traceSubscription.unsubscribe()
+    )
+  ).subscribe(subscriber);
+});
+
+export const traceWhile = <T = any>(
+  name: string,
+  test: (a: T) => boolean,
+  options?: { orComplete?: boolean }
+) => (source$: Observable<T>) => new Observable<T>(subscriber => {
+  let traceSubscription: Subscription | undefined;
+  return source$.pipe(
+    tap(
+      a => {
+        if (test(a)) {
+          traceSubscription = traceSubscription || trace$(name).subscribe();
+        } else {
+          if (traceSubscription) {
+            traceSubscription.unsubscribe();
+          }
+
+          traceSubscription = undefined;
+        }
+      },
+      () => {
+      },
+      () => options && options.orComplete && traceSubscription && traceSubscription.unsubscribe()
+    )
+  ).subscribe(subscriber);
+});
+
+export const traceUntilComplete = <T = any>(name: string) => (source$: Observable<T>) => new Observable<T>(subscriber => {
+  const traceSubscription = trace$(name).subscribe();
+  return source$.pipe(
+    tap(
+      () => {
+      },
+      () => {
+      },
+      () => traceSubscription.unsubscribe()
+    )
+  ).subscribe(subscriber);
+});
+
+export const traceUntilFirst = <T = any>(name: string) => (source$: Observable<T>) => new Observable<T>(subscriber => {
+  const traceSubscription = trace$(name).subscribe();
+  return source$.pipe(
+    tap(
+      () => traceSubscription.unsubscribe(),
+      () => {
+      },
+      () => {
+      }
+    )
+  ).subscribe(subscriber);
+});
+
+export const trace = <T = any>(name: string) => (source$: Observable<T>) => new Observable<T>(subscriber => {
+  const traceSubscription = trace$(name).subscribe();
+  return source$.pipe(
+    tap(
+      () => traceSubscription.unsubscribe(),
+      () => {
+      },
+      () => traceSubscription.unsubscribe()
+    )
+  ).subscribe(subscriber);
+});
+
+ɵapplyMixins(AngularFirePerformance, [proxyPolyfillCompat]);

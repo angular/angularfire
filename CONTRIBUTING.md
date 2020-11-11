@@ -56,8 +56,10 @@ and help you to craft the change so that it is successfully accepted into the pr
 
 ```shell
 $ git clone <your fork SSH/HTTPS from GitHub>
-$ yarn install
-$ yarn test
+$ cd angularfire
+$ yarn
+$ yarn build
+$ yarn test:all
 ```
 
 3) Make your changes in a new git branch:
@@ -78,8 +80,8 @@ Providing the following information will increase the chances of your issue bein
 * **Angular Version** - what version of Angular, Firebase, and AngularFire are you using?
 * **Motivation for or Use Case** - explain what are you trying to do and why the current behavior is a bug for you
 * **Browsers and Operating System** - is this a problem with all browsers?
-* **Reproduce the Error** - provide a live example (using [Plunker][plunker],
-  [JSFiddle][jsfiddle] or [Runnable][runnable]) or a unambiguous set of steps
+* **Reproduce the Error** - provide a live example (using StackBlitz (https://stackblitz.com/edit/angular-fire-start))
+ or a unambiguous set of steps
 * **Related Issues** - has a similar issue been reported before?
 * **Suggest a Fix** - if you can't fix the bug yourself, perhaps you can point to what might be
   causing the problem (line of code or commit)

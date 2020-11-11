@@ -13,7 +13,7 @@ npm uninstall -g ionic
 npm cache clean
 
 # reinstall clean version
-npm install -g ionic
+npm install -g @ionic/cli
 ```
 
 ### 1. Create a new project
