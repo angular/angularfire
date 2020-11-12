@@ -13,4 +13,4 @@ export const ssr = require('ssr-functions').ssr;
 
 export const yada = functions.https.onCall(() => {
     return { time: new Date().getTime() };
-})
+});
