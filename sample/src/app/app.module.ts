@@ -16,12 +16,12 @@ import {
 } from '@angular/fire/analytics';
 
 import { FirestoreComponent } from './firestore/firestore.component';
-import { AngularFireDatabaseModule, URL as DATABASE_URL } from '@angular/fire/database';
-import { AngularFirestoreModule, SETTINGS as FIRESTORE_SETTINGS } from '@angular/fire/firestore';
+import { AngularFireDatabaseModule, USE_EMULATOR as USE_DATABASE_EMULATOR } from '@angular/fire/database';
+import { AngularFirestoreModule, USE_EMULATOR as USE_FIRESTORE_EMULATOR } from '@angular/fire/firestore';
 import { AngularFireStorageModule } from '@angular/fire/storage';
-import { AngularFireAuthModule } from '@angular/fire/auth';
-import { AngularFireMessagingModule } from '@angular/fire/messaging';
-import { AngularFireFunctionsModule, ORIGIN as FUNCTIONS_ORIGIN } from '@angular/fire/functions';
+import { AngularFireAuthModule, USE_DEVICE_LANGUAGE, USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/auth';
+import { AngularFireMessagingModule, SERVICE_WORKER, VAPID_KEY } from '@angular/fire/messaging';
+import { AngularFireFunctionsModule, USE_EMULATOR as USE_FUNCTIONS_EMULATOR, ORIGIN as FUNCTIONS_ORIGIN } from '@angular/fire/functions';
 import { AngularFireRemoteConfigModule, SETTINGS as REMOTE_CONFIG_SETTINGS, DEFAULTS as REMOTE_CONFIG_DEFAULTS } from '@angular/fire/remote-config';
 import { AngularFirePerformanceModule, PerformanceMonitoringService } from '@angular/fire/performance';
 import { AngularFireAuthGuardModule } from '@angular/fire/auth-guard';
@@ -73,14 +73,16 @@ const shouldUseEmulator = () => false;
         useFactory: () => isDevMode()
       },
     */
-    {
-      provide: DATABASE_URL,
-      useFactory: () => shouldUseEmulator() ? `http://localhost:9000?ns=${environment.firebase.projectId}` : undefined
-    },
-    { provide: FIRESTORE_SETTINGS, useFactory: () => shouldUseEmulator() ? { host: 'localhost:8080', ssl: false } : {} },
-    { provide: FUNCTIONS_ORIGIN, useFactory: () => shouldUseEmulator() ? 'http://localhost:9999' : undefined },
+    { provide: USE_AUTH_EMULATOR, useFactory: () => shouldUseEmulator() ? 'http://localhost:4000' : undefined },
+    { provide: USE_DATABASE_EMULATOR, useFactory: () => shouldUseEmulator() ? ['localhost', 9000] : undefined },
+    { provide: USE_FIRESTORE_EMULATOR, useFactory: () => shouldUseEmulator() ? ['localhost', 8080] : undefined },
+    { provide: USE_FUNCTIONS_EMULATOR, useFactory: () => shouldUseEmulator() ? ['localhost', 9999] : undefined },
+    { provide: FUNCTIONS_ORIGIN, useFactory: () => isDevMode() ? location.origin : undefined },
     { provide: REMOTE_CONFIG_SETTINGS, useFactory: () => isDevMode() ? { minimumFetchIntervalMillis: 10_000 } : {} },
     { provide: REMOTE_CONFIG_DEFAULTS, useValue: { background_color: 'red' } },
+    { provide: USE_DEVICE_LANGUAGE, useValue: true },
+    { provide: VAPID_KEY, useValue: environment.vapidKey },
+    { provide: SERVICE_WORKER, useFactory: () => navigator?.serviceWorker?.getRegistration() ?? undefined },
   ],
   bootstrap: [AppComponent]
 })

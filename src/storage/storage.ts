@@ -16,6 +16,8 @@ import firebase from 'firebase/app';
 import { registerStorage } from '@firebase/storage';
 
 export const BUCKET = new InjectionToken<string>('angularfire2.storageBucket');
+export const MAX_UPLOAD_RETRY_TIME = new InjectionToken<number>('angularfire2.storage.maxUploadRetryTime');
+export const MAX_OPERATION_RETRY_TIME = new InjectionToken<number>('angularfire2.storage.maxOperationRetryTime');
 
 /**
  * AngularFireStorage Service
@@ -39,7 +41,9 @@ export class AngularFireStorage {
     @Optional() @Inject(BUCKET) storageBucket: string | null,
     // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
-    zone: NgZone
+    zone: NgZone,
+    @Optional() @Inject(MAX_UPLOAD_RETRY_TIME) maxUploadRetryTime: number | any,
+    @Optional() @Inject(MAX_OPERATION_RETRY_TIME) maxOperationRetryTime: number | any,
   ) {
     this.schedulers = new ɵAngularFireSchedulers(zone);
     this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers);
@@ -49,12 +53,23 @@ export class AngularFireStorage {
       if (registerStorage) {
         registerStorage(firebase as any);
       }
-      return app.storage(storageBucket || undefined);
+      const storage = app.storage(storageBucket || undefined);
+      if (maxUploadRetryTime) {
+        storage.setMaxUploadRetryTime(maxUploadRetryTime);
+      }
+      if (maxOperationRetryTime) {
+        storage.setMaxOperationRetryTime(maxOperationRetryTime);
+      }
+      return storage;
     });
   }
 
   ref(path: string) {
     return createStorageRef(this.storage.ref(path), this.schedulers, this.keepUnstableUntilFirst);
+  }
+
+  refFromURL(path: string) {
+    return createStorageRef(this.storage.refFromURL(path), this.schedulers, this.keepUnstableUntilFirst);
   }
 
   upload(path: string, data: any, metadata?: UploadMetadata) {

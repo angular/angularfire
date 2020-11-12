@@ -3,8 +3,6 @@ import { AngularFireMessaging } from '@angular/fire/messaging';
 import { trace } from '@angular/fire/performance';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { SwPush } from '@angular/service-worker';
-import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-messaging',
@@ -24,8 +22,12 @@ export class MessagingComponent implements OnInit {
   message$: Observable<any>;
   showRequest = false;
 
-  constructor(public readonly messaging: AngularFireMessaging, readonly swpush: SwPush) {
-    swpush.messages.subscribe(it => console.log('swpush', it));
+  constructor(public readonly messaging: AngularFireMessaging) {
+    this.message$ = messaging.messages;
+    this.token$ = messaging.tokenChanges.pipe(
+      trace('token'),
+      tap(token => this.showRequest = !token)
+    );
     /*
     TODO get this sorted back out with Firebase 8
     messaging.usePublicVapidKey(environment.vapidKey).then(async () => {
@@ -35,11 +37,7 @@ export class MessagingComponent implements OnInit {
           await messaging.useServiceWorker(registration);
         }
       }
-      this.message$ = messaging.messages;
-      this.token$ = messaging.tokenChanges.pipe(
-        trace('token'),
-        tap(token => this.showRequest = !token)
-      );
+      
     });*/
   }
 

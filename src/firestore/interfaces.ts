@@ -49,7 +49,7 @@ export interface Action<T> {
 }
 
 export interface Reference<T> {
-  onSnapshot: (sub: Subscriber<any>) => any;
+  onSnapshot: (options: firebase.firestore.SnapshotListenOptions, sub: Subscriber<any>) => any;
 }
 
 // A convience type for making a query.
