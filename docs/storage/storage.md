@@ -191,7 +191,7 @@ A convenient pipe exists for simple in page references.
 ```ts
 @Component({
   selector: 'app-root',
-  template: `<img [src]="'users/davideast.jpg' | getDownloadUrl" />`
+  template: `<img [src]="'users/davideast.jpg' | getDownloadURL" />`
 })
 export class AppComponent {}
 ```
