@@ -1,3 +1,25 @@
+<a name="6.1.0-rc.1"></a>
+# [6.1.0-rc.1](https://github.com/angular/angularfire/compare/6.1.0-rc.0...6.1.0-rc.1) (2020-11-12)
+
+### Bug Fixes
+
+* **firestore:** doc and collection methods generic ([#2649](https://github.com/angular/angularfire/issues/2649)) ([796b7c1](https://github.com/angular/angularfire/commit/796b7c1))
+
+
+### Features
+
+* **firestore:** Inherit doc return type from class ([#2640](https://github.com/angular/angularfire/issues/2640)) ([f7bbd09](https://github.com/angular/angularfire/commit/f7bbd09))
+* **firestore:** map document ID to the provided idField in a collection group query ([#2580](https://github.com/angular/angularfire/issues/2580)) ([dbf31d9](https://github.com/angular/angularfire/commit/dbf31d9))
+* **auth-guard:** add support for specifying a `string` to redirect to ([#2448](https://github.com/angular/angularfire/issues/2448)) ([fe31191](https://github.com/angular/angularfire/commit/fe31191)), closes [#2287](https://github.com/angular/angularfire/issues/2287) [#2144](https://github.com/angular/angularfire/issues/2144)
+* **database:** add option to include key on `valueChanges()` ([#2126](https://github.com/angular/angularfire/issues/2126)) ([5cdb8ce](https://github.com/angular/angularfire/commit/5cdb8ce))
+* **deploy:** More deploy options ([#2647](https://github.com/angular/angularfire/issues/2647)) ([1bbd3e4](https://github.com/angular/angularfire/commit/1bbd3e4))
+* **firestore:** options to include document ID on valueChanges() ([#2113](https://github.com/angular/angularfire/issues/2113)) ([09ed22a](https://github.com/angular/angularfire/commit/09ed22a))
+* **functions:** Add options param to httpsCallable functions ([#2434](https://github.com/angular/angularfire/issues/2434)) ([f8d5a50](https://github.com/angular/angularfire/commit/f8d5a50)), closes [#2433](https://github.com/angular/angularfire/issues/2433)
+* **schematics:** support FIREBASE_TOKEN for `ng deploy` ([#2327](https://github.com/angular/angularfire/issues/2327)) ([dd92869](https://github.com/angular/angularfire/commit/dd92869))
+* **storage:** getDownloadURL pipe ([#2648](https://github.com/angular/angularfire/issues/2648)) ([0d799da](https://github.com/angular/angularfire/commit/0d799da))
+
+
+
 <a name="6.1.0-rc.0"></a>
 # [6.1.0-rc.0](https://github.com/angular/angularfire/compare/6.0.5...6.1.0-rc.0) (2020-11-11)
 
