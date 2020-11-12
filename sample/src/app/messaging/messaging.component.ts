@@ -28,16 +28,6 @@ export class MessagingComponent implements OnInit {
       trace('token'),
       tap(token => this.showRequest = !token)
     );
-    /*
-    TODO get this sorted back out with Firebase 8
-    messaging.usePublicVapidKey(environment.vapidKey).then(async () => {
-      if (navigator && navigator.serviceWorker) {
-        const registration = await navigator.serviceWorker.getRegistration();
-        if (registration) {
-          await messaging.useServiceWorker(registration);
-        }
-      }
-    });*/
   }
 
   ngOnInit(): void {
