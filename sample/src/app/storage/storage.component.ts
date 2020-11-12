@@ -13,7 +13,8 @@ const TRANSPARENT_PNG
   template: `
     <p>
       Storage!
-      <img [src]="downloadUrl$ | async" width="64" height="64"/>
+      <img [src]="downloadUrl$ | async" width="64" height="64" />
+      <br><small>{{ 'google-g.png' | getDownloadURL | json }}</small>
     </p>
   `,
   styles: []

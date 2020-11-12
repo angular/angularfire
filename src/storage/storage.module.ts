@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
+import { GetDownloadURLPipeModule } from './pipes/storageUrl.pipe';
 import { AngularFireStorage } from './storage';
-import { AngularFirestoreStorageUrl } from './pipes/storageUrl.pipe';
 
 @NgModule({
-  declarations: [ AngularFirestoreStorageUrl ],
+  exports: [ GetDownloadURLPipeModule ],
   providers: [ AngularFireStorage ]
 })
 export class AngularFireStorageModule { }
