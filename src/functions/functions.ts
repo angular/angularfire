@@ -34,7 +34,7 @@ export interface AngularFireFunctions extends Omit<ɵPromiseProxy<firebase.funct
 })
 export class AngularFireFunctions {
 
-  public readonly httpsCallable: <T = any, R = any>(name: string) => (data: T) => Observable<R>;
+  public readonly httpsCallable: <T = any, R = any>(name: string, options?: HttpsCallableOptions) => (data: T) => Observable<R>;
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,

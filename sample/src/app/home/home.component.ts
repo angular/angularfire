@@ -12,10 +12,10 @@ import { FirebaseApp } from '@angular/fire';
     <app-auth></app-auth>
     <app-remote-config></app-remote-config>
     <app-messaging></app-messaging>
+    <app-functions></app-functions>
   `,
   styles: [``]
 })
 export class HomeComponent {
-  constructor(public readonly firebaseApp: FirebaseApp) {
-  }
+  constructor(public readonly firebaseApp: FirebaseApp) {}
 }

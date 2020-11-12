@@ -21,7 +21,7 @@ import { AngularFirestoreModule, USE_EMULATOR as USE_FIRESTORE_EMULATOR } from '
 import { AngularFireStorageModule } from '@angular/fire/storage';
 import { AngularFireAuthModule, USE_DEVICE_LANGUAGE, USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/auth';
 import { AngularFireMessagingModule, SERVICE_WORKER, VAPID_KEY } from '@angular/fire/messaging';
-import { AngularFireFunctionsModule, USE_EMULATOR as USE_FUNCTIONS_EMULATOR, ORIGIN as FUNCTIONS_ORIGIN } from '@angular/fire/functions';
+import { AngularFireFunctionsModule, USE_EMULATOR as USE_FUNCTIONS_EMULATOR, ORIGIN as FUNCTIONS_ORIGIN, NEW_ORIGIN_BEHAVIOR } from '@angular/fire/functions';
 import { AngularFireRemoteConfigModule, SETTINGS as REMOTE_CONFIG_SETTINGS, DEFAULTS as REMOTE_CONFIG_DEFAULTS } from '@angular/fire/remote-config';
 import { AngularFirePerformanceModule, PerformanceMonitoringService } from '@angular/fire/performance';
 import { AngularFireAuthGuardModule } from '@angular/fire/auth-guard';
@@ -31,6 +31,7 @@ import { RemoteConfigComponent } from './remote-config/remote-config.component';
 import { HomeComponent } from './home/home.component';
 import { AuthComponent } from './auth/auth.component';
 import { MessagingComponent } from './messaging/messaging.component';
+import { FunctionsComponent } from './functions/functions.component';
 
 @NgModule({
   declarations: [
@@ -41,7 +42,8 @@ import { MessagingComponent } from './messaging/messaging.component';
     RemoteConfigComponent,
     HomeComponent,
     AuthComponent,
-    MessagingComponent
+    MessagingComponent,
+    FunctionsComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),
@@ -75,7 +77,8 @@ import { MessagingComponent } from './messaging/messaging.component';
     { provide: USE_DATABASE_EMULATOR, useValue: environment.useEmulators ? ['localhost', 9000] : undefined },
     { provide: USE_FIRESTORE_EMULATOR, useValue: environment.useEmulators ? ['localhost', 8080] : undefined },
     { provide: USE_FUNCTIONS_EMULATOR, useValue: environment.useEmulators ? ['localhost', 5001] : undefined },
-    { provide: FUNCTIONS_ORIGIN, useFactory: () => isDevMode() ? location.origin : undefined },
+    { provide: NEW_ORIGIN_BEHAVIOR, useValue: true },
+    { provide: FUNCTIONS_ORIGIN, useFactory: () => isDevMode() ? undefined : location.origin },
     { provide: REMOTE_CONFIG_SETTINGS, useFactory: () => isDevMode() ? { minimumFetchIntervalMillis: 10_000 } : {} },
     { provide: REMOTE_CONFIG_DEFAULTS, useValue: { background_color: 'red' } },
     { provide: USE_DEVICE_LANGUAGE, useValue: true },
