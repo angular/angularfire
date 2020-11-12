@@ -38,7 +38,7 @@ export function validateEventsArray(events?: DocumentChangeType[]) {
  * // Subscribe to changes as snapshots. This provides you data updates as well as delta updates.
  * fakeStock.valueChanges().subscribe(value => console.log(value));
  */
-export class AngularFirestoreCollection<T= DocumentData> {
+export class AngularFirestoreCollection<T = DocumentData> {
   /**
    * The constructor takes in a CollectionReference and Query to provide wrapper methods
    * for data operations and data streaming.
@@ -49,8 +49,8 @@ export class AngularFirestoreCollection<T= DocumentData> {
    * on this implication.
    */
   constructor(
-    public readonly ref: CollectionReference,
-    private readonly query: Query,
+    public readonly ref: CollectionReference<T>,
+    private readonly query: Query<T>,
     private readonly afs: AngularFirestore) { }
 
   /**
@@ -134,14 +134,14 @@ export class AngularFirestoreCollection<T= DocumentData> {
    * when you update data it is not updating data to the window of your query unless
    * the data fits the criteria of the query.
    */
-  add(data: T): Promise<DocumentReference> {
+  add(data: T): Promise<DocumentReference<T>> {
     return this.ref.add(data);
   }
 
   /**
    * Create a reference to a single document in a collection.
    */
-  doc<T2 = T>(path?: string): AngularFirestoreDocument<T2> {
-    return new AngularFirestoreDocument<T2>(this.ref.doc(path), this.afs);
+  doc(path?: string): AngularFirestoreDocument<T> {
+    return new AngularFirestoreDocument<T>(this.ref.doc(path), this.afs);
   }
 }

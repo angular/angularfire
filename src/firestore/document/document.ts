@@ -31,10 +31,10 @@ import firebase from 'firebase/app';
 export class AngularFirestoreDocument<T = DocumentData> {
 
   /**
-   * The contstuctor takes in a DocumentReference to provide wrapper methods
+   * The constructor takes in a DocumentReference to provide wrapper methods
    * for data operations, data streaming, and Symbol.observable.
    */
-  constructor(public ref: DocumentReference, private afs: AngularFirestore) { }
+  constructor(public ref: DocumentReference<T>, private afs: AngularFirestore) { }
 
   /**
    * Create or overwrite a single document.
@@ -62,9 +62,9 @@ export class AngularFirestoreDocument<T = DocumentData> {
    * function.
    */
   collection<R = DocumentData>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<R> {
-    const collectionRef = this.ref.collection(path);
+    const collectionRef = this.ref.collection(path) as firebase.firestore.CollectionReference<R>;
     const { ref, query } = associateQuery(collectionRef, queryFn);
-    return new AngularFirestoreCollection<R>(ref, query, this.afs);
+    return new AngularFirestoreCollection(ref, query, this.afs);
   }
 
   /**

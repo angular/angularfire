@@ -46,7 +46,7 @@ export const SETTINGS = new InjectionToken<Settings>('angularfire2.firestore.set
  *  return ref.where('age', '<', 200);
  * });
  */
-export function associateQuery(collectionRef: CollectionReference, queryFn = ref => ref): AssociatedReference {
+export function associateQuery<T>(collectionRef: CollectionReference<T>, queryFn = ref => ref): AssociatedReference<T> {
   const query = queryFn(collectionRef);
   const ref = collectionRef;
   return { query, ref };
@@ -173,14 +173,14 @@ export class AngularFirestore {
   collection<T>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<T>;
   // tslint:disable-next-line:unified-signatures
   collection<T>(ref: CollectionReference, queryFn?: QueryFn): AngularFirestoreCollection<T>;
-  collection<T>(pathOrRef: string | CollectionReference, queryFn?: QueryFn): AngularFirestoreCollection<T> {
-    let collectionRef: CollectionReference;
+  collection<T>(pathOrRef: string | CollectionReference<T>, queryFn?: QueryFn): AngularFirestoreCollection<T> {
+    let collectionRef: CollectionReference<T>;
     if (typeof pathOrRef === 'string') {
-      collectionRef = this.firestore.collection(pathOrRef);
+      collectionRef = this.firestore.collection(pathOrRef) as firebase.firestore.CollectionReference<T>;
     } else {
       collectionRef = pathOrRef;
     }
-    const { ref, query } = associateQuery(collectionRef, queryFn);
+    const { ref, query } = associateQuery<T>(collectionRef, queryFn);
     const refInZone = this.schedulers.ngZone.run(() => ref);
     return new AngularFirestoreCollection<T>(refInZone, query, this);
   }
@@ -190,9 +190,9 @@ export class AngularFirestore {
    * and an optional query function to narrow the result
    * set.
    */
-  collectionGroup<T>(collectionId: string, queryGroupFn?: QueryGroupFn): AngularFirestoreCollectionGroup<T> {
+  collectionGroup<T>(collectionId: string, queryGroupFn?: QueryGroupFn<T>): AngularFirestoreCollectionGroup<T> {
     const queryFn = queryGroupFn || (ref => ref);
-    const collectionGroup: Query = this.firestore.collectionGroup(collectionId);
+    const collectionGroup: Query<T> = this.firestore.collectionGroup(collectionId) as firebase.firestore.Query<T>;
     return new AngularFirestoreCollectionGroup<T>(queryFn(collectionGroup), this);
   }
 
@@ -205,10 +205,10 @@ export class AngularFirestore {
   doc<T>(path: string): AngularFirestoreDocument<T>;
   // tslint:disable-next-line:unified-signatures
   doc<T>(ref: DocumentReference): AngularFirestoreDocument<T>;
-  doc<T>(pathOrRef: string | DocumentReference): AngularFirestoreDocument<T> {
-    let ref: DocumentReference;
+  doc<T>(pathOrRef: string | DocumentReference<T>): AngularFirestoreDocument<T> {
+    let ref: DocumentReference<T>;
     if (typeof pathOrRef === 'string') {
-      ref = this.firestore.doc(pathOrRef);
+      ref = this.firestore.doc(pathOrRef) as firebase.firestore.DocumentReference<T>;
     } else {
       ref = pathOrRef;
     }
