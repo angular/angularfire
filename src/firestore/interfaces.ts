@@ -2,8 +2,8 @@ import { Subscriber } from 'rxjs';
 import firebase from 'firebase/app';
 
 export type Settings =  firebase.firestore.Settings;
-export type CollectionReference<T = DocumentData> = firebase.firestore.CollectionReference;
-export type DocumentReference<T = DocumentData> = firebase.firestore.DocumentReference;
+export type CollectionReference<T = DocumentData> = firebase.firestore.CollectionReference<T>;
+export type DocumentReference<T = DocumentData> = firebase.firestore.DocumentReference<T>;
 export type PersistenceSettings = firebase.firestore.PersistenceSettings;
 export type DocumentChangeType = firebase.firestore.DocumentChangeType;
 export type SnapshotOptions = firebase.firestore.SnapshotOptions;

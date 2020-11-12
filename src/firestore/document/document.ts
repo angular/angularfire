@@ -62,9 +62,9 @@ export class AngularFirestoreDocument<T = DocumentData> {
    * function.
    */
   collection<R = DocumentData>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<R> {
-    const collectionRef = this.ref.collection(path);
+    const collectionRef = this.ref.collection(path) as firebase.firestore.CollectionReference<R>;
     const { ref, query } = associateQuery(collectionRef, queryFn);
-    return new AngularFirestoreCollection<R>(ref, query, this.afs);
+    return new AngularFirestoreCollection(ref, query, this.afs);
   }
 
   /**
