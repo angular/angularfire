@@ -20,7 +20,7 @@ export const VAPID_KEY = new InjectionToken<string>('angularfire2.messaging.vapi
 export const SERVICE_WORKER = new InjectionToken<Promise<ServiceWorkerRegistration>>('angularfire2.messaging.service-worker-registeration');
 
 // SEMVER(7): drop
-const firebaseLTv8 = parseInt(firebase.SDK_VERSION) < 8;
+const firebaseLTv8 = parseInt(firebase.SDK_VERSION, 10) < 8;
 
 export interface AngularFireMessaging extends Omit<ɵPromiseProxy<firebase.messaging.Messaging>, 'deleteToken' | 'getToken' | 'requestPermission'> {
 }
@@ -61,7 +61,7 @@ export class AngularFireMessaging {
             messaging.usePublicVapidKey(vapidKey);
           }
           if (serviceWorker) {
-            messaging.useServiceWorker(await serviceWorker)
+            messaging.useServiceWorker(await serviceWorker);
           }
         }
         return messaging;

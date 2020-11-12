@@ -54,7 +54,7 @@ export class AngularFireFunctions {
       map(app => {
         if (newOriginBehavior) {
           if (region && origin) {
-            throw 'REGION and ORIGIN can\'t be used at the same time.';
+            throw new Error('REGION and ORIGIN can\'t be used at the same time.');
           }
           return app.functions(region || origin || undefined);
         } else {

@@ -37,7 +37,6 @@ export class MessagingComponent implements OnInit {
           await messaging.useServiceWorker(registration);
         }
       }
-      
     });*/
   }
 
