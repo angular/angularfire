@@ -62,7 +62,7 @@ trace.stop();
 
 ## RXJS operators
 
-AngularFire provides a number of RXJS operaters which wrap the User Timing API. These are picked up by performance monitoring tools such as Chrome Inspector and Firebase Performance Monitoring.
+AngularFire provides a number of RXJS operators which wrap the User Timing API. These are picked up by performance monitoring tools such as Chrome Inspector and Firebase Performance Monitoring.
 
 ```ts
 import { trace } from '@angular/fire/performance';
