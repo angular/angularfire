@@ -32,8 +32,6 @@ import { HomeComponent } from './home/home.component';
 import { AuthComponent } from './auth/auth.component';
 import { MessagingComponent } from './messaging/messaging.component';
 
-const shouldUseEmulator = () => false;
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -73,10 +71,10 @@ const shouldUseEmulator = () => false;
         useFactory: () => isDevMode()
       },
     */
-    { provide: USE_AUTH_EMULATOR, useFactory: () => shouldUseEmulator() ? 'http://localhost:4000' : undefined },
-    { provide: USE_DATABASE_EMULATOR, useFactory: () => shouldUseEmulator() ? ['localhost', 9000] : undefined },
-    { provide: USE_FIRESTORE_EMULATOR, useFactory: () => shouldUseEmulator() ? ['localhost', 8080] : undefined },
-    { provide: USE_FUNCTIONS_EMULATOR, useFactory: () => shouldUseEmulator() ? ['localhost', 9999] : undefined },
+    { provide: USE_AUTH_EMULATOR, useValue: environment.useEmulators ? ['localhost', 9099] : undefined },
+    { provide: USE_DATABASE_EMULATOR, useValue: environment.useEmulators ? ['localhost', 9000] : undefined },
+    { provide: USE_FIRESTORE_EMULATOR, useValue: environment.useEmulators ? ['localhost', 8080] : undefined },
+    { provide: USE_FUNCTIONS_EMULATOR, useValue: environment.useEmulators ? ['localhost', 5001] : undefined },
     { provide: FUNCTIONS_ORIGIN, useFactory: () => isDevMode() ? location.origin : undefined },
     { provide: REMOTE_CONFIG_SETTINGS, useFactory: () => isDevMode() ? { minimumFetchIntervalMillis: 10_000 } : {} },
     { provide: REMOTE_CONFIG_DEFAULTS, useValue: { background_color: 'red' } },
@@ -86,5 +84,4 @@ const shouldUseEmulator = () => false;
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule {
-}
+export class AppModule { }

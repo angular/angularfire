@@ -19,9 +19,7 @@ import { proxyPolyfillCompat } from './base';
 
 export interface AngularFireAuth extends ɵPromiseProxy<firebase.auth.Auth> {}
 
-// SEMVER(7): use Parameters to detirmine the useEmulator arguments
-// type UseEmulatorArguments = Parameters<typeof firebase.auth.Auth.prototype.useEmulator>;
-type UseEmulatorArguments = [url: string];
+type UseEmulatorArguments = [host: string, port: number];
 export const USE_EMULATOR = new InjectionToken<UseEmulatorArguments>('angularfire2.auth.use-emulator');
 
 export const SETTINGS = new InjectionToken<firebase.auth.AuthSettings>('angularfire2.auth.settings');
@@ -81,7 +79,8 @@ export class AngularFireAuth {
         const auth = app.auth();
         const useEmulator: UseEmulatorArguments | null = _useEmulator;
         if (useEmulator) {
-          auth.useEmulator(...useEmulator);
+          // Firebase Auth doesn't conform to the useEmulator convention, let's smooth that over
+          auth.useEmulator(`http://${useEmulator.join(':')}`);
         }
         if (tenantId) {
           auth.tenantId = tenantId;

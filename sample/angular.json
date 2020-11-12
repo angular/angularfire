@@ -32,6 +32,14 @@
             "scripts": []
           },
           "configurations": {
+            "emulated": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.emulated.ts"
+                }
+              ]
+            },
             "production": {
               "fileReplacements": [
                 {
@@ -71,6 +79,9 @@
           "configurations": {
             "production": {
               "browserTarget": "sample:build:production"
+            },
+            "emulated": {
+              "browserTarget": "sample:build:emulated"
             }
           }
         },
