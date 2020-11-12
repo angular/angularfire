@@ -186,6 +186,16 @@ export class AppComponent {
 
 ### Downloading Files
 
+A convenient pipe exists for simple in page references.
+
+```ts
+@Component({
+  selector: 'app-root',
+  template: `<img [src]="'users/davideast.jpg' | getDownloadURL" />`
+})
+export class AppComponent {}
+```
+
 To download a file you'll need to create a reference and call the `getDownloadURL()` method on an `AngularFireStorageReference`.
 
 ```ts
