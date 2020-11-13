@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { UploadTask, UploadTaskSnapshot } from '../interfaces';
 
-export function fromTask(task: UploadTask) {
+export function fromTask(task: UploadTask): Observable<UploadTaskSnapshot> {
   return new Observable<UploadTaskSnapshot>(subscriber => {
     const progress = (snap: UploadTaskSnapshot) => subscriber.next(snap);
     const error = e => subscriber.error(e);
