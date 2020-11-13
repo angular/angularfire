@@ -19,6 +19,12 @@ import firebase from 'firebase/app';
 
 export const URL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
 
+// SEMVER(7): use Parameters to detirmine the useEmulator arguments
+// TODO(jamesdaniels): don't hardcode, but having tyepscript issues with firebase.database.Database
+// type UseEmulatorArguments = Parameters<typeof firebase.database.Database.prototype.useEmulator>;
+type UseEmulatorArguments = [string, number];
+export const USE_EMULATOR = new InjectionToken<UseEmulatorArguments>('angularfire2.database.use-emulator');
+
 @Injectable({
   providedIn: 'any'
 })
@@ -34,7 +40,8 @@ export class AngularFireDatabase {
     @Optional() @Inject(URL) databaseURL: string | null,
     // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
-    zone: NgZone
+    zone: NgZone,
+    @Optional() @Inject(USE_EMULATOR) _useEmulator: any, // tuple isn't working here
   ) {
     this.schedulers = new ɵAngularFireSchedulers(zone);
     this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers);
@@ -44,7 +51,12 @@ export class AngularFireDatabase {
       if (registerDatabase) {
         registerDatabase(firebase as any);
       }
-      return app.database(databaseURL || undefined);
+      const database = app.database(databaseURL || undefined);
+      const useEmulator: UseEmulatorArguments | null = _useEmulator;
+      if (useEmulator) {
+        database.useEmulator(...useEmulator);
+      }
+      return database;
     });
   }
 

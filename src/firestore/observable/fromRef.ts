@@ -7,10 +7,10 @@ function _fromRef<T, R>(ref: Reference<T>, scheduler: SchedulerLike = asyncSched
     let unsubscribe: () => void;
     if (scheduler != null) {
       scheduler.schedule(() => {
-        unsubscribe = ref.onSnapshot(subscriber);
+        unsubscribe = ref.onSnapshot({ includeMetadataChanges: true }, subscriber);
       });
     } else {
-      unsubscribe = ref.onSnapshot(subscriber);
+      unsubscribe = ref.onSnapshot({ includeMetadataChanges: true }, subscriber);
     }
 
     return () => {

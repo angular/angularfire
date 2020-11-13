@@ -1,4 +1,4 @@
-import { Inject, Injectable, NgZone, Optional, PLATFORM_ID } from '@angular/core';
+import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
 import firebase from 'firebase/app';
 import { concat, EMPTY, Observable, of, throwError, fromEvent } from 'rxjs';
 import { catchError, defaultIfEmpty, map, mergeMap, observeOn, switchMap, switchMapTo, shareReplay, filter, subscribeOn } from 'rxjs/operators';
@@ -15,6 +15,12 @@ import {
 } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
 import { proxyPolyfillCompat } from './base';
+
+export const VAPID_KEY = new InjectionToken<string>('angularfire2.messaging.vapid-key');
+export const SERVICE_WORKER = new InjectionToken<Promise<ServiceWorkerRegistration>>('angularfire2.messaging.service-worker-registeration');
+
+// SEMVER(7): drop
+const firebaseLTv8 = parseInt(firebase.SDK_VERSION, 10) < 8;
 
 export interface AngularFireMessaging extends Omit<ɵPromiseProxy<firebase.messaging.Messaging>, 'deleteToken' | 'getToken' | 'requestPermission'> {
 }
@@ -36,16 +42,30 @@ export class AngularFireMessaging {
     @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string | FirebaseAppConfig | null | undefined,
     // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
-    zone: NgZone
+    zone: NgZone,
+    @Optional() @Inject(VAPID_KEY) vapidKey: string|null,
+    @Optional() @Inject(SERVICE_WORKER) _serviceWorker: any,
   ) {
     const schedulers = new ɵAngularFireSchedulers(zone);
+    const serviceWorker: Promise<ServiceWorkerRegistration> | null = _serviceWorker;
 
     const messaging = of(undefined).pipe(
       subscribeOn(schedulers.outsideAngular),
       observeOn(schedulers.insideAngular),
       switchMap(() => isPlatformServer(platformId) ? EMPTY : import('firebase/messaging')),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
-      map(app => app.messaging()),
+      switchMap(async app => {
+        const messaging = app.messaging();
+        if (firebaseLTv8) {
+          if (vapidKey) {
+            messaging.usePublicVapidKey(vapidKey);
+          }
+          if (serviceWorker) {
+            messaging.useServiceWorker(await serviceWorker);
+          }
+        }
+        return messaging;
+      }),
       shareReplay({ bufferSize: 1, refCount: false })
     );
 
@@ -59,23 +79,37 @@ export class AngularFireMessaging {
     this.getToken = messaging.pipe(
       subscribeOn(schedulers.outsideAngular),
       observeOn(schedulers.insideAngular),
-      switchMap(messaging => firebase.messaging.isSupported() && Notification.permission === 'granted' ? messaging.getToken() : EMPTY),
-      defaultIfEmpty(null)
+      switchMap(async messaging => {
+        if (firebase.messaging.isSupported() && Notification.permission === 'granted') {
+          if (firebaseLTv8) {
+            return await messaging.getToken();
+          } else {
+            const serviceWorkerRegistration = serviceWorker ? await serviceWorker : null;
+            return await messaging.getToken({ vapidKey, serviceWorkerRegistration });
+          }
+        } else {
+          return null;
+        }
+      })
     );
 
-    const tokenChanges = messaging.pipe(
+    const notificationPermission$ = new Observable<string>(emitter => {
+      navigator.permissions.query({ name: 'notifications' }).then(notificationPerm => {
+        notificationPerm.onchange = () => emitter.next();
+      });
+    });
+
+    const tokenChange$ = messaging.pipe(
       subscribeOn(schedulers.outsideAngular),
       observeOn(schedulers.insideAngular),
-      switchMap(messaging => firebase.messaging.isSupported() ? new Observable<string>(emitter =>
-        messaging.onTokenRefresh(emitter.next, emitter.error, emitter.complete)
-      ) : EMPTY),
+      switchMapTo(notificationPermission$),
       switchMapTo(this.getToken)
     );
 
     this.tokenChanges = messaging.pipe(
       subscribeOn(schedulers.outsideAngular),
       observeOn(schedulers.insideAngular),
-      switchMap(messaging => firebase.messaging.isSupported() ? concat(this.getToken, tokenChanges) : EMPTY)
+      switchMap(() => firebase.messaging.isSupported() ? concat(this.getToken, tokenChange$) : EMPTY)
     );
 
 
@@ -88,15 +122,18 @@ export class AngularFireMessaging {
     );
 
     this.requestToken = of(undefined).pipe(
+      subscribeOn(schedulers.outsideAngular),
+      observeOn(schedulers.insideAngular),
       switchMap(() => this.requestPermission),
       catchError(() => of(null)),
       mergeMap(() => this.tokenChanges)
     );
 
-    this.deleteToken = (token: string) => messaging.pipe(
+    // SEMVER(7): drop token
+    this.deleteToken = (token?: string) => messaging.pipe(
       subscribeOn(schedulers.outsideAngular),
       observeOn(schedulers.insideAngular),
-      switchMap(messaging => messaging.deleteToken(token)),
+      switchMap(messaging => messaging.deleteToken(token || undefined)),
       defaultIfEmpty(false)
     );
 

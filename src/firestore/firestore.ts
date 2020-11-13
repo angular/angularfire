@@ -34,6 +34,11 @@ export const ENABLE_PERSISTENCE = new InjectionToken<boolean>('angularfire2.enab
 export const PERSISTENCE_SETTINGS = new InjectionToken<PersistenceSettings | undefined>('angularfire2.firestore.persistenceSettings');
 export const SETTINGS = new InjectionToken<Settings>('angularfire2.firestore.settings');
 
+// SEMVER(7): use Parameters to detirmine the useEmulator arguments
+// type UseEmulatorArguments = Parameters<typeof firebase.firestore.Firestore.prototype.useEmulator>;
+type UseEmulatorArguments = [string, number];
+export const USE_EMULATOR = new InjectionToken<UseEmulatorArguments>('angularfire2.firestore.use-emulator');
+
 /**
  * A utility methods for associating a collection reference with
  * a query.
@@ -129,7 +134,8 @@ export class AngularFirestore {
     // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
-    @Optional() @Inject(PERSISTENCE_SETTINGS) persistenceSettings: PersistenceSettings | null
+    @Optional() @Inject(PERSISTENCE_SETTINGS) persistenceSettings: PersistenceSettings | null,
+    @Optional() @Inject(USE_EMULATOR) _useEmulator: any,
   ) {
     this.schedulers = new ɵAngularFireSchedulers(zone);
     this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers);
@@ -145,6 +151,10 @@ export class AngularFirestore {
       const firestore = app.firestore();
       if (settings) {
         firestore.settings(settings);
+      }
+      const useEmulator: UseEmulatorArguments | null = _useEmulator;
+      if (useEmulator) {
+        firestore.useEmulator(...useEmulator);
       }
       return firestore;
     });

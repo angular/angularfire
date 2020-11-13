@@ -1,4 +1,4 @@
-import { Injectable, Inject, Optional, NgZone, PLATFORM_ID } from '@angular/core';
+import { Injectable, Inject, Optional, NgZone, PLATFORM_ID, InjectionToken } from '@angular/core';
 import { Observable, of, from } from 'rxjs';
 import { switchMap, map, observeOn, shareReplay, first } from 'rxjs/operators';
 import {
@@ -18,6 +18,15 @@ import { isPlatformServer } from '@angular/common';
 import { proxyPolyfillCompat } from './base';
 
 export interface AngularFireAuth extends ɵPromiseProxy<firebase.auth.Auth> {}
+
+type UseEmulatorArguments = [string, number];
+export const USE_EMULATOR = new InjectionToken<UseEmulatorArguments>('angularfire2.auth.use-emulator');
+
+export const SETTINGS = new InjectionToken<firebase.auth.AuthSettings>('angularfire2.auth.settings');
+export const TENANT_ID = new InjectionToken<string>('angularfire2.auth.tenant-id');
+export const LANGUAGE_CODE = new InjectionToken<string>('angularfire2.auth.langugage-code');
+export const USE_DEVICE_LANGUAGE = new InjectionToken<boolean>('angularfire2.auth.use-device-language');
+export const PERSISTENCE = new InjectionToken<string>('angularfire.auth.persistence');
 
 @Injectable({
   providedIn: 'any'
@@ -51,7 +60,13 @@ export class AngularFireAuth {
     @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string|FirebaseAppConfig|null|undefined,
     // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
-    zone: NgZone
+    zone: NgZone,
+    @Optional() @Inject(USE_EMULATOR) _useEmulator: any, // can't use the tuple here
+    @Optional() @Inject(SETTINGS) _settings: any, // can't use firebase.auth.AuthSettings here
+    @Optional() @Inject(TENANT_ID) tenantId: string | null,
+    @Optional() @Inject(LANGUAGE_CODE) languageCode: string | null,
+    @Optional() @Inject(USE_DEVICE_LANGUAGE) useDeviceLanguage: boolean | null,
+    @Optional() @Inject(PERSISTENCE) persistence: string | null,
   ) {
     const schedulers = new ɵAngularFireSchedulers(zone);
     const keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(schedulers);
@@ -60,7 +75,29 @@ export class AngularFireAuth {
       observeOn(schedulers.outsideAngular),
       switchMap(() => zone.runOutsideAngular(() => import('firebase/auth'))),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
-      map(app => zone.runOutsideAngular(() => app.auth())),
+      map(app => zone.runOutsideAngular(() => {
+        const auth = app.auth();
+        const useEmulator: UseEmulatorArguments | null = _useEmulator;
+        if (useEmulator) {
+          // Firebase Auth doesn't conform to the useEmulator convention, let's smooth that over
+          auth.useEmulator(`http://${useEmulator.join(':')}`);
+        }
+        if (tenantId) {
+          auth.tenantId = tenantId;
+        }
+        auth.languageCode = languageCode;
+        if (useDeviceLanguage) {
+          auth.useDeviceLanguage();
+        }
+        const settings: firebase.auth.AuthSettings | null = _settings;
+        if (settings) {
+          auth.settings = settings;
+        }
+        if (persistence) {
+          auth.setPersistence(persistence);
+        }
+        return auth;
+      })),
       shareReplay({ bufferSize: 1, refCount: false }),
     );
 
