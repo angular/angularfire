@@ -22,7 +22,7 @@ export const NEW_ORIGIN_BEHAVIOR = new InjectionToken<boolean>('angularfire2.fun
 
 // SEMVER(7): use Parameters to detirmine the useEmulator arguments
 // type UseEmulatorArguments = Parameters<typeof firebase.functions.Functions.prototype.useEmulator>;
-type UseEmulatorArguments = [host: string, port: number];
+type UseEmulatorArguments = [string, number];
 export const USE_EMULATOR = new InjectionToken<UseEmulatorArguments>('angularfire2.functions.use-emulator');
 
 // override httpsCallable for compatibility with 5.x

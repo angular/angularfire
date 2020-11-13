@@ -36,7 +36,7 @@ export const SETTINGS = new InjectionToken<Settings>('angularfire2.firestore.set
 
 // SEMVER(7): use Parameters to detirmine the useEmulator arguments
 // type UseEmulatorArguments = Parameters<typeof firebase.firestore.Firestore.prototype.useEmulator>;
-type UseEmulatorArguments = [host: string, port: number];
+type UseEmulatorArguments = [string, number];
 export const USE_EMULATOR = new InjectionToken<UseEmulatorArguments>('angularfire2.firestore.use-emulator');
 
 /**

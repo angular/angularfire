@@ -19,7 +19,7 @@ import { proxyPolyfillCompat } from './base';
 
 export interface AngularFireAuth extends ɵPromiseProxy<firebase.auth.Auth> {}
 
-type UseEmulatorArguments = [host: string, port: number];
+type UseEmulatorArguments = [string, number];
 export const USE_EMULATOR = new InjectionToken<UseEmulatorArguments>('angularfire2.auth.use-emulator');
 
 export const SETTINGS = new InjectionToken<firebase.auth.AuthSettings>('angularfire2.auth.settings');
