@@ -44,7 +44,7 @@ describe('AngularFireDatabase', () => {
     });
 
     it('should accept a Firebase App in the constructor', (done) => {
-      const database = new AngularFireDatabase(app.options, rando(), undefined, {}, zone);
+      const database = new AngularFireDatabase(app.options, rando(), undefined, {}, zone, undefined);
       expect(database instanceof AngularFireDatabase).toEqual(true);
       database.database.app.delete().then(done, done);
     });
