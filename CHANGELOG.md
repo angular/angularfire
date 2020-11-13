@@ -1,3 +1,22 @@
+<a name="6.1.0-rc.2"></a>
+# [6.1.0-rc.2](https://github.com/angular/angularfire/compare/6.1.0-rc.1...6.1.0-rc.2) (2020-11-13)
+
+
+### Bug Fixes
+
+* **fcm:** `tokenChanges` now listen for notification permission changes and trip token detection as expected ([#2652](https://github.com/angular/angularfire/issues/2652)) ([8d3093f](https://github.com/angular/angularfire/commit/8d3093f))
+
+### Features
+
+* **database:** Added `USE_EMULATOR` DI token ([#2652](https://github.com/angular/angularfire/issues/2652)) ([8d3093f](https://github.com/angular/angularfire/commit/8d3093f))
+* **fcm:** Added `VAPID_KEY`, `SERVICE_WORKER`, and `USE_EMULATOR` DI tokens ([#2652](https://github.com/angular/angularfire/issues/2652)) ([8d3093f](https://github.com/angular/angularfire/commit/8d3093f))
+* **fcm:** `deleteToken`'s token argument is now optional, reflecting Firebase v8 changes ([#2652](https://github.com/angular/angularfire/issues/2652)) ([8d3093f](https://github.com/angular/angularfire/commit/8d3093f))
+* **auth:** Added `SETTINGS`, `TENANT_ID`, `LANGUAGE_CODE`, `USE_DEVICE_LANGUAGE`, `USE_EMULATOR` and `PERSISTENCE` DI tokens ([#2652](https://github.com/angular/angularfire/issues/2652)) ([8d3093f](https://github.com/angular/angularfire/commit/8d3093f))
+* **functions:** Added `USE_EMULATOR` and `NEW_ORIGIN_BEHAVIOR` DI token to opt-into the new way of setting `ORIGIN` ([#2652](https://github.com/angular/angularfire/issues/2652)) ([8d3093f](https://github.com/angular/angularfire/commit/8d3093f))
+* **functions:** `httpsCallable` function now takes in `HttpsCallableOptions` ([#2652](https://github.com/angular/angularfire/issues/2652)) ([8d3093f](https://github.com/angular/angularfire/commit/8d3093f))
+* **storage:** Added `MAX_UPLOAD_RETRY_TIME` and `MAX_OPERATION_RETRY_TIME` DI tokens ([#2652](https://github.com/angular/angularfire/issues/2652)) ([8d3093f](https://github.com/angular/angularfire/commit/8d3093f))
+
+
 <a name="6.1.0-rc.1"></a>
 # [6.1.0-rc.1](https://github.com/angular/angularfire/compare/6.1.0-rc.0...6.1.0-rc.1) (2020-11-12)
 
