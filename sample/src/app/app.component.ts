@@ -1,8 +1,5 @@
 import { ApplicationRef, Component } from '@angular/core';
 import { FirebaseApp } from '@angular/fire';
-import { ActivatedRoute, ActivationEnd, NavigationEnd, Router } from '@angular/router';
-import { of, zip } from 'rxjs';
-import { filter, groupBy, mergeMap, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
