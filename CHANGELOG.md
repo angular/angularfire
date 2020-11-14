@@ -1,3 +1,10 @@
+<a name="6.1.0-rc.3"></a>
+# [6.1.0-rc.3](https://github.com/angular/angularfire/compare/6.1.0-rc.2...6.1.0-rc.3) (2020-11-14)
+
+### Bug Fixes
+
+* **analytics:** Bunch of analytics & screen tracking improvements ([#2654](https://github.com/angular/angularfire/pull/2654)) ([5bc159a](https://github.com/angular/angularfire/commit/5bc159a))
+
 <a name="6.1.0-rc.2"></a>
 # [6.1.0-rc.2](https://github.com/angular/angularfire/compare/6.1.0-rc.1...6.1.0-rc.2) (2020-11-13)
 
