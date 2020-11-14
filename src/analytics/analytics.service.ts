@@ -3,17 +3,16 @@ import {
   Inject,
   Injectable,
   Injector,
-  NgModuleFactory,
   NgZone,
   OnDestroy,
   Optional,
   PLATFORM_ID
 } from '@angular/core';
 import { from, Observable, of, Subscription } from 'rxjs';
-import { filter, groupBy, map, mergeMap, observeOn, pairwise, startWith, switchMap, tap, withLatestFrom } from 'rxjs/operators';
-import { ActivationEnd, NavigationEnd, Router, ROUTES } from '@angular/router';
+import { distinctUntilChanged, filter, groupBy, map, mergeMap, observeOn, pairwise, startWith, switchMap, tap } from 'rxjs/operators';
+import { ActivationEnd, Router, ɵEmptyOutletComponent } from '@angular/router';
 import { ɵAngularFireSchedulers } from '@angular/fire';
-import { AngularFireAnalytics, DEBUG_MODE } from './analytics';
+import { AngularFireAnalytics } from './analytics';
 import firebase from 'firebase/app';
 import { Title } from '@angular/platform-browser';
 import { isPlatformBrowser, isPlatformServer } from '@angular/common';
@@ -30,15 +29,10 @@ const PAGE_PATH_KEY = 'page_path';
 const PAGE_TITLE_KEY = 'page_title';
 const SCREEN_CLASS_KEY = 'screen_class';
 const SCREEN_NAME_KEY = 'screen_name';
-
 const SCREEN_VIEW_EVENT = 'screen_view';
 const EVENT_ORIGIN_AUTO = 'auto';
 const DEFAULT_SCREEN_CLASS = '???';
-const NG_PRIMARY_OUTLET = 'primary';
 const SCREEN_INSTANCE_DELIMITER = '#';
-
-const ANNOTATIONS = '__annotations__';
-
 
 // this is an INT64 in iOS/Android but use INT32 cause javascript
 let nextScreenInstanceID = Math.floor(Math.random() * (2 ** 32 - 1)) - 2 ** 31;
@@ -72,25 +66,30 @@ export class ScreenTrackingService implements OnDestroy {
     componentFactoryResolver: ComponentFactoryResolver,
     // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
-    @Optional() @Inject(DEBUG_MODE) debugModeEnabled: boolean | null,
     zone: NgZone,
-    injector: Injector
+    injector: Injector,
   ) {
     if (!router || !isPlatformBrowser(platformId)) {
       return this;
     }
     zone.runOutsideAngular(() => {
       const activationEndEvents = router.events.pipe(filter<ActivationEnd>(e => e instanceof ActivationEnd));
-      const navigationEndEvents = router.events.pipe(filter<NavigationEnd>(e => e instanceof NavigationEnd));
-      this.disposable = navigationEndEvents.pipe(
-        withLatestFrom(activationEndEvents),
-        switchMap(([navigationEnd, activationEnd]) => {
-          // SEMVER: start using optional chains and nullish coalescing once we support newer typescript
-          const pagePath = navigationEnd.url;
-          const screenName = activationEnd.snapshot.routeConfig && activationEnd.snapshot.routeConfig.path || pagePath;
+      this.disposable = activationEndEvents.pipe(
+        switchMap(activationEnd => {
+          // router parseUrl is having trouble with outlets when they're empty
+          // e.g, /asdf/1(bob://sally:asdf), so put another slash in when empty
+          const urlTree = router.parseUrl(router.url.replace(/(?:\().+(?:\))/g, a => a.replace('://', ':///')));
+          const pagePath = urlTree.root.children[activationEnd.snapshot.outlet]?.toString() || '';
+          const actualSnapshot = router.routerState.root.children.map(it => it).find(it => it.outlet === activationEnd.snapshot.outlet);
+          let actualDeep = actualSnapshot;
+          while (actualDeep.firstChild) {
+            actualDeep = actualDeep.firstChild;
+          }
+          const screenName = actualDeep.pathFromRoot.map(s => s.routeConfig?.path).filter(it => it).join('/') || '/';
+
           const params = {
             [SCREEN_NAME_KEY]: screenName,
-            [PAGE_PATH_KEY]: pagePath,
+            [PAGE_PATH_KEY]: `/${pagePath}`,
             [FIREBASE_EVENT_ORIGIN_KEY]: EVENT_ORIGIN_AUTO,
             [FIREBASE_SCREEN_NAME_KEY]: screenName,
             [OUTLET_KEY]: activationEnd.snapshot.outlet
@@ -98,85 +97,52 @@ export class ScreenTrackingService implements OnDestroy {
           if (title) {
             params[PAGE_TITLE_KEY] = title.getTitle();
           }
-          const component = activationEnd.snapshot.component;
-          const routeConfig = activationEnd.snapshot.routeConfig;
-          const loadChildren = routeConfig && routeConfig.loadChildren;
-          // TODO figure out how to handle minification
-          if (typeof loadChildren === 'string') {
-            // SEMVER: this is the older lazy load style "./path#ClassName", drop this when we drop old ng
-            // TODO is it worth seeing if I can look up the component factory selector from the module name?
-            // it's lazy so it's not registered with componentFactoryResolver yet... seems a pain for a depreciated style
-            return of({ ...params, [SCREEN_CLASS_KEY]: loadChildren.split('#')[1] });
-          } else if (typeof component === 'string') {
+
+          let component = actualSnapshot.component;
+          if (component) {
+            if (component === ɵEmptyOutletComponent) {
+              let deepSnapshot = activationEnd.snapshot;
+              // TODO when might there be mutple children, different outlets? explore
+              while (deepSnapshot.firstChild) {
+                deepSnapshot = deepSnapshot.firstChild;
+              }
+              component = deepSnapshot.component;
+            }
+          } else {
+            component = activationEnd.snapshot.component;
+          }
+
+          if (typeof component === 'string') {
             return of({ ...params, [SCREEN_CLASS_KEY]: component });
           } else if (component) {
             const componentFactory = componentFactoryResolver.resolveComponentFactory(component);
             return of({ ...params, [SCREEN_CLASS_KEY]: componentFactory.selector });
-          } else if (loadChildren) {
-            const loadedChildren = loadChildren();
-            const loadedChildren$: Observable<any> = (loadedChildren instanceof Observable) ?
-              loadedChildren :
-              from(Promise.resolve(loadedChildren));
-            return loadedChildren$.pipe(
-              map(lazyModule => {
-                if (lazyModule instanceof NgModuleFactory) {
-                  // AOT create an injector
-                  const moduleRef = lazyModule.create(injector);
-                  // INVESTIGATE is this the right way to get at the matching route?
-                  const routes = moduleRef.injector.get(ROUTES);
-                  const component = routes[0][0].component; // should i just be grabbing 0-0 here?
-                  try {
-                    const componentFactory = moduleRef.componentFactoryResolver.resolveComponentFactory(component);
-                    return { ...params, [SCREEN_CLASS_KEY]: componentFactory.selector };
-                  } catch (_) {
-                    return { ...params, [SCREEN_CLASS_KEY]: DEFAULT_SCREEN_CLASS };
-                  }
-                } else {
-                  // JIT look at the annotations
-                  // INVESTIGATE are there public APIs for this stuff?
-                  const declarations = [].concat.apply([], (lazyModule[ANNOTATIONS] || []).map((f: any) => f.declarations));
-                  const selectors = [].concat.apply([], declarations.map((c: any) => (c[ANNOTATIONS] || []).map((f: any) => f.selector)));
-                  // should I just be grabbing the selector like this or should i match against the route component?
-                  //   const routerModule = lazyModule.ngInjectorDef.imports.find(i => i.ngModule && ....);
-                  //   const route = routerModule.providers[0].find(p => p.provide == ROUTES).useValue[0];
-                  return { ...params, [SCREEN_CLASS_KEY]: selectors[0] || DEFAULT_SCREEN_CLASS };
-                }
-              })
-            );
           } else {
-            return of({ ...params, [SCREEN_CLASS_KEY]: DEFAULT_SCREEN_CLASS });
+            // lazy loads cause extra activations, ignore
+            return of(null);
           }
         }),
+        filter(it => it),
         map(params => ({
           [FIREBASE_SCREEN_CLASS_KEY]: params[SCREEN_CLASS_KEY],
           [FIREBASE_SCREEN_INSTANCE_ID_KEY]: getScreenInstanceID(params),
           ...params
         })),
-        tap(params => {
-          // TODO perhaps I can be smarter about this, bubble events up to the nearest outlet?
-          if (params[OUTLET_KEY] === NG_PRIMARY_OUTLET) {
-            analytics.setCurrentScreen(params[SCREEN_NAME_KEY]);
-            analytics.updateConfig({
-              [PAGE_PATH_KEY]: params[PAGE_PATH_KEY],
-              [SCREEN_CLASS_KEY]: params[SCREEN_CLASS_KEY]
-            });
-            if (title) {
-              analytics.updateConfig({ [PAGE_TITLE_KEY]: params[PAGE_TITLE_KEY] });
-            }
-          }
-        }),
-        groupBy(params => params[OUTLET_KEY]),
-        // tslint:disable-next-line
-        mergeMap(group => group.pipe(startWith(undefined), pairwise())),
-        map(([prior, current]) => prior ? {
-          [FIREBASE_PREVIOUS_SCREEN_CLASS_KEY]: prior[SCREEN_CLASS_KEY],
-          [FIREBASE_PREVIOUS_SCREEN_NAME_KEY]: prior[SCREEN_NAME_KEY],
-          [FIREBASE_PREVIOUS_SCREEN_INSTANCE_ID_KEY]: prior[FIREBASE_SCREEN_INSTANCE_ID_KEY],
-          ...current
-        } : current),
-        // tslint:disable-next-line:no-console
-        tap(params => debugModeEnabled && console.info(SCREEN_VIEW_EVENT, params)),
-        tap(params => zone.runOutsideAngular(() => analytics.logEvent(SCREEN_VIEW_EVENT, params)))
+        groupBy(it => it[OUTLET_KEY]),
+        mergeMap(it => it.pipe(
+          distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
+          startWith(undefined),
+          pairwise(),
+          map(([prior, current]) =>
+            prior ? {
+              [FIREBASE_PREVIOUS_SCREEN_CLASS_KEY]: prior[SCREEN_CLASS_KEY],
+              [FIREBASE_PREVIOUS_SCREEN_NAME_KEY]: prior[SCREEN_NAME_KEY],
+              [FIREBASE_PREVIOUS_SCREEN_INSTANCE_ID_KEY]: prior[FIREBASE_SCREEN_INSTANCE_ID_KEY],
+              ...current
+            } : current
+          ),
+          tap(params => analytics.logEvent(SCREEN_VIEW_EVENT, params))
+        ))
       ).subscribe();
     });
   }

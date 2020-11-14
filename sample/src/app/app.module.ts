@@ -10,9 +10,12 @@ import { AngularFireModule } from '@angular/fire';
 
 import {
   AngularFireAnalyticsModule,
+  APP_NAME,
+  APP_VERSION,
   DEBUG_MODE as ANALYTICS_DEBUG_MODE,
   ScreenTrackingService,
-  UserTrackingService
+  UserTrackingService,
+  COLLECTION_ENABLED
 } from '@angular/fire/analytics';
 
 import { FirestoreComponent } from './firestore/firestore.component';
@@ -55,24 +58,20 @@ import { FunctionsComponent } from './functions/functions.component';
     AngularFireDatabaseModule,
     AngularFirestoreModule.enablePersistence({ synchronizeTabs: true }),
     AngularFireAuthModule,
+    AngularFireAuthGuardModule,
     AngularFireRemoteConfigModule,
     AngularFireMessagingModule,
-    // AngularFireAnalyticsModule, // TODO having trouble getting this to work in IE
+    AngularFireAnalyticsModule,
     AngularFireFunctionsModule,
-    // AngularFirePerformanceModule, // TODO having trouble getting this to work in IE
+    AngularFirePerformanceModule,
     AngularFireAuthGuardModule
   ],
   providers: [
-    /*
-      TODO Analytics and Performance monitoring aren't working in IE, sort this out
-      UserTrackingService,
-      ScreenTrackingService,
-      PerformanceMonitoringService,
-      {
-        provide: ANALYTICS_DEBUG_MODE,
-        useFactory: () => isDevMode()
-      },
-    */
+    UserTrackingService,
+    ScreenTrackingService,
+    PerformanceMonitoringService,
+    { provide: ANALYTICS_DEBUG_MODE, useValue: false },
+    { provide: COLLECTION_ENABLED, useValue: true },
     { provide: USE_AUTH_EMULATOR, useValue: environment.useEmulators ? ['localhost', 9099] : undefined },
     { provide: USE_DATABASE_EMULATOR, useValue: environment.useEmulators ? ['localhost', 9000] : undefined },
     { provide: USE_FIRESTORE_EMULATOR, useValue: environment.useEmulators ? ['localhost', 8080] : undefined },
@@ -84,6 +83,8 @@ import { FunctionsComponent } from './functions/functions.component';
     { provide: USE_DEVICE_LANGUAGE, useValue: true },
     { provide: VAPID_KEY, useValue: environment.vapidKey },
     { provide: SERVICE_WORKER, useFactory: () => navigator?.serviceWorker?.getRegistration() ?? undefined },
+    { provide: APP_VERSION, useValue: '0.0.0' },
+    { provide: APP_NAME, useValue: 'Angular' }
   ],
   bootstrap: [AppComponent]
 })
