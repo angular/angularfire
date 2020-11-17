@@ -31,6 +31,7 @@ import { isPlatformBrowser } from '@angular/common';
 import firebase from 'firebase/app';
 import { Settings } from './interfaces';
 import { proxyPolyfillCompat } from './base';
+import { ɵfetchInstance } from '@angular/fire';
 
 export interface ConfigTemplate {
   [key: string]: string | number | boolean;
@@ -149,15 +150,16 @@ export class AngularFireRemoteConfig {
       switchMap(() => import('@firebase/remote-config')),
       tap(rc => rc.registerRemoteConfig && rc.registerRemoteConfig(firebase as any)),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
-      map(app => app.remoteConfig()),
-      tap(rc => {
+      map(app => ɵfetchInstance(`${app.name}.remote-config`, 'AngularFireRemoteConfig', app, () => {
+        const rc = app.remoteConfig();
         if (settings) {
           rc.settings = settings;
         }
         if (defaultConfig) {
           rc.defaultConfig = defaultConfig;
         }
-      }),
+        return rc;
+      }, [settings, defaultConfig])),
       // tslint:disable-next-line
       startWith(undefined),
       shareReplay({ bufferSize: 1, refCount: false })

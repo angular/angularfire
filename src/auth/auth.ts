@@ -16,6 +16,7 @@ import {
 import firebase from 'firebase/app';
 import { isPlatformServer } from '@angular/common';
 import { proxyPolyfillCompat } from './base';
+import { ɵfetchInstance } from '@angular/fire';
 
 export interface AngularFireAuth extends ɵPromiseProxy<firebase.auth.Auth> {}
 
@@ -76,27 +77,29 @@ export class AngularFireAuth {
       switchMap(() => zone.runOutsideAngular(() => import('firebase/auth'))),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
       map(app => zone.runOutsideAngular(() => {
-        const auth = app.auth();
         const useEmulator: UseEmulatorArguments | null = _useEmulator;
-        if (useEmulator) {
-          // Firebase Auth doesn't conform to the useEmulator convention, let's smooth that over
-          auth.useEmulator(`http://${useEmulator.join(':')}`);
-        }
-        if (tenantId) {
-          auth.tenantId = tenantId;
-        }
-        auth.languageCode = languageCode;
-        if (useDeviceLanguage) {
-          auth.useDeviceLanguage();
-        }
         const settings: firebase.auth.AuthSettings | null = _settings;
-        if (settings) {
-          auth.settings = settings;
-        }
-        if (persistence) {
-          auth.setPersistence(persistence);
-        }
-        return auth;
+        return ɵfetchInstance(`${app.name}.auth`, 'AngularFireAuth', app, () => {
+          const auth = app.auth();
+          if (useEmulator) {
+            // Firebase Auth doesn't conform to the useEmulator convention, let's smooth that over
+            auth.useEmulator(`http://${useEmulator.join(':')}`);
+          }
+          if (tenantId) {
+            auth.tenantId = tenantId;
+          }
+          auth.languageCode = languageCode;
+          if (useDeviceLanguage) {
+            auth.useDeviceLanguage();
+          }
+          if (settings) {
+            auth.settings = settings;
+          }
+          if (persistence) {
+            auth.setPersistence(persistence);
+          }
+          return auth;
+        }, [useEmulator, tenantId, languageCode, useDeviceLanguage, settings, persistence]);
       })),
       shareReplay({ bufferSize: 1, refCount: false }),
     );

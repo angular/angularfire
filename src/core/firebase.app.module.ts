@@ -1,5 +1,5 @@
 import {
-  Inject, InjectionToken, ModuleWithProviders, NgModule, NgZone, Optional, PLATFORM_ID, VERSION as NG_VERSION, Version
+  Inject, InjectionToken, isDevMode, ModuleWithProviders, NgModule, NgZone, Optional, PLATFORM_ID, VERSION as NG_VERSION, Version
 } from '@angular/core';
 import firebase from 'firebase/app';
 
@@ -42,7 +42,45 @@ export function ɵfirebaseAppFactory(options: FirebaseOptions, zone: NgZone, nam
   const existingApp = firebase.apps.filter(app => app && app.name === config.name)[0] as any;
   // We support FirebaseConfig, initializeApp's public type only accepts string; need to cast as any
   // Could be solved with https://github.com/firebase/firebase-js-sdk/pull/1206
-  return (existingApp || zone.runOutsideAngular(() => firebase.initializeApp(options, config as any))) as FirebaseApp;
+  const app = (existingApp || zone.runOutsideAngular(() => firebase.initializeApp(options, config as any))) as FirebaseApp;
+  if (JSON.stringify(options) !== JSON.stringify(app.options)) {
+    const hmr = !!(module as any).hot;
+    log('error', `${app.toString()} already initialized with different options${hmr ? ', you may need to reload as Firebase is not HMR aware.' : '.'}`);
+  }
+  return app;
+}
+
+export const ɵlogAuthEmulatorError = () => {
+  // TODO sort this out, https://github.com/angular/angularfire/issues/2656
+  log('warn', 'You may need to import \'firebase/auth\' manually in your component rather than rely on AngularFireAuth\'s dynamic import, when using the emulator suite https://github.com/angular/angularfire/issues/2656');
+};
+
+const log = (level: 'log'|'error'|'info'|'warn', ...args: any) => {
+  if (isDevMode() && typeof console !== 'undefined') {
+    console[level](...args);
+  }
+};
+
+globalThis.ɵAngularfireInstanceCache ||= new Map();
+
+export function ɵfetchInstance<T>(cacheKey: any, moduleName: string, app: FirebaseApp, fn: () => T, args: any[]): T {
+  const [instance, ...cachedArgs] = globalThis.ɵAngularfireInstanceCache.get(cacheKey) || [];
+  if (instance && args.some((arg, i) => {
+    const cachedArg = cachedArgs[i];
+    if (arg && typeof arg === 'object') {
+      return JSON.stringify(arg) !== JSON.stringify(cachedArg);
+    } else {
+      return arg !== cachedArg;
+    }
+  })) {
+    const hmr = !!(module as any).hot;
+    log('error', `${moduleName} was already initialized on the ${app.name} Firebase App instance with different settings.${hmr ? ' You may need to reload as Firebase is not HMR aware.' : ''}`);
+    return instance;
+  } else {
+    const newInstance = fn();
+    globalThis.ɵAngularfireInstanceCache.set(cacheKey, [newInstance, ...args]);
+    return newInstance;
+  }
 }
 
 const FIREBASE_APP_PROVIDER = {

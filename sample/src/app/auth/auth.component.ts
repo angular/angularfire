@@ -13,6 +13,7 @@ import { isPlatformServer } from '@angular/common';
     <p>
       Auth!
       {{ (auth.user | async)?.uid | json }}
+      {{ (auth.user | async)?.metadata | json }}
       <button (click)="login()" *ngIf="showLoginButton">Log in with Google</button>
       <button (click)="logout()" *ngIf="showLogoutButton">Log out</button>
     </p>
@@ -46,12 +47,15 @@ export class AuthComponent implements OnInit, OnDestroy {
     }
   }
 
-  login() {
-    this.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+  async login() {
+    const user = await this.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    console.log(user?.additionalUserInfo.isNewUser);
+    // TODO sign into offline app
   }
 
   logout() {
     this.auth.signOut();
+    // TODO sign out of offline app
   }
 
 }

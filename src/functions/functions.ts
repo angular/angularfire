@@ -1,6 +1,6 @@
 import { Inject, Injectable, InjectionToken, NgZone, Optional } from '@angular/core';
 import { from, Observable, of } from 'rxjs';
-import { map, observeOn, shareReplay, switchMap, tap } from 'rxjs/operators';
+import { map, observeOn, shareReplay, switchMap } from 'rxjs/operators';
 import {
   FIREBASE_APP_NAME,
   FIREBASE_OPTIONS,
@@ -15,6 +15,7 @@ import {
 import firebase from 'firebase/app';
 import { proxyPolyfillCompat } from './base';
 import { HttpsCallableOptions } from '@firebase/functions-types';
+import { ɵfetchInstance } from '@angular/fire';
 
 export const ORIGIN = new InjectionToken<string>('angularfire2.functions.origin');
 export const REGION = new InjectionToken<string>('angularfire2.functions.region');
@@ -46,30 +47,30 @@ export class AngularFireFunctions {
     @Optional() @Inject(USE_EMULATOR) _useEmulator: any, // can't use the tuple here
   ) {
     const schedulers = new ɵAngularFireSchedulers(zone);
+    const useEmulator: UseEmulatorArguments | null = _useEmulator;
 
     const functions = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
       switchMap(() => import('firebase/functions')),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
-      map(app => {
+      map(app => ɵfetchInstance(`${app.name}.functions.${region || origin}`, 'AngularFireFunctions', app, () => {
+        let functions: firebase.functions.Functions;
         if (newOriginBehavior) {
           if (region && origin) {
             throw new Error('REGION and ORIGIN can\'t be used at the same time.');
           }
-          return app.functions(region || origin || undefined);
+          functions = app.functions(region || origin || undefined);
         } else {
-          return app.functions(region || undefined);
+          functions = app.functions(region || undefined);
         }
-      }),
-      tap(functions => {
-        const useEmulator: UseEmulatorArguments | null = _useEmulator;
         if (!newOriginBehavior && !useEmulator && origin) {
           functions.useFunctionsEmulator(origin);
         }
         if (useEmulator) {
           functions.useEmulator(...useEmulator);
         }
-      }),
+        return functions;
+      }, [region, origin, useEmulator])),
       shareReplay({ bufferSize: 1, refCount: false })
     );
 

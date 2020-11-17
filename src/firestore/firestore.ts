@@ -20,12 +20,14 @@ import {
   FirebaseOptions,
   ɵAngularFireSchedulers,
   ɵfirebaseAppFactory,
-  ɵkeepUnstableUntilFirstFactory
+  ɵkeepUnstableUntilFirstFactory,
+  FirebaseApp
 } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
 import 'firebase/firestore';
-const atFirestore = require('@firebase/firestore');
 import firebase from 'firebase/app';
+import { USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/auth';
+import { ɵfetchInstance, ɵlogAuthEmulatorError } from '@angular/fire';
 
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
@@ -56,6 +58,13 @@ export function associateQuery<T>(collectionRef: CollectionReference<T>, queryFn
   const ref = collectionRef;
   return { query, ref };
 }
+
+type InstanceCache = Map<FirebaseApp, [
+  firebase.firestore.Firestore,
+  firebase.firestore.Settings | null,
+  UseEmulatorArguments | null,
+  boolean | null]
+>;
 
 /**
  * AngularFirestore Service
@@ -136,43 +145,44 @@ export class AngularFirestore {
     zone: NgZone,
     @Optional() @Inject(PERSISTENCE_SETTINGS) persistenceSettings: PersistenceSettings | null,
     @Optional() @Inject(USE_EMULATOR) _useEmulator: any,
+    @Optional() @Inject(USE_AUTH_EMULATOR) useAuthEmulator: any,
   ) {
     this.schedulers = new ɵAngularFireSchedulers(zone);
     this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers);
 
-    this.firestore = zone.runOutsideAngular(() => {
-      const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
-      // INVESTIGATE this seems to be required because in the browser build registerFirestore is an Object?
-      //             seems like we're fighting ngcc. In the server firestore() isn't available, so I have to register
-      //             in the browser registerFirestore is not a function... maybe this is an underlying firebase-js-sdk issue
-      if ('registerFirestore' in atFirestore) {
-        (atFirestore as any).registerFirestore(firebase as any);
-      }
-      const firestore = app.firestore();
+    const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
+    if (!firebase.auth && useAuthEmulator) {
+      ɵlogAuthEmulatorError();
+    }
+    const useEmulator: UseEmulatorArguments | null = _useEmulator;
+
+    [this.firestore, this.persistenceEnabled$] = ɵfetchInstance(`${app.name}.firestore`, 'AngularFirestore', app, () => {
+      const firestore = zone.runOutsideAngular(() => app.firestore());
       if (settings) {
         firestore.settings(settings);
       }
-      const useEmulator: UseEmulatorArguments | null = _useEmulator;
       if (useEmulator) {
         firestore.useEmulator(...useEmulator);
       }
-      return firestore;
-    });
 
-    if (shouldEnablePersistence && !isPlatformServer(platformId)) {
-      // We need to try/catch here because not all enablePersistence() failures are caught
-      // https://github.com/firebase/firebase-js-sdk/issues/608
-      const enablePersistence = () => {
-        try {
-          return from(this.firestore.enablePersistence(persistenceSettings || undefined).then(() => true, () => false));
-        } catch (e) {
-          return of(false);
-        }
-      };
-      this.persistenceEnabled$ = zone.runOutsideAngular(enablePersistence);
-    } else {
-      this.persistenceEnabled$ = of(false);
-    }
+      if (shouldEnablePersistence && !isPlatformServer(platformId)) {
+        // We need to try/catch here because not all enablePersistence() failures are caught
+        // https://github.com/firebase/firebase-js-sdk/issues/608
+        const enablePersistence = () => {
+          try {
+            return from(firestore.enablePersistence(persistenceSettings || undefined).then(() => true, () => false));
+          } catch (e) {
+            if (typeof console !== 'undefined') { console.warn(e); }
+            return of(false);
+          }
+        };
+        // TODO how do I back this up for a cache hit?
+        return [firestore, zone.runOutsideAngular(enablePersistence)];
+      } else {
+        return [firestore, of(false)];
+      }
+
+    }, [settings, useEmulator, shouldEnablePersistence]);
   }
 
   /**
