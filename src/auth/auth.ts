@@ -124,12 +124,15 @@ export class AngularFireAuth {
       const _ = auth.pipe(first()).subscribe();
 
       this.authState = auth.pipe(
+        // wait for getRedirectResult otherwise we often get extraneous nulls firing on page load even if
+        // a user is signed in
         switchMap(auth => auth.getRedirectResult().then(() => auth, () => auth)),
         switchMap(auth => zone.runOutsideAngular(() => new Observable<firebase.User|null>(auth.onAuthStateChanged.bind(auth)))),
         keepUnstableUntilFirst
       );
 
       this.user = auth.pipe(
+        // see comment on authState
         switchMap(auth => auth.getRedirectResult().then(() => auth, () => auth)),
         switchMap(auth => zone.runOutsideAngular(() => new Observable<firebase.User|null>(auth.onIdTokenChanged.bind(auth)))),
         keepUnstableUntilFirst
@@ -147,8 +150,11 @@ export class AngularFireAuth {
         switchMap(auth => merge(
           auth.getRedirectResult().then(it => it, () => null),
           logins,
+          // pipe in null authState to make credential zipable, just a weird devexp if
+          // authState and user go null to still have a credential
           this.authState.pipe(filter(it => !it)))
         ),
+        // handle the { user: { } } when a user is already logged in, rather have null
         map(credential => credential?.user ? credential : null),
       );
 
@@ -156,8 +162,9 @@ export class AngularFireAuth {
 
     return ɵlazySDKProxy(this, auth, zone, { spy: {
       apply: (name, _, val) => {
-        // if they're using the UserTrackingService spy on auth calls and log sign_up and login
-        // events based on whether the user is new or not
+        // If they call a signIn or createUser function listen into the promise
+        // this will give us the user credential, push onto the logins Subject
+        // to be consumed in .credential
         if (name.startsWith('signIn') || name.startsWith('createUser')) {
           val.then((user: firebase.auth.UserCredential) => logins.next(user));
         }
