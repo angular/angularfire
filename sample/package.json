@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "started:emulated": "concurrently -n ng,firebase -c red,yellow \"ng serve -c emulated\" \"firebase emulators:start\"",
+    "start:emulated": "concurrently -n ng,firebase -c red,yellow \"ng serve -c emulated\" \"firebase emulators:start\"",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",

@@ -7,13 +7,13 @@ import {
   FirebaseAppConfig,
   FirebaseOptions,
   ɵAngularFireSchedulers,
+  ɵfetchInstance,
   ɵfirebaseAppFactory,
   ɵkeepUnstableUntilFirstFactory
 } from '@angular/fire';
 import { UploadMetadata } from './interfaces';
 import 'firebase/storage';
 import firebase from 'firebase/app';
-import { registerStorage } from '@firebase/storage';
 
 export const BUCKET = new InjectionToken<string>('angularfire2.storageBucket');
 export const MAX_UPLOAD_RETRY_TIME = new InjectionToken<number>('angularfire2.storage.maxUploadRetryTime');
@@ -47,13 +47,10 @@ export class AngularFireStorage {
   ) {
     this.schedulers = new ɵAngularFireSchedulers(zone);
     this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers);
+    const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
 
-    this.storage = zone.runOutsideAngular(() => {
-      const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
-      if (registerStorage) {
-        registerStorage(firebase as any);
-      }
-      const storage = app.storage(storageBucket || undefined);
+    this.storage = ɵfetchInstance(`${app.name}.storage.${storageBucket}`, 'AngularFireStorage', app, () => {
+      const storage = zone.runOutsideAngular(() => app.storage(storageBucket || undefined));
       if (maxUploadRetryTime) {
         storage.setMaxUploadRetryTime(maxUploadRetryTime);
       }
@@ -61,7 +58,7 @@ export class AngularFireStorage {
         storage.setMaxOperationRetryTime(maxOperationRetryTime);
       }
       return storage;
-    });
+    }, [maxUploadRetryTime, maxOperationRetryTime]);
   }
 
   ref(path: string) {

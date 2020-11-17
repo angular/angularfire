@@ -2,20 +2,18 @@ import {
   ComponentFactoryResolver,
   Inject,
   Injectable,
-  Injector,
   NgZone,
   OnDestroy,
   Optional,
   PLATFORM_ID
 } from '@angular/core';
-import { from, Observable, of, Subscription } from 'rxjs';
-import { distinctUntilChanged, filter, groupBy, map, mergeMap, observeOn, pairwise, startWith, switchMap, tap } from 'rxjs/operators';
+import { of, Subscription } from 'rxjs';
+import { distinctUntilChanged, filter, groupBy, map, mergeMap, pairwise, startWith, switchMap } from 'rxjs/operators';
 import { ActivationEnd, Router, ɵEmptyOutletComponent } from '@angular/router';
-import { ɵAngularFireSchedulers } from '@angular/fire';
 import { AngularFireAnalytics } from './analytics';
-import firebase from 'firebase/app';
 import { Title } from '@angular/platform-browser';
-import { isPlatformBrowser, isPlatformServer } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
+import { UserTrackingService } from './user-tracking.service';
 
 const FIREBASE_EVENT_ORIGIN_KEY = 'firebase_event_origin';
 const FIREBASE_PREVIOUS_SCREEN_CLASS_KEY = 'firebase_previous_class';
@@ -31,7 +29,6 @@ const SCREEN_CLASS_KEY = 'screen_class';
 const SCREEN_NAME_KEY = 'screen_name';
 const SCREEN_VIEW_EVENT = 'screen_view';
 const EVENT_ORIGIN_AUTO = 'auto';
-const DEFAULT_SCREEN_CLASS = '???';
 const SCREEN_INSTANCE_DELIMITER = '#';
 
 // this is an INT64 in iOS/Android but use INT32 cause javascript
@@ -67,7 +64,7 @@ export class ScreenTrackingService implements OnDestroy {
     // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
-    injector: Injector,
+    @Optional() userTrackingService: UserTrackingService,
   ) {
     if (!router || !isPlatformBrowser(platformId)) {
       return this;
@@ -141,7 +138,12 @@ export class ScreenTrackingService implements OnDestroy {
               ...current
             } : current
           ),
-          tap(params => analytics.logEvent(SCREEN_VIEW_EVENT, params))
+          switchMap(async params => {
+            if (userTrackingService) {
+              await userTrackingService.initialized;
+            }
+            return await analytics.logEvent(SCREEN_VIEW_EVENT, params);
+          })
         ))
       ).subscribe();
     });
@@ -153,39 +155,4 @@ export class ScreenTrackingService implements OnDestroy {
     }
   }
 
-}
-
-@Injectable()
-export class UserTrackingService implements OnDestroy {
-
-  private disposable: Subscription | undefined;
-
-  // TODO a user properties injector
-  constructor(
-    analytics: AngularFireAnalytics,
-    zone: NgZone,
-    // tslint:disable-next-line:ban-types
-    @Inject(PLATFORM_ID) platformId: Object
-  ) {
-    const schedulers = new ɵAngularFireSchedulers(zone);
-
-    if (!isPlatformServer(platformId)) {
-      zone.runOutsideAngular(() => {
-        // @ts-ignore zap the import in the UMD
-        this.disposable = from(import('firebase/auth')).pipe(
-          observeOn(schedulers.outsideAngular),
-          switchMap(() => analytics.app),
-          map(app => app.auth()),
-          switchMap(auth => new Observable<firebase.User | null>(auth.onAuthStateChanged.bind(auth))),
-          switchMap(user => analytics.setUserId(user ? user.uid : null))
-        ).subscribe();
-      });
-    }
-  }
-
-  ngOnDestroy() {
-    if (this.disposable) {
-      this.disposable.unsubscribe();
-    }
-  }
 }

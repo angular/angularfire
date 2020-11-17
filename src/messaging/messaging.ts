@@ -15,6 +15,7 @@ import {
 } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
 import { proxyPolyfillCompat } from './base';
+import { ɵfetchInstance } from '@angular/fire';
 
 export const VAPID_KEY = new InjectionToken<string>('angularfire2.messaging.vapid-key');
 export const SERVICE_WORKER = new InjectionToken<Promise<ServiceWorkerRegistration>>('angularfire2.messaging.service-worker-registeration');
@@ -54,7 +55,7 @@ export class AngularFireMessaging {
       observeOn(schedulers.insideAngular),
       switchMap(() => isPlatformServer(platformId) ? EMPTY : import('firebase/messaging')),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
-      switchMap(async app => {
+      switchMap(app => ɵfetchInstance(`${app.name}.messaging`, 'AngularFireMessaging', app, async () => {
         const messaging = app.messaging();
         if (firebaseLTv8) {
           if (vapidKey) {
@@ -65,7 +66,7 @@ export class AngularFireMessaging {
           }
         }
         return messaging;
-      }),
+      }, [vapidKey, serviceWorker])),
       shareReplay({ bufferSize: 1, refCount: false })
     );
 

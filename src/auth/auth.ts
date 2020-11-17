@@ -1,6 +1,6 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID, InjectionToken } from '@angular/core';
-import { Observable, of, from } from 'rxjs';
-import { switchMap, map, observeOn, shareReplay, first } from 'rxjs/operators';
+import { Observable, of, from, merge, Subject } from 'rxjs';
+import { switchMap, map, observeOn, shareReplay, first, filter } from 'rxjs/operators';
 import {
   FIREBASE_OPTIONS,
   FIREBASE_APP_NAME,
@@ -16,6 +16,7 @@ import {
 import firebase from 'firebase/app';
 import { isPlatformServer } from '@angular/common';
 import { proxyPolyfillCompat } from './base';
+import { ɵfetchInstance } from '@angular/fire';
 
 export interface AngularFireAuth extends ɵPromiseProxy<firebase.auth.Auth> {}
 
@@ -55,6 +56,11 @@ export class AngularFireAuth {
    */
   public readonly idTokenResult: Observable<firebase.auth.IdTokenResult|null>;
 
+  /**
+   * Observable of the currently signed-in user's credential, or null
+   */
+  public readonly credential: Observable<Required<firebase.auth.UserCredential>|null>;
+
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string|FirebaseAppConfig|null|undefined,
@@ -70,40 +76,43 @@ export class AngularFireAuth {
   ) {
     const schedulers = new ɵAngularFireSchedulers(zone);
     const keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(schedulers);
+    const logins = new Subject<firebase.auth.UserCredential>();
 
     const auth = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
       switchMap(() => zone.runOutsideAngular(() => import('firebase/auth'))),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
       map(app => zone.runOutsideAngular(() => {
-        const auth = app.auth();
         const useEmulator: UseEmulatorArguments | null = _useEmulator;
-        if (useEmulator) {
-          // Firebase Auth doesn't conform to the useEmulator convention, let's smooth that over
-          auth.useEmulator(`http://${useEmulator.join(':')}`);
-        }
-        if (tenantId) {
-          auth.tenantId = tenantId;
-        }
-        auth.languageCode = languageCode;
-        if (useDeviceLanguage) {
-          auth.useDeviceLanguage();
-        }
         const settings: firebase.auth.AuthSettings | null = _settings;
-        if (settings) {
-          auth.settings = settings;
-        }
-        if (persistence) {
-          auth.setPersistence(persistence);
-        }
-        return auth;
+        return ɵfetchInstance(`${app.name}.auth`, 'AngularFireAuth', app, () => {
+          const auth = app.auth();
+          if (useEmulator) {
+            // Firebase Auth doesn't conform to the useEmulator convention, let's smooth that over
+            auth.useEmulator(`http://${useEmulator.join(':')}`);
+          }
+          if (tenantId) {
+            auth.tenantId = tenantId;
+          }
+          auth.languageCode = languageCode;
+          if (useDeviceLanguage) {
+            auth.useDeviceLanguage();
+          }
+          if (settings) {
+            auth.settings = settings;
+          }
+          if (persistence) {
+            auth.setPersistence(persistence);
+          }
+          return auth;
+        }, [useEmulator, tenantId, languageCode, useDeviceLanguage, settings, persistence]);
       })),
       shareReplay({ bufferSize: 1, refCount: false }),
     );
 
     if (isPlatformServer(platformId)) {
 
-      this.authState = this.user = this.idToken = this.idTokenResult = of(null);
+      this.authState = this.user = this.idToken = this.idTokenResult = this.credential = of(null);
 
     } else {
 
@@ -115,12 +124,15 @@ export class AngularFireAuth {
       const _ = auth.pipe(first()).subscribe();
 
       this.authState = auth.pipe(
+        // wait for getRedirectResult otherwise we often get extraneous nulls firing on page load even if
+        // a user is signed in
         switchMap(auth => auth.getRedirectResult().then(() => auth, () => auth)),
         switchMap(auth => zone.runOutsideAngular(() => new Observable<firebase.User|null>(auth.onAuthStateChanged.bind(auth)))),
         keepUnstableUntilFirst
       );
 
       this.user = auth.pipe(
+        // see comment on authState
         switchMap(auth => auth.getRedirectResult().then(() => auth, () => auth)),
         switchMap(auth => zone.runOutsideAngular(() => new Observable<firebase.User|null>(auth.onIdTokenChanged.bind(auth)))),
         keepUnstableUntilFirst
@@ -134,9 +146,30 @@ export class AngularFireAuth {
         switchMap(user => user ? from(user.getIdTokenResult()) : of(null))
       );
 
+      this.credential = auth.pipe(
+        switchMap(auth => merge(
+          auth.getRedirectResult().then(it => it, () => null),
+          logins,
+          // pipe in null authState to make credential zipable, just a weird devexp if
+          // authState and user go null to still have a credential
+          this.authState.pipe(filter(it => !it)))
+        ),
+        // handle the { user: { } } when a user is already logged in, rather have null
+        map(credential => credential?.user ? credential : null),
+      );
+
     }
 
-    return ɵlazySDKProxy(this, auth, zone);
+    return ɵlazySDKProxy(this, auth, zone, { spy: {
+      apply: (name, _, val) => {
+        // If they call a signIn or createUser function listen into the promise
+        // this will give us the user credential, push onto the logins Subject
+        // to be consumed in .credential
+        if (name.startsWith('signIn') || name.startsWith('createUser')) {
+          val.then((user: firebase.auth.UserCredential) => logins.next(user));
+        }
+      }
+    }});
 
   }
 

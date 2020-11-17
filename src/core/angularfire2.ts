@@ -134,10 +134,18 @@ const noopFunctions = ['ngOnDestroy'];
 
 // INVESTIGATE should we make the Proxy revokable and do some cleanup?
 //             right now it's fairly simple but I'm sure this will grow in complexity
-export const ɵlazySDKProxy = (klass: any, observable: Observable<any>, zone: NgZone) => {
+export const ɵlazySDKProxy = (klass: any, observable: Observable<any>, zone: NgZone, options: {
+  spy?: {
+    get?: ((name: string, it: any) => void),
+    apply?: ((name: string, args: any[], it: any) => void)
+  }
+} = {}) => {
   return new Proxy(klass, {
     get: (_, name: string) => zone.runOutsideAngular(() => {
       if (klass[name]) {
+        if (options?.spy?.get) {
+          options.spy.get(name, klass[name]);
+        }
         return klass[name];
       }
       if (noopFunctions.indexOf(name) > -1) {
@@ -159,7 +167,13 @@ export const ɵlazySDKProxy = (klass: any, observable: Observable<any>, zone: Ng
       return new Proxy(() => {}, {
           get: (_, name) => promise[name],
           // TODO handle callbacks as transparently as I can
-          apply: (self, _, args) => promise.then(it => it && it(...args))
+          apply: (self, _, args) => promise.then(it => {
+            const res = it && it(...args);
+            if (options?.spy?.apply) {
+              options.spy.apply(name, args, res);
+            }
+            return res;
+          })
         }
       );
     })

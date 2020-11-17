@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, PLATFORM_ID } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import firebase from 'firebase/app';
 import { Subscription } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { trace } from '@angular/fire/performance';
 import { Inject } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
@@ -13,7 +13,9 @@ import { isPlatformServer } from '@angular/common';
     <p>
       Auth!
       {{ (auth.user | async)?.uid | json }}
+      {{ (auth.credential | async)?.operationType | json }}
       <button (click)="login()" *ngIf="showLoginButton">Log in with Google</button>
+      <button (click)="loginAnonymously()" *ngIf="showLoginButton">Log in anonymously</button>
       <button (click)="logout()" *ngIf="showLogoutButton">Log out</button>
     </p>
   `,
@@ -46,12 +48,19 @@ export class AuthComponent implements OnInit, OnDestroy {
     }
   }
 
-  login() {
-    this.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+  async login() {
+    const user = await this.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    // TODO sign into offline app
+  }
+
+  async loginAnonymously() {
+    const user = await this.auth.signInAnonymously();
+    // TODO sign into offline app
   }
 
   logout() {
     this.auth.signOut();
+    // TODO sign out of offline app
   }
 
 }

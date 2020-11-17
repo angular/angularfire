@@ -5,6 +5,7 @@ import firebase from 'firebase/app';
 import { FirebaseApp, ɵapplyMixins, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
 import { isPlatformBrowser } from '@angular/common';
 import { proxyPolyfillCompat } from './base';
+import { ɵfetchInstance } from '@angular/fire';
 
 // SEMVER @ v6, drop and move core ng metrics to a service
 export const AUTOMATICALLY_TRACE_CORE_NG_METRICS = new InjectionToken<boolean>('angularfire2.performance.auto_trace');
@@ -32,15 +33,16 @@ export class AngularFirePerformance {
 
     this.performance = of(undefined).pipe(
       switchMap(() => isPlatformBrowser(platformId) ? zone.runOutsideAngular(() => import('firebase/performance')) : EMPTY),
-      map(() => zone.runOutsideAngular(() => app.performance())),
-      tap(performance => {
+      map(() => ɵfetchInstance(`performance`, 'AngularFirePerformance', app, () => {
+        const performance = zone.runOutsideAngular(() => app.performance());
         if (instrumentationEnabled === false) {
           performance.instrumentationEnabled = false;
         }
         if (dataCollectionEnabled === false) {
           performance.dataCollectionEnabled = false;
         }
-      }),
+        return performance;
+      }, [instrumentationEnabled, dataCollectionEnabled])),
       shareReplay({ bufferSize: 1, refCount: false })
     );
 
