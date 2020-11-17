@@ -1,7 +1,7 @@
 import { isPlatformServer } from '@angular/common';
 import { Inject, Injectable, OnDestroy, PLATFORM_ID } from '@angular/core';
-import { AngularFireAnalytics } from 'dist/packages-dist/analytics/analytics';
-import { AngularFireAuth } from 'dist/packages-dist/auth/auth';
+import { AngularFireAnalytics } from '@angular/fire/analytics';
+import { AngularFireAuth } from '@angular/fire/auth';
 import { Subscription } from 'rxjs';
 import { pairwise, tap } from 'rxjs/operators';
 
@@ -23,21 +23,9 @@ export class UserTrackingService implements OnDestroy {
       if (!isPlatformServer(platformId)) {
         this.disposable = auth.user.pipe(
             tap(user => {
-                // TODO pairwise, null => !null track login
                 analytics.setUserId(user?.uid);
                 resolve();
             }),
-            pairwise(),
-            tap(([prev, current]) => {
-                if (!prev && current) {
-                    // TODO how do I differentiate from signup? current.metadata.creationTime
-                    if (current.metadata.creationTime) {
-                        analytics.logEvent('login', { method: current.providerId });
-                    } else {
-                        analytics.logEvent('signup', { method: current.providerId });
-                    }
-                }
-            })
         ).subscribe();
       } else {
         resolve();

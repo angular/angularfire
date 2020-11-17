@@ -176,7 +176,6 @@ export class AngularFirestore {
             return of(false);
           }
         };
-        // TODO how do I back this up for a cache hit?
         return [firestore, zone.runOutsideAngular(enablePersistence)];
       } else {
         return [firestore, of(false)];
