@@ -1,3 +1,17 @@
+<a name="6.1.0-rc.4"></a>
+# [6.1.0-rc.4](https://github.com/angular/angularfire/compare/6.1.0-rc.3...6.1.0-rc.4) (2020-11-17)
+
+### Bug Fixes
+
+* **auth:** `ScreenTrackingService` will now wait for `UserTrackingService` to report an initial result, if `UserTrackingService` has been provided ([#2661](https://github.com/angular/angularfire/issues/2661)) ([b666a80](https://github.com/angular/angularfire/commit/b666a80))
+
+### Features
+
+* **core:** Adding global caches that survive/warn on HMR ([#2661](https://github.com/angular/angularfire/issues/2661)) ([b666a80](https://github.com/angular/angularfire/commit/b666a80)), closes [#2655](https://github.com/angular/angularfire/issues/2655)
+* **auth:** Warn when using Auth emulator in conjunction with database or firestore, ([#2661](https://github.com/angular/angularfire/issues/2661)) ([b666a80](https://github.com/angular/angularfire/commit/b666a80)), closes [#2656](https://github.com/angular/angularfire/issues/2656)
+* **auth:** Adding `AngularFireAuth.credential` an observer for `firebase.auth.UserCredential` ([#2661](https://github.com/angular/angularfire/issues/2661)) ([b666a80](https://github.com/angular/angularfire/commit/b666a80))
+* **auth:** `ScreenTrackingService` now logs `sign_up` and `login` events ([#2661](https://github.com/angular/angularfire/issues/2661)) ([b666a80](https://github.com/angular/angularfire/commit/b666a80))
+
 <a name="6.1.0-rc.3"></a>
 # [6.1.0-rc.3](https://github.com/angular/angularfire/compare/6.1.0-rc.2...6.1.0-rc.3) (2020-11-14)
 
