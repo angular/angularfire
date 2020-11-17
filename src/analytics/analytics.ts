@@ -29,6 +29,7 @@ const DEBUG_MODE_KEY = 'debug_mode';
 const GTAG_CONFIG_COMMAND = 'config';
 const GTAG_FUNCTION_NAME = 'gtag'; // TODO rename these
 const DATA_LAYER_NAME = 'dataLayer';
+const SEND_TO_KEY = 'send_to';
 
 export interface AngularFireAnalytics extends ɵPromiseProxy<firebase.analytics.Analytics> {
 }
@@ -85,9 +86,7 @@ export class AngularFireAnalytics {
           // TODO(jamesdaniels): I'm doing this as documented but it's still not
           //   showing up in the console. Investigate. Guessing it's just part of the
           //   whole GA4 transition mess.
-          // TODO check the send_to to make sure we're only sending to the firebase
-          //   property, incase they have multple gtags
-          if (args[0] === 'event') {
+          if (args[0] === 'event' && args[2][SEND_TO_KEY] === this.measurementId) {
             if (providedAppName) {
               args[2][APP_NAME_KEY] = providedAppName;
             }

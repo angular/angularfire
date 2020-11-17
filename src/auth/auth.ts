@@ -1,6 +1,6 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID, InjectionToken } from '@angular/core';
-import { Observable, of, from } from 'rxjs';
-import { switchMap, map, observeOn, shareReplay, first } from 'rxjs/operators';
+import { Observable, of, from, merge, Subject } from 'rxjs';
+import { switchMap, map, observeOn, shareReplay, first, filter } from 'rxjs/operators';
 import {
   FIREBASE_OPTIONS,
   FIREBASE_APP_NAME,
@@ -56,6 +56,11 @@ export class AngularFireAuth {
    */
   public readonly idTokenResult: Observable<firebase.auth.IdTokenResult|null>;
 
+  /**
+   * Observable of the currently signed-in user's credential, or null
+   */
+  public readonly credential: Observable<Required<firebase.auth.UserCredential>|null>;
+
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string|FirebaseAppConfig|null|undefined,
@@ -71,6 +76,7 @@ export class AngularFireAuth {
   ) {
     const schedulers = new ɵAngularFireSchedulers(zone);
     const keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(schedulers);
+    const logins = new Subject<firebase.auth.UserCredential>();
 
     const auth = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
@@ -106,7 +112,7 @@ export class AngularFireAuth {
 
     if (isPlatformServer(platformId)) {
 
-      this.authState = this.user = this.idToken = this.idTokenResult = of(null);
+      this.authState = this.user = this.idToken = this.idTokenResult = this.credential = of(null);
 
     } else {
 
@@ -137,9 +143,26 @@ export class AngularFireAuth {
         switchMap(user => user ? from(user.getIdTokenResult()) : of(null))
       );
 
+      this.credential = auth.pipe(
+        switchMap(auth => merge(
+          auth.getRedirectResult().then(it => it, () => null),
+          logins,
+          this.authState.pipe(filter(it => !it)))
+        ),
+        map(credential => credential?.user ? credential : null),
+      );
+
     }
 
-    return ɵlazySDKProxy(this, auth, zone);
+    return ɵlazySDKProxy(this, auth, zone, { spy: {
+      apply: (name, _, val) => {
+        // if they're using the UserTrackingService spy on auth calls and log sign_up and login
+        // events based on whether the user is new or not
+        if (name.startsWith('signIn') || name.startsWith('createUser')) {
+          val.then((user: firebase.auth.UserCredential) => logins.next(user));
+        }
+      }
+    }});
 
   }
 
