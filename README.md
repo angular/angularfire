@@ -43,7 +43,7 @@ export class MyApp {
 
 ### Angular and Firebase versions
 
-AngularFire doesn't follow Angular's versioning as Firebase also has breaking changes throughout the year. Instead we try to maintain compatability with both Firebase and Angular majors for as long as possible, only breaking when we need to support a new major of one or the other. We've been forunate that the APIs we rely on have been fairly stable, but we understand this can lead to some confusion so we've created the following table for advice.
+AngularFire doesn't follow Angular's versioning as Firebase also has breaking changes throughout the year. Instead we try to maintain compatability with both Firebase and Angular majors for as long as possible, only breaking when we need to support a new major of one or the other.
 
 | Angular | Firebase | AngularFire  |
 | --------|----------|--------------|
@@ -59,12 +59,12 @@ AngularFire doesn't follow Angular's versioning as Firebase also has breaking ch
 
 ### Polyfills
 
-Neither AngularFire or Firebase ship with polyfills & we tend to use modern ES features in our development. To have compatability across as wide-range of environments we suggest the following polyfills be added to your application:
+Neither AngularFire or Firebase ship with polyfills. To have compatability across as wide-range of environments we suggest the following polyfills be added to your application:
 
 | API | Environments | Suggested Polyfill | License |
 |-----|--------------|--------------------|---------|
-| Various ES5+ features  | IE 11<br>Safari &lt; 10<br>Node &lt; 6.5             | [`core-js/stable`](https://github.com/zloirock/core-js#readme) | MIT |
-| `globalThis` | [most](https://caniuse.com/mdn-javascript_builtins_globalthis) | [`globalThis`](https://github.com/es-shims/globalThis#readme) | MIT |
+| Various ES5+ features  | IE 11<br>Safari &lt; 10 | [`core-js/stable`](https://github.com/zloirock/core-js#readme) | MIT |
+| `globalThis` | [IE 11<br>Chrome &lt; 71<br>Safari &lt; 12.1<br>iOS &lt; 12.2<br>Node &lt; 12](https://caniuse.com/mdn-javascript_builtins_globalthis) | [`globalThis`](https://github.com/es-shims/globalThis#readme) | MIT |
 | `Proxy` | [IE 11<br>Safari &lt; 10](https://caniuse.com/proxy) | [`proxy-polyfill`](https://github.com/GoogleChrome/proxy-polyfill#readme) | Apache 2.0 |
 | `fetch` | [IE 11<br>Node<br>Safari &lt; 10.1<br>iOS &lt; 10.3](https://caniuse.com/fetch) | [`cross-fetch`](https://github.com/lquixada/cross-fetch#readme) | MIT |
 | `Headers` | [IE 11<br>Node<br>Safari &lt; 10.1<br>iOS Safari](https://caniuse.com/mdn-api_headers) | [`cross-fetch`](https://github.com/lquixada/cross-fetch#readme) | MIT |
