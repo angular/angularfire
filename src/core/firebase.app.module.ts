@@ -45,7 +45,7 @@ export function ɵfirebaseAppFactory(options: FirebaseOptions, zone: NgZone, nam
   const app = (existingApp || zone.runOutsideAngular(() => firebase.initializeApp(options, config as any))) as FirebaseApp;
   if (JSON.stringify(options) !== JSON.stringify(app.options)) {
     const hmr = !!(module as any).hot;
-    log('error', `${app.toString()} already initialized with different options${hmr ? ', you may need to reload as Firebase is not HMR aware.' : '.'}`);
+    log('error', `${app.name} Firebase App already initialized with different options${hmr ? ', you may need to reload as Firebase is not HMR aware.' : '.'}`);
   }
   return app;
 }
@@ -65,16 +65,18 @@ globalThis.ɵAngularfireInstanceCache ||= new Map();
 
 export function ɵfetchInstance<T>(cacheKey: any, moduleName: string, app: FirebaseApp, fn: () => T, args: any[]): T {
   const [instance, ...cachedArgs] = globalThis.ɵAngularfireInstanceCache.get(cacheKey) || [];
-  if (instance && args.some((arg, i) => {
-    const cachedArg = cachedArgs[i];
-    if (arg && typeof arg === 'object') {
-      return JSON.stringify(arg) !== JSON.stringify(cachedArg);
-    } else {
-      return arg !== cachedArg;
+  if (instance) {
+    if (args.some((arg, i) => {
+      const cachedArg = cachedArgs[i];
+      if (arg && typeof arg === 'object') {
+        return JSON.stringify(arg) !== JSON.stringify(cachedArg);
+      } else {
+        return arg !== cachedArg;
+      }
+    })) {
+      const hmr = !!(module as any).hot;
+      log('error', `${moduleName} was already initialized on the ${app.name} Firebase App instance with different settings.${hmr ? ' You may need to reload as Firebase is not HMR aware.' : ''}`);
     }
-  })) {
-    const hmr = !!(module as any).hot;
-    log('error', `${moduleName} was already initialized on the ${app.name} Firebase App instance with different settings.${hmr ? ' You may need to reload as Firebase is not HMR aware.' : ''}`);
     return instance;
   } else {
     const newInstance = fn();
