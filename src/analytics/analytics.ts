@@ -80,7 +80,7 @@ export class AngularFireAnalytics {
       const patchGtag = (fn?: (...args: any[]) => void) => {
         window[GTAG_FUNCTION_NAME] = (...args: any[]) => {
           if (fn) {
-            fn(args);
+            fn(...args);
           }
           // Inject app_name and app_version into events
           // TODO(jamesdaniels): I'm doing this as documented but it's still not
