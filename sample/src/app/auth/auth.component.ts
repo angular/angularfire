@@ -13,7 +13,7 @@ import { isPlatformServer } from '@angular/common';
     <p>
       Auth!
       {{ (auth.user | async)?.uid | json }}
-      {{ (auth.credential | async)?.operationType | json }}
+      {{ (auth.credential | async)?.additionalUserInfo.isNewUser | json }}
       <button (click)="login()" *ngIf="showLoginButton">Log in with Google</button>
       <button (click)="loginAnonymously()" *ngIf="showLoginButton">Log in anonymously</button>
       <button (click)="logout()" *ngIf="showLogoutButton">Log out</button>

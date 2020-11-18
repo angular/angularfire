@@ -76,7 +76,7 @@ export class AngularFireAuth {
   ) {
     const schedulers = new ɵAngularFireSchedulers(zone);
     const keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(schedulers);
-    const logins = new Subject<firebase.auth.UserCredential>();
+    const logins = new Subject<Required<firebase.auth.UserCredential>>();
 
     const auth = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
@@ -86,7 +86,7 @@ export class AngularFireAuth {
         const useEmulator: UseEmulatorArguments | null = _useEmulator;
         const settings: firebase.auth.AuthSettings | null = _settings;
         return ɵfetchInstance(`${app.name}.auth`, 'AngularFireAuth', app, () => {
-          const auth = app.auth();
+          const auth = zone.runOutsideAngular(() => app.auth());
           if (useEmulator) {
             // Firebase Auth doesn't conform to the useEmulator convention, let's smooth that over
             auth.useEmulator(`http://${useEmulator.join(':')}`);
@@ -128,14 +128,17 @@ export class AngularFireAuth {
         // a user is signed in
         switchMap(auth => auth.getRedirectResult().then(() => auth, () => auth)),
         switchMap(auth => zone.runOutsideAngular(() => new Observable<firebase.User|null>(auth.onAuthStateChanged.bind(auth)))),
-        keepUnstableUntilFirst
+        keepUnstableUntilFirst,
+        // TODO figure out why I needed share, perhaps it's the observable construction?
+        shareReplay(1)
       );
 
       this.user = auth.pipe(
         // see comment on authState
         switchMap(auth => auth.getRedirectResult().then(() => auth, () => auth)),
         switchMap(auth => zone.runOutsideAngular(() => new Observable<firebase.User|null>(auth.onIdTokenChanged.bind(auth)))),
-        keepUnstableUntilFirst
+        keepUnstableUntilFirst,
+        shareReplay(1) // see authState
       );
 
       this.idToken = this.user.pipe(
@@ -152,10 +155,12 @@ export class AngularFireAuth {
           logins,
           // pipe in null authState to make credential zipable, just a weird devexp if
           // authState and user go null to still have a credential
-          this.authState.pipe(filter(it => !it)))
-        ),
+          this.authState.pipe(filter(it => !it))
+        )),
         // handle the { user: { } } when a user is already logged in, rather have null
         map(credential => credential?.user ? credential : null),
+        keepUnstableUntilFirst,
+        shareReplay(1)
       );
 
     }
@@ -166,7 +171,8 @@ export class AngularFireAuth {
         // this will give us the user credential, push onto the logins Subject
         // to be consumed in .credential
         if (name.startsWith('signIn') || name.startsWith('createUser')) {
-          val.then((user: firebase.auth.UserCredential) => logins.next(user));
+          // TODO fix the types, the trouble is UserCredential has everything optional
+          val.then((user: firebase.auth.UserCredential) => logins.next(user as any));
         }
       }
     }});

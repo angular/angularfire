@@ -3,7 +3,6 @@ import { Inject, Injectable, OnDestroy, PLATFORM_ID } from '@angular/core';
 import { AngularFireAnalytics } from './analytics';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { Subscription } from 'rxjs';
-import { credential } from 'firebase-admin';
 
 @Injectable()
 export class UserTrackingService implements OnDestroy {
@@ -19,27 +18,27 @@ export class UserTrackingService implements OnDestroy {
     auth: AngularFireAuth,
   ) {
 
-    this.initialized = new Promise(resolve => {
-      if (!isPlatformServer(platformId)) {
-        this.disposables = [
-            auth.authState.subscribe(user => {
-                analytics.setUserId(user?.uid);
-                resolve();
-            }),
-            auth.credential.subscribe(credential => {
-                if (credential) {
-                    const method = credential.user.isAnonymous ? 'anonymous' : credential.additionalUserInfo.providerId;
-                    if (credential.additionalUserInfo.isNewUser) {
-                        analytics.logEvent('sign_up', { method });
-                    }
-                    analytics.logEvent('login', { method });
-                }
-            })
-        ];
-      } else {
-        resolve();
-      }
-    });
+    if (!isPlatformServer(platformId)) {
+      let resolveInitialized;
+      this.initialized = new Promise(resolve => resolveInitialized = resolve);
+      this.disposables = [
+          auth.authState.subscribe(user => {
+            analytics.setUserId(user?.uid);
+            resolveInitialized();
+          }),
+          auth.credential.subscribe(credential => {
+            if (credential) {
+              const method = credential.user.isAnonymous ? 'anonymous' : credential.additionalUserInfo.providerId;
+              if (credential.additionalUserInfo.isNewUser) {
+                analytics.logEvent('sign_up', { method });
+              }
+              analytics.logEvent('login', { method });
+            }
+          })
+      ];
+    } else {
+      this.initialized = Promise.resolve();
+    }
 
   }
 
