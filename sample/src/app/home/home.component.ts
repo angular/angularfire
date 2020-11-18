@@ -6,7 +6,7 @@ import { FirebaseApp } from '@angular/fire';
   template: `
     Hello world!
     {{ firebaseApp.name }}
-    <!-- TODO wrap the Zone issue <app-database></app-database> -->
+    <app-database></app-database>
     <app-firestore></app-firestore>
     <app-firestore-offline></app-firestore-offline>
     <app-storage></app-storage>

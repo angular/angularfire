@@ -65,7 +65,7 @@ export class AngularFireDatabase {
   }
 
   list<T>(pathOrRef: PathReference, queryFn?: QueryFn): AngularFireList<T> {
-    const ref = getRef(this.database, pathOrRef);
+    const ref = this.schedulers.ngZone.runOutsideAngular(() => getRef(this.database, pathOrRef));
     let query: DatabaseQuery = ref;
     if (queryFn) {
       query = queryFn(ref);
@@ -74,12 +74,13 @@ export class AngularFireDatabase {
   }
 
   object<T>(pathOrRef: PathReference): AngularFireObject<T> {
-    const ref = getRef(this.database, pathOrRef);
+    const ref = this.schedulers.ngZone.runOutsideAngular(() => getRef(this.database, pathOrRef));
     return createObjectReference<T>(ref, this);
   }
 
   createPushId() {
-    return this.database.ref().push().key;
+    const ref = this.schedulers.ngZone.runOutsideAngular(() => this.database.ref());
+    return ref.push().key;
   }
 
 }

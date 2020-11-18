@@ -21,7 +21,6 @@ export class DatabaseComponent implements OnInit {
   public readonly testObjectValue$: Observable<any>;
 
   constructor(state: TransferState, database: AngularFireDatabase, @Inject(PLATFORM_ID) platformId: object) {
-    // TODO fix the Zone.js issue with AngularFireDatabase
     if (isPlatformServer(platformId)) {
       this.testObjectValue$ = EMPTY;
     } else {
