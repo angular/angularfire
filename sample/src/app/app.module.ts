@@ -67,7 +67,6 @@ import { FirestoreOfflineModule } from './firestore-offline/firestore-offline.mo
     AngularFireAnalyticsModule,
     AngularFireFunctionsModule,
     AngularFirePerformanceModule,
-    AngularFireAuthGuardModule,
     FirestoreOfflineModule
   ],
   providers: [
@@ -86,7 +85,9 @@ import { FirestoreOfflineModule } from './firestore-offline/firestore-offline.mo
     { provide: REMOTE_CONFIG_DEFAULTS, useValue: { background_color: 'red' } },
     { provide: USE_DEVICE_LANGUAGE, useValue: true },
     { provide: VAPID_KEY, useValue: environment.vapidKey },
-    { provide: SERVICE_WORKER, useFactory: () => navigator?.serviceWorker?.getRegistration() ?? undefined },
+    { provide: SERVICE_WORKER, useFactory: () =>
+      (typeof navigator !== 'undefined' && navigator.serviceWorker?.getRegistration()) ?? undefined
+    },
     { provide: APP_VERSION, useValue: '0.0.0' },
     { provide: APP_NAME, useValue: 'Angular' }
   ],

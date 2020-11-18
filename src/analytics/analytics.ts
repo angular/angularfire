@@ -138,7 +138,7 @@ export class AngularFireAnalytics {
 
     } else {
 
-      this.analyticsInitialized = Promise.reject();
+      this.analyticsInitialized = Promise.resolve();
 
     }
 
