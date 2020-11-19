@@ -2,6 +2,7 @@ import { JsonObject, logging } from '@angular-devkit/core';
 import { BuilderContext, BuilderRun, ScheduleOptions, Target } from '@angular-devkit/architect';
 import { BuildTarget, FirebaseDeployConfig, FirebaseTools, FSHost } from '../interfaces';
 import deploy, { deployToFunction } from './actions';
+import { join } from 'path';
 import 'jasmine';
 
 let context: BuilderContext;
@@ -167,8 +168,8 @@ describe('universal deployment', () => {
     const packageArgs = spy.calls.argsFor(0);
     const functionArgs = spy.calls.argsFor(1);
 
-    expect(packageArgs[0]).toBe('dist/package.json');
-    expect(functionArgs[0]).toBe('dist/index.js');
+    expect(packageArgs[0]).toBe(join('dist', 'package.json'));
+    expect(functionArgs[0]).toBe(join('dist', 'index.js'));
   });
 
   it('should rename the index.html file in the nested dist', async () => {
@@ -189,8 +190,8 @@ describe('universal deployment', () => {
     const packageArgs = spy.calls.argsFor(0);
 
     expect(packageArgs).toEqual([
-      'dist/dist/browser/index.html',
-      'dist/dist/browser/index.original.html'
+      join('dist', 'dist', 'browser', 'index.html'),
+      join('dist', 'dist', 'browser', 'index.original.html')
     ]);
   });
 

@@ -1,6 +1,7 @@
 import { Tree } from '@angular-devkit/schematics';
 import { setupProject } from './ng-add';
 import 'jasmine';
+import { join } from 'path';
 
 const PROJECT_NAME = 'pie-ka-chu';
 const PROJECT_ROOT = 'pirojok';
@@ -335,7 +336,7 @@ const projectAngularJson = `{
 const universalFirebaseJson = {
   hosting: [{
     target: 'pie-ka-chu',
-    public: 'dist/dist/ikachu',
+    public: join('dist', 'dist', 'ikachu'),
     ignore: [
       '**/.*'
     ],
@@ -368,7 +369,7 @@ describe('ng-add', () => {
     });
 
     it('generates new files if starting from scratch', async () => {
-      const result = await setupProject(tree, {
+      const result = setupProject(tree, {
         firebaseProject: FIREBASE_PROJECT,
         isUniversalProject: false,
         project: PROJECT_NAME
@@ -379,7 +380,7 @@ describe('ng-add', () => {
     });
 
     it('uses default project', async () => {
-      const result = await setupProject(tree, {
+      const result = setupProject(tree, {
         firebaseProject: FIREBASE_PROJECT,
         isUniversalProject: false,
         project: undefined
@@ -390,11 +391,11 @@ describe('ng-add', () => {
     });
 
     it('overrides existing files', async () => {
-      const tempTree = await setupProject(tree, {
+      const tempTree = setupProject(tree, {
         firebaseProject: FIREBASE_PROJECT,
         isUniversalProject: false, project: PROJECT_NAME
       });
-      const result = await setupProject(tempTree, {
+      const result = setupProject(tempTree, {
         firebaseProject: OTHER_FIREBASE_PROJECT_NAME,
         project: OTHER_PROJECT_NAME,
         isUniversalProject: false
@@ -590,13 +591,13 @@ describe('ng-add', () => {
         const tree = Tree.empty();
         tree.create('angular.json', JSON.stringify(generateAngularJsonWithServer()));
 
-        const result = await setupProject(tree, {
+        const result = setupProject(tree, {
           firebaseProject: FIREBASE_PROJECT,
           isUniversalProject: true,
           project: PROJECT_NAME
         });
 
-        const workspace = JSON.parse((await result.read('angular.json')).toString());
+        const workspace = JSON.parse(result.read('angular.json').toString());
         expect(workspace.projects['pie-ka-chu'].architect.deploy.options.ssr).toBeTrue();
       });
 
@@ -604,13 +605,13 @@ describe('ng-add', () => {
         const tree = Tree.empty();
         tree.create('angular.json', JSON.stringify(generateAngularJsonWithServer()));
 
-        const result = await setupProject(tree, {
+        const result = setupProject(tree, {
           firebaseProject: FIREBASE_PROJECT,
           isUniversalProject: true,
           project: PROJECT_NAME
         });
 
-        const firebaseJson = JSON.parse((await result.read('firebase.json')).toString());
+        const firebaseJson = JSON.parse(result.read('firebase.json').toString());
         expect(firebaseJson).toEqual(universalFirebaseJson);
       });
     });
