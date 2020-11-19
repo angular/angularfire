@@ -141,7 +141,8 @@ export class AngularFirestoreCollection<T = DocumentData> {
   /**
    * Create a reference to a single document in a collection.
    */
-  doc(path?: string): AngularFirestoreDocument<T> {
-    return new AngularFirestoreDocument<T>(this.ref.doc(path), this.afs);
+  doc<T2 = T>(path?: string): AngularFirestoreDocument<T2> {
+    // TODO is there a better way to solve this type issue
+    return new AngularFirestoreDocument(this.ref.doc(path) as any, this.afs);
   }
 }
