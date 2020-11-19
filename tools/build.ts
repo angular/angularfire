@@ -94,6 +94,28 @@ async function measure(module: string) {
   return { size, gzip };
 }
 
+async function fixImportForLazyModules() {
+  await Promise.all(LAZY_MODULES.map(async module => {
+    const packageJson = JSON.parse((await readFile(dest(module, 'package.json'))).toString());
+    const entries = Array.from(new Set(Object.values(packageJson).filter(v => typeof v === 'string' && v.endsWith('.js')))) as string[];
+    // TODO don't hardcode esm2015 here, perhaps we should scan all the entry directories
+    //      e.g, if ng-packagr starts building other non-flattened entries we'll lose the dynamic import
+    entries.push(`../esm2015/${module}/public_api.js`); // the import isn't pulled into the ESM public_api
+    await Promise.all(entries.map(async path => {
+      const source = (await readFile(dest(module, path))).toString();
+      let newSource: string;
+      if (path.endsWith('.umd.js')) {
+        // in the UMD for lazy modules replace the dyanamic import
+        newSource = source.replace(`import('firebase/${module}')`, 'rxjs.of(undefined)');
+      } else {
+        // in everything else get rid of the global side-effect import
+        newSource = source.replace(new RegExp(`^import 'firebase/${module}'.+$`, 'gm'), '');
+      }
+      await writeFile(dest(module, path), newSource);
+    }));
+  }));
+}
+
 async function buildLibrary() {
   await proxyPolyfillCompat();
   await spawnPromise('npx', ['ng', 'build']);
@@ -103,7 +125,8 @@ async function buildLibrary() {
     copy(join(process.cwd(), 'docs'), dest('docs')),
     compileSchematics(),
     replacePackageJsonVersions(),
-    replacePackageCoreVersion()
+    replacePackageCoreVersion(),
+    fixImportForLazyModules(),
   ]);
 }
 

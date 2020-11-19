@@ -1,4 +1,4 @@
-import { Inject, Injectable, InjectionToken, NgZone, Optional } from '@angular/core';
+import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
 import { from, Observable, of } from 'rxjs';
 import { map, observeOn, shareReplay, switchMap } from 'rxjs/operators';
 import {
@@ -16,6 +16,7 @@ import firebase from 'firebase/app';
 import { proxyPolyfillCompat } from './base';
 import { HttpsCallableOptions } from '@firebase/functions-types';
 import { ɵfetchInstance } from '@angular/fire';
+import { isPlatformServer } from '@angular/common';
 
 export const ORIGIN = new InjectionToken<string>('angularfire2.functions.origin');
 export const REGION = new InjectionToken<string>('angularfire2.functions.region');
@@ -45,6 +46,8 @@ export class AngularFireFunctions {
     @Optional() @Inject(ORIGIN) origin: string | null,
     @Optional() @Inject(NEW_ORIGIN_BEHAVIOR) newOriginBehavior: boolean | null,
     @Optional() @Inject(USE_EMULATOR) _useEmulator: any, // can't use the tuple here
+    // tslint:disable-next-line:ban-types
+    @Inject(PLATFORM_ID) platformId: Object,
   ) {
     const schedulers = new ɵAngularFireSchedulers(zone);
     const useEmulator: UseEmulatorArguments | null = _useEmulator;
