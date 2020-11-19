@@ -37,6 +37,7 @@ import { MessagingComponent } from './messaging/messaging.component';
 import { FunctionsComponent } from './functions/functions.component';
 import { FirestoreOfflineComponent } from './firestore-offline/firestore-offline.component';
 import { FirestoreOfflineModule } from './firestore-offline/firestore-offline.module';
+import { UpboatsComponent } from './upboats/upboats.component';
 
 @NgModule({
   declarations: [
@@ -50,6 +51,7 @@ import { FirestoreOfflineModule } from './firestore-offline/firestore-offline.mo
     AuthComponent,
     MessagingComponent,
     FunctionsComponent,
+    UpboatsComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),
