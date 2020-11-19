@@ -1,10 +1,11 @@
 <a name="6.1.1"></a>
-## [6.1.1](https://github.com/angular/angularfire/compare/6.1.0...6.1.1) (2020-11-19)
+# [6.1.1](https://github.com/angular/angularfire/compare/6.1.0...6.1.1) (2020-11-19)
 
 ### Bug Fixes
 
 * **afs:** fix regression keeping one from overriding collection.doc type ([#2668](https://github.com/angular/angularfire/issues/2668)) ([22e2883](https://github.com/angular/angularfire/commit/22e2883))
-* **core:** fix the instance cache logic ([#2667](https://github.com/angular/angularfire/issues/2667)) ([7f89643](https://github.com/* **storage:** error state not represent in UploadTaskSnapshot ([#2665](https://github.com/angular/angularfire/issues/2665)) ([2ce41aa](https://github.com/angular/angularfire/commit/2ce41aa))
+* **core:** fix the instance cache logic ([#2667](https://github.com/angular/angularfire/issues/2667)) ([7f89643](https://github.com/angular/angularfire/commit/7f89643))
+* **storage:** error state not represent in UploadTaskSnapshot ([#2665](https://github.com/angular/angularfire/issues/2665)) ([2ce41aa](https://github.com/angular/angularfire/commit/2ce41aa))
 
 
 <a name="6.1.0"></a>
