@@ -1,6 +1,6 @@
 import { fromCollectionRef } from '../observable/fromRef';
 import { Observable, SchedulerLike } from 'rxjs';
-import { map, scan } from 'rxjs/operators';
+import { distinctUntilChanged, map, pairwise, scan, startWith } from 'rxjs/operators';
 
 import { DocumentChange, DocumentChangeAction, DocumentChangeType, Query } from '../interfaces';
 
@@ -25,8 +25,29 @@ export function sortedChanges<T>(
   scheduler?: SchedulerLike): Observable<DocumentChangeAction<T>[]> {
   return fromCollectionRef(query, scheduler)
     .pipe(
-      map(changes => changes.payload.docChanges()),
-      scan((current, changes) => combineChanges(current, changes, events), []),
+      startWith(undefined),
+      pairwise(),
+      scan((current, [priorChanges, changes]) => {
+        const docChanges = changes.payload.docChanges();
+        const ret = combineChanges(current, docChanges, events);
+        // docChanges({ includeMetadataChanges: true }) does't include metadata changes... wat?
+        if (events.indexOf('modified') > -1 && priorChanges &&
+            JSON.stringify(priorChanges.payload.metadata) !== JSON.stringify(changes.payload.metadata)) {
+          return ret.map(it => {
+            const partOfDocChanges = !!docChanges.find(d => d.doc.ref.isEqual(it.doc.ref));
+            return {
+              // if it's not one of the changed docs that means we already saw it's order change
+              // so this is purely metadata, so don't move the doc
+              oldIndex: partOfDocChanges ? it.oldIndex : it.newIndex,
+              newIndex: it.newIndex,
+              type: 'modified',
+              doc: changes.payload.docs.find(d => d.ref.isEqual(it.doc.ref))
+            };
+          });
+        }
+        return ret;
+      }, []),
+      distinctUntilChanged(), // cut down on unneed change cycles
       map(changes => changes.map(c => ({ type: c.type, payload: c } as DocumentChangeAction<T>))));
 }
 
@@ -45,6 +66,21 @@ export function combineChanges<T>(current: DocumentChange<T>[], changes: Documen
 }
 
 /**
+ * Splice arguments on top of a sliced array, to break top-level ===
+ * this is useful for change-detection
+ */
+function sliceAndSplice<T>(
+  original: T[],
+  start: number,
+  deleteCount: number,
+  ...args: T[]
+): T[] {
+  const returnArray = original.slice();
+  returnArray.splice(start, deleteCount, ...args);
+  return returnArray;
+}
+
+/**
  * Creates a new sorted array from a new change.
  */
 export function combineChange<T>(combined: DocumentChange<T>[], change: DocumentChange<T>): DocumentChange<T>[] {
@@ -53,7 +89,7 @@ export function combineChange<T>(combined: DocumentChange<T>[], change: Document
       if (combined[change.newIndex] && combined[change.newIndex].doc.ref.isEqual(change.doc.ref)) {
         // Not sure why the duplicates are getting fired
       } else {
-        combined.splice(change.newIndex, 0, change);
+        return sliceAndSplice(combined, change.newIndex, 0, change);
       }
       break;
     case 'modified':
@@ -61,16 +97,18 @@ export function combineChange<T>(combined: DocumentChange<T>[], change: Document
         // When an item changes position we first remove it
         // and then add it's new position
         if (change.oldIndex !== change.newIndex) {
-          combined.splice(change.oldIndex, 1);
-          combined.splice(change.newIndex, 0, change);
+          const copiedArray = combined.slice();
+          copiedArray.splice(change.oldIndex, 1);
+          copiedArray.splice(change.newIndex, 0, change);
+          return copiedArray;
         } else {
-          combined.splice(change.newIndex, 1, change);
+          return sliceAndSplice(combined, change.newIndex, 1, change);
         }
       }
       break;
     case 'removed':
       if (combined[change.oldIndex] && combined[change.oldIndex].doc.ref.isEqual(change.doc.ref)) {
-        combined.splice(change.oldIndex, 1);
+        return sliceAndSplice(combined, change.oldIndex, 1);
       }
       break;
   }
