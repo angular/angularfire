@@ -129,24 +129,7 @@
             "main": "server.ts",
             "tsConfig": "tsconfig.server.json",
             "bundleDependencies": true,
-            "externalDependencies": [
-              "@firebase/analytics",
-              "@firebase/app",
-              "@firebase/auth",
-              "@firebase/component",
-              "@firebase/database",
-              "@firebase/firestore",
-              "@firebase/functions",
-              "@firebase/installations",
-              "@firebase/logger",
-              "@firebase/messaging",
-              "@firebase/performance",
-              "@firebase/polyfill",
-              "@firebase/remote-config",
-              "@firebase/storage",
-              "@firebase/util",
-              "@firebase/webchannel-wrapper"
-            ]
+            "externalDependencies": [ ]
           },
           "configurations": {
             "production": {

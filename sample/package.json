@@ -50,6 +50,7 @@
     "@types/jasminewd2": "~2.0.3",
     "codelyzer": "^6.0.0",
     "concurrently": "^5.3.0",
+    "dir-loader": "^0.3.0",
     "express": "^4.17.1",
     "express-serve-static-core": "^0.1.1",
     "firebase-admin": "^8.13.0",

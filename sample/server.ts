@@ -14,6 +14,9 @@ global['XMLHttpRequest'] = require('xhr2');
 global['WebSocket'] = require('ws');
 /* tslint:enable:no-string-literal */
 
+// include the protos required to bundle firestore
+import 'dir-loader!./firestore-protos';
+
 // The Express app is exported so that it can be used by serverless Functions.
 export function app() {
   const server = express();
