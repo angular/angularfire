@@ -34,9 +34,10 @@ export function app() {
   // Example Express Rest API endpoints
   // app.get('/api/**', (req, res) => { });
   // Serve static files from /browser
+  // TODO sort out why the types broke, express?
   server.get('*.*', express.static(distFolder, {
     maxAge: '1y'
-  }));
+  }) as any);
 
   // All regular routes use the Universal engine
   server.get('*', (req, res) => {

@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { DocumentChangeAction } from '@angular/fire/firestore';
+import { AngularFirestore, DocumentChangeAction } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
-import { AngularFirestoreOffline } from '../firestore-offline/firestore-offline.module';
 
 @Component({
   selector: 'app-protected-lazy',
@@ -12,7 +11,7 @@ export class ProtectedLazyComponent implements OnInit {
 
   public snapshot: Observable<DocumentChangeAction<unknown>[]>;
 
-  constructor(private afs: AngularFirestoreOffline) {
+  constructor(private afs: AngularFirestore) {
     this.snapshot = afs.collection('test').snapshotChanges();
   }
 

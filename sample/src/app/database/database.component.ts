@@ -21,17 +21,13 @@ export class DatabaseComponent implements OnInit {
   public readonly testObjectValue$: Observable<any>;
 
   constructor(state: TransferState, database: AngularFireDatabase, @Inject(PLATFORM_ID) platformId: object) {
-    if (isPlatformServer(platformId)) {
-      this.testObjectValue$ = EMPTY;
-    } else {
-      const doc = database.object('test');
-      const key = makeStateKey(doc.query.toString());
-      const existing = state.get(key, undefined);
-      this.testObjectValue$ = doc.valueChanges().pipe(
-        trace('database'),
-        existing ? startWith(existing) : tap(it => state.set(key, it))
-      );
-    }
+    const doc = database.object('test');
+    const key = makeStateKey(doc.query.toString());
+    const existing = state.get(key, undefined);
+    this.testObjectValue$ = doc.valueChanges().pipe(
+      trace('database'),
+      existing ? startWith(existing) : tap(it => state.set(key, it))
+    );
   }
 
   ngOnInit(): void {

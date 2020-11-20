@@ -25,7 +25,6 @@ import {
 } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
 import firebase from 'firebase/app';
-import 'firebase/firestore';
 import { USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/auth';
 import { ɵfetchInstance, ɵlogAuthEmulatorError } from '@angular/fire';
 

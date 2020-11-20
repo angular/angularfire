@@ -20,7 +20,7 @@ import {
 
 import { FirestoreComponent } from './firestore/firestore.component';
 import { AngularFireDatabaseModule, USE_EMULATOR as USE_DATABASE_EMULATOR } from '@angular/fire/database';
-import { AngularFirestoreModule, USE_EMULATOR as USE_FIRESTORE_EMULATOR, SETTINGS as FIRESTORE_SETTINGS } from '@angular/fire/firestore';
+import { USE_EMULATOR as USE_FIRESTORE_EMULATOR, SETTINGS as FIRESTORE_SETTINGS } from '@angular/fire/firestore';
 import { AngularFireStorageModule } from '@angular/fire/storage';
 import { AngularFireAuthModule, USE_DEVICE_LANGUAGE, USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/auth';
 import { AngularFireMessagingModule, SERVICE_WORKER, VAPID_KEY } from '@angular/fire/messaging';
@@ -35,8 +35,6 @@ import { HomeComponent } from './home/home.component';
 import { AuthComponent } from './auth/auth.component';
 import { MessagingComponent } from './messaging/messaging.component';
 import { FunctionsComponent } from './functions/functions.component';
-import { FirestoreOfflineComponent } from './firestore-offline/firestore-offline.component';
-import { FirestoreOfflineModule } from './firestore-offline/firestore-offline.module';
 import { UpboatsComponent } from './upboats/upboats.component';
 
 @NgModule({
@@ -44,7 +42,6 @@ import { UpboatsComponent } from './upboats/upboats.component';
     AppComponent,
     StorageComponent,
     FirestoreComponent,
-    FirestoreOfflineComponent,
     DatabaseComponent,
     RemoteConfigComponent,
     HomeComponent,
@@ -61,7 +58,6 @@ import { UpboatsComponent } from './upboats/upboats.component';
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireStorageModule,
     AngularFireDatabaseModule,
-    AngularFirestoreModule,
     AngularFireAuthModule,
     AngularFireAuthGuardModule,
     AngularFireRemoteConfigModule,
@@ -69,7 +65,6 @@ import { UpboatsComponent } from './upboats/upboats.component';
     AngularFireAnalyticsModule,
     AngularFireFunctionsModule,
     AngularFirePerformanceModule,
-    FirestoreOfflineModule
   ],
   providers: [
     UserTrackingService,
