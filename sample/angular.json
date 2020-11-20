@@ -129,37 +129,7 @@
             "main": "server.ts",
             "tsConfig": "tsconfig.server.json",
             "bundleDependencies": true,
-            "externalDependencies": [
-              "firebase",
-              "@firebase/analytics",
-              "@firebase/analytics-types",
-              "@firebase/app",
-              "@firebase/app-types",
-              "@firebase/auth",
-              "@firebase/auth-interop-types",
-              "@firebase/auth-types",
-              "@firebase/component",
-              "@firebase/database",
-              "@firebase/database-types",
-              "@firebase/firestore",
-              "@firebase/firestore-types",
-              "@firebase/functions",
-              "@firebase/functions-types",
-              "@firebase/installations",
-              "@firebase/installations-types",
-              "@firebase/logger",
-              "@firebase/messaging",
-              "@firebase/messaging-types",
-              "@firebase/performance",
-              "@firebase/performance-types",
-              "@firebase/polyfill",
-              "@firebase/remote-config",
-              "@firebase/remote-config-types",
-              "@firebase/storage",
-              "@firebase/storage-types",
-              "@firebase/util",
-              "@firebase/webchannel-wrapper"
-            ]
+            "externalDependencies": [ ]
           },
           "configurations": {
             "production": {

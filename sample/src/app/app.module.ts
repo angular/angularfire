@@ -83,7 +83,7 @@ import { UpboatsComponent } from './upboats/upboats.component';
     { provide: USE_FIRESTORE_EMULATOR, useValue: environment.useEmulators ? ['localhost', 8080] : undefined },
     { provide: USE_FUNCTIONS_EMULATOR, useValue: environment.useEmulators ? ['localhost', 5001] : undefined },
     { provide: NEW_ORIGIN_BEHAVIOR, useValue: true },
-    { provide: FUNCTIONS_ORIGIN, useFactory: () => isDevMode() ? undefined : location.origin },
+    { provide: FUNCTIONS_ORIGIN, useFactory: () => isDevMode() || typeof location === 'undefined' ? undefined : location.origin },
     { provide: REMOTE_CONFIG_SETTINGS, useFactory: () => isDevMode() ? { minimumFetchIntervalMillis: 10_000 } : {} },
     { provide: REMOTE_CONFIG_DEFAULTS, useValue: { background_color: 'red' } },
     { provide: USE_DEVICE_LANGUAGE, useValue: true },
