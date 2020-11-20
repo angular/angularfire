@@ -129,7 +129,10 @@
             "main": "server.ts",
             "tsConfig": "tsconfig.server.json",
             "bundleDependencies": true,
-            "externalDependencies": [ ]
+            "externalDependencies": [ ],
+            "fileReplacements": [
+              { "replace": "src/firestore.ts", "with": "src/firestore.server.ts" }
+            ]
           },
           "configurations": {
             "production": {

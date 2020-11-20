@@ -7,8 +7,7 @@ import { AngularFirestoreModule } from '@angular/fire/firestore';
   imports: [
     AppModule,
     AngularFirestoreModule.enablePersistence({
-        synchronizeTabs: true,
-        experimentalForceOwningTab: true
+        synchronizeTabs: true
     })
   ],
   bootstrap: [AppComponent],

@@ -2,6 +2,8 @@ import { ModuleWithProviders, NgModule } from '@angular/core';
 import { PersistenceSettings } from './interfaces';
 import { AngularFirestore, ENABLE_PERSISTENCE, PERSISTENCE_SETTINGS } from './firestore';
 
+import 'firebase/firestore';
+
 @NgModule({
   providers: [ AngularFirestore ]
 })

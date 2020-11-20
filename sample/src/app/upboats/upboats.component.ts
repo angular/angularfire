@@ -4,7 +4,7 @@ import { map, startWith, tap } from 'rxjs/operators';
 import firebase from 'firebase/app';
 import { makeStateKey, TransferState } from '@angular/platform-browser';
 import { trace } from '@angular/fire/performance';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFirestore } from '../../firestore';
 
 type Animal = { name: string, upboats: number, id: string, hasPendingWrites: boolean };
 

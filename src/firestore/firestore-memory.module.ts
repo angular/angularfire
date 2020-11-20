@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { AngularFirestore } from './firestore';
 
+import 'firebase/firestore/memory';
+
 @NgModule({
   providers: [ AngularFirestore ]
 })
