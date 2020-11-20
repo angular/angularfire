@@ -11,6 +11,7 @@ import { trace } from '@angular/fire/performance';
     Firestore!
     {{ testDocValue$ | async | json }}
     {{ persistenceEnabled$ | async }}
+    {{ persistenceProvider || 'unknown (mangled)' }}
   </p>`,
   styles: [``]
 })
@@ -18,8 +19,10 @@ export class FirestoreComponent implements OnInit {
 
   public readonly persistenceEnabled$: Observable<boolean>;
   public readonly testDocValue$: Observable<any>;
+  public readonly persistenceProvider: any;
 
   constructor(state: TransferState, firestore: AngularFirestore) {
+    this.persistenceProvider = (firestore.firestore as any)._persistenceProvider?.constructor.name;
     const doc = firestore.doc('test/1');
     const key = makeStateKey(doc.ref.path);
     const existing = state.get(key, undefined);

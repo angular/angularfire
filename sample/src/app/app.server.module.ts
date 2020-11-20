@@ -14,7 +14,7 @@ import { AngularFirestoreModule } from '@angular/fire/firestore/memory';
     AngularFirestoreModule
   ],
   providers: [
-    { provide: APP_BASE_HREF, useFactory: () => isDevMode() ? '/us-central1/ssr' : '/ssr' },
+    { provide: APP_BASE_HREF, useFactory: () => process.env.FUNCTIONS_EMULATOR === 'true' ? '/aftest-94085/us-central1/ssr' : '/ssr' },
   ],
   bootstrap: [AppComponent],
 })

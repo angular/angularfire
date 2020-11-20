@@ -1,4 +1,4 @@
-import { ApplicationRef, Component } from '@angular/core';
+import { ApplicationRef, Component, isDevMode } from '@angular/core';
 import { FirebaseApp } from '@angular/fire';
 
 @Component({
@@ -25,6 +25,8 @@ import { FirebaseApp } from '@angular/fire';
 })
 export class AppComponent {
   constructor(public readonly firebaseApp: FirebaseApp, appRef: ApplicationRef) {
-    appRef.isStable.subscribe(it => console.log('isStable', it));
+    if (isDevMode()) {
+      appRef.isStable.subscribe(it => console.log('isStable', it));
+    }
   }
 }
