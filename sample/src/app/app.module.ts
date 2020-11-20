@@ -71,7 +71,7 @@ import { UpboatsComponent } from './upboats/upboats.component';
     ScreenTrackingService,
     PerformanceMonitoringService,
     { provide: FIRESTORE_SETTINGS, useValue: { ignoreUndefinedProperties: true } },
-    { provide: ANALYTICS_DEBUG_MODE, useValue: true },
+    { provide: ANALYTICS_DEBUG_MODE, useFactory: isDevMode },
     { provide: COLLECTION_ENABLED, useValue: true },
     { provide: USE_AUTH_EMULATOR, useValue: environment.useEmulators ? ['localhost', 9099] : undefined },
     { provide: USE_DATABASE_EMULATOR, useValue: environment.useEmulators ? ['localhost', 9000] : undefined },
