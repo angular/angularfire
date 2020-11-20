@@ -78,6 +78,11 @@ export class ScreenTrackingService implements OnDestroy {
           const urlTree = router.parseUrl(router.url.replace(/(?:\().+(?:\))/g, a => a.replace('://', ':///')));
           const pagePath = urlTree.root.children[activationEnd.snapshot.outlet]?.toString() || '';
           const actualSnapshot = router.routerState.root.children.map(it => it).find(it => it.outlet === activationEnd.snapshot.outlet);
+
+          if (!actualSnapshot) {
+            return of(null);
+          }
+
           let actualDeep = actualSnapshot;
           while (actualDeep.firstChild) {
             actualDeep = actualDeep.firstChild;
