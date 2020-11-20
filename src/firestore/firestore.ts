@@ -164,6 +164,9 @@ export class AngularFirestore {
         firestore.useEmulator(...useEmulator);
       }
 
+      // TODO can I tell if they are using the memory-only variant? would skip the warning if they
+      // try to enable persistence via DI. Also I could add a console.info suggesting memory-only
+      // if they aren't using it & not trying to enable persistence.
       if (shouldEnablePersistence && !isPlatformServer(platformId)) {
         // We need to try/catch here because not all enablePersistence() failures are caught
         // https://github.com/firebase/firebase-js-sdk/issues/608
