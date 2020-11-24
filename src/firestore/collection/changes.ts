@@ -1,6 +1,6 @@
 import { fromCollectionRef } from '../observable/fromRef';
 import { Observable, SchedulerLike } from 'rxjs';
-import { bufferTime, distinctUntilChanged, map, pairwise, scan, startWith } from 'rxjs/operators';
+import { distinctUntilChanged, map, pairwise, scan, startWith } from 'rxjs/operators';
 import { DocumentChange, DocumentChangeAction, DocumentChangeType, Query } from '../interfaces';
 
 /**
@@ -40,9 +40,6 @@ export function docChanges<T>(query: Query, scheduler?: SchedulerLike): Observab
         }
         return actions as DocumentChangeAction<T>[];
       }),
-      // there are some sync changes firing, esp. when taking over from cache, buffer and flatten them
-      bufferTime(0),
-      map(it => [].concat(...it))
   );
 }
 
