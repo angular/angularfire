@@ -1,3 +1,20 @@
+<a name="6.1.2"></a>
+# [6.1.2](https://github.com/angular/angularfire/compare/6.1.1...6.1.2) (2020-11-24)
+
+
+### Bug Fixes
+
+* **afs:** document's actions should have appropriate types ([#2683](https://github.com/angular/angularfire/issues/2683)) ([d36544f](https://github.com/angular/angularfire/commit/d36544f))
+* **afs:** fixing the metadata in `snapshotChanges` and more ([#2670](https://github.com/angular/angularfire/issues/2670)) ([d5dbe99](https://github.com/angular/angularfire/commit/d5dbe99))
+* **afs:** `stateChanges` and `auditLog` correctly emit metadata changes ([#2684](https://github.com/angular/angularfire/issues/2684)) ([fce594b](https://github.com/angular/angularfire/commit/fce594b))
+* **analytics:** screen tracking will no longer fail on broken routes ([#2678](https://github.com/angular/angularfire/issues/2678)) ([ae26b35](https://github.com/angular/angularfire/commit/ae26b35)), closes [#2677](https://github.com/angular/angularfire/issues/2677)
+* **auth:** removed the `shareReplay` from auth and addressed Zone.js issues ([#2682](https://github.com/angular/angularfire/issues/2682)) ([059547b](https://github.com/angular/angularfire/commit/059547b)), closes [#2681](https://github.com/angular/angularfire/issues/2681)
+* **core:** ensure the UMDs are importing things correctly for the lazy modules ([#2676](https://github.com/angular/angularfire/issues/2676)) ([6817bcc](https://github.com/angular/angularfire/commit/6817bcc))
+* **core:** try/catch the HMR/DI warning ([#2687](https://github.com/angular/angularfire/issues/2687)) ([1530112](https://github.com/angular/angularfire/commit/1530112))
+* **storage:** unsubscribing from the upload progress will not cancel and added replay ([#2688](https://github.com/angular/angularfire/issues/2688)) ([d845cdd](https://github.com/angular/angularfire/commit/d845cdd)), closes [#2685](https://github.com/angular/angularfire/issues/2685)
+
+
+
 <a name="6.1.1"></a>
 # [6.1.1](https://github.com/angular/angularfire/compare/6.1.0...6.1.1) (2020-11-19)
 
