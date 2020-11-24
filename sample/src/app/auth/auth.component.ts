@@ -51,17 +51,14 @@ export class AuthComponent implements OnInit, OnDestroy {
 
   async login() {
     const user = await this.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-    // TODO sign into offline app
   }
 
   async loginAnonymously() {
     const user = await this.auth.signInAnonymously();
-    // TODO sign into offline app
   }
 
   logout() {
     this.auth.signOut();
-    // TODO sign out of offline app
   }
 
 }
