@@ -1,7 +1,6 @@
 import { fromCollectionRef } from '../observable/fromRef';
-import { Observable, of, SchedulerLike } from 'rxjs';
-import { concatMap, distinctUntilChanged, map, pairwise, scan, startWith } from 'rxjs/operators';
-
+import { Observable, SchedulerLike } from 'rxjs';
+import { bufferTime, distinctUntilChanged, map, pairwise, scan, startWith } from 'rxjs/operators';
 import { DocumentChange, DocumentChangeAction, DocumentChangeType, Query } from '../interfaces';
 
 /**
@@ -15,43 +14,35 @@ export function docChanges<T>(query: Query, scheduler?: SchedulerLike): Observab
       pairwise(),
       map(([priorAction, action]) => {
         const docChanges = action.payload.docChanges();
-        // if it's the first fire from the cache it's not added
-        const overrideAsModified = !priorAction && action.payload.metadata.fromCache;
-        const ret = docChanges.map(change => {
-          if (overrideAsModified) {
-            return {
-              type: 'modified', payload: {
-                oldIndex: change.oldIndex,
-                newIndex: change.newIndex,
-                type: 'modified',
-                doc: change.doc,
-              }
-            };
-          } else {
-            return { type: change.type, payload: change };
-          }
-        });
+        const actions = docChanges.map(change => ({ type: change.type, payload: change }));
+        // the metadata has changed from the prior emission
         if (priorAction && JSON.stringify(priorAction.payload.metadata) !== JSON.stringify(action.payload.metadata)) {
-          return [ret, action.payload.docs.map((it, i) => {
-            const docChange = docChanges.find(d => d.doc.ref.isEqual(it.ref));
-            const priorDoc = priorAction?.payload.docs.find(d => d.ref.isEqual(it.ref));
-            if (!docChange && priorDoc && JSON.stringify(priorDoc.metadata) === JSON.stringify(it.metadata)) {
-              return null;
-            }
-            return {
-              type: 'modified',
-              payload: {
-                oldIndex: i,
-                newIndex: i,
+          // go through all the docs in payload and figure out which ones changed
+          action.payload.docs.forEach((currentDoc, currentIndex) => {
+            const docChange = docChanges.find(d => d.doc.ref.isEqual(currentDoc.ref));
+            const priorDoc = priorAction?.payload.docs.find(d => d.ref.isEqual(currentDoc.ref));
+            if (docChange && JSON.stringify(docChange.doc.metadata) === JSON.stringify(currentDoc.metadata) ||
+              !docChange && priorDoc && JSON.stringify(priorDoc.metadata) === JSON.stringify(currentDoc.metadata)) {
+              // document doesn't appear to have changed, don't log another action
+            } else {
+              // since the actions are processed in order just push onto the array
+              actions.push({
                 type: 'modified',
-                doc: it
-              }
-            } as DocumentChangeAction<T>;
-          }).filter(it => !!it)];
+                payload: {
+                  oldIndex: currentIndex,
+                  newIndex: currentIndex,
+                  type: 'modified',
+                  doc: currentDoc
+                }
+              });
+            }
+          });
         }
-        return [ret as DocumentChangeAction<T>[]];
+        return actions as DocumentChangeAction<T>[];
       }),
-      concatMap(it => of(...it) as Observable<DocumentChangeAction<T>[]>),
+      // there are some sync changes firing, esp. when taking over from cache, buffer and flatten them
+      bufferTime(0),
+      map(it => [].concat(...it))
   );
 }
 
@@ -100,32 +91,30 @@ function sliceAndSplice<T>(
 
 /**
  * Creates a new sorted array from a new change.
+ * Build our own because we allow filtering of action types ('added', 'removed', 'modified') before scanning
+ * and so we have greater control over change detection (by breaking ===)
  */
 export function combineChange<T>(combined: DocumentChange<T>[], change: DocumentChange<T>): DocumentChange<T>[] {
   switch (change.type) {
-    case 'modified':
-      // OldIndex == -1 is added, since we added modified if fromCache, skip over, don't break
-      if (change.oldIndex > -1) {
-        if (combined[change.oldIndex] == null || combined[change.oldIndex].doc.ref.isEqual(change.doc.ref)) {
-          // When an item changes position we first remove it
-          // and then add it's new position
-          if (change.oldIndex !== change.newIndex) {
-            const copiedArray = combined.slice();
-            copiedArray.splice(change.oldIndex, 1);
-            copiedArray.splice(change.newIndex, 0, change);
-            return copiedArray;
-          } else {
-            return sliceAndSplice(combined, change.newIndex, 1, change);
-          }
-        }
-        break;
-      }
-    // tslint:disable-next-line:no-switch-case-fall-through
     case 'added':
       if (combined[change.newIndex] && combined[change.newIndex].doc.ref.isEqual(change.doc.ref)) {
         // Not sure why the duplicates are getting fired
       } else {
         return sliceAndSplice(combined, change.newIndex, 0, change);
+      }
+      break;
+    case 'modified':
+      if (combined[change.oldIndex] == null || combined[change.oldIndex].doc.ref.isEqual(change.doc.ref)) {
+        // When an item changes position we first remove it
+        // and then add it's new position
+        if (change.oldIndex !== change.newIndex) {
+          const copiedArray = combined.slice();
+          copiedArray.splice(change.oldIndex, 1);
+          copiedArray.splice(change.newIndex, 0, change);
+          return copiedArray;
+        } else {
+          return sliceAndSplice(combined, change.newIndex, 1, change);
+        }
       }
       break;
     case 'removed':
