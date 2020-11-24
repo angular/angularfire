@@ -1,4 +1,5 @@
 import { Observable } from 'rxjs';
+import { shareReplay } from 'rxjs/operators';
 import { UploadTask, UploadTaskSnapshot } from '../interfaces';
 
 export function fromTask(task: UploadTask) {
@@ -13,6 +14,7 @@ export function fromTask(task: UploadTask) {
       progress(task.snapshot);
       complete();
     });
-    return () => task.cancel();
-  });
+  }).pipe(
+    shareReplay({ bufferSize: 1, refCount: false })
+  );
 }
