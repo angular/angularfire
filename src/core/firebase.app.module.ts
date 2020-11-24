@@ -43,10 +43,12 @@ export function ɵfirebaseAppFactory(options: FirebaseOptions, zone: NgZone, nam
   // We support FirebaseConfig, initializeApp's public type only accepts string; need to cast as any
   // Could be solved with https://github.com/firebase/firebase-js-sdk/pull/1206
   const app = (existingApp || zone.runOutsideAngular(() => firebase.initializeApp(options, config as any))) as FirebaseApp;
-  if (JSON.stringify(options) !== JSON.stringify(app.options)) {
-    const hmr = !!(module as any).hot;
-    log('error', `${app.name} Firebase App already initialized with different options${hmr ? ', you may need to reload as Firebase is not HMR aware.' : '.'}`);
-  }
+  try {
+    if (JSON.stringify(options) !== JSON.stringify(app.options)) {
+      const hmr = !!(module as any).hot;
+      log('error', `${app.name} Firebase App already initialized with different options${hmr ? ', you may need to reload as Firebase is not HMR aware.' : '.'}`);
+    }
+  } catch (e) { }
   return app;
 }
 
@@ -66,17 +68,19 @@ globalThis.ɵAngularfireInstanceCache ||= new Map();
 export function ɵfetchInstance<T>(cacheKey: any, moduleName: string, app: FirebaseApp, fn: () => T, args: any[]): T {
   const [instance, ...cachedArgs] = globalThis.ɵAngularfireInstanceCache.get(cacheKey) || [];
   if (instance) {
-    if (args.some((arg, i) => {
-      const cachedArg = cachedArgs[i];
-      if (arg && typeof arg === 'object') {
-        return JSON.stringify(arg) !== JSON.stringify(cachedArg);
-      } else {
-        return arg !== cachedArg;
+    try {
+      if (args.some((arg, i) => {
+        const cachedArg = cachedArgs[i];
+        if (arg && typeof arg === 'object') {
+          return JSON.stringify(arg) !== JSON.stringify(cachedArg);
+        } else {
+          return arg !== cachedArg;
+        }
+      })) {
+        const hmr = !!(module as any).hot;
+        log('error', `${moduleName} was already initialized on the ${app.name} Firebase App instance with different settings.${hmr ? ' You may need to reload as Firebase is not HMR aware.' : ''}`);
       }
-    })) {
-      const hmr = !!(module as any).hot;
-      log('error', `${moduleName} was already initialized on the ${app.name} Firebase App instance with different settings.${hmr ? ' You may need to reload as Firebase is not HMR aware.' : ''}`);
-    }
+    } catch (e) { }
     return instance;
   } else {
     const newInstance = fn();
