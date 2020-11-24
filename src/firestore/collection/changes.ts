@@ -1,6 +1,6 @@
 import { fromCollectionRef } from '../observable/fromRef';
-import { Observable, SchedulerLike } from 'rxjs';
-import { distinctUntilChanged, map, pairwise, scan, startWith } from 'rxjs/operators';
+import { Observable, of, SchedulerLike } from 'rxjs';
+import { concatMap, distinctUntilChanged, map, pairwise, scan, startWith } from 'rxjs/operators';
 
 import { DocumentChange, DocumentChangeAction, DocumentChangeType, Query } from '../interfaces';
 
@@ -11,9 +11,48 @@ import { DocumentChange, DocumentChangeAction, DocumentChangeType, Query } from 
 export function docChanges<T>(query: Query, scheduler?: SchedulerLike): Observable<DocumentChangeAction<T>[]> {
   return fromCollectionRef(query, scheduler)
     .pipe(
-      map(action =>
-        action.payload.docChanges()
-          .map(change => ({ type: change.type, payload: change } as DocumentChangeAction<T>))));
+      startWith(undefined),
+      pairwise(),
+      map(([priorAction, action]) => {
+        const docChanges = action.payload.docChanges();
+        // if it's the first fire from the cache it's not added
+        const overrideAsModified = !priorAction && action.payload.metadata.fromCache;
+        const ret = docChanges.map(change => {
+          if (overrideAsModified) {
+            return {
+              type: 'modified', payload: {
+                oldIndex: change.oldIndex,
+                newIndex: change.newIndex,
+                type: 'modified',
+                doc: change.doc,
+              }
+            };
+          } else {
+            return { type: change.type, payload: change };
+          }
+        });
+        if (priorAction && JSON.stringify(priorAction.payload.metadata) !== JSON.stringify(action.payload.metadata)) {
+          return [ret, action.payload.docs.map((it, i) => {
+            const docChange = docChanges.find(d => d.doc.ref.isEqual(it.ref));
+            const priorDoc = priorAction?.payload.docs.find(d => d.ref.isEqual(it.ref));
+            if (!docChange && priorDoc && JSON.stringify(priorDoc.metadata) === JSON.stringify(it.metadata)) {
+              return null;
+            }
+            return {
+              type: 'modified',
+              payload: {
+                oldIndex: i,
+                newIndex: i,
+                type: 'modified',
+                doc: it
+              }
+            } as DocumentChangeAction<T>;
+          }).filter(it => !!it)];
+        }
+        return [ret as DocumentChangeAction<T>[]];
+      }),
+      concatMap(it => of(...it) as Observable<DocumentChangeAction<T>[]>),
+  );
 }
 
 /**
@@ -23,30 +62,9 @@ export function sortedChanges<T>(
   query: Query,
   events: DocumentChangeType[],
   scheduler?: SchedulerLike): Observable<DocumentChangeAction<T>[]> {
-  return fromCollectionRef(query, scheduler)
+  return docChanges<T>(query, scheduler)
     .pipe(
-      startWith(undefined),
-      pairwise(),
-      scan((current, [priorChanges, changes]) => {
-        const docChanges = changes.payload.docChanges();
-        const ret = combineChanges(current, docChanges, events);
-        // docChanges({ includeMetadataChanges: true }) does't include metadata changes... wat?
-        if (events.indexOf('modified') > -1 && priorChanges &&
-            JSON.stringify(priorChanges.payload.metadata) !== JSON.stringify(changes.payload.metadata)) {
-          return ret.map(it => {
-            const partOfDocChanges = !!docChanges.find(d => d.doc.ref.isEqual(it.doc.ref));
-            return {
-              // if it's not one of the changed docs that means we already saw it's order change
-              // so this is purely metadata, so don't move the doc
-              oldIndex: partOfDocChanges ? it.oldIndex : it.newIndex,
-              newIndex: it.newIndex,
-              type: 'modified',
-              doc: changes.payload.docs.find(d => d.ref.isEqual(it.doc.ref))
-            };
-          });
-        }
-        return ret;
-      }, []),
+      scan((current, changes) => combineChanges<T>(current, changes.map(it => it.payload), events), []),
       distinctUntilChanged(), // cut down on unneed change cycles
       map(changes => changes.map(c => ({ type: c.type, payload: c } as DocumentChangeAction<T>))));
 }
@@ -85,25 +103,29 @@ function sliceAndSplice<T>(
  */
 export function combineChange<T>(combined: DocumentChange<T>[], change: DocumentChange<T>): DocumentChange<T>[] {
   switch (change.type) {
+    case 'modified':
+      // OldIndex == -1 is added, since we added modified if fromCache, skip over, don't break
+      if (change.oldIndex > -1) {
+        if (combined[change.oldIndex] == null || combined[change.oldIndex].doc.ref.isEqual(change.doc.ref)) {
+          // When an item changes position we first remove it
+          // and then add it's new position
+          if (change.oldIndex !== change.newIndex) {
+            const copiedArray = combined.slice();
+            copiedArray.splice(change.oldIndex, 1);
+            copiedArray.splice(change.newIndex, 0, change);
+            return copiedArray;
+          } else {
+            return sliceAndSplice(combined, change.newIndex, 1, change);
+          }
+        }
+        break;
+      }
+    // tslint:disable-next-line:no-switch-case-fall-through
     case 'added':
       if (combined[change.newIndex] && combined[change.newIndex].doc.ref.isEqual(change.doc.ref)) {
         // Not sure why the duplicates are getting fired
       } else {
         return sliceAndSplice(combined, change.newIndex, 0, change);
-      }
-      break;
-    case 'modified':
-      if (combined[change.oldIndex] == null || combined[change.oldIndex].doc.ref.isEqual(change.doc.ref)) {
-        // When an item changes position we first remove it
-        // and then add it's new position
-        if (change.oldIndex !== change.newIndex) {
-          const copiedArray = combined.slice();
-          copiedArray.splice(change.oldIndex, 1);
-          copiedArray.splice(change.newIndex, 0, change);
-          return copiedArray;
-        } else {
-          return sliceAndSplice(combined, change.newIndex, 1, change);
-        }
       }
       break;
     case 'removed':
