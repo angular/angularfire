@@ -34,7 +34,7 @@ export function fromDocRef<T>(ref: DocumentReference<T>, scheduler?: SchedulerLi
         if (!payload.exists) {
           return { payload, type: 'removed' };
         }
-        if (priorPayload ? !priorPayload.exists : !payload.metadata.fromCache) {
+        if (!priorPayload?.exists) {
           return { payload, type: 'added' };
         }
         return { payload, type: 'modified' };
