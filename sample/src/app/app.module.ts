@@ -6,7 +6,7 @@ import { AppComponent } from './app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 
-import { AngularFireModule } from '@angular/fire';
+import { AngularFireModule, FIREBASE_APP_NAME } from '@angular/fire';
 
 import {
   AngularFireAnalyticsModule,
@@ -44,7 +44,7 @@ import { FunctionsComponent } from './functions/functions.component';
 import { FirestoreOfflineComponent } from './firestore-offline/firestore-offline.component';
 import { FirestoreOfflineModule } from './firestore-offline/firestore-offline.module';
 import { UpboatsComponent } from './upboats/upboats.component';
-import { CookieService } from 'ngx-cookie-service';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -78,13 +78,12 @@ import { CookieService } from 'ngx-cookie-service';
     FirestoreOfflineModule
   ],
   providers: [
-    CookieService,
     UserTrackingService,
     ScreenTrackingService,
     PerformanceMonitoringService,
     { provide: EXPERIMENTAL_COOKIE_AUTH, useValue: true },
     { provide: FIRESTORE_SETTINGS, useValue: { ignoreUndefinedProperties: true } },
-    { provide: ANALYTICS_DEBUG_MODE, useValue: true },
+    { provide: ANALYTICS_DEBUG_MODE, useFactory: isDevMode },
     { provide: COLLECTION_ENABLED, useValue: true },
     { provide: USE_AUTH_EMULATOR, useValue: environment.useEmulators ? ['localhost', 9099] : undefined },
     { provide: USE_DATABASE_EMULATOR, useValue: environment.useEmulators ? ['localhost', 9000] : undefined },

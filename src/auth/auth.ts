@@ -1,6 +1,6 @@
-import { Injectable, Inject, Optional, NgZone, PLATFORM_ID, InjectionToken } from '@angular/core';
-import { Observable, of, from, merge, Subject, Subscriber } from 'rxjs';
-import { switchMap, map, observeOn, shareReplay, first, filter, switchMapTo, subscribeOn, tap, take, mapTo } from 'rxjs/operators';
+import { Injectable, Inject, Optional, NgZone, PLATFORM_ID, InjectionToken, OnDestroy } from '@angular/core';
+import { Observable, of, from, merge, Subject, Subscriber, SubscriptionLike } from 'rxjs';
+import { switchMap, map, observeOn, shareReplay, filter, switchMapTo, subscribeOn, tap, pairwise, take } from 'rxjs/operators';
 import {
   FIREBASE_OPTIONS,
   FIREBASE_APP_NAME,
@@ -18,7 +18,8 @@ import { isPlatformServer } from '@angular/common';
 import { proxyPolyfillCompat } from './base';
 import { ɵfetchInstance } from '@angular/fire';
 import { REQUEST } from '@nguniversal/express-engine/tokens';
-import { experimental } from '@angular-devkit/core';
+import { get as getCookie, set as setCookie, remove as removeCookie } from 'js-cookie';
+import { parse as parseCookies } from 'cookie';
 
 export interface AngularFireAuth extends ɵPromiseProxy<firebase.auth.Auth> {}
 
@@ -35,7 +36,9 @@ export const EXPERIMENTAL_COOKIE_AUTH = new InjectionToken<boolean>('angularfire
 @Injectable({
   providedIn: 'any'
 })
-export class AngularFireAuth {
+export class AngularFireAuth implements OnDestroy {
+
+  private disposables: SubscriptionLike[] = [];
 
   /**
    * Observable of authentication state; as of Firebase 4.0 this is only triggered via sign-in/out
@@ -76,7 +79,7 @@ export class AngularFireAuth {
     @Optional() @Inject(LANGUAGE_CODE) languageCode: string | null,
     @Optional() @Inject(USE_DEVICE_LANGUAGE) useDeviceLanguage: boolean | null,
     @Optional() @Inject(PERSISTENCE) persistence: string | null,
-    @Optional() @Inject(EXPERIMENTAL_COOKIE_AUTH) experimentalCookieAuth: boolean | null,
+    @Optional() @Inject(EXPERIMENTAL_COOKIE_AUTH) private experimentalCookieAuth: boolean | null,
     @Optional() @Inject(REQUEST) request: any,
   ) {
     const schedulers = new ɵAngularFireSchedulers(zone);
@@ -120,27 +123,25 @@ export class AngularFireAuth {
       shareReplay({ bufferSize: 1, refCount: false }),
     );
 
+    // HACK, as we're exporting auth.Auth, rather than auth, developers importing firebase.auth
+    //       (e.g, `import { auth } from 'firebase/app'`) are getting an undefined auth object unexpectedly
+    //       as we're completely lazy. Let's eagerly load the Auth SDK here.
+    //       There could potentially be race conditions still... but this greatly decreases the odds while
+    //       we reevaluate the API.
+    this.disposables.push(auth.pipe(take(1)).subscribe());
+
     const cookieAuthCredential = auth.pipe(
       switchMap(auth => {
-        // grabbed from ngx-cookie-service, they don't support universal
-        const getCookieRegExp = (name: string): RegExp => {
-          const escapedName: string = name.replace(/([\[\]\{\}\(\)\|\=\;\+\?\,\.\*\^\$])/gi, '\\$1');
-          return new RegExp('(?:^' + escapedName + '|;\\s*' + escapedName + ')=(.*?)(?:;|$)', 'g');
-        };
-        const cookie = isPlatformServer(platformId) ? request.headers.cookie : document.cookie;
-        const session = getCookieRegExp('session').exec(cookie)?.[1];
-        if (session) {
-          const authCredentialJSON = JSON.parse(decodeURIComponent(session));
-          const credentialUid = authCredentialJSON._uid;
-          delete authCredentialJSON._uid;
-          const authCredential = firebase.auth.AuthCredential.fromJSON(authCredentialJSON);
-          // TODO investigate, this is likely a security concern but is there a way we could utilize this property
-          //      perhaps we can build the _uid into the application name?
-          if (auth.currentUser?.uid === credentialUid) {
-            return of({ user: auth.currentUser, additionalUserInfo: null, credential: authCredential, operationType: null });
-          } else {
-            return auth.signInWithCredential(authCredential);
-          }
+        const encodedSession = isPlatformServer(platformId) ?
+          request.headers.cookie && parseCookies(request.headers.cookie).__session :
+          getCookie('__session');
+        if (encodedSession) {
+          const session = JSON.parse(decodeURIComponent(encodedSession));
+          const authCredential = firebase.auth.AuthCredential.fromJSON(session.credential);
+          return auth.signInWithCredential(authCredential).then(it => it, (e) => {
+            console.warn(e);
+            return null;
+          });
         } else {
           return of(null);
         }
@@ -148,13 +149,6 @@ export class AngularFireAuth {
       map(credential => credential?.user ? credential as firebase.auth.UserCredential : null),
       shareReplay({ bufferSize: 1, refCount: false }),
     );
-
-    // HACK, as we're exporting auth.Auth, rather than auth, developers importing firebase.auth
-    //       (e.g, `import { auth } from 'firebase/app'`) are getting an undefined auth object unexpectedly
-    //       as we're completely lazy. Let's eagerly load the Auth SDK here.
-    //       There could potentially be race conditions still... but this greatly decreases the odds while
-    //       we reevaluate the API.
-    const _ = auth.pipe(first()).subscribe();
 
     const cookieAuthUser = cookieAuthCredential.pipe(
       map(it => it?.user)
@@ -220,33 +214,6 @@ export class AngularFireAuth {
         observeOn(schedulers.insideAngular),
       );
 
-      if (experimentalCookieAuth) {
-
-        /* TODO add the side-effects
-           it's now seeming like this should be a service instead
-
-          this.cookieExchangeDisposable = this.credential.pipe(
-            filter(it => !!it),
-            tap(it => console.log(it.credential)),
-          ).subscribe(userCredential => {
-            const json = userCredential.credential.toJSON();
-            // TODO do we want to put the instanceId on here too?
-            //      any other properties that we can use from the server side?
-            json['_uid'] = userCredential.user.uid;
-            // are we taking on ngx-cookie?
-            cookies.set('session', JSON.stringify(json));
-          });
-
-          this.user.pipe(
-            pairwise(),
-            filter(([a,b]) => !!a && !b)
-          ).subscribe(() => {
-            cookies.delete('session');
-          });
-        */
-
-      }
-
     }
 
     this.idToken = this.user.pipe(
@@ -256,6 +223,33 @@ export class AngularFireAuth {
     this.idTokenResult = this.user.pipe(
       switchMap(user => user ? from(user.getIdTokenResult()) : of(null))
     );
+
+
+    if (this.experimentalCookieAuth) {
+
+      this.disposables.push(
+        this.credential.pipe(
+          filter(it => !!it)
+        ).subscribe(userCredential => {
+          const session = {
+            uid: userCredential.user.uid,
+            credential: userCredential.credential.toJSON(),
+          };
+          // TODO look at security
+          setCookie('__session', JSON.stringify(session));
+        })
+      );
+
+      this.disposables.push(
+          this.user.pipe(
+          pairwise(),
+          filter(([a, b]) => !!a && !b),
+        ).subscribe(() => {
+          removeCookie('__session');
+        })
+      );
+
+    }
 
     return ɵlazySDKProxy(this, auth, zone, { spy: {
       apply: (name, _, val) => {
@@ -269,6 +263,11 @@ export class AngularFireAuth {
       }
     }});
 
+  }
+
+  ngOnDestroy() {
+    this.disposables.forEach(it => it.unsubscribe());
+    firebase.apps.forEach(app => app.auth().signOut());
   }
 
 }
