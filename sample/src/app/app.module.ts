@@ -18,11 +18,17 @@ import {
   COLLECTION_ENABLED
 } from '@angular/fire/analytics';
 
+import {
+  AngularFireAuthModule,
+  USE_DEVICE_LANGUAGE,
+  USE_EMULATOR as USE_AUTH_EMULATOR,
+  EXPERIMENTAL_COOKIE_AUTH
+} from '@angular/fire/auth';
+
 import { FirestoreComponent } from './firestore/firestore.component';
 import { AngularFireDatabaseModule, USE_EMULATOR as USE_DATABASE_EMULATOR } from '@angular/fire/database';
 import { AngularFirestoreModule, USE_EMULATOR as USE_FIRESTORE_EMULATOR, SETTINGS as FIRESTORE_SETTINGS } from '@angular/fire/firestore';
 import { AngularFireStorageModule } from '@angular/fire/storage';
-import { AngularFireAuthModule, USE_DEVICE_LANGUAGE, USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/auth';
 import { AngularFireMessagingModule, SERVICE_WORKER, VAPID_KEY } from '@angular/fire/messaging';
 import { AngularFireFunctionsModule, USE_EMULATOR as USE_FUNCTIONS_EMULATOR, ORIGIN as FUNCTIONS_ORIGIN, NEW_ORIGIN_BEHAVIOR } from '@angular/fire/functions';
 import { AngularFireRemoteConfigModule, SETTINGS as REMOTE_CONFIG_SETTINGS, DEFAULTS as REMOTE_CONFIG_DEFAULTS } from '@angular/fire/remote-config';
@@ -38,7 +44,7 @@ import { FunctionsComponent } from './functions/functions.component';
 import { FirestoreOfflineComponent } from './firestore-offline/firestore-offline.component';
 import { FirestoreOfflineModule } from './firestore-offline/firestore-offline.module';
 import { UpboatsComponent } from './upboats/upboats.component';
-
+import { CookieService } from 'ngx-cookie-service';
 @NgModule({
   declarations: [
     AppComponent,
@@ -72,9 +78,11 @@ import { UpboatsComponent } from './upboats/upboats.component';
     FirestoreOfflineModule
   ],
   providers: [
+    CookieService,
     UserTrackingService,
     ScreenTrackingService,
     PerformanceMonitoringService,
+    { provide: EXPERIMENTAL_COOKIE_AUTH, useValue: true },
     { provide: FIRESTORE_SETTINGS, useValue: { ignoreUndefinedProperties: true } },
     { provide: ANALYTICS_DEBUG_MODE, useValue: true },
     { provide: COLLECTION_ENABLED, useValue: true },

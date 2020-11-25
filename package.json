@@ -78,6 +78,7 @@
     "@angular/compiler-cli": "^9.0.0 || ^10.0.0 || ^11.0.0",
     "@angular/platform-server": "^9.0.0 || ^10.0.0 || ^11.0.0",
     "@firebase/app-types": "^0.6.1",
+    "@nguniversal/express-engine": "^11.0.0",
     "@types/fs-extra": "^7.0.0",
     "@types/gzip-size": "^5.1.1",
     "@types/inquirer": "^0.0.44",

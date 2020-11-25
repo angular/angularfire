@@ -1570,6 +1570,21 @@
     enhanced-resolve "5.3.1"
     webpack-sources "2.0.1"
 
+"@nguniversal/common@11.0.0":
+  version "11.0.0"
+  resolved "https://registry.yarnpkg.com/@nguniversal/common/-/common-11.0.0.tgz#1777e60b15b58d31a75de1c316db9cb0383ec408"
+  integrity sha512-trcOrxEt1LjH0bl+zcqbY2UEhThi1FkzOBr3ox8uXrp8BZh6/V3mVtO4nNkSh71yPXlBJ0/qlDEpyqV4jvkMGw==
+  dependencies:
+    tslib "^2.0.0"
+
+"@nguniversal/express-engine@^11.0.0":
+  version "11.0.0"
+  resolved "https://registry.yarnpkg.com/@nguniversal/express-engine/-/express-engine-11.0.0.tgz#48450e199695faab79078a397e6bc9936a986fb4"
+  integrity sha512-CUsXnFK/BIeyY/sKY8G03R0QyTxPWbilMcR9aX2TPguL7hPtLqz4Jq8kuL2qN1xBwChV5XvdEQ4xKSl+jTKfAQ==
+  dependencies:
+    "@nguniversal/common" "11.0.0"
+    tslib "^2.0.0"
+
 "@nodelib/fs.scandir@2.1.3":
   version "2.1.3"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.scandir/-/fs.scandir-2.1.3.tgz#3a582bdb53804c6ba6d146579c46e52130cf4a3b"
