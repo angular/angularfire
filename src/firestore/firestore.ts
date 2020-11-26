@@ -1,7 +1,6 @@
-import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
+import { Inject, Injectable, NgZone, Optional, PLATFORM_ID } from '@angular/core';
 import { from, Observable, of } from 'rxjs';
 import {
-  AssociatedReference,
   CollectionReference,
   DocumentReference,
   PersistenceSettings,
@@ -21,49 +20,13 @@ import {
   ɵAngularFireSchedulers,
   ɵfirebaseAppFactory,
   ɵkeepUnstableUntilFirstFactory,
-  FirebaseApp
 } from '@angular/fire';
 import { isPlatformServer } from '@angular/common';
 import firebase from 'firebase/app';
 import { USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/auth';
 import { ɵfetchInstance, ɵlogAuthEmulatorError } from '@angular/fire';
-
-/**
- * The value of this token determines whether or not the firestore will have persistance enabled
- */
-export const ENABLE_PERSISTENCE = new InjectionToken<boolean>('angularfire2.enableFirestorePersistence');
-export const PERSISTENCE_SETTINGS = new InjectionToken<PersistenceSettings | undefined>('angularfire2.firestore.persistenceSettings');
-export const SETTINGS = new InjectionToken<Settings>('angularfire2.firestore.settings');
-
-// SEMVER(7): use Parameters to detirmine the useEmulator arguments
-// type UseEmulatorArguments = Parameters<typeof firebase.firestore.Firestore.prototype.useEmulator>;
-type UseEmulatorArguments = [string, number];
-export const USE_EMULATOR = new InjectionToken<UseEmulatorArguments>('angularfire2.firestore.use-emulator');
-
-/**
- * A utility methods for associating a collection reference with
- * a query.
- *
- * @param collectionRef - A collection reference to query
- * @param queryFn - The callback to create a query
- *
- * Example:
- * const { query, ref } = associateQuery(docRef.collection('items'), ref => {
- *  return ref.where('age', '<', 200);
- * });
- */
-export function associateQuery<T>(collectionRef: CollectionReference<T>, queryFn = ref => ref): AssociatedReference<T> {
-  const query = queryFn(collectionRef);
-  const ref = collectionRef;
-  return { query, ref };
-}
-
-type InstanceCache = Map<FirebaseApp, [
-  firebase.firestore.Firestore,
-  firebase.firestore.Settings | null,
-  UseEmulatorArguments | null,
-  boolean | null]
->;
+import { ENABLE_PERSISTENCE, PERSISTENCE_SETTINGS, SETTINGS, USE_EMULATOR, associateQuery, ɵUseEmulatorArguments } from '@angular/fire/firestore-lazy';
+export { ENABLE_PERSISTENCE, PERSISTENCE_SETTINGS, SETTINGS, USE_EMULATOR, associateQuery };
 
 /**
  * AngularFirestore Service
@@ -153,7 +116,7 @@ export class AngularFirestore {
     if (!firebase.auth && useAuthEmulator) {
       ɵlogAuthEmulatorError();
     }
-    const useEmulator: UseEmulatorArguments | null = _useEmulator;
+    const useEmulator: ɵUseEmulatorArguments | null = _useEmulator;
 
     [this.firestore, this.persistenceEnabled$] = ɵfetchInstance(`${app.name}.firestore`, 'AngularFirestore', app, () => {
       const firestore = zone.runOutsideAngular(() => app.firestore());

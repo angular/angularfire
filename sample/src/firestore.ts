@@ -1,1 +1,1 @@
-export * from '@angular/fire/firestore';
+export * from '@angular/fire/firestore-lazy';

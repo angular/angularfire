@@ -1,8 +1,9 @@
-import { from, Observable } from 'rxjs';
-import { fromCollectionRef, docChanges, sortedChanges  } from '@angular/fire/firestore-lazy';
-import { filter, map, observeOn, scan } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { fromCollectionRef } from '../observable/fromRef';
+import { filter, map, observeOn, scan, switchMap } from 'rxjs/operators';
 import firebase from 'firebase/app';
 import { CollectionReference, DocumentChangeAction, DocumentChangeType, DocumentData, DocumentReference, Query } from '../interfaces';
+import { docChanges, sortedChanges } from './changes';
 import { AngularFirestoreDocument } from '../document/document';
 import { AngularFirestore } from '../firestore';
 
@@ -47,8 +48,8 @@ export class AngularFirestoreCollection<T = DocumentData> {
    * on this implication.
    */
   constructor(
-    public readonly ref: CollectionReference<T>,
-    private readonly query: Query<T>,
+    public readonly ref: Observable<CollectionReference<T>>,
+    private readonly query: Observable<Query<T>>,
     private readonly afs: AngularFirestore) { }
 
   /**
@@ -58,11 +59,14 @@ export class AngularFirestoreCollection<T = DocumentData> {
    */
   stateChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction<T>[]> {
     if (!events || events.length === 0) {
-      return docChanges<T>(this.query, this.afs.schedulers.outsideAngular).pipe(
+      this.query.pipe(
+        switchMap(query => docChanges<T>(query, this.afs.schedulers.outsideAngular)),
+        filter(changes =>  changes.length > 0),
         this.afs.keepUnstableUntilFirst
       );
     }
-    return docChanges<T>(this.query, this.afs.schedulers.outsideAngular).pipe(
+    return this.query.pipe(
+      switchMap(query => docChanges<T>(query, this.afs.schedulers.outsideAngular)),
       map(actions => actions.filter(change => events.indexOf(change.type) > -1)),
       filter(changes =>  changes.length > 0),
       this.afs.keepUnstableUntilFirst
@@ -83,8 +87,8 @@ export class AngularFirestoreCollection<T = DocumentData> {
    */
   snapshotChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction<T>[]> {
     const validatedEvents = validateEventsArray(events);
-    const scheduledSortedChanges$ = sortedChanges<T>(this.query, validatedEvents, this.afs.schedulers.outsideAngular);
-    return scheduledSortedChanges$.pipe(
+    return this.query.pipe(
+      switchMap(query => sortedChanges<T>(query, validatedEvents, this.afs.schedulers.outsideAngular)),
       this.afs.keepUnstableUntilFirst
     );
   }
@@ -100,27 +104,28 @@ export class AngularFirestoreCollection<T = DocumentData> {
   valueChanges({}): Observable<T[]>;
   valueChanges<K extends string>(options: {idField: K}): Observable<(T & { [T in K]: string })[]>;
   valueChanges<K extends string>(options: {idField?: K} = {}): Observable<T[]> {
-    return fromCollectionRef<T>(this.query, this.afs.schedulers.outsideAngular)
-      .pipe(
-        map(actions => actions.payload.docs.map(a => {
-          if (options.idField) {
-            return {
-              ...a.data() as {},
-              ...{ [options.idField]: a.id }
-            } as T & { [T in K]: string };
-          } else {
-            return a.data();
-          }
-        })),
-        this.afs.keepUnstableUntilFirst
-      );
+    return this.query.pipe(
+      switchMap(query => fromCollectionRef<T>(query, this.afs.schedulers.outsideAngular)),
+      map(actions => actions.payload.docs.map(a => {
+        if (options.idField) {
+          return {
+            ...a.data() as {},
+            ...{ [options.idField]: a.id }
+          } as T & { [T in K]: string };
+        } else {
+          return a.data();
+        }
+      })),
+      this.afs.keepUnstableUntilFirst
+    );
   }
 
   /**
    * Retrieve the results of the query once.
    */
   get(options?: firebase.firestore.GetOptions) {
-    return from(this.query.get(options)).pipe(
+    return this.query.pipe(
+      switchMap(query => query.get(options)),
       observeOn(this.afs.schedulers.insideAngular),
     );
   }
@@ -133,7 +138,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
    * the data fits the criteria of the query.
    */
   add(data: T): Promise<DocumentReference<T>> {
-    return this.ref.add(data);
+    return this.ref.toPromise().then(ref => ref.add(data));
   }
 
   /**
@@ -141,6 +146,6 @@ export class AngularFirestoreCollection<T = DocumentData> {
    */
   doc<T2 = T>(path?: string): AngularFirestoreDocument<T2> {
     // TODO is there a better way to solve this type issue
-    return new AngularFirestoreDocument(this.ref.doc(path) as any, this.afs);
+    return new AngularFirestoreDocument(this.ref.pipe(map(ref => ref.doc(path) as any)), this.afs);
   }
 }

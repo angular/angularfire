@@ -1,1 +1,1 @@
-export * from '@angular/fire/firestore/memory';
+export * from '@angular/fire/firestore-lazy/memory';

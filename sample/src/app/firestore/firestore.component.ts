@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFirestore } from '../../firestore';
-import { Observable } from 'rxjs';
-import { startWith, tap } from 'rxjs/operators';
+import { from, Observable } from 'rxjs';
+import { map, startWith, switchMap, tap } from 'rxjs/operators';
 import { makeStateKey, TransferState } from '@angular/platform-browser';
 import { trace } from '@angular/fire/performance';
 
@@ -11,7 +11,7 @@ import { trace } from '@angular/fire/performance';
     Firestore!
     {{ testDocValue$ | async | json }}
     {{ persistenceEnabled$ | async }}
-    {{ persistenceProvider || 'unknown (mangled)' }}
+    {{ (persistenceProvider | async) || 'unknown (mangled)' }}
   </p>`,
   styles: [``]
 })
@@ -22,13 +22,17 @@ export class FirestoreComponent implements OnInit {
   public readonly persistenceProvider: any;
 
   constructor(state: TransferState, firestore: AngularFirestore) {
-    this.persistenceProvider = (firestore.firestore as any)._persistenceProvider?.constructor.name;
+    this.persistenceProvider = from((firestore as any)._persistenceProvider).pipe(map(it => it?.constructor.name));
     const doc = firestore.doc('test/1');
-    const key = makeStateKey(doc.ref.path);
-    const existing = state.get(key, undefined);
-    this.testDocValue$ = firestore.doc('test/1').valueChanges().pipe(
-      trace('firestore'),
-      existing ? startWith(existing) : tap(it => state.set(key, it))
+    this.testDocValue$ = from(doc.ref).pipe(
+      switchMap(ref => {
+        const key = makeStateKey(ref.path);
+        const existing = state.get(key, undefined);
+        return doc.valueChanges().pipe(
+          trace('firestore'),
+          existing ? startWith(existing) : tap(it => state.set(key, it))
+        );
+      })
     );
     this.persistenceEnabled$ = firestore.persistenceEnabled$;
   }

@@ -9,10 +9,10 @@ import firebase from 'firebase/app';
 // TODO infer these from the package.json
 const MODULES = [
   'core', 'analytics', 'auth', 'auth-guard', 'database',
-  'firestore', 'functions', 'remote-config',
+  'firestore', 'firestore-lazy', 'functions', 'remote-config',
   'storage', 'messaging', 'performance'
 ];
-const LAZY_MODULES = ['analytics', 'auth', 'functions', 'messaging', 'remote-config'];
+const LAZY_MODULES = [['analytics'], ['auth'], ['functions'], ['firestore-lazy', 'firestore'], ['messaging'], ['remote-config']];
 const UMD_NAMES = MODULES.map(m => m === 'core' ? 'angular-fire' : `angular-fire-${m}`);
 const ENTRY_NAMES = MODULES.map(m => m === 'core' ? '@angular/fire' : `@angular/fire/${m}`);
 
@@ -24,6 +24,7 @@ function proxyPolyfillCompat() {
     messaging: tsKeys<firebase.messaging.Messaging>(),
     performance: tsKeys<firebase.performance.Performance>(),
     'remote-config': tsKeys<firebase.remoteConfig.RemoteConfig>(),
+    'firestore-lazy': tsKeys<firebase.firestore.Firestore>(),
   };
 
   return Promise.all(Object.keys(defaultObject).map(module =>
@@ -95,7 +96,9 @@ async function measure(module: string) {
 }
 
 async function fixImportForLazyModules() {
-  await Promise.all(LAZY_MODULES.map(async module => {
+  // firebase-lazy/memory is special-case, make sure to also cover that as we make changes
+  await Promise.all(LAZY_MODULES.map(async ([module, _sdk]) => {
+    const sdk = _sdk || module;
     const packageJson = JSON.parse((await readFile(dest(module, 'package.json'))).toString());
     const entries = Array.from(new Set(Object.values(packageJson).filter(v => typeof v === 'string' && v.endsWith('.js')))) as string[];
     // TODO don't hardcode esm2015 here, perhaps we should scan all the entry directories
@@ -106,13 +109,38 @@ async function fixImportForLazyModules() {
       let newSource: string;
       if (path.endsWith('.umd.js')) {
         // in the UMD for lazy modules replace the dyanamic import
-        newSource = source.replace(`import('firebase/${module}')`, 'rxjs.of(undefined)');
+        newSource = source.replace(`import('firebase/${sdk}')`, 'rxjs.of(undefined)');
       } else {
         // in everything else get rid of the global side-effect import
-        newSource = source.replace(new RegExp(`^import 'firebase/${module}'.+$`, 'gm'), '');
+        newSource = source.replace(new RegExp(`^import 'firebase/${sdk}'.+$`, 'gm'), '');
       }
       await writeFile(dest(module, path), newSource);
     }));
+  }));
+}
+
+async function fixFirestoreLazyMemoryModule() {
+  const module = 'firestore-lazy/memory';
+  const packageJson = JSON.parse((await readFile(dest(module, 'package.json'))).toString());
+  const entries = Array.from(new Set(Object.values(packageJson).filter(v => typeof v === 'string' && v.endsWith('.js')))) as string[];
+  // TODO don't hardcode esm2015 here, perhaps we should scan all the entry directories
+  //      e.g, if ng-packagr starts building other non-flattened entries we'll lose the dynamic import
+  entries.push(`../../esm2015/${module}/public_api.js`); // the import isn't pulled into the ESM public_api
+  entries.push(`../../esm2015/${module}/firestore.js`);
+  await Promise.all(entries.map(async path => {
+    const source = (await readFile(dest(module, path))).toString();
+    let newSource: string;
+    if (path.endsWith('.umd.js')) {
+      // in the UMD for lazy modules replace the dyanamic import
+      newSource = source.replace('import(\'firebase/firestore\')', 'rxjs.of(undefined)')
+        .replace('require(\'firebase/firestore\')', 'require(\'firebase/firestore/memory\')')
+        .replace(', \'firebase/firestore\',', ', \'firebase/firestore/memory\',');
+    } else {
+      // in everything else get rid of the global side-effect import
+      newSource = source.replace(/^import 'firebase\/firestore'.+$/gm, '')
+        .replace('import(\'firebase/firestore\')', 'import(\'firebase/firestore/memory\')');
+    }
+    await writeFile(dest(module, path), newSource);
   }));
 }
 
@@ -127,6 +155,7 @@ async function buildLibrary() {
     replacePackageJsonVersions(),
     replacePackageCoreVersion(),
     fixImportForLazyModules(),
+    fixFirestoreLazyMemoryModule(),
   ]);
 }
 

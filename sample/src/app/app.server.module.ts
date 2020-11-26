@@ -1,10 +1,9 @@
-import { isDevMode, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { ServerModule, ServerTransferStateModule } from '@angular/platform-server';
-
 import { AppModule } from './app.module';
 import { AppComponent } from './app.component';
 import { APP_BASE_HREF } from '@angular/common';
-import { AngularFirestoreModule } from '@angular/fire/firestore/memory';
+import { AngularFirestoreModule } from '@angular/fire/firestore-lazy/memory';
 
 @NgModule({
   imports: [

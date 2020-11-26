@@ -1,8 +1,8 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
-import { PersistenceSettings } from '@angular/fire/firestore-lazy';
+import { PersistenceSettings } from './interfaces';
 import { AngularFirestore, ENABLE_PERSISTENCE, PERSISTENCE_SETTINGS } from './firestore';
 
-import 'firebase/firestore';
+import 'firebase/firestore'; // removed in build process when not UMD
 
 @NgModule({
   providers: [ AngularFirestore ]
