@@ -51,7 +51,8 @@ export function app() {
     if (idToken) {
         const { uid, exp } = await admin.auth().verifyIdToken(idToken);
         try {
-            const { secure, hostname: domain } = req;
+            const { secure, hostname } = req;
+            const domain = req.get('x-forwarded-host') || hostname;
             // custom tokens last for an hour, but let's tie expiration to the ID token
             // which triggered the request (which will be < 1 hour)
             const expires = new Date(exp * 1_000);
