@@ -45,3 +45,5 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+/service-account.json

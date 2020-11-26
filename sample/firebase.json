@@ -30,9 +30,6 @@
           "source": "yada",
           "function": "yada"
         }, {
-          "source": "createSession",
-          "function": "createSession"
-        }, {
           "source": "**",
           "function": "ssr"
         }

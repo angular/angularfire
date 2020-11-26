@@ -22,7 +22,9 @@ export class AngularFirestoreOffline extends AngularFirestore {
         super(options, 'offline', true, settings, platformId, zone, { synchronizeTabs: true }, useEmulator, useAuthEmulator);
         afAuth.credential.subscribe(userCredential => {
           const auth = this.firestore.app.auth();
-          if (userCredential) {
+          // TODO signing in with custom token isn't returning a credential
+          //      investigate a work-around for SSR
+          if (userCredential?.credential) {
             auth.signInWithCredential(userCredential.credential);
           } else {
             auth.signOut();

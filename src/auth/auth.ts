@@ -1,6 +1,7 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID, InjectionToken, OnDestroy } from '@angular/core';
 import { Observable, of, from, merge, Subject, Subscriber, SubscriptionLike } from 'rxjs';
-import { switchMap, map, observeOn, shareReplay, filter, switchMapTo, subscribeOn, tap, pairwise, take } from 'rxjs/operators';
+import { ajax } from 'rxjs/ajax';
+import { switchMap, map, observeOn, shareReplay, filter, switchMapTo, subscribeOn, take } from 'rxjs/operators';
 import {
   FIREBASE_OPTIONS,
   FIREBASE_APP_NAME,
@@ -79,7 +80,7 @@ export class AngularFireAuth implements OnDestroy {
     @Optional() @Inject(LANGUAGE_CODE) languageCode: string | null,
     @Optional() @Inject(USE_DEVICE_LANGUAGE) useDeviceLanguage: boolean | null,
     @Optional() @Inject(PERSISTENCE) persistence: string | null,
-    @Optional() @Inject(EXPERIMENTAL_COOKIE_AUTH) private experimentalCookieAuth: boolean | null,
+    @Optional() @Inject(EXPERIMENTAL_COOKIE_AUTH) experimentalCookieAuth: boolean | null,
     @Optional() @Inject(REQUEST) request: any,
   ) {
     const schedulers = new ɵAngularFireSchedulers(zone);
@@ -109,12 +110,7 @@ export class AngularFireAuth implements OnDestroy {
           if (settings) {
             auth.settings = settings;
           }
-          if (experimentalCookieAuth) {
-            auth.setPersistence('none');
-            if (persistence && typeof console !== 'undefined') {
-              console.warn('Experimental cookie auth overrides persistence to NONE.');
-            }
-          } else if (persistence) {
+          if (persistence) {
             auth.setPersistence(persistence);
           }
           return auth;
@@ -130,36 +126,34 @@ export class AngularFireAuth implements OnDestroy {
     //       we reevaluate the API.
     this.disposables.push(auth.pipe(take(1)).subscribe());
 
-    const cookieAuthCredential = auth.pipe(
-      switchMap(auth => {
-        const encodedSession = isPlatformServer(platformId) ?
-          request.headers.cookie && parseCookies(request.headers.cookie).__session :
-          getCookie('__session');
-        if (encodedSession) {
-          const session = JSON.parse(decodeURIComponent(encodedSession));
-          const authCredential = firebase.auth.AuthCredential.fromJSON(session.credential);
-          return auth.signInWithCredential(authCredential).then(it => it, (e) => {
-            console.warn(e);
-            return null;
-          });
-        } else {
-          return of(null);
-        }
-      }),
-      map(credential => credential?.user ? credential as firebase.auth.UserCredential : null),
-      shareReplay({ bufferSize: 1, refCount: false }),
-    );
-
-    const cookieAuthUser = cookieAuthCredential.pipe(
-      map(it => it?.user)
-    );
-
     if (isPlatformServer(platformId)) {
 
       if (experimentalCookieAuth) {
 
-        this.user = this.authState = cookieAuthUser;
-        this.credential = cookieAuthCredential;
+        this.credential = auth.pipe(
+          switchMap(auth => {
+            const encodedSession = request.signedCookies?.__session;
+            if (encodedSession) {
+              const { uid, customToken } = JSON.parse(encodedSession);
+              if (auth.currentUser?.uid === uid) {
+                return of({ user: auth.currentUser, credential: null });
+              } else {
+                return auth.signInWithCustomToken(customToken).then(it => it, (e) => {
+                  console.warn(e);
+                  return null;
+                });
+              }
+            } else {
+              return of(null);
+            }
+          }),
+          map(credential => credential?.user ? credential as firebase.auth.UserCredential : null),
+          shareReplay({ bufferSize: 1, refCount: false }),
+        );
+
+        this.user = this.authState = this.credential.pipe(
+          map(it => it?.user)
+        );
 
       } else {
 
@@ -171,7 +165,6 @@ export class AngularFireAuth implements OnDestroy {
 
       const redirectResult = auth.pipe(
         switchMap(auth => auth.getRedirectResult().then(it => it, () => null)),
-        experimentalCookieAuth ? switchMap(it => cookieAuthCredential.pipe(map(() => it))) : tap(),
         keepUnstableUntilFirst,
         shareReplay({ bufferSize: 1, refCount: false }),
       );
@@ -225,28 +218,19 @@ export class AngularFireAuth implements OnDestroy {
     );
 
 
-    if (this.experimentalCookieAuth) {
+    if (!isPlatformServer(platformId) && experimentalCookieAuth) {
 
       this.disposables.push(
-        this.credential.pipe(
-          filter(it => !!it)
-        ).subscribe(userCredential => {
-          const session = {
-            uid: userCredential.user.uid,
-            credential: userCredential.credential.toJSON(),
-          };
-          // TODO look at security
-          setCookie('__session', JSON.stringify(session));
-        })
-      );
-
-      this.disposables.push(
-          this.user.pipe(
-          pairwise(),
-          filter(([a, b]) => !!a && !b),
-        ).subscribe(() => {
-          removeCookie('__session');
-        })
+        this.idToken.pipe(
+          // use xhr rather than fetch so set-cookie works
+          switchMap(idToken => ajax({
+            url: '/createSession',
+            method: 'POST',
+            headers: idToken ? {
+              authorization: `Bearer ${idToken}`
+            } : {}
+          }))
+        ).subscribe()
       );
 
     }
@@ -267,6 +251,8 @@ export class AngularFireAuth implements OnDestroy {
 
   ngOnDestroy() {
     this.disposables.forEach(it => it.unsubscribe());
+    // TODO let's take advantage of this, rather than sign-out let's use the cookie uid
+    //      in the app name (if experimentalCookieAuth that is)
     firebase.apps.forEach(app => app.auth().signOut());
   }
 
