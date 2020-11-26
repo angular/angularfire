@@ -9690,6 +9690,11 @@ postcss@^7.0.0, postcss@^7.0.1, postcss@^7.0.14, postcss@^7.0.27, postcss@^7.0.3
     source-map "^0.6.1"
     supports-color "^6.1.0"
 
+preboot@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/preboot/-/preboot-7.0.0.tgz#a06e9ec5d60b0f0a0143981e89983173510459b9"
+  integrity sha512-moGFdwpdY91Hr7L1OdwpMWPLwJmijUdynZkP7zJzpIgTqCShisVVU5AMVHLdetu1EvOpMo9Hy7WPMH1mDk19hQ==
+
 prelude-ls@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.1.2.tgz#21932a549f5e52ffd9a827f570e04be62a97da54"
