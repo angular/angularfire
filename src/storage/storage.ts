@@ -14,10 +14,8 @@ import {
 import { UploadMetadata } from './interfaces';
 import 'firebase/storage';
 import firebase from 'firebase/app';
-
-export const BUCKET = new InjectionToken<string>('angularfire2.storageBucket');
-export const MAX_UPLOAD_RETRY_TIME = new InjectionToken<number>('angularfire2.storage.maxUploadRetryTime');
-export const MAX_OPERATION_RETRY_TIME = new InjectionToken<number>('angularfire2.storage.maxOperationRetryTime');
+import { BUCKET, MAX_UPLOAD_RETRY_TIME, MAX_OPERATION_RETRY_TIME } from '@angular/fire/storage-lazy';
+export { BUCKET, MAX_UPLOAD_RETRY_TIME, MAX_OPERATION_RETRY_TIME };
 
 /**
  * AngularFireStorage Service

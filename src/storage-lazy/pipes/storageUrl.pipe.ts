@@ -2,7 +2,7 @@ import { AsyncPipe } from '@angular/common';
 import { ChangeDetectorRef, NgModule, OnDestroy, Pipe, PipeTransform } from '@angular/core';
 import { makeStateKey, TransferState } from '@angular/platform-browser';
 import { Observable, of } from 'rxjs';
-import { startWith, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { AngularFireStorage } from '../storage';
 
 /** to be used with in combination with | async */

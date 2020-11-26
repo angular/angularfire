@@ -2,7 +2,7 @@ import { ListResult, Reference, SettableMetadata, StringFormat, UploadMetadata }
 import { AngularFireUploadTask, createUploadTask } from './task';
 import { from, Observable, of } from 'rxjs';
 import { ɵAngularFireSchedulers } from '@angular/fire';
-import { observeOn, switchMap } from 'rxjs/operators';
+import { map, observeOn, switchMap } from 'rxjs/operators';
 
 export interface AngularFireStorageReference {
   getDownloadURL(): Observable<any>;
@@ -20,32 +20,32 @@ export interface AngularFireStorageReference {
  * creates observable methods from promise based methods.
  */
 export function createStorageRef(
-  ref: Reference,
+  ref$: Observable<Reference>,
   schedulers: ɵAngularFireSchedulers,
   keepUnstableUntilFirst: <T>(obs$: Observable<T>) => Observable<T>
 ): AngularFireStorageReference {
   return {
-    getDownloadURL: () => of(undefined).pipe(
+    getDownloadURL: () => ref$.pipe(
       observeOn(schedulers.outsideAngular),
-      switchMap(() => ref.getDownloadURL()),
+      switchMap(ref => ref.getDownloadURL()),
       keepUnstableUntilFirst
     ),
-    getMetadata: () => of(undefined).pipe(
+    getMetadata: () => ref$.pipe(
       observeOn(schedulers.outsideAngular),
-      switchMap(() => ref.getMetadata()),
+      switchMap(ref => ref.getMetadata()),
       keepUnstableUntilFirst
     ),
-    delete: () => from(ref.delete()),
-    child: (path: string) => createStorageRef(ref.child(path), schedulers, keepUnstableUntilFirst),
-    updateMetadata: (meta: SettableMetadata) => from(ref.updateMetadata(meta)),
+    delete: () => ref$.pipe(switchMap(ref => ref.delete())),
+    child: (path: string) => createStorageRef(ref$.pipe(map(ref => ref.child(path))), schedulers, keepUnstableUntilFirst),
+    updateMetadata: (meta: SettableMetadata) => ref$.pipe(switchMap(ref => ref.updateMetadata(meta))),
     put: (data: any, metadata?: UploadMetadata) => {
-      const task = ref.put(data, metadata);
+      const task = ref$.pipe(map(ref => ref.put(data, metadata)));
       return createUploadTask(task);
     },
     putString: (data: string, format?: StringFormat, metadata?: UploadMetadata) => {
-      const task = ref.putString(data, format, metadata);
+      const task = ref$.pipe(map(ref => ref.putString(data, format, metadata)));
       return createUploadTask(task);
     },
-    listAll: () => from(ref.listAll())
+    listAll: () => ref$.pipe(switchMap(ref => ref.listAll()))
   };
 }

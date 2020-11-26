@@ -1,5 +1,5 @@
 import { UploadTask, UploadTaskSnapshot } from './interfaces';
-import { fromTask } from './observable/fromTask';
+import { fromTask } from '@angular/fire/storage-lazy';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 

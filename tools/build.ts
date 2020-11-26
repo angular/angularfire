@@ -10,9 +10,9 @@ import firebase from 'firebase/app';
 const MODULES = [
   'core', 'analytics', 'auth', 'auth-guard', 'database',
   'firestore', 'firestore-lazy', 'functions', 'remote-config',
-  'storage', 'messaging', 'performance'
+  'storage', 'messaging', 'performance', 'storage-lazy'
 ];
-const LAZY_MODULES = [['analytics'], ['auth'], ['functions'], ['firestore-lazy', 'firestore'], ['messaging'], ['remote-config']];
+const LAZY_MODULES = [['analytics'], ['auth'], ['functions'], ['firestore-lazy', 'firestore'], ['messaging'], ['remote-config'], ['storage-lazy', 'storage']];
 const UMD_NAMES = MODULES.map(m => m === 'core' ? 'angular-fire' : `angular-fire-${m}`);
 const ENTRY_NAMES = MODULES.map(m => m === 'core' ? '@angular/fire' : `@angular/fire/${m}`);
 
@@ -25,6 +25,7 @@ function proxyPolyfillCompat() {
     performance: tsKeys<firebase.performance.Performance>(),
     'remote-config': tsKeys<firebase.remoteConfig.RemoteConfig>(),
     'firestore-lazy': tsKeys<firebase.firestore.Firestore>(),
+    'storage-lazy': tsKeys<firebase.storage.Storage>(),
   };
 
   return Promise.all(Object.keys(defaultObject).map(module =>

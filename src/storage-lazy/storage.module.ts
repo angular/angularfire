@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { GetDownloadURLPipeModule } from '@angular/fire/storage-lazy';
+import { GetDownloadURLPipeModule } from './pipes/storageUrl.pipe';
 import { AngularFireStorage } from './storage';
 
 @NgModule({
