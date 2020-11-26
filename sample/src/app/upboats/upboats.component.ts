@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { from, Observable } from 'rxjs';
-import { map, startWith, switchMap, tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map, startWith, tap } from 'rxjs/operators';
 import firebase from 'firebase/app';
 import { makeStateKey, TransferState } from '@angular/platform-browser';
 import { trace } from '@angular/fire/performance';
@@ -21,20 +21,16 @@ export class UpboatsComponent implements OnInit {
     const collection = firestore.collection<Animal>('animals', ref =>
       ref.orderBy('upboats', 'desc').orderBy('updatedAt', 'desc')
     );
-    this.animals = from(collection.ref).pipe(
-      switchMap(ref => {
-        const key = makeStateKey(ref.path);
-        const existing = state.get(key, undefined);
-        return collection.snapshotChanges().pipe(
-          trace('animals'),
-          map(it => it.map(change => ({
-            ...change.payload.doc.data(),
-            id: change.payload.doc.id,
-            hasPendingWrites: change.payload.doc.metadata.hasPendingWrites
-          }))),
-          existing ? startWith(existing) : tap(it => state.set(key, it))
-        );
-      })
+    const key = makeStateKey('animals');
+    const existing = state.get(key, undefined);
+    this.animals = collection.snapshotChanges().pipe(
+      trace('animals'),
+      map(it => it.map(change => ({
+        ...change.payload.doc.data(),
+        id: change.payload.doc.id,
+        hasPendingWrites: change.payload.doc.metadata.hasPendingWrites
+      }))),
+      existing ? startWith(existing) : tap(it => state.set(key, it))
     );
   }
 
