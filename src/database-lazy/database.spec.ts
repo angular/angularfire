@@ -6,7 +6,7 @@ import { NgZone } from '@angular/core';
 import 'firebase/database';
 import { rando } from '../firestore/utils.spec';
 
-describe('AngularFireDatabase', () => {
+describe('AngularFireLazyDatabase', () => {
   let app: FirebaseApp;
   let db: AngularFireDatabase;
   let zone: NgZone;
@@ -57,7 +57,7 @@ describe('AngularFireDatabase', () => {
 
 });
 
-describe('AngularFireDatabase w/options', () => {
+describe('AngularFireLazyDatabase w/options', () => {
   let app: FirebaseApp;
   let db: AngularFireDatabase;
   let firebaseAppName: string;

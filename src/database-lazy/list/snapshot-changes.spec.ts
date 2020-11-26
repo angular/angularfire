@@ -8,7 +8,7 @@ import { skip, switchMap, take } from 'rxjs/operators';
 import 'firebase/database';
 import { rando } from '../../firestore/utils.spec';
 
-describe('snapshotChanges', () => {
+describe('lazy snapshotChanges', () => {
   let app: FirebaseApp;
   let db: AngularFireDatabase;
   let createRef: (path: string) => firebase.database.Reference;

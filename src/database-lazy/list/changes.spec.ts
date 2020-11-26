@@ -7,7 +7,7 @@ import { skip, take } from 'rxjs/operators';
 import 'firebase/database';
 import { rando } from '../../firestore/utils.spec';
 
-describe('listChanges', () => {
+describe('lazy listChanges', () => {
   let app: FirebaseApp;
   let db: AngularFireDatabase;
   let ref: (path: string) => firebase.database.Reference;

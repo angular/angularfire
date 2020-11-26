@@ -7,7 +7,7 @@ import { take } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
 import { rando } from '../../firestore/utils.spec';
 
-describe('fromRef', () => {
+describe('lazy fromRef', () => {
   let app: FirebaseApp;
   let db: AngularFireDatabase;
   let ref: (path: string) => DatabaseReference;

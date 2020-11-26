@@ -96,7 +96,7 @@ describe('AngularFirestoreLazy', () => {
 
 });
 
-describe('AngularFirestore with different app', () => {
+describe('AngularFirestoreLazy with different app', () => {
   let app: FirebaseApp;
   let afs: AngularFirestore;
   let firebaseAppName: string;
@@ -141,8 +141,7 @@ describe('AngularFirestore with different app', () => {
 
 });
 
-
-describe('AngularFirestore without persistance', () => {
+describe('AngularFirestoreLazy without persistance', () => {
   let app: FirebaseApp;
   let afs: AngularFirestore;
 

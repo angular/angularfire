@@ -7,7 +7,7 @@ import { skip } from 'rxjs/operators';
 import 'firebase/database';
 import { rando } from '../../firestore/utils.spec';
 
-describe('auditTrail', () => {
+describe('lazy auditTrail', () => {
   let app: FirebaseApp;
   let db: AngularFireDatabase;
   let createRef: (path: string) => DatabaseReference;

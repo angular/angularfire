@@ -26,15 +26,15 @@
         "@angular/fire/auth": ["dist/packages-dist/auth"],
         "@angular/fire/auth-guard": ["dist/packages-dist/auth-guard"],
         "@angular/fire/database": ["dist/packages-dist/database"],
-        "@angular/fire/database-deprecated": ["dist/packages-dist/database-deprecated"],
-        "@angular/fire/firebase-node": ["dist/packages-dist/firebase-node"],
+        "@angular/fire/database-lazy": ["dist/packages-dist/database-lazy"],
         "@angular/fire/firestore": ["dist/packages-dist/firestore"],
         "@angular/fire/firestore-lazy": ["dist/packages-dist/firestore-lazy"],
         "@angular/fire/functions": ["dist/packages-dist/functions"],
         "@angular/fire/messaging": ["dist/packages-dist/messaging"],
         "@angular/fire/performance": ["dist/packages-dist/performance"],
         "@angular/fire/remote-config": ["dist/packages-dist/remote-config"],
-        "@angular/fire/storage": ["dist/packages-dist/storage"]
+        "@angular/fire/storage": ["dist/packages-dist/storage"],
+        "@angular/fire/storage-lazy": ["dist/packages-dist/storage-lazy"]
       }
     }
   }

@@ -21,7 +21,7 @@ const blobOrBuffer = (data: string, options: {}) => {
   }
 };
 
-describe('AngularFireStorage', () => {
+describe('AngularFireLazyStorage', () => {
   let app: FirebaseApp;
   let afStorage: AngularFireStorage;
   let cdr: ChangeDetectorRef;
@@ -151,7 +151,7 @@ describe('AngularFireStorage', () => {
 
 });
 
-describe('AngularFireStorage w/options', () => {
+describe('AngularFireLazyStorage w/options', () => {
   let app: FirebaseApp;
   let afStorage: AngularFireStorage;
   let firebaseAppName: string;

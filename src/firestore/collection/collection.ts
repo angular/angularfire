@@ -59,6 +59,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
   stateChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction<T>[]> {
     if (!events || events.length === 0) {
       return docChanges<T>(this.query, this.afs.schedulers.outsideAngular).pipe(
+        filter(changes =>  changes.length > 0),
         this.afs.keepUnstableUntilFirst
       );
     }
