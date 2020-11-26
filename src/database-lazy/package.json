@@ -1,0 +1,12 @@
+{
+  "$schema": "../../node_modules/ng-packagr/package.schema.json",
+  "ngPackage": {
+    "lib": {
+      "umdModuleIds": {
+        "firebase/app": "firebase",
+        "@firebase/database": "firebase-database"
+      },
+      "entryFile": "public_api.ts"
+    }
+  }
+}

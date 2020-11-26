@@ -5,7 +5,7 @@ import { Component, OnInit } from '@angular/core';
   template: `
     <p>
       Storage!
-      <img [src]="'google-g.png' | getDownloadURL" width="64" height="64" />
+      <img [src]="'google-g.png' | getDownloadURL" loading="lazy" width="64" height="64" />
     </p>
   `,
   styles: []

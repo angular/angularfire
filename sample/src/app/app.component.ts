@@ -1,5 +1,6 @@
-import { ApplicationRef, Component, isDevMode } from '@angular/core';
+import { ApplicationRef, Component, Inject, isDevMode, Optional } from '@angular/core';
 import { FirebaseApp } from '@angular/fire';
+import { RESPONSE } from '@nguniversal/express-engine/tokens';
 
 @Component({
   selector: 'app-root',
@@ -24,9 +25,12 @@ import { FirebaseApp } from '@angular/fire';
   styles: [``]
 })
 export class AppComponent {
-  constructor(public readonly firebaseApp: FirebaseApp, appRef: ApplicationRef) {
+  constructor(public readonly firebaseApp: FirebaseApp, appRef: ApplicationRef, @Optional() @Inject(RESPONSE) response: any) {
     if (isDevMode()) {
       appRef.isStable.subscribe(it => console.log('isStable', it));
+    }
+    if (response) {
+      response.setHeader('Cache-Control', 'public, max-age=600');
     }
   }
 }
