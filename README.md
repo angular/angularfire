@@ -117,6 +117,10 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 - [Getting started with Firebase Authentication](docs/auth/getting-started.md)
 - [Route users with AngularFire guards](docs/auth/router-guards.md)
 
+### Local Emulator Suite
+
+- [Getting started with Firebase Emulator Suite](docs/emulators/emulators.md)
+
 ### Upload files
 
 - [Getting started with Cloud Storage](docs/storage/storage.md)
