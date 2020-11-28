@@ -29,7 +29,7 @@ firebase init emulators
 
 Follow the instructions to download whatever emulator you want to use then checkout that the `firebase.json` file got updated with the default ports per emulator, something like this:
 
-```json
+```jsonc
 {
   // Existing firebase configuration ...
   // Optional emulator configuration. Default
