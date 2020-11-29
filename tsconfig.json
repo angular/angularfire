@@ -5,6 +5,7 @@
     "target": "es2015",
     "declaration": true,
     "inlineSources": true,
+    "stripInternal": true,
     "types": [
       "node",
       "zone.js"

@@ -1,5 +1,6 @@
-import { ApplicationRef, Component } from '@angular/core';
+import { ApplicationRef, Component, Inject, isDevMode, Optional } from '@angular/core';
 import { FirebaseApp } from '@angular/fire';
+import { RESPONSE } from '@nguniversal/express-engine/tokens';
 import { debounceTime } from 'rxjs/operators';
 
 @Component({
@@ -25,7 +26,12 @@ import { debounceTime } from 'rxjs/operators';
   styles: [``]
 })
 export class AppComponent {
-  constructor(public readonly firebaseApp: FirebaseApp, appRef: ApplicationRef) {
-    appRef.isStable.pipe(debounceTime(200)).subscribe(it => console.log('isStable', it));
+  constructor(public readonly firebaseApp: FirebaseApp, appRef: ApplicationRef, @Optional() @Inject(RESPONSE) response: any) {
+    if (isDevMode()) {
+      appRef.isStable.pipe(debounceTime(200)).subscribe(it => console.log('isStable', it));
+    }
+    if (response) {
+      response.setHeader('Cache-Control', 'public, max-age=600');
+    }
   }
 }

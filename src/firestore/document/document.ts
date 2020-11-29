@@ -1,6 +1,6 @@
 import { from, Observable } from 'rxjs';
 import { Action, DocumentData, DocumentReference, DocumentSnapshot, QueryFn, SetOptions } from '../interfaces';
-import { fromDocRef } from '../observable/fromRef';
+import { fromDocRef } from '@angular/fire/firestore-lazy';
 import { map, observeOn } from 'rxjs/operators';
 import { AngularFirestore, associateQuery } from '../firestore';
 import { AngularFirestoreCollection } from '../collection/collection';

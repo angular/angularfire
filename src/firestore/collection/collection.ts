@@ -1,10 +1,8 @@
 import { from, Observable } from 'rxjs';
-import { fromCollectionRef } from '../observable/fromRef';
+import { fromCollectionRef, docChanges, sortedChanges  } from '@angular/fire/firestore-lazy';
 import { filter, map, observeOn, scan } from 'rxjs/operators';
 import firebase from 'firebase/app';
-
 import { CollectionReference, DocumentChangeAction, DocumentChangeType, DocumentData, DocumentReference, Query } from '../interfaces';
-import { docChanges, sortedChanges } from './changes';
 import { AngularFirestoreDocument } from '../document/document';
 import { AngularFirestore } from '../firestore';
 

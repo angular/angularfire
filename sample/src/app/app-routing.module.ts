@@ -6,9 +6,10 @@ import { AngularFireAuthGuard, canActivate, isNotAnonymous } from '@angular/fire
 import { SecondaryComponent } from './secondary/secondary.component';
 
 const routes: Routes = [
-  { path: '', component: HomeComponent, outlet: 'primary', pathMatch: 'prefix' },
-  { path: '', component: SecondaryComponent, outlet: 'secondary', pathMatch: 'prefix' },
-  { path: '', component: SecondaryComponent, outlet: 'tertiary', pathMatch: 'prefix' },
+  { path: '', component: HomeComponent, outlet: 'primary' },
+  { path: '', component: SecondaryComponent, outlet: 'secondary' },
+  { path: '', component: SecondaryComponent, outlet: 'tertiary' },
+  { path: 'index.html', component: HomeComponent, outlet: 'primary', pathMatch: 'full' },
   { path: 'protected', component: ProtectedComponent, canActivate: [AngularFireAuthGuard] },
   { path: 'lazy', loadChildren: () => import('./protected-lazy/protected-lazy.module').then(m => m.ProtectedLazyModule) },
   { path: 'protected-lazy',
