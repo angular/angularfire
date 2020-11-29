@@ -96,11 +96,11 @@ export class AppModule {}
 
 ### Cloud Functions emulator
 
-Point callable Functions to the Cloud Function emulator by adding `ORIGIN` to the `providers` section of your `NgModule`.
+Point callable Functions to the Cloud Function emulator by adding `USE_EMULATOR` to the `providers` section of your `NgModule`.
 
 ```ts
 import { NgModule } from '@angular/core';
-import { AngularFireFunctionsModule, ORIGIN } from '@angular/fire/functions';
+import { AngularFireFunctionsModule, USE_EMULATOR } from '@angular/fire/functions';
 
 @NgModule({
   imports: [
@@ -110,7 +110,7 @@ import { AngularFireFunctionsModule, ORIGIN } from '@angular/fire/functions';
   ],
   ...
   providers: [
-   { provide: ORIGIN, useValue: 'http://localhost:5001' }
+   { provide: USE_EMULATOR, useValue: ['localhost', 5001] }
   ]
 })
 export class AppModule {}
@@ -127,11 +127,11 @@ To set this up, you first need to update your `hosting` section in `firebase.jso
   "hosting": {
     "rewrites": [
       {
-        "source": "/project-name/us-central1/someFunction",
+        "source": "/someFunction",
         "function": "someFunction"
       },
       {
-        "source": "/project-name/us-central1/anotherFunction",
+        "source": "/anotherFunction",
         "function": "anotherFunction"
       },
       ...
@@ -145,7 +145,7 @@ Next, configure functions origin to point at your app domain:
 
 ```ts
 import { NgModule } from '@angular/core';
-import { AngularFireFunctionsModule, ORIGIN } from '@angular/fire/functions';
+import { AngularFireFunctionsModule, ORIGIN, NEW_ORIGIN_BEHAVIOR } from '@angular/fire/functions';
 
 @NgModule({
   imports: [
@@ -155,6 +155,7 @@ import { AngularFireFunctionsModule, ORIGIN } from '@angular/fire/functions';
   ],
   ...
   providers: [
+   { provide: NEW_ORIGIN_BEHAVIOR, useValue: true },
    { provide: ORIGIN, useValue: 'https://project-name.web.app' }
   ]
 })
