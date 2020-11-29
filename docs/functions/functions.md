@@ -117,6 +117,8 @@ export class AppModule {}
 
 ```
 
+[Learn more about integration with the Firebase Emulator suite on our dedicated guide here](../emulators/emulators.md).
+
 ### Firebase Hosting integration
 
 If you serve your app using [Firebase Hosting](https://firebase.google.com/docs/hosting/), you can configure Functions to be served from the same domain as your app. This will avoid an extra round-trip per function call due to [CORS preflight request](https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request). This only applies to sites hosted via firebase on `us-central1`.
@@ -139,9 +141,7 @@ To set this up, you first need to update your `hosting` section in `firebase.jso
   }
 ```
 
-Replace `project-name` with your Firebase project id (you can find it by looking at the value of `projectId` field in the Firebase app config). Then deploy your hosting project so that the new settings go into effect.
-
-Next, configure functions origin to point at your app domain:
+Deploy your hosting project to the new settings go into effect, finally configure functions origin to point at your app domain:
 
 ```ts
 import { NgModule } from '@angular/core';
