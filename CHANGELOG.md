@@ -1,3 +1,13 @@
+<a name="6.1.3"></a>
+## [6.1.3](https://github.com/angular/angularfire/compare/6.1.2...6.1.3) (2020-11-30)
+
+
+### Bug Fixes
+
+* **afs:** allow stateChanges and auditLog to emit blank arrays at first ([21442f0](https://github.com/angular/angularfire/commit/21442f0))
+
+
+
 <a name="6.1.2"></a>
 # [6.1.2](https://github.com/angular/angularfire/compare/6.1.1...6.1.2) (2020-11-24)
 
