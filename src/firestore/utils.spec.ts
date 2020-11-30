@@ -54,4 +54,4 @@ export function delayDelete<T>(collection: AngularFirestoreCollection<T>|firebas
   }, delay);
 }
 
-export const rando = () => (Math.random() + 1).toString(36).substring(7);
+export const rando = () => (Math.random() + 1).toString(36).split('.')[1];
