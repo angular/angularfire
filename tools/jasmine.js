@@ -21,7 +21,7 @@ require('zone.js/dist/task-tracking');
 const { getTestBed } = require('@angular/core/testing');
 const { platformServerTesting, ServerTestingModule } = require('@angular/platform-server/testing');
 
-var globalThis = require('globalthis/polyfill')();
+global['globalThis'] = require('globalthis/polyfill')();
 
 // First, initialize the Angular testing environment.
 getTestBed().initTestEnvironment(
