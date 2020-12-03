@@ -87,7 +87,7 @@ jobs:
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
           yarn install --frozen-lockfile --prefer-offline
       - name: Bump Firebase
-        run: yarn add firebase@^${{ matrix.firebase }}.0 --prefer-offline
+        run: yarn add firebase@^${{ matrix.firebase }}.0 --offline
       - name: Firebase emulator cache
         uses: actions/cache@v2
         with:
@@ -135,7 +135,7 @@ jobs:
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
           yarn install --frozen-lockfile --prefer-offline
       - name: Bump Firebase
-        run: yarn add firebase@^${{ matrix.firebase }}.0 --prefer-offline
+        run: yarn add firebase@^${{ matrix.firebase }}.0 --offline
       - name: Firebase emulator cache
         uses: actions/cache@v2
         with:
