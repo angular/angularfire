@@ -10,27 +10,14 @@ export function fromTask(task: UploadTask) {
     const progress = (snap: UploadTaskSnapshot) => subscriber.next(snap);
     const error = e => subscriber.error(e);
     const complete = () => subscriber.complete();
-    progress(task.snapshot);
-    switch (task.snapshot.state) {
-      case firebase.storage.TaskState.SUCCESS:
-      case firebase.storage.TaskState.CANCELED:
-        complete();
-        break;
-      case firebase.storage.TaskState.ERROR:
-        error(new Error('task was already in error state'));
-        break;
-      default:
-        // on's type if Function, rather than () => void, need to wrap
-        const unsub = task.on('state_changed', progress, (e) => {
-          progress(task.snapshot);
-          error(e);
-        }, () => {
-          progress(task.snapshot);
-          complete();
-        });
-        return function unsubscribe() {
-          unsub();
-        };
-    }
+    const unsub = task.on('state_changed', progress);
+    task.then(snapshot => {
+      progress(snapshot);
+      complete();
+    }, error);
+    // on's type if Function, rather than () => void, need to wrap
+    return function unsubscribe() {
+      unsub();
+    };
   });
 }
