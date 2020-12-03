@@ -26,8 +26,10 @@ jobs:
         id: node_modules_cache
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-14-node_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: ${{ runner.os }}-14-node_modules-
+          key: ${{ runner.os }}-14-8-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-14-8-node_modules-
+            ${{ runner.os }}-14-node_modules-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         uses: actions/cache@v2
@@ -72,8 +74,10 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-${{ matrix.node }}-node_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: ${{ runner.os }}-${{ matrix.node }}-node_modules-
+          key: ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-node_modules-
+            ${{ runner.os }}-${{ matrix.node }}-node_modules-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         uses: actions/cache@v2
@@ -86,8 +90,7 @@ jobs:
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
           yarn install --frozen-lockfile --prefer-offline
-      - name: Bump Firebase
-        run: yarn add firebase@^${{ matrix.firebase }}.0 --cached
+          yarn add firebase@^${{ matrix.firebase }}.0 --prefer-offline
       - name: Firebase emulator cache
         uses: actions/cache@v2
         with:
@@ -120,8 +123,10 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-14-node_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: ${{ runner.os }}-14-node_modules-
+          key: ${{ runner.os }}-14-${{ matrix.firebase }}-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-14-${{ matrix.firebase }}-node_modules-
+            ${{ runner.os }}-14-node_modules-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         uses: actions/cache@v2
@@ -134,8 +139,7 @@ jobs:
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
           yarn install --frozen-lockfile --prefer-offline
-      - name: Bump Firebase
-        run: yarn add firebase@^${{ matrix.firebase }}.0 --cached
+          yarn add firebase@^${{ matrix.firebase }}.0 --prefer-offline
       - name: Firebase emulator cache
         uses: actions/cache@v2
         with:
