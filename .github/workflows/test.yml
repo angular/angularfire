@@ -81,10 +81,10 @@ jobs:
           yarn install --frozen-lockfile --prefer-offline
       - name: 'Download Artifacts'
         uses: actions/download-artifact@v2
-      - name: Expand Artifact
-        run: rsync -a ./angularfire-${{ github.run_id }}/dist/ ./dist/
       - name: Run tests
-        run: yarn test:node
+        run: |
+          mv angularfire-${{ github.run_id }} dist
+          yarn test:node
   headless:
     runs-on: ubuntu-latest
     needs: build
@@ -119,10 +119,10 @@ jobs:
           yarn install --frozen-lockfile --prefer-offline
       - name: 'Download Artifacts'
         uses: actions/download-artifact@v2
-      - name: Expand Artifact
-        run: rsync -a ./angularfire-${{ github.run_id }}/dist/ ./dist/
       - name: Run tests
-        run: yarn test:chrome-headless
+        run: |
+          mv angularfire-${{ github.run_id }} dist
+          yarn test:chrome-headless
   publish:
     runs-on: ubuntu-latest
     name: Publish (NPM)
@@ -138,7 +138,7 @@ jobs:
         uses: actions/download-artifact@v2
       - name: Publish
         run: |
-          cd ./angularfire-${{ github.run_id }}/dist/packages-dist
+          cd ./angularfire-${{ github.run_id }}/packages-dist
           chmod +x publish.sh
           ./publish.sh
         env:
