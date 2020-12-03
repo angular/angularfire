@@ -89,6 +89,7 @@
     "concurrently": "^2.2.0",
     "conventional-changelog-cli": "^1.2.0",
     "firebase-functions-test": "^0.2.2",
+    "globalthis": "^1.0.1",
     "gzip-size": "^5.1.1",
     "jasmine": "^3.4.0",
     "jasmine-core": "~3.5.0",
