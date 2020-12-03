@@ -1,4 +1,4 @@
-import { ApplicationRef, Component } from '@angular/core';
+import { ApplicationRef, Component, isDevMode } from '@angular/core';
 import { FirebaseApp } from '@angular/fire';
 import { debounceTime } from 'rxjs/operators';
 
@@ -26,6 +26,8 @@ import { debounceTime } from 'rxjs/operators';
 })
 export class AppComponent {
   constructor(public readonly firebaseApp: FirebaseApp, appRef: ApplicationRef) {
-    appRef.isStable.pipe(debounceTime(200)).subscribe(it => console.log('isStable', it));
+    if (isDevMode()) {
+      appRef.isStable.pipe(debounceTime(200)).subscribe(it => console.log('isStable', it));
+    }
   }
 }

@@ -1,6 +1,7 @@
-import { Injectable, Inject, Optional, NgZone, PLATFORM_ID, InjectionToken } from '@angular/core';
-import { Observable, of, from, merge, Subject, Subscriber } from 'rxjs';
-import { switchMap, map, observeOn, shareReplay, first, filter, switchMapTo, subscribeOn } from 'rxjs/operators';
+import { Injectable, Inject, Optional, NgZone, PLATFORM_ID, InjectionToken, OnDestroy } from '@angular/core';
+import { Observable, of, from, merge, Subject, Subscriber, SubscriptionLike } from 'rxjs';
+import { ajax } from 'rxjs/ajax';
+import { switchMap, map, observeOn, shareReplay, filter, switchMapTo, subscribeOn, take } from 'rxjs/operators';
 import {
   FIREBASE_OPTIONS,
   FIREBASE_APP_NAME,
@@ -17,6 +18,9 @@ import firebase from 'firebase/app';
 import { isPlatformServer } from '@angular/common';
 import { proxyPolyfillCompat } from './base';
 import { ɵfetchInstance } from '@angular/fire';
+import { REQUEST } from '@nguniversal/express-engine/tokens';
+import { get as getCookie, set as setCookie, remove as removeCookie } from 'js-cookie';
+import { parse as parseCookies } from 'cookie';
 
 export interface AngularFireAuth extends ɵPromiseProxy<firebase.auth.Auth> {}
 
@@ -28,11 +32,14 @@ export const TENANT_ID = new InjectionToken<string>('angularfire2.auth.tenant-id
 export const LANGUAGE_CODE = new InjectionToken<string>('angularfire2.auth.langugage-code');
 export const USE_DEVICE_LANGUAGE = new InjectionToken<boolean>('angularfire2.auth.use-device-language');
 export const PERSISTENCE = new InjectionToken<string>('angularfire.auth.persistence');
+export const EXPERIMENTAL_COOKIE_AUTH = new InjectionToken<boolean>('angularfire.auth.ssr-auth');
 
 @Injectable({
   providedIn: 'any'
 })
-export class AngularFireAuth {
+export class AngularFireAuth implements OnDestroy {
+
+  private disposables: SubscriptionLike[] = [];
 
   /**
    * Observable of authentication state; as of Firebase 4.0 this is only triggered via sign-in/out
@@ -59,7 +66,7 @@ export class AngularFireAuth {
   /**
    * Observable of the currently signed-in user's credential, or null
    */
-  public readonly credential: Observable<Required<firebase.auth.UserCredential>|null>;
+  public readonly credential: Observable<firebase.auth.UserCredential|null>;
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
@@ -73,6 +80,8 @@ export class AngularFireAuth {
     @Optional() @Inject(LANGUAGE_CODE) languageCode: string | null,
     @Optional() @Inject(USE_DEVICE_LANGUAGE) useDeviceLanguage: boolean | null,
     @Optional() @Inject(PERSISTENCE) persistence: string | null,
+    @Optional() @Inject(EXPERIMENTAL_COOKIE_AUTH) experimentalCookieAuth: boolean | null,
+    @Optional() @Inject(REQUEST) request: any,
   ) {
     const schedulers = new ɵAngularFireSchedulers(zone);
     const keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(schedulers);
@@ -110,18 +119,49 @@ export class AngularFireAuth {
       shareReplay({ bufferSize: 1, refCount: false }),
     );
 
+    // HACK, as we're exporting auth.Auth, rather than auth, developers importing firebase.auth
+    //       (e.g, `import { auth } from 'firebase/app'`) are getting an undefined auth object unexpectedly
+    //       as we're completely lazy. Let's eagerly load the Auth SDK here.
+    //       There could potentially be race conditions still... but this greatly decreases the odds while
+    //       we reevaluate the API.
+    this.disposables.push(auth.pipe(take(1)).subscribe());
+
     if (isPlatformServer(platformId)) {
 
-      this.authState = this.user = this.idToken = this.idTokenResult = this.credential = of(null);
+      if (experimentalCookieAuth) {
+
+        this.credential = auth.pipe(
+          switchMap(auth => {
+            const encodedSession = request.signedCookies?.__session;
+            if (encodedSession) {
+              const { uid, customToken } = JSON.parse(encodedSession);
+              if (auth.currentUser?.uid === uid) {
+                return of({ user: auth.currentUser, credential: null });
+              } else {
+                return auth.signInWithCustomToken(customToken).then(it => it, (e) => {
+                  console.warn(e);
+                  return null;
+                });
+              }
+            } else {
+              return of(null);
+            }
+          }),
+          map(credential => credential?.user ? credential as firebase.auth.UserCredential : null),
+          shareReplay({ bufferSize: 1, refCount: false }),
+        );
+
+        this.user = this.authState = this.credential.pipe(
+          map(it => it?.user)
+        );
+
+      } else {
+
+        this.user = this.authState = this.credential = of(null);
+
+      }
 
     } else {
-
-      // HACK, as we're exporting auth.Auth, rather than auth, developers importing firebase.auth
-      //       (e.g, `import { auth } from 'firebase/app'`) are getting an undefined auth object unexpectedly
-      //       as we're completely lazy. Let's eagerly load the Auth SDK here.
-      //       There could potentially be race conditions still... but this greatly decreases the odds while
-      //       we reevaluate the API.
-      const _ = auth.pipe(first()).subscribe();
 
       const redirectResult = auth.pipe(
         switchMap(auth => auth.getRedirectResult().then(it => it, () => null)),
@@ -153,14 +193,6 @@ export class AngularFireAuth {
         observeOn(schedulers.insideAngular),
       );
 
-      this.idToken = this.user.pipe(
-        switchMap(user => user ? from(user.getIdToken()) : of(null))
-      );
-
-      this.idTokenResult = this.user.pipe(
-        switchMap(user => user ? from(user.getIdTokenResult()) : of(null))
-      );
-
       this.credential = merge(
         redirectResult,
         logins,
@@ -170,9 +202,35 @@ export class AngularFireAuth {
       ).pipe(
         // handle the { user: { } } when a user is already logged in, rather have null
         // TODO handle the type corcersion better
-        map(credential => credential?.user ? credential as Required<firebase.auth.UserCredential> : null),
+        map(credential => credential?.user ? credential : null),
         subscribeOn(schedulers.outsideAngular),
         observeOn(schedulers.insideAngular),
+      );
+
+    }
+
+    this.idToken = this.user.pipe(
+      switchMap(user => user ? from(user.getIdToken()) : of(null))
+    );
+
+    this.idTokenResult = this.user.pipe(
+      switchMap(user => user ? from(user.getIdTokenResult()) : of(null))
+    );
+
+
+    if (!isPlatformServer(platformId) && experimentalCookieAuth) {
+
+      this.disposables.push(
+        this.idToken.pipe(
+          // use xhr rather than fetch so set-cookie works
+          switchMap(idToken => ajax({
+            url: '/createSession',
+            method: 'POST',
+            headers: idToken ? {
+              authorization: `Bearer ${idToken}`
+            } : {}
+          }))
+        ).subscribe()
       );
 
     }
@@ -189,6 +247,13 @@ export class AngularFireAuth {
       }
     }});
 
+  }
+
+  ngOnDestroy() {
+    this.disposables.forEach(it => it.unsubscribe());
+    // TODO let's take advantage of this, rather than sign-out let's use the cookie uid
+    //      in the app name (if experimentalCookieAuth that is)
+    firebase.apps.forEach(app => app.auth().signOut());
   }
 
 }

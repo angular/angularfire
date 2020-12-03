@@ -129,7 +129,9 @@
             "main": "server.ts",
             "tsConfig": "tsconfig.server.json",
             "bundleDependencies": true,
-            "externalDependencies": [ ]
+            "externalDependencies": [
+              "firebase-admin"
+            ]
           },
           "configurations": {
             "production": {
