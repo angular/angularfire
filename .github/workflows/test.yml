@@ -96,11 +96,55 @@ jobs:
           chmod +x angularfire-${{ github.run_id }}/unpack.sh
           ./angularfire-${{ github.run_id }}/unpack.sh
       - name: Run tests
-        run: yarn test:all
+        run: yarn test
+  headless:
+    runs-on: ubuntu-latest
+    needs: build
+    name: Headless Chrome (Ubuntu)
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v2-beta
+        with:
+          node-version: '14'
+          check-latest: true
+      - name: Get cache directory
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Use yarn cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            ~/.npm-packages-offline-cache
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-
+      - name: Use Firebase emulator cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/firebase/emulators
+          key: firebase_emulators
+      - name: Install deps
+        run: |
+          yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
+          yarn config set yarn-offline-mirror-pruning true
+          yarn install --frozen-lockfile --prefer-offline
+      - name: 'Download Artifacts'
+        uses: actions/download-artifact@v2
+      - name: Expand Artifact
+        run: |
+          mkdir -p dist/packages-dist
+          chmod +x angularfire-${{ github.run_id }}/unpack.sh
+          ./angularfire-${{ github.run_id }}/unpack.sh
+      - name: Run tests
+        run: yarn test:chrome-headless
   publish:
     runs-on: ubuntu-latest
     name: Publish (NPM)
-    needs: test
+    needs: ['test', 'headless']
     if: ${{ github.ref == 'refs/heads/master' || github.event_name == 'release' }}
     steps:
       - name: Setup node
