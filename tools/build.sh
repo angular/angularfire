@@ -16,11 +16,6 @@ fi;
 
 npm --no-git-tag-version --allow-same-version -f version $OVERRIDE_VERSION
 yarn build
-TARBALL=$(npm pack ./dist/packages-dist | tail -n 1)
-cp $TARBALL angularfire.tgz
 
-echo "npm publish \$(dirname \"\$0\")/angularfire.tgz --tag $NPM_TAG" > ./publish.sh
+echo "npm publish . --tag $NPM_TAG" > ./dist/packages-dist/publish.sh
 chmod +x ./publish.sh
-
-echo "tar -xzvf \$(dirname \"\$0\")/angularfire.tgz && rsync -a package/ ./dist/packages-dist/" > ./unpack.sh
-chmod +x ./unpack.sh

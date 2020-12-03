@@ -4,16 +4,17 @@
   "description": "The official Angular library for Firebase.",
   "private": true,
   "scripts": {
-    "test": "npm run test:node",
+    "test": "npm run build:jasmine && npm run test:node",
     "test:watch": "firebase emulators:exec --project=angularfire2-test \"ng test --watch=true --browsers=Chrome\"",
     "test:chrome": "firebase emulators:exec --project=angularfire2-test \"ng test --watch=false --browsers=Chrome\"",
     "test:chrome-headless": "firebase emulators:exec --project=angularfire2-test \"ng test --watch=false --browsers=ChromeHeadless\"",
     "lint": "ng lint",
-    "test:node": "tsc -p tsconfig.jasmine.json; cp ./dist/packages-dist/schematics/versions.json ./dist/out-tsc/jasmine/schematics && firebase emulators:exec --project=angularfire2-test \"node -r tsconfig-paths/register ./tools/jasmine.js\"",
+    "test:node": "firebase emulators:exec --project=angularfire2-test \"node -r tsconfig-paths/register ./tools/jasmine.js\"",
     "test:typings": "node ./tools/run-typings-test.js",
     "test:build": "bash ./test/ng-build/build.sh",
     "test:all": "npm run test:node && npm run test:chrome-headless && npm run test:typings && npm run test:build",
     "build": "ttsc -p tsconfig.build.json; node ./tools/build.js",
+    "build:jasmine": "tsc -p tsconfig.jasmine.json; cp ./dist/packages-dist/schematics/versions.json ./dist/out-tsc/jasmine/schematics",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 1"
   },
   "husky": {
@@ -118,5 +119,8 @@
     "typedoc": "^0.16.4",
     "typescript": ">=4.0.0 <4.1.0"
   },
-  "typings": "index.d.ts"
+  "typings": "index.d.ts",
+  "resolutions": {
+    "webpack": "5.4.0"
+  }
 }
