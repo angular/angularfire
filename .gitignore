@@ -20,3 +20,6 @@ coverage
 *.log
 api-*.json
 src/**/base.ts
+angularfire.tgz
+unpack.sh
+publish.sh

@@ -1,8 +1,5 @@
 import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire';
-import { AngularFirestore, SETTINGS } from './firestore';
-import { AngularFirestoreModule } from './firestore.module';
-import { AngularFirestoreDocument } from './document/document';
-import { AngularFirestoreCollection } from './collection/collection';
+import { AngularFirestore, SETTINGS, AngularFirestoreModule, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/firestore';
 
 import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../test-config';

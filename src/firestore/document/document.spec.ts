@@ -1,9 +1,5 @@
 import { AngularFireModule, FirebaseApp } from '@angular/fire';
-import { AngularFirestore, SETTINGS } from '../firestore';
-import { AngularFirestoreModule } from '../firestore.module';
-import { Subscription } from 'rxjs';
-import { AngularFirestoreDocument } from './document';
-import { DocumentReference } from '../interfaces';
+import { AngularFirestore, SETTINGS, AngularFirestoreModule, AngularFirestoreDocument, DocumentReference } from '@angular/fire/firestore';
 import { take } from 'rxjs/operators';
 
 import { TestBed } from '@angular/core/testing';

@@ -1,33 +1,120 @@
-name: Unit tests
+name: Test and publish
 
 on:
   push:
     branches:
-      - master
-  pull_request:
+      - "**"
+    paths-ignore:
+      - "**/*.md"
+  release:
+    types:
+      - published
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    name: Build
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v2-beta
-      with:
-        node-version: '12'
-        check-latest: true
-    - name: yarn cache dir
-      id: yarn-cache-dir-path
-      run: echo "::set-output name=dir::$(yarn cache dir)"
-    - uses: actions/cache@v2
-      with:
-        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
-          ${{ runner.os }}-
-    - name: yarn test
-      run: |
-        yarn install --frozen-lockfile --prefer-offline
-        yarn lint
-        yarn build
-        yarn test:all
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v2-beta
+        with:
+          node-version: '14'
+      - name: Get cache directory
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Use yarn cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            ~/.npm-packages-offline-cache
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-
+      - name: Install deps
+        run: |
+          yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
+          yarn config set yarn-offline-mirror-pruning true
+          yarn install --frozen-lockfile --prefer-offline
+      - name: Build
+        id: yarn-pack-dir
+        run: ./tools/build.sh
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v2
+        with:
+          name: angularfire-${{ github.run_id }}
+          path: |
+            angularfire.tgz
+            publish.sh
+            unpack.sh
+          retention-days: 1
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    strategy:
+      matrix:
+        node: ["10", "12", "14"]
+    name: Test Node.js ${{ matrix.node }} (Ubuntu)
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v2-beta
+        with:
+          node-version: ${{ matrix.node }}
+          check-latest: true
+      - name: Get cache directory
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Use yarn cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            ~/.npm-packages-offline-cache
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-
+      - name: Use Firebase emulator cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/firebase/emulators
+          key: firebase_emulators
+      - name: Install deps
+        run: |
+          yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
+          yarn config set yarn-offline-mirror-pruning true
+          yarn install --frozen-lockfile --prefer-offline
+      - name: 'Download Artifacts'
+        uses: actions/download-artifact@v2
+      - name: Expand Artifact
+        run: |
+          mkdir -p dist/packages-dist
+          chmod +x angularfire-${{ github.run_id }}/unpack.sh
+          ./angularfire-${{ github.run_id }}/unpack.sh
+      - name: Run tests
+        run: yarn test:all
+  publish:
+    runs-on: ubuntu-latest
+    name: Publish (NPM)
+    needs: test
+    if: ${{ github.ref == 'refs/heads/master' || github.event_name == 'release' }}
+    steps:
+      - name: Setup node
+        uses: actions/setup-node@v2-beta
+        with:
+          node-version: '14'
+          registry-url: 'https://registry.npmjs.org'
+      - name: 'Download Artifacts'
+        uses: actions/download-artifact@v2
+      - name: Publish
+        run: |
+          cd ./angularfire-${{ github.run_id }}/
+          chmod +x publish.sh
+          ./publish.sh
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
