@@ -30,7 +30,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-14-8-node_modules-
             ${{ runner.os }}-14-node_modules-
-            ${{ runner.os }}-node_modules-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         uses: actions/cache@v2
@@ -61,6 +60,7 @@ jobs:
       matrix:
         node: ["10", "12", "14"]
         firebase: ["7", "8"]
+      fail-fast: false
     name: Test Firebase v${{ matrix.firebase }} on Node.js ${{ matrix.node }}
     steps:
       - name: Checkout
@@ -79,7 +79,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-node_modules-
             ${{ runner.os }}-${{ matrix.node }}-node_modules-
-            ${{ runner.os }}-node_modules-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         uses: actions/cache@v2
@@ -129,7 +128,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-14-${{ matrix.firebase }}-node_modules-
             ${{ runner.os }}-14-node_modules-
-            ${{ runner.os }}-node_modules-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         uses: actions/cache@v2
