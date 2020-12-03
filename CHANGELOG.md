@@ -1,3 +1,14 @@
+<a name="6.1.4"></a>
+## [6.1.4](https://github.com/angular/angularfire/compare/6.1.3...6.1.4) (2020-12-03)
+
+
+### Bug Fixes
+
+* **storage:** `firebase.default` typing issue with Firebase v7 ([#2703](https://github.com/angular/angularfire/issues/2703)) ([984006d](https://github.com/angular/angularfire/commit/984006d))
+* **storage:** snapshotChanges should return a success snapshot ([#2704](https://github.com/angular/angularfire/issues/2704)) ([972aa85](https://github.com/angular/angularfire/commit/972aa85))
+* **analytics:** no longer error when included in SSR or when using Firebase v7 ([#2701](https://github.com/angular/angularfire/issues/2704)) ([da8c660](https://github.com/angular/angularfire/commit/da8c660))
+
+
 <a name="6.1.3"></a>
 ## [6.1.3](https://github.com/angular/angularfire/compare/6.1.2...6.1.3) (2020-11-30)
 
