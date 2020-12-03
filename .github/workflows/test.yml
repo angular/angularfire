@@ -111,6 +111,7 @@ jobs:
     strategy:
       matrix:
         firebase: ["7", "8"]
+      fail-fast: false
     steps:
       - name: Checkout
         uses: actions/checkout@v2
