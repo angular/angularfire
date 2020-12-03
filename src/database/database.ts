@@ -58,7 +58,6 @@ export class AngularFireDatabase {
     this.database = ɵfetchInstance(`${app.name}.database.${databaseURL}`, 'AngularFireDatabase', app, () => {
       const database = zone.runOutsideAngular(() => app.database(databaseURL || undefined));
       if (useEmulator) {
-        // @ts-ignore keep from failing on v7 headless
         database.useEmulator(...useEmulator);
       }
       return database;
