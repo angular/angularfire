@@ -65,16 +65,19 @@ describe('AngularFireStorage', () => {
       const blob = blobOrBuffer(JSON.stringify(data), { type: 'application/json' });
       const ref = afStorage.ref(rando());
       const task = ref.put(blob);
+      let emissionCount = 0;
       let lastSnap: firebase.storage.UploadTaskSnapshot;
       task.snapshotChanges()
         .subscribe(
           snap => {
             lastSnap = snap;
+            emissionCount++;
             expect(snap).toBeDefined();
           },
           done.fail,
           () => {
             expect(lastSnap.state).toBe('success');
+            expect(emissionCount).toBeGreaterThan(0);
             ref.delete().subscribe(done, done.fail);
           });
     });
@@ -113,16 +116,19 @@ describe('AngularFireStorage', () => {
       const blob = blobOrBuffer(JSON.stringify(data), { type: 'application/json' });
       const ref = afStorage.storage.ref(rando());
       const task = ref.put(blob);
+      let emissionCount = 0;
       let lastSnap: firebase.storage.UploadTaskSnapshot;
       task.then(_snap => {
         fromTask(task).subscribe(
             snap => {
               lastSnap = snap;
+              emissionCount++;
               expect(snap).toBeDefined();
             },
             done.fail,
             () => {
               expect(lastSnap.state).toBe('success');
+              expect(emissionCount).toBe(1);
               ref.delete().then(done, done.fail);
             });
       });
