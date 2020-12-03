@@ -85,8 +85,7 @@ jobs:
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
           yarn install --frozen-lockfile --prefer-offline
-      - name: Bump Firebase
-        run: yarn add firebase@^${{ matrix.firebase }}.0
+          yarn add firebase@^${{ matrix.firebase }}.0 --prefer-offline
       - name: 'Download Artifacts'
         uses: actions/download-artifact@v2
       - name: Run tests
@@ -130,8 +129,7 @@ jobs:
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
           yarn install --frozen-lockfile --prefer-offline
-      - name: Bump Firebase
-        run: yarn add firebase@^${{ matrix.firebase }}.0
+          yarn add firebase@^${{ matrix.firebase }}.0 --prefer-offline
       - name: 'Download Artifacts'
         uses: actions/download-artifact@v2
       - name: Run tests
