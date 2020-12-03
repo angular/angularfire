@@ -90,7 +90,7 @@ jobs:
       - name: Expand Artifact
         run: rsync -a ./angularfire-${{ github.run_id }}/dist/ ./dist/
       - name: Run tests
-        run: yarn test
+        run: yarn test:node
   headless:
     runs-on: ubuntu-latest
     needs: build
