@@ -25,14 +25,14 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.npm-packages-offline-cache
-          key: ${{ runner.os }}-yarn-offline-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: ${{ runner.os }}-yarn-offline-
+          key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: yarn-offline
       - name: node_modules cache
         uses: actions/cache@v2
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: ${{ runner.os }}-node_modules-
+          key: ${{ runner.os }}-14-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: ${{ runner.os }}-14-node_modules-
       - name: Install deps
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
@@ -68,15 +68,14 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.npm-packages-offline-cache
-          key: ${{ runner.os }}-yarn-offline-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: ${{ runner.os }}-yarn-offline-
+          key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: yarn-offline
       - name: node_modules cache
         uses: actions/cache@v2
-        if: ${{ matrix.node == '14' }}
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: ${{ runner.os }}-node_modules-
+          key: ${{ runner.os }}-${{ matrix.node }}-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: ${{ runner.os }}-${{ matrix.node }}-node_modules-
       - name: Firebase emulator cache
         uses: actions/cache@v2
         with:
@@ -114,14 +113,14 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.npm-packages-offline-cache
-          key: ${{ runner.os }}-yarn-offline-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: ${{ runner.os }}-yarn-offline-
+          key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: yarn-offline
       - name: node_modules cache
         uses: actions/cache@v2
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: ${{ runner.os }}-node_modules-
+          key: ${{ runner.os }}-14-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: ${{ runner.os }}-14-node_modules-
       - name: Firebase emulator cache
         uses: actions/cache@v2
         with:
