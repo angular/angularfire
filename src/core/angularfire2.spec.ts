@@ -1,11 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { CompilerFactory, NgModule, NgZone, PlatformRef } from '@angular/core';
-import { AngularFireModule, FirebaseApp } from './public_api';
+import { AngularFireModule, FirebaseApp, ɵAngularFireSchedulers, ɵkeepUnstableUntilFirstFactory, ɵZoneScheduler } from '@angular/fire';
 import { Observable, of, Subject } from 'rxjs';
 import { COMMON_CONFIG } from '../test-config';
 import { BrowserModule } from '@angular/platform-browser';
 import firebase from 'firebase/app';
-import { ɵAngularFireSchedulers, ɵkeepUnstableUntilFirstFactory, ɵZoneScheduler } from './angularfire2';
 import { tap } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
 import { rando } from '../firestore/utils.spec';

@@ -1,16 +1,16 @@
-import { DatabaseReference } from '../interfaces';
 import { AngularFireModule, FirebaseApp } from '@angular/fire';
-import { AngularFireDatabase, AngularFireDatabaseModule, auditTrail, ChildEvent, URL } from '../public_api';
+import { AngularFireDatabase, AngularFireDatabaseModule, auditTrail, ChildEvent, URL } from '@angular/fire/database';
 import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 import { skip } from 'rxjs/operators';
 import 'firebase/database';
+import firebase from 'firebase/app';
 import { rando } from '../../firestore/utils.spec';
 
 describe('auditTrail', () => {
   let app: FirebaseApp;
   let db: AngularFireDatabase;
-  let createRef: (path: string) => DatabaseReference;
+  let createRef: (path: string) => firebase.database.Reference;
   let batch = {};
   const items = [{ name: 'zero' }, { name: 'one' }, { name: 'two' }].map((item, i) => ({ key: i.toString(), ...item }));
   Object.keys(items).forEach((key, i) => {

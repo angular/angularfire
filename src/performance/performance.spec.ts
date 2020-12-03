@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { AngularFireModule, FirebaseApp } from '@angular/fire';
-import { AngularFirePerformance, AngularFirePerformanceModule } from './public_api';
+import { AngularFirePerformance, AngularFirePerformanceModule } from '@angular/fire/performance';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../firestore/utils.spec';
 

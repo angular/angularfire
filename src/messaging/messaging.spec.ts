@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire';
-import { AngularFireMessaging, AngularFireMessagingModule } from './public_api';
+import { AngularFireMessaging, AngularFireMessagingModule } from '@angular/fire/messaging';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../firestore/utils.spec';
 

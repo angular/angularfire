@@ -144,10 +144,11 @@ export class AngularFireAnalytics {
 
     const analytics = of(undefined).pipe(
       observeOn(new ɵAngularFireSchedulers(zone).outsideAngular),
-      switchMap(() => import('firebase/analytics')),
-      switchMap(() => firebase.analytics.isSupported().then(it => it, () => false)),
+      switchMap(() => isPlatformBrowser(platformId) ? zone.runOutsideAngular(() => import('firebase/analytics')) : EMPTY),
+      // SEMVER can switch to isSupported() when we only target v8
+      // switchMap(() => firebase.analytics.isSupported().then(it => it, () => false)),
       // TODO server-side investigate use of the Universal Analytics API
-      switchMap(supported => supported ? of(undefined) : EMPTY),
+      // switchMap(supported => supported ? of(undefined) : EMPTY),
       map(() => {
         return ɵfetchInstance(`analytics`, 'AngularFireAnalytics', app, () => {
           const analytics = app.analytics();

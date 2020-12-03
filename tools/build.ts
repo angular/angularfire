@@ -182,13 +182,9 @@ async function buildDocs() {
   return writeFile(`./api-${root.version}.json`, JSON.stringify(afdoc, null, 2));
 }
 
-function packLibrary() {
-  return spawnPromise('npm', ['pack', './dist/packages-dist']);
-}
-
 Promise.all([
   buildDocs(),
-  buildLibrary().then(packLibrary)
+  buildLibrary()
 ]).then(measureLibrary).then(stats =>
   console.log(`
 Package         Size    Gzipped

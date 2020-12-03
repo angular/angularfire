@@ -1,8 +1,5 @@
 import { AngularFireModule, FirebaseApp } from '@angular/fire';
-import { AngularFirestore, SETTINGS } from '../firestore';
-import { AngularFirestoreModule } from '../firestore.module';
-import { AngularFirestoreCollection } from './collection';
-import { QueryFn, CollectionReference } from '../interfaces';
+import { AngularFirestore, SETTINGS, AngularFirestoreModule, AngularFirestoreCollection, QueryFn, CollectionReference } from '@angular/fire/firestore';
 import { BehaviorSubject } from 'rxjs';
 import { skip, switchMap, take } from 'rxjs/operators';
 import 'firebase/firestore';

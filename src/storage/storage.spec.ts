@@ -1,11 +1,10 @@
-import { forkJoin, from } from 'rxjs';
+import { forkJoin } from 'rxjs';
 import { mergeMap, tap } from 'rxjs/operators';
 import { TestBed } from '@angular/core/testing';
 import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire';
-import { AngularFireStorage, AngularFireStorageModule, AngularFireUploadTask, BUCKET } from './public_api';
+import { AngularFireStorage, AngularFireStorageModule, AngularFireUploadTask, BUCKET } from '@angular/fire/storage';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../firestore/utils.spec';
-import { GetDownloadURLPipe } from './pipes/storageUrl.pipe';
 import { ChangeDetectorRef } from '@angular/core';
 import 'firebase/storage';
 
