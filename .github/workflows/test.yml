@@ -21,19 +21,22 @@ jobs:
         uses: actions/setup-node@v2-beta
         with:
           node-version: '14'
+      - name: node_modules cache
+        uses: actions/cache@v2
+        id: node_modules_cache
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-14-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: ${{ runner.os }}-14-node_modules-
       - name: Yarn offline cache
+        if: steps.node_modules_cache.outputs.cache-hit != 'true'
         uses: actions/cache@v2
         with:
           path: ~/.npm-packages-offline-cache
           key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
           restore-keys: yarn-offline
-      - name: node_modules cache
-        uses: actions/cache@v2
-        with:
-          path: ./node_modules
-          key: ${{ runner.os }}-14-node_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: ${{ runner.os }}-14-node_modules-
       - name: Install deps
+        if: steps.node_modules_cache.outputs.cache-hit != 'true'
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
           yarn config set yarn-offline-mirror-pruning true
@@ -64,28 +67,32 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           check-latest: true
-      - name: Yarn offline cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm-packages-offline-cache
-          key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: yarn-offline
       - name: node_modules cache
+        id: node_modules_cache
         uses: actions/cache@v2
         with:
           path: ./node_modules
           key: ${{ runner.os }}-${{ matrix.node }}-node_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: ${{ runner.os }}-${{ matrix.node }}-node_modules-
+      - name: Yarn offline cache
+        if: steps.node_modules_cache.outputs.cache-hit != 'true'
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm-packages-offline-cache
+          key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: yarn-offline
+      - name: Install deps
+        if: steps.node_modules_cache.outputs.cache-hit != 'true'
+        run: |
+          yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
+          yarn install --frozen-lockfile --prefer-offline
+      - name: Bump Firebase
+        run: yarn add firebase@^${{ matrix.firebase }}.0 --prefer-offline
       - name: Firebase emulator cache
         uses: actions/cache@v2
         with:
           path: ~/.cache/firebase/emulators
           key: firebase_emulators
-      - name: Install deps
-        run: |
-          yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
-          yarn install --frozen-lockfile --prefer-offline
-          yarn add firebase@^${{ matrix.firebase }}.0 --prefer-offline
       - name: 'Download Artifacts'
         uses: actions/download-artifact@v2
       - name: Run tests
@@ -108,28 +115,32 @@ jobs:
         with:
           node-version: '14'
           check-latest: true
-      - name: Yarn offline cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm-packages-offline-cache
-          key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: yarn-offline
       - name: node_modules cache
+        id: node_modules_cache
         uses: actions/cache@v2
         with:
           path: ./node_modules
           key: ${{ runner.os }}-14-node_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: ${{ runner.os }}-14-node_modules-
+      - name: Yarn offline cache
+        if: steps.node_modules_cache.outputs.cache-hit != 'true'
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm-packages-offline-cache
+          key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: yarn-offline
+      - name: Install deps
+        if: steps.node_modules_cache.outputs.cache-hit != 'true'
+        run: |
+          yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
+          yarn install --frozen-lockfile --prefer-offline
+      - name: Bump Firebase
+        run: yarn add firebase@^${{ matrix.firebase }}.0 --prefer-offline
       - name: Firebase emulator cache
         uses: actions/cache@v2
         with:
           path: ~/.cache/firebase/emulators
           key: firebase_emulators
-      - name: Install deps
-        run: |
-          yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
-          yarn install --frozen-lockfile --prefer-offline
-          yarn add firebase@^${{ matrix.firebase }}.0 --prefer-offline
       - name: 'Download Artifacts'
         uses: actions/download-artifact@v2
       - name: Run tests
