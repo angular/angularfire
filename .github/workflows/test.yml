@@ -21,14 +21,11 @@ jobs:
         uses: actions/setup-node@v2-beta
         with:
           node-version: '14'
-      - name: Get cache directory
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
       - name: Use yarn cache
         uses: actions/cache@v2
         with:
           path: |
-            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            ./node_modules
             ~/.npm-packages-offline-cache
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
@@ -62,14 +59,11 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           check-latest: true
-      - name: Get cache directory
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
       - name: Use yarn cache
         uses: actions/cache@v2
         with:
           path: |
-            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            ./node_modules
             ~/.npm-packages-offline-cache
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
@@ -103,14 +97,11 @@ jobs:
         with:
           node-version: '14'
           check-latest: true
-      - name: Get cache directory
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
       - name: Use yarn cache
         uses: actions/cache@v2
         with:
           path: |
-            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            ./node_modules
             ~/.npm-packages-offline-cache
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
