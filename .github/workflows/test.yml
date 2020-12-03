@@ -21,19 +21,27 @@ jobs:
         uses: actions/setup-node@v2-beta
         with:
           node-version: '14'
-      - name: Use yarn cache
+      - name: node_modules cache
+        uses: actions/cache@v2
+        id: node_modules_cache
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-14-8-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-14-8-node_modules-
+            ${{ runner.os }}-14-node_modules-
+      - name: Yarn offline cache
+        if: steps.node_modules_cache.outputs.cache-hit != 'true'
         uses: actions/cache@v2
         with:
-          path: |
-            ./node_modules
-            ~/.npm-packages-offline-cache
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-            ${{ runner.os }}-
+          path: ~/.npm-packages-offline-cache
+          key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: yarn-offline
       - name: Install deps
+        if: steps.node_modules_cache.outputs.cache-hit != 'true'
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
+          yarn config set yarn-offline-mirror-pruning true
           yarn install --frozen-lockfile --prefer-offline
       - name: Build
         id: yarn-pack-dir
@@ -44,13 +52,16 @@ jobs:
           name: angularfire-${{ github.run_id }}
           path: dist
           retention-days: 1
+
   test:
     runs-on: ubuntu-latest
     needs: build
     strategy:
       matrix:
         node: ["10", "12", "14"]
-    name: Test Node.js ${{ matrix.node }} (Ubuntu)
+        firebase: ["7", "8"]
+      fail-fast: false
+    name: Test Firebase v${{ matrix.firebase }} on Node.js ${{ matrix.node }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -59,36 +70,48 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           check-latest: true
-      - name: Use yarn cache
+      - name: node_modules cache
+        id: node_modules_cache
         uses: actions/cache@v2
         with:
-          path: |
-            ./node_modules
-            ~/.npm-packages-offline-cache
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: ./node_modules
+          key: ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-node_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
-            ${{ runner.os }}-
-      - name: Use Firebase emulator cache
+            ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-node_modules-
+            ${{ runner.os }}-${{ matrix.node }}-node_modules-
+      - name: Yarn offline cache
+        if: steps.node_modules_cache.outputs.cache-hit != 'true'
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm-packages-offline-cache
+          key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: yarn-offline
+      - name: Install deps
+        if: steps.node_modules_cache.outputs.cache-hit != 'true'
+        run: |
+          yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
+          yarn install --frozen-lockfile --prefer-offline
+          yarn add firebase@^${{ matrix.firebase }}.0 --prefer-offline
+      - name: Firebase emulator cache
         uses: actions/cache@v2
         with:
           path: ~/.cache/firebase/emulators
           key: firebase_emulators
-      - name: Install deps
-        run: |
-          yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
-          yarn config set yarn-offline-mirror-pruning true
-          yarn install --frozen-lockfile --prefer-offline
       - name: 'Download Artifacts'
         uses: actions/download-artifact@v2
       - name: Run tests
         run: |
           mv angularfire-${{ github.run_id }} dist
           yarn test:node
+
   headless:
     runs-on: ubuntu-latest
     needs: build
-    name: Test Headless Chrome (Ubuntu)
+    name: Test Firebase v${{ matrix.firebase }} on Headless Chrome
+    strategy:
+      matrix:
+        firebase: ["7", "8"]
+      fail-fast: false
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -97,32 +120,40 @@ jobs:
         with:
           node-version: '14'
           check-latest: true
-      - name: Use yarn cache
+      - name: node_modules cache
+        id: node_modules_cache
         uses: actions/cache@v2
         with:
-          path: |
-            ./node_modules
-            ~/.npm-packages-offline-cache
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: ./node_modules
+          key: ${{ runner.os }}-14-${{ matrix.firebase }}-node_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
-            ${{ runner.os }}-
-      - name: Use Firebase emulator cache
+            ${{ runner.os }}-14-${{ matrix.firebase }}-node_modules-
+            ${{ runner.os }}-14-node_modules-
+      - name: Yarn offline cache
+        if: steps.node_modules_cache.outputs.cache-hit != 'true'
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm-packages-offline-cache
+          key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: yarn-offline
+      - name: Install deps
+        if: steps.node_modules_cache.outputs.cache-hit != 'true'
+        run: |
+          yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
+          yarn install --frozen-lockfile --prefer-offline
+          yarn add firebase@^${{ matrix.firebase }}.0 --prefer-offline
+      - name: Firebase emulator cache
         uses: actions/cache@v2
         with:
           path: ~/.cache/firebase/emulators
           key: firebase_emulators
-      - name: Install deps
-        run: |
-          yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
-          yarn config set yarn-offline-mirror-pruning true
-          yarn install --frozen-lockfile --prefer-offline
       - name: 'Download Artifacts'
         uses: actions/download-artifact@v2
       - name: Run tests
         run: |
           mv angularfire-${{ github.run_id }} dist
           yarn test:chrome-headless
+
   publish:
     runs-on: ubuntu-latest
     name: Publish (NPM)
