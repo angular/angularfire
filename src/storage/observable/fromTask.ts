@@ -6,13 +6,15 @@ import { UploadTask, UploadTaskSnapshot } from '../interfaces';
 // and it no longer works w/Firebase v7
 import firebase from 'firebase/app';
 
+// Things aren't working great, I'm having to put in a lot of work-arounds for what
+// appear to be Firebase JS SDK bugs https://github.com/firebase/firebase-js-sdk/issues/4158
 export function fromTask(task: UploadTask) {
   return new Observable<UploadTaskSnapshot>(subscriber => {
     const progress = (snap: UploadTaskSnapshot) => subscriber.next(snap);
     const error = e => subscriber.error(e);
     const complete = () => subscriber.complete();
     // emit the current snapshot, so they don't have to wait for state_changes
-    // to fire next
+    // to fire next... this is stale if the task is no longer running :(
     progress(task.snapshot);
     const unsub = task.on('state_changed', progress);
     // it turns out that neither task snapshot nor 'state_changed' fire the last
@@ -21,7 +23,11 @@ export function fromTask(task: UploadTask) {
     task.then(snapshot => {
       progress(snapshot);
       complete();
-    }, error);
+    }, e => {
+      // TODO investigate, again this is stale, we never fire a canceled or error it seems
+      progress(task.snapshot);
+      error(e);
+    });
     // on's type if Function, rather than () => void, need to wrap
     return function unsubscribe() {
       unsub();

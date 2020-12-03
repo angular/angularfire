@@ -111,6 +111,45 @@ describe('AngularFireStorage', () => {
       }).catch(done.fail);
     });
 
+    it('should cancel the task', (done) => {
+      const data = { angular: 'promise' };
+      const blob = blobOrBuffer(JSON.stringify(data), { type: 'application/json' });
+      const ref = afStorage.ref(rando());
+      const task: AngularFireUploadTask = ref.put(blob);
+      let emissionCount = 0;
+      let lastSnap: firebase.storage.UploadTaskSnapshot;
+      task.snapshotChanges().subscribe(snap => {
+        emissionCount++;
+        lastSnap = snap;
+        if (emissionCount === 1) {
+          task.cancel();
+        }
+      }, () => {
+        // TODO investigate, this doesn't appear to work...
+        // https://github.com/firebase/firebase-js-sdk/issues/4158
+        // expect(lastSnap.state).toEqual('canceled');
+        done();
+      }, done.fail);
+    });
+
+    it('should be able to pause/resume the task', (done) => {
+      const data = { angular: 'promise' };
+      const blob = blobOrBuffer(JSON.stringify(data), { type: 'application/json' });
+      const ref = afStorage.ref(rando());
+      const task: AngularFireUploadTask = ref.put(blob);
+      let paused = false;
+      task.pause();
+      task.snapshotChanges().subscribe(snap => {
+        if (snap.state === 'paused') {
+          paused = true;
+          task.resume();
+        }
+      }, done.fail, () => {
+        expect(paused).toBeTruthy();
+        done();
+      });
+    });
+
     it('should work with an already finished task', (done) => {
       const data = { angular: 'promise' };
       const blob = blobOrBuffer(JSON.stringify(data), { type: 'application/json' });
