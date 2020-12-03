@@ -41,7 +41,7 @@ jobs:
           yarn install --frozen-lockfile --prefer-offline
       - name: Build
         id: yarn-pack-dir
-        run: ./build.sh
+        run: ./tools/build.sh
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v2
         with:
