@@ -93,6 +93,7 @@ jobs:
         uses: actions/download-artifact@v2
       - name: Expand Artifact
         run: |
+          mkdir -p dist/packages-dist
           chmod +x angularfire-${{ github.run_id }}/unpack.sh
           ./angularfire-${{ github.run_id }}/unpack.sh
       - name: Run tests
