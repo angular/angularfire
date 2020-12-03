@@ -19,4 +19,4 @@ yarn build
 yarn build:jasmine
 
 echo "npm publish . --tag $NPM_TAG" > ./dist/packages-dist/publish.sh
-chmod +x ./publish.sh
+chmod +x ./dist/packages-dist/publish.sh
