@@ -15,7 +15,8 @@ global['WebSocket'] = require('ws');
 /* tslint:enable:no-string-literal */
 
 // include the protos required to bundle firestore
-import 'dir-loader!./firestore-protos';
+// in webpack 5 this is failing
+// import 'dir-loader!./firestore-protos';
 
 // The Express app is exported so that it can be used by serverless Functions.
 export function app() {
@@ -36,7 +37,7 @@ export function app() {
   // Serve static files from /browser
   server.get('*.*', express.static(distFolder, {
     maxAge: '1y'
-  }));
+  }) as any);
 
   // All regular routes use the Universal engine
   server.get('*', (req, res) => {

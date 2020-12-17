@@ -1,61 +1,51 @@
 import {
-  Inject, InjectionToken, isDevMode, ModuleWithProviders, NgModule, NgZone, Optional, PLATFORM_ID, VERSION as NG_VERSION, Version
+  InjectionToken,
+  isDevMode,
+  ModuleWithProviders,
+  NgModule,
+  NgZone,
+  Optional,
+  PLATFORM_ID,
+  VERSION as NG_VERSION,
+  Version,
 } from '@angular/core';
-import firebase from 'firebase/app';
+import { FirebaseApp as FirebaseAppType, FirebaseOptions, FirebaseAppConfig } from '@firebase/app-types';
+import { getApps, initializeApp, registerVersion } from 'firebase/app';
 
-// INVESTIGATE Public types don't expose FirebaseOptions or FirebaseAppConfig, is this the case anylonger?
-export interface FirebaseOptions {
-  [key: string]: any;
-}
-
-export interface FirebaseAppConfig {
-  [key: string]: any;
-}
+// tslint:disable-next-line:no-empty-interface
+export interface FirebaseApp extends FirebaseAppType { }
+export class FirebaseApp { }
 
 export const FIREBASE_OPTIONS = new InjectionToken<FirebaseOptions>('angularfire2.app.options');
-export const FIREBASE_APP_NAME = new InjectionToken<string | FirebaseAppConfig | undefined>('angularfire2.app.nameOrConfig');
-
-// Have to implement as we need to return a class from the provider, we should consider exporting
-// this in the firebase/app types as this is our highest risk of breaks
-export class FirebaseApp implements Partial<firebase.app.App> {
-  name: string;
-  options: {};
-  analytics: () => firebase.analytics.Analytics;
-  auth: () => firebase.auth.Auth;
-  database: (databaseURL?: string) => firebase.database.Database;
-  messaging: () => firebase.messaging.Messaging;
-  performance: () => firebase.performance.Performance;
-  storage: (storageBucket?: string) => firebase.storage.Storage;
-  delete: () => Promise<void>;
-  firestore: () => firebase.firestore.Firestore;
-  functions: (region?: string) => firebase.functions.Functions;
-  remoteConfig: () => firebase.remoteConfig.RemoteConfig;
-}
+export const FIREBASE_APP_NAME = new InjectionToken<string | FirebaseAppConfig | undefined>('angularfire2.app.name');
+export const AUTOMATIC_DATA_COLLECTION_ENABLED = new InjectionToken<boolean|undefined>('angularfire2.app.nameOrConfig');
 
 export const VERSION = new Version('ANGULARFIRE2_VERSION');
 
-export function ɵfirebaseAppFactory(options: FirebaseOptions, zone: NgZone, nameOrConfig?: string | FirebaseAppConfig | null) {
-  const name = typeof nameOrConfig === 'string' && nameOrConfig || '[DEFAULT]';
-  const config = typeof nameOrConfig === 'object' && nameOrConfig || {};
-  config.name = config.name || name;
-  // Added any due to some inconsistency between @firebase/app and firebase types
-  const existingApp = firebase.apps.filter(app => app && app.name === config.name)[0] as any;
-  // We support FirebaseConfig, initializeApp's public type only accepts string; need to cast as any
-  // Could be solved with https://github.com/firebase/firebase-js-sdk/pull/1206
-  const app = (existingApp || zone.runOutsideAngular(() => firebase.initializeApp(options, config as any))) as FirebaseApp;
+export function ɵfirebaseAppFactory(
+  options: FirebaseOptions,
+  zone: NgZone,
+  platformId: object,
+  name: string = '[DEFAULT]',
+  injectedAutomaticDataCollectionEnabled: boolean|null
+) {
+  const automaticDataCollectionEnabled = injectedAutomaticDataCollectionEnabled ?? true; // optional, default to true
+  const app = getApps().find(app => app.name === name) ||
+      zone.runOutsideAngular(() => {
+        const ret = initializeApp(options, name);
+        ret.automaticDataCollectionEnabled = automaticDataCollectionEnabled;
+        return ret;
+      });
   try {
-    if (JSON.stringify(options) !== JSON.stringify(app.options)) {
+    if (JSON.stringify(options) !== JSON.stringify(app.options) || app.automaticDataCollectionEnabled !== automaticDataCollectionEnabled) {
       const hmr = !!(module as any).hot;
-      log('error', `${app.name} Firebase App already initialized with different options${hmr ? ', you may need to reload as Firebase is not HMR aware.' : '.'}`);
+      log('error', `${name} Firebase App already initialized with different options${hmr ? ', you may need to reload as Firebase is not HMR aware.' : '.'}`);
     }
   } catch (e) { }
+  registerVersion('angularfire', VERSION.full, platformId.toString());
+  registerVersion('angular', NG_VERSION.full);
   return app;
 }
-
-export const ɵlogAuthEmulatorError = () => {
-  // TODO sort this out, https://github.com/angular/angularfire/issues/2656
-  log('warn', 'You may need to import \'firebase/auth\' manually in your component rather than rely on AngularFireAuth\'s dynamic import, when using the emulator suite https://github.com/angular/angularfire/issues/2656');
-};
 
 const log = (level: 'log'|'error'|'info'|'warn', ...args: any) => {
   if (isDevMode() && typeof console !== 'undefined') {
@@ -65,7 +55,7 @@ const log = (level: 'log'|'error'|'info'|'warn', ...args: any) => {
 
 globalThis.ɵAngularfireInstanceCache ||= new Map();
 
-export function ɵfetchInstance<T>(cacheKey: any, moduleName: string, app: FirebaseApp, fn: () => T, args: any[]): T {
+export function ɵfetchInstance<T>(cacheKey: any, moduleName: string, app: FirebaseAppType, fn: () => T, args: any[]): T {
   const [instance, ...cachedArgs] = globalThis.ɵAngularfireInstanceCache.get(cacheKey) || [];
   if (instance) {
     try {
@@ -95,7 +85,9 @@ const FIREBASE_APP_PROVIDER = {
   deps: [
     FIREBASE_OPTIONS,
     NgZone,
-    [new Optional(), FIREBASE_APP_NAME]
+    PLATFORM_ID,
+    [new Optional(), FIREBASE_APP_NAME],
+    [new Optional(), AUTOMATIC_DATA_COLLECTION_ENABLED],
   ]
 };
 
@@ -103,19 +95,13 @@ const FIREBASE_APP_PROVIDER = {
   providers: [FIREBASE_APP_PROVIDER]
 })
 export class AngularFireModule {
-  static initializeApp(options: FirebaseOptions, nameOrConfig?: string | FirebaseAppConfig): ModuleWithProviders<AngularFireModule> {
+  static initializeApp(options: FirebaseOptions, name?: string): ModuleWithProviders<AngularFireModule> {
     return {
       ngModule: AngularFireModule,
       providers: [
         {provide: FIREBASE_OPTIONS, useValue: options},
-        {provide: FIREBASE_APP_NAME, useValue: nameOrConfig}
+        {provide: FIREBASE_APP_NAME, useValue: name}
       ]
     };
-  }
-
-  // tslint:disable-next-line:ban-types
-  constructor(@Inject(PLATFORM_ID) platformId: Object) {
-    firebase.registerVersion('angularfire', VERSION.full, platformId.toString());
-    firebase.registerVersion('angular', NG_VERSION.full);
   }
 }

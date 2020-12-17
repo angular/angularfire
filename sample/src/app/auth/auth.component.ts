@@ -1,11 +1,10 @@
-import { Component, OnInit, OnDestroy, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
-import firebase from 'firebase/app';
-import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { trace } from '@angular/fire/performance';
-import { Inject } from '@angular/core';
-import { isPlatformServer } from '@angular/common';
+import { FirebaseApp } from '@angular/fire';
+import { Subscription } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-auth',
@@ -13,7 +12,7 @@ import { isPlatformServer } from '@angular/common';
     <p>
       Auth!
       {{ (auth.user | async)?.uid | json }}
-      {{ (auth.credential | async)?.additionalUserInfo.isNewUser | json }}
+      {{ (auth.credential | async) | json }}
       <button (click)="login()" *ngIf="showLoginButton">Log in with Google</button>
       <button (click)="loginAnonymously()" *ngIf="showLoginButton">Log in anonymously</button>
       <button (click)="logout()" *ngIf="showLogoutButton">Log out</button>
@@ -28,10 +27,11 @@ export class AuthComponent implements OnInit, OnDestroy {
   showLoginButton = false;
   showLogoutButton = false;
 
-  constructor(public readonly auth: AngularFireAuth, @Inject(PLATFORM_ID) platformId: object) {
+  // tslint:disable-next-line:ban-types
+  constructor(public readonly app: FirebaseApp, public readonly auth: AngularFireAuth, @Inject(PLATFORM_ID) platformId: Object) {
 
-    if (!isPlatformServer(platformId)) {
-      this.userDisposable = this.auth.authState.pipe(
+    if (isPlatformBrowser(platformId)) {
+      this.userDisposable = auth.authState.pipe(
         trace('auth'),
         map(u => !!u)
       ).subscribe(isLoggedIn => {
@@ -50,18 +50,19 @@ export class AuthComponent implements OnInit, OnDestroy {
   }
 
   async login() {
-    const user = await this.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-    // TODO sign into offline app
+    const { getAuth, GoogleAuthProvider, signInWithPopup } = await import(/* webpackExports: ["getAuth", "GoogleAuthProvider", "signInWithPopup"] */'firebase/auth');
+    const provider = new GoogleAuthProvider();
+    return await signInWithPopup(getAuth(this.app), provider);
   }
 
   async loginAnonymously() {
-    const user = await this.auth.signInAnonymously();
-    // TODO sign into offline app
+    const { getAuth, signInAnonymously } = await import(/* webpackExports: ["getAuth", "signInAnonymously"] */'firebase/auth');
+    return await signInAnonymously(getAuth(this.app));
   }
 
-  logout() {
-    this.auth.signOut();
-    // TODO sign out of offline app
+  async logout() {
+    const { getAuth, signOut } = await import(/* webpackExports: ["getAuth", "signOut"] */'firebase/auth');
+    return await signOut(getAuth(this.app));
   }
 
 }

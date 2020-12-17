@@ -117,7 +117,7 @@ type NonPromiseReturningFunctionPropertyNames<T> = {
 type NonFunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof T];
 // tslint:enable:ban-types
 
-export type ɵPromiseProxy<T> = { [K in NonFunctionPropertyNames<T>]: Promise<T[K]> } &
+export type ɵPromiseProxy<T> = Promise<T> & { [K in NonFunctionPropertyNames<T>]: Promise<T[K]> } &
   { [K in NonPromiseReturningFunctionPropertyNames<T>]: (...args: Parameters<T[K]>) => Promise<ReturnType<T[K]>> } &
   { [K in PromiseReturningFunctionPropertyNames<T>]: (...args: Parameters<T[K]>) => ReturnType<T[K]> };
 

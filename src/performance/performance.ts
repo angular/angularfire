@@ -1,18 +1,19 @@
 import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
-import { EMPTY, Observable, of, Subscription } from 'rxjs';
-import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
-import firebase from 'firebase/app';
+import { EMPTY, from, Observable, of, Subscription } from 'rxjs';
+import { map, shareReplay, switchMap, tap, withLatestFrom } from 'rxjs/operators';
 import { FirebaseApp, ɵapplyMixins, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
 import { isPlatformBrowser } from '@angular/common';
 import { proxyPolyfillCompat } from './base';
 import { ɵfetchInstance } from '@angular/fire';
+import { FirebasePerformance } from '@firebase/performance-types';
+import { FirebaseApp as FirebaseAppType } from '@firebase/app-types';
 
 // SEMVER @ v6, drop and move core ng metrics to a service
 export const AUTOMATICALLY_TRACE_CORE_NG_METRICS = new InjectionToken<boolean>('angularfire2.performance.auto_trace');
 export const INSTRUMENTATION_ENABLED = new InjectionToken<boolean>('angularfire2.performance.instrumentationEnabled');
 export const DATA_COLLECTION_ENABLED = new InjectionToken<boolean>('angularfire2.performance.dataCollectionEnabled');
 
-export interface AngularFirePerformance extends ɵPromiseProxy<firebase.performance.Performance> {
+export interface AngularFirePerformance extends ɵPromiseProxy<FirebasePerformance> {
 }
 
 @Injectable({
@@ -20,33 +21,30 @@ export interface AngularFirePerformance extends ɵPromiseProxy<firebase.performa
 })
 export class AngularFirePerformance {
 
-  private readonly performance: Observable<firebase.performance.Performance>;
-
   constructor(
     app: FirebaseApp,
-    @Optional() @Inject(INSTRUMENTATION_ENABLED) instrumentationEnabled: boolean | null,
-    @Optional() @Inject(DATA_COLLECTION_ENABLED) dataCollectionEnabled: boolean | null,
+    @Optional() @Inject(INSTRUMENTATION_ENABLED) providedInstrumentationEnabled: boolean | null,
+    @Optional() @Inject(DATA_COLLECTION_ENABLED) providedDataCollectionEnabled: boolean | null,
     private zone: NgZone,
     // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object
   ) {
 
-    this.performance = of(undefined).pipe(
-      switchMap(() => isPlatformBrowser(platformId) ? zone.runOutsideAngular(() => import('firebase/performance')) : EMPTY),
-      map(() => ɵfetchInstance(`performance`, 'AngularFirePerformance', app, () => {
-        const performance = zone.runOutsideAngular(() => app.performance());
-        if (instrumentationEnabled === false) {
-          performance.instrumentationEnabled = false;
-        }
-        if (dataCollectionEnabled === false) {
-          performance.dataCollectionEnabled = false;
-        }
-        return performance;
+    const instrumentationEnabled = providedInstrumentationEnabled ?? true;
+    const dataCollectionEnabled = providedDataCollectionEnabled ?? true;
+
+    const performance = of(undefined).pipe(
+      switchMap(() => isPlatformBrowser(platformId) ? zone.runOutsideAngular(() => import(/* webpackExports: ["getPerformance"] */ 'firebase/performance')) : EMPTY),
+      map(({ getPerformance }) => ɵfetchInstance(`performance`, 'AngularFirePerformance', app, () => {
+        return zone.runOutsideAngular(() => getPerformance(app, {
+          instrumentationEnabled,
+          dataCollectionEnabled,
+        }));
       }, [instrumentationEnabled, dataCollectionEnabled])),
       shareReplay({ bufferSize: 1, refCount: false })
     );
 
-    return ɵlazySDKProxy(this, this.performance, zone);
+    return ɵlazySDKProxy(this, performance, zone);
 
   }
 

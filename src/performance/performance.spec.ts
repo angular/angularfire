@@ -2,7 +2,8 @@ import { TestBed } from '@angular/core/testing';
 import { AngularFireModule, FirebaseApp } from '@angular/fire';
 import { AngularFirePerformance, AngularFirePerformanceModule } from '@angular/fire/performance';
 import { COMMON_CONFIG } from '../test-config';
-import { rando } from '../firestore/utils.spec';
+import { rando } from '../utils.spec';
+import { deleteApp } from 'firebase/app';
 
 describe('AngularFirePerformance', () => {
   let app: FirebaseApp;
@@ -20,8 +21,8 @@ describe('AngularFirePerformance', () => {
     afp = TestBed.inject(AngularFirePerformance);
   });
 
-  afterEach(() => {
-    app.delete();
+  afterEach(done => {
+    app.then(deleteApp).then(done, done);
   });
 
   it('should exist', () => {

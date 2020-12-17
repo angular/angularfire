@@ -16,6 +16,7 @@
       "typeRoots": [
         "node_modules/@types"
       ],
+      "skipLibCheck": true,
       "lib": [
         "es2018",
         "dom"

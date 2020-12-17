@@ -12,6 +12,7 @@
       ]
     },
     "include": [
+        "src/root.spec.ts",
         "src/**/*.jasmine.ts",
         "src/**/*.spec.ts",
         "src/**/*.d.ts",

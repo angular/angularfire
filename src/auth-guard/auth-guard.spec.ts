@@ -4,7 +4,8 @@ import { COMMON_CONFIG } from '../test-config';
 import { AngularFireAuthGuard, AngularFireAuthGuardModule } from '@angular/fire/auth-guard';
 import { Router, RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
-import { rando } from '../firestore/utils.spec';
+import { rando } from '../utils.spec';
+import { deleteApp } from 'firebase/app';
 
 describe('AngularFireAuthGuard', () => {
   let app: FirebaseApp;
@@ -29,7 +30,7 @@ describe('AngularFireAuthGuard', () => {
   });
 
   afterEach(done => {
-    app.delete().then(done, done);
+    app.then(deleteApp).then(done, done);
   });
 
   it('should be injectable', () => {

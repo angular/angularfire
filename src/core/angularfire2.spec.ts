@@ -4,16 +4,13 @@ import { AngularFireModule, FirebaseApp, ɵAngularFireSchedulers, ɵkeepUnstable
 import { Observable, of, Subject } from 'rxjs';
 import { COMMON_CONFIG } from '../test-config';
 import { BrowserModule } from '@angular/platform-browser';
-import firebase from 'firebase/app';
 import { tap } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
-import { rando } from '../firestore/utils.spec';
+import { rando } from '../utils.spec';
+import { deleteApp } from 'firebase/app';
 
 describe('angularfire', () => {
   let app: FirebaseApp;
-  let rootRef: firebase.database.Reference;
-  let questionsRef: firebase.database.Reference;
-  let listOfQuestionsRef: firebase.database.Reference;
   let defaultPlatform: PlatformRef;
   let appName: string;
 
@@ -27,14 +24,10 @@ describe('angularfire', () => {
 
     app = TestBed.inject(FirebaseApp);
     defaultPlatform = TestBed.inject(PlatformRef);
-    rootRef = app.database().ref();
-    questionsRef = rootRef.child('questions');
-    listOfQuestionsRef = rootRef.child('list-of-questions');
   });
 
-  afterEach(() => {
-    rootRef.remove();
-    app.delete();
+  afterEach(done => {
+    app.then(deleteApp).then(done, done);
   });
 
   describe('ZoneScheduler', () => {
@@ -204,42 +197,36 @@ describe('angularfire', () => {
 
   describe('FirebaseApp', () => {
 
-    it('should provide a FirebaseApp for the FirebaseApp binding', () => {
-      expect(typeof app.delete).toBe('function');
+    it('should have the provided name', async (done) => {
+      expect((await app).name).toBe(appName);
+      done();
     });
 
-    if (typeof window !== 'undefined') {
-
-      it('should have the provided name', () => {
-        expect(app.name).toBe(appName);
-      });
-
-      it('should use an already intialized firebase app if it exists', done => {
-        @NgModule({
-          imports: [
-            AngularFireModule.initializeApp(COMMON_CONFIG, appName),
-            BrowserModule
-          ]
-        })
-        class MyModule {
-          ngDoBootstrap() {
-          }
+    it('should use an already intialized firebase app if it exists', done => {
+      @NgModule({
+        imports: [
+          AngularFireModule.initializeApp(COMMON_CONFIG, appName),
+          BrowserModule
+        ]
+      })
+      class MyModule {
+        ngDoBootstrap() {
         }
+      }
 
-        const compilerFactory: CompilerFactory =
-          defaultPlatform.injector.get(CompilerFactory, null);
-        const moduleFactory = compilerFactory.createCompiler().compileModuleSync(MyModule);
+      const compilerFactory: CompilerFactory =
+        defaultPlatform.injector.get(CompilerFactory, null);
+      const moduleFactory = compilerFactory.createCompiler().compileModuleSync(MyModule);
 
-        defaultPlatform.bootstrapModuleFactory(moduleFactory)
-          .then(moduleRef => {
-            const ref = moduleRef.injector.get(FirebaseApp);
-            expect(ref.name).toEqual(app.name);
-          }).then(done, e => {
-          fail(e);
-          done();
-        });
+      defaultPlatform.bootstrapModuleFactory(moduleFactory)
+        .then(async moduleRef => {
+          const ref = moduleRef.injector.get(FirebaseApp);
+          expect((await ref).name).toEqual((await app).name);
+        }).then(done, e => {
+        fail(e);
+        done();
       });
+    });
 
-    }
   });
 });

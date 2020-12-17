@@ -144,21 +144,8 @@ export const setupUniversalDeployment = (config: {
   // is problematic for SSR (references to Window, etc.) Let's just mark all of them as external so we know the CJS is used.
   const externalDependencies: string[] = project.architect.server.options.externalDependencies || [];
   [
-    'firebase',
     '@firebase/app',
-    '@firebase/analytics',
-    '@firebase/app',
-    '@firebase/auth',
-    '@firebase/component',
-    '@firebase/database',
     '@firebase/firestore',
-    '@firebase/functions',
-    '@firebase/installations',
-    '@firebase/messaging',
-    '@firebase/storage',
-    '@firebase/performance',
-    '@firebase/remote-config',
-    '@firebase/util'
   ].forEach(dep => {
     if (!externalDependencies.includes(dep)) { externalDependencies.push(dep); }
   });

@@ -3,7 +3,8 @@ import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } f
 import { AngularFireFunctions, AngularFireFunctionsModule, ORIGIN, REGION } from '@angular/fire/functions';
 import { COMMON_CONFIG } from '../test-config';
 import 'firebase/functions';
-import { rando } from '../firestore/utils.spec';
+import { rando } from '../utils.spec';
+import { deleteApp } from 'firebase/app';
 
 describe('AngularFireFunctions', () => {
   let app: FirebaseApp;
@@ -21,8 +22,8 @@ describe('AngularFireFunctions', () => {
     afFns = TestBed.inject(AngularFireFunctions);
   });
 
-  afterEach(() => {
-    app.delete();
+  afterEach(done => {
+    app.then(deleteApp).then(done, done);
   });
 
   it('should exist', () => {
@@ -59,8 +60,8 @@ describe('AngularFireFunctions with different app', () => {
     afFns = TestBed.inject(AngularFireFunctions);
   });
 
-  afterEach(() => {
-    app.delete();
+  afterEach(done => {
+    app.then(deleteApp).then(done, done);
   });
 
   describe('<constructor>', () => {
