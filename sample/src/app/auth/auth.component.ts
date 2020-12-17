@@ -50,18 +50,18 @@ export class AuthComponent implements OnInit, OnDestroy {
   }
 
   async login() {
-    const { getAuth, GoogleAuthProvider, signInWithPopup } = await import(/* webpackExports: ["getAuth", "GoogleAuthProvider", "signInWithPopup"] */'firebase/auth');
+    const { getAuth, GoogleAuthProvider, signInWithPopup } = await import('./signInWithGoogle');
     const provider = new GoogleAuthProvider();
     return await signInWithPopup(getAuth(this.app), provider);
   }
 
   async loginAnonymously() {
-    const { getAuth, signInAnonymously } = await import(/* webpackExports: ["getAuth", "signInAnonymously"] */'firebase/auth');
+    const { getAuth, signInAnonymously } = await import('./signInAnonymously');
     return await signInAnonymously(getAuth(this.app));
   }
 
   async logout() {
-    const { getAuth, signOut } = await import(/* webpackExports: ["getAuth", "signOut"] */'firebase/auth');
+    const { getAuth, signOut } = await import('./signOut');
     return await signOut(getAuth(this.app));
   }
 

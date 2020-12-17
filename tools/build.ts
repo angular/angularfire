@@ -7,13 +7,13 @@ import { keys as tsKeys } from 'ts-transformer-keys';
 import { FirebaseApp } from '@firebase/app-types';
 import { Auth as FirebaseAuth } from '@firebase/auth-types';
 import { Functions } from '@firebase/functions-types';
-import { FirebaseMessaging } from '@firebase/messaging-types';
 import { FirebasePerformance } from '@firebase/performance-types';
 import { RemoteConfig } from '@firebase/remote-config-types';
+import { FirebaseFirestore } from 'firebase/firestore';
 
 // TODO infer these from the package.json
-const MODULES = ['core', 'auth', 'auth-guard', 'functions', 'remote-config', 'performance'];
-const LAZY_MODULES = [['', 'app'], ['auth'], ['functions'], ['remote-config'], ['performance']];
+const MODULES = ['core', 'auth', 'auth-guard', 'firestore', 'functions', 'remote-config', 'performance'];
+const LAZY_MODULES = [['', 'app'], ['auth'], ['firestore'], ['functions'], ['remote-config'], ['performance']];
 const UMD_NAMES = MODULES.map(m => m === 'core' ? 'angular-fire' : `angular-fire-${m}`);
 const ENTRY_NAMES = MODULES.map(m => m === 'core' ? '@angular/fire' : `@angular/fire/${m}`);
 
@@ -21,6 +21,7 @@ function proxyPolyfillCompat() {
   const defaultObject = {
     core: tsKeys<FirebaseApp>(),
     auth: tsKeys<FirebaseAuth>(),
+    firestore: tsKeys<FirebaseFirestore>(),
     functions: tsKeys<Functions>(),
     performance: tsKeys<FirebasePerformance>(),
     'remote-config': tsKeys<RemoteConfig>(),
@@ -117,6 +118,31 @@ async function fixImportForLazyModules() {
   }));
 }
 
+async function fixFirestoreLazyMemoryModule() {
+  const module = 'firestore/memory';
+  const packageJson = JSON.parse((await readFile(dest(module, 'package.json'))).toString());
+  const entries = Array.from(new Set(Object.values(packageJson).filter(v => typeof v === 'string' && v.endsWith('.js')))) as string[];
+  // TODO don't hardcode esm2015 here, perhaps we should scan all the entry directories
+  //      e.g, if ng-packagr starts building other non-flattened entries we'll lose the dynamic import
+  entries.push(`../../esm2015/${module}/public_api.js`); // the import isn't pulled into the ESM public_api
+  entries.push(`../../esm2015/${module}/firestore.js`);
+  await Promise.all(entries.map(async path => {
+    const source = (await readFile(dest(module, path))).toString();
+    let newSource: string;
+    if (path.endsWith('.umd.js')) {
+      // in the UMD for lazy modules replace the dyanamic import
+      newSource = source.replace(new RegExp(`import\\(.*'firebase/firestore'\\)`, 'gm'), `Promise.resolve(require('firebase/firestore/memory'))`)
+        .replace('require(\'firebase/firestore\')', 'require(\'firebase/firestore/memory\')')
+        .replace(', \'firebase/firestore\',', ', \'firebase/firestore/memory\',');
+    } else {
+      // in everything else get rid of the global side-effect import
+      newSource = source.replace(/^import 'firebase\/firestore'.+$/gm, '')
+        .replace(new RegExp(`import\\((.*)'firebase/firestore'\\)`, 'gm'), (_, magic) => `import(${magic}'firebase/firestore/memory')`);
+    }
+    await writeFile(dest(module, path), newSource);
+  }));
+}
+
 async function buildLibrary() {
   await proxyPolyfillCompat();
   await spawnPromise('npx', ['ng', 'build']);
@@ -126,7 +152,10 @@ async function buildLibrary() {
     copy(join(process.cwd(), 'docs'), dest('docs')),
     compileSchematics(),
     replacePackageJsonVersions(),
-    replacePackageCoreVersion().then(fixImportForLazyModules),
+    replacePackageCoreVersion().then(() => Promise.all([
+      fixImportForLazyModules(),
+      fixFirestoreLazyMemoryModule()
+    ])),
   ]);
 }
 

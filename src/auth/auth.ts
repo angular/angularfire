@@ -1,6 +1,6 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID, InjectionToken } from '@angular/core';
 import { Observable, of, from, merge, Subject } from 'rxjs';
-import { switchMap, map, observeOn, shareReplay, filter, switchMapTo, withLatestFrom, take } from 'rxjs/operators';
+import { switchMap, map, observeOn, shareReplay, filter, withLatestFrom, take } from 'rxjs/operators';
 import {
   FIREBASE_OPTIONS,
   FIREBASE_APP_NAME,

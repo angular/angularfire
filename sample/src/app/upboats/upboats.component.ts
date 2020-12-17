@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, startWith, tap } from 'rxjs/operators';
-import { AngularFirestoreOffline } from '../firestore-offline/firestore-offline.module';
-import firebase from 'firebase/app';
 import { makeStateKey, TransferState } from '@angular/platform-browser';
 import { trace } from '@angular/fire/performance';
+import { AngularFirestore } from '@angular/fire/firestore';
 
 type Animal = { name: string, upboats: number, id: string, hasPendingWrites: boolean };
 
@@ -17,11 +16,12 @@ export class UpboatsComponent implements OnInit {
 
   public animals: Observable<Animal[]>;
 
-  constructor(private firestore: AngularFirestoreOffline, state: TransferState) {
-    const collection = firestore.collection<Animal>('animals', ref =>
-      ref.orderBy('upboats', 'desc').orderBy('updatedAt', 'desc')
-    );
-    const key = makeStateKey(collection.ref.path);
+  constructor(private firestore: AngularFirestore, state: TransferState) {
+    const collection = firestore.collection<Animal>('animals', async ref => {
+      const { orderBy, query } = await import('./query');
+      return query(ref, orderBy('upboats', 'desc'), orderBy('updatedAt', 'desc'));
+    });
+    const key = makeStateKey('animals');
     const existing = state.get(key, undefined);
     this.animals = collection.snapshotChanges().pipe(
       trace('animals'),
@@ -37,28 +37,31 @@ export class UpboatsComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  upboat(id: string) {
+  async upboat(id: string) {
+    const { increment, serverTimestamp } = await import('./update');
     // TODO add rule
-    this.firestore.doc(`animals/${id}`).update({
-      upboats: firebase.firestore.FieldValue.increment(1),
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    return await this.firestore.doc(`animals/${id}`).update({
+      upboats: increment(1),
+      updatedAt: serverTimestamp(),
     });
   }
 
-  downboat(id: string) {
+  async downboat(id: string) {
+    const { increment, serverTimestamp } = await import('./update');
     // TODO add rule
-    this.firestore.doc(`animals/${id}`).update({
-      upboats: firebase.firestore.FieldValue.increment(-1),
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    return await this.firestore.doc(`animals/${id}`).update({
+      upboats: increment(-1),
+      updatedAt: serverTimestamp(),
     });
   }
 
-  newAnimal() {
+  async newAnimal() {
+    const { serverTimestamp } = await import('./update');
     // TODO add rule
-    this.firestore.collection('animals').add({
+    return await this.firestore.collection('animals').add({
       name: prompt('Can haz name?'),
       upboats: 1,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt: serverTimestamp(),
     });
   }
 
