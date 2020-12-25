@@ -13,6 +13,10 @@
       "type": "string",
       "description": "The Firebase project name or project alias to use when deploying"
     },
+    "target": {
+      "type": "string",
+      "description": "The Firebase hosting target in firebase.json for multi-site"
+    },
     "functionsNodeVersion": {
       "type": "number",
       "description": "Version of Node.js to run Cloud Functions on"
