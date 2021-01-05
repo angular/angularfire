@@ -9,7 +9,7 @@ If you'd like this feature please add your 👍 to [this issue](https://github.c
 
 Your alternatives are to use
 - [WorkboxJS](https://developers.google.com/web/tools/workbox/)
-- Following the discussion in this [this issue](https://github.com/angular/angular/issues/34352) and [here](https://github.com/angular/angularfire/discussions/1923) ,manually registering the Angular Service Worker
+- Follow the discussion in this [this issue](https://github.com/angular/angular/issues/34352) and [here](https://github.com/angular/angularfire/discussions/1923), manually registering the Angular Service Worker
 - The Firebase Messaging Service Worker, which is detailed below
 
 ### Import the `NgModule`
