@@ -18,8 +18,8 @@ const linkButton = {
   name: "linkbutton",
   type: "addPairedShortcode",
   create (content, href, type='primary', external=false) {
-    const primaryClass = `link-button inline-block shadow-lg bg-blue text-white text-lg uppercase font-bold font-display tracking-wide rounded-lg px-6 py-4 text-center`;
-    const secondaryClass = `link-button inline-block shadow-lg bg-blue-200 text-black text-lg uppercase font-bold font-display tracking-wide rounded-lg px-6 py-4 text-center`;
+    const primaryClass = `link-button inline-block shadow-lg bg-blue text-white text-lg uppercase font-bold font-display tracking-wide rounded-lg px-8 py-3 text-center`;
+    const secondaryClass = `link-button inline-block shadow-lg bg-blue-200 text-black text-lg uppercase font-bold font-display tracking-wide rounded-lg px-8 py-3 text-center`;
     const cssClass = type === 'primary' ? primaryClass : secondaryClass;
     const externalAttrs = external ? 'rel="noopener" target="blank"' : '';
     return `<a class="${cssClass}" href="${href}" ${externalAttrs}>${content}</a>`;

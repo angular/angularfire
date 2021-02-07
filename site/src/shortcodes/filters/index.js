@@ -1,3 +1,4 @@
+const console = require('console');
 const { resolve } = require('path');
 
 const findByName = {
@@ -77,14 +78,20 @@ const mergeNavigation = {
   create(eleventyNavigation) {
     const customNavigation = require(resolve(__dirname, '../../_data/nextprev.json'));
     const customKeys = Object.keys(customNavigation);
+    console.log(eleventyNavigation);
     customKeys.forEach(key => {
+      console.log('key: ', key);
       const eleventyNavMatch = eleventyNavigation.find(item => item.key === key);
-      const matchKids = eleventyNavMatch.children;
-      const newKids = customNavigation[key].children.map(child => {
-        return matchKids.find(c => c.key === child.key);
-      });
-      eleventyNavigation.find(item => item.key === key).children = newKids;
+      console.log('eleventyNavMatch: ', eleventyNavMatch)
+      if(eleventyNavMatch != undefined) {
+        const matchKids = eleventyNavMatch.children;
+        const newKids = customNavigation[key].children.map(child => {
+          return matchKids.find(c => c.key === child.key);
+        });
+        eleventyNavigation.find(item => item.key === key).children = newKids;
+      }
     });
+    console.log(eleventyNavigation);
     return eleventyNavigation;
   }  
 }

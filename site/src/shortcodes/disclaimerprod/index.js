@@ -20,8 +20,8 @@ const disclaimerprod = {
   type: "addShortcode",
   create() {
     return `<div class="bg-yellow text-black p-8 rounded-lg shadow-lg text-base">
-  <h4 class="uppercase tracking-wide font-bold mb-2 text-base">Not ready for production</h4>
-  <p class="p-0 m-0">The API of the Modular SDK is not stable and is <strong>not production ready yet</strong>. We are in the process of collecting feedback to iterate on the API. We may update the API and introduce incompatible changes at any point. </strong>Do not use the SDK in your production apps</strong>.</p>
+  <h4 class="uppercase tracking-wide font-bold mb-2 text-base">Beta Site!</h4>
+  <p class="p-0 m-0">This is a brand new guide site that is in beta. During this time period we'd love to hear your feedback on our <a href="https://github.com/angular/angularfire/discussions" target="blank" rel="opener">GitHub Discussion board</a>. Please let us know what you think of the usability, content, and any ideas for improvement. All contributors are welcome!</p>
 </div>`;
   }
 }

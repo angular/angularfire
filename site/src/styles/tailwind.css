@@ -133,6 +133,12 @@
  .docs-content article p > b {
    @apply font-display;
  }
+
+ .docs-content article ol, .docs-content article ul:not(.prevnext-grid) {
+  list-style-type: initial;
+  padding: 0 2rem;
+  margin: 1rem 0;
+}
  
  table a, article p > a:not(.link-button) {
    @apply underline text-blue;

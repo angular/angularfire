@@ -1,1 +1,10 @@
-{}
+{
+  "Get started": { 
+    "key": "Get Started", 
+    "url": "/get-started", 
+    "children": [
+      { "key": "Quick start", "url": "/get-started" },
+      { "key": "Deploying", "url": "/get-started/deploying" }
+    ]
+  }
+}

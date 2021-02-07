@@ -9,14 +9,20 @@ eleventyNavigation:
 
 {% subheading %}The official library for Angular and Firebase{% endsubheading %}
 
-<div class="mb-24">
-  {%- linkbutton "/get-started/quick-start" %}
-    Get started
-  {%- endlinkbutton %}
-  {%- linkbutton "https://github.com/angular/fire", "secondary", true %}
-    GitHub
-  {%- endlinkbutton %}
+<div class="flex flex-col py-4 lg:flex-row xl:flex-row mb-8">
+  <section class="flex mb-4 lg:mr-4 xl:mr-4 lg:mb-0 xl:mb-0">
+    {%- linkbutton "/get-started/quick-start" %}
+      Get started
+    {%- endlinkbutton %}   
+  </section>
+  <section class="">
+    {%- linkbutton "https://github.com/angular/fire", "secondary", true %}
+      GitHub
+    {%- endlinkbutton %}  
+  </section>          
 </div>
+
+{% disclaimerprod %}
 
 ## What is AngularFire?
 
