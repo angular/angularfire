@@ -1,0 +1,45 @@
+{# 
+Type of sectionEntry
+[{
+    "key": "Mammals",
+    "url": "/mammals/",
+    "title": "Mammals",
+    "children": [{
+        "key": "Humans",
+        "parentKey": "Mammals",
+        "url": "/humans/",
+        "title": "Humans"
+      },
+      {
+        "key": "Dogs",
+        "parentKey": "Mammals",
+        "url": "/dogs/",
+        "title": "Dogs"
+      }]
+  }] 
+#}
+
+{% macro navsection(sectionEntry, page) %}
+<ul class="pb-8">
+
+  <li class="font-bold font-display">
+
+    <a href="{{sectionEntry.url}}" {% if page.url == sectionEntry.url %} aria-current="page"{% endif %}>
+      {{sectionEntry.key}}
+    </a>
+
+    <ul class="mt-2 ml-6 text-sm font-normal font-body text-grey-300">
+
+    {%- for pageEntry in sectionEntry.children %}
+      <li class="py-1">
+        <a href="{{pageEntry.url}}" {% if page.url == pageEntry.url %} aria-current="page" class="text-blue"{% endif %}>
+          {{pageEntry.key}}
+        </a>
+      </li>
+    {% endfor %}
+    </ul>
+
+  </li>
+
+</ul>
+{% endmacro %}

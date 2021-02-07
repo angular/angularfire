@@ -1,0 +1,68 @@
+{% import "side-nav.njk" as nav %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>
+      {% block title %}Firebase Modular JavaScript SDK Documentation{% endblock %}
+    </title>
+    <meta charset="utf-8" />
+    {% if description %}
+      <meta name="description" content="{{description}}"/>
+    {% endif%}
+    <meta http-equiv="x-ua-compatible" content="ie=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover"/>
+    <link rel="stylesheet" href="/style.css?v={% version %}"/>
+    <link rel="stylesheet" href="/prism.css?v={% version %}"/>
+    <script type="module" src="/js/tab-switcher.js?v={% version %}"></script>
+    <script type="module" src="/js/click-card.js?v={% version %}"></script>
+    <script type="module" src="/js/menu-button.js?v={% version %}"></script>
+  </head>
+  <body class="text-lg font-body docs-content">
+
+    <main class="relative py-18">
+        
+      <aside id="sideNav" class="sticky top-0 bg-gray-100">
+        <header class="py-16">
+          <section class="flex items-center">
+
+            <div class="mr-2">
+              <img src="/assets/firebase-logo.svg" class="w-10 h-10" />
+            </div>
+
+            <div class="">
+              <div class="text-sm font-bold text-black font-display">
+                Modular JavaScript SDK
+              </div>
+              <div class="text-sm font-display text-grey-300">
+                Early Access Program
+              </div>
+            </div>
+
+          </section>
+        </header>
+        <section class="sticky overflow-y-scroll top-16">
+          <nav>
+
+            {%- for section in collections.all | eleventyNavigation | mergeNavigation %}
+              {{ nav.navsection(section, page) }}
+            {%- endfor %}
+
+          </nav>
+        </section>
+      </aside>
+
+      <article>
+        <section class="container py-16 mt-24">
+        {% block content%}
+          {{ content | safe }}
+        {% endblock %}
+        <section>
+      </article>
+      
+      <eap-menu-button data-menu-id="sideNav"></eap-menu-button>
+
+    </main>
+
+  </body>
+</html>

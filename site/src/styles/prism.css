@@ -1,0 +1,187 @@
+/**
+ * Copyright 2021 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * prism.js custom theme for JavaScript, CSS and HTML
+ * Based on default theme
+ */
+
+ code[class*="language-"] {
+  padding: 0;
+}
+
+code[class*="language-"],
+pre[class*="language-"] {
+  color: aliceblue;
+  background: none;
+  font-size: 14px;
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 400;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.5;
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+code[class*="language-css"],
+pre[class*="language-css"],
+code[class*="language-html"],
+pre[class*="language-html"] {
+ color: #d0d2d1 !important;
+}
+
+code[class*="language-html"].token.punctuation,
+pre[class*="language-html"].token.punctuation {
+ color: #4dd0e1 !important;
+}
+
+pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
+  text-shadow: none;
+  background: hsl(213, 92%, 85%);
+  opacity: 0.4;
+}
+
+pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
+code[class*="language-"]::selection, code[class*="language-"] ::selection {
+  text-shadow: none;
+  background: #b3d4fc;
+  opacity: 0.4;
+}
+
+@media print {
+  code[class*="language-"],
+  pre[class*="language-"] {
+    text-shadow: none;
+  }
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: 1em;
+  overflow: auto;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+ border-radius: 8px;
+ background-color: #283142;
+ margin-bottom: 2rem;
+ margin-top: 2rem;
+ /*TODO:(davideast) We have to set the max-width of the codeblock because 
+   it causes the content to break out of the viewport. The "break out" 
+   causes those annoying x axis overflows and scrolling on mobile devices.
+   Ideally there's a better solution. 
+ */
+ max-width:100%;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+  white-space: normal;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #f06292;
+}
+
+.token.punctuation {
+  color: aliceblue;
+}
+
+.namespace {
+  opacity: .7;
+}
+
+.token.function,
+.token.property {
+  color: #4dd0e1;
+}
+
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #9ccc65;
+}
+
+.token.tag,
+.token.selector,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: #9ccc65;
+}
+
+.token.attr-name,
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #9ccc65;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #4dd0e1;
+}
+
+.token.class-name {
+  color: #4dd0e1;
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #4dd0e1;
+}
+
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+eap-tab-panel :not(pre) > code[class*="language-"],
+eap-tab-panel pre[class*="language-"] {
+ padding: 0;
+ margin: 0;
+}

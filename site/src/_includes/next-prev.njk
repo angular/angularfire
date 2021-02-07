@@ -1,0 +1,65 @@
+
+{% macro item(direction, title, url) %}
+  {% set justifyDirection = 'justify-center lg:justify-start xl:justify-start' %}
+  {% set textDirection = 'text-center lg:text-left xl:text-left' %}
+
+  {% if direction === 'Next' %}
+    {% set justifyDirection = 'justify-center lg:justify-end xl:justify-end' %}
+    {% set textDirection = 'text-center lg:text-right xl:text-right' %}
+  {% endif%}
+
+  <eap-click-card class="flex items-center h-32 px-8 py-6 bg-gray-100 rounded-md shadow-md {{ textDirection }} {{ justifyDirection }}">
+    <div>
+      <h5 class="text-xl font-bold tracking-wider text-black uppercase font-display">
+        {{ direction }}
+      </h5>
+      <a class="underline text-blue" href="{{ url }}">
+        {{ title }}
+      </a>
+    </div>
+  </eap-click-card>
+{% endmacro %}
+
+{% macro grid(prevRecord, nextRecord) %}
+  
+  <section class="py-8 next-prev">
+
+    <nav>
+      <ul class="grid grid-cols-2 gap-x-4 lg:gap-x-16 xl:gap-x-16">
+
+      {% if prevRecord %}
+      <li class="border-b-4 border-solid border-blue">
+        {{ item("Previous", prevRecord.key, prevRecord.url) }}
+      </li>
+      {% else %}
+      <div></div>
+      {% endif %}
+
+      {% if nextRecord %}
+      <li class="border-b-4 border-solid border-blue">
+        {{ item("Next", nextRecord.key, nextRecord.url) }}  
+      </li>
+      {% else %}
+      <div></div>
+      {% endif %}
+
+      </ul>
+    </nav>
+
+  </section>
+
+{% endmacro %}
+
+{% macro contextgrid(tag) %}
+  {# Get the current page index from eleventyNavigation and then get the next and previous pages #}
+  
+  {% if eleventyNavigation.parent %}
+    {% set children = nextprev[eleventyNavigation.parent].children %}
+    {% set prevRecord = children | findPreviousEntry(eleventyNavigation) %}
+    {% set nextRecord = children | findNextEntry(eleventyNavigation) %}
+
+    {{ grid(prevRecord, nextRecord) }}
+
+  {% endif%}
+
+{% endmacro %}
