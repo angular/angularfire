@@ -1,8 +1,5 @@
 ---
 layout: default.njk
-eleventyNavigation:
-  key: Home
-  order: 0
 ---
 
 {% headingone %}AngularFire{% endheadingone %}
