@@ -4,7 +4,8 @@
     "url": "/get-started", 
     "children": [
       { "key": "Quick start", "url": "/get-started" },
-      { "key": "Deploying", "url": "/get-started/deploying" }
+      { "key": "Deploying", "url": "/get-started/deploying" },
+      { "key": "Local development", "url": "/get-started/local-development" }
     ]
   },
   "Firestore": {
@@ -13,6 +14,23 @@
     "children": [
       { "key": "Documents", "url": "/firestore/documents" },
       { "key": "Collections", "url": "/firestore/collections" }
+    ]    
+  },
+  "Auth": {
+    "key": "Auth", 
+    "url": "/auth", 
+    "children": [
+      { "key": "Getting started", "url": "/auth" },
+      { "key": "Route guards", "url": "/auth/route-gards" }
+    ]    
+  },
+  "RTDB": {
+    "key": "RTDB", 
+    "url": "/rtdb", 
+    "children": [
+      { "key": "Objects", "url": "/rtdb/objects" },
+      { "key": "Lists", "url": "/rtdb/lists" },
+      { "key": "Querying", "url": "/rtdb/querying" }
     ]    
   }
 }

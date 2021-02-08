@@ -88,7 +88,6 @@ const mergeNavigation = {
         eleventyNavigation.find(item => item.key === key).children = newKids;
       }
     });
-    console.log(eleventyNavigation);
     return eleventyNavigation;
   }  
 }

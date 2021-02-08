@@ -143,6 +143,11 @@
  table a, article p > a:not(.link-button) {
    @apply underline text-blue;
  }
+
+ .annotations-section p {
+   @apply text-sm !important;
+   line-height: 1.35rem !important;
+ }
  
  @media (max-width: 775px) {
  
