@@ -1,0 +1,331 @@
+/**
+ * Copyright 2021 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+ @import "tailwindcss/base";
+ @import "tailwindcss/components";
+ @import "tailwindcss/utilities";
+ 
+ @font-face {
+   font-family: 'Google Sans';
+   font-style: normal;
+   font-weight: 400;
+   src: url('/assets/GoogleSans-Regular.woff2') format('woff2');
+ }
+ 
+ @font-face {
+   font-family: 'Google Sans';
+   font-style: normal;
+   font-weight: 500;
+   src: url('/assets/GoogleSans-Medium.woff2') format('woff2');
+ }
+ 
+ @font-face {
+   font-family: 'Google Sans';
+   font-style: bold;
+   font-weight: 900;
+   src: url('/assets/GoogleSans-Bold.woff2') format('woff2');
+ }
+ 
+ @font-face {
+   font-family: 'Roboto';
+   font-style: normal;
+   font-weight: 400;
+   src: url('/assets/Roboto-Regular.woff2') format('woff2');
+ }
+ 
+ @font-face {
+   font-family: 'Roboto';
+   font-style: italic;
+   font-weight: 400;
+   src: url('/assets/Roboto-Italic.woff2') format('woff2');
+ }
+ 
+ @font-face {
+   font-family: 'Roboto';
+   font-style: bold;
+   font-weight: 900;
+   src: url('/assets/Roboto-900.woff2') format('woff2');
+ }
+ 
+ @font-face {
+   font-family: 'Roboto Mono';
+   font-style: normal;
+   font-weight: 400;
+   src: url('/assets/RobotoMono-Regular.woff2') format('woff2');
+ }
+ 
+ body {
+   background-color: hsl(255 1% 98%);
+   background-image: url(/assets/corner.svg);
+   background-position: top right;
+   background-repeat: no-repeat;
+   width: 100vw;
+ }
+ 
+ a[aria-current="page"] {
+   @apply text-blue;
+ }
+ 
+ .docs-content main {
+   @apply grid min-h-screen;
+   grid-template-columns:[side] auto 1fr [stack];
+   grid-template-rows: [side] 1fr;
+   column-gap: 8vw;
+ }
+ 
+ .docs-content main > aside {
+   min-width: 32ch;
+   @apply sticky top-0 z-10 h-screen pl-8 pr-4 overflow-y-scroll;
+ }
+ 
+ .docs-content main > article {
+   max-width: 64ch;
+   @apply min-h-screen pr-8;
+ }
+ 
+ h1, h2, h3, h4, h5, h6 {
+   @apply font-display;
+ }
+ 
+ h1 {
+   @apply text-5xl font-bold font-display;
+ }
+ 
+ .docs-content main > article h2 {
+   @apply mt-12 mb-4 antialiased font-bold leading-snug text-black;
+   font-size: 24px;
+ }
+ 
+ .docs-content main > article h3 {
+   @apply mt-8 text-xl;
+ }
+ 
+ .docs-content main > article h4 {
+   @apply mt-2 text-lg leading-snug text-grey-600;
+ }
+ 
+ .docs-content main > article p {
+   @apply mb-6 text-lg;
+   line-height: 2rem;
+ }
+ 
+ /** 
+   Don't go further than direct descendants for code styling
+   otherwise it will mess with the codeboxes 
+ */
+ .docs-content main > article p > code {
+   @apply p-1 bg-gray-200 rounded-md;
+ }
+ 
+ .docs-content article p > b {
+   @apply font-display;
+ }
+
+ .docs-content article ol, .docs-content article ul:not(.prevnext-grid) {
+  list-style-type: initial;
+  padding: 0 2rem;
+  margin: 1rem 0;
+}
+ 
+ table a, article p > a:not(.link-button) {
+   @apply underline text-blue;
+ }
+
+ .annotations-section p {
+   @apply text-sm !important;
+   line-height: 1.35rem !important;
+ }
+ 
+ @media (max-width: 775px) {
+ 
+   .docs-content main {
+     column-gap: unset;
+   }
+ 
+   .docs-content main > article {
+     @apply w-screen p-2;
+   }
+ 
+   .docs-content main > aside,
+   .docs-content main > article {
+     grid-area: side;
+   }
+ 
+   .docs-content main > aside {
+     transition: transform 0.25s cubic-bezier(0.445, 0.05, 0.55, 0.95);
+     transform: translateX(-200%);
+   }
+ 
+   .docs-content main > aside.slideIn {
+     transform: translateX(0);
+   }
+ 
+   .landing-container, .landing-faq {
+     width: 100vw !important;
+     padding-left: 2rem;
+     padding-right: 2rem;
+   }
+ 
+ }
+ 
+ @media (max-width: 420px) { 
+   .landing-container h1 {
+     @apply text-4xl;
+   }
+   body.landing-content {
+     background-image: none;
+   }
+ }
+ 
+ /* Thanks to https://css-tricks.com/responsive-data-tables/ */
+ table { 
+   width: 100%;
+   border-collapse: collapse; 
+   overflow-x: scroll;
+   overflow-wrap: break-word;
+   @apply text-sm;
+ }
+ /* Zebra striping */
+ tr:nth-of-type(odd) { 
+   @apply bg-gray-100;
+ }
+ th { 
+   @apply font-bold tracking-wide uppercase font-display;
+ }
+ td, th { 
+   @apply p-2 text-left;
+ }
+ 
+ @media 
+ only screen and (max-width: 760px),
+ (min-device-width: 768px) and (max-device-width: 1024px)  {
+ 
+   /* Stack the table */
+   table, thead, tbody, th, td, tr { 
+     display: block; 
+   }
+   
+ }
+ 
+ eap-tab-switcher {
+   @apply block w-full overflow-x-hidden bg-navy rounded-t-md;
+ }
+ 
+ .docs-content article eap-tab-switcher {
+   @apply mb-6;
+ }
+ 
+ eap-tab-list {
+   @apply flex items-center h-16 bg-white border border-solid border-grey rounded-t-md font-display;
+ }
+ 
+ eap-tab-list button {
+   @apply p-4 text-sm font-medium text-gray-600;
+ }
+ 
+ eap-tab-list button[aria-selected="true"] {
+   @apply text-blue;
+ }
+ 
+ eap-tab-panel-list {
+   @apply block p-4 overflow-x-scroll;
+ }
+ 
+ eap-tab-panel {
+   @apply block;
+ }
+ 
+ eap-tab-panel pre code {
+   @apply bg-navy;
+ }
+ 
+ eap-tab-panel {
+   @apply text-white;
+ }
+ 
+ .docs-content h3 + pre[class*="language-"], h3 + eap-tab-switcher {
+   margin-top: .5rem;
+ }
+ 
+ eap-click-card {
+   @apply block;
+ }
+ 
+ .landing-container {
+   width: 84ch;
+   margin: 0 auto;
+ }
+ 
+ .landing-faq {
+   width: 64ch;
+ }
+ 
+ .code-editor {
+   display: grid;
+ }
+ 
+ .code-editor pre[class="language-js"] {
+   border-radius: 0;
+   margin: 0;
+   padding: 2rem;
+ }
+ 
+ .code-editor .terminal {
+   height: 100%;
+   padding: 1rem;
+ }
+ 
+ .code-editor .terminal div {
+   opacity: 0;
+   overflow: hidden;
+   margin: 1rem;
+ }
+ 
+ .code-editor .terminal div:nth-child(2) {
+   animation: fadeIn 400ms cubic-bezier(0.47, 0, 0.745, 0.715) 2.5s forwards;
+ }
+ 
+ .code-editor .terminal div:nth-child(3) {
+   animation: fadeIn 400ms cubic-bezier(0.47, 0, 0.745, 0.715) 4s forwards;
+ }
+ 
+ .code-editor .terminal div:nth-child(4) {
+   animation: fadeIn 400ms cubic-bezier(0.47, 0, 0.745, 0.715) 5.5s forwards;
+ }
+ 
+ .code-editor .terminal div:nth-child(5), #btnShowCode {
+   animation: fadeIn 400ms cubic-bezier(0.47, 0, 0.745, 0.715) 7.5s forwards;
+ }
+ 
+ /* Thanks to https://css-tricks.com/snippets/css/typewriter-effect/ */
+ .terminal .typewriter {
+   overflow: hidden; /* Ensures the content is not revealed until the animation */
+   white-space: nowrap; /* Keeps the content on a single line */
+   margin: 0 auto; /* Gives that scrolling effect as the typing happens */
+   letter-spacing: .1em; /* Adjust as needed */
+   animation: typing 3.65s steps(40, end) 1s forwards;
+ }
+ 
+ /* The typing effect */
+ @keyframes typing {
+   from { opacity:1; width: 0 }
+   to { width: 100%; opacity:1; }
+ }
+ 
+ @keyframes fadeIn {
+   from { opacity: 0 }
+   to { opacity: 1; }
+ }
