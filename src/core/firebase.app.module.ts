@@ -1,7 +1,16 @@
 import {
   Inject, InjectionToken, isDevMode, ModuleWithProviders, NgModule, NgZone, Optional, PLATFORM_ID, VERSION as NG_VERSION, Version
 } from '@angular/core';
-import firebase from 'firebase/app';
+import { FirebaseApp as FirebaseAppType, getApps, initializeApp, registerVersion } from 'firebase/app';
+import { Analytics } from 'firebase/analytics';
+import { Database } from 'firebase/database';
+import { Auth } from 'firebase/auth';
+import { FirebaseMessaging } from 'firebase/messaging';
+import { FirebasePerformance } from 'firebase/performance';
+import { StorageService } from 'firebase/storage';
+import { FirebaseFirestore } from 'firebase/firestore';
+import { Functions } from 'firebase/functions';
+import { RemoteConfig } from 'firebase/remote-config';
 
 // INVESTIGATE Public types don't expose FirebaseOptions or FirebaseAppConfig, is this the case anylonger?
 export interface FirebaseOptions {
@@ -17,19 +26,19 @@ export const FIREBASE_APP_NAME = new InjectionToken<string | FirebaseAppConfig |
 
 // Have to implement as we need to return a class from the provider, we should consider exporting
 // this in the firebase/app types as this is our highest risk of breaks
-export class FirebaseApp implements Partial<firebase.app.App> {
+export class FirebaseApp implements Partial<FirebaseAppType> {
   name: string;
   options: {};
-  analytics: () => firebase.analytics.Analytics;
-  auth: () => firebase.auth.Auth;
-  database: (databaseURL?: string) => firebase.database.Database;
-  messaging: () => firebase.messaging.Messaging;
-  performance: () => firebase.performance.Performance;
-  storage: (storageBucket?: string) => firebase.storage.Storage;
+  analytics: () => Analytics;
+  auth: () => Auth;
+  database: (databaseURL?: string) => Database;
+  messaging: () => FirebaseMessaging;
+  performance: () => FirebasePerformance;
+  storage: (storageBucket?: string) => StorageService;
   delete: () => Promise<void>;
-  firestore: () => firebase.firestore.Firestore;
-  functions: (region?: string) => firebase.functions.Functions;
-  remoteConfig: () => firebase.remoteConfig.RemoteConfig;
+  firestore: () => FirebaseFirestore;
+  functions: (region?: string) => Functions;
+  remoteConfig: () => RemoteConfig;
 }
 
 export const VERSION = new Version('ANGULARFIRE2_VERSION');
@@ -39,10 +48,10 @@ export function ɵfirebaseAppFactory(options: FirebaseOptions, zone: NgZone, nam
   const config = typeof nameOrConfig === 'object' && nameOrConfig || {};
   config.name = config.name || name;
   // Added any due to some inconsistency between @firebase/app and firebase types
-  const existingApp = firebase.apps.filter(app => app && app.name === config.name)[0] as any;
+  const existingApp = getApps().filter(app => app && app.name === config.name)[0] as any;
   // We support FirebaseConfig, initializeApp's public type only accepts string; need to cast as any
   // Could be solved with https://github.com/firebase/firebase-js-sdk/pull/1206
-  const app = (existingApp || zone.runOutsideAngular(() => firebase.initializeApp(options, config as any))) as FirebaseApp;
+  const app = (existingApp || zone.runOutsideAngular(() => initializeApp(options, config as any))) as FirebaseApp;
   try {
     if (JSON.stringify(options) !== JSON.stringify(app.options)) {
       const hmr = !!(module as any).hot;
@@ -115,7 +124,7 @@ export class AngularFireModule {
 
   // tslint:disable-next-line:ban-types
   constructor(@Inject(PLATFORM_ID) platformId: Object) {
-    firebase.registerVersion('angularfire', VERSION.full, platformId.toString());
-    firebase.registerVersion('angular', NG_VERSION.full);
+    registerVersion('angularfire', VERSION.full, platformId.toString());
+    registerVersion('angular', NG_VERSION.full);
   }
 }
