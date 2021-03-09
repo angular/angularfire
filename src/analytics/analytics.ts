@@ -9,7 +9,7 @@ import {
   ɵapplyMixins,
   FirebaseApp
 } from '@angular/fire';
-import firebase from 'firebase/app';
+import { Analytics, setAnalyticsCollectionEnabled } from 'firebase/analytics';
 import { proxyPolyfillCompat } from './base';
 import { ɵfetchInstance } from '@angular/fire';
 
@@ -31,7 +31,7 @@ const GTAG_FUNCTION_NAME = 'gtag'; // TODO rename these
 const DATA_LAYER_NAME = 'dataLayer';
 const SEND_TO_KEY = 'send_to';
 
-export interface AngularFireAnalytics extends ɵPromiseProxy<firebase.analytics.Analytics> {
+export interface AngularFireAnalytics extends ɵPromiseProxy<Analytics> {
 }
 
 @Injectable({
@@ -146,14 +146,14 @@ export class AngularFireAnalytics {
       observeOn(new ɵAngularFireSchedulers(zone).outsideAngular),
       switchMap(() => isPlatformBrowser(platformId) ? zone.runOutsideAngular(() => import('firebase/analytics')) : EMPTY),
       // SEMVER can switch to isSupported() when we only target v8
-      // switchMap(() => firebase.analytics.isSupported().then(it => it, () => false)),
+      // switchMap(() => isSupported().then(it => it, () => false)),
       // TODO server-side investigate use of the Universal Analytics API
       // switchMap(supported => supported ? of(undefined) : EMPTY),
       map(() => {
         return ɵfetchInstance(`analytics`, 'AngularFireAnalytics', app, () => {
           const analytics = app.analytics();
           if (analyticsCollectionEnabled === false) {
-            analytics.setAnalyticsCollectionEnabled(false);
+            setAnalyticsCollectionEnabled(analytics, false);
           }
           return analytics;
         }, [app, analyticsCollectionEnabled, providedConfig, debugModeEnabled]);
@@ -161,6 +161,7 @@ export class AngularFireAnalytics {
       shareReplay({ bufferSize: 1, refCount: false })
     );
 
+    // TODO(davideast, jamesdaniels): Hardcore zone patch or just patch here?
     return ɵlazySDKProxy(this, analytics, zone);
 
   }
