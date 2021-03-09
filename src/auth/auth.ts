@@ -13,17 +13,17 @@ import {
   ɵkeepUnstableUntilFirstFactory,
   ɵapplyMixins
 } from '@angular/fire';
-import firebase from 'firebase/app';
+import { Auth, AuthSettings, UserCredential, User, IdTokenResult, Persistence, getRedirectResult, useAuthEmulator, setPersistence } from 'firebase/auth';
 import { isPlatformServer } from '@angular/common';
 import { proxyPolyfillCompat } from './base';
 import { ɵfetchInstance } from '@angular/fire';
 
-export interface AngularFireAuth extends ɵPromiseProxy<firebase.auth.Auth> {}
+export interface AngularFireAuth extends ɵPromiseProxy<Auth> {}
 
 type UseEmulatorArguments = [string, number];
 export const USE_EMULATOR = new InjectionToken<UseEmulatorArguments>('angularfire2.auth.use-emulator');
 
-export const SETTINGS = new InjectionToken<firebase.auth.AuthSettings>('angularfire2.auth.settings');
+export const SETTINGS = new InjectionToken<AuthSettings>('angularfire2.auth.settings');
 export const TENANT_ID = new InjectionToken<string>('angularfire2.auth.tenant-id');
 export const LANGUAGE_CODE = new InjectionToken<string>('angularfire2.auth.langugage-code');
 export const USE_DEVICE_LANGUAGE = new InjectionToken<boolean>('angularfire2.auth.use-device-language');
@@ -37,7 +37,7 @@ export class AngularFireAuth {
   /**
    * Observable of authentication state; as of Firebase 4.0 this is only triggered via sign-in/out
    */
-  public readonly authState: Observable<firebase.User|null>;
+  public readonly authState: Observable<User|null>;
 
   /**
    * Observable of the currently signed-in user's JWT token used to identify the user to a Firebase service (or null).
@@ -47,19 +47,19 @@ export class AngularFireAuth {
   /**
    * Observable of the currently signed-in user (or null).
    */
-  public readonly user: Observable<firebase.User|null>;
+  public readonly user: Observable<User|null>;
 
   /**
    * Observable of the currently signed-in user's IdTokenResult object which contains the ID token JWT string and other
    * helper properties for getting different data associated with the token as well as all the decoded payload claims
    * (or null).
    */
-  public readonly idTokenResult: Observable<firebase.auth.IdTokenResult|null>;
+  public readonly idTokenResult: Observable<IdTokenResult|null>;
 
   /**
    * Observable of the currently signed-in user's credential, or null
    */
-  public readonly credential: Observable<Required<firebase.auth.UserCredential>|null>;
+  public readonly credential: Observable<Required<UserCredential>|null>;
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
@@ -68,15 +68,15 @@ export class AngularFireAuth {
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
     @Optional() @Inject(USE_EMULATOR) _useEmulator: any, // can't use the tuple here
-    @Optional() @Inject(SETTINGS) _settings: any, // can't use firebase.auth.AuthSettings here
+    @Optional() @Inject(SETTINGS) _settings: any, // can't use AuthSettings here
     @Optional() @Inject(TENANT_ID) tenantId: string | null,
     @Optional() @Inject(LANGUAGE_CODE) languageCode: string | null,
     @Optional() @Inject(USE_DEVICE_LANGUAGE) useDeviceLanguage: boolean | null,
-    @Optional() @Inject(PERSISTENCE) persistence: string | null,
+    @Optional() @Inject(PERSISTENCE) persistence: Persistence | null,
   ) {
     const schedulers = new ɵAngularFireSchedulers(zone);
     const keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(schedulers);
-    const logins = new Subject<Required<firebase.auth.UserCredential>>();
+    const logins = new Subject<Required<UserCredential>>();
 
     const auth = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
@@ -84,12 +84,12 @@ export class AngularFireAuth {
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
       map(app => zone.runOutsideAngular(() => {
         const useEmulator: UseEmulatorArguments | null = _useEmulator;
-        const settings: firebase.auth.AuthSettings | null = _settings;
+        const settings: AuthSettings | null = _settings;
         return ɵfetchInstance(`${app.name}.auth`, 'AngularFireAuth', app, () => {
           const auth = zone.runOutsideAngular(() => app.auth());
           if (useEmulator) {
             // Firebase Auth doesn't conform to the useEmulator convention, let's smooth that over
-            auth.useEmulator(`http://${useEmulator.join(':')}`);
+            useAuthEmulator(auth, `http://${useEmulator.join(':')}`);
           }
           if (tenantId) {
             auth.tenantId = tenantId;
@@ -98,11 +98,12 @@ export class AngularFireAuth {
           if (useDeviceLanguage) {
             auth.useDeviceLanguage();
           }
-          if (settings) {
-            auth.settings = settings;
-          }
+          // TODO(team): We need to initalizeAuth with settings in the NgModule
+          // if (settings) {
+          //   auth.settings = settings;
+          // }
           if (persistence) {
-            auth.setPersistence(persistence);
+            setPersistence(auth, persistence);
           }
           return auth;
         }, [useEmulator, tenantId, languageCode, useDeviceLanguage, settings, persistence]);
@@ -124,7 +125,7 @@ export class AngularFireAuth {
       const _ = auth.pipe(first()).subscribe();
 
       const redirectResult = auth.pipe(
-        switchMap(auth => auth.getRedirectResult().then(it => it, () => null)),
+        switchMap(auth => getRedirectResult(auth).then(it => it, () => null)),
         keepUnstableUntilFirst,
         shareReplay({ bufferSize: 1, refCount: false }),
       );
@@ -170,7 +171,7 @@ export class AngularFireAuth {
       ).pipe(
         // handle the { user: { } } when a user is already logged in, rather have null
         // TODO handle the type corcersion better
-        map(credential => credential?.user ? credential as Required<firebase.auth.UserCredential> : null),
+        map(credential => credential?.user ? credential as Required<UserCredential> : null),
         subscribeOn(schedulers.outsideAngular),
         observeOn(schedulers.insideAngular),
       );
@@ -184,7 +185,7 @@ export class AngularFireAuth {
         // to be consumed in .credential
         if (name.startsWith('signIn') || name.startsWith('createUser')) {
           // TODO fix the types, the trouble is UserCredential has everything optional
-          val.then((user: firebase.auth.UserCredential) => logins.next(user as any));
+          val.then((user: UserCredential) => logins.next(user as any));
         }
       }
     }});
