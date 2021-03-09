@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
-import firebase from 'firebase/app';
+import { Reference, ThenableReference, Query, DataSnapshot } from 'firebase/database';
 
-export type FirebaseOperation = string | firebase.database.Reference | firebase.database.DataSnapshot;
+export type FirebaseOperation = string | Reference | DataSnapshot;
 
 export interface AngularFireList<T> {
   query: DatabaseQuery;
@@ -12,7 +12,7 @@ export interface AngularFireList<T> {
   auditTrail(events?: ChildEvent[]): Observable<SnapshotAction<T>[]>;
   update(item: FirebaseOperation, data: Partial<T>): Promise<void>;
   set(item: FirebaseOperation, data: T): Promise<void>;
-  push(data: T): firebase.database.ThenableReference;
+  push(data: T): ThenableReference;
   remove(item?: FirebaseOperation): Promise<void>;
 }
 
@@ -50,13 +50,13 @@ export type SnapshotAction<T> = AngularFireAction<DatabaseSnapshot<T>>;
 
 export type Primitive = number | string | boolean;
 
-export interface DatabaseSnapshotExists<T> extends firebase.database.DataSnapshot {
+export interface DatabaseSnapshotExists<T> extends DataSnapshot {
   exists(): true;
   val(): T;
   forEach(action: (a: DatabaseSnapshot<T>) => boolean): boolean;
 }
 
-export interface DatabaseSnapshotDoesNotExist<T> extends firebase.database.DataSnapshot {
+export interface DatabaseSnapshotDoesNotExist<T> extends DataSnapshot {
   exists(): false;
   val(): null;
   forEach(action: (a: DatabaseSnapshot<T>) => boolean): boolean;
@@ -64,8 +64,8 @@ export interface DatabaseSnapshotDoesNotExist<T> extends firebase.database.DataS
 
 export type DatabaseSnapshot<T> = DatabaseSnapshotExists<T> | DatabaseSnapshotDoesNotExist<T>;
 
-export type DatabaseReference = firebase.database.Reference;
-export type DatabaseQuery = firebase.database.Query;
-export type DataSnapshot = firebase.database.DataSnapshot;
+export type DatabaseReference = Reference;
+export type DatabaseQuery = Query;
+export { DataSnapshot };
 export type QueryReference = DatabaseReference | DatabaseQuery;
 export type PathReference = QueryReference | string;

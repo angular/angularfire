@@ -1,5 +1,5 @@
 import { DatabaseReference, FirebaseOperation, FirebaseOperationCases, PathReference } from './interfaces';
-import firebase from 'firebase/app';
+import { Database } from 'firebase/database';
 
 export function isString(value: any): boolean {
   return typeof value === 'string';
@@ -23,7 +23,7 @@ export function isFirebaseRef(value: any): boolean {
  * @param database - Firebase Database
  * @param pathRef - Database path, relative or absolute
  */
-export function getRef(database: firebase.database.Database, pathRef: PathReference): DatabaseReference {
+export function getRef(database: Database, pathRef: PathReference): DatabaseReference {
   // if a db ref was passed in, just return it
   return isFirebaseRef(pathRef) ? pathRef as DatabaseReference
     : database.ref(pathRef as string);

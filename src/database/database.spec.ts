@@ -3,7 +3,6 @@ import { AngularFireDatabase, AngularFireDatabaseModule, URL } from '@angular/fi
 import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../test-config';
 import { NgZone } from '@angular/core';
-import 'firebase/database';
 import { rando } from '../firestore/utils.spec';
 
 describe('AngularFireDatabase', () => {

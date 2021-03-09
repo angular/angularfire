@@ -4,13 +4,13 @@ import { AngularFireDatabase, AngularFireDatabaseModule, ChildEvent, stateChange
 import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 import { skip } from 'rxjs/operators';
-import 'firebase/database';
+import { Reference } from 'firebase/database';
 import { rando } from '../../firestore/utils.spec';
 
 describe('stateChanges', () => {
   let app: FirebaseApp;
   let db: AngularFireDatabase;
-  let createRef: (path: string) => firebase.database.Reference;
+  let createRef: (path: string) => Reference;
   let batch = {};
   const items = [{ name: 'zero' }, { name: 'one' }, { name: 'two' }].map((item, i) => ({ key: i.toString(), ...item }));
   Object.keys(items).forEach((key, i) => {

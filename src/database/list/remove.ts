@@ -1,8 +1,6 @@
 import { DatabaseReference, DatabaseSnapshot, FirebaseOperation } from '../interfaces';
 import { checkOperationCases } from '../utils';
 
-// TODO(davideast): Find out why TS thinks this returns firebase.Primise
-// instead of Promise.
 export function createRemoveMethod<T>(ref: DatabaseReference) {
   return function remove(item?: FirebaseOperation): any {
     if (!item) { return ref.remove(); }
