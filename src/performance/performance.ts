@@ -1,7 +1,7 @@
 import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
 import { EMPTY, Observable, of, Subscription } from 'rxjs';
 import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
-import firebase from 'firebase/app';
+import { FirebasePerformance, initializePerformance } from 'firebase/performance';
 import { FirebaseApp, ɵapplyMixins, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
 import { isPlatformBrowser } from '@angular/common';
 import { proxyPolyfillCompat } from './base';
@@ -12,7 +12,7 @@ export const AUTOMATICALLY_TRACE_CORE_NG_METRICS = new InjectionToken<boolean>('
 export const INSTRUMENTATION_ENABLED = new InjectionToken<boolean>('angularfire2.performance.instrumentationEnabled');
 export const DATA_COLLECTION_ENABLED = new InjectionToken<boolean>('angularfire2.performance.dataCollectionEnabled');
 
-export interface AngularFirePerformance extends ɵPromiseProxy<firebase.performance.Performance> {
+export interface AngularFirePerformance extends ɵPromiseProxy<FirebasePerformance> {
 }
 
 @Injectable({
@@ -20,7 +20,7 @@ export interface AngularFirePerformance extends ɵPromiseProxy<firebase.performa
 })
 export class AngularFirePerformance {
 
-  private readonly performance: Observable<firebase.performance.Performance>;
+  private readonly performance: Observable<FirebasePerformance>;
 
   constructor(
     app: FirebaseApp,
@@ -34,13 +34,12 @@ export class AngularFirePerformance {
     this.performance = of(undefined).pipe(
       switchMap(() => isPlatformBrowser(platformId) ? zone.runOutsideAngular(() => import('firebase/performance')) : EMPTY),
       map(() => ɵfetchInstance(`performance`, 'AngularFirePerformance', app, () => {
-        const performance = zone.runOutsideAngular(() => app.performance());
-        if (instrumentationEnabled === false) {
-          performance.instrumentationEnabled = false;
-        }
-        if (dataCollectionEnabled === false) {
-          performance.dataCollectionEnabled = false;
-        }
+        const performance = zone.runOutsideAngular(() => {
+          return initializePerformance(app, { 
+            instrumentationEnabled, 
+            dataCollectionEnabled 
+          });
+        });
         return performance;
       }, [instrumentationEnabled, dataCollectionEnabled])),
       shareReplay({ bufferSize: 1, refCount: false })
