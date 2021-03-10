@@ -1,10 +1,10 @@
 import { from, Observable } from 'rxjs';
-import { Action, DocumentData, DocumentReference, DocumentSnapshot, QueryFn, SetOptions } from '../interfaces';
+import { Action, DocumentData, DocumentReference, DocumentSnapshot, QueryFn, SetOptions, CollectionReference } from '../interfaces';
 import { fromDocRef } from '../observable/fromRef';
 import { map, observeOn } from 'rxjs/operators';
 import { AngularFirestore, associateQuery } from '../firestore';
 import { AngularFirestoreCollection } from '../collection/collection';
-import firebase from 'firebase/app';
+import { setDoc, updateDoc, deleteDoc, getDoc, collection } from 'firebase/firestore';
 
 /**
  * AngularFirestoreDocument service
@@ -40,21 +40,21 @@ export class AngularFirestoreDocument<T = DocumentData> {
    * Create or overwrite a single document.
    */
   set(data: T, options?: SetOptions): Promise<void> {
-    return this.ref.set(data, options);
+    return setDoc(this.ref, data, options);
   }
 
   /**
    * Update some fields of a document without overwriting the entire document.
    */
   update(data: Partial<T>): Promise<void> {
-    return this.ref.update(data);
+    return updateDoc(this.ref, data);
   }
 
   /**
    * Delete a document.
    */
   delete(): Promise<void> {
-    return this.ref.delete();
+    return deleteDoc(this.ref);
   }
 
   /**
@@ -62,7 +62,7 @@ export class AngularFirestoreDocument<T = DocumentData> {
    * function.
    */
   collection<R = DocumentData>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<R> {
-    const collectionRef = this.ref.collection(path) as firebase.firestore.CollectionReference<R>;
+    const collectionRef = collection(this.ref, path) as CollectionReference<R>;
     const { ref, query } = associateQuery(collectionRef, queryFn);
     return new AngularFirestoreCollection(ref, query, this.afs);
   }
@@ -99,8 +99,10 @@ export class AngularFirestoreDocument<T = DocumentData> {
   /**
    * Retrieve the document once.
    */
-  get(options?: firebase.firestore.GetOptions) {
-    return from(this.ref.get(options)).pipe(
+  // MARK: Breaking change
+  // previous: get(options?: firebase.firestore.GetOptions)
+  get() {
+    return from(getDoc(this.ref)).pipe(
       observeOn(this.afs.schedulers.insideAngular),
     );
   }

@@ -3,7 +3,6 @@ import { AngularFirestore, SETTINGS, AngularFirestoreModule, AngularFirestoreDoc
 
 import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../test-config';
-import 'firebase/firestore';
 import { rando } from './utils.spec';
 
 describe('AngularFirestore', () => {

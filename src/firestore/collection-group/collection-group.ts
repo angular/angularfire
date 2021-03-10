@@ -1,12 +1,12 @@
 import { from, Observable } from 'rxjs';
 import { fromCollectionRef } from '../observable/fromRef';
 import { filter, map, observeOn, scan } from 'rxjs/operators';
-import firebase from 'firebase/app';
 
 import { DocumentChangeAction, DocumentChangeType, DocumentData, Query } from '../interfaces';
 import { validateEventsArray } from '../collection/collection';
 import { docChanges, sortedChanges } from '../collection/changes';
 import { AngularFirestore } from '../firestore';
+import { getDocs } from 'firebase/firestore';
 
 /**
  * AngularFirestoreCollectionGroup service
@@ -19,7 +19,7 @@ import { AngularFirestore } from '../firestore';
  *
  * Example:
  *
- * const collectionGroup = firebase.firestore.collectionGroup('stocks');
+ * const collectionGroup = collectionGroup('stocks');
  * const query = collectionRef.where('price', '>', '0.01');
  * const fakeStock = new AngularFirestoreCollectionGroup<Stock>(query, afs);
  *
@@ -105,8 +105,10 @@ export class AngularFirestoreCollectionGroup<T = DocumentData> {
   /**
    * Retrieve the results of the query once.
    */
-  get(options?: firebase.firestore.GetOptions) {
-    return from(this.query.get(options)).pipe(
+  // MARK: Breaking change
+  // previous: get(options?: firebase.firestore.GetOptions)
+  get() {
+    return from(getDocs(this.query)).pipe(
       observeOn(this.afs.schedulers.insideAngular)
     );
   }

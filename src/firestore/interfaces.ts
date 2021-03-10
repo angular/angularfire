@@ -1,40 +1,45 @@
 import { Subscriber } from 'rxjs';
-import firebase from 'firebase/app';
+import { 
+  DocumentSnapshot as BaseDocumentSnapshot, 
+  QuerySnapshot as BaseQuerySnapshot, 
+  QueryDocumentSnapshot as BaseQueryDocumentSnapshot,
+  DocumentChange as BaseDocumentChange,
+} from 'firebase/firestore';
 
-export type Settings =  firebase.firestore.Settings;
-export type CollectionReference<T = DocumentData> = firebase.firestore.CollectionReference<T>;
-export type DocumentReference<T = DocumentData> = firebase.firestore.DocumentReference<T>;
-export type PersistenceSettings = firebase.firestore.PersistenceSettings;
-export type DocumentChangeType = firebase.firestore.DocumentChangeType;
-export type SnapshotOptions = firebase.firestore.SnapshotOptions;
-export type FieldPath = firebase.firestore.FieldPath;
-export type Query<T = DocumentData> = firebase.firestore.Query<T>;
+export type Settings = import('firebase/firestore').Settings;
+export type CollectionReference<T = DocumentData> = import('firebase/firestore').CollectionReference<T>;
+export type DocumentReference<T = DocumentData> = import('firebase/firestore').DocumentReference<T>;
+export type PersistenceSettings = import('firebase/firestore').PersistenceSettings;
+export type DocumentChangeType = import('firebase/firestore').DocumentChangeType;
+export type SnapshotOptions = import('firebase/firestore').SnapshotOptions;
+export type FieldPath = import('firebase/firestore').FieldPath;
+export type Query<T = DocumentData> = import('firebase/firestore').Query<T>;
 
-export type SetOptions = firebase.firestore.SetOptions;
-export type DocumentData = firebase.firestore.DocumentData;
+export type SetOptions = import('firebase/firestore').SetOptions;
+export type DocumentData = import('firebase/firestore').DocumentData;
 
-export interface DocumentSnapshotExists<T> extends firebase.firestore.DocumentSnapshot {
-  readonly exists: true;
+export interface DocumentSnapshotExists<T> extends BaseDocumentSnapshot {
+  readonly exists: () => QueryDocumentSnapshot<DocumentData>;
   data(options?: SnapshotOptions): T;
 }
 
-export interface DocumentSnapshotDoesNotExist extends firebase.firestore.DocumentSnapshot {
-  readonly exists: false;
+export interface DocumentSnapshotDoesNotExist extends BaseDocumentSnapshot {
+  readonly exists: () => QueryDocumentSnapshot<DocumentData>;
   data(options?: SnapshotOptions): undefined;
   get(fieldPath: string | FieldPath, options?: SnapshotOptions): undefined;
 }
 
 export type DocumentSnapshot<T> = DocumentSnapshotExists<T> | DocumentSnapshotDoesNotExist;
 
-export interface QueryDocumentSnapshot<T> extends firebase.firestore.QueryDocumentSnapshot {
+export interface QueryDocumentSnapshot<T> extends BaseQueryDocumentSnapshot {
   data(options?: SnapshotOptions): T;
 }
 
-export interface QuerySnapshot<T> extends firebase.firestore.QuerySnapshot {
+export interface QuerySnapshot<T> extends BaseQuerySnapshot {
   readonly docs: QueryDocumentSnapshot<T>[];
 }
 
-export interface DocumentChange<T> extends firebase.firestore.DocumentChange {
+export interface DocumentChange<T> extends BaseDocumentChange {
   readonly doc: QueryDocumentSnapshot<T>;
 }
 
@@ -48,9 +53,9 @@ export interface Action<T> {
   payload: T;
 }
 
-export interface Reference<T> {
-  onSnapshot: (options: firebase.firestore.SnapshotListenOptions, sub: Subscriber<any>) => any;
-}
+// export interface Reference<T> {
+//   onSnapshot: (options: import('firebase/firestore').SnapshotListenOptions, sub: Subscriber<any>) => any;
+// }
 
 // A convience type for making a query.
 // Example: const query = (ref) => ref.where('name', == 'david');

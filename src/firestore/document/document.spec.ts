@@ -6,8 +6,6 @@ import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 
 import { FAKE_STOCK_DATA, rando, randomName, Stock } from '../utils.spec';
-import firebase from 'firebase/app';
-import 'firebase/firestore';
 
 describe('AngularFirestoreDocument', () => {
   let app: FirebaseApp;
@@ -36,7 +34,7 @@ describe('AngularFirestoreDocument', () => {
 
     it('should get unwrapped snapshot', async (done: any) => {
       const randomCollectionName = afs.firestore.collection('a').doc().id;
-      const ref = afs.firestore.doc(`${randomCollectionName}/FAKE`) as firebase.firestore.DocumentReference<Stock>;
+      const ref = afs.firestore.doc(`${randomCollectionName}/FAKE`) as DocumentReference<Stock>;
       const stock = new AngularFirestoreDocument(ref, afs);
       await stock.set(FAKE_STOCK_DATA);
       const obs$ = stock.valueChanges();

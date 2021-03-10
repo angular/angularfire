@@ -2,6 +2,7 @@ import { fromCollectionRef } from '../observable/fromRef';
 import { Observable, SchedulerLike } from 'rxjs';
 import { distinctUntilChanged, map, pairwise, scan, startWith } from 'rxjs/operators';
 import { DocumentChange, DocumentChangeAction, DocumentChangeType, Query } from '../interfaces';
+import { refEqual } from 'firebase/firestore';
 
 /**
  * Return a stream of document changes on a query. These results are not in sort order but in
@@ -19,8 +20,8 @@ export function docChanges<T>(query: Query, scheduler?: SchedulerLike): Observab
         if (priorAction && JSON.stringify(priorAction.payload.metadata) !== JSON.stringify(action.payload.metadata)) {
           // go through all the docs in payload and figure out which ones changed
           action.payload.docs.forEach((currentDoc, currentIndex) => {
-            const docChange = docChanges.find(d => d.doc.ref.isEqual(currentDoc.ref));
-            const priorDoc = priorAction?.payload.docs.find(d => d.ref.isEqual(currentDoc.ref));
+            const docChange = docChanges.find(d => refEqual(d.doc.ref, currentDoc.ref));
+            const priorDoc = priorAction?.payload.docs.find(d => refEqual(d.ref, currentDoc.ref));
             if (docChange && JSON.stringify(docChange.doc.metadata) === JSON.stringify(currentDoc.metadata) ||
               !docChange && priorDoc && JSON.stringify(priorDoc.metadata) === JSON.stringify(currentDoc.metadata)) {
               // document doesn't appear to have changed, don't log another action
@@ -94,14 +95,14 @@ function sliceAndSplice<T>(
 export function combineChange<T>(combined: DocumentChange<T>[], change: DocumentChange<T>): DocumentChange<T>[] {
   switch (change.type) {
     case 'added':
-      if (combined[change.newIndex] && combined[change.newIndex].doc.ref.isEqual(change.doc.ref)) {
+      if (combined[change.newIndex] && refEqual(combined[change.newIndex].doc.ref, change.doc.ref)) {
         // Not sure why the duplicates are getting fired
       } else {
         return sliceAndSplice(combined, change.newIndex, 0, change);
       }
       break;
     case 'modified':
-      if (combined[change.oldIndex] == null || combined[change.oldIndex].doc.ref.isEqual(change.doc.ref)) {
+      if (combined[change.oldIndex] == null || refEqual(combined[change.oldIndex].doc.ref, change.doc.ref)) {
         // When an item changes position we first remove it
         // and then add it's new position
         if (change.oldIndex !== change.newIndex) {
@@ -115,7 +116,7 @@ export function combineChange<T>(combined: DocumentChange<T>[], change: Document
       }
       break;
     case 'removed':
-      if (combined[change.oldIndex] && combined[change.oldIndex].doc.ref.isEqual(change.doc.ref)) {
+      if (combined[change.oldIndex] && refEqual(combined[change.oldIndex].doc.ref, change.doc.ref)) {
         return sliceAndSplice(combined, change.oldIndex, 1);
       }
       break;

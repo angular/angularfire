@@ -1,16 +1,18 @@
 import { asyncScheduler, Observable, SchedulerLike } from 'rxjs';
-import { Action, DocumentReference, DocumentSnapshot, Query, QuerySnapshot, Reference } from '../interfaces';
+import { Action, DocumentSnapshot, Query, QuerySnapshot } from '../interfaces';
 import { map, pairwise, startWith } from 'rxjs/operators';
+import { onSnapshot, DocumentReference } from 'firebase/firestore';
 
-function _fromRef<T, R>(ref: Reference<T>, scheduler: SchedulerLike = asyncScheduler): Observable<R> {
-  return new Observable(subscriber => {
+// TODO(team): Figure out type safety between DocumentReference and Query
+function _fromRef<T, R>(ref: any, scheduler: SchedulerLike = asyncScheduler): Observable<R> {
+  return new Observable<R>((subscriber: any) => {
     let unsubscribe: () => void;
     if (scheduler != null) {
       scheduler.schedule(() => {
-        unsubscribe = ref.onSnapshot({ includeMetadataChanges: true }, subscriber);
+        unsubscribe = onSnapshot(ref, { includeMetadataChanges: true }, subscriber);
       });
     } else {
-      unsubscribe = ref.onSnapshot({ includeMetadataChanges: true }, subscriber);
+      unsubscribe = onSnapshot(ref, { includeMetadataChanges: true }, subscriber);
     }
 
     return () => {
@@ -25,7 +27,7 @@ export function fromRef<R, T>(ref: DocumentReference<T> | Query<T>, scheduler?: 
   return _fromRef<typeof ref, R>(ref, scheduler);
 }
 
-export function fromDocRef<T>(ref: DocumentReference<T>, scheduler?: SchedulerLike): Observable<Action<DocumentSnapshot<T>>> {
+export function fromDocRef<T>(ref: DocumentReference<T>, scheduler?: SchedulerLike): Observable<Action<DocumentSnapshot<T>>> {  
   return fromRef<DocumentSnapshot<T>, T>(ref, scheduler)
     .pipe(
       startWith(undefined),

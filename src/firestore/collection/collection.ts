@@ -1,7 +1,7 @@
 import { from, Observable } from 'rxjs';
 import { fromCollectionRef } from '../observable/fromRef';
 import { filter, map, observeOn, pairwise, scan, startWith } from 'rxjs/operators';
-import firebase from 'firebase/app';
+import { addDoc, doc, getDocs } from 'firebase/firestore';
 
 import { CollectionReference, DocumentChangeAction, DocumentChangeType, DocumentData, DocumentReference, Query } from '../interfaces';
 import { docChanges, sortedChanges } from './changes';
@@ -126,8 +126,10 @@ export class AngularFirestoreCollection<T = DocumentData> {
   /**
    * Retrieve the results of the query once.
    */
-  get(options?: firebase.firestore.GetOptions) {
-    return from(this.query.get(options)).pipe(
+  // MARK: Breaking change
+  // previous: get(options?: firebase.firestore.GetOptions)
+  get() {
+    return from(getDocs(this.query)).pipe(
       observeOn(this.afs.schedulers.insideAngular),
     );
   }
@@ -140,7 +142,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
    * the data fits the criteria of the query.
    */
   add(data: T): Promise<DocumentReference<T>> {
-    return this.ref.add(data);
+    return addDoc(this.ref, data);
   }
 
   /**
@@ -148,6 +150,6 @@ export class AngularFirestoreCollection<T = DocumentData> {
    */
   doc<T2 = T>(path?: string): AngularFirestoreDocument<T2> {
     // TODO is there a better way to solve this type issue
-    return new AngularFirestoreDocument(this.ref.doc(path) as any, this.afs);
+    return new AngularFirestoreDocument(doc(this.ref, path) as any, this.afs);
   }
 }
