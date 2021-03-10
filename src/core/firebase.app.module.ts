@@ -26,7 +26,7 @@ export const FIREBASE_APP_NAME = new InjectionToken<string | FirebaseAppConfig |
 
 // Have to implement as we need to return a class from the provider, we should consider exporting
 // this in the firebase/app types as this is our highest risk of breaks
-export class FirebaseApp implements Partial<FirebaseAppType> {
+export class FirebaseApp implements FirebaseAppType {
   name: string;
   options: {};
   analytics: () => Analytics;
@@ -39,6 +39,7 @@ export class FirebaseApp implements Partial<FirebaseAppType> {
   firestore: () => FirebaseFirestore;
   functions: (region?: string) => Functions;
   remoteConfig: () => RemoteConfig;
+  automaticDataCollectionEnabled: boolean;
 }
 
 export const VERSION = new Version('ANGULARFIRE2_VERSION');
