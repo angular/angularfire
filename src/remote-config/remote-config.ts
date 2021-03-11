@@ -12,7 +12,6 @@ import {
   shareReplay,
   startWith,
   switchMap,
-  tap,
   withLatestFrom
 } from 'rxjs/operators';
 import {
@@ -27,9 +26,16 @@ import {
   ɵPromiseProxy,
   ɵapplyMixins
 } from '@angular/fire';
-import { isPlatformBrowser } from '@angular/common';
-import firebase from 'firebase/app';
-import { Settings } from './interfaces';
+import { 
+  RemoteConfig, 
+  ValueType, 
+  getRemoteConfig,
+  activate,
+  fetchAndActivate,
+  getAll,
+  ensureInitialized 
+} from 'firebase/remote-config';
+import { Settings, ValueSource } from './interfaces';
 import { proxyPolyfillCompat } from './base';
 import { ɵfetchInstance } from '@angular/fire';
 
@@ -40,7 +46,7 @@ export interface ConfigTemplate {
 export const SETTINGS = new InjectionToken<Settings>('angularfire2.remoteConfig.settings');
 export const DEFAULTS = new InjectionToken<ConfigTemplate>('angularfire2.remoteConfig.defaultConfig');
 
-export interface AngularFireRemoteConfig extends ɵPromiseProxy<firebase.remoteConfig.RemoteConfig> {
+export interface AngularFireRemoteConfig extends ɵPromiseProxy<RemoteConfig> {
 }
 
 const AS_TO_FN = { strings: 'asString', numbers: 'asNumber', booleans: 'asBoolean' };
@@ -58,7 +64,7 @@ const proxyAll = (observable: Observable<Parameter[]>, as: 'numbers' | 'booleans
 ) as any;
 
 // TODO export as implements Partial<...> so minor doesn't break us
-export class Value implements firebase.remoteConfig.Value {
+export class Value implements ValueType {
   asBoolean() {
     return ['1', 'true', 't', 'y', 'yes', 'on'].indexOf(this._value.toLowerCase()) > -1;
   }
@@ -76,13 +82,13 @@ export class Value implements firebase.remoteConfig.Value {
   }
 
   // tslint:disable-next-line:variable-name
-  constructor(public _source: firebase.remoteConfig.ValueSource, public _value: string) {
+  constructor(public _source: ValueSource, public _value: string) {
   }
 }
 
 // SEMVER use ConstructorParameters when we can support Typescript 3.6
 export class Parameter extends Value {
-  constructor(public key: string, public fetchTimeMillis: number, source: firebase.remoteConfig.ValueSource, value: string) {
+  constructor(public key: string, public fetchTimeMillis: number, source: ValueSource, value: string) {
     super(source, value);
   }
 }
@@ -103,8 +109,8 @@ export const filterFresh = (howRecentInMillis: number) => filterTest(p => p.fetc
 // on the Parameter. Also if it doesn't come from the server it won't emit again in .changes, due to the distinctUntilChanged,
 // which we can simplify to === rather than deep comparison
 const scanToParametersArray = (
-  remoteConfig: Observable<firebase.remoteConfig.RemoteConfig | undefined>
-): OperatorFunction<{ [key: string]: firebase.remoteConfig.Value }, Parameter[]> => pipe(
+  remoteConfig: Observable<RemoteConfig | undefined>
+): OperatorFunction<{ [key: string]: ValueType }, Parameter[]> => pipe(
   withLatestFrom(remoteConfig),
   scan((existing, [all, rc]) => {
     // SEMVER use "new Set" to unique once we're only targeting es6
@@ -146,12 +152,12 @@ export class AngularFireRemoteConfig {
 
     const remoteConfig$ = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
-      switchMap(() => isPlatformBrowser(platformId) ? import('firebase/remote-config') : EMPTY),
-      switchMap(() => import('@firebase/remote-config')),
-      tap(rc => rc.registerRemoteConfig && rc.registerRemoteConfig(firebase as any)),
+      // switchMap(() => isPlatformBrowser(platformId) ? import('firebase/remote-config') : EMPTY),
+      // switchMap(() => import('@firebase/remote-config')),
+      // tap(rc => rc.registerRemoteConfig && rc.registerRemoteConfig(firebase as any)),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
       map(app => ɵfetchInstance(`${app.name}.remote-config`, 'AngularFireRemoteConfig', app, () => {
-        const rc = app.remoteConfig();
+        const rc = getRemoteConfig(app);
         if (settings) {
           rc.settings = settings;
         }
@@ -166,16 +172,16 @@ export class AngularFireRemoteConfig {
     );
 
     const loadedRemoteConfig$ = remoteConfig$.pipe(
-      filter<firebase.remoteConfig.RemoteConfig>(rc => !!rc)
+      filter<RemoteConfig>(rc => !!rc)
     );
 
-    const default$: Observable<{ [key: string]: firebase.remoteConfig.Value }> = of(Object.keys(defaultConfig || {}).reduce(
+    const default$: Observable<{ [key: string]: ValueType }> = of(Object.keys(defaultConfig || {}).reduce(
       (c, k) => ({ ...c, [k]: new Value('default', defaultConfig[k].toString()) }), {}
     ));
 
     // we should filter out the defaults we provided to RC, since we have our own implementation
     // that gives us a -1 for fetchTimeMillis (so filterFresh can filter them out)
-    const filterOutDefaults = map<{ [key: string]: firebase.remoteConfig.Value }, { [key: string]: firebase.remoteConfig.Value }>(all =>
+    const filterOutDefaults = map<{ [key: string]: ValueType }, { [key: string]: ValueType }>(all =>
       Object.keys(all)
         .filter(key => all[key].getSource() !== 'default')
         .reduce((acc, key) => ({ ...acc, [key]: all[key] }), {})
@@ -183,18 +189,18 @@ export class AngularFireRemoteConfig {
 
     const existing$ = loadedRemoteConfig$.pipe(
       switchMap(rc =>
-        rc.activate()
-          .then(() => rc.ensureInitialized())
-          .then(() => rc.getAll())
+        activate(rc)
+          .then(() => ensureInitialized(rc))
+          .then(() => getAll(rc))
       ),
       filterOutDefaults
     );
 
     const fresh$ = loadedRemoteConfig$.pipe(
       switchMap(rc => zone.runOutsideAngular(() =>
-        rc.fetchAndActivate()
-          .then(() => rc.ensureInitialized())
-          .then(() => rc.getAll())
+        fetchAndActivate(rc)
+          .then(() => ensureInitialized(rc))
+          .then(() => getAll(rc))
       )),
       filterOutDefaults
     );

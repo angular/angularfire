@@ -1,3 +1,4 @@
-import firebase from 'firebase/app';
+// TODO(team): This should be available in the regular package
+import { Settings, ValueSource } from '@firebase/remote-config-types';
 
-export type Settings = firebase.remoteConfig.Settings;
+export { Settings, ValueSource };
