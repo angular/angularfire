@@ -14,6 +14,7 @@ import { AngularFireAnalytics } from './analytics';
 import { Title } from '@angular/platform-browser';
 import { isPlatformBrowser } from '@angular/common';
 import { UserTrackingService } from './user-tracking.service';
+import { logEvent } from 'firebase/analytics';
 
 const FIREBASE_EVENT_ORIGIN_KEY = 'firebase_event_origin';
 const FIREBASE_PREVIOUS_SCREEN_CLASS_KEY = 'firebase_previous_class';
@@ -143,11 +144,19 @@ export class ScreenTrackingService implements OnDestroy {
               ...current
             } : current
           ),
-          switchMap(async params => {
+          mergeMap(([prior, current]) => {
+            return analytics.analytics$.pipe(
+              map(analytics => {
+                return { prior, current, analytics };
+              })
+            );
+          }),
+          switchMap(async ({ prior, current, analytics }) => {
             if (userTrackingService) {
               await userTrackingService.initialized;
             }
-            return await analytics.logEvent(SCREEN_VIEW_EVENT, params);
+            // TODO(team): Why do we need to cast a string to a string here?
+            return await logEvent(analytics, SCREEN_VIEW_EVENT as string, { prior, current });
           })
         ))
       ).subscribe();

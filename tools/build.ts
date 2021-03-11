@@ -4,7 +4,12 @@ import { prettySize } from 'pretty-size';
 import { sync as gzipSync } from 'gzip-size';
 import { dirname, join } from 'path';
 import { keys as tsKeys } from 'ts-transformer-keys';
-import firebase from 'firebase/app';
+import { Analytics } from 'firebase/analytics';
+import { Auth } from 'firebase/auth';
+import { FirebaseMessaging } from 'firebase/messaging';
+import { FirebasePerformance } from 'firebase/performance';
+import { Functions } from 'firebase/functions';
+import { RemoteConfig } from 'firebase/remote-config';
 
 // TODO infer these from the package.json
 const MODULES = [
@@ -18,12 +23,12 @@ const ENTRY_NAMES = MODULES.map(m => m === 'core' ? '@angular/fire' : `@angular/
 
 function proxyPolyfillCompat() {
   const defaultObject = {
-    analytics: tsKeys<firebase.analytics.Analytics>(),
-    auth: tsKeys<firebase.auth.Auth>(),
-    functions: tsKeys<firebase.functions.Functions>(),
-    messaging: tsKeys<firebase.messaging.Messaging>(),
-    performance: tsKeys<firebase.performance.Performance>(),
-    'remote-config': tsKeys<firebase.remoteConfig.RemoteConfig>(),
+    analytics: tsKeys<Analytics>(),
+    auth: tsKeys<Auth>(),
+    functions: tsKeys<Functions>(),
+    messaging: tsKeys<FirebaseMessaging>(),
+    performance: tsKeys<FirebasePerformance>(),
+    'remote-config': tsKeys<RemoteConfig>(),
   };
 
   return Promise.all(Object.keys(defaultObject).map(module =>
