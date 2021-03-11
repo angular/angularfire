@@ -11,9 +11,8 @@ import {
   ɵfirebaseAppFactory,
   ɵkeepUnstableUntilFirstFactory
 } from '@angular/fire';
-import { UploadMetadata } from './interfaces';
-import 'firebase/storage';
-import firebase from 'firebase/app';
+import { UploadMetadata, StorageService } from './interfaces';
+import { getStorage, ref } from 'firebase/storage';
 
 export const BUCKET = new InjectionToken<string>('angularfire2.storageBucket');
 export const MAX_UPLOAD_RETRY_TIME = new InjectionToken<number>('angularfire2.storage.maxUploadRetryTime');
@@ -30,7 +29,7 @@ export const MAX_OPERATION_RETRY_TIME = new InjectionToken<number>('angularfire2
   providedIn: 'any'
 })
 export class AngularFireStorage {
-  public readonly storage: firebase.storage.Storage;
+  public readonly storage: StorageService;
 
   public readonly keepUnstableUntilFirst: <T>(obs: Observable<T>) => Observable<T>;
   public readonly schedulers: ɵAngularFireSchedulers;
@@ -50,29 +49,31 @@ export class AngularFireStorage {
     const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
 
     this.storage = ɵfetchInstance(`${app.name}.storage.${storageBucket}`, 'AngularFireStorage', app, () => {
-      const storage = zone.runOutsideAngular(() => app.storage(storageBucket || undefined));
+      const storage = zone.runOutsideAngular(() => {
+        return getStorage(app, storageBucket || undefined);
+      });
       if (maxUploadRetryTime) {
-        storage.setMaxUploadRetryTime(maxUploadRetryTime);
+        storage.maxUploadRetryTime = maxUploadRetryTime;
       }
       if (maxOperationRetryTime) {
-        storage.setMaxOperationRetryTime(maxOperationRetryTime);
+        storage.maxOperationRetryTime = maxOperationRetryTime;
       }
       return storage;
     }, [maxUploadRetryTime, maxOperationRetryTime]);
   }
 
   ref(path: string) {
-    return createStorageRef(this.storage.ref(path), this.schedulers, this.keepUnstableUntilFirst);
+    return createStorageRef(this.storage, ref(this.storage, path), this.schedulers, this.keepUnstableUntilFirst);
   }
 
   refFromURL(path: string) {
-    return createStorageRef(this.storage.refFromURL(path), this.schedulers, this.keepUnstableUntilFirst);
+    return createStorageRef(this.storage, ref(this.storage, path), this.schedulers, this.keepUnstableUntilFirst);
   }
 
   upload(path: string, data: any, metadata?: UploadMetadata) {
-    const storageRef = this.storage.ref(path);
-    const ref = createStorageRef(storageRef, this.schedulers, this.keepUnstableUntilFirst);
-    return ref.put(data, metadata);
+    const storageRef = ref(this.storage, path);
+    const afRef = createStorageRef(this.storage, storageRef, this.schedulers, this.keepUnstableUntilFirst);
+    return afRef.put(data, metadata);
   }
 
 }

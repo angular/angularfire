@@ -6,8 +6,7 @@ import { AngularFireStorage, AngularFireStorageModule, AngularFireUploadTask, BU
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../firestore/utils.spec';
 import { ChangeDetectorRef } from '@angular/core';
-import 'firebase/storage';
-import firebase from 'firebase/app';
+import { UploadTaskSnapshot, getMetadata } from 'firebase/storage';
 
 if (typeof XMLHttpRequest === 'undefined') {
   globalThis.XMLHttpRequest = require('xhr2');
@@ -66,7 +65,7 @@ describe('AngularFireStorage', () => {
       const ref = afStorage.ref(rando());
       const task = ref.put(blob);
       let emissionCount = 0;
-      let lastSnap: firebase.storage.UploadTaskSnapshot;
+      let lastSnap: UploadTaskSnapshot;
       task.snapshotChanges()
         .subscribe(
           snap => {
@@ -117,7 +116,7 @@ describe('AngularFireStorage', () => {
       const ref = afStorage.ref(rando());
       const task: AngularFireUploadTask = ref.put(blob);
       let emissionCount = 0;
-      let lastSnap: firebase.storage.UploadTaskSnapshot;
+      let lastSnap: UploadTaskSnapshot;
       task.snapshotChanges().subscribe(snap => {
         emissionCount++;
         lastSnap = snap;
@@ -156,7 +155,7 @@ describe('AngularFireStorage', () => {
       const ref = afStorage.storage.ref(rando());
       const task = ref.put(blob);
       let emissionCount = 0;
-      let lastSnap: firebase.storage.UploadTaskSnapshot;
+      let lastSnap: UploadTaskSnapshot;
       task.then(_snap => {
         fromTask(task).subscribe(
             snap => {
@@ -205,7 +204,7 @@ describe('AngularFireStorage', () => {
       forkJoin([task.snapshotChanges()])
         .pipe(
           // get the metadata download
-          mergeMap(() => ref.getMetadata()),
+          mergeMap(() => getMetadata(ref)),
           // assert the URL
           tap(meta => expect(meta.customMetadata).toEqual({ blah: 'blah' })),
           // Delete the file
