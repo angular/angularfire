@@ -60,10 +60,11 @@ jobs:
           retention-days: 1
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: build
     strategy:
       matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
         node: ["10", "12", "14"]
         firebase: ["7", "8"]
       fail-fast: false
