@@ -34,10 +34,10 @@ describe('AngularFirestoreDocument', () => {
 
   describe('valueChanges()', () => {
 
-    it('should get unwrapped snapshot', async (done: any) => {
+    it('should get unwrapped snapshot', async (done: DoneFn) => {
       const randomCollectionName = afs.firestore.collection('a').doc().id;
-      const ref = afs.firestore.doc(`${randomCollectionName}/FAKE`) as firebase.firestore.DocumentReference<Stock>;
-      const stock = new AngularFirestoreDocument(ref, afs);
+      const ref = afs.firestore.doc(`${randomCollectionName}/FAKE`) as DocumentReference<Stock>;
+      const stock = new AngularFirestoreDocument<Stock>(ref, afs);
       await stock.set(FAKE_STOCK_DATA);
       const obs$ = stock.valueChanges();
       obs$.pipe(take(1)).subscribe(async data => {
@@ -46,10 +46,9 @@ describe('AngularFirestoreDocument', () => {
       });
     });
 
-    /* TODO(jamesdaniels): test is flaking, look into this
-    it('should optionally map the doc ID to the emitted data object', async (done: any) => {
+    it('should optionally map the doc ID to the emitted data object if doc exists', async (done: DoneFn) => {
       const randomCollectionName = afs.firestore.collection('a').doc().id;
-      const ref = afs.firestore.doc(`${randomCollectionName}/FAKE`);
+      const ref = afs.firestore.doc(`${randomCollectionName}/FAKE`) as DocumentReference<Stock>;
       const stock = new AngularFirestoreDocument<Stock>(ref, afs);
       await stock.set(FAKE_STOCK_DATA);
       const idField = 'myCustomID';
@@ -59,36 +58,33 @@ describe('AngularFirestoreDocument', () => {
         expect(data).toEqual(jasmine.objectContaining(FAKE_STOCK_DATA));
         stock.delete().then(done).catch(done.fail);
       });
-    });*/
+    });
+
+    it('should not optionally map the doc ID to the emitted data object if doc does not exists', async (done: DoneFn) => {
+      const randomCollectionName = afs.firestore.collection('a').doc().id;
+      const ref = afs.firestore.doc(`${randomCollectionName}/FAKE`) as DocumentReference<Stock>;
+      const stock = new AngularFirestoreDocument<Stock>(ref, afs);
+      // await stock.set(FAKE_STOCK_DATA);
+      const idField = 'myCustomID';
+      const obs$ = stock.valueChanges({ idField });
+      obs$.pipe(take(1)).subscribe(async data => {
+        expect(data).toBeUndefined();
+        stock.delete().then(done).catch(done.fail);
+      });
+    });
 
   });
 
   describe('snapshotChanges()', () => {
 
-    it('should get action updates', async (done: any) => {
+    it('should get action updates', async (done: DoneFn) => {
       const randomCollectionName = randomName(afs.firestore);
       const ref = afs.firestore.doc(`${randomCollectionName}/FAKE`) as DocumentReference<Stock>;
       const stock = new AngularFirestoreDocument<Stock>(ref, afs);
       await stock.set(FAKE_STOCK_DATA);
-      const sub = stock
-        .snapshotChanges()
-        .subscribe(async a => {
-          sub.unsubscribe();
-          if (a.payload.exists) {
-            expect(a.payload.data()).toEqual(FAKE_STOCK_DATA);
-            stock.delete().then(done).catch(done.fail);
-          }
-        });
-    });
-
-    it('should get unwrapped snapshot', async (done: any) => {
-      const randomCollectionName = afs.firestore.collection('a').doc().id;
-      const ref = afs.firestore.doc(`${randomCollectionName}/FAKE`) as DocumentReference<Stock>;
-      const stock = new AngularFirestoreDocument<Stock>(ref, afs);
-      await stock.set(FAKE_STOCK_DATA);
-      const obs$ = stock.valueChanges();
-      obs$.pipe(take(1)).subscribe(async data => {
-        expect(data).toEqual(FAKE_STOCK_DATA);
+      const obs$ = stock.snapshotChanges();
+      obs$.pipe(take(1)).subscribe(async a => {
+        expect(a.payload.data()).toEqual(FAKE_STOCK_DATA);
         stock.delete().then(done).catch(done.fail);
       });
     });
