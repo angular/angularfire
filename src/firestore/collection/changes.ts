@@ -1,7 +1,6 @@
 import { fromCollectionRef } from '../observable/fromRef';
 import { Observable, SchedulerLike } from 'rxjs';
 import { distinctUntilChanged, map, pairwise, scan, startWith } from 'rxjs/operators';
-
 import { DocumentChange, DocumentChangeAction, DocumentChangeType, Query } from '../interfaces';
 
 /**
@@ -11,9 +10,37 @@ import { DocumentChange, DocumentChangeAction, DocumentChangeType, Query } from 
 export function docChanges<T>(query: Query, scheduler?: SchedulerLike): Observable<DocumentChangeAction<T>[]> {
   return fromCollectionRef(query, scheduler)
     .pipe(
-      map(action =>
-        action.payload.docChanges()
-          .map(change => ({ type: change.type, payload: change } as DocumentChangeAction<T>))));
+      startWith(undefined),
+      pairwise(),
+      map(([priorAction, action]) => {
+        const docChanges = action.payload.docChanges();
+        const actions = docChanges.map(change => ({ type: change.type, payload: change }));
+        // the metadata has changed from the prior emission
+        if (priorAction && JSON.stringify(priorAction.payload.metadata) !== JSON.stringify(action.payload.metadata)) {
+          // go through all the docs in payload and figure out which ones changed
+          action.payload.docs.forEach((currentDoc, currentIndex) => {
+            const docChange = docChanges.find(d => d.doc.ref.isEqual(currentDoc.ref));
+            const priorDoc = priorAction?.payload.docs.find(d => d.ref.isEqual(currentDoc.ref));
+            if (docChange && JSON.stringify(docChange.doc.metadata) === JSON.stringify(currentDoc.metadata) ||
+              !docChange && priorDoc && JSON.stringify(priorDoc.metadata) === JSON.stringify(currentDoc.metadata)) {
+              // document doesn't appear to have changed, don't log another action
+            } else {
+              // since the actions are processed in order just push onto the array
+              actions.push({
+                type: 'modified',
+                payload: {
+                  oldIndex: currentIndex,
+                  newIndex: currentIndex,
+                  type: 'modified',
+                  doc: currentDoc
+                }
+              });
+            }
+          });
+        }
+        return actions as DocumentChangeAction<T>[];
+      }),
+  );
 }
 
 /**
@@ -23,30 +50,9 @@ export function sortedChanges<T>(
   query: Query,
   events: DocumentChangeType[],
   scheduler?: SchedulerLike): Observable<DocumentChangeAction<T>[]> {
-  return fromCollectionRef(query, scheduler)
+  return docChanges<T>(query, scheduler)
     .pipe(
-      startWith(undefined),
-      pairwise(),
-      scan((current, [priorChanges, changes]) => {
-        const docChanges = changes.payload.docChanges();
-        const ret = combineChanges(current, docChanges, events);
-        // docChanges({ includeMetadataChanges: true }) does't include metadata changes... wat?
-        if (events.indexOf('modified') > -1 && priorChanges &&
-            JSON.stringify(priorChanges.payload.metadata) !== JSON.stringify(changes.payload.metadata)) {
-          return ret.map(it => {
-            const partOfDocChanges = !!docChanges.find(d => d.doc.ref.isEqual(it.doc.ref));
-            return {
-              // if it's not one of the changed docs that means we already saw it's order change
-              // so this is purely metadata, so don't move the doc
-              oldIndex: partOfDocChanges ? it.oldIndex : it.newIndex,
-              newIndex: it.newIndex,
-              type: 'modified',
-              doc: changes.payload.docs.find(d => d.ref.isEqual(it.doc.ref))
-            };
-          });
-        }
-        return ret;
-      }, []),
+      scan((current, changes) => combineChanges<T>(current, changes.map(it => it.payload), events), []),
       distinctUntilChanged(), // cut down on unneed change cycles
       map(changes => changes.map(c => ({ type: c.type, payload: c } as DocumentChangeAction<T>))));
 }
@@ -82,6 +88,8 @@ function sliceAndSplice<T>(
 
 /**
  * Creates a new sorted array from a new change.
+ * Build our own because we allow filtering of action types ('added', 'removed', 'modified') before scanning
+ * and so we have greater control over change detection (by breaking ===)
  */
 export function combineChange<T>(combined: DocumentChange<T>[], change: DocumentChange<T>): DocumentChange<T>[] {
   switch (change.type) {

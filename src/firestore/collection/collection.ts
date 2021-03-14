@@ -1,6 +1,6 @@
 import { from, Observable } from 'rxjs';
 import { fromCollectionRef } from '../observable/fromRef';
-import { filter, map, observeOn, scan } from 'rxjs/operators';
+import { filter, map, observeOn, pairwise, scan, startWith } from 'rxjs/operators';
 import firebase from 'firebase/app';
 
 import { CollectionReference, DocumentChangeAction, DocumentChangeType, DocumentData, DocumentReference, Query } from '../interfaces';
@@ -59,14 +59,19 @@ export class AngularFirestoreCollection<T = DocumentData> {
    * your own data structure.
    */
   stateChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction<T>[]> {
-    if (!events || events.length === 0) {
-      return docChanges<T>(this.query, this.afs.schedulers.outsideAngular).pipe(
-        this.afs.keepUnstableUntilFirst
+    let source = docChanges<T>(this.query, this.afs.schedulers.outsideAngular);
+    if (events && events.length > 0) {
+      source = source.pipe(
+        map(actions => actions.filter(change => events.indexOf(change.type) > -1))
       );
     }
-    return docChanges<T>(this.query, this.afs.schedulers.outsideAngular).pipe(
-      map(actions => actions.filter(change => events.indexOf(change.type) > -1)),
-      filter(changes =>  changes.length > 0),
+    return source.pipe(
+      // We want to filter out empty arrays, but always emit at first, so the developer knows
+      // that the collection has been resolve; even if it's empty
+      startWith(undefined),
+      pairwise(),
+      filter(([prior, current]) => current.length > 0 || !prior),
+      map(([prior, current]) => current),
       this.afs.keepUnstableUntilFirst
     );
   }

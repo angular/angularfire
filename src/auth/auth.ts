@@ -1,6 +1,6 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID, InjectionToken } from '@angular/core';
-import { Observable, of, from, merge, Subject } from 'rxjs';
-import { switchMap, map, observeOn, shareReplay, first, filter } from 'rxjs/operators';
+import { Observable, of, from, merge, Subject, Subscriber } from 'rxjs';
+import { switchMap, map, observeOn, shareReplay, first, filter, switchMapTo, subscribeOn } from 'rxjs/operators';
 import {
   FIREBASE_OPTIONS,
   FIREBASE_APP_NAME,
@@ -123,22 +123,34 @@ export class AngularFireAuth {
       //       we reevaluate the API.
       const _ = auth.pipe(first()).subscribe();
 
-      this.authState = auth.pipe(
-        // wait for getRedirectResult otherwise we often get extraneous nulls firing on page load even if
-        // a user is signed in
-        switchMap(auth => auth.getRedirectResult().then(() => auth, () => auth)),
-        switchMap(auth => zone.runOutsideAngular(() => new Observable<firebase.User|null>(auth.onAuthStateChanged.bind(auth)))),
+      const redirectResult = auth.pipe(
+        switchMap(auth => auth.getRedirectResult().then(it => it, () => null)),
         keepUnstableUntilFirst,
-        // TODO figure out why I needed share, perhaps it's the observable construction?
-        shareReplay(1)
+        shareReplay({ bufferSize: 1, refCount: false }),
       );
 
-      this.user = auth.pipe(
-        // see comment on authState
-        switchMap(auth => auth.getRedirectResult().then(() => auth, () => auth)),
-        switchMap(auth => zone.runOutsideAngular(() => new Observable<firebase.User|null>(auth.onIdTokenChanged.bind(auth)))),
-        keepUnstableUntilFirst,
-        shareReplay(1) // see authState
+      const fromCallback = <T = any>(cb: (sub: Subscriber<T>) => () => void) => new Observable<T>(subscriber =>
+        ({ unsubscribe: zone.runOutsideAngular(() => cb(subscriber)) })
+      );
+
+      const authStateChanged = auth.pipe(
+        switchMap(auth => fromCallback(auth.onAuthStateChanged.bind(auth))),
+      );
+
+      const idTokenChanged = auth.pipe(
+        switchMap(auth => fromCallback(auth.onIdTokenChanged.bind(auth)))
+      );
+
+      this.authState = redirectResult.pipe(
+        switchMapTo(authStateChanged),
+        subscribeOn(schedulers.outsideAngular),
+        observeOn(schedulers.insideAngular),
+      );
+
+      this.user = redirectResult.pipe(
+        switchMapTo(idTokenChanged),
+        subscribeOn(schedulers.outsideAngular),
+        observeOn(schedulers.insideAngular),
       );
 
       this.idToken = this.user.pipe(
@@ -149,18 +161,18 @@ export class AngularFireAuth {
         switchMap(user => user ? from(user.getIdTokenResult()) : of(null))
       );
 
-      this.credential = auth.pipe(
-        switchMap(auth => merge(
-          auth.getRedirectResult().then(it => it, () => null),
-          logins,
-          // pipe in null authState to make credential zipable, just a weird devexp if
-          // authState and user go null to still have a credential
-          this.authState.pipe(filter(it => !it))
-        )),
+      this.credential = merge(
+        redirectResult,
+        logins,
+        // pipe in null authState to make credential zipable, just a weird devexp if
+        // authState and user go null to still have a credential
+        this.authState.pipe(filter(it => !it))
+      ).pipe(
         // handle the { user: { } } when a user is already logged in, rather have null
-        map(credential => credential?.user ? credential : null),
-        keepUnstableUntilFirst,
-        shareReplay(1)
+        // TODO handle the type corcersion better
+        map(credential => credential?.user ? credential as Required<firebase.auth.UserCredential> : null),
+        subscribeOn(schedulers.outsideAngular),
+        observeOn(schedulers.insideAngular),
       );
 
     }

@@ -2,13 +2,14 @@
 
 > The FCM JavaScript API lets you receive notification messages in web apps running in browsers that support the Push API.
 
-### AngularFireMessaging is not compatible with the Angular Service Worker
+### AngularFireMessaging is not out-of-the-box compatible with the Angular Service Worker
 
-If you are using the Angular Service Worker, you are not currently able to use AngularFireMessaging.
+If you are using the Angular Service Worker, you are not currently able to use AngularFireMessaging out-of-the-box.
 If you'd like this feature please add your 👍 to [this issue](https://github.com/angular/angular/issues/34352).
 
 Your alternatives are to use
 - [WorkboxJS](https://developers.google.com/web/tools/workbox/)
+- Follow the discussion in [this issue](https://github.com/angular/angular/issues/34352) and [here](https://github.com/angular/angularfire/discussions/1923), manually registering the Angular Service Worker
 - The Firebase Messaging Service Worker, which is detailed below
 
 ### Import the `NgModule`

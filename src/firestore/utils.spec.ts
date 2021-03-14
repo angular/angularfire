@@ -1,5 +1,5 @@
 import firebase from 'firebase/app';
-import { AngularFirestoreCollection } from './collection/collection';
+import { AngularFirestoreCollection } from '@angular/fire/firestore';
 
 export interface Stock {
   name: string;
@@ -54,4 +54,4 @@ export function delayDelete<T>(collection: AngularFirestoreCollection<T>|firebas
   }, delay);
 }
 
-export const rando = () => (Math.random() + 1).toString(36).substring(7);
+export const rando = () => (Math.random() + 1).toString(36).split('.')[1];

@@ -2,7 +2,7 @@ import firebase from 'firebase/app';
 import { Observable, Subject } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
 import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire';
-import { AngularFireAuth, AngularFireAuthModule } from './public_api';
+import { AngularFireAuth, AngularFireAuthModule } from '@angular/fire/auth';
 import { COMMON_CONFIG } from '../test-config';
 import 'firebase/auth';
 import { rando } from '../firestore/utils.spec';
@@ -118,20 +118,21 @@ describe('AngularFireAuth', () => {
 
 });
 
-const FIREBASE_APP_NAME_TOO = (Math.random() + 1).toString(36).substring(7);
-
 describe('AngularFireAuth with different app', () => {
   let app: FirebaseApp;
   let afAuth: AngularFireAuth;
+  let firebaseAppName: string;
 
   beforeEach(() => {
+    firebaseAppName = rando();
+
     TestBed.configureTestingModule({
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireAuthModule
       ],
       providers: [
-        { provide: FIREBASE_APP_NAME, useValue: FIREBASE_APP_NAME_TOO },
+        { provide: FIREBASE_APP_NAME, useValue: firebaseAppName },
         { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG }
       ]
     });
@@ -156,7 +157,7 @@ describe('AngularFireAuth with different app', () => {
 
     it('should have an initialized Firebase app instance member', async () => {
       const app = await afAuth.app;
-      expect(app.name).toEqual(FIREBASE_APP_NAME_TOO);
+      expect(app.name).toEqual(firebaseAppName);
     });
   });
 

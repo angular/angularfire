@@ -1,6 +1,5 @@
 import { AngularFireModule, FirebaseApp } from '@angular/fire';
-import { AngularFirestore, AngularFirestoreCollectionGroup, AngularFirestoreModule, SETTINGS } from '../public_api';
-import { QueryGroupFn, Query } from '../interfaces';
+import { QueryGroupFn, Query , AngularFirestore, AngularFirestoreCollectionGroup, AngularFirestoreModule, SETTINGS } from '@angular/fire/firestore';
 import { BehaviorSubject } from 'rxjs';
 import { skip, switchMap, take } from 'rxjs/operators';
 import { TestBed } from '@angular/core/testing';

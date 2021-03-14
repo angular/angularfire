@@ -1,0 +1,95 @@
+{
+  "Get started": { 
+    "key": "Get Started", 
+    "url": "/get-started", 
+    "children": [
+      { "key": "Quick start", "url": "/get-started" },
+      { "key": "Deploying", "url": "/get-started/deploying" },
+      { "key": "Local development", "url": "/get-started/local-development" }
+    ]
+  },
+  "Firestore": {
+    "key": "Firestore", 
+    "url": "/firestore", 
+    "children": [
+      { "key": "Documents", "url": "/firestore/documents" },
+      { "key": "Collections", "url": "/firestore/collections" }
+    ]    
+  },
+  "Auth": {
+    "key": "Auth", 
+    "url": "/auth", 
+    "children": [
+      { "key": "Getting started", "url": "/auth" },
+      { "key": "Route guards", "url": "/auth/route-gards" }
+    ]    
+  },
+  "RTDB": {
+    "key": "RTDB", 
+    "url": "/rtdb", 
+    "children": [
+      { "key": "Objects", "url": "/rtdb/objects" },
+      { "key": "Lists", "url": "/rtdb/lists" },
+      { "key": "Querying", "url": "/rtdb/querying" }
+    ]    
+  },
+  "Analytics": {
+    "key": "Analytics", 
+    "url": "/analytics", 
+    "children": [
+      { "key": "Getting started", "url": "/analytics" }
+    ]    
+  },
+  "Storage": {
+    "key": "Storage", 
+    "url": "/storage", 
+    "children": [
+      { "key": "Getting started", "url": "/storage" }
+    ]
+  },
+  "Functions": {
+    "key": "Functions", 
+    "url": "/functions", 
+    "children": [
+      { "key": "Getting started", "url": "/functions" }
+    ]
+  },
+  "Messaging": {
+    "key": "Messaging", 
+    "url": "/messaging", 
+    "children": [
+      { "key": "Getting started", "url": "/messaging" }
+    ]
+  },
+  "Remote Config": {
+    "key": "Remote Config", 
+    "url": "/remote-config", 
+    "children": [
+      { "key": "Getting started", "url": "/remote-config" }
+    ]
+  },
+  "Performance": {
+    "key": "Performance", 
+    "url": "/performance", 
+    "children": [
+      { "key": "Getting started", "url": "/performance" }
+    ]
+  },
+  "Universal": {
+    "key": "Universal", 
+    "url": "/universal", 
+    "children": [
+      { "key": "Getting started", "url": "/universal" },
+      { "key": "Cloud Functions", "url": "/universal/cloud-functions" },
+      { "key": "Prerendering", "url": "/universal/prerendering" }
+    ]
+  },
+  "Ionic": {
+    "key": "Ionic", 
+    "url": "/ionic", 
+    "children": [
+      { "key": "Getting started", "url": "/ionic/getting-started" },
+      { "key": "Authentication", "url": "/ionic/authentication" }
+    ]
+  }
+}

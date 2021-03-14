@@ -33,7 +33,7 @@
         "@angular/fire/messaging": ["dist/packages-dist/messaging"],
         "@angular/fire/performance": ["dist/packages-dist/performance"],
         "@angular/fire/remote-config": ["dist/packages-dist/remote-config"],
-        "@angular/fire/storage": ["dist/packages-dist/storage"]
+        "@angular/fire/storage": ["dist/packages-dist/storage"],
       }
     }
   }

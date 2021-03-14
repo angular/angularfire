@@ -1,16 +1,16 @@
-import { DatabaseReference } from '../interfaces';
 import { AngularFireModule, FirebaseApp, ɵZoneScheduler } from '@angular/fire';
-import { AngularFireDatabase, AngularFireDatabaseModule, fromRef } from '../public_api';
+import { AngularFireDatabase, AngularFireDatabaseModule, fromRef } from '@angular/fire/database';
 import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 import { take } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
 import { rando } from '../../firestore/utils.spec';
+import firebase from 'firebase/app';
 
 describe('fromRef', () => {
   let app: FirebaseApp;
   let db: AngularFireDatabase;
-  let ref: (path: string) => DatabaseReference;
+  let ref: (path: string) => firebase.database.Reference;
   let batch = {};
   const items = [{ name: 'one' }, { name: 'two' }, { name: 'three' }].map(item => ({ key: rando(), ...item }));
   Object.keys(items).forEach((key) => {

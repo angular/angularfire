@@ -1,8 +1,5 @@
 import { AngularFireModule, FirebaseApp } from '@angular/fire';
-import { AngularFirestore, SETTINGS } from '../firestore';
-import { AngularFirestoreModule } from '../firestore.module';
-import { AngularFirestoreCollection } from './collection';
-import { QueryFn, CollectionReference } from '../interfaces';
+import { AngularFirestore, SETTINGS, AngularFirestoreModule, AngularFirestoreCollection, QueryFn, CollectionReference } from '@angular/fire/firestore';
 import { BehaviorSubject } from 'rxjs';
 import { skip, switchMap, take } from 'rxjs/operators';
 import 'firebase/firestore';
@@ -399,7 +396,7 @@ describe('AngularFirestoreCollection', () => {
       const ITEMS = 10;
       const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
 
-      const sub = stocks.stateChanges(['modified']).subscribe(data => {
+      const sub = stocks.stateChanges(['modified']).pipe(skip(1), take(1)).subscribe(data => {
         sub.unsubscribe();
         expect(data.length).toEqual(1);
         expect(data[0].payload.doc.data().price).toEqual(2);
@@ -436,7 +433,7 @@ describe('AngularFirestoreCollection', () => {
       const ITEMS = 10;
       const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
 
-      const sub = stocks.stateChanges(['removed']).subscribe(data => {
+      const sub = stocks.stateChanges(['removed']).pipe(skip(1), take(1)).subscribe(data => {
         sub.unsubscribe();
         expect(data.length).toEqual(1);
         expect(data[0].type).toEqual('removed');
@@ -446,6 +443,21 @@ describe('AngularFirestoreCollection', () => {
 
       delayDelete(stocks, names[0], 400);
     });
+
+    it('stateChanges() should emit on empty collection', async (done) => {
+      afs.collection('EMPTY_COLLECTION').stateChanges().pipe(take(1)).subscribe(data => {
+        expect(data.length).toEqual(0);
+        done();
+      });
+    });
+
+    it('stateChanges() w/filter should emit on empty collection', async (done) => {
+      afs.collection('EMPTY_COLLECTION').stateChanges(['added']).pipe(take(1)).subscribe(data => {
+        expect(data.length).toEqual(0);
+        done();
+      });
+    });
+
   });
 
   describe('auditTrail()', () => {
@@ -471,7 +483,7 @@ describe('AngularFirestoreCollection', () => {
       const ITEMS = 10;
       const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
 
-      const sub = stocks.auditTrail(['removed']).subscribe(data => {
+      const sub = stocks.auditTrail(['removed']).pipe(skip(1), take(1)).subscribe(data => {
         sub.unsubscribe();
         expect(data.length).toEqual(1);
         expect(data[0].type).toEqual('removed');

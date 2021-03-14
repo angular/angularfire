@@ -1,5 +1,5 @@
 import { isPlatformServer } from '@angular/common';
-import { Inject, Injectable, OnDestroy, PLATFORM_ID } from '@angular/core';
+import { Inject, Injectable, NgZone, OnDestroy, PLATFORM_ID } from '@angular/core';
 import { AngularFireAnalytics } from './analytics';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { Subscription } from 'rxjs';
@@ -8,7 +8,7 @@ import { Subscription } from 'rxjs';
 export class UserTrackingService implements OnDestroy {
 
   initialized: Promise<void>;
-  private disposables: Subscription[] = [];
+  private disposables: Array<Subscription> = [];
 
   // TODO a user properties injector
   constructor(
@@ -16,11 +16,12 @@ export class UserTrackingService implements OnDestroy {
     // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
     auth: AngularFireAuth,
+    zone: NgZone,
   ) {
 
     if (!isPlatformServer(platformId)) {
       let resolveInitialized;
-      this.initialized = new Promise(resolve => resolveInitialized = resolve);
+      this.initialized = zone.runOutsideAngular(() => new Promise(resolve => resolveInitialized = resolve));
       this.disposables = [
           auth.authState.subscribe(user => {
             analytics.setUserId(user?.uid);

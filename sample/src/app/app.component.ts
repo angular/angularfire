@@ -1,5 +1,6 @@
 import { ApplicationRef, Component } from '@angular/core';
 import { FirebaseApp } from '@angular/fire';
+import { debounceTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -25,6 +26,6 @@ import { FirebaseApp } from '@angular/fire';
 })
 export class AppComponent {
   constructor(public readonly firebaseApp: FirebaseApp, appRef: ApplicationRef) {
-    appRef.isStable.subscribe(it => console.log('isStable', it));
+    appRef.isStable.pipe(debounceTime(200)).subscribe(it => console.log('isStable', it));
   }
 }

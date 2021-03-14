@@ -1,11 +1,22 @@
-yarn
+SHORT_SHA=$(git rev-parse --short $GITHUB_SHA)
+TAG_TEST="^refs/tags/.+$"
+LATEST_TEST="^[^-]*$"
 
-if test $TAG_NAME; then
-    export VERSION=$TAG_NAME
+if [[ $GITHUB_REF =~ $TAG_TEST ]]; then
+    OVERRIDE_VERSION=${GITHUB_REF/refs\/tags\//}
+    if [[ $OVERRIDE_VERSION =~ $LATEST_TEST ]]; then
+        NPM_TAG=latest
+    else
+        NPM_TAG=next
+    fi;
 else
-    export VERSION=$(npm version | sed -n "s/. '@angular\/fire': '\(.*\)',/\1/p")-canary.$SHORT_SHA
-fi
+    OVERRIDE_VERSION=$(node -e "console.log(require('./package.json').version)")-canary.$SHORT_SHA
+    NPM_TAG=canary
+fi;
 
-echo $VERSION &&
-npm --no-git-tag-version -f version $VERSION --allow-same-version &&
+npm --no-git-tag-version --allow-same-version -f version $OVERRIDE_VERSION
 yarn build
+yarn build:jasmine
+
+echo "npm publish . --tag $NPM_TAG" > ./dist/packages-dist/publish.sh
+chmod +x ./dist/packages-dist/publish.sh

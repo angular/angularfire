@@ -1,3 +1,41 @@
+<a name="6.1.4"></a>
+## [6.1.4](https://github.com/angular/angularfire/compare/6.1.3...6.1.4) (2020-12-03)
+
+
+### Bug Fixes
+
+* **storage:** `firebase.default` typing issue with Firebase v7 ([#2703](https://github.com/angular/angularfire/issues/2703)) ([984006d](https://github.com/angular/angularfire/commit/984006d))
+* **storage:** snapshotChanges should return a success snapshot ([#2704](https://github.com/angular/angularfire/issues/2704)) ([972aa85](https://github.com/angular/angularfire/commit/972aa85))
+* **analytics:** no longer error when included in SSR or when using Firebase v7 ([#2701](https://github.com/angular/angularfire/issues/2704)) ([da8c660](https://github.com/angular/angularfire/commit/da8c660))
+
+
+<a name="6.1.3"></a>
+## [6.1.3](https://github.com/angular/angularfire/compare/6.1.2...6.1.3) (2020-11-30)
+
+
+### Bug Fixes
+
+* **afs:** allow stateChanges and auditLog to emit blank arrays at first ([21442f0](https://github.com/angular/angularfire/commit/21442f0))
+
+
+
+<a name="6.1.2"></a>
+# [6.1.2](https://github.com/angular/angularfire/compare/6.1.1...6.1.2) (2020-11-24)
+
+
+### Bug Fixes
+
+* **afs:** document's actions should have appropriate types ([#2683](https://github.com/angular/angularfire/issues/2683)) ([d36544f](https://github.com/angular/angularfire/commit/d36544f))
+* **afs:** fixing the metadata in `snapshotChanges` and more ([#2670](https://github.com/angular/angularfire/issues/2670)) ([d5dbe99](https://github.com/angular/angularfire/commit/d5dbe99))
+* **afs:** `stateChanges` and `auditLog` correctly emit metadata changes ([#2684](https://github.com/angular/angularfire/issues/2684)) ([fce594b](https://github.com/angular/angularfire/commit/fce594b))
+* **analytics:** screen tracking will no longer fail on broken routes ([#2678](https://github.com/angular/angularfire/issues/2678)) ([ae26b35](https://github.com/angular/angularfire/commit/ae26b35)), closes [#2677](https://github.com/angular/angularfire/issues/2677)
+* **auth:** removed the `shareReplay` from auth and addressed Zone.js issues ([#2682](https://github.com/angular/angularfire/issues/2682)) ([059547b](https://github.com/angular/angularfire/commit/059547b)), closes [#2681](https://github.com/angular/angularfire/issues/2681)
+* **core:** ensure the UMDs are importing things correctly for the lazy modules ([#2676](https://github.com/angular/angularfire/issues/2676)) ([6817bcc](https://github.com/angular/angularfire/commit/6817bcc))
+* **core:** try/catch the HMR/DI warning ([#2687](https://github.com/angular/angularfire/issues/2687)) ([1530112](https://github.com/angular/angularfire/commit/1530112))
+* **storage:** unsubscribing from the upload progress will not cancel and added replay ([#2688](https://github.com/angular/angularfire/issues/2688)) ([d845cdd](https://github.com/angular/angularfire/commit/d845cdd)), closes [#2685](https://github.com/angular/angularfire/issues/2685)
+
+
+
 <a name="6.1.1"></a>
 # [6.1.1](https://github.com/angular/angularfire/compare/6.1.0...6.1.1) (2020-11-19)
 
