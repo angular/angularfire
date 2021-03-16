@@ -43,7 +43,7 @@ export class MyApp {
 
 ### Angular and Firebase versions
 
-AngularFire doesn't follow Angular's versioning as Firebase also has breaking changes throughout the year. Instead we try to maintain compatability with both Firebase and Angular majors for as long as possible, only breaking when we need to support a new major of one or the other.
+AngularFire doesn't follow Angular's versioning as Firebase also has breaking changes throughout the year. Instead we try to maintain compatibility with both Firebase and Angular majors for as long as possible, only breaking when we need to support a new major of one or the other.
 
 | Angular | Firebase | AngularFire  |
 | --------|----------|--------------|
