@@ -27,6 +27,7 @@
     "@angular/core": "ANGULAR_VERSION",
     "@angular/platform-browser": "ANGULAR_VERSION",
     "@angular/platform-browser-dynamic": "ANGULAR_VERSION",
+    "@firebase/app-types": "FIREBASE_APP_TYPES_VERSION",
     "firebase": "FIREBASE_VERSION",
     "rxjs": "RXJS_VERSION"
   },

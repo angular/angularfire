@@ -1,16 +1,17 @@
 import {
-  Inject, InjectionToken, isDevMode, ModuleWithProviders, NgModule, NgZone, Optional, PLATFORM_ID, VERSION as NG_VERSION, Version
+  Inject,
+  InjectionToken,
+  isDevMode,
+  ModuleWithProviders,
+  NgModule,
+  NgZone,
+  Optional,
+  PLATFORM_ID,
+  VERSION as NG_VERSION,
+  Version,
 } from '@angular/core';
+import { FirebaseAppConfig, FirebaseOptions } from '@firebase/app-types';
 import firebase from 'firebase/app';
-
-// INVESTIGATE Public types don't expose FirebaseOptions or FirebaseAppConfig, is this the case anylonger?
-export interface FirebaseOptions {
-  [key: string]: any;
-}
-
-export interface FirebaseAppConfig {
-  [key: string]: any;
-}
 
 export const FIREBASE_OPTIONS = new InjectionToken<FirebaseOptions>('angularfire2.app.options');
 export const FIREBASE_APP_NAME = new InjectionToken<string | FirebaseAppConfig | undefined>('angularfire2.app.nameOrConfig');
