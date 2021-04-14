@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import firebase from 'firebase/app';
+import firebase from 'firebase/compat/app';
 
 export type FirebaseOperation = string | firebase.database.Reference | firebase.database.DataSnapshot;
 

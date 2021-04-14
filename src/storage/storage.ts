@@ -12,8 +12,8 @@ import {
   ɵkeepUnstableUntilFirstFactory
 } from '@angular/fire';
 import { UploadMetadata } from './interfaces';
-import 'firebase/storage';
-import firebase from 'firebase/app';
+import 'firebase/compat/storage';
+import firebase from 'firebase/compat/app';
 
 export const BUCKET = new InjectionToken<string>('angularfire2.storageBucket');
 export const MAX_UPLOAD_RETRY_TIME = new InjectionToken<number>('angularfire2.storage.maxUploadRetryTime');

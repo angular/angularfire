@@ -4,7 +4,7 @@ import { AngularFireModule, FirebaseApp, ɵAngularFireSchedulers, ɵkeepUnstable
 import { Observable, of, Subject } from 'rxjs';
 import { COMMON_CONFIG } from '../test-config';
 import { BrowserModule } from '@angular/platform-browser';
-import firebase from 'firebase/app';
+import firebase from 'firebase/compat/app';
 import { tap } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
 import { rando } from '../firestore/utils.spec';
@@ -34,7 +34,7 @@ describe('angularfire', () => {
 
   afterEach(() => {
     rootRef.remove();
-    app.delete();
+    // app.delete();
   });
 
   describe('ZoneScheduler', () => {

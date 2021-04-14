@@ -1,4 +1,4 @@
-import firebase from 'firebase/app';
+import firebase from 'firebase/compat/app';
 
 export type UploadTask = firebase.storage.UploadTask;
 export type UploadTaskSnapshot = firebase.storage.UploadTaskSnapshot;

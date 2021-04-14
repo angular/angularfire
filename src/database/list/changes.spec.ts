@@ -1,10 +1,10 @@
-import firebase from 'firebase/app';
+import firebase from 'firebase/compat/app';
 import { AngularFireModule, FirebaseApp } from '@angular/fire';
 import { AngularFireDatabase, AngularFireDatabaseModule, listChanges, URL } from '@angular/fire/database';
 import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 import { skip, take } from 'rxjs/operators';
-import 'firebase/database';
+import 'firebase/compat/database';
 import { rando } from '../../firestore/utils.spec';
 
 describe('listChanges', () => {
@@ -36,7 +36,7 @@ describe('listChanges', () => {
   });
 
   afterEach(() => {
-    app.delete();
+    // try { app.delete() } catch(e) { };
   });
 
   describe('events', () => {

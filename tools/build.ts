@@ -4,7 +4,7 @@ import { prettySize } from 'pretty-size';
 import { sync as gzipSync } from 'gzip-size';
 import { dirname, join } from 'path';
 import { keys as tsKeys } from 'ts-transformer-keys';
-import firebase from 'firebase/app';
+import firebase from 'firebase/compat/app';
 
 // TODO infer these from the package.json
 const MODULES = [
@@ -106,10 +106,10 @@ async function fixImportForLazyModules() {
       let newSource: string;
       if (path.endsWith('.umd.js')) {
         // in the UMD for lazy modules replace the dyanamic import
-        newSource = source.replace(`import('firebase/${module}')`, 'rxjs.of(undefined)');
+        newSource = source.replace(`import('firebase/compat/${module}')`, 'rxjs.of(undefined)');
       } else {
         // in everything else get rid of the global side-effect import
-        newSource = source.replace(new RegExp(`^import 'firebase/${module}'.+$`, 'gm'), '');
+        newSource = source.replace(new RegExp(`^import 'firebase/compat/${module}'.+$`, 'gm'), '');
       }
       await writeFile(dest(module, path), newSource);
     }));

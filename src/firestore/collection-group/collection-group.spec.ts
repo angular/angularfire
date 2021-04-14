@@ -4,7 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 import { skip, switchMap, take } from 'rxjs/operators';
 import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
-import 'firebase/firestore';
+import 'firebase/compat/firestore';
 
 import {
   createRandomStocks,

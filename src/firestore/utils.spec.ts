@@ -1,4 +1,4 @@
-import firebase from 'firebase/app';
+import firebase from 'firebase/compat/app';
 import { AngularFirestoreCollection } from '@angular/fire/firestore';
 
 export interface Stock {

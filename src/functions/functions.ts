@@ -12,14 +12,13 @@ import {
   ɵPromiseProxy,
   ɵapplyMixins
 } from '@angular/fire';
-import firebase from 'firebase/app';
+import firebase from 'firebase/compat/app';
 import { proxyPolyfillCompat } from './base';
 import { HttpsCallableOptions } from '@firebase/functions-types';
 import { ɵfetchInstance } from '@angular/fire';
 
 export const ORIGIN = new InjectionToken<string>('angularfire2.functions.origin');
 export const REGION = new InjectionToken<string>('angularfire2.functions.region');
-export const NEW_ORIGIN_BEHAVIOR = new InjectionToken<boolean>('angularfire2.functions.new-origin-behavior');
 
 // SEMVER(7): use Parameters to detirmine the useEmulator arguments
 // type UseEmulatorArguments = Parameters<typeof firebase.functions.Functions.prototype.useEmulator>;
@@ -43,7 +42,6 @@ export class AngularFireFunctions {
     zone: NgZone,
     @Optional() @Inject(REGION) region: string | null,
     @Optional() @Inject(ORIGIN) origin: string | null,
-    @Optional() @Inject(NEW_ORIGIN_BEHAVIOR) newOriginBehavior: boolean | null,
     @Optional() @Inject(USE_EMULATOR) _useEmulator: any, // can't use the tuple here
   ) {
     const schedulers = new ɵAngularFireSchedulers(zone);
@@ -51,21 +49,14 @@ export class AngularFireFunctions {
 
     const functions = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
-      switchMap(() => import('firebase/functions')),
+      switchMap(() => import('firebase/compat/functions')),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
       map(app => ɵfetchInstance(`${app.name}.functions.${region || origin}`, 'AngularFireFunctions', app, () => {
         let functions: firebase.functions.Functions;
-        if (newOriginBehavior) {
-          if (region && origin) {
-            throw new Error('REGION and ORIGIN can\'t be used at the same time.');
-          }
-          functions = app.functions(region || origin || undefined);
-        } else {
-          functions = app.functions(region || undefined);
+        if (region && origin) {
+          throw new Error('REGION and ORIGIN can\'t be used at the same time.');
         }
-        if (!newOriginBehavior && !useEmulator && origin) {
-          functions.useFunctionsEmulator(origin);
-        }
+        functions = app.functions(region || origin || undefined);
         if (useEmulator) {
           functions.useEmulator(...useEmulator);
         }

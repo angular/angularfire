@@ -2,9 +2,9 @@ import { Observable } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { UploadTask, UploadTaskSnapshot } from '../interfaces';
 
-// need to import, else the types become import('firebase/app').default.storage.UploadTask
+// need to import, else the types become import('firebase/compat/app').default.storage.UploadTask
 // and it no longer works w/Firebase v7
-import firebase from 'firebase/app';
+import firebase from 'firebase/compat/app';
 
 // Things aren't working great, I'm having to put in a lot of work-arounds for what
 // appear to be Firebase JS SDK bugs https://github.com/firebase/firebase-js-sdk/issues/4158

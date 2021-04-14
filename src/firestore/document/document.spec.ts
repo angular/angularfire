@@ -6,8 +6,8 @@ import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 
 import { FAKE_STOCK_DATA, rando, randomName, Stock } from '../utils.spec';
-import firebase from 'firebase/app';
-import 'firebase/firestore';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
 
 describe('AngularFirestoreDocument', () => {
   let app: FirebaseApp;

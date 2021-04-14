@@ -13,9 +13,9 @@ import {
   ɵkeepUnstableUntilFirstFactory,
 } from '@angular/fire';
 import { Observable } from 'rxjs';
-import 'firebase/database';
+import 'firebase/compat/database';
 import { USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/auth';
-import firebase from 'firebase/app';
+import firebase from 'firebase/compat/app';
 import { ɵfetchInstance, ɵlogAuthEmulatorError } from '@angular/fire';
 
 export const URL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');

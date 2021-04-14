@@ -4,7 +4,7 @@ import { fromDocRef } from '../observable/fromRef';
 import { map, observeOn } from 'rxjs/operators';
 import { AngularFirestore, associateQuery } from '../firestore';
 import { AngularFirestoreCollection } from '../collection/collection';
-import firebase from 'firebase/app';
+import firebase from 'firebase/compat/app';
 
 /**
  * AngularFirestoreDocument service

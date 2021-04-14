@@ -30,7 +30,7 @@
     "@angular/service-worker": "^11.0.0",
     "@nguniversal/express-engine": "~10.1.0",
     "core-js": "^3.6.5",
-    "firebase": "^8.0.0",
+    "firebase": "^9.0.0-beta.1",
     "first-input-delay": "^0.1.3",
     "proxy-polyfill": "^0.3.2",
     "rxjs": "~6.6.3",

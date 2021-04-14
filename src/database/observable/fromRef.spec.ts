@@ -5,7 +5,7 @@ import { COMMON_CONFIG } from '../../test-config';
 import { take } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
 import { rando } from '../../firestore/utils.spec';
-import firebase from 'firebase/app';
+import firebase from 'firebase/compat/app';
 
 describe('fromRef', () => {
   let app: FirebaseApp;
@@ -37,7 +37,7 @@ describe('fromRef', () => {
   });
 
   afterEach(() => {
-    app.delete();
+    // try { app.delete() } catch(e) { };
   });
 
   it('it should be async by default', (done) => {

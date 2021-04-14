@@ -6,8 +6,8 @@ import { AngularFireStorage, AngularFireStorageModule, AngularFireUploadTask, BU
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../firestore/utils.spec';
 import { ChangeDetectorRef } from '@angular/core';
-import 'firebase/storage';
-import firebase from 'firebase/app';
+import 'firebase/compat/storage';
+import firebase from 'firebase/compat/app';
 
 if (typeof XMLHttpRequest === 'undefined') {
   globalThis.XMLHttpRequest = require('xhr2');

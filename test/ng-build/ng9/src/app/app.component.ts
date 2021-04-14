@@ -11,9 +11,9 @@ import { AngularFirePerformance } from '@angular/fire/performance';
 import { canActivate, loggedIn } from '@angular/fire/auth-guard';
 import { AngularFireRemoteConfig } from '@angular/fire/remote-config';
 
-import 'firebase/database';
-import 'firebase/firestore';
-import 'firebase/storage';
+import 'firebase/compat/database';
+import 'firebase/compat/firestore';
+import 'firebase/compat/storage';
 
 @Component({
   selector: 'app-root',

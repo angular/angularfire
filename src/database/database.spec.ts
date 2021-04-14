@@ -3,7 +3,7 @@ import { AngularFireDatabase, AngularFireDatabaseModule, URL } from '@angular/fi
 import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../test-config';
 import { NgZone } from '@angular/core';
-import 'firebase/database';
+import 'firebase/compat/database';
 import { rando } from '../firestore/utils.spec';
 
 describe('AngularFireDatabase', () => {
@@ -30,7 +30,7 @@ describe('AngularFireDatabase', () => {
   });
 
   afterEach(() => {
-    app.delete();
+    // try { app.delete() } catch(e) { };
   });
 
   describe('<constructor>', () => {
@@ -46,7 +46,8 @@ describe('AngularFireDatabase', () => {
     it('should accept a Firebase App in the constructor', (done) => {
       const database = new AngularFireDatabase(app.options, rando(), undefined, {}, zone, undefined, undefined);
       expect(database instanceof AngularFireDatabase).toEqual(true);
-      database.database.app.delete().then(done, done);
+      // try { database.database.app.delete().then(done, done); } catch(e) { done(); }
+      done();
     });
 
     it('should have an initialized Firebase app instance member', () => {
@@ -85,7 +86,7 @@ describe('AngularFireDatabase w/options', () => {
   });
 
   afterEach(() => {
-    app.delete();
+    // try { app.delete() } catch(e) { };
   });
 
   describe('<constructor>', () => {

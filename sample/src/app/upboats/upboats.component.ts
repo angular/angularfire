@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, startWith, tap } from 'rxjs/operators';
 import { AngularFirestoreOffline } from '../firestore-offline/firestore-offline.module';
-import firebase from 'firebase/app';
+import firebase from 'firebase/compat/app';
 import { makeStateKey, TransferState } from '@angular/platform-browser';
 import { trace } from '@angular/fire/performance';
 

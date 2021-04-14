@@ -13,7 +13,7 @@ import {
   ɵkeepUnstableUntilFirstFactory,
   ɵapplyMixins
 } from '@angular/fire';
-import firebase from 'firebase/app';
+import firebase from 'firebase/compat/app';
 import { isPlatformServer } from '@angular/common';
 import { proxyPolyfillCompat } from './base';
 import { ɵfetchInstance } from '@angular/fire';
@@ -80,7 +80,7 @@ export class AngularFireAuth {
 
     const auth = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
-      switchMap(() => zone.runOutsideAngular(() => import('firebase/auth'))),
+      switchMap(() => zone.runOutsideAngular(() => import('firebase/compat/auth'))),
       map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
       map(app => zone.runOutsideAngular(() => {
         const useEmulator: UseEmulatorArguments | null = _useEmulator;
@@ -94,7 +94,8 @@ export class AngularFireAuth {
           if (tenantId) {
             auth.tenantId = tenantId;
           }
-          auth.languageCode = languageCode;
+          // Feedback filed against beta.
+          // auth.languageCode = languageCode;
           if (useDeviceLanguage) {
             auth.useDeviceLanguage();
           }
@@ -117,7 +118,7 @@ export class AngularFireAuth {
     } else {
 
       // HACK, as we're exporting auth.Auth, rather than auth, developers importing firebase.auth
-      //       (e.g, `import { auth } from 'firebase/app'`) are getting an undefined auth object unexpectedly
+      //       (e.g, `import { auth } from 'firebase/compat/app'`) are getting an undefined auth object unexpectedly
       //       as we're completely lazy. Let's eagerly load the Auth SDK here.
       //       There could potentially be race conditions still... but this greatly decreases the odds while
       //       we reevaluate the API.
@@ -129,16 +130,24 @@ export class AngularFireAuth {
         shareReplay({ bufferSize: 1, refCount: false }),
       );
 
-      const fromCallback = <T = any>(cb: (sub: Subscriber<T>) => () => void) => new Observable<T>(subscriber =>
-        ({ unsubscribe: zone.runOutsideAngular(() => cb(subscriber)) })
-      );
-
       const authStateChanged = auth.pipe(
-        switchMap(auth => fromCallback(auth.onAuthStateChanged.bind(auth))),
+        switchMap(auth => new Observable<firebase.User|null>(sub =>
+          ({ unsubscribe: zone.runOutsideAngular(() => auth.onAuthStateChanged(
+            next => sub.next(next),
+            err => sub.error(err),
+            () => sub.complete()
+          ))})
+        )),
       );
 
       const idTokenChanged = auth.pipe(
-        switchMap(auth => fromCallback(auth.onIdTokenChanged.bind(auth)))
+        switchMap(auth => new Observable<firebase.User|null>(sub =>
+          ({ unsubscribe: zone.runOutsideAngular(() => auth.onIdTokenChanged(
+            next => sub.next(next),
+            err => sub.error(err),
+            () => sub.complete()
+          ))})
+        ))
       );
 
       this.authState = redirectResult.pipe(
