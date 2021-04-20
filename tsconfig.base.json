@@ -23,18 +23,25 @@
       ],
       "paths": {
         "@angular/fire": ["dist/packages-dist"],
-        "@angular/fire/analytics": ["dist/packages-dist/analytics"],
         "@angular/fire/auth": ["dist/packages-dist/auth"],
         "@angular/fire/auth-guard": ["dist/packages-dist/auth-guard"],
         "@angular/fire/database": ["dist/packages-dist/database"],
-        "@angular/fire/database-deprecated": ["dist/packages-dist/database-deprecated"],
-        "@angular/fire/firebase-node": ["dist/packages-dist/firebase-node"],
         "@angular/fire/firestore": ["dist/packages-dist/firestore"],
         "@angular/fire/functions": ["dist/packages-dist/functions"],
         "@angular/fire/messaging": ["dist/packages-dist/messaging"],
         "@angular/fire/performance": ["dist/packages-dist/performance"],
         "@angular/fire/remote-config": ["dist/packages-dist/remote-config"],
         "@angular/fire/storage": ["dist/packages-dist/storage"],
+        "@angular/fire/compat": ["dist/packages-dist/compat"],
+        "@angular/fire/compat/analytics": ["dist/packages-dist/compat/analytics"],
+        "@angular/fire/compat/auth": ["dist/packages-dist/compat/auth"],
+        "@angular/fire/compat/database": ["dist/packages-dist/compat/database"],
+        "@angular/fire/compat/firestore": ["dist/packages-dist/compat/firestore"],
+        "@angular/fire/compat/functions": ["dist/packages-dist/compat/functions"],
+        "@angular/fire/compat/messaging": ["dist/packages-dist/compat/messaging"],
+        "@angular/fire/compat/performance": ["dist/packages-dist/compat/performance"],
+        "@angular/fire/compat/remote-config": ["dist/packages-dist/compat/remote-config"],
+        "@angular/fire/compat/storage": ["dist/packages-dist/compat/storage"],
       }
     }
   }

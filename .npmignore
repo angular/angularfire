@@ -1,3 +1,5 @@
 *.spec.*
 test-config.*
 publish.sh
+*.min.js
+*.min.js.map

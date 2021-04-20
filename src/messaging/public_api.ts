@@ -1,2 +1,1 @@
-export * from './messaging';
-export * from './messaging.module';
+export const a = 1;

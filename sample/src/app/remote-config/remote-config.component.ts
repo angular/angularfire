@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFireRemoteConfig, mapToObject } from '@angular/fire/remote-config';
-import { trace } from '@angular/fire/performance';
+import { AngularFireRemoteConfig, mapToObject } from '@angular/fire/compat/remote-config';
+import { trace } from '@angular/fire/compat/performance';
 import { Observable } from 'rxjs';
 
 @Component({

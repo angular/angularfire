@@ -1,9 +1,9 @@
 import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
-import { AngularFireDatabase } from '@angular/fire/database';
+import { AngularFireDatabase } from '@angular/fire/compat/database';
 import { EMPTY, Observable } from 'rxjs';
 import { makeStateKey, TransferState } from '@angular/platform-browser';
 import { startWith, tap } from 'rxjs/operators';
-import { trace } from '@angular/fire/performance';
+import { trace } from '@angular/fire/compat/performance';
 import { isPlatformServer } from '@angular/common';
 
 @Component({

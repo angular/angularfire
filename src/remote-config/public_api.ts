@@ -1,2 +1,1 @@
-export * from './remote-config';
-export * from './remote-config.module';
+export const a = 1;

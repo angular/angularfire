@@ -1,3 +1,1 @@
-export * from './performance';
-export * from './performance.module';
-export * from './performance.service';
+export const a = 1;

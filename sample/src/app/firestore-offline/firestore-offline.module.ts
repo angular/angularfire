@@ -1,8 +1,9 @@
 import { Inject, Injectable, InjectionToken, NgModule, NgZone, Optional, PLATFORM_ID } from '@angular/core';
-import { FirebaseOptions, FIREBASE_OPTIONS } from '@angular/fire';
-import { USE_EMULATOR } from '@angular/fire/firestore';
-import { AngularFirestore, SETTINGS, Settings } from '@angular/fire/firestore';
-import { USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/auth';
+import { FIREBASE_OPTIONS } from '@angular/fire';
+import { FirebaseOptions } from 'firebase/app';
+import { USE_EMULATOR } from '@angular/fire/compat/firestore';
+import { AngularFirestore, SETTINGS, Settings } from '@angular/fire/compat/firestore';
+import { USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/compat/auth';
 
 export const FIRESTORE_OFFLINE = new InjectionToken<AngularFirestore>('my.firestore');
 
