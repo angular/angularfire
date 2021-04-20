@@ -15,6 +15,9 @@ import { UploadMetadata } from './interfaces';
 import 'firebase/storage';
 import firebase from 'firebase/app';
 
+type UseEmulatorArguments = [string, number];
+export const USE_EMULATOR = new InjectionToken<UseEmulatorArguments>('angularfire2.storage.use-emulator');
+
 export const BUCKET = new InjectionToken<string>('angularfire2.storageBucket');
 export const MAX_UPLOAD_RETRY_TIME = new InjectionToken<number>('angularfire2.storage.maxUploadRetryTime');
 export const MAX_OPERATION_RETRY_TIME = new InjectionToken<number>('angularfire2.storage.maxOperationRetryTime');
@@ -42,15 +45,21 @@ export class AngularFireStorage {
     // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
+    @Optional() @Inject(USE_EMULATOR) _useEmulator: any, // can't use the tuple here
     @Optional() @Inject(MAX_UPLOAD_RETRY_TIME) maxUploadRetryTime: number | any,
     @Optional() @Inject(MAX_OPERATION_RETRY_TIME) maxOperationRetryTime: number | any,
   ) {
     this.schedulers = new ɵAngularFireSchedulers(zone);
     this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers);
     const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
+    const useEmulator: UseEmulatorArguments | null = _useEmulator;
 
     this.storage = ɵfetchInstance(`${app.name}.storage.${storageBucket}`, 'AngularFireStorage', app, () => {
       const storage = zone.runOutsideAngular(() => app.storage(storageBucket || undefined));
+      if(useEmulator) {
+        firebase.storage().useEmulator(...useEmulator);
+      }
+      
       if (maxUploadRetryTime) {
         storage.setMaxUploadRetryTime(maxUploadRetryTime);
       }
@@ -58,7 +67,7 @@ export class AngularFireStorage {
         storage.setMaxOperationRetryTime(maxOperationRetryTime);
       }
       return storage;
-    }, [maxUploadRetryTime, maxOperationRetryTime]);
+    }, [maxUploadRetryTime, maxOperationRetryTime, useEmulator]);
   }
 
   ref(path: string) {
