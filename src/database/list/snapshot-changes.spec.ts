@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 import { BehaviorSubject } from 'rxjs';
 import { skip, switchMap, take } from 'rxjs/operators';
-import { Reference } from 'firebase/database';
+import { Reference, set, child, query, equalTo, orderByChild, ref } from 'firebase/database';
 import { rando } from '../../firestore/utils.spec';
 
 describe('snapshotChanges', () => {
@@ -32,7 +32,7 @@ describe('snapshotChanges', () => {
 
     app = TestBed.inject(FirebaseApp);
     db = TestBed.inject(AngularFireDatabase);
-    createRef = (path: string) => db.database.ref(path);
+    createRef = (path: string) => ref(db.database, path);
   });
 
   afterEach(() => {
@@ -55,7 +55,7 @@ describe('snapshotChanges', () => {
       const data = actions.map(a => a.payload.val());
       expect(data).toEqual(items);
     }).add(done);
-    ref.set(batch);
+    set(ref, batch);
   });
 
   it('should handle multiple subscriptions (hot)', (done) => {
@@ -66,7 +66,7 @@ describe('snapshotChanges', () => {
       const data = actions.map(a => a.payload.val());
       expect(data).toEqual(items);
     }).add(sub);
-    ref.set(batch);
+    set(ref, batch);
   });
 
   it('should handle multiple subscriptions (warm)', done => {
@@ -78,7 +78,7 @@ describe('snapshotChanges', () => {
         expect(data).toEqual(items);
       }).add(done);
     });
-    ref.set(batch);
+    set(ref, batch);
   });
 
   it('should listen to only child_added events', (done) => {
@@ -87,7 +87,7 @@ describe('snapshotChanges', () => {
       const data = actions.map(a => a.payload.val());
       expect(data).toEqual(items);
     }).add(done);
-    ref.set(batch);
+    set(ref, batch);
   });
 
   /* FLAKE? set promise not fufilling
@@ -110,7 +110,7 @@ describe('snapshotChanges', () => {
 
   it('should handle empty sets', done => {
     const aref = createRef(rando());
-    aref.set({});
+    set(aref, {});
     snapshotChanges(aref).pipe(take(1)).subscribe(data => {
       expect(data.length).toEqual(0);
     }).add(done);
@@ -120,9 +120,9 @@ describe('snapshotChanges', () => {
     let count = 0;
     const namefilter$ = new BehaviorSubject<number | null>(null);
     const aref = createRef(rando());
-    aref.set(batch);
+    set(aref, batch);
     namefilter$.pipe(switchMap(name => {
-      const filteredRef = name ? aref.child('name').equalTo(name) : aref;
+      const filteredRef = name ? query(aref, orderByChild('name'), equalTo(name)) : aref;
       return snapshotChanges(filteredRef);
     }), take(2)).subscribe(data => {
       count = count + 1;

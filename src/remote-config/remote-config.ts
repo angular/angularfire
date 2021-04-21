@@ -26,16 +26,17 @@ import {
   ɵPromiseProxy,
   ɵapplyMixins
 } from '@angular/fire';
-import { 
-  RemoteConfig, 
-  ValueType, 
+import {
+  RemoteConfig,
+  ValueSource,
+  Value as ValueType,
+  Settings,
   getRemoteConfig,
   activate,
   fetchAndActivate,
   getAll,
-  ensureInitialized 
+  ensureInitialized
 } from 'firebase/remote-config';
-import { Settings, ValueSource } from './interfaces';
 import { proxyPolyfillCompat } from './base';
 import { ɵfetchInstance } from '@angular/fire';
 

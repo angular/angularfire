@@ -27,7 +27,7 @@ export function fromRef<R, T>(ref: DocumentReference<T> | Query<T>, scheduler?: 
   return _fromRef<typeof ref, R>(ref, scheduler);
 }
 
-export function fromDocRef<T>(ref: DocumentReference<T>, scheduler?: SchedulerLike): Observable<Action<DocumentSnapshot<T>>> {  
+export function fromDocRef<T>(ref: DocumentReference<T>, scheduler?: SchedulerLike): Observable<Action<DocumentSnapshot<T>>> {
   return fromRef<DocumentSnapshot<T>, T>(ref, scheduler)
     .pipe(
       startWith(undefined),

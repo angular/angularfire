@@ -3,7 +3,7 @@ import {
 } from '@angular/core';
 import { FirebaseApp as FirebaseAppType, getApps, initializeApp, registerVersion } from 'firebase/app';
 import { Analytics } from 'firebase/analytics';
-import { Database } from 'firebase/database';
+import { FirebaseDatabase } from 'firebase/database';
 import { Auth } from 'firebase/auth';
 import { FirebaseMessaging } from 'firebase/messaging';
 import { FirebasePerformance } from 'firebase/performance';
@@ -11,6 +11,7 @@ import { StorageService } from 'firebase/storage';
 import { FirebaseFirestore } from 'firebase/firestore';
 import { Functions } from 'firebase/functions';
 import { RemoteConfig } from 'firebase/remote-config';
+import { FirebaseApp as FirebaseCompatApp } from '@angular/fire/compat';
 
 // INVESTIGATE Public types don't expose FirebaseOptions or FirebaseAppConfig, is this the case anylonger?
 export interface FirebaseOptions {
@@ -31,7 +32,7 @@ export class FirebaseApp implements FirebaseAppType {
   options: {};
   analytics: () => Analytics;
   auth: () => Auth;
-  database: (databaseURL?: string) => Database;
+  database: (databaseURL?: string) => FirebaseDatabase;
   messaging: () => FirebaseMessaging;
   performance: () => FirebasePerformance;
   storage: (storageBucket?: string) => StorageService;
@@ -75,7 +76,7 @@ const log = (level: 'log'|'error'|'info'|'warn', ...args: any) => {
 
 globalThis.ɵAngularfireInstanceCache ||= new Map();
 
-export function ɵfetchInstance<T>(cacheKey: any, moduleName: string, app: FirebaseApp, fn: () => T, args: any[]): T {
+export function ɵfetchInstance<T>(cacheKey: any, moduleName: string, app: FirebaseApp | FirebaseCompatApp, fn: () => T, args: any[]): T {
   const [instance, ...cachedArgs] = globalThis.ɵAngularfireInstanceCache.get(cacheKey) || [];
   if (instance) {
     try {

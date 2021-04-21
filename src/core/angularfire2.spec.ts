@@ -4,7 +4,7 @@ import { AngularFireModule, FirebaseApp, ɵAngularFireSchedulers, ɵkeepUnstable
 import { Observable, of, Subject } from 'rxjs';
 import { COMMON_CONFIG } from '../test-config';
 import { BrowserModule } from '@angular/platform-browser';
-import { Reference } from 'firebase/database';
+import { Reference, child, remove, ref } from 'firebase/database';
 import { tap } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
 import { rando } from '../firestore/utils.spec';
@@ -27,13 +27,13 @@ describe('angularfire', () => {
 
     app = TestBed.inject(FirebaseApp);
     defaultPlatform = TestBed.inject(PlatformRef);
-    rootRef = app.database().ref();
-    questionsRef = rootRef.child('questions');
-    listOfQuestionsRef = rootRef.child('list-of-questions');
+    rootRef = ref(app.database());
+    questionsRef = child(rootRef, 'questions');
+    listOfQuestionsRef = child(rootRef, 'list-of-questions');
   });
 
   afterEach(() => {
-    rootRef.remove();
+    remove(rootRef);
     app.delete();
   });
 

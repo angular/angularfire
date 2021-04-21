@@ -1,7 +1,7 @@
 import { Subscriber } from 'rxjs';
-import { 
-  DocumentSnapshot as BaseDocumentSnapshot, 
-  QuerySnapshot as BaseQuerySnapshot, 
+import {
+  DocumentSnapshot as BaseDocumentSnapshot,
+  QuerySnapshot as BaseQuerySnapshot,
   QueryDocumentSnapshot as BaseQueryDocumentSnapshot,
   DocumentChange as BaseDocumentChange,
 } from 'firebase/firestore';

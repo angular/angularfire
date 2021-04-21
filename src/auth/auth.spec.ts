@@ -69,7 +69,7 @@ describe('AngularFireAuth', () => {
   });
 
   it('should have an initialized Firebase app', () => {
-    expect(afAuth.app).toBeDefined();
+    expect(afAuth.name).toBeDefined();
   });
 
   it('should emit auth updates through authState', (done: any) => {
@@ -152,12 +152,12 @@ describe('AngularFireAuth with different app', () => {
     });
 
     it('should have an initialized Firebase app', () => {
-      expect(afAuth.app).toBeDefined();
+      expect(afAuth.name).toBeDefined();
     });
 
     it('should have an initialized Firebase app instance member', async () => {
-      const app = await afAuth.app;
-      expect(app.name).toEqual(firebaseAppName);
+      const appName = await afAuth.name;
+      expect(appName).toEqual(firebaseAppName);
     });
   });
 

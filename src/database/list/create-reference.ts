@@ -6,6 +6,7 @@ import { createDataOperationMethod } from './data-operation';
 import { createRemoveMethod } from './remove';
 import { AngularFireDatabase } from '../database';
 import { map } from 'rxjs/operators';
+import { push } from 'firebase/database';
 
 export function createListReference<T= any>(query: DatabaseQuery, afDatabase: AngularFireDatabase): AngularFireList<T> {
   const outsideAngularScheduler = afDatabase.schedulers.outsideAngular;
@@ -14,7 +15,7 @@ export function createListReference<T= any>(query: DatabaseQuery, afDatabase: An
     query,
     update: createDataOperationMethod<Partial<T>>(refInZone, 'update'),
     set: createDataOperationMethod<T>(refInZone, 'set'),
-    push: (data: T) => refInZone.push(data),
+    push: (data: T) => push(refInZone, data),
     remove: createRemoveMethod(refInZone),
     snapshotChanges(events?: ChildEvent[]) {
       return snapshotChanges<T>(query, events, outsideAngularScheduler).pipe(afDatabase.keepUnstableUntilFirst);

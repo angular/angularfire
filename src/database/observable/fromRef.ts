@@ -1,6 +1,7 @@
 import { AngularFireAction, DatabaseQuery, DatabaseSnapshot, ListenEvent } from '../interfaces';
 import { asyncScheduler, Observable, SchedulerLike } from 'rxjs';
 import { map, share } from 'rxjs/operators';
+import { off } from 'firebase/database';
 
 interface SnapshotPrevKey<T> {
   snapshot: DatabaseSnapshot<T>;
@@ -36,7 +37,7 @@ export function fromRef<T>(ref: DatabaseQuery,
       return {
         unsubscribe() {
           if (fn != null) {
-            ref.off(event, fn);
+            off(ref, event, fn);
           }
         }
       };

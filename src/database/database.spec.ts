@@ -29,7 +29,7 @@ describe('AngularFireDatabase', () => {
   });
 
   afterEach(() => {
-    app.delete();
+    // app.delete();
   });
 
   describe('<constructor>', () => {
@@ -45,7 +45,7 @@ describe('AngularFireDatabase', () => {
     it('should accept a Firebase App in the constructor', (done) => {
       const database = new AngularFireDatabase(app.options, rando(), undefined, {}, zone, undefined, undefined);
       expect(database instanceof AngularFireDatabase).toEqual(true);
-      database.database.app.delete().then(done, done);
+    //  database.database.app.delete().then(done, done);
     });
 
     it('should have an initialized Firebase app instance member', () => {

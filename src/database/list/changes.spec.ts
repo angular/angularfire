@@ -3,7 +3,7 @@ import { AngularFireDatabase, AngularFireDatabaseModule, listChanges, URL } from
 import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 import { skip, take } from 'rxjs/operators';
-import { Reference } from 'firebase/database';
+import { Reference, set, push, orderByChild, query, equalTo, ref as dbRef } from 'firebase/database';
 import { rando } from '../../firestore/utils.spec';
 
 describe('listChanges', () => {
@@ -31,7 +31,7 @@ describe('listChanges', () => {
 
     app = TestBed.inject(FirebaseApp);
     db = TestBed.inject(AngularFireDatabase);
-    ref = (path: string) => db.database.ref(path);
+    ref = (path: string) => dbRef(db.database, path);
   });
 
   afterEach(() => {
@@ -47,7 +47,7 @@ describe('listChanges', () => {
         const data = changes.map(change => change.payload.val());
         expect(data).toEqual(items);
       }).add(done);
-      someRef.set(batch);
+      set(someRef, batch);
     });
 
     it('should process a new child_added event', done => {
@@ -57,25 +57,25 @@ describe('listChanges', () => {
         const data = changes.map(change => change.payload.val());
         expect(data[3]).toEqual({ name: 'anotha one' });
       }).add(done);
-      aref.set(batch);
-      aref.push({ name: 'anotha one' });
+      set(aref, batch);
+      push(aref, { name: 'anotha one' });
     });
 
     it('should stream in order events', (done) => {
       const aref = ref(rando());
-      const obs = listChanges(aref.orderByChild('name'), ['child_added']);
+      const obs = listChanges(query(aref, orderByChild('name')), ['child_added']);
       obs.pipe(take(1)).subscribe(changes => {
         const names = changes.map(change => change.payload.val().name);
         expect(names[0]).toEqual('one');
         expect(names[1]).toEqual('two');
         expect(names[2]).toEqual('zero');
       }).add(done);
-      aref.set(batch);
+      set(aref, batch);
     });
 
     it('should stream in order events w/child_added', (done) => {
       const aref = ref(rando());
-      const obs = listChanges(aref.orderByChild('name'), ['child_added']);
+      const obs = listChanges(query(aref, orderByChild('name')), ['child_added']);
       obs.pipe(skip(1), take(1)).subscribe(changes => {
         const names = changes.map(change => change.payload.val().name);
         expect(names[0]).toEqual('anotha one');
@@ -83,20 +83,20 @@ describe('listChanges', () => {
         expect(names[2]).toEqual('two');
         expect(names[3]).toEqual('zero');
       }).add(done);
-      aref.set(batch);
-      aref.push({ name: 'anotha one' });
+      set(aref, batch);
+      push(aref, { name: 'anotha one' });
     });
 
     it('should stream events filtering', (done) => {
       const aref = ref(rando());
-      const obs = listChanges(aref.orderByChild('name').equalTo('zero'), ['child_added']);
+      const obs = listChanges(query(aref, orderByChild('name'), equalTo('zero')), ['child_added']);
       obs.pipe(skip(1), take(1)).subscribe(changes => {
         const names = changes.map(change => change.payload.val().name);
         expect(names[0]).toEqual('zero');
         expect(names[1]).toEqual('zero');
       }).add(done);
-      aref.set(batch);
-      aref.push({ name: 'zero' });
+      set(aref, batch);
+      push(aref, { name: 'zero' });
     });
 
 

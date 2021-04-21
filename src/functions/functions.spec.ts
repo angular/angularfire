@@ -29,7 +29,7 @@ describe('AngularFireFunctions', () => {
   });
 
   it('should have the Firebase Functions instance', () => {
-    expect(afFns.useFunctionsEmulator).toBeDefined();
+    expect(afFns.app).toBeDefined();
   });
 
 });
@@ -69,7 +69,7 @@ describe('AngularFireFunctions with different app', () => {
     });
 
     it('should have the Firebase Functions instance', () => {
-      expect(afFns.useFunctionsEmulator).toBeDefined();
+      expect(afFns.app).toBeDefined();
     });
 
   });

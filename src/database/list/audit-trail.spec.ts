@@ -3,7 +3,7 @@ import { AngularFireDatabase, AngularFireDatabaseModule, auditTrail, ChildEvent,
 import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 import { skip } from 'rxjs/operators';
-import { Reference } from 'firebase/database';
+import { Reference, set, ref } from 'firebase/database';
 import { rando } from '../../firestore/utils.spec';
 
 describe('auditTrail', () => {
@@ -31,7 +31,7 @@ describe('auditTrail', () => {
 
     app = TestBed.inject(FirebaseApp);
     db = TestBed.inject(AngularFireDatabase);
-    createRef = (path: string) => db.database.ref(path);
+    createRef = (path: string) => ref(db.database, path);
   });
 
   afterEach(() => {
@@ -41,7 +41,7 @@ describe('auditTrail', () => {
   function prepareAuditTrail(opts: { events?: ChildEvent[], skipnumber: number } = { skipnumber: 0 }) {
     const { events, skipnumber } = opts;
     const aref = createRef(rando());
-    aref.set(batch);
+    set(aref, batch);
     const changes = auditTrail(aref, events);
     return {
       changes: changes.pipe(skip(skipnumber)),

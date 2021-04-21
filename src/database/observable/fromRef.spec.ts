@@ -5,7 +5,7 @@ import { COMMON_CONFIG } from '../../test-config';
 import { take } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
 import { rando } from '../../firestore/utils.spec';
-import { Reference } from 'firebase/database';
+import { Reference, set, child, update, push, orderByChild, equalTo, query, remove, setPriority, ref as dbRef } from 'firebase/database';
 
 describe('fromRef', () => {
   let app: FirebaseApp;
@@ -33,7 +33,7 @@ describe('fromRef', () => {
 
     app = TestBed.inject(FirebaseApp);
     db = TestBed.inject(AngularFireDatabase);
-    ref = (path: string) => db.database.ref(path);
+    ref = (path: string) => dbRef(db.database, path);
   });
 
   afterEach(() => {
@@ -42,7 +42,7 @@ describe('fromRef', () => {
 
   it('it should be async by default', (done) => {
     const itemRef = ref(rando());
-    itemRef.set(batch);
+    set(itemRef, batch);
     const obs = fromRef(itemRef, 'value');
     let count = 0;
     expect(count).toEqual(0);
@@ -57,7 +57,7 @@ describe('fromRef', () => {
 
   it('should take a scheduler', done => {
     const itemRef = ref(rando());
-    itemRef.set(batch);
+    set(itemRef, batch);
 
     const testScheduler = new TestScheduler((actual, expected) => {
       expect(actual).toEqual(expected);
@@ -107,7 +107,7 @@ describe('fromRef', () => {
 
     // Completed
     const itemRef = ref(rando());
-    itemRef.set(batch);
+    set(itemRef, batch);
 
     const scheduler = new ɵZoneScheduler(Zone.current.fork({
       name: 'ExpectedZone'
@@ -131,7 +131,7 @@ describe('fromRef', () => {
 
   it('it should should handle non-existence', (done) => {
     const itemRef = ref(rando());
-    itemRef.set({});
+    set(itemRef, {});
     const obs = fromRef(itemRef, 'value');
     obs.pipe(take(1)).subscribe(change => {
       expect(change.payload.exists()).toEqual(false);
@@ -141,7 +141,7 @@ describe('fromRef', () => {
 
   it('once should complete', (done) => {
     const itemRef = ref(rando());
-    itemRef.set(batch);
+    set(itemRef, batch);
     const obs = fromRef(itemRef, 'value', 'once');
     obs.subscribe(() => {
     }, () => {
@@ -150,7 +150,7 @@ describe('fromRef', () => {
 
   it('it should listen and then unsubscribe', (done) => {
     const itemRef = ref(rando());
-    itemRef.set(batch);
+    set(itemRef, batch);
     const obs = fromRef(itemRef, 'value');
     let count = 0;
     const sub = obs.subscribe(() => {
@@ -160,7 +160,7 @@ describe('fromRef', () => {
       expect(count).toEqual(1);
       done();
       sub.unsubscribe();
-      itemRef.push({ name: 'anotha one' });
+      push(itemRef, { name: 'anotha one' });
     });
   });
 
@@ -168,7 +168,7 @@ describe('fromRef', () => {
 
     it('should stream back a child_added event', async (done: any) => {
       const itemRef = ref(rando());
-      itemRef.set(batch);
+      set(itemRef, batch);
       const obs = fromRef(itemRef, 'child_added');
       let count = 0;
       const sub = obs.subscribe(change => {
@@ -186,7 +186,7 @@ describe('fromRef', () => {
 
     it('should stream back a child_changed event', async (done: any) => {
       const itemRef = ref(rando());
-      itemRef.set(batch);
+      set(itemRef, batch);
       const obs = fromRef(itemRef, 'child_changed');
       const name = 'look at what you made me do';
       const key = items[0].key;
@@ -198,12 +198,12 @@ describe('fromRef', () => {
         sub.unsubscribe();
         done();
       });
-      itemRef.child(key).update({ name });
+      update(child(itemRef, key), { name });
     });
 
     it('should stream back a child_removed event', async (done: any) => {
       const itemRef = ref(rando());
-      itemRef.set(batch);
+      set(itemRef, batch);
       const obs = fromRef(itemRef, 'child_removed');
       const key = items[0].key;
       const name = items[0].name;
@@ -215,12 +215,12 @@ describe('fromRef', () => {
         sub.unsubscribe();
         done();
       });
-      itemRef.child(key).remove();
+      remove(child(itemRef, key));
     });
 
     it('should stream back a child_moved event', async (done: any) => {
       const itemRef = ref(rando());
-      itemRef.set(batch);
+      set(itemRef, batch);
       const obs = fromRef(itemRef, 'child_moved');
       const key = items[2].key;
       const name = items[2].name;
@@ -232,13 +232,12 @@ describe('fromRef', () => {
         sub.unsubscribe();
         done();
       });
-      itemRef.child(key).setPriority(-100, () => {
-      });
+      setPriority(child(itemRef, key), -100);
     });
 
     it('should stream back a value event', (done: any) => {
       const itemRef = ref(rando());
-      itemRef.set(batch);
+      set(itemRef, batch);
       const obs = fromRef(itemRef, 'value');
       const sub = obs.subscribe(change => {
         const { type, payload } = change;
@@ -252,9 +251,9 @@ describe('fromRef', () => {
 
     it('should stream back query results', (done: any) => {
       const itemRef = ref(rando());
-      itemRef.set(batch);
-      const query = itemRef.orderByChild('name').equalTo(items[0].name);
-      const obs = fromRef(query, 'value');
+      set(itemRef, batch);
+      const qRef = query(itemRef, orderByChild('name'), equalTo(items[0].name));
+      const obs = fromRef(qRef, 'value');
       obs.subscribe(change => {
         let child = null;
         change.payload.forEach(snap => {

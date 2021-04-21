@@ -1,5 +1,4 @@
-import { FirebaseFirestore, CollectionReference, writeBatch, doc } from 'firebase/firestore';
-import { AngularFirestoreCollection } from '@angular/fire/firestore';
+import { FirebaseFirestore, CollectionReference, writeBatch, doc, updateDoc, setDoc, deleteDoc } from 'firebase/firestore';
 
 export interface Stock {
   name: string;
@@ -36,21 +35,21 @@ export function deleteThemAll(names, ref) {
   return Promise.all(promises);
 }
 
-export function delayUpdate<T>(collection: AngularFirestoreCollection<T>, path, data, delay = 250) {
+export function delayUpdate<T>(collection: CollectionReference<T>, path, data, delay = 250) {
   setTimeout(() => {
-    collection.doc(path).update(data);
+    updateDoc(doc(collection, path), data);
   }, delay);
 }
 
-export function delayAdd<T>(collection: AngularFirestoreCollection<T>, path, data, delay = 250) {
+export function delayAdd<T>(collection: CollectionReference<T>, path, data, delay = 250) {
   setTimeout(() => {
-    collection.doc(path).set(data);
+    setDoc(doc(collection, path), data);
   }, delay);
 }
 
-export function delayDelete<T>(collection: AngularFirestoreCollection<T>, path, delay = 250) {
+export function delayDelete<T>(collection: CollectionReference<T>, path, delay = 250) {
   setTimeout(() => {
-    collection.doc(path).delete();
+    deleteDoc(doc(collection, path));
   }, delay);
 }
 

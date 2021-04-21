@@ -4,7 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 import { skip, switchMap, take } from 'rxjs/operators';
 import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
-
+import { collection, collectionGroup, doc, deleteDoc, updateDoc, query, where, orderBy } from 'firebase/firestore';
 import {
   createRandomStocks,
   delayAdd,
@@ -19,11 +19,11 @@ import {
 
 async function collectionHarness(afs: AngularFirestore, items: number, queryGroupFn?: QueryGroupFn<Stock>) {
   const randomCollectionName = randomName(afs.firestore);
-  const ref = afs.firestore.collection(`${randomCollectionName}`);
+  const ref = collection(afs.firestore, `${randomCollectionName}`);
   const firestore = afs.firestore;
-  const collectionGroup = firestore.collectionGroup(randomCollectionName) as Query<Stock>;
+  const query = collectionGroup(firestore, randomCollectionName) as Query<Stock>;
   const queryFn = queryGroupFn || (ref => ref);
-  const stocks = new AngularFirestoreCollectionGroup<Stock>(queryFn(collectionGroup), afs);
+  const stocks = new AngularFirestoreCollectionGroup<Stock>(queryFn(query), afs);
   const names = await createRandomStocks(afs.firestore, ref, items);
   return { randomCollectionName, ref, stocks, names };
 }
@@ -71,7 +71,7 @@ describe('AngularFirestoreCollectionGroup', () => {
           expect(stock).toEqual(FAKE_STOCK_DATA);
         });
         // Delete them all
-        const promises = names.map(name => ref.doc(name).delete());
+        const promises = names.map(name => deleteDoc(doc(ref, name)));
         Promise.all(promises).then(done).catch(fail);
       });
 
@@ -112,10 +112,10 @@ describe('AngularFirestoreCollectionGroup', () => {
 
       const pricefilter$ = new BehaviorSubject<number | null>(null);
       const randomCollectionName = randomName(afs.firestore);
-      const ref = afs.firestore.collection(`${randomCollectionName}`);
+      const ref = collection(afs.firestore, `${randomCollectionName}`);
       const names = await createRandomStocks(afs.firestore, ref, ITEMS);
       const sub = pricefilter$.pipe(switchMap(price => {
-        return afs.collection(randomCollectionName, ref => price ? ref.where('price', '==', price) : ref).valueChanges();
+        return afs.collection(randomCollectionName, ref => price ? query(ref, where('price', '==', price)) : ref).valueChanges();
       })).subscribe(data => {
         count = count + 1;
         // the first time should all be 'added'
@@ -158,7 +158,7 @@ describe('AngularFirestoreCollectionGroup', () => {
         // the first time should all be 'added'
         if (count === 1) {
           // make an update
-          ref.doc(names[0]).update({ price: 2 });
+          updateDoc(doc(ref, names[0]), { price: 2 });
         }
         // on the second round, make sure the array is still the same
         // length but the updated item is now modified
@@ -206,14 +206,14 @@ describe('AngularFirestoreCollectionGroup', () => {
       let count = 0;
       let firstIndex = 0;
       const { ref, stocks, names } =
-        await collectionHarness(afs, ITEMS, ref => ref.orderBy('price', 'desc'));
+        await collectionHarness(afs, ITEMS, ref => query(ref, orderBy('price', 'desc')));
       const sub = stocks.snapshotChanges().subscribe(data => {
         count = count + 1;
         // the first time should all be 'added'
         if (count === 1) {
           // make an update
           firstIndex = data.filter(d => d.payload.doc.id === names[0])[0].payload.newIndex;
-          ref.doc(names[0]).update({ price: 2 });
+          updateDoc(doc(ref, names[0]), { price: 2 });
         }
         // on the second round, make sure the array is still the same
         // length but the updated item is now modified
@@ -249,7 +249,7 @@ describe('AngularFirestoreCollectionGroup', () => {
       const harness = await collectionHarness(afs, ITEMS);
       const { randomCollectionName, ref, stocks } = harness;
       let { names } = harness;
-      const nextId = ref.doc('a').id;
+      const nextId = doc(ref, 'a').id;
 
       const sub = stocks.snapshotChanges(['added']).pipe(skip(1)).subscribe(data => {
         sub.unsubscribe();
@@ -265,7 +265,7 @@ describe('AngularFirestoreCollectionGroup', () => {
       names = names.concat([nextId]);
       // TODO these two add tests are the only one really testing collection-group queries
       //      should flex more, maybe split the stocks between more than one collection
-      delayAdd(ref.doc(names[0]).collection(randomCollectionName), nextId, { price: 2 });
+      delayAdd(collection(doc(ref, names[0]), randomCollectionName), nextId, { price: 2 });
     });
 
     it('should be able to filter snapshotChanges() types - added w/same id', async (done) => {
@@ -278,13 +278,13 @@ describe('AngularFirestoreCollectionGroup', () => {
         expect(data.length).toEqual(ITEMS + 1);
         expect(change.payload.doc.data().price).toEqual(3);
         expect(change.type).toEqual('added');
-        ref.doc(names[0]).collection(randomCollectionName).doc(names[0]).delete()
+        deleteDoc(doc(collection(doc(ref, names[0]), randomCollectionName), names[0]))
           .then(() => deleteThemAll(names, ref))
           .then(done).catch(done.fail);
         done();
       });
 
-      delayAdd(ref.doc(names[0]).collection(randomCollectionName), names[0], { price: 3 });
+      delayAdd(collection(doc(ref, names[0]), randomCollectionName), names[0], { price: 3 });
     });
 
     /* TODO(jamesdaniels): revisit this test with metadata changes, need to do some additional skips
@@ -371,7 +371,7 @@ describe('AngularFirestoreCollectionGroup', () => {
       stocks.stateChanges().subscribe(data => {
         count = count + 1;
         if (count === 1) {
-          ref.doc(names[0]).update({ price: 2 });
+          updateDoc(doc(ref, names[0]), { price: 2 });
         }
         if (count === 2) {
           expect(data.length).toEqual(1);
@@ -443,7 +443,7 @@ describe('AngularFirestoreCollectionGroup', () => {
         done();
       });
 
-      const nextId = ref.doc('a').id;
+      const nextId = doc(ref, 'a').id;
       names = names.concat([nextId]);
       delayAdd(ref, nextId, { price: 2 });
     });
@@ -472,7 +472,7 @@ describe('AngularFirestoreCollectionGroup', () => {
       const sub = stocks.auditTrail().subscribe(data => {
         count = count + 1;
         if (count === 1) {
-          ref.doc(names[0]).update({ price: 2 });
+          updateDoc(doc(ref, names[0]), { price: 2 });
         }
         if (count === 2) {
           sub.unsubscribe();

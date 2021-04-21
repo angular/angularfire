@@ -10,7 +10,7 @@ import { ListResult,
   UploadResult,
   StorageService,
 } from './interfaces';
-import { 
+import {
   getDownloadURL,
   getMetadata,
   ref,

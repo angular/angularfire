@@ -29,7 +29,7 @@ describe('AngularFireRemoteConfig', () => {
   });
 
   it('should have the Firebase Functions instance', () => {
-    expect(rc.getValue).toBeDefined();
+    expect(rc.settings).toBeDefined();
   });
 
 });
@@ -69,7 +69,7 @@ describe('AngularFireRemoteConfig with different app', () => {
     });
 
     it('should have the Firebase Functions instance', () => {
-      expect(rc.getValue).toBeDefined();
+      expect(rc.settings).toBeDefined();
     });
 
   });

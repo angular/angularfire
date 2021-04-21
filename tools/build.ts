@@ -4,6 +4,7 @@ import { prettySize } from 'pretty-size';
 import { sync as gzipSync } from 'gzip-size';
 import { dirname, join } from 'path';
 import { keys as tsKeys } from 'ts-transformer-keys';
+import firebase from 'firebase/compat/app';
 import { Analytics } from 'firebase/analytics';
 import { Auth } from 'firebase/auth';
 import { FirebaseMessaging } from 'firebase/messaging';
@@ -13,12 +14,17 @@ import { RemoteConfig } from 'firebase/remote-config';
 
 // TODO infer these from the package.json
 const MODULES = [
-  'core', 'analytics', 'auth', 'auth-guard', 'database',
-  'firestore', 'functions', 'remote-config',
-  'storage', 'messaging', 'performance'
+  'core', 'compat', 'analytics', 'auth', 'database', 'firestore',
+  'functions', 'remote-config', 'storage', 'messaging', 'performance',
+  'compat/analytics', 'compat/auth-guard', 'compat/auth', 'auth-guard',
+  'compat/database', 'compat/firestore', 'compat/functions', 'compat/remote-config',
+  'compat/storage', 'compat/messaging', 'compat/performance'
 ];
-const LAZY_MODULES = ['analytics', 'auth', 'functions', 'messaging', 'remote-config'];
-const UMD_NAMES = MODULES.map(m => m === 'core' ? 'angular-fire' : `angular-fire-${m}`);
+const LAZY_MODULES = [
+  'analytics', 'auth', 'functions', 'messaging', 'remote-config', 'compat/analytics',
+  'compat/auth', 'compat/functions', 'compat/messaging', 'compat/remote-config'
+];
+const UMD_NAMES = MODULES.map(m => m === 'core' ? 'angular-fire' : `angular-fire-${m.replace('/', '-')}`);
 const ENTRY_NAMES = MODULES.map(m => m === 'core' ? '@angular/fire' : `@angular/fire/${m}`);
 
 function proxyPolyfillCompat() {
@@ -29,6 +35,12 @@ function proxyPolyfillCompat() {
     messaging: tsKeys<FirebaseMessaging>(),
     performance: tsKeys<FirebasePerformance>(),
     'remote-config': tsKeys<RemoteConfig>(),
+    'compat/analytics': tsKeys<firebase.analytics.Analytics>(),
+    'compat/auth': tsKeys<firebase.auth.Auth>(),
+    'compat/functions': tsKeys<firebase.functions.Functions>(),
+    'compat/messaging': tsKeys<firebase.messaging.Messaging>(),
+    'compat/performance': tsKeys<firebase.performance.Performance>(),
+    'compat/remote-config': tsKeys<firebase.remoteConfig.RemoteConfig>(),
   };
 
   return Promise.all(Object.keys(defaultObject).map(module =>
@@ -105,7 +117,7 @@ async function fixImportForLazyModules() {
     const entries = Array.from(new Set(Object.values(packageJson).filter(v => typeof v === 'string' && v.endsWith('.js')))) as string[];
     // TODO don't hardcode esm2015 here, perhaps we should scan all the entry directories
     //      e.g, if ng-packagr starts building other non-flattened entries we'll lose the dynamic import
-    entries.push(`../esm2015/${module}/public_api.js`); // the import isn't pulled into the ESM public_api
+    entries.push(`../${module.includes('/') ? '../' : ''}esm2015/${module}/public_api.js`);
     await Promise.all(entries.map(async path => {
       const source = (await readFile(dest(module, path))).toString();
       let newSource: string;
@@ -192,8 +204,8 @@ Promise.all([
   buildLibrary()
 ]).then(measureLibrary).then(stats =>
   console.log(`
-Package         Size    Gzipped
+Package              Size    Gzipped
 ------------------------------------
-${stats.map((s, i) => [MODULES[i].padEnd(16), s.size.padEnd(8), s.gzip].join('')).join('\n')}`
+${stats.map((s, i) => [MODULES[i].padEnd(21), s.size.padEnd(8), s.gzip].join('')).join('\n')}`
   )
 );

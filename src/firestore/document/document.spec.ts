@@ -1,7 +1,7 @@
 import { AngularFireModule, FirebaseApp } from '@angular/fire';
 import { AngularFirestore, SETTINGS, AngularFirestoreModule, AngularFirestoreDocument, DocumentReference } from '@angular/fire/firestore';
 import { take } from 'rxjs/operators';
-
+import { collection, doc } from 'firebase/firestore';
 import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 
@@ -33,8 +33,8 @@ describe('AngularFirestoreDocument', () => {
   describe('valueChanges()', () => {
 
     it('should get unwrapped snapshot', async (done: any) => {
-      const randomCollectionName = afs.firestore.collection('a').doc().id;
-      const ref = afs.firestore.doc(`${randomCollectionName}/FAKE`) as DocumentReference<Stock>;
+      const randomCollectionName = doc(collection(afs.firestore, 'a')).id;
+      const ref = doc(afs.firestore, `${randomCollectionName}/FAKE`) as DocumentReference<Stock>;
       const stock = new AngularFirestoreDocument(ref, afs);
       await stock.set(FAKE_STOCK_DATA);
       const obs$ = stock.valueChanges();
@@ -65,7 +65,7 @@ describe('AngularFirestoreDocument', () => {
 
     it('should get action updates', async (done: any) => {
       const randomCollectionName = randomName(afs.firestore);
-      const ref = afs.firestore.doc(`${randomCollectionName}/FAKE`) as DocumentReference<Stock>;
+      const ref = doc(afs.firestore, `${randomCollectionName}/FAKE`) as DocumentReference<Stock>;
       const stock = new AngularFirestoreDocument<Stock>(ref, afs);
       await stock.set(FAKE_STOCK_DATA);
       const sub = stock
@@ -80,8 +80,8 @@ describe('AngularFirestoreDocument', () => {
     });
 
     it('should get unwrapped snapshot', async (done: any) => {
-      const randomCollectionName = afs.firestore.collection('a').doc().id;
-      const ref = afs.firestore.doc(`${randomCollectionName}/FAKE`) as DocumentReference<Stock>;
+      const randomCollectionName = doc(collection(afs.firestore, 'a')).id;
+      const ref = doc(afs.firestore, `${randomCollectionName}/FAKE`) as DocumentReference<Stock>;
       const stock = new AngularFirestoreDocument<Stock>(ref, afs);
       await stock.set(FAKE_STOCK_DATA);
       const obs$ = stock.valueChanges();

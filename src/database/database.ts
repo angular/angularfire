@@ -15,7 +15,7 @@ import {
 import { Observable } from 'rxjs';
 import 'firebase/database';
 import { USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/auth';
-import { Database } from 'firebase/database';
+import { FirebaseDatabase, useDatabaseEmulator, ref } from 'firebase/database';
 import { ɵfetchInstance, ɵlogAuthEmulatorError } from '@angular/fire';
 
 export const URL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
@@ -30,7 +30,7 @@ export const USE_EMULATOR = new InjectionToken<UseEmulatorArguments>('angularfir
   providedIn: 'any'
 })
 export class AngularFireDatabase {
-  public readonly database: Database;
+  public readonly database: FirebaseDatabase;
 
   public readonly schedulers: ɵAngularFireSchedulers;
   public readonly keepUnstableUntilFirst: <T>(obs$: Observable<T>) => Observable<T>;
@@ -51,7 +51,7 @@ export class AngularFireDatabase {
     const useEmulator: UseEmulatorArguments | null = _useEmulator;
     const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
 
-    // TODO(team): Figure out how to get detect potential Authentication instance 
+    // TODO(team): Figure out how to get detect potential Authentication instance
     // in vNext world
     // if (!firebase.auth && useAuthEmulator) {
     //   ɵlogAuthEmulatorError();
@@ -60,7 +60,7 @@ export class AngularFireDatabase {
     this.database = ɵfetchInstance(`${app.name}.database.${databaseURL}`, 'AngularFireDatabase', app, () => {
       const database = zone.runOutsideAngular(() => app.database(databaseURL || undefined));
       if (useEmulator) {
-        database.useEmulator(...useEmulator);
+        useDatabaseEmulator(database, ...useEmulator);
       }
       return database;
     }, [useEmulator]);
@@ -81,7 +81,7 @@ export class AngularFireDatabase {
   }
 
   createPushId() {
-    const ref = this.schedulers.ngZone.runOutsideAngular(() => this.database.ref());
+    const ref = this.schedulers.ngZone.runOutsideAngular(() => ref(this.database));
     return ref.push().key;
   }
 
