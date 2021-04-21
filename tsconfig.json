@@ -25,6 +25,7 @@
   },
   "exclude": [
     "src/test.ts",
+    "src/**/*.jasmine.ts",
     "src/**/*.spec.ts"
   ]
 }

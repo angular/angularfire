@@ -41,7 +41,7 @@
         "@angular/fire/compat/messaging": ["dist/packages-dist/compat/messaging"],
         "@angular/fire/compat/performance": ["dist/packages-dist/compat/performance"],
         "@angular/fire/compat/remote-config": ["dist/packages-dist/compat/remote-config"],
-        "@angular/fire/compat/storage": ["dist/packages-dist/compat/storage"],
+        "@angular/fire/compat/storage": ["dist/packages-dist/compat/storage"]
       }
     }
   }
