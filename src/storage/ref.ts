@@ -1,4 +1,4 @@
-import { ListResult, Reference, SettableMetadata, StringFormat, UploadMetadata } from './interfaces';
+import { ListResult, Reference, SettableMetadata, StringFormat, UploadMetadata, ListOptions } from './interfaces';
 import { AngularFireUploadTask, createUploadTask } from './task';
 import { from, Observable, of } from 'rxjs';
 import { ɵAngularFireSchedulers } from '@angular/fire';
@@ -12,6 +12,7 @@ export interface AngularFireStorageReference {
   updateMetadata(meta: SettableMetadata): Observable<any>;
   put(data: any, metadata?: UploadMetadata | undefined): AngularFireUploadTask;
   putString(data: string, format?: string | undefined, metadata?: UploadMetadata | undefined): AngularFireUploadTask;
+  list(options: ListOptions): Observable<ListResult>;
   listAll(): Observable<ListResult>;
 }
 
@@ -46,6 +47,7 @@ export function createStorageRef(
       const task = ref.putString(data, format, metadata);
       return createUploadTask(task);
     },
+    list: (options: ListOptions) => from(ref.list(options)),
     listAll: () => from(ref.listAll())
   };
 }
