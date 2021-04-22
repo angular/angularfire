@@ -27,6 +27,7 @@ export class UserTrackingService implements OnDestroy {
       this.initialized = zone.runOutsideAngular(() => new Promise(resolve => resolveInitialized = resolve));
 
       this.disposables = [
+        /*
           analytics.analytics$.pipe(
             switchMap(analytics => {
               return auth.authState.pipe(
@@ -54,6 +55,7 @@ export class UserTrackingService implements OnDestroy {
               logEvent(analytics, 'login', { method });
             }
           }),
+          */
       ];
     } else {
       this.initialized = Promise.resolve();

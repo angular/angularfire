@@ -46,7 +46,7 @@ export class AngularFireStorage {
     this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers);
     const app = ɵfirebaseAppFactory(options, zone, name);
 
-    this.storage = ɵfetchInstance(`${app.name}.storage.${storageBucket}`, 'AngularFireStorage', app, () => {
+    this.storage = ɵfetchInstance(`${app.name}.storage.${storageBucket}`, 'AngularFireStorage', app.name, () => {
       const storage = zone.runOutsideAngular(() => app.storage(storageBucket || undefined));
       if (maxUploadRetryTime) {
         storage.setMaxUploadRetryTime(maxUploadRetryTime);

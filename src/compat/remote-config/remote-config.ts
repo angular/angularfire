@@ -145,7 +145,7 @@ export class AngularFireRemoteConfig {
       switchMap(() => isPlatformBrowser(platformId) ? import('firebase/compat/remote-config') : EMPTY),
       switchMap(() => import('@firebase/remote-config')),
       map(() => ɵfirebaseAppFactory(options, zone, name)),
-      map(app => ɵfetchInstance(`${app.name}.remote-config`, 'AngularFireRemoteConfig', app, () => {
+      map(app => ɵfetchInstance(`${app.name}.remote-config`, 'AngularFireRemoteConfig', app.name, () => {
         const rc = app.remoteConfig();
         if (settings) {
           rc.settings = settings;

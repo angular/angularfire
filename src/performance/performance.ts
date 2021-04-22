@@ -33,7 +33,7 @@ export class AngularFirePerformance {
 
     this.performance = of(undefined).pipe(
       switchMap(() => isPlatformBrowser(platformId) ? zone.runOutsideAngular(() => import('firebase/performance')) : EMPTY),
-      map(() => ɵfetchInstance(`performance`, 'AngularFirePerformance', app, () => {
+      map(() => ɵfetchInstance(`performance`, 'AngularFirePerformance', app.name, () => {
         const performance = zone.runOutsideAngular(() => {
           return initializePerformance(app, {
             instrumentationEnabled,

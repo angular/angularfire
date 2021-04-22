@@ -23,7 +23,7 @@ import { isPlatformServer } from '@angular/common';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import { USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/compat/auth';
-import { ɵfetchInstance, ɵlogAuthEmulatorError } from '@angular/fire';
+import { ɵfetchInstance } from '@angular/fire';
 
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
@@ -147,12 +147,9 @@ export class AngularFirestore {
     this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers);
 
     const app = ɵfirebaseAppFactory(options, zone, name);
-    if (!firebase.auth && useAuthEmulator) {
-      ɵlogAuthEmulatorError();
-    }
     const useEmulator: UseEmulatorArguments | null = _useEmulator;
 
-    [this.firestore, this.persistenceEnabled$] = ɵfetchInstance(`${app.name}.firestore`, 'AngularFirestore', app, () => {
+    [this.firestore, this.persistenceEnabled$] = ɵfetchInstance(`${app.name}.firestore`, 'AngularFirestore', app.name, () => {
       const firestore = zone.runOutsideAngular(() => app.firestore());
       if (settings) {
         firestore.settings(settings);

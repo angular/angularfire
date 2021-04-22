@@ -16,17 +16,15 @@ import { AngularFirestoreCollectionGroup } from './collection-group/collection-g
 import {
   FIREBASE_APP_NAME,
   FIREBASE_OPTIONS,
-  FirebaseAppConfig,
-  FirebaseOptions,
   ɵAngularFireSchedulers,
   ɵfirebaseAppFactory,
   ɵkeepUnstableUntilFirstFactory,
   FirebaseApp
 } from '@angular/fire';
+import { FirebaseOptions } from 'firebase/app';
 import { isPlatformServer } from '@angular/common';
-import { FirebaseFirestore, useFirestoreEmulator, enableIndexedDbPersistence, collection, collectionGroup, doc } from 'firebase/firestore';
-import { USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/auth';
-import { ɵfetchInstance, ɵlogAuthEmulatorError } from '@angular/fire';
+import { FirebaseFirestore, useFirestoreEmulator, enableIndexedDbPersistence, collection, collectionGroup, doc, initializeFirestore } from 'firebase/firestore';
+import { ɵfetchInstance } from '@angular/fire';
 
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
@@ -136,7 +134,7 @@ export class AngularFirestore {
    */
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
-    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string | FirebaseAppConfig | null | undefined,
+    @Optional() @Inject(FIREBASE_APP_NAME) name: string | null | undefined,
     @Optional() @Inject(ENABLE_PERSISTENCE) shouldEnablePersistence: boolean | null,
     @Optional() @Inject(SETTINGS) settings: Settings | null,
     // tslint:disable-next-line:ban-types
@@ -144,24 +142,18 @@ export class AngularFirestore {
     zone: NgZone,
     @Optional() @Inject(PERSISTENCE_SETTINGS) persistenceSettings: PersistenceSettings | null,
     @Optional() @Inject(USE_EMULATOR) _useEmulator: any,
-    @Optional() @Inject(USE_AUTH_EMULATOR) useAuthEmulator: any,
   ) {
     this.schedulers = new ɵAngularFireSchedulers(zone);
     this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers);
 
-    const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
+    const app = ɵfirebaseAppFactory(options, zone, name);
     // if (!firebase.auth && useAuthEmulator) {
     //   ɵlogAuthEmulatorError();
     // }
     const useEmulator: UseEmulatorArguments | null = _useEmulator;
 
-    [this.firestore, this.persistenceEnabled$] = ɵfetchInstance(`${app.name}.firestore`, 'AngularFirestore', app, () => {
-      const firestore = zone.runOutsideAngular(() => app.firestore());
-
-      // TODO(team): Initialize settings in NgModule for initializeFirestore()
-      // if (settings) {
-      //   firestore.settings(settings);
-      // }
+    [this.firestore, this.persistenceEnabled$] = ɵfetchInstance(`${app.name}.firestore`, 'AngularFirestore', app.name, () => {
+      const firestore = zone.runOutsideAngular(() => initializeFirestore(app, settings));
 
       if (useEmulator) {
         const [host, port] = useEmulator;

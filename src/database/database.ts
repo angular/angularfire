@@ -6,17 +6,14 @@ import { createObjectReference } from './object/create-reference';
 import {
   FIREBASE_APP_NAME,
   FIREBASE_OPTIONS,
-  FirebaseAppConfig,
-  FirebaseOptions,
   ɵAngularFireSchedulers,
   ɵfirebaseAppFactory,
   ɵkeepUnstableUntilFirstFactory,
 } from '@angular/fire';
+import { FirebaseOptions } from 'firebase/app';
 import { Observable } from 'rxjs';
-import 'firebase/database';
-import { USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/auth';
-import { FirebaseDatabase, useDatabaseEmulator, ref } from 'firebase/database';
-import { ɵfetchInstance, ɵlogAuthEmulatorError } from '@angular/fire';
+import { FirebaseDatabase, useDatabaseEmulator, getDatabase } from 'firebase/database';
+import { ɵfetchInstance } from '@angular/fire';
 
 export const URL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
 
@@ -37,19 +34,18 @@ export class AngularFireDatabase {
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
-    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string | FirebaseAppConfig | null | undefined,
+    @Optional() @Inject(FIREBASE_APP_NAME) name: string | null | undefined,
     @Optional() @Inject(URL) databaseURL: string | null,
     // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
     @Optional() @Inject(USE_EMULATOR) _useEmulator: any, // tuple isn't working here
-    @Optional() @Inject(USE_AUTH_EMULATOR) useAuthEmulator: any,
   ) {
     this.schedulers = new ɵAngularFireSchedulers(zone);
     this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers);
 
     const useEmulator: UseEmulatorArguments | null = _useEmulator;
-    const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
+    const app = ɵfirebaseAppFactory(options, zone, name);
 
     // TODO(team): Figure out how to get detect potential Authentication instance
     // in vNext world
@@ -57,8 +53,8 @@ export class AngularFireDatabase {
     //   ɵlogAuthEmulatorError();
     // }
 
-    this.database = ɵfetchInstance(`${app.name}.database.${databaseURL}`, 'AngularFireDatabase', app, () => {
-      const database = zone.runOutsideAngular(() => app.database(databaseURL || undefined));
+    this.database = ɵfetchInstance(`${app.name}.database.${databaseURL}`, 'AngularFireDatabase', app.name, () => {
+      const database = zone.runOutsideAngular(() => getDatabase(app, databaseURL || undefined));
       if (useEmulator) {
         useDatabaseEmulator(database, ...useEmulator);
       }

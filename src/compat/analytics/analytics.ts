@@ -150,7 +150,7 @@ export class AngularFireAnalytics {
       // TODO server-side investigate use of the Universal Analytics API
       // switchMap(supported => supported ? of(undefined) : EMPTY),
       map(() => {
-        return ɵfetchInstance(`analytics`, 'AngularFireAnalytics', app, () => {
+        return ɵfetchInstance(`analytics`, 'AngularFireAnalytics', app.name, () => {
           const analytics = app.analytics();
           if (analyticsCollectionEnabled === false) {
             analytics.setAnalyticsCollectionEnabled(false);

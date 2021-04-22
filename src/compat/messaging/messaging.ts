@@ -49,7 +49,7 @@ export class AngularFireMessaging {
       observeOn(schedulers.insideAngular),
       switchMap(() => isPlatformServer(platformId) ? EMPTY : import('firebase/compat/messaging')),
       map(() => ɵfirebaseAppFactory(options, zone, name)),
-      switchMap(app => ɵfetchInstance(`${app.name}.messaging`, 'AngularFireMessaging', app, async () => {
+      switchMap(app => ɵfetchInstance(`${app.name}.messaging`, 'AngularFireMessaging', app.name, async () => {
         return app.messaging();
       }, [])),
       shareReplay({ bufferSize: 1, refCount: false })

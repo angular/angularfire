@@ -13,7 +13,7 @@ import { Observable } from 'rxjs';
 import 'firebase/compat/database';
 import { USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/compat/auth';
 import firebase from 'firebase/compat/app';
-import { ɵfetchInstance, ɵlogAuthEmulatorError } from '@angular/fire';
+import { ɵfetchInstance } from '@angular/fire';
 
 export const URL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
 
@@ -48,11 +48,7 @@ export class AngularFireDatabase {
     const useEmulator: UseEmulatorArguments | null = _useEmulator;
     const app = ɵfirebaseAppFactory(options, zone, name);
 
-    if (!firebase.auth && useAuthEmulator) {
-      ɵlogAuthEmulatorError();
-    }
-
-    this.database = ɵfetchInstance(`${app.name}.database.${databaseURL}`, 'AngularFireDatabase', app, () => {
+    this.database = ɵfetchInstance(`${app.name}.database.${databaseURL}`, 'AngularFireDatabase', app.name, () => {
       const database = zone.runOutsideAngular(() => app.database(databaseURL || undefined));
       if (useEmulator) {
         database.useEmulator(...useEmulator);

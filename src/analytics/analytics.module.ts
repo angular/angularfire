@@ -8,12 +8,7 @@ import { UserTrackingService } from './user-tracking.service';
 })
 export class AngularFireAnalyticsModule {
   constructor(
-    analytics: AngularFireAnalytics,
     @Optional() screenTracking: ScreenTrackingService,
     @Optional() userTracking: UserTrackingService
-  ) {
-    // calling anything on analytics will eagerly load the SDK
-    // tslint:disable-next-line:no-unused-expression
-    analytics.app.then(() => {});
-  }
+  ) { }
 }

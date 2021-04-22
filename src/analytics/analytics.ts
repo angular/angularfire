@@ -1,17 +1,7 @@
 import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
-import { EMPTY, Observable, of } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
-import { map, shareReplay, switchMap, observeOn } from 'rxjs/operators';
-import {
-  ɵAngularFireSchedulers,
-  ɵlazySDKProxy,
-  ɵPromiseProxy,
-  ɵapplyMixins,
-  FirebaseApp
-} from '@angular/fire';
+import { ɵfetchInstance, FirebaseApp } from '@angular/fire';
 import { getAnalytics, Analytics, setAnalyticsCollectionEnabled } from 'firebase/analytics';
-import { proxyPolyfillCompat } from './base';
-import { ɵfetchInstance } from '@angular/fire';
 
 export interface Config {
   [key: string]: any;
@@ -31,22 +21,21 @@ const GTAG_FUNCTION_NAME = 'gtag'; // TODO rename these
 const DATA_LAYER_NAME = 'dataLayer';
 const SEND_TO_KEY = 'send_to';
 
-export interface AngularFireAnalytics extends ɵPromiseProxy<Analytics> {
-}
+// tslint:disable-next-line:no-empty-interface
+export interface AngularFireAnalytics extends Analytics {}
+
+let resolveAnalyticsInitialized: () => void | undefined;
+const measurementId: () => string = () => globalThis.ɵAngularfireMeasurementId;
+const analyticsInitialized: Promise<void> = globalThis.ɵAngularfireAnalyticsInitialized || new Promise((resolve) => {
+  resolveAnalyticsInitialized = resolve;
+});
+
+globalThis.ɵAngularfireAnalyticsInitialized ||= analyticsInitialized;
 
 @Injectable({
   providedIn: 'any'
 })
 export class AngularFireAnalytics {
-
-  private measurementId: string;
-  private analyticsInitialized: Promise<void> = new Promise(() => {});
-  analytics$: Observable<Analytics>;
-
-  async updateConfig(config: Config) {
-    await this.analyticsInitialized;
-    window[GTAG_FUNCTION_NAME](GTAG_CONFIG_COMMAND, this.measurementId, { ...config, update: true });
-  }
 
   constructor(
     app: FirebaseApp,
@@ -71,7 +60,7 @@ export class AngularFireAnalytics {
       // e.g, ['config', measurementId, { origin: 'firebase', firebase_id }]
       const parseMeasurementId = (...args: any[]) => {
         if (args[0] === 'config' && args[2].origin === 'firebase') {
-          this.measurementId = args[1];
+          globalThis.ɵAngularfireMeasurementId = args[1];
           return true;
         } else {
           return false;
@@ -87,7 +76,7 @@ export class AngularFireAnalytics {
           // TODO(jamesdaniels): I'm doing this as documented but it's still not
           //   showing up in the console. Investigate. Guessing it's just part of the
           //   whole GA4 transition mess.
-          if (args[0] === 'event' && args[2][SEND_TO_KEY] === this.measurementId) {
+          if (args[0] === 'event' && args[2][SEND_TO_KEY] === measurementId()) {
             if (providedAppName) {
               args[2][APP_NAME_KEY] = providedAppName;
             }
@@ -118,54 +107,39 @@ export class AngularFireAnalytics {
       // before sending anything
       const firebaseAnalyticsAlreadyInitialized = window[DATA_LAYER_NAME].some(parseMeasurementId);
       if (firebaseAnalyticsAlreadyInitialized) {
-        this.analyticsInitialized = Promise.resolve();
+        if (resolveAnalyticsInitialized) { resolveAnalyticsInitialized(); }
         patchGtag();
       } else {
-        this.analyticsInitialized = new Promise(resolve => {
-          patchGtag((...args) => {
-            if (parseMeasurementId(...args)) {
-              resolve();
-            }
-          });
+        patchGtag((...args) => {
+          if (parseMeasurementId(...args)) {
+            if (resolveAnalyticsInitialized) { resolveAnalyticsInitialized(); }
+          }
         });
       }
 
       if (providedConfig) {
-        this.updateConfig(providedConfig);
+        updateConfig(providedConfig);
       }
       if (debugModeEnabled) {
-        this.updateConfig({ [DEBUG_MODE_KEY]: 1 });
+        updateConfig({ [DEBUG_MODE_KEY]: 1 });
       }
-
-    } else {
-
-      this.analyticsInitialized = Promise.resolve();
 
     }
 
-    this.analytics$ = of(undefined).pipe(
-      observeOn(new ɵAngularFireSchedulers(zone).outsideAngular),
-      // switchMap(() => isPlatformBrowser(platformId) ? zone.runOutsideAngular(() => import('firebase/analytics')) : EMPTY),
-      // SEMVER can switch to isSupported() when we only target v8
-      // switchMap(() => isSupported().then(it => it, () => false)),
-      // TODO server-side investigate use of the Universal Analytics API
-      // switchMap(supported => supported ? of(undefined) : EMPTY),
-      map(() => {
-        return ɵfetchInstance(`analytics`, 'AngularFireAnalytics', app, () => {
+    return zone.runOutsideAngular(() =>
+      ɵfetchInstance(`analytics`, 'AngularFireAnalytics', app.name, () => {
           const analytics = getAnalytics(app);
           if (analyticsCollectionEnabled === false) {
             setAnalyticsCollectionEnabled(analytics, false);
           }
           return analytics;
-        }, [app, analyticsCollectionEnabled, providedConfig, debugModeEnabled]);
-      }),
-      shareReplay({ bufferSize: 1, refCount: false })
+      }, [app, analyticsCollectionEnabled, providedConfig, debugModeEnabled])
     );
-
-    // TODO(team): Hardcore zone patch or just patch here?
-    return ɵlazySDKProxy(this, this.analytics$, zone);
   }
-
 }
 
-ɵapplyMixins(AngularFireAnalytics, [proxyPolyfillCompat]);
+
+export async function updateConfig(config: Config) {
+  await this.analyticsInitialized;
+  window[GTAG_FUNCTION_NAME](GTAG_CONFIG_COMMAND, measurementId(), { ...config, update: true });
+}

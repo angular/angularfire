@@ -5,14 +5,15 @@ import { catchError, defaultIfEmpty, map, mergeMap, observeOn, switchMap, switch
 import {
   FIREBASE_APP_NAME,
   FIREBASE_OPTIONS,
-  FirebaseAppConfig,
-  FirebaseOptions,
   ɵAngularFireSchedulers,
   ɵfirebaseAppFactory,
   ɵlazySDKProxy,
   ɵPromiseProxy,
   ɵapplyMixins
 } from '@angular/fire';
+import {
+  FirebaseAppConfig,
+  FirebaseOptions, } from 'firebase/app';
 import { isPlatformServer } from '@angular/common';
 import { proxyPolyfillCompat } from './base';
 import { ɵfetchInstance } from '@angular/fire';
@@ -41,7 +42,7 @@ export class AngularFireMessaging {
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
-    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string | FirebaseAppConfig | null | undefined,
+    @Optional() @Inject(FIREBASE_APP_NAME) name: string | null | undefined,
     // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
@@ -55,8 +56,8 @@ export class AngularFireMessaging {
       subscribeOn(schedulers.outsideAngular),
       observeOn(schedulers.insideAngular),
       switchMap(() => isPlatformServer(platformId) ? EMPTY : import('firebase/messaging')),
-      map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
-      switchMap(app => ɵfetchInstance(`${app.name}.messaging`, 'AngularFireMessaging', app, async () => {
+      map(() => ɵfirebaseAppFactory(options, zone, name)),
+      switchMap(app => ɵfetchInstance(`${app.name}.messaging`, 'AngularFireMessaging', app.name, async () => {
         const messaging = getMessaging(app);
         // MARK: Breaking change
         // Removed: useVapidKey removed?

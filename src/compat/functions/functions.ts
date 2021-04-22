@@ -48,7 +48,7 @@ export class AngularFireFunctions {
       observeOn(schedulers.outsideAngular),
       switchMap(() => import('firebase/compat/functions')),
       map(() => ɵfirebaseAppFactory(options, zone, name)),
-      map(app => ɵfetchInstance(`${app.name}.functions.${region || origin}`, 'AngularFireFunctions', app, () => {
+      map(app => ɵfetchInstance(`${app.name}.functions.${region || origin}`, 'AngularFireFunctions', app.name, () => {
         let functions: firebase.functions.Functions;
         if (region && origin) {
           throw new Error('REGION and ORIGIN can\'t be used at the same time.');

@@ -18,13 +18,10 @@
  * BROWSER POLYFILLS
  */
 
-/** IE10 and IE11 requires the following for NgClass support on SVG elements */
+/**
+ * IE11 requires the following for NgClass support on SVG elements
+ */
 // import 'classlist.js';  // Run `npm install --save classlist.js`.
-
-import 'proxy-polyfill/proxy.min.js';
-import 'core-js/stable';
-import 'whatwg-fetch';
-import 'first-input-delay';
 
 /**
  * Web Animations `@angular/platform-browser/animations`
@@ -60,7 +57,7 @@ import 'first-input-delay';
 /***************************************************************************************************
  * Zone JS is required by default for Angular itself.
  */
-import 'zone.js/dist/zone'; // Included with Angular CLI.
+import 'zone.js';  // Included with Angular CLI.
 
 
 /***************************************************************************************************

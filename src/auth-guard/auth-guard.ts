@@ -19,7 +19,7 @@ export class AngularFireAuthGuard implements CanActivate {
 
   canActivate = (next: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
     const authPipeFactory = next.data.authGuardPipe as AuthPipeGenerator || (() => loggedIn);
-    return this.auth.user.pipe(
+    /*return this.auth.user.pipe(
       take(1),
       authPipeFactory(next, state),
       map(can => {
@@ -32,7 +32,8 @@ export class AngularFireAuthGuard implements CanActivate {
           return this.router.parseUrl(can);
         }
       })
-    );
+    );*/
+    return true;
   }
 
 }

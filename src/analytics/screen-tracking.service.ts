@@ -144,19 +144,12 @@ export class ScreenTrackingService implements OnDestroy {
               ...current
             } : current
           ),
-          mergeMap(([prior, current]) => {
-            return analytics.analytics$.pipe(
-              map(analytics => {
-                return { prior, current, analytics };
-              })
-            );
-          }),
-          switchMap(async ({ prior, current, analytics }) => {
+          switchMap(async ([ prior, current ]) => {
             if (userTrackingService) {
               await userTrackingService.initialized;
             }
             // TODO(team): Why do we need to cast a string to a string here?
-            return await logEvent(analytics, SCREEN_VIEW_EVENT as string, { prior, current });
+            return logEvent(analytics, SCREEN_VIEW_EVENT as string, { prior, current });
           })
         ))
       ).subscribe();

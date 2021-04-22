@@ -4,14 +4,15 @@ import { map, observeOn, shareReplay, switchMap } from 'rxjs/operators';
 import {
   FIREBASE_APP_NAME,
   FIREBASE_OPTIONS,
-  FirebaseAppConfig,
-  FirebaseOptions,
   ɵAngularFireSchedulers,
   ɵfirebaseAppFactory,
   ɵlazySDKProxy,
   ɵPromiseProxy,
   ɵapplyMixins
 } from '@angular/fire';
+import {
+  FirebaseAppConfig,
+  FirebaseOptions } from 'firebase/app';
 import { proxyPolyfillCompat } from './base';
 import { HttpsCallableOptions, Functions, useFunctionsEmulator, httpsCallable, getFunctions } from 'firebase/functions';
 import { ɵfetchInstance } from '@angular/fire';
@@ -38,7 +39,7 @@ export class AngularFireFunctions {
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
-    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string | FirebaseAppConfig | null | undefined,
+    @Optional() @Inject(FIREBASE_APP_NAME) name: string | null | undefined,
     zone: NgZone,
     @Optional() @Inject(REGION) region: string | null,
     // MARK: Breaking change
@@ -53,8 +54,8 @@ export class AngularFireFunctions {
     const functions = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
       switchMap(() => import('firebase/functions')),
-      map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
-      map(app => ɵfetchInstance(`${app.name}.functions.${region || origin}`, 'AngularFireFunctions', app, () => {
+      map(() => ɵfirebaseAppFactory(options, zone, name)),
+      map(app => ɵfetchInstance(`${app.name}.functions.${region || origin}`, 'AngularFireFunctions', app.name, () => {
         const functions = getFunctions(app, region || undefined);
         if (useEmulator) {
           const [host, port] = useEmulator;

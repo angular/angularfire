@@ -82,7 +82,7 @@ export class AngularFireAuth {
       map(app => zone.runOutsideAngular(() => {
         const useEmulator: UseEmulatorArguments | null = _useEmulator;
         const settings: firebase.auth.AuthSettings | null = _settings;
-        return ɵfetchInstance(`${app.name}.auth`, 'AngularFireAuth', app, () => {
+        return ɵfetchInstance(`${app.name}.auth`, 'AngularFireAuth', app.name, () => {
           const auth = zone.runOutsideAngular(() => app.auth());
           if (useEmulator) {
             // Firebase Auth doesn't conform to the useEmulator convention, let's smooth that over

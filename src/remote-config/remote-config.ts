@@ -17,8 +17,6 @@ import {
 import {
   FIREBASE_APP_NAME,
   FIREBASE_OPTIONS,
-  FirebaseAppConfig,
-  FirebaseOptions,
   ɵAngularFireSchedulers,
   ɵfirebaseAppFactory,
   ɵkeepUnstableUntilFirstFactory,
@@ -26,6 +24,9 @@ import {
   ɵPromiseProxy,
   ɵapplyMixins
 } from '@angular/fire';
+import {
+  FirebaseAppConfig,
+  FirebaseOptions } from 'firebase/app';
 import {
   RemoteConfig,
   ValueSource,
@@ -141,7 +142,7 @@ export class AngularFireRemoteConfig {
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
-    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string | FirebaseAppConfig | null | undefined,
+    @Optional() @Inject(FIREBASE_APP_NAME) name: string | null | undefined,
     @Optional() @Inject(SETTINGS) settings: Settings | null,
     @Optional() @Inject(DEFAULTS) defaultConfig: ConfigTemplate | null,
     private zone: NgZone,
@@ -156,8 +157,8 @@ export class AngularFireRemoteConfig {
       // switchMap(() => isPlatformBrowser(platformId) ? import('firebase/remote-config') : EMPTY),
       // switchMap(() => import('@firebase/remote-config')),
       // tap(rc => rc.registerRemoteConfig && rc.registerRemoteConfig(firebase as any)),
-      map(() => ɵfirebaseAppFactory(options, zone, nameOrConfig)),
-      map(app => ɵfetchInstance(`${app.name}.remote-config`, 'AngularFireRemoteConfig', app, () => {
+      map(() => ɵfirebaseAppFactory(options, zone, name)),
+      map(app => ɵfetchInstance(`${app.name}.remote-config`, 'AngularFireRemoteConfig', app.name, () => {
         const rc = getRemoteConfig(app);
         if (settings) {
           rc.settings = settings;
