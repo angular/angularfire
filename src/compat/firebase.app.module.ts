@@ -3,11 +3,10 @@ import {
 } from '@angular/core';
 import firebase from 'firebase/compat/app';
 import { FirebaseOptions, FirebaseAppConfig } from 'firebase/app';
+import { VERSION } from '@angular/fire';
 
 export const FIREBASE_OPTIONS = new InjectionToken<FirebaseOptions>('angularfire2.app.options');
 export const FIREBASE_APP_NAME = new InjectionToken<string | undefined>('angularfire2.app.name');
-
-export const VERSION = new Version('ANGULARFIRE2_VERSION');
 
 // tslint:disable-next-line:no-empty-interface
 export interface FirebaseApp extends firebase.app.App {}

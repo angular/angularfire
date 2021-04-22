@@ -2,16 +2,13 @@ import { Inject, Injectable, InjectionToken, NgZone, Optional } from '@angular/c
 import { from, Observable, of } from 'rxjs';
 import { map, observeOn, shareReplay, switchMap } from 'rxjs/operators';
 import {
-  FIREBASE_APP_NAME,
-  FIREBASE_OPTIONS,
   ɵAngularFireSchedulers,
-  ɵfirebaseAppFactory,
   ɵlazySDKProxy,
   ɵPromiseProxy,
-  ɵapplyMixins
+  ɵapplyMixins,
+  FirebaseApp,
 } from '@angular/fire';
 import {
-  FirebaseAppConfig,
   FirebaseOptions } from 'firebase/app';
 import { proxyPolyfillCompat } from './base';
 import { HttpsCallableOptions, Functions, useFunctionsEmulator, httpsCallable, getFunctions } from 'firebase/functions';
@@ -38,8 +35,7 @@ export class AngularFireFunctions {
   public readonly httpsCallable: <T = any, R = any>(name: string, options?: HttpsCallableOptions) => (data: T) => Observable<R>;
 
   constructor(
-    @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
-    @Optional() @Inject(FIREBASE_APP_NAME) name: string | null | undefined,
+    app: FirebaseApp,
     zone: NgZone,
     @Optional() @Inject(REGION) region: string | null,
     // MARK: Breaking change
@@ -54,8 +50,7 @@ export class AngularFireFunctions {
     const functions = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
       switchMap(() => import('firebase/functions')),
-      map(() => ɵfirebaseAppFactory(options, zone, name)),
-      map(app => ɵfetchInstance(`${app.name}.functions.${region || origin}`, 'AngularFireFunctions', app.name, () => {
+      map(() => ɵfetchInstance(`${app.name}.functions.${region || origin}`, 'AngularFireFunctions', app.name, () => {
         const functions = getFunctions(app, region || undefined);
         if (useEmulator) {
           const [host, port] = useEmulator;

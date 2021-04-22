@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { AngularFireModule, FirebaseApp } from '@angular/fire';
+import { deleteApp } from 'firebase/app';
 import { AngularFireAnalytics, AngularFireAnalyticsModule } from '@angular/fire/analytics';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../firestore/utils.spec';
@@ -22,7 +23,7 @@ describe('AngularFireAnalytics', () => {
   });
 
   afterEach(() => {
-    app.delete();
+    deleteApp(app);
   });
 
   it('should be exist', () => {

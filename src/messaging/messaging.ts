@@ -3,16 +3,13 @@ import { FirebaseMessaging, getMessaging, getToken, onMessage, deleteToken, Mess
 import { concat, EMPTY, Observable, of, throwError } from 'rxjs';
 import { catchError, defaultIfEmpty, map, mergeMap, observeOn, switchMap, switchMapTo, shareReplay, filter, subscribeOn } from 'rxjs/operators';
 import {
-  FIREBASE_APP_NAME,
-  FIREBASE_OPTIONS,
   ɵAngularFireSchedulers,
-  ɵfirebaseAppFactory,
   ɵlazySDKProxy,
   ɵPromiseProxy,
-  ɵapplyMixins
+  ɵapplyMixins,
+  FirebaseApp,
 } from '@angular/fire';
 import {
-  FirebaseAppConfig,
   FirebaseOptions, } from 'firebase/app';
 import { isPlatformServer } from '@angular/common';
 import { proxyPolyfillCompat } from './base';
@@ -41,8 +38,7 @@ export class AngularFireMessaging {
   public readonly deleteToken: (token: string) => Observable<boolean>;
 
   constructor(
-    @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
-    @Optional() @Inject(FIREBASE_APP_NAME) name: string | null | undefined,
+    app: FirebaseApp,
     // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
@@ -56,8 +52,7 @@ export class AngularFireMessaging {
       subscribeOn(schedulers.outsideAngular),
       observeOn(schedulers.insideAngular),
       switchMap(() => isPlatformServer(platformId) ? EMPTY : import('firebase/messaging')),
-      map(() => ɵfirebaseAppFactory(options, zone, name)),
-      switchMap(app => ɵfetchInstance(`${app.name}.messaging`, 'AngularFireMessaging', app.name, async () => {
+      switchMap(() => ɵfetchInstance(`${app.name}.messaging`, 'AngularFireMessaging', app.name, async () => {
         const messaging = getMessaging(app);
         // MARK: Breaking change
         // Removed: useVapidKey removed?

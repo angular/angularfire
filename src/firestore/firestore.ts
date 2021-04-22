@@ -14,14 +14,10 @@ import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 import { AngularFirestoreCollectionGroup } from './collection-group/collection-group';
 import {
-  FIREBASE_APP_NAME,
-  FIREBASE_OPTIONS,
   ɵAngularFireSchedulers,
-  ɵfirebaseAppFactory,
   ɵkeepUnstableUntilFirstFactory,
   FirebaseApp
 } from '@angular/fire';
-import { FirebaseOptions } from 'firebase/app';
 import { isPlatformServer } from '@angular/common';
 import { FirebaseFirestore, useFirestoreEmulator, enableIndexedDbPersistence, collection, collectionGroup, doc, initializeFirestore } from 'firebase/firestore';
 import { ɵfetchInstance } from '@angular/fire';
@@ -133,8 +129,7 @@ export class AngularFirestore {
    * apps and use multiple apps.
    */
   constructor(
-    @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
-    @Optional() @Inject(FIREBASE_APP_NAME) name: string | null | undefined,
+    app: FirebaseApp,
     @Optional() @Inject(ENABLE_PERSISTENCE) shouldEnablePersistence: boolean | null,
     @Optional() @Inject(SETTINGS) settings: Settings | null,
     // tslint:disable-next-line:ban-types
@@ -146,7 +141,6 @@ export class AngularFirestore {
     this.schedulers = new ɵAngularFireSchedulers(zone);
     this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers);
 
-    const app = ɵfirebaseAppFactory(options, zone, name);
     // if (!firebase.auth && useAuthEmulator) {
     //   ɵlogAuthEmulatorError();
     // }

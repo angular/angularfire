@@ -1,11 +1,11 @@
-import firebase from 'firebase/app';
 import { Observable, Subject } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
-import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire';
-import { AngularFireAuth, AngularFireAuthModule } from '@angular/fire/auth';
+import { AngularFireModule, FirebaseApp, FIREBASE_APPS } from '@angular/fire';
+import { AngularFireAuth, AngularFireAuthModule, AUTH_INSTANCES } from '@angular/fire/auth';
 import { COMMON_CONFIG } from '../test-config';
 import { User } from 'firebase/auth';
 import { rando } from '../firestore/utils.spec';
+import { deleteApp } from 'firebase/app';
 
 const firebaseUser = {
   uid: '12345',
@@ -14,6 +14,7 @@ const firebaseUser = {
 
 describe('AngularFireAuth', () => {
   let app: FirebaseApp;
+  let apps: FirebaseApp[];
   let afAuth: AngularFireAuth;
   let mockAuthState: Subject<User>;
 
@@ -26,6 +27,7 @@ describe('AngularFireAuth', () => {
     });
 
     app = TestBed.inject(FirebaseApp);
+    apps = TestBed.inject(FIREBASE_APPS);
     afAuth = TestBed.inject(AngularFireAuth);
 
     mockAuthState = new Subject<User>();
@@ -38,7 +40,7 @@ describe('AngularFireAuth', () => {
   });
 
   afterEach(() => {
-    app.delete();
+    apps.forEach(app => deleteApp(app));
   });
 
   describe('Zones', () => {
@@ -120,7 +122,8 @@ describe('AngularFireAuth', () => {
 
 describe('AngularFireAuth with different app', () => {
   let app: FirebaseApp;
-  let afAuth: AngularFireAuth;
+  let apps: FirebaseApp[];
+  let authInstances: AngularFireAuth[];
   let firebaseAppName: string;
 
   beforeEach(() => {
@@ -128,36 +131,37 @@ describe('AngularFireAuth with different app', () => {
 
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
-        AngularFireAuthModule
-      ],
-      providers: [
-        { provide: FIREBASE_APP_NAME, useValue: firebaseAppName },
-        { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG }
+        AngularFireModule.initializeApp(COMMON_CONFIG, firebaseAppName ),
+        AngularFireAuthModule.initializeAuth({ appName: firebaseAppName })
       ]
     });
 
     app = TestBed.inject(FirebaseApp);
-    afAuth = TestBed.inject(AngularFireAuth);
+    apps = TestBed.inject(FIREBASE_APPS);
+    authInstances = TestBed.inject(AUTH_INSTANCES);
   });
 
   afterEach(() => {
-    app.delete();
+    apps.forEach(app => deleteApp(app));
   });
 
   describe('<constructor>', () => {
 
     it('should be an AngularFireAuth type', () => {
-      expect(afAuth instanceof AngularFireAuth).toEqual(true);
+      expect(authInstances.length).toBeGreaterThan(0);
+      authInstances.forEach(afAuth => {
+        expect(afAuth instanceof AngularFireAuth).toEqual(true);
+      });
     });
 
     it('should have an initialized Firebase app', () => {
-      expect(afAuth.name).toBeDefined();
+      authInstances.forEach(afAuth => {
+        expect(afAuth.name).toBeDefined();
+      });
     });
 
-    it('should have an initialized Firebase app instance member', async () => {
-      const appName = await afAuth.name;
-      expect(appName).toEqual(firebaseAppName);
+    it('should have an initialized Firebase app instance member', () => {
+      expect(authInstances.map(afAuth => afAuth.name).indexOf(firebaseAppName)).toBeGreaterThan(-1);
     });
   });
 

@@ -15,18 +15,14 @@ import {
   withLatestFrom
 } from 'rxjs/operators';
 import {
-  FIREBASE_APP_NAME,
-  FIREBASE_OPTIONS,
+  FirebaseApp,
   ɵAngularFireSchedulers,
-  ɵfirebaseAppFactory,
   ɵkeepUnstableUntilFirstFactory,
   ɵlazySDKProxy,
   ɵPromiseProxy,
-  ɵapplyMixins
+  ɵapplyMixins,
+  ɵfetchInstance
 } from '@angular/fire';
-import {
-  FirebaseAppConfig,
-  FirebaseOptions } from 'firebase/app';
 import {
   RemoteConfig,
   ValueSource,
@@ -39,7 +35,6 @@ import {
   ensureInitialized
 } from 'firebase/remote-config';
 import { proxyPolyfillCompat } from './base';
-import { ɵfetchInstance } from '@angular/fire';
 
 export interface ConfigTemplate {
   [key: string]: string | number | boolean;
@@ -141,8 +136,7 @@ export class AngularFireRemoteConfig {
   readonly strings: Observable<{ [key: string]: string | undefined }> & { [key: string]: Observable<string | undefined> };
 
   constructor(
-    @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
-    @Optional() @Inject(FIREBASE_APP_NAME) name: string | null | undefined,
+    app: FirebaseApp,
     @Optional() @Inject(SETTINGS) settings: Settings | null,
     @Optional() @Inject(DEFAULTS) defaultConfig: ConfigTemplate | null,
     private zone: NgZone,
@@ -157,8 +151,7 @@ export class AngularFireRemoteConfig {
       // switchMap(() => isPlatformBrowser(platformId) ? import('firebase/remote-config') : EMPTY),
       // switchMap(() => import('@firebase/remote-config')),
       // tap(rc => rc.registerRemoteConfig && rc.registerRemoteConfig(firebase as any)),
-      map(() => ɵfirebaseAppFactory(options, zone, name)),
-      map(app => ɵfetchInstance(`${app.name}.remote-config`, 'AngularFireRemoteConfig', app.name, () => {
+      map(() => ɵfetchInstance(`${app.name}.remote-config`, 'AngularFireRemoteConfig', app.name, () => {
         const rc = getRemoteConfig(app);
         if (settings) {
           rc.settings = settings;

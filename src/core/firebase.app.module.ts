@@ -1,9 +1,19 @@
-import { Inject, InjectionToken, isDevMode, ModuleWithProviders, NgModule, NgZone, Optional, PLATFORM_ID, VERSION as NG_VERSION } from '@angular/core';
+import {
+  Inject,
+  InjectionToken,
+  isDevMode,
+  ModuleWithProviders,
+  NgModule,
+  NgZone,
+  Optional,
+  PLATFORM_ID,
+  VERSION as NG_VERSION,
+  Version
+} from '@angular/core';
 import { FirebaseApp as IFirebaseApp, getApps, getApp, initializeApp, registerVersion, FirebaseOptions } from 'firebase/app';
-import { FIREBASE_OPTIONS, FIREBASE_APP_NAME, VERSION } from '@angular/fire/compat';
 import isEqual from 'lodash.isequal';
 
-export { FIREBASE_OPTIONS, FIREBASE_APP_NAME, VERSION };
+export const VERSION = new Version('ANGULARFIRE2_VERSION');
 
 // tslint:disable-next-line:no-empty-interface
 export interface FirebaseApp extends IFirebaseApp {}

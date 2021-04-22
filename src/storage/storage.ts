@@ -2,16 +2,11 @@ import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } fro
 import { createStorageRef } from './ref';
 import { Observable } from 'rxjs';
 import {
-  FIREBASE_APP_NAME,
-  FIREBASE_OPTIONS,
   ɵAngularFireSchedulers,
   ɵfetchInstance,
-  ɵfirebaseAppFactory,
-  ɵkeepUnstableUntilFirstFactory
+  ɵkeepUnstableUntilFirstFactory,
+  FirebaseApp
 } from '@angular/fire';
-import {
-  FirebaseAppConfig,
-  FirebaseOptions } from 'firebase/app';
 import { UploadMetadata, StorageService } from './interfaces';
 import { getStorage } from 'firebase/storage';
 
@@ -36,8 +31,7 @@ export class AngularFireStorage {
   public readonly schedulers: ɵAngularFireSchedulers;
 
   constructor(
-    @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
-    @Optional() @Inject(FIREBASE_APP_NAME) name: string | null | undefined,
+    app: FirebaseApp,
     @Optional() @Inject(BUCKET) storageBucket: string | null,
     // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
@@ -47,7 +41,6 @@ export class AngularFireStorage {
   ) {
     this.schedulers = new ɵAngularFireSchedulers(zone);
     this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers);
-    const app = ɵfirebaseAppFactory(options, zone, name);
 
     this.storage = ɵfetchInstance(`${app.name}.storage.${storageBucket}`, 'AngularFireStorage', app.name, () => {
       const storage = zone.runOutsideAngular(() => {

@@ -4,13 +4,10 @@ import { getRef } from './utils';
 import { createListReference } from './list/create-reference';
 import { createObjectReference } from './object/create-reference';
 import {
-  FIREBASE_APP_NAME,
-  FIREBASE_OPTIONS,
   ɵAngularFireSchedulers,
-  ɵfirebaseAppFactory,
   ɵkeepUnstableUntilFirstFactory,
+  FirebaseApp,
 } from '@angular/fire';
-import { FirebaseOptions } from 'firebase/app';
 import { Observable } from 'rxjs';
 import { FirebaseDatabase, useDatabaseEmulator, getDatabase } from 'firebase/database';
 import { ɵfetchInstance } from '@angular/fire';
@@ -33,8 +30,7 @@ export class AngularFireDatabase {
   public readonly keepUnstableUntilFirst: <T>(obs$: Observable<T>) => Observable<T>;
 
   constructor(
-    @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
-    @Optional() @Inject(FIREBASE_APP_NAME) name: string | null | undefined,
+    app: FirebaseApp,
     @Optional() @Inject(URL) databaseURL: string | null,
     // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
@@ -45,7 +41,6 @@ export class AngularFireDatabase {
     this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers);
 
     const useEmulator: UseEmulatorArguments | null = _useEmulator;
-    const app = ɵfirebaseAppFactory(options, zone, name);
 
     // TODO(team): Figure out how to get detect potential Authentication instance
     // in vNext world
