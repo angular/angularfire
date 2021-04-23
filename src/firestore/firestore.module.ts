@@ -4,6 +4,7 @@ import { FirebaseFirestore } from 'firebase/firestore';
 import { ɵsmartCacheInstance, ɵfetchCachedInstance } from '../core';
 import { Firestore } from './firestore';
 import { DEFAULT_APP_NAME, FIREBASE_APPS } from '../app/app.module';
+import { AUTH_INSTANCES } from '../auth/auth.module';
 
 export const FIRESTORE_INSTANCES = new InjectionToken<Firestore[]>('angularfire2.firestore-instances');
 
@@ -59,7 +60,9 @@ export function provideFirestore(fn: () => FirebaseFirestore) {
       multi: true,
       deps: [
         NgZone,
-        [new Optional(), FIREBASE_APPS ]
+        [new Optional(), FIREBASE_APPS ],
+        // Firestore+Auth work better if Auth is loaded first
+        [new Optional(), AUTH_INSTANCES ],
       ]
     }]
   };

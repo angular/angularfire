@@ -1,5 +1,6 @@
 import { NgModule, Optional, NgZone, InjectionToken } from '@angular/core';
 import { FirebaseDatabase } from 'firebase/database';
+import { AUTH_INSTANCES } from '../auth/auth.module';
 
 import { ɵsmartCacheInstance, ɵfetchCachedInstance } from '../core';
 import { Database } from './database';
@@ -59,7 +60,9 @@ export function provideDatabase(fn: () => FirebaseDatabase) {
       multi: true,
       deps: [
         NgZone,
-        [new Optional(), FIREBASE_APPS ]
+        [new Optional(), FIREBASE_APPS ],
+        // Database+Auth work better if Auth is loaded first
+        [new Optional(), AUTH_INSTANCES ],
       ]
     }]
   };
