@@ -6,6 +6,8 @@ import { Router, RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
 import { rando } from '../../utils';
 
+class TestComponent { }
+
 describe('AngularFireAuthGuard', () => {
   let app: FirebaseApp;
   let router: Router;
@@ -16,7 +18,7 @@ describe('AngularFireAuthGuard', () => {
         AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireAuthGuardModule,
         RouterModule.forRoot([
-          { path: 'a', redirectTo: '/', canActivate: [AngularFireAuthGuard] }
+          { path: 'a', component: TestComponent, canActivate: [AngularFireAuthGuard] }
         ])
       ],
       providers: [
