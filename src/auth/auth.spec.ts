@@ -1,7 +1,7 @@
 import { Observable, Subject } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
 import { AngularFireModule, FirebaseApp, FIREBASE_APPS } from '@angular/fire';
-import { AngularFireAuth, AngularFireAuthModule, AUTH_INSTANCES } from '@angular/fire/auth';
+import { AngularFireAuth, AngularFireAuthModule, AUTH_INSTANCES } from '@angular/fire';
 import { COMMON_CONFIG } from '../test-config';
 import { User } from 'firebase/auth';
 import { rando } from '../firestore/utils.spec';

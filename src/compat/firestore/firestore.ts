@@ -13,17 +13,13 @@ import {
 import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 import { AngularFirestoreCollectionGroup } from './collection-group/collection-group';
-import {
-  ɵAngularFireSchedulers,
-  ɵkeepUnstableUntilFirstFactory,
-} from '@angular/fire';
+import { ɵAngularFireSchedulers, ɵkeepUnstableUntilFirstFactory } from '@angular/fire';
 import { FirebaseApp, ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire/compat';
-import { FirebaseAppConfig, FirebaseOptions } from 'firebase/app';
+import { FirebaseOptions } from 'firebase/app';
 import { isPlatformServer } from '@angular/common';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
-import { USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/compat/auth';
-import { ɵfetchInstance } from '@angular/fire';
+import { ɵcacheInstance } from '@angular/fire';
 
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
@@ -141,7 +137,6 @@ export class AngularFirestore {
     zone: NgZone,
     @Optional() @Inject(PERSISTENCE_SETTINGS) persistenceSettings: PersistenceSettings | null,
     @Optional() @Inject(USE_EMULATOR) _useEmulator: any,
-    @Optional() @Inject(USE_AUTH_EMULATOR) useAuthEmulator: any,
   ) {
     this.schedulers = new ɵAngularFireSchedulers(zone);
     this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers);
@@ -149,7 +144,7 @@ export class AngularFirestore {
     const app = ɵfirebaseAppFactory(options, zone, name);
     const useEmulator: UseEmulatorArguments | null = _useEmulator;
 
-    [this.firestore, this.persistenceEnabled$] = ɵfetchInstance(`${app.name}.firestore`, 'AngularFirestore', app.name, () => {
+    [this.firestore, this.persistenceEnabled$] = ɵcacheInstance(`${app.name}.firestore`, 'AngularFirestore', app.name, () => {
       const firestore = zone.runOutsideAngular(() => app.firestore());
       if (settings) {
         firestore.settings(settings);

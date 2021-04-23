@@ -5,36 +5,19 @@ import { sync as gzipSync } from 'gzip-size';
 import { dirname, join } from 'path';
 import { keys as tsKeys } from 'ts-transformer-keys';
 import firebase from 'firebase/compat/app';
-import { Analytics } from 'firebase/analytics';
-import { Auth } from 'firebase/auth';
-import { FirebaseMessaging } from 'firebase/messaging';
-import { FirebasePerformance } from 'firebase/performance';
-import { Functions } from 'firebase/functions';
-import { RemoteConfig } from 'firebase/remote-config';
 
 // TODO infer these from the package.json
 const MODULES = [
-  'core', 'compat', 'analytics', 'auth', 'database', 'firestore',
-  'functions', 'remote-config', 'storage', 'messaging', 'performance',
-  'compat/analytics', 'compat/auth-guard', 'compat/auth', 'auth-guard',
+  'core', 'compat', 'compat/analytics', 'compat/auth-guard', 'compat/auth',
   'compat/database', 'compat/firestore', 'compat/functions', 'compat/remote-config',
   'compat/storage', 'compat/messaging', 'compat/performance'
 ];
-const LAZY_MODULES = [
-  'analytics', 'auth', 'functions', 'messaging', 'remote-config', 'compat/analytics',
-  'compat/auth', 'compat/functions', 'compat/messaging', 'compat/remote-config'
-];
+const LAZY_MODULES = ['compat/analytics', 'compat/auth', 'compat/functions', 'compat/messaging', 'compat/remote-config'];
 const UMD_NAMES = MODULES.map(m => m === 'core' ? 'angular-fire' : `angular-fire-${m.replace('/', '-')}`);
 const ENTRY_NAMES = MODULES.map(m => m === 'core' ? '@angular/fire' : `@angular/fire/${m}`);
 
 function proxyPolyfillCompat() {
   const defaultObject = {
-    analytics: tsKeys<Analytics>(),
-    auth: tsKeys<Auth>(),
-    functions: tsKeys<Functions>(),
-    messaging: tsKeys<FirebaseMessaging>(),
-    performance: tsKeys<FirebasePerformance>(),
-    'remote-config': tsKeys<RemoteConfig>(),
     'compat/analytics': tsKeys<firebase.analytics.Analytics>(),
     'compat/auth': tsKeys<firebase.auth.Auth>(),
     'compat/functions': tsKeys<firebase.functions.Functions>(),
@@ -96,8 +79,8 @@ function spawnPromise(command: string, args: string[]) {
 async function compileSchematics() {
   await spawnPromise(`npx`, ['tsc', '-p', src('schematics', 'tsconfig.json')]);
   return Promise.all([
-    copy(src('core', 'builders.json'), dest('builders.json')),
-    copy(src('core', 'collection.json'), dest('collection.json')),
+    copy(src('builders.json'), dest('builders.json')),
+    copy(src('collection.json'), dest('collection.json')),
     copy(src('schematics', 'deploy', 'schema.json'), dest('schematics', 'deploy', 'schema.json')),
     replaceSchematicVersions()
   ]);
@@ -153,10 +136,14 @@ function measureLibrary() {
 
 async function buildDocs() {
   // INVESTIGATE json to stdout rather than FS?
-  await Promise.all(MODULES.map(module => spawnPromise('npx', ['typedoc', `./src/${module}`, '--json', `./dist/typedocs/${module}.json`])));
+  await Promise.all(MODULES.map(module => spawnPromise('npx', ['typedoc', `${module === 'core' ? './src' : `./src/${module}`}`, '--json', `./dist/typedocs/${module}.json`])));
   const entries = await Promise.all(MODULES.map(async (module) => {
+
     const buffer = await readFile(`./dist/typedocs/${module}.json`);
     const typedoc = JSON.parse(buffer.toString());
+    if (!typedoc.children) {
+      console.log('typedoc fail', module);
+    }
     // TODO infer the entryPoint from the package.json
     const entryPoint = typedoc.children.find((c: any) => c.name === '"public_api"');
     const allChildren = [].concat(...typedoc.children.map(child =>

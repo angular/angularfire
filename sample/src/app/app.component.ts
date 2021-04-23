@@ -1,6 +1,5 @@
 import { Component, Inject, Optional } from '@angular/core';
-import { FirebaseApp, FIREBASE_APPS } from '@angular/fire';
-import { AngularFireAuth, AUTH_INSTANCES } from '@angular/fire/auth';
+import { FirebaseApp, Auth, AUTH_INSTANCES, FIREBASE_APPS } from '@angular/fire';
 
 @Component({
   selector: 'app-root',
@@ -32,11 +31,11 @@ import { AngularFireAuth, AUTH_INSTANCES } from '@angular/fire/auth';
 export class AppComponent {
   title = 'sample';
   constructor(
-    public app: FirebaseApp,
-    public auth: AngularFireAuth,
-    @Inject(FIREBASE_APPS) public apps: FirebaseApp[],
-    @Optional() @Inject(AUTH_INSTANCES) public authInstances: AngularFireAuth[],
+    public app: FirebaseApp,      // default Firebase App
+    public auth: Auth, // default Firbase Auth
+    @Inject(FIREBASE_APPS) public apps: FirebaseApp[], // all initialized App instances
+    @Optional() @Inject(AUTH_INSTANCES) public authInstances: Auth[], // all initialized Auth instances
   ) {
-    console.log(app, auth, apps, authInstances);
+    console.log(app, auth, apps, authInstances, 'hi!...');
   }
 }

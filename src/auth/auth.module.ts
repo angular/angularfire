@@ -1,85 +1,66 @@
-import { NgModule, Optional } from '@angular/core';
-import { NgZone, InjectionToken } from '@angular/core';
-import { ɵfetchInstance, DEFAULT_APP_NAME, FIREBASE_APPS, FirebaseApp } from '@angular/fire';
-import { initializeAuth, Dependencies, AuthSettings, Persistence, useAuthEmulator, setPersistence } from 'firebase/auth';
-import { getApp } from 'firebase/app';
-import { AngularFireAuth } from './auth';
+import { NgModule, Optional, NgZone, InjectionToken } from '@angular/core';
+import { Auth as FirebaseAuth } from 'firebase/auth';
 
-export const AUTH_INSTANCES = new InjectionToken<AngularFireAuth[]>('angularfire2.auth-instances');
+import { ɵsmartCacheInstance, ɵfetchCachedInstance } from '../core';
+import { Auth } from './auth';
+import { DEFAULT_APP_NAME, FIREBASE_APPS } from '../app/app.module';
 
-type UseEmulatorArguments = Parameters<typeof useAuthEmulator> extends [infer _, ...infer Args] ? Args : never;
+export const AUTH_INSTANCES = new InjectionToken<Auth[]>('angularfire2.auth-instances');
 
-export type FactoryOptions = {
-  appName?: string,
-  dependencies?: Dependencies,
-  useEmulator?: UseEmulatorArguments,
-  tenantId?: string,
-  useDeviceLanguage?: boolean,
-  languageCode?: string,
-  settings?: AuthSettings,
-  persistence?: Persistence,
-};
+const CACHE_PREFIX = 'Auth';
 
-export function instanceFactory(zone: NgZone, _: FirebaseApp[]) {
-  const options: FactoryOptions = this || {};
-  const auth = zone.runOutsideAngular(() => {
-    const app = getApp(options.appName);
-    return ɵfetchInstance(`${app.name}.auth`, 'AngularFireAuth', app.name, () => {
-      const auth = initializeAuth(app, options.dependencies);
-      if (options.useEmulator) {
-        useAuthEmulator(auth, ...options.useEmulator);
-      }
-      if (options.tenantId) {
-        auth.tenantId = options.tenantId;
-      }
-      // TODO(jamesdaniels): beta.1 languageCode is not settable
-      // auth.languageCode = languageCode;
-      if (options.useDeviceLanguage) {
-        auth.useDeviceLanguage();
-      }
-      if (options.settings) {
-        Object.values(options.settings).forEach(([k, v]) => {
-          auth.settings[k] = v;
-        });
-      }
-      if (options.persistence) {
-        setPersistence(auth, options.persistence);
-      }
-      return auth;
-    }, options);
-  });
-  return new AngularFireAuth(auth);
+export function ɵdefaultAuthInstanceFactory(_: Auth[]) {
+  const auth = ɵfetchCachedInstance([CACHE_PREFIX, DEFAULT_APP_NAME].join('.'));
+  if (auth) {
+    return new Auth(auth);
+  }
+  throw new Error(`No Auth Instance provided for the '${DEFAULT_APP_NAME}' Firebase App - call provideAuth(...) in your providers list.`);
 }
 
-export function defaultInstanceFactory(zone: NgZone, instances: AngularFireAuth[]) {
-  return instances?.find(it => it.name === DEFAULT_APP_NAME) || instanceFactory.bind({})(zone, []);
+export function ɵwrapAuthInstanceInInjectable(auth: FirebaseAuth) {
+  return new Auth(auth);
+}
+
+export function ɵauthInstancesFactory(instances: Auth[]) {
+  return instances;
+}
+
+// Hack: useFactory doesn't allow us to pass a lambda, so let's bind the arugments
+// Going this direction to cut down on DI token noise; also making it easier to support
+// multiple Firebase Apps
+export function ɵboundAuthInstanceFactory(zone: NgZone) {
+  const auth = ɵsmartCacheInstance<FirebaseAuth>(CACHE_PREFIX, this);
+  return new Auth(auth);
 }
 
 const DEFAULT_AUTH_INSTANCE_PROVIDER = {
-  provide: AngularFireAuth,
-  useFactory: defaultInstanceFactory,
+  provide: Auth,
+  useFactory: ɵdefaultAuthInstanceFactory,
   deps: [
     NgZone,
-    [new Optional(), AUTH_INSTANCES ]
+    [new Optional(), AUTH_INSTANCES ],
   ]
 };
 
 @NgModule({
-  providers: [ DEFAULT_AUTH_INSTANCE_PROVIDER ]
+  providers: [
+    DEFAULT_AUTH_INSTANCE_PROVIDER,
+  ]
 })
-export class AngularFireAuthModule {
-  static initializeAuth(options?: FactoryOptions) {
-    return {
-      ngModule: AngularFireAuthModule,
-      providers: [{
-        provide: AUTH_INSTANCES,
-        useFactory: instanceFactory.bind(options),
-        multi: true,
-        deps: [
-          NgZone,
-          [new Optional(), FIREBASE_APPS ]
-        ]
-      }]
-    };
-  }
+export class AuthModule {
+}
+
+export function provideAuth(fn: () => FirebaseAuth) {
+  return {
+    ngModule: AuthModule,
+    providers: [{
+      provide: AUTH_INSTANCES,
+      useFactory: ɵboundAuthInstanceFactory.bind(fn),
+      multi: true,
+      deps: [
+        NgZone,
+        [new Optional(), FIREBASE_APPS ]
+      ]
+    }]
+  };
 }

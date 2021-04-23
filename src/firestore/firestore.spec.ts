@@ -1,170 +1,167 @@
-import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire';
-import { AngularFirestore, SETTINGS, AngularFirestoreModule, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/firestore';
-
+import { Observable, Subject } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
+import { AngularFireModule, FirebaseApp, FIREBASE_APPS } from '@angular/fire';
+import { AngularFireAuth, AngularFireAuthModule, AUTH_INSTANCES } from '@angular/fire';
 import { COMMON_CONFIG } from '../test-config';
-import { rando } from './utils.spec';
+import { User } from 'firebase/auth';
+import { rando } from '../firestore/utils.spec';
+import { deleteApp } from 'firebase/app';
 
-describe('AngularFirestore', () => {
+const firebaseUser = {
+  uid: '12345',
+  providerData: [{ displayName: 'jeffbcrossyface' }]
+} as User;
+
+describe('AngularFireAuth', () => {
   let app: FirebaseApp;
-  let afs: AngularFirestore;
+  let apps: FirebaseApp[];
+  let afAuth: AngularFireAuth;
+  let mockAuthState: Subject<User>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
-        AngularFirestoreModule.enablePersistence()
-      ],
-      providers: [
-        { provide: SETTINGS, useValue: { host: 'localhost:8080', ssl: false } }
+        AngularFireAuthModule
       ]
     });
 
     app = TestBed.inject(FirebaseApp);
-    afs = TestBed.inject(AngularFirestore);
+    apps = TestBed.inject(FIREBASE_APPS);
+    afAuth = TestBed.inject(AngularFireAuth);
+
+    mockAuthState = new Subject<User>();
+    // @ts-ignore
+    spyOn(afAuth, 'authState').and.returnValue(mockAuthState);
+    // @ts-ignore
+    spyOn(afAuth, 'idToken').and.returnValue(mockAuthState);
+    (afAuth as any).authState = mockAuthState as Observable<User>;
+    (afAuth as any).idToken = mockAuthState as Observable<User>;
   });
 
   afterEach(() => {
-    app.delete();
+    apps.forEach(app => deleteApp(app));
   });
 
-  it('should be the properly initialized type', () => {
-    expect(afs instanceof AngularFirestore).toBe(true);
+  describe('Zones', () => {
+    it('should call operators and subscriber in the same zone as when service was initialized', (done) => {
+      // Initialize the app outside of the zone, to mimick real life behavior.
+      const ngZone = Zone.current.fork({
+        name: 'ngZone'
+      });
+      ngZone.run(() => {
+        const subs = [
+          afAuth.authState.subscribe(() => {
+            expect(Zone.current.name).toBe('ngZone');
+            done();
+          }, done.fail),
+          afAuth.authState.subscribe(() => {
+            expect(Zone.current.name).toBe('ngZone');
+            done();
+          }, done.fail)
+        ];
+        mockAuthState.next(firebaseUser);
+        subs.forEach(s => s.unsubscribe());
+      });
+    });
+  });
+
+  it('should exist', () => {
+    expect(afAuth instanceof AngularFireAuth).toBe(true);
   });
 
   it('should have an initialized Firebase app', () => {
-    expect(afs.firestore.app).toBeDefined();
+    expect(afAuth.name).toBeDefined();
   });
 
-  it('should create an AngularFirestoreDocument from a string path', () => {
-    const doc = afs.doc('a/doc');
-    expect(doc instanceof AngularFirestoreDocument).toBe(true);
-  });
+  it('should emit auth updates through authState', (done: any) => {
+    let count = 0;
 
-  it('should create an AngularFirestoreDocument from a string path', () => {
-    const doc = afs.doc(afs.doc('a/doc').ref);
-    expect(doc instanceof AngularFirestoreDocument).toBe(true);
-  });
-
-  it('should create an AngularFirestoreCollection from a string path', () => {
-    const collection = afs.collection('stuffs');
-    expect(collection instanceof AngularFirestoreCollection).toBe(true);
-  });
-
-  it('should create an AngularFirestoreCollection from a reference', () => {
-    const collection = afs.collection(afs.collection('stuffs').ref);
-    expect(collection instanceof AngularFirestoreCollection).toBe(true);
-  });
-
-  it('should throw on an invalid document path', () => {
-    const singleWrapper = () => afs.doc('collection');
-    const tripleWrapper = () => afs.doc('collection/doc/subcollection');
-    expect(singleWrapper).toThrowError();
-    expect(tripleWrapper).toThrowError();
-  });
-
-  it('should throw on an invalid collection path', () => {
-    const singleWrapper = () => afs.collection('collection/doc');
-    const quadWrapper = () => afs.collection('collection/doc/subcollection/doc');
-    expect(singleWrapper).toThrowError();
-    expect(quadWrapper).toThrowError();
-  });
-
-  if (typeof window === 'undefined') {
-
-    it('should not enable persistence (Node.js)', (done) => {
-      afs.persistenceEnabled$.subscribe(isEnabled => {
-        expect(isEnabled).toBe(false);
-        done();
-      });
+    // Check that the first value is null and second is the auth user
+    const subs = afAuth.authState.subscribe({
+      next: (user => {
+        if (count === 0) {
+          expect(user).toBe(null);
+          count = count + 1;
+          mockAuthState.next(firebaseUser);
+        } else {
+          expect(user).toEqual(firebaseUser);
+          subs.unsubscribe();
+          done();
+        }
+      }),
+      error: done,
+      complete: done.fail
     });
+    mockAuthState.next(null);
+  });
 
-  } else {
+  it('should emit auth updates through idToken', (done: any) => {
+    let count = 0;
 
-    it('should enable persistence', (done) => {
-      afs.persistenceEnabled$.subscribe(isEnabled => {
-        expect(isEnabled).toBe(true);
-        done();
-      });
+    // Check that the first value is null and second is the auth user
+    const subs = afAuth.idToken.subscribe({
+      next: user => {
+        if (count === 0) {
+          expect(user).toBe(null);
+          count = count + 1;
+          mockAuthState.next(firebaseUser);
+        } else {
+          expect(user as any).toEqual(firebaseUser);
+          subs.unsubscribe();
+          done();
+        }
+      },
+      error: done,
+      complete: done.fail
     });
-
-  }
+    mockAuthState.next(null);
+  });
 
 });
 
-describe('AngularFirestore with different app', () => {
+describe('AngularFireAuth with different app', () => {
   let app: FirebaseApp;
-  let afs: AngularFirestore;
+  let apps: FirebaseApp[];
+  let authInstances: AngularFireAuth[];
   let firebaseAppName: string;
 
   beforeEach(() => {
     firebaseAppName = rando();
+
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
-        AngularFirestoreModule
-      ],
-      providers: [
-        { provide: FIREBASE_APP_NAME, useValue: firebaseAppName },
-        { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG },
-        { provide: SETTINGS, useValue: { host: 'localhost:8080', ssl: false } }
+        AngularFireModule.initializeApp(COMMON_CONFIG, firebaseAppName ),
+        AngularFireAuthModule.initializeAuth({ appName: firebaseAppName })
       ]
     });
 
-
     app = TestBed.inject(FirebaseApp);
-    afs = TestBed.inject(AngularFirestore);
+    apps = TestBed.inject(FIREBASE_APPS);
+    authInstances = TestBed.inject(AUTH_INSTANCES);
   });
 
   afterEach(() => {
-    app.delete();
+    apps.forEach(app => deleteApp(app));
   });
 
   describe('<constructor>', () => {
 
-    it('should be an AngularFirestore type', () => {
-      expect(afs instanceof AngularFirestore).toEqual(true);
+    it('should be an AngularFireAuth type', () => {
+      expect(authInstances.length).toBeGreaterThan(0);
+      authInstances.forEach(afAuth => {
+        expect(afAuth instanceof AngularFireAuth).toEqual(true);
+      });
     });
 
     it('should have an initialized Firebase app', () => {
-      expect(afs.firestore.app).toBeDefined();
+      authInstances.forEach(afAuth => {
+        expect(afAuth.name).toBeDefined();
+      });
     });
 
     it('should have an initialized Firebase app instance member', () => {
-      expect(afs.firestore.app.name).toEqual(firebaseAppName);
-    });
-  });
-
-});
-
-
-describe('AngularFirestore without persistance', () => {
-  let app: FirebaseApp;
-  let afs: AngularFirestore;
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
-        AngularFirestoreModule
-      ],
-      providers: [
-        { provide: SETTINGS, useValue: { host: 'localhost:8080', ssl: false } }
-      ]
-    });
-
-    app = TestBed.inject(FirebaseApp);
-    afs = TestBed.inject(AngularFirestore);
-  });
-
-  afterEach(() => {
-    app.delete();
-  });
-
-  it('should not enable persistence', (done) => {
-    afs.persistenceEnabled$.subscribe(isEnabled => {
-      expect(isEnabled).toBe(false);
-      done();
+      expect(authInstances.map(afAuth => afAuth.name).indexOf(firebaseAppName)).toBeGreaterThan(-1);
     });
   });
 

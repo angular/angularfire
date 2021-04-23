@@ -4,18 +4,11 @@ import {
 import firebase from 'firebase/compat/app';
 import { FirebaseOptions, FirebaseAppConfig } from 'firebase/app';
 import { VERSION } from '@angular/fire';
+import { FirebaseApp } from './firebase.app';
 
 export const FIREBASE_OPTIONS = new InjectionToken<FirebaseOptions>('angularfire2.app.options');
 export const FIREBASE_APP_NAME = new InjectionToken<string | undefined>('angularfire2.app.name');
 
-// tslint:disable-next-line:no-empty-interface
-export interface FirebaseApp extends firebase.app.App {}
-
-export class FirebaseApp {
-  constructor(app: firebase.app.App) {
-    return app;
-  }
-}
 
 export function ɵfirebaseAppFactory(options: FirebaseOptions, zone: NgZone, nameOrConfig?: string | FirebaseAppConfig | null) {
   const name = typeof nameOrConfig === 'string' && nameOrConfig || '[DEFAULT]';

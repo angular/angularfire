@@ -2,16 +2,12 @@ import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } fro
 import { EMPTY, of } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { map, shareReplay, switchMap, observeOn } from 'rxjs/operators';
-import {
-  ɵAngularFireSchedulers,
-  ɵlazySDKProxy,
-  ɵPromiseProxy,
-  ɵapplyMixins,
-} from '@angular/fire';
+import { ɵAngularFireSchedulers } from '@angular/fire';
+import { ɵlazySDKProxy, ɵPromiseProxy, ɵapplyMixins } from '@angular/fire/compat';
 import { FirebaseApp } from '@angular/fire/compat';
 import firebase from 'firebase/compat/app';
 import { proxyPolyfillCompat } from './base';
-import { ɵfetchInstance } from '@angular/fire';
+import { ɵcacheInstance } from '@angular/fire';
 
 export interface Config {
   [key: string]: any;
@@ -150,7 +146,7 @@ export class AngularFireAnalytics {
       // TODO server-side investigate use of the Universal Analytics API
       // switchMap(supported => supported ? of(undefined) : EMPTY),
       map(() => {
-        return ɵfetchInstance(`analytics`, 'AngularFireAnalytics', app.name, () => {
+        return ɵcacheInstance(`analytics`, 'AngularFireAnalytics', app.name, () => {
           const analytics = app.analytics();
           if (analyticsCollectionEnabled === false) {
             analytics.setAnalyticsCollectionEnabled(false);

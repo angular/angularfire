@@ -1,71 +1,11 @@
-import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
-import { createStorageRef } from './ref';
-import { Observable } from 'rxjs';
-import {
-  ɵAngularFireSchedulers,
-  ɵfetchInstance,
-  ɵkeepUnstableUntilFirstFactory,
-  FirebaseApp
-} from '@angular/fire';
-import { UploadMetadata, StorageService } from './interfaces';
-import { getStorage } from 'firebase/storage';
+import { StorageService as FirebaseStorage } from 'firebase/storage';
 
-export const BUCKET = new InjectionToken<string>('angularfire2.storageBucket');
-export const MAX_UPLOAD_RETRY_TIME = new InjectionToken<number>('angularfire2.storage.maxUploadRetryTime');
-export const MAX_OPERATION_RETRY_TIME = new InjectionToken<number>('angularfire2.storage.maxOperationRetryTime');
+// see notes in core/firebase.app.module.ts for why we're building the class like this
+// tslint:disable-next-line:no-empty-interface
+export interface Storage extends FirebaseStorage {}
 
-/**
- * AngularFireStorage Service
- *
- * This service is the main entry point for this feature module. It provides
- * an API for uploading and downloading binary files from Cloud Storage for
- * Firebase.
- */
-@Injectable({
-  providedIn: 'any'
-})
-export class AngularFireStorage {
-  public readonly storage: StorageService;
-
-  public readonly keepUnstableUntilFirst: <T>(obs: Observable<T>) => Observable<T>;
-  public readonly schedulers: ɵAngularFireSchedulers;
-
-  constructor(
-    app: FirebaseApp,
-    @Optional() @Inject(BUCKET) storageBucket: string | null,
-    // tslint:disable-next-line:ban-types
-    @Inject(PLATFORM_ID) platformId: Object,
-    zone: NgZone,
-    @Optional() @Inject(MAX_UPLOAD_RETRY_TIME) maxUploadRetryTime: number | any,
-    @Optional() @Inject(MAX_OPERATION_RETRY_TIME) maxOperationRetryTime: number | any,
-  ) {
-    this.schedulers = new ɵAngularFireSchedulers(zone);
-    this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers);
-
-    this.storage = ɵfetchInstance(`${app.name}.storage.${storageBucket}`, 'AngularFireStorage', app.name, () => {
-      const storage = zone.runOutsideAngular(() => {
-        return getStorage(app, storageBucket || undefined);
-      });
-      if (maxUploadRetryTime) {
-        storage.maxUploadRetryTime = maxUploadRetryTime;
-      }
-      if (maxOperationRetryTime) {
-        storage.maxOperationRetryTime = maxOperationRetryTime;
-      }
-      return storage;
-    }, [maxUploadRetryTime, maxOperationRetryTime]);
+export class Storage {
+  constructor(auth: FirebaseStorage) {
+    return auth;
   }
-
-}
-
-export function ref(storage: AngularFireStorage, path: string) {
-  return createStorageRef(storage.storage, ref(storage, path), this.schedulers, this.keepUnstableUntilFirst);
-}
-
-export function refFromURL(storage: AngularFireStorage, path: string) {
-  return createStorageRef(storage.storage, ref(storage, path), this.schedulers, this.keepUnstableUntilFirst);
-}
-
-export function uploadBytes(storage: AngularFireStorage, path: string, data: any, metadata?: UploadMetadata) {
-  return ref(storage, path).put(data, metadata);
 }

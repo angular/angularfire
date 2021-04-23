@@ -1,14 +1,9 @@
 import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
 import firebase from 'firebase/compat/app';
-import { concat, EMPTY, Observable, of, throwError, fromEvent } from 'rxjs';
-import { catchError, defaultIfEmpty, map, mergeMap, observeOn, switchMap, switchMapTo, shareReplay, filter, subscribeOn } from 'rxjs/operators';
-import {
-  ɵAngularFireSchedulers,
-  ɵlazySDKProxy,
-  ɵPromiseProxy,
-  ɵfetchInstance,
-  ɵapplyMixins
-} from '@angular/fire';
+import { concat, EMPTY, Observable, of, throwError } from 'rxjs';
+import { catchError, defaultIfEmpty, map, mergeMap, observeOn, switchMap, switchMapTo, shareReplay, subscribeOn } from 'rxjs/operators';
+import { ɵAngularFireSchedulers, ɵcacheInstance } from '@angular/fire';
+import { ɵlazySDKProxy, ɵPromiseProxy, ɵapplyMixins } from '@angular/fire/compat';
 import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire/compat';
 import { FirebaseOptions } from 'firebase/app';
 import { isPlatformServer } from '@angular/common';
@@ -49,7 +44,7 @@ export class AngularFireMessaging {
       observeOn(schedulers.insideAngular),
       switchMap(() => isPlatformServer(platformId) ? EMPTY : import('firebase/compat/messaging')),
       map(() => ɵfirebaseAppFactory(options, zone, name)),
-      switchMap(app => ɵfetchInstance(`${app.name}.messaging`, 'AngularFireMessaging', app.name, async () => {
+      switchMap(app => ɵcacheInstance(`${app.name}.messaging`, 'AngularFireMessaging', app.name, async () => {
         return app.messaging();
       }, [])),
       shareReplay({ bufferSize: 1, refCount: false })

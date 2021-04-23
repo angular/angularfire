@@ -1,19 +1,14 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID, InjectionToken } from '@angular/core';
-import { Observable, of, from, merge, Subject, Subscriber } from 'rxjs';
+import { Observable, of, from, merge, Subject } from 'rxjs';
 import { switchMap, map, observeOn, shareReplay, first, filter, switchMapTo, subscribeOn } from 'rxjs/operators';
-import {
-  ɵPromiseProxy,
-  ɵlazySDKProxy,
-  ɵAngularFireSchedulers,
-  ɵkeepUnstableUntilFirstFactory,
-  ɵapplyMixins
-} from '@angular/fire';
+import { ɵAngularFireSchedulers, ɵkeepUnstableUntilFirstFactory } from '@angular/fire';
+import { ɵlazySDKProxy, ɵPromiseProxy, ɵapplyMixins } from '@angular/fire/compat';
 import {  ɵfirebaseAppFactory, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire/compat';
 import { FirebaseOptions } from 'firebase/app';
 import firebase from 'firebase/compat/app';
 import { isPlatformServer } from '@angular/common';
 import { proxyPolyfillCompat } from './base';
-import { ɵfetchInstance } from '@angular/fire';
+import { ɵcacheInstance } from '@angular/fire';
 
 export interface AngularFireAuth extends ɵPromiseProxy<firebase.auth.Auth> {}
 
@@ -82,7 +77,7 @@ export class AngularFireAuth {
       map(app => zone.runOutsideAngular(() => {
         const useEmulator: UseEmulatorArguments | null = _useEmulator;
         const settings: firebase.auth.AuthSettings | null = _settings;
-        return ɵfetchInstance(`${app.name}.auth`, 'AngularFireAuth', app.name, () => {
+        return ɵcacheInstance(`${app.name}.auth`, 'AngularFireAuth', app.name, () => {
           const auth = zone.runOutsideAngular(() => app.auth());
           if (useEmulator) {
             // Firebase Auth doesn't conform to the useEmulator convention, let's smooth that over

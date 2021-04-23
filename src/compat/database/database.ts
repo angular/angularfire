@@ -3,17 +3,14 @@ import { AngularFireList, AngularFireObject, DatabaseQuery, PathReference, Query
 import { getRef } from './utils';
 import { createListReference } from './list/create-reference';
 import { createObjectReference } from './object/create-reference';
-import {
-  ɵAngularFireSchedulers,
-  ɵkeepUnstableUntilFirstFactory,
-} from '@angular/fire';
+import { ɵAngularFireSchedulers, ɵkeepUnstableUntilFirstFactory } from '@angular/fire';
 import { FirebaseOptions } from 'firebase/app';
 import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire/compat';
 import { Observable } from 'rxjs';
 import 'firebase/compat/database';
 import { USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/compat/auth';
 import firebase from 'firebase/compat/app';
-import { ɵfetchInstance } from '@angular/fire';
+import { ɵcacheInstance } from '@angular/fire';
 
 export const URL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
 
@@ -48,7 +45,7 @@ export class AngularFireDatabase {
     const useEmulator: UseEmulatorArguments | null = _useEmulator;
     const app = ɵfirebaseAppFactory(options, zone, name);
 
-    this.database = ɵfetchInstance(`${app.name}.database.${databaseURL}`, 'AngularFireDatabase', app.name, () => {
+    this.database = ɵcacheInstance(`${app.name}.database.${databaseURL}`, 'AngularFireDatabase', app.name, () => {
       const database = zone.runOutsideAngular(() => app.database(databaseURL || undefined));
       if (useEmulator) {
         database.useEmulator(...useEmulator);

@@ -2,8 +2,8 @@ import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } fro
 import { EMPTY, Observable, of, Subscription } from 'rxjs';
 import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import firebase from 'firebase/compat/app';
-import { ɵapplyMixins, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire';
-import { ɵfetchInstance } from '@angular/fire';
+import { ɵapplyMixins, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire/compat';
+import { ɵcacheInstance } from '@angular/fire';
 import { FirebaseApp } from '@angular/fire/compat';
 import { isPlatformBrowser } from '@angular/common';
 import { proxyPolyfillCompat } from './base';
@@ -34,7 +34,7 @@ export class AngularFirePerformance {
 
     this.performance = of(undefined).pipe(
       switchMap(() => isPlatformBrowser(platformId) ? zone.runOutsideAngular(() => import('firebase/compat/performance')) : EMPTY),
-      map(() => ɵfetchInstance(`performance`, 'AngularFirePerformance', app.name, () => {
+      map(() => ɵcacheInstance(`performance`, 'AngularFirePerformance', app.name, () => {
         const performance = zone.runOutsideAngular(() => app.performance());
         if (instrumentationEnabled === false) {
           performance.instrumentationEnabled = false;

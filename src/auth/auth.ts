@@ -1,10 +1,11 @@
-import { Auth } from 'firebase/auth';
+import { Auth as FirebaseAuth } from 'firebase/auth';
 
+// see notes in core/firebase.app.module.ts for why we're building the class like this
 // tslint:disable-next-line:no-empty-interface
-export interface AngularFireAuth extends Auth {}
+export interface Auth extends FirebaseAuth {}
 
-export class AngularFireAuth {
-  constructor(auth: Auth) {
+export class Auth {
+  constructor(auth: FirebaseAuth) {
     return auth;
   }
 }

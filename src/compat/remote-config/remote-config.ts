@@ -14,20 +14,15 @@ import {
   switchMap,
   withLatestFrom
 } from 'rxjs/operators';
-import {
-  ɵAngularFireSchedulers,
-  ɵkeepUnstableUntilFirstFactory,
-  ɵlazySDKProxy,
-  ɵPromiseProxy,
-  ɵapplyMixins
-} from '@angular/fire';
+import { ɵAngularFireSchedulers, ɵkeepUnstableUntilFirstFactory } from '@angular/fire';
+import { ɵlazySDKProxy, ɵPromiseProxy, ɵapplyMixins } from '@angular/fire/compat';
 import { FirebaseOptions } from 'firebase/app';
 import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire/compat';
 import { isPlatformBrowser } from '@angular/common';
 import firebase from 'firebase/compat/app';
 import { Settings } from './interfaces';
 import { proxyPolyfillCompat } from './base';
-import { ɵfetchInstance } from '@angular/fire';
+import { ɵcacheInstance } from '@angular/fire';
 
 export interface ConfigTemplate {
   [key: string]: string | number | boolean;
@@ -145,7 +140,7 @@ export class AngularFireRemoteConfig {
       switchMap(() => isPlatformBrowser(platformId) ? import('firebase/compat/remote-config') : EMPTY),
       switchMap(() => import('@firebase/remote-config')),
       map(() => ɵfirebaseAppFactory(options, zone, name)),
-      map(app => ɵfetchInstance(`${app.name}.remote-config`, 'AngularFireRemoteConfig', app.name, () => {
+      map(app => ɵcacheInstance(`${app.name}.remote-config`, 'AngularFireRemoteConfig', app.name, () => {
         const rc = app.remoteConfig();
         if (settings) {
           rc.settings = settings;

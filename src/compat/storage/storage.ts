@@ -1,11 +1,7 @@
 import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
 import { createStorageRef } from './ref';
 import { Observable } from 'rxjs';
-import {
-  ɵAngularFireSchedulers,
-  ɵfetchInstance,
-  ɵkeepUnstableUntilFirstFactory
-} from '@angular/fire';
+import { ɵAngularFireSchedulers, ɵcacheInstance, ɵkeepUnstableUntilFirstFactory } from '@angular/fire';
 import { FirebaseOptions } from 'firebase/app';
 import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire/compat';
 import { UploadMetadata } from './interfaces';
@@ -46,7 +42,7 @@ export class AngularFireStorage {
     this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers);
     const app = ɵfirebaseAppFactory(options, zone, name);
 
-    this.storage = ɵfetchInstance(`${app.name}.storage.${storageBucket}`, 'AngularFireStorage', app.name, () => {
+    this.storage = ɵcacheInstance(`${app.name}.storage.${storageBucket}`, 'AngularFireStorage', app.name, () => {
       const storage = zone.runOutsideAngular(() => app.storage(storageBucket || undefined));
       if (maxUploadRetryTime) {
         storage.setMaxUploadRetryTime(maxUploadRetryTime);

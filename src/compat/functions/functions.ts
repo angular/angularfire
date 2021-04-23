@@ -1,18 +1,14 @@
 import { Inject, Injectable, InjectionToken, NgZone, Optional } from '@angular/core';
 import { from, Observable, of } from 'rxjs';
 import { map, observeOn, shareReplay, switchMap } from 'rxjs/operators';
-import {
-  ɵAngularFireSchedulers,
-  ɵlazySDKProxy,
-  ɵPromiseProxy,
-  ɵapplyMixins
-} from '@angular/fire';
+import { ɵAngularFireSchedulers } from '@angular/fire';
+import { ɵlazySDKProxy, ɵPromiseProxy, ɵapplyMixins } from '@angular/fire/compat';
 import { FirebaseOptions } from 'firebase/app';
 import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire/compat';
 import firebase from 'firebase/compat/app';
 import { proxyPolyfillCompat } from './base';
 import { HttpsCallableOptions } from '@firebase/functions-types';
-import { ɵfetchInstance } from '@angular/fire';
+import { ɵcacheInstance } from '@angular/fire';
 
 export const ORIGIN = new InjectionToken<string>('angularfire2.functions.origin');
 export const REGION = new InjectionToken<string>('angularfire2.functions.region');
@@ -48,7 +44,7 @@ export class AngularFireFunctions {
       observeOn(schedulers.outsideAngular),
       switchMap(() => import('firebase/compat/functions')),
       map(() => ɵfirebaseAppFactory(options, zone, name)),
-      map(app => ɵfetchInstance(`${app.name}.functions.${region || origin}`, 'AngularFireFunctions', app.name, () => {
+      map(app => ɵcacheInstance(`${app.name}.functions.${region || origin}`, 'AngularFireFunctions', app.name, () => {
         let functions: firebase.functions.Functions;
         if (region && origin) {
           throw new Error('REGION and ORIGIN can\'t be used at the same time.');
