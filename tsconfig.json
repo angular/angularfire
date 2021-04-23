@@ -5,6 +5,7 @@
     "target": "es2015",
     "declaration": true,
     "inlineSources": true,
+    "declarationMap": false,
     "types": [
       "node",
       "zone.js"
@@ -16,6 +17,7 @@
   },
   "angularCompilerOptions": {
     "enableIvy": false,
+    "compilationMode": "partial",
     "annotateForClosureCompiler": true,
     "skipTemplateCodegen": true,
     "strictMetadataEmit": true,

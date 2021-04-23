@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve --hmr",
     "build": "ng build --stats-json",
+    "build:prod": "ng build --configuration production --stats-json",
     "analyze": "webpack-bundle-analyzer dist/sample/stats.json",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",

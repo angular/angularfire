@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFireMessaging } from '@angular/fire/messaging';
-import { trace } from '@angular/fire/performance';
+import { AngularFireMessaging } from '@angular/fire/compat/messaging';
+import { trace } from '@angular/fire/compat/performance';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 

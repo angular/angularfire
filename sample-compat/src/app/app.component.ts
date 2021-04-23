@@ -1,5 +1,5 @@
 import { ApplicationRef, Component } from '@angular/core';
-import { FirebaseApp } from '@angular/fire';
+import { FirebaseApp } from '@angular/fire/compat';
 import { debounceTime } from 'rxjs/operators';
 
 @Component({

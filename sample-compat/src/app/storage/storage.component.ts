@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFireStorage } from '@angular/fire/storage';
+import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { Observable, of } from 'rxjs';
 import { startWith, tap } from 'rxjs/operators';
 import { makeStateKey, TransferState } from '@angular/platform-browser';
-import { trace } from '@angular/fire/performance';
+import { trace } from '@angular/fire/compat/performance';
 
 const TRANSPARENT_PNG
   = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
@@ -26,7 +26,7 @@ export class StorageComponent implements OnInit {
   constructor(storage: AngularFireStorage, state: TransferState) {
     const icon = storage.ref('google-g.png');
     const key = makeStateKey('google-icon-url');
-    const existing = state.get(key, undefined);
+    const existing = state.get<string>(key, undefined);
     this.downloadUrl$ = existing ? of(existing) : icon.getDownloadURL().pipe(
       trace('storage'),
       tap(it => state.set(key, it)),

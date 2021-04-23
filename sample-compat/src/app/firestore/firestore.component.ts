@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Observable } from 'rxjs';
 import { startWith, tap } from 'rxjs/operators';
 import { makeStateKey, TransferState } from '@angular/platform-browser';
-import { trace } from '@angular/fire/performance';
+import { trace } from '@angular/fire/compat/performance';
 
 @Component({
   selector: 'app-firestore',
@@ -22,7 +22,7 @@ export class FirestoreComponent implements OnInit {
   constructor(state: TransferState, firestore: AngularFirestore) {
     const doc = firestore.doc('test/1');
     const key = makeStateKey(doc.ref.path);
-    const existing = state.get(key, undefined);
+    const existing = state.get<any>(key, undefined);
     this.testDocValue$ = firestore.doc('test/1').valueChanges().pipe(
       trace('firestore'),
       existing ? startWith(existing) : tap(it => state.set(key, it))

@@ -1,8 +1,9 @@
 import { Inject, Injectable, InjectionToken, NgModule, NgZone, Optional, PLATFORM_ID } from '@angular/core';
-import { FirebaseOptions, FIREBASE_OPTIONS } from '@angular/fire';
-import { USE_EMULATOR } from '@angular/fire/firestore';
-import { AngularFirestore, SETTINGS, Settings } from '@angular/fire/firestore';
-import { USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/auth';
+import { FIREBASE_OPTIONS } from '@angular/fire/compat';
+import { FirebaseOptions } from 'firebase/app';
+import { USE_EMULATOR } from '@angular/fire/compat/firestore';
+import { AngularFirestore, SETTINGS, Settings } from '@angular/fire/compat/firestore';
+import { USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/compat/auth';
 
 export const FIRESTORE_OFFLINE = new InjectionToken<AngularFirestore>('my.firestore');
 
@@ -15,9 +16,8 @@ export class AngularFirestoreOffline extends AngularFirestore {
         @Inject(PLATFORM_ID) platformId: Object,
         zone: NgZone,
         @Optional() @Inject(USE_EMULATOR) useEmulator: any,
-        @Optional() @Inject(USE_AUTH_EMULATOR) useAuthEmulator: any,
       ) {
-        super(options, 'offline', true, settings, platformId, zone, { synchronizeTabs: true }, useEmulator, useAuthEmulator);
+        super(options, 'offline', true, settings, platformId, zone, { synchronizeTabs: true }, useEmulator);
       }
 }
 

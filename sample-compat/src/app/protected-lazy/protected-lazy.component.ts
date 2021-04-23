@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DocumentChangeAction } from '@angular/fire/firestore';
+import { DocumentChangeAction } from '@angular/fire/compat/firestore';
 import { Observable } from 'rxjs';
 import { AngularFirestoreOffline } from '../firestore-offline/firestore-offline.module';
 

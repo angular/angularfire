@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FirebaseApp } from '@angular/fire';
+import { FirebaseApp } from '@angular/fire/compat';
 
 @Component({
   selector: 'app-home',
