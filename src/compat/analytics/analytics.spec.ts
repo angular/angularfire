@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { AngularFireModule, FirebaseApp } from '@angular/fire/compat';
 import { AngularFireAnalytics, AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
 import { COMMON_CONFIG } from '../../test-config';
-import { rando } from '../firestore/utils.spec';
+import { rando } from '../../utils';
 
 
 describe('AngularFireAnalytics', () => {

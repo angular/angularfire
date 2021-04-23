@@ -3,7 +3,7 @@ import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } f
 import { AngularFireFunctions, AngularFireFunctionsModule, ORIGIN, REGION } from '@angular/fire/compat/functions';
 import { COMMON_CONFIG } from '../../test-config';
 import 'firebase/compat/functions';
-import { rando } from '../firestore/utils.spec';
+import { rando } from '../../utils';
 
 describe('AngularFireFunctions', () => {
   let app: FirebaseApp;

@@ -13,10 +13,10 @@ import {
   delayUpdate,
   deleteThemAll,
   FAKE_STOCK_DATA,
-  rando,
   randomName,
   Stock
 } from '../utils.spec';
+import { rando } from '../../../utils';
 
 async function collectionHarness(afs: AngularFirestore, items: number, queryGroupFn?: QueryGroupFn<Stock>) {
   const randomCollectionName = randomName(afs.firestore);

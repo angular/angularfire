@@ -5,7 +5,7 @@ import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../../test-config';
 import { skip, take } from 'rxjs/operators';
 import 'firebase/compat/database';
-import { rando } from '../../firestore/utils.spec';
+import { rando } from '../../../utils';
 
 describe('listChanges', () => {
   let app: FirebaseApp;
@@ -36,7 +36,7 @@ describe('listChanges', () => {
   });
 
   afterEach(() => {
-    // try { app.delete() } catch(e) { };
+    app.delete();
   });
 
   describe('events', () => {

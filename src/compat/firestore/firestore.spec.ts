@@ -4,7 +4,7 @@ import { AngularFirestore, SETTINGS, AngularFirestoreModule, AngularFirestoreDoc
 import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 import 'firebase/compat/firestore';
-import { rando } from './utils.spec';
+import { rando } from '../../utils';
 
 describe('AngularFirestore', () => {
   let app: FirebaseApp;

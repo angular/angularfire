@@ -5,7 +5,7 @@ import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../../test-config';
 import { take } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
-import { rando } from '../../firestore/utils.spec';
+import { rando } from '../../../utils';
 import firebase from 'firebase/compat/app';
 
 describe('fromRef', () => {
@@ -38,7 +38,7 @@ describe('fromRef', () => {
   });
 
   afterEach(() => {
-    // try { app.delete() } catch(e) { };
+    app.delete();
   });
 
   it('it should be async by default', (done) => {

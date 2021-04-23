@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire/compat';
 import { AngularFireStorage, AngularFireStorageModule, AngularFireUploadTask, BUCKET, fromTask } from '@angular/fire/compat/storage';
 import { COMMON_CONFIG } from '../../test-config';
-import { rando } from '../firestore/utils.spec';
+import { rando } from '../../utils';
 import { ChangeDetectorRef } from '@angular/core';
 import 'firebase/compat/storage';
 import firebase from 'firebase/compat/app';

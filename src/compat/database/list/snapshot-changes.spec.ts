@@ -6,7 +6,7 @@ import { COMMON_CONFIG } from '../../../test-config';
 import { BehaviorSubject } from 'rxjs';
 import { skip, switchMap, take } from 'rxjs/operators';
 import 'firebase/compat/database';
-import { rando } from '../../firestore/utils.spec';
+import { rando } from '../../../utils';
 
 describe('snapshotChanges', () => {
   let app: FirebaseApp;
@@ -37,7 +37,7 @@ describe('snapshotChanges', () => {
   });
 
   afterEach(() => {
-    // try { app.delete() } catch(e) { };
+    app.delete();
   });
 
   function prepareSnapshotChanges(opts: { events?: ChildEvent[], skipnumber: number } = { skipnumber: 0 }) {

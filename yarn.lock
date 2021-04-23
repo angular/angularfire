@@ -11316,12 +11316,10 @@ rx@2.3.24:
   resolved "https://registry.yarnpkg.com/rx/-/rx-2.3.24.tgz#14f950a4217d7e35daa71bbcbe58eff68ea4b2b7"
   integrity sha1-FPlQpCF9fjXapxu8vljv9o6ksrc=
 
-"rxfire@^3.9.7 || ^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/rxfire/-/rxfire-4.0.0.tgz#53f70fac70864f517134bf99e3a1b3424ca4a854"
-  integrity sha512-0Hor04B9ZgOZSULW3xOvEFXNPuqFXpwoT+4UdMSB5JCxXaVvltJ2eQynRdnGcalhqND3Vbtgz2TZia9aGs3TlQ==
-  dependencies:
-    tslib "^1.11.1"
+rxfire@0.500.0-canary.0df3466:
+  version "0.500.0-canary.0df3466"
+  resolved "https://registry.yarnpkg.com/rxfire/-/rxfire-0.500.0-canary.0df3466.tgz#c3a59a4c523f4e93a02d14be5365256af94f1ef7"
+  integrity sha512-XhCly7+zs6vLI+m8jH5bx/zokPoXZHlff8SE1wSggZnrpo+8Ze/G4L3kiliTf0c29sg7uxDFLGLqxYyM52wHJQ==
 
 rxjs@6.4.0:
   version "6.4.0"

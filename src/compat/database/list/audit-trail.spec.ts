@@ -5,7 +5,7 @@ import { COMMON_CONFIG } from '../../../test-config';
 import { skip } from 'rxjs/operators';
 import 'firebase/compat/database';
 import firebase from 'firebase/compat/app';
-import { rando } from '../../firestore/utils.spec';
+import { rando } from '../../../utils';
 
 describe('auditTrail', () => {
   let app: FirebaseApp;
@@ -36,7 +36,7 @@ describe('auditTrail', () => {
   });
 
   afterEach(() => {
-    // try { app.delete() } catch(e) { };
+    app.delete();
   });
 
   function prepareAuditTrail(opts: { events?: ChildEvent[], skipnumber: number } = { skipnumber: 0 }) {

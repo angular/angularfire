@@ -5,7 +5,8 @@ import { take } from 'rxjs/operators';
 import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../../test-config';
 
-import { FAKE_STOCK_DATA, rando, randomName, Stock } from '../utils.spec';
+import { FAKE_STOCK_DATA, randomName, Stock } from '../utils.spec';
+import { rando } from '../../../utils';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 

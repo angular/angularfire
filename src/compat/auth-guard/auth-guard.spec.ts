@@ -4,7 +4,7 @@ import { COMMON_CONFIG } from '../../test-config';
 import { AngularFireAuthGuard, AngularFireAuthGuardModule } from '@angular/fire/compat/auth-guard';
 import { Router, RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
-import { rando } from '../firestore/utils.spec';
+import { rando } from '../../utils';
 
 describe('AngularFireAuthGuard', () => {
   let app: FirebaseApp;

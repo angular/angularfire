@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
 import { NgZone } from '@angular/core';
 import 'firebase/compat/database';
-import { rando } from '../firestore/utils.spec';
+import { rando } from '../../utils';
 
 describe('AngularFireDatabase', () => {
   let app: FirebaseApp;
@@ -30,7 +30,7 @@ describe('AngularFireDatabase', () => {
   });
 
   afterEach(() => {
-    // try { app.delete() } catch(e) { };
+    app.delete();
   });
 
   describe('<constructor>', () => {
@@ -86,7 +86,7 @@ describe('AngularFireDatabase w/options', () => {
   });
 
   afterEach(() => {
-    // try { app.delete() } catch(e) { };
+    app.delete();
   });
 
   describe('<constructor>', () => {

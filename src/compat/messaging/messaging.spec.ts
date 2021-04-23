@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire/compat';
 import { AngularFireMessaging, AngularFireMessagingModule } from '@angular/fire/compat/messaging';
 import { COMMON_CONFIG } from '../../test-config';
-import { rando } from '../firestore/utils.spec';
+import { rando } from '../../utils';
 
 describe('AngularFireMessaging', () => {
   let app: FirebaseApp;
