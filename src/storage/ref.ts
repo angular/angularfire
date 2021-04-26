@@ -1,4 +1,4 @@
-import { ListResult, Reference, SettableMetadata, StringFormat, UploadMetadata, ListOptions } from './interfaces';
+import { ListOptions, ListResult, Reference, SettableMetadata, StringFormat, UploadMetadata } from './interfaces';
 import { AngularFireUploadTask, createUploadTask } from './task';
 import { from, Observable, of } from 'rxjs';
 import { ɵAngularFireSchedulers } from '@angular/fire';
