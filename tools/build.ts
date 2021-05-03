@@ -8,9 +8,11 @@ import firebase from 'firebase/compat/app';
 
 // TODO infer these from the package.json
 const MODULES = [
-  'core', 'compat', 'compat/analytics', 'compat/auth-guard', 'compat/auth',
-  'compat/database', 'compat/firestore', 'compat/functions', 'compat/remote-config',
-  'compat/storage', 'compat/messaging', 'compat/performance'
+  'core', 'compat', 'analytics', 'auth', 'database', 'firestore', 'functions',
+  'remote-config', 'storage', 'messaging', 'performance', 'compat/analytics',
+  'compat/auth-guard', 'compat/auth', 'compat/database', 'compat/firestore',
+  'compat/functions', 'compat/remote-config', 'compat/storage', 'compat/messaging',
+  'compat/performance'
 ];
 const LAZY_MODULES = ['compat/analytics', 'compat/auth', 'compat/functions', 'compat/messaging', 'compat/remote-config'];
 const UMD_NAMES = MODULES.map(m => m === 'core' ? 'angular-fire' : `angular-fire-${m.replace('/', '-')}`);
@@ -142,7 +144,7 @@ async function buildDocs() {
     const buffer = await readFile(`./dist/typedocs/${module}.json`);
     const typedoc = JSON.parse(buffer.toString());
     if (!typedoc.children) {
-      console.log('typedoc fail', module);
+      console.error('typedoc fail', module);
     }
     // TODO infer the entryPoint from the package.json
     const entryPoint = typedoc.children.find((c: any) => c.name === '"public_api"');
@@ -150,7 +152,7 @@ async function buildDocs() {
       // TODO chop out the working directory and filename
       child.children ? child.children.map(c => ({ ...c, path: dirname(child.originalName.split(process.cwd())[1]) })) : []
     ));
-    return entryPoint.children
+    return (entryPoint.children || [])
       .filter(c => c.name[0] !== 'ɵ' && c.name[0] !== '_' /* private */)
       .map(child => ({ ...allChildren.find(c => child.target === c.id) }))
       .reduce((acc, child) => ({ ...acc, [encodeURIComponent(child.name)]: child }), {});

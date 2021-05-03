@@ -28,7 +28,7 @@ export function ɵanalyticsInstancesFactory(instances: Analytics[]) {
 // Hack: useFactory doesn't allow us to pass a lambda, so let's bind the arugments
 // Going this direction to cut down on DI token noise; also making it easier to support
 // multiple Firebase Apps
-export function ɵboundAuthInstanceFactory(zone: NgZone) {
+export function ɵboundAnalyticsInstanceFactory(zone: NgZone) {
   const analytics = ɵsmartCacheInstance<FirebaseAnalytics>(CACHE_PREFIX, this);
   return new Analytics(analytics);
 }
@@ -47,15 +47,15 @@ const DEFAULT_ANALYTICS_INSTANCE_PROVIDER = {
     DEFAULT_ANALYTICS_INSTANCE_PROVIDER,
   ]
 })
-export class AngularFireAuthModule {
+export class AngularFireAnalyticsModule {
 }
 
 export function provideAnalytics(fn: () => FirebaseAnalytics) {
   return {
-    ngModule: AngularFireAuthModule,
+    ngModule: AngularFireAnalyticsModule,
     providers: [{
       provide: ANALYTICS_INSTANCES,
-      useFactory: ɵboundAuthInstanceFactory.bind(fn),
+      useFactory: ɵboundAnalyticsInstanceFactory.bind(fn),
       multi: true,
       deps: [
         NgZone,
