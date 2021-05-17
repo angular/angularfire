@@ -1,5 +1,10 @@
+<a name="6.1.5"></a>
+# [6.1.5](https://github.com/angular/angularfire/compare/6.1.4...6.1.5) (2021-05-17)
+
+* Support Angular 12 peer
+
 <a name="6.1.4"></a>
-## [6.1.4](https://github.com/angular/angularfire/compare/6.1.3...6.1.4) (2020-12-03)
+# [6.1.4](https://github.com/angular/angularfire/compare/6.1.3...6.1.4) (2020-12-03)
 
 
 ### Bug Fixes
@@ -10,7 +15,7 @@
 
 
 <a name="6.1.3"></a>
-## [6.1.3](https://github.com/angular/angularfire/compare/6.1.2...6.1.3) (2020-11-30)
+# [6.1.3](https://github.com/angular/angularfire/compare/6.1.2...6.1.3) (2020-11-30)
 
 
 ### Bug Fixes
