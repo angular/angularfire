@@ -21,7 +21,7 @@ describe('AngularFireMessaging', () => {
   });
 
   afterEach(() => {
-    app.delete();
+    app.delete().catch();
   });
 
   it('should be exist', () => {
@@ -57,7 +57,7 @@ describe('AngularFireMessaging with different app', () => {
   });
 
   afterEach(() => {
-    app.delete();
+    app.delete().catch();
   });
 
   describe('<constructor>', () => {

@@ -1,4 +1,4 @@
-import 'zone.js/dist/zone-node';
+import 'zone.js/node';
 
 import { ngExpressEngine } from '@nguniversal/express-engine';
 import * as express from 'express';
@@ -36,7 +36,7 @@ export function app() {
   // Serve static files from /browser
   server.get('*.*', express.static(distFolder, {
     maxAge: '1y'
-  }));
+  }) as any);
 
   // All regular routes use the Universal engine
   server.get('*', (req, res) => {

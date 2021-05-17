@@ -21,7 +21,7 @@ export class UpboatsComponent implements OnInit {
     const collection = firestore.collection<Animal>('animals', ref =>
       ref.orderBy('upboats', 'desc').orderBy('updatedAt', 'desc')
     );
-    const key = makeStateKey(collection.ref.path);
+    const key = makeStateKey<Animal[]>(collection.ref.path);
     const existing = state.get(key, undefined);
     this.animals = collection.snapshotChanges().pipe(
       trace('animals'),
