@@ -61,7 +61,7 @@ jobs:
     needs: build
     strategy:
       matrix:
-        node: ["10", "12", "14"]
+        node: ["12", "14", "16"]
         firebase: ["7", "8"]
       fail-fast: false
     name: Test Firebase v${{ matrix.firebase }} on Node.js ${{ matrix.node }}
