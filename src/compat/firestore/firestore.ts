@@ -13,7 +13,7 @@ import {
 import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 import { AngularFirestoreCollectionGroup } from './collection-group/collection-group';
-import { ɵAngularFireSchedulers, ɵkeepUnstableUntilFirstFactory } from '@angular/fire';
+import { ɵAngularFireSchedulers } from '@angular/fire';
 import { FirebaseApp, ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire/compat';
 import { FirebaseOptions } from 'firebase/app';
 import { isPlatformServer } from '@angular/common';
@@ -119,8 +119,6 @@ type InstanceCache = Map<FirebaseApp, [
 export class AngularFirestore {
   public readonly firestore: firebase.firestore.Firestore;
   public readonly persistenceEnabled$: Observable<boolean>;
-  public readonly schedulers: ɵAngularFireSchedulers;
-  public readonly keepUnstableUntilFirst: <T>(obs: Observable<T>) => Observable<T>;
 
   /**
    * Each Feature of AngularFire has a FirebaseApp injected. This way we
@@ -135,12 +133,10 @@ export class AngularFirestore {
     // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
+    public schedulers: ɵAngularFireSchedulers,
     @Optional() @Inject(PERSISTENCE_SETTINGS) persistenceSettings: PersistenceSettings | null,
     @Optional() @Inject(USE_EMULATOR) _useEmulator: any,
   ) {
-    this.schedulers = new ɵAngularFireSchedulers(zone);
-    this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers);
-
     const app = ɵfirebaseAppFactory(options, zone, name);
     const useEmulator: UseEmulatorArguments | null = _useEmulator;
 

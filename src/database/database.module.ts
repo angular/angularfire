@@ -5,6 +5,7 @@ import { AUTH_INSTANCES } from '../auth/auth.module';
 import { ɵsmartCacheInstance, ɵfetchCachedInstance } from '../core';
 import { Database } from './database';
 import { DEFAULT_APP_NAME, FIREBASE_APPS } from '../app/app.module';
+import { ɵAngularFireSchedulers } from '../zones';
 
 export const DATABASE_INSTANCES = new InjectionToken<Database[]>('angularfire2.database-instances');
 
@@ -30,7 +31,7 @@ export function ɵdatabaseInstancesFactory(instances: Database[]) {
 // Going this direction to cut down on DI token noise; also making it easier to support
 // multiple Firebase Apps
 export function ɵboundDatabaseInstanceFactory(zone: NgZone) {
-  const database = ɵsmartCacheInstance<FirebaseDatabase>(CACHE_PREFIX, this);
+  const database = ɵsmartCacheInstance<FirebaseDatabase>(CACHE_PREFIX, this, zone);
   return new Database(database);
 }
 
@@ -60,6 +61,7 @@ export function provideDatabase(fn: () => FirebaseDatabase) {
       multi: true,
       deps: [
         NgZone,
+        ɵAngularFireSchedulers,
         [new Optional(), FIREBASE_APPS ],
         // Database+Auth work better if Auth is loaded first
         [new Optional(), AUTH_INSTANCES ],

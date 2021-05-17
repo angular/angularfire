@@ -19,7 +19,10 @@ tools/build.js
 coverage
 *.log
 api-*.json
-src/**/base.ts
 angularfire.tgz
 unpack.sh
 publish.sh
+
+# auto-gen files
+src/compat/**/base.ts
+src/**/rxfire.ts

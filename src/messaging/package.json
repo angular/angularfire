@@ -3,7 +3,7 @@
   "ngPackage": {
     "lib": {
       "umdModuleIds": {
-        "rxfire/messaging": "rxfire"
+        "rxfire/messaging": "rxfire-messaging"
       },
       "entryFile": "public_api.ts"
     }

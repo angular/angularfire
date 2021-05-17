@@ -3,10 +3,9 @@ import { AngularFireList, AngularFireObject, DatabaseQuery, PathReference, Query
 import { getRef } from './utils';
 import { createListReference } from './list/create-reference';
 import { createObjectReference } from './object/create-reference';
-import { ɵAngularFireSchedulers, ɵkeepUnstableUntilFirstFactory } from '@angular/fire';
+import { ɵAngularFireSchedulers } from '@angular/fire';
 import { FirebaseOptions } from 'firebase/app';
 import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire/compat';
-import { Observable } from 'rxjs';
 import 'firebase/compat/database';
 import { USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/compat/auth';
 import firebase from 'firebase/compat/app';
@@ -26,9 +25,6 @@ export const USE_EMULATOR = new InjectionToken<UseEmulatorArguments>('angularfir
 export class AngularFireDatabase {
   public readonly database: firebase.database.Database;
 
-  public readonly schedulers: ɵAngularFireSchedulers;
-  public readonly keepUnstableUntilFirst: <T>(obs$: Observable<T>) => Observable<T>;
-
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) name: string | null | undefined,
@@ -36,11 +32,10 @@ export class AngularFireDatabase {
     // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
+    public schedulers: ɵAngularFireSchedulers,
     @Optional() @Inject(USE_EMULATOR) _useEmulator: any, // tuple isn't working here
     @Optional() @Inject(USE_AUTH_EMULATOR) useAuthEmulator: any,
   ) {
-    this.schedulers = new ɵAngularFireSchedulers(zone);
-    this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers);
 
     const useEmulator: UseEmulatorArguments | null = _useEmulator;
     const app = ɵfirebaseAppFactory(options, zone, name);

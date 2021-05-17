@@ -1,7 +1,7 @@
 import { Injectable, Inject, Optional, NgZone, PLATFORM_ID, InjectionToken } from '@angular/core';
 import { Observable, of, from, merge, Subject } from 'rxjs';
 import { switchMap, map, observeOn, shareReplay, first, filter, switchMapTo, subscribeOn } from 'rxjs/operators';
-import { ɵAngularFireSchedulers, ɵkeepUnstableUntilFirstFactory } from '@angular/fire';
+import { ɵAngularFireSchedulers, keepUnstableUntilFirst } from '@angular/fire';
 import { ɵlazySDKProxy, ɵPromiseProxy, ɵapplyMixins } from '@angular/fire/compat';
 import {  ɵfirebaseAppFactory, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire/compat';
 import { FirebaseOptions } from 'firebase/app';
@@ -59,6 +59,7 @@ export class AngularFireAuth {
     // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
+    schedulers: ɵAngularFireSchedulers,
     @Optional() @Inject(USE_EMULATOR) _useEmulator: any, // can't use the tuple here
     @Optional() @Inject(SETTINGS) _settings: any, // can't use firebase.auth.AuthSettings here
     @Optional() @Inject(TENANT_ID) tenantId: string | null,
@@ -66,8 +67,6 @@ export class AngularFireAuth {
     @Optional() @Inject(USE_DEVICE_LANGUAGE) useDeviceLanguage: boolean | null,
     @Optional() @Inject(PERSISTENCE) persistence: string | null,
   ) {
-    const schedulers = new ɵAngularFireSchedulers(zone);
-    const keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(schedulers);
     const logins = new Subject<Required<firebase.auth.UserCredential>>();
 
     const auth = of(undefined).pipe(

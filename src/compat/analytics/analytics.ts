@@ -52,7 +52,8 @@ export class AngularFireAnalytics {
     @Optional() @Inject(CONFIG) providedConfig: Config | null,
     // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
-    zone: NgZone
+    zone: NgZone,
+    schedulers: ɵAngularFireSchedulers,
   ) {
 
     if (isPlatformBrowser(platformId)) {
@@ -139,7 +140,7 @@ export class AngularFireAnalytics {
     }
 
     const analytics = of(undefined).pipe(
-      observeOn(new ɵAngularFireSchedulers(zone).outsideAngular),
+      observeOn(schedulers.outsideAngular),
       switchMap(() => isPlatformBrowser(platformId) ? zone.runOutsideAngular(() => import('firebase/compat/analytics')) : EMPTY),
       // SEMVER can switch to isSupported() when we only target v8
       // switchMap(() => firebase.analytics.isSupported().then(it => it, () => false)),

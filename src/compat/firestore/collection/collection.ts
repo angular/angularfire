@@ -1,11 +1,12 @@
 import { from, Observable } from 'rxjs';
-import { fromCollectionRef } from '../observable/fromRef';
-import { filter, map, observeOn, pairwise, scan, startWith } from 'rxjs/operators';
+import { filter, map, pairwise, scan, startWith } from 'rxjs/operators';
 import firebase from 'firebase/compat/app';
+import { keepUnstableUntilFirst, observeInsideAngular } from '@angular/fire';
 
 import { CollectionReference, DocumentChangeAction, DocumentChangeType, DocumentData, DocumentReference, Query } from '../interfaces';
 import { docChanges, sortedChanges } from './changes';
 import { AngularFirestoreDocument } from '../document/document';
+import { fromCollectionRef } from '../observable/fromRef';
 import { AngularFirestore } from '../firestore';
 
 export function validateEventsArray(events?: DocumentChangeType[]) {
@@ -72,7 +73,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
       pairwise(),
       filter(([prior, current]) => current.length > 0 || !prior),
       map(([prior, current]) => current),
-      this.afs.keepUnstableUntilFirst
+      keepUnstableUntilFirst
     );
   }
 
@@ -92,7 +93,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
     const validatedEvents = validateEventsArray(events);
     const scheduledSortedChanges$ = sortedChanges<T>(this.query, validatedEvents, this.afs.schedulers.outsideAngular);
     return scheduledSortedChanges$.pipe(
-      this.afs.keepUnstableUntilFirst
+      keepUnstableUntilFirst
     );
   }
 
@@ -119,7 +120,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
             return a.data();
           }
         })),
-        this.afs.keepUnstableUntilFirst
+        keepUnstableUntilFirst
       );
   }
 
@@ -128,7 +129,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
    */
   get(options?: firebase.firestore.GetOptions) {
     return from(this.query.get(options)).pipe(
-      observeOn(this.afs.schedulers.insideAngular),
+      observeInsideAngular,
     );
   }
 

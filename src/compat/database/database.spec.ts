@@ -5,6 +5,7 @@ import { COMMON_CONFIG } from '../../test-config';
 import { NgZone } from '@angular/core';
 import 'firebase/compat/database';
 import { rando } from '../../utils';
+import { ɵAngularFireSchedulers } from '@angular/fire';
 
 describe('AngularFireDatabase', () => {
   let app: FirebaseApp;
@@ -44,7 +45,8 @@ describe('AngularFireDatabase', () => {
     });
 
     it('should accept a Firebase App in the constructor', (done) => {
-      const database = new AngularFireDatabase(app.options, rando(), undefined, {}, zone, undefined, undefined);
+      const schedulers = new ɵAngularFireSchedulers(zone);
+      const database = new AngularFireDatabase(app.options, rando(), undefined, {}, zone, schedulers, undefined, undefined);
       expect(database instanceof AngularFireDatabase).toEqual(true);
       // try { database.database.app.delete().then(done, done); } catch(e) { done(); }
       done();

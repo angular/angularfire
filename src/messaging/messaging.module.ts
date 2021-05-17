@@ -4,6 +4,7 @@ import { FirebaseMessaging } from 'firebase/messaging';
 import { ɵsmartCacheInstance, ɵfetchCachedInstance } from '../core';
 import { Messaging } from './messaging';
 import { DEFAULT_APP_NAME, FIREBASE_APPS } from '../app/app.module';
+import { ɵAngularFireSchedulers } from '../zones';
 
 export const MESSAGING_INSTANCES = new InjectionToken<Messaging[]>('angularfire2.messaging-instances');
 
@@ -29,7 +30,7 @@ export function ɵmessagingInstancesFactory(instances: Messaging[]) {
 // Going this direction to cut down on DI token noise; also making it easier to support
 // multiple Firebase Apps
 export function ɵboundMessagingInstanceFactory(zone: NgZone) {
-  const messaging = ɵsmartCacheInstance<FirebaseMessaging>(CACHE_PREFIX, this);
+  const messaging = ɵsmartCacheInstance<FirebaseMessaging>(CACHE_PREFIX, this, zone);
   return new Messaging(messaging);
 }
 
@@ -59,6 +60,7 @@ export function provideMessaging(fn: () => FirebaseMessaging) {
       multi: true,
       deps: [
         NgZone,
+        ɵAngularFireSchedulers,
         [new Optional(), FIREBASE_APPS ]
       ]
     }]

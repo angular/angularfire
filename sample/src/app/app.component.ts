@@ -1,5 +1,7 @@
-import { Component, Inject, Optional } from '@angular/core';
+import { ApplicationRef, Component, Inject, Optional } from '@angular/core';
 import { FirebaseApp, Auth, AUTH_INSTANCES, FIREBASE_APPS } from '@angular/fire';
+import { authState } from '@angular/fire/auth';
+import { debounceTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -35,7 +37,12 @@ export class AppComponent {
     public auth: Auth, // default Firbase Auth
     @Inject(FIREBASE_APPS) public apps: FirebaseApp[], // all initialized App instances
     @Optional() @Inject(AUTH_INSTANCES) public authInstances: Auth[], // all initialized Auth instances
+    appRef: ApplicationRef,
   ) {
     console.log(app, auth, apps, authInstances, 'hi!...');
+    // onAuthStateChanged should destablize the zone
+    // onAuthStateChanged(auth, it => console.log('onAuthStateChanged', it));
+    authState(auth).subscribe(it => console.log('authState', it));
+    appRef.isStable.pipe(debounceTime(200)).subscribe(it => console.log('isStable', it));
   }
 }

@@ -14,7 +14,7 @@ import {
   switchMap,
   withLatestFrom
 } from 'rxjs/operators';
-import { ɵAngularFireSchedulers, ɵkeepUnstableUntilFirstFactory } from '@angular/fire';
+import { ɵAngularFireSchedulers, keepUnstableUntilFirst } from '@angular/fire';
 import { ɵlazySDKProxy, ɵPromiseProxy, ɵapplyMixins } from '@angular/fire/compat';
 import { FirebaseOptions } from 'firebase/app';
 import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire/compat';
@@ -129,12 +129,10 @@ export class AngularFireRemoteConfig {
     @Optional() @Inject(SETTINGS) settings: Settings | null,
     @Optional() @Inject(DEFAULTS) defaultConfig: ConfigTemplate | null,
     private zone: NgZone,
+    schedulers: ɵAngularFireSchedulers,
     // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object
   ) {
-
-    const schedulers = new ɵAngularFireSchedulers(zone);
-
     const remoteConfig$ = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
       switchMap(() => isPlatformBrowser(platformId) ? import('firebase/compat/remote-config') : EMPTY),
@@ -191,7 +189,7 @@ export class AngularFireRemoteConfig {
 
     this.parameters = concat(default$, existing$, fresh$).pipe(
       scanToParametersArray(remoteConfig$),
-      ɵkeepUnstableUntilFirstFactory(schedulers),
+      keepUnstableUntilFirst,
       shareReplay({ bufferSize: 1, refCount: true })
     );
 

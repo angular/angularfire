@@ -4,6 +4,7 @@ import { Functions as FirebaseFunctions } from 'firebase/functions';
 import { ɵsmartCacheInstance, ɵfetchCachedInstance } from '../core';
 import { Functions } from './functions';
 import { DEFAULT_APP_NAME, FIREBASE_APPS } from '../app/app.module';
+import { ɵAngularFireSchedulers } from '../zones';
 
 export const FUNCTIONS_INSTANCES = new InjectionToken<Functions[]>('angularfire2.functions-instances');
 
@@ -29,7 +30,7 @@ export function ɵfunctionsInstancesFactory(instances: Functions[]) {
 // Going this direction to cut down on DI token noise; also making it easier to support
 // multiple Firebase Apps
 export function ɵboundFunctionsInstanceFactory(zone: NgZone) {
-  const functions = ɵsmartCacheInstance<FirebaseFunctions>(CACHE_PREFIX, this);
+  const functions = ɵsmartCacheInstance<FirebaseFunctions>(CACHE_PREFIX, this, zone);
   return new Functions(functions);
 }
 
@@ -59,6 +60,7 @@ export function provideFunctions(fn: () => FirebaseFunctions) {
       multi: true,
       deps: [
         NgZone,
+        ɵAngularFireSchedulers,
         [new Optional(), FIREBASE_APPS ]
       ]
     }]

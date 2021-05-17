@@ -4,6 +4,7 @@ import { StorageService as FirebaseStorage } from 'firebase/storage';
 import { ɵsmartCacheInstance, ɵfetchCachedInstance } from '../core';
 import { Storage } from './storage';
 import { DEFAULT_APP_NAME, FIREBASE_APPS } from '../app/app.module';
+import { ɵAngularFireSchedulers } from '../zones';
 
 export const STORAGE_INSTANCES = new InjectionToken<Storage[]>('angularfire2.storage-instances');
 
@@ -29,7 +30,7 @@ export function ɵstorageInstancesFactory(instances: Storage[]) {
 // Going this direction to cut down on DI token noise; also making it easier to support
 // multiple Firebase Apps
 export function ɵboundStorageInstanceFactory(zone: NgZone) {
-  const storage = ɵsmartCacheInstance<FirebaseStorage>(CACHE_PREFIX, this);
+  const storage = ɵsmartCacheInstance<FirebaseStorage>(CACHE_PREFIX, this, zone);
   return new Storage(storage);
 }
 
@@ -59,6 +60,7 @@ export function provideStorage(fn: () => FirebaseStorage) {
       multi: true,
       deps: [
         NgZone,
+        ɵAngularFireSchedulers,
         [new Optional(), FIREBASE_APPS ]
       ]
     }]

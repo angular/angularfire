@@ -3,7 +3,7 @@
   "ngPackage": {
     "lib": {
       "umdModuleIds": {
-        "rxfire/database": "rxfire"
+        "rxfire/database": "rxfire-database"
       },
       "entryFile": "public_api.ts"
     }

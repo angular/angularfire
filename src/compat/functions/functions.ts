@@ -33,11 +33,11 @@ export class AngularFireFunctions {
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) name: string | null | undefined,
     zone: NgZone,
+    schedulers: ɵAngularFireSchedulers,
     @Optional() @Inject(REGION) region: string | null,
     @Optional() @Inject(ORIGIN) origin: string | null,
     @Optional() @Inject(USE_EMULATOR) _useEmulator: any, // can't use the tuple here
   ) {
-    const schedulers = new ɵAngularFireSchedulers(zone);
     const useEmulator: UseEmulatorArguments | null = _useEmulator;
 
     const functions = of(undefined).pipe(

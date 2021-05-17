@@ -4,6 +4,7 @@ import { FirebasePerformance } from 'firebase/performance';
 import { ɵsmartCacheInstance, ɵfetchCachedInstance } from '../core';
 import { Performance } from './performance';
 import { DEFAULT_APP_NAME, FIREBASE_APPS } from '../app/app.module';
+import { ɵAngularFireSchedulers } from '../zones';
 
 export const PERFORMANCE_INSTANCES = new InjectionToken<Performance[]>('angularfire2.performance-instances');
 
@@ -29,7 +30,7 @@ export function ɵperformanceInstancesFactory(instances: Performance[]) {
 // Going this direction to cut down on DI token noise; also making it easier to support
 // multiple Firebase Apps
 export function ɵboundPerformanceInstanceFactory(zone: NgZone) {
-  const performance = ɵsmartCacheInstance<FirebasePerformance>(CACHE_PREFIX, this);
+  const performance = ɵsmartCacheInstance<FirebasePerformance>(CACHE_PREFIX, this, zone);
   return new Performance(performance);
 }
 
@@ -59,6 +60,7 @@ export function providePerformance(fn: () => FirebasePerformance) {
       multi: true,
       deps: [
         NgZone,
+        ɵAngularFireSchedulers,
         [new Optional(), FIREBASE_APPS ]
       ]
     }]

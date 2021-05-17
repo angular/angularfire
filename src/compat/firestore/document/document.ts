@@ -1,4 +1,5 @@
 import { from, Observable } from 'rxjs';
+import { keepUnstableUntilFirst } from '@angular/fire';
 import { Action, DocumentData, DocumentReference, DocumentSnapshot, QueryFn, SetOptions } from '../interfaces';
 import { fromDocRef } from '../observable/fromRef';
 import { map, observeOn } from 'rxjs/operators';
@@ -73,7 +74,7 @@ export class AngularFirestoreDocument<T = DocumentData> {
   snapshotChanges(): Observable<Action<DocumentSnapshot<T>>> {
     const scheduledFromDocRef$ = fromDocRef<T>(this.ref, this.afs.schedulers.outsideAngular);
     return scheduledFromDocRef$.pipe(
-      this.afs.keepUnstableUntilFirst
+      keepUnstableUntilFirst
     );
   }
 

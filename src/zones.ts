@@ -1,4 +1,4 @@
-import { NgZone } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import {
   asyncScheduler,
   Observable,
@@ -44,8 +44,7 @@ export class ɵZoneScheduler implements SchedulerLike {
   }
 }
 
-// tslint:disable-next-line:class-name
-export class ɵBlockUntilFirstOperator<T> implements Operator<T, T> {
+class BlockUntilFirstOperator<T> implements Operator<T, T> {
   private task: MacroTask | null = null;
 
   constructor(private zone: any) {
@@ -72,6 +71,9 @@ export class ɵBlockUntilFirstOperator<T> implements Operator<T, T> {
   }
 }
 
+@Injectable({
+  providedIn: 'root',
+})
 // tslint:disable-next-line:class-name
 export class ɵAngularFireSchedulers {
   public readonly outsideAngular: ɵZoneScheduler;
@@ -80,28 +82,64 @@ export class ɵAngularFireSchedulers {
   constructor(public ngZone: NgZone) {
     this.outsideAngular = ngZone.runOutsideAngular(() => new ɵZoneScheduler(Zone.current));
     this.insideAngular = ngZone.run(() => new ɵZoneScheduler(Zone.current, asyncScheduler));
+    globalThis.ɵAngularFireScheduler ||= this;
   }
 }
 
-/**
- * Operator to block the zone until the first value has been emitted or the observable
- * has completed/errored. This is used to make sure that universal waits until the first
- * value from firebase but doesn't block the zone forever since the firebase subscription
- * is still alive.
- */
-export function ɵkeepUnstableUntilFirstFactory(schedulers: ɵAngularFireSchedulers) {
-  return function keepUnstableUntilFirst<T>(obs$: Observable<T>): Observable<T> {
-    obs$ = obs$.lift(
-      new ɵBlockUntilFirstOperator(schedulers.ngZone)
-    );
-
-    return obs$.pipe(
-      // Run the subscribe body outside of Angular (e.g. calling Firebase SDK to add a listener to a change event)
-      subscribeOn(schedulers.outsideAngular),
-      // Run operators inside the angular zone (e.g. side effects via tap())
-      observeOn(schedulers.insideAngular)
-      // INVESTIGATE https://github.com/angular/angularfire/pull/2315
-      // share()
-    );
-  };
+function getSchedulers() {
+  const schedulers = globalThis.ɵAngularFireScheduler as ɵAngularFireSchedulers|undefined;
+  if (!schedulers) { throw new Error('AngularFireModule has not been provided'); }
+  return schedulers;
 }
+
+function runOutsideAngular<T>(fn: (...args: any[]) => T): T {
+  return getSchedulers().ngZone.runOutsideAngular(() => fn());
+}
+
+function run<T>(fn: (...args: any[]) => T): T {
+  return getSchedulers().ngZone.run(() => fn());
+}
+
+export function observeOutsideAngular<T>(obs$: Observable<T>): Observable<T> {
+  return obs$.pipe(observeOn(getSchedulers().outsideAngular));
+}
+
+export function observeInsideAngular<T>(obs$: Observable<T>): Observable<T> {
+  return obs$.pipe(observeOn(getSchedulers().insideAngular));
+}
+
+export function keepUnstableUntilFirst<T>(obs$: Observable<T>): Observable<T> {
+  const scheduler = getSchedulers();
+  obs$ = obs$.lift(
+    new BlockUntilFirstOperator(scheduler.ngZone)
+  );
+  return obs$.pipe(
+    // Run the subscribe body outside of Angular (e.g. calling Firebase SDK to add a listener to a change event)
+    subscribeOn(scheduler.outsideAngular),
+    // Run operators inside the angular zone (e.g. side effects via tap())
+    observeOn(scheduler.insideAngular)
+  );
+}
+
+const zoneWrapFn = (it: (...args: any[]) => any) => {
+  const _this = this;
+  // function() is needed for the arguments object
+  // tslint:disable-next-line:only-arrow-functions
+  return function() {
+    return run(() => it.apply(_this, arguments));
+  };
+};
+
+export const ɵzoneWrap = <T= Observable<any>|number>(it: (..._: any[]) => T, args: IArguments): T => {
+  for (let i = 0; i < args.length; i++) {
+    if (typeof args[i] === 'function') {
+      args[i] = zoneWrapFn(args[i]);
+    }
+  }
+  const ret = runOutsideAngular(() => it.apply(this, args));
+  if (ret instanceof Observable) {
+    return ret.pipe(keepUnstableUntilFirst) as any;
+  } else {
+    return run(() => ret);
+  }
+};

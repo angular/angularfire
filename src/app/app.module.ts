@@ -12,6 +12,7 @@ import { FirebaseApp as IFirebaseApp, getApps, getApp, registerVersion } from 'f
 
 import { FirebaseApp } from './app';
 import { VERSION, ɵsmartCacheInstance } from '../core';
+import { ɵAngularFireSchedulers } from '../zones';
 
 export const DEFAULT_APP_NAME = '[DEFAULT]';
 export const FIREBASE_APPS = new InjectionToken<Array<FirebaseApp>>('angularfire2.apps');
@@ -58,7 +59,7 @@ const CACHE_PREFIX = 'FirebaseApp';
 // Going this direction to cut down on DI token noise; also making it easier to support
 // multiple Firebase Apps
 export function ɵboundFirebaseAppFactory(zone: NgZone) {
-  const app = ɵsmartCacheInstance<IFirebaseApp>(CACHE_PREFIX, this);
+  const app = ɵsmartCacheInstance<IFirebaseApp>(CACHE_PREFIX, this, zone);
   return new FirebaseApp(app);
 }
 
@@ -86,7 +87,7 @@ export function provideFirebaseApp(fn: () => IFirebaseApp): ModuleWithProviders<
       provide: INTERNAL_FIREBASE_APPS,
       useFactory: ɵboundFirebaseAppFactory.bind(fn),
       multi: true,
-      deps: [ NgZone ],
+      deps: [ NgZone, ɵAngularFireSchedulers ],
     }],
   };
 }

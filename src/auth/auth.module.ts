@@ -4,6 +4,7 @@ import { Auth as FirebaseAuth } from 'firebase/auth';
 import { ɵsmartCacheInstance, ɵfetchCachedInstance } from '../core';
 import { Auth } from './auth';
 import { DEFAULT_APP_NAME, FIREBASE_APPS } from '../app/app.module';
+import { ɵAngularFireSchedulers } from '../zones';
 
 export const AUTH_INSTANCES = new InjectionToken<Auth[]>('angularfire2.auth-instances');
 
@@ -29,7 +30,7 @@ export function ɵauthInstancesFactory(instances: Auth[]) {
 // Going this direction to cut down on DI token noise; also making it easier to support
 // multiple Firebase Apps
 export function ɵboundAuthInstanceFactory(zone: NgZone) {
-  const auth = ɵsmartCacheInstance<FirebaseAuth>(CACHE_PREFIX, this);
+  const auth = ɵsmartCacheInstance<FirebaseAuth>(CACHE_PREFIX, this, zone);
   return new Auth(auth);
 }
 
@@ -59,6 +60,7 @@ export function provideAuth(fn: () => FirebaseAuth) {
       multi: true,
       deps: [
         NgZone,
+        ɵAngularFireSchedulers,
         [new Optional(), FIREBASE_APPS ]
       ]
     }]

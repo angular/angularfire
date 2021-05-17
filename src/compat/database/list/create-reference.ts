@@ -6,6 +6,7 @@ import { createDataOperationMethod } from './data-operation';
 import { createRemoveMethod } from './remove';
 import { AngularFireDatabase } from '../database';
 import { map } from 'rxjs/operators';
+import { keepUnstableUntilFirst } from '@angular/fire';
 
 export function createListReference<T= any>(query: DatabaseQuery, afDatabase: AngularFireDatabase): AngularFireList<T> {
   const outsideAngularScheduler = afDatabase.schedulers.outsideAngular;
@@ -17,13 +18,13 @@ export function createListReference<T= any>(query: DatabaseQuery, afDatabase: An
     push: (data: T) => refInZone.push(data),
     remove: createRemoveMethod(refInZone),
     snapshotChanges(events?: ChildEvent[]) {
-      return snapshotChanges<T>(query, events, outsideAngularScheduler).pipe(afDatabase.keepUnstableUntilFirst);
+      return snapshotChanges<T>(query, events, outsideAngularScheduler).pipe(keepUnstableUntilFirst);
     },
     stateChanges(events?: ChildEvent[]) {
-      return stateChanges<T>(query, events, outsideAngularScheduler).pipe(afDatabase.keepUnstableUntilFirst);
+      return stateChanges<T>(query, events, outsideAngularScheduler).pipe(keepUnstableUntilFirst);
     },
     auditTrail(events?: ChildEvent[]) {
-      return auditTrail<T>(query, events, outsideAngularScheduler).pipe(afDatabase.keepUnstableUntilFirst);
+      return auditTrail<T>(query, events, outsideAngularScheduler).pipe(keepUnstableUntilFirst);
     },
     valueChanges<K extends string>(events?: ChildEvent[], options?: {idField?: K}) {
       const snapshotChanges$ = snapshotChanges<T>(query, events, outsideAngularScheduler);
@@ -40,7 +41,7 @@ export function createListReference<T= any>(query: DatabaseQuery, afDatabase: An
             return a.payload.val() as T;
           }
         })),
-        afDatabase.keepUnstableUntilFirst
+        keepUnstableUntilFirst
       );
     }
   };

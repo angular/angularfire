@@ -1,7 +1,8 @@
 import { from, Observable } from 'rxjs';
 import { fromCollectionRef } from '../observable/fromRef';
-import { filter, map, observeOn, scan } from 'rxjs/operators';
+import { filter, map, scan } from 'rxjs/operators';
 import firebase from 'firebase/compat/app';
+import { keepUnstableUntilFirst, observeInsideAngular } from '@angular/fire';
 
 import { DocumentChangeAction, DocumentChangeType, DocumentData, Query } from '../interfaces';
 import { validateEventsArray } from '../collection/collection';
@@ -43,14 +44,14 @@ export class AngularFirestoreCollectionGroup<T = DocumentData> {
   stateChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction<T>[]> {
     if (!events || events.length === 0) {
       return docChanges<T>(this.query, this.afs.schedulers.outsideAngular).pipe(
-        this.afs.keepUnstableUntilFirst
+        keepUnstableUntilFirst
       );
     }
     return docChanges<T>(this.query, this.afs.schedulers.outsideAngular)
       .pipe(
         map(actions => actions.filter(change => events.indexOf(change.type) > -1)),
         filter(changes =>  changes.length > 0),
-        this.afs.keepUnstableUntilFirst
+        keepUnstableUntilFirst
       );
   }
 
@@ -70,7 +71,7 @@ export class AngularFirestoreCollectionGroup<T = DocumentData> {
     const validatedEvents = validateEventsArray(events);
     const scheduledSortedChanges$ = sortedChanges<T>(this.query, validatedEvents, this.afs.schedulers.outsideAngular);
     return scheduledSortedChanges$.pipe(
-      this.afs.keepUnstableUntilFirst
+      keepUnstableUntilFirst
     );
   }
 
@@ -98,7 +99,7 @@ export class AngularFirestoreCollectionGroup<T = DocumentData> {
             return a.data();
           }
         })),
-        this.afs.keepUnstableUntilFirst
+        keepUnstableUntilFirst
       );
   }
 
@@ -107,7 +108,7 @@ export class AngularFirestoreCollectionGroup<T = DocumentData> {
    */
   get(options?: firebase.firestore.GetOptions) {
     return from(this.query.get(options)).pipe(
-      observeOn(this.afs.schedulers.insideAngular)
+      observeInsideAngular
     );
   }
 

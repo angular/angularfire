@@ -3,7 +3,7 @@
   "ngPackage": {
     "lib": {
       "umdModuleIds": {
-        "rxfire/performance": "rxfire"
+        "rxfire/performance": "rxfire-performance"
       },
       "entryFile": "public_api.ts"
     }

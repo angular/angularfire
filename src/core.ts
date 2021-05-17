@@ -1,4 +1,4 @@
-import { isDevMode, Version } from '@angular/core';
+import { isDevMode, NgZone, Version } from '@angular/core';
 
 export const VERSION = new Version('ANGULARFIRE2_VERSION');
 
@@ -26,12 +26,12 @@ export function ɵcacheInstance<T>(cacheKey: any, moduleName: string, appName: s
   }
 }
 
-export function ɵsmartCacheInstance<T>(moduleName: string, fn: () => T): T {
+export function ɵsmartCacheInstance<T>(moduleName: string, fn: () => T, zone: NgZone): T {
   const cached = ɵfetchCachedInstanceByDep<T>(fn);
   if (cached) {
     return cached as T;
   } else {
-    const instance = fn();
+    const instance = zone.runOutsideAngular(() => fn());
     globalThis.ɵAngularfireInstanceCache.set([moduleName, (instance as any).name].join('.'), [instance, fn]);
     return instance;
   }

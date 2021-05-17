@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { provideFirebaseApp, provideAuth } from '@angular/fire';
 import { initializeApp, getApp } from 'firebase/app';
-import { initializeAuth } from '@firebase/auth';
+import { initializeAuth, getAuth } from '@firebase/auth';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -21,7 +21,7 @@ import { environment } from '../environments/environment';
       app.automaticDataCollectionEnabled = false;
       return app;
     }),
-    provideAuth(() => initializeAuth(getApp())),
+    provideAuth(() => getAuth()),
     provideAuth(() => {
       const auth = initializeAuth(getApp('second'));
       auth.useDeviceLanguage();

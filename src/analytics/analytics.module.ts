@@ -4,6 +4,7 @@ import { Analytics as FirebaseAnalytics } from 'firebase/analytics';
 import { ɵsmartCacheInstance, ɵfetchCachedInstance } from '../core';
 import { Analytics } from './analytics';
 import { DEFAULT_APP_NAME, FIREBASE_APPS } from '../app/app.module';
+import { ɵAngularFireSchedulers } from '../zones';
 
 export const ANALYTICS_INSTANCES = new InjectionToken<Analytics[]>('angularfire2.analytics-instances');
 
@@ -29,7 +30,7 @@ export function ɵanalyticsInstancesFactory(instances: Analytics[]) {
 // Going this direction to cut down on DI token noise; also making it easier to support
 // multiple Firebase Apps
 export function ɵboundAnalyticsInstanceFactory(zone: NgZone) {
-  const analytics = ɵsmartCacheInstance<FirebaseAnalytics>(CACHE_PREFIX, this);
+  const analytics = ɵsmartCacheInstance<FirebaseAnalytics>(CACHE_PREFIX, this, zone);
   return new Analytics(analytics);
 }
 
@@ -59,6 +60,7 @@ export function provideAnalytics(fn: () => FirebaseAnalytics) {
       multi: true,
       deps: [
         NgZone,
+        ɵAngularFireSchedulers,
         [new Optional(), FIREBASE_APPS ]
       ]
     }]

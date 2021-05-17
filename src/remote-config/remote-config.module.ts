@@ -4,6 +4,7 @@ import { RemoteConfig as FirebaseRemoteConfig } from 'firebase/remote-config';
 import { ɵsmartCacheInstance, ɵfetchCachedInstance } from '../core';
 import { RemoteConfig } from './remote-config';
 import { DEFAULT_APP_NAME, FIREBASE_APPS } from '../app/app.module';
+import { ɵAngularFireSchedulers } from '../zones';
 
 export const REMOTE_CONFIG_INSTANCES = new InjectionToken<RemoteConfig[]>('angularfire2.remote-config-instances');
 
@@ -29,7 +30,7 @@ export function ɵremoteConfigInstancesFactory(instances: RemoteConfig[]) {
 // Going this direction to cut down on DI token noise; also making it easier to support
 // multiple Firebase Apps
 export function ɵboundRemoteConfigInstanceFactory(zone: NgZone) {
-  const remoteConfig = ɵsmartCacheInstance<FirebaseRemoteConfig>(CACHE_PREFIX, this);
+  const remoteConfig = ɵsmartCacheInstance<FirebaseRemoteConfig>(CACHE_PREFIX, this, zone);
   return new RemoteConfig(remoteConfig);
 }
 
@@ -59,6 +60,7 @@ export function provideRemoteConfig(fn: () => FirebaseRemoteConfig) {
       multi: true,
       deps: [
         NgZone,
+        ɵAngularFireSchedulers,
         [new Optional(), FIREBASE_APPS ]
       ]
     }]

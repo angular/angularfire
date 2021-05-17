@@ -33,10 +33,10 @@ export class AngularFireMessaging {
     // tslint:disable-next-line:ban-types
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
+    schedulers: ɵAngularFireSchedulers,
     @Optional() @Inject(VAPID_KEY) vapidKey: string|null,
     @Optional() @Inject(SERVICE_WORKER) _serviceWorker: any,
   ) {
-    const schedulers = new ɵAngularFireSchedulers(zone);
     const serviceWorker: Promise<ServiceWorkerRegistration> | null = _serviceWorker;
 
     const messaging = of(undefined).pipe(

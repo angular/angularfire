@@ -3,7 +3,7 @@
   "ngPackage": {
     "lib": {
       "umdModuleIds": {
-        "rxfire/remote-config": "rxfire"
+        "rxfire/remote-config": "rxfire-remote-config"
       },
       "entryFile": "public_api.ts"
     }
