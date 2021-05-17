@@ -99,7 +99,7 @@ export class AngularFireAuth {
             auth.useDeviceLanguage();
           }
           if (settings) {
-            auth.settings = settings;
+            auth.settings.appVerificationDisabledForTesting  = settings.appVerificationDisabledForTesting;
           }
           if (persistence) {
             auth.setPersistence(persistence);
