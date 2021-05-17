@@ -1,3 +1,2 @@
-export * from './performance';
-export * from './performance.module';
-export * from './performance.service';
+export { Performance, providePerformance, PERFORMANCE_INSTANCES } from '@angular/fire';
+export * from './rxfire';

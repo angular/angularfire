@@ -1,31 +1,48 @@
-import { ApplicationRef, Component } from '@angular/core';
-import { FirebaseApp } from '@angular/fire';
+import { ApplicationRef, Component, Inject, Optional } from '@angular/core';
+import { FirebaseApp, Auth, AUTH_INSTANCES, FIREBASE_APPS } from '@angular/fire';
+import { authState } from '@angular/fire/auth';
 import { debounceTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
   template: `
-    <h1>AngularFire kitchen sink</h1>
-    <h2>Primary outlet</h2>
-    <nav>
-      <a [routerLink]="[{ outlets: { primary: [] }}]">Home</a> |
-      <a [routerLink]="[{ outlets: { primary: ['protected'] }}]">Protected</a> |
-      <a [routerLink]="[{ outlets: { primary: ['lazy'] }}]">Lazy</a> |
-      <a [routerLink]="[{ outlets: { primary: ['protected-lazy'] }}]">Protected Lazy</a> |
-      <a [routerLink]="[{ outlets: { primary: ['protected-lazy', 'asdf'] }}]">Protected Lazy Deep</a> |
-      <a [routerLink]="[{ outlets: { primary: ['protected-lazy', '1', 'bob'] }}]">Protected Lazy Deep</a></nav>
+    <!--The content below is only a placeholder and can be replaced.-->
+    <div style="text-align:center" class="content">
+      <h1>
+        Welcome to {{title}}!
+      </h1>
+      <span style="display: block">{{ app.name }} app is running!</span>
+      <img width="300" alt="Angular Logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
+    </div>
+    <h2>Here are some links to help you start: </h2>
+    <ul>
+      <li>
+        <h2><a target="_blank" rel="noopener" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
+      </li>
+      <li>
+        <h2><a target="_blank" rel="noopener" href="https://angular.io/cli">CLI Documentation</a></h2>
+      </li>
+      <li>
+        <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
+      </li>
+    </ul>
     <router-outlet></router-outlet>
-    <h2>Secondary outlet</h2>
-    <nav><a [routerLink]="[{ outlets: { secondary: [] }}]">Home</a> | <a [routerLink]="[{ outlets: { secondary: ['protected'] }}]">Protected</a> | <a [routerLink]="[{ outlets: { secondary: ['protected-lazy'] }}]">Protected Lazy (no anonymous)</a></nav>
-    <router-outlet name="secondary"></router-outlet>
-    <h2>Yet anther outlet</h2>
-    <nav><a [routerLink]="[{ outlets: { tertiary: [] }}]">Home</a> | <a [routerLink]="[{ outlets: { tertiary: ['protected'] }}]">Protected</a></nav>
-    <router-outlet name="tertiary"></router-outlet>
   `,
-  styles: [``]
+  styles: []
 })
 export class AppComponent {
-  constructor(public readonly firebaseApp: FirebaseApp, appRef: ApplicationRef) {
+  title = 'sample';
+  constructor(
+    public app: FirebaseApp,      // default Firebase App
+    public auth: Auth, // default Firbase Auth
+    @Inject(FIREBASE_APPS) public apps: FirebaseApp[], // all initialized App instances
+    @Optional() @Inject(AUTH_INSTANCES) public authInstances: Auth[], // all initialized Auth instances
+    appRef: ApplicationRef,
+  ) {
+    console.log(app, auth, apps, authInstances, 'hi!...');
+    // onAuthStateChanged should destablize the zone
+    // onAuthStateChanged(auth, it => console.log('onAuthStateChanged', it));
+    authState(auth).subscribe(it => console.log('authState', it));
     appRef.isStable.pipe(debounceTime(200)).subscribe(it => console.log('isStable', it));
   }
 }

@@ -1,0 +1,11 @@
+{
+  "$schema": "../../node_modules/ng-packagr/package.schema.json",
+  "ngPackage": {
+    "lib": {
+      "umdModuleIds": {
+        "rxfire/app": "rxfire-app"
+      },
+      "entryFile": "public_api.ts"
+    }
+  }
+}

@@ -1,3 +1,7 @@
 *.spec.*
 test-config.*
 publish.sh
+__ivy_ngcc__/
+*.min.js
+*.min.js.map
+*.__ivy_ngcc_bak

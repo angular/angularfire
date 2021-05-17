@@ -4,6 +4,8 @@
     ],
     "compilerOptions": {
         "outDir": "tools",
+        "skipLibCheck": true,
+        "lib": ["es2019"],
         "plugins": [
             { "transform": "ts-transformer-keys/transformer" }
         ],

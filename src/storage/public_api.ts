@@ -1,6 +1,2 @@
-export * from './ref';
-export * from './storage';
-export * from './task';
-export * from './observable/fromTask';
-export * from './storage.module';
-export * from './pipes/storageUrl.pipe';
+export { Storage, provideStorage, STORAGE_INSTANCES } from '@angular/fire';
+export * from './rxfire';

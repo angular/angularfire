@@ -18,6 +18,9 @@
       "curly": true,
       "directive-class-suffix": true,
       "no-shadowed-variable": false,
+      "no-trailing-whitespace": {
+        "severity": "warn"
+      },
       "directive-selector": [
         true,
         "attribute",

@@ -18,8 +18,9 @@ AngularFire smooths over the rough edges an Angular developer might encounter wh
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { Firestore } from '@angular/fire';
+import { Observable, valueChanges } from 'rxjs';
+import { collection } from 'firebase/firestore';
 
 @Component({
   selector: 'app-root',
@@ -33,8 +34,8 @@ import { Observable } from 'rxjs';
 })
 export class MyApp {
   item$: Observable<any[]>;
-  constructor(firestore: AngularFirestore) {
-    this.item$ = firestore.collection('items').valueChanges();
+  constructor(firestore: Firestore) {
+    this.item$ = valueChanges(collection(firestore, 'items'));
   }
 }
 ```
@@ -47,6 +48,7 @@ AngularFire doesn't follow Angular's versioning as Firebase also has breaking ch
 
 | Angular | Firebase | AngularFire  |
 | --------|----------|--------------|
+| 12      | 9        | ^7.0         |
 | 11      | 7,8      | ^6.1         |
 | 10      | 8        | ^6.0.4       |
 | 10      | 7        | ^6.0.3       |
@@ -77,7 +79,7 @@ Neither AngularFire or Firebase ship with polyfills. To have compatability acros
 
 [Stackblitz Template](https://stackblitz.com/edit/angular-fire-start) - Remember to set your Firebase configuration in `app/app.module.ts`.
 
-[Upgrading to v6.0? Check out our guide.](docs/version-6-upgrade.md)
+[Upgrading to v7.0? Check out our guide.](docs/version-7-upgrade.md)
 
 **Having troubles?** Get help on our [Q&A board](https://github.com/angular/angularfire/discussions?discussions_q=category%3AQ%26A), the official [Firebase Mailing List](https://groups.google.com/forum/#!forum/firebase-talk), the [Firebase Community Slack](https://firebase.community/) (`#angularfire2`), the [Angular Community Discord](http://discord.gg/angular) (`#firebase`), [Gitter](https://gitter.im/angular/angularfire2), the [Firebase subreddit](https://www.reddit.com/r/firebase), or [Stack Overflow](https://stackoverflow.com/questions/tagged/angularfire2).
 
