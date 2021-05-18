@@ -42,7 +42,7 @@ export const ngAddSetupProject = (
   // I'm still not able to resolve bluebird.... this is definately some sort
   // of race condition.
   await new Promise<void>(resolve => {
-    setTimeout(() => {
+    setInterval(() => {
       try {
         require('bluebird');
         resolve();
