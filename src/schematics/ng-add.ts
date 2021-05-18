@@ -1,11 +1,11 @@
-import { chain, Tree } from '@angular-devkit/schematics';
-import { listProjects, projectPrompt, getWorkspace, getProject } from './utils';
+import { SchematicContext, Tree } from '@angular-devkit/schematics';
+import { listProjects, projectPrompt, getWorkspace, getProject, projectTypePrompt } from './utils';
 import { DeployOptions, NgAddNormalizedOptions } from './ng-add-common';
 import { addFirebaseFunctionsDependencies, setupUniversalDeployment } from './ng-add-ssr';
 import { addFirebaseHostingDependencies, setupStaticDeployment } from './ng-add-static';
 
 export const setupProject =
-  (host: Tree, options: DeployOptions & { firebaseProject: string, isUniversalProject: boolean }) => {
+  (host: Tree, options: DeployOptions & { firebaseProject: string, universalProject: boolean }) => {
     const { path: workspacePath, workspace } = getWorkspace(host);
 
     const {project, projectName} = getProject(options, host);
@@ -15,7 +15,7 @@ export const setupProject =
       firebaseProject: options.firebaseProject
     };
 
-    if (options.isUniversalProject) {
+    if (options.universalProject) {
       return setupUniversalDeployment({
         workspace,
         workspacePath,
@@ -36,15 +36,13 @@ export const setupProject =
 
 export const ngAddSetupProject = (
   options: DeployOptions
-) => async (host: Tree) => {
+) => async (host: Tree, context: SchematicContext) => {
   const projects = await listProjects();
   const { firebaseProject } = await projectPrompt(projects);
-  const isUniversalProject = (global as any).setupAsAngularUniversalApp;
-  return setupProject(host, {...options, firebaseProject, isUniversalProject });
+  const { project } = getProject(options, host);
+  const { universalProject } = await projectTypePrompt(project);
+  if (universalProject) { host = addFirebaseFunctionsDependencies(host, context); }
+  return setupProject(host, {...options, firebaseProject, universalProject });
 };
 
-export const ngAdd = (options: DeployOptions) => chain([
-  addFirebaseHostingDependencies(),
-  addFirebaseFunctionsDependencies(options),
-  ngAddSetupProject(options),
-]);
+export const ngAdd = addFirebaseHostingDependencies;

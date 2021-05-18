@@ -1,7 +1,6 @@
 import { SchematicsException, Tree, SchematicContext, noop } from '@angular-devkit/schematics';
 import {
   addDependencies,
-  DeployOptions,
   generateFirebaseRc,
   NgAddNormalizedOptions,
   overwriteIfExists,
@@ -9,7 +8,6 @@ import {
   stringifyFormatted
 } from './ng-add-common';
 import { FirebaseJSON, Workspace, WorkspaceProject } from './interfaces';
-import { getProject, projectTypePrompt } from './utils';
 import { firebaseFunctions as firebaseFunctionsDependencies } from './versions.json';
 import { dirname, join } from 'path';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
@@ -98,23 +96,14 @@ export function generateFirebaseJson(
   overwriteIfExists(tree, path, stringifyFormatted(firebaseJson));
 }
 
-export const addFirebaseFunctionsDependencies = (options: DeployOptions) => (tree: Tree, context: SchematicContext) => {
-  const {project} = getProject(options, tree);
-  projectTypePrompt(project).then(({universalProject}) => {
-    if (universalProject) {
-      (global as any).setupAsAngularUniversalApp = true;
-      addDependencies(
-        tree,
-        firebaseFunctionsDependencies,
-        context
-      );
-      context.addTask(new NodePackageInstallTask());
-      return tree;
-    } else {
-      (global as any).setupAsAngularUniversalApp = false;
-      return noop();
-    }
-  });
+export const addFirebaseFunctionsDependencies = (tree: Tree, context: SchematicContext) => {
+  addDependencies(
+    tree,
+    firebaseFunctionsDependencies,
+    context
+  );
+  context.addTask(new NodePackageInstallTask());
+  return tree;
 };
 
 export const setupUniversalDeployment = (config: {
