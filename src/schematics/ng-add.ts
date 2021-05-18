@@ -1,6 +1,5 @@
 import { SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
 import { NodePackageInstallTask, RunSchematicTask } from '@angular-devkit/schematics/tasks';
-import { JsonParseMode, parseJson } from '@angular-devkit/core';
 import { listProjects, projectPrompt, projectTypePrompt } from './utils';
 import { Workspace } from './interfaces';
 import { DeployOptions, NgAddNormalizedOptions } from './ng-add-common';
@@ -19,12 +18,13 @@ function getWorkspace(
   }
   const content = configBuffer.toString();
 
+  const { parse } = (require('jsonc-parser') as typeof import('jsonc-parser'));
+
   let workspace: Workspace;
   try {
-    workspace = (parseJson(
+    workspace = parse(
       content,
-      JsonParseMode.Loose
-    ) as {}) as Workspace;
+    ) as Workspace;
   } catch (e) {
     throw new SchematicsException(`Could not parse angular.json: ` + e.message);
   }
@@ -103,14 +103,14 @@ export const ngAdd = (options: DeployOptions) => (
   context: SchematicContext
 ) => {
 
+  addFirebaseHostingDependencies(host, context);
+
   const {project} = getProject(options, host);
 
   return projectTypePrompt(project).then(
     ({ universalProject }: { universalProject: boolean }) => {
       if (universalProject) {
         addFirebaseFunctionsDependencies(host, context);
-      } else {
-        addFirebaseHostingDependencies(host, context);
       }
       const projectOptions: DeployOptions & { isUniversalProject: boolean } = {
         ...options,

@@ -65,7 +65,8 @@
     "tslib": "^1.10.0 || ^2.0.0",
     "ws": "^7.2.1",
     "xhr2": "^0.1.4",
-    "zone.js": "~0.11.4"
+    "zone.js": "~0.11.4",
+    "jsonc-parser": "^3.0.0"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.1",

@@ -130,7 +130,6 @@ describe('Deploy Angular apps', () => {
       try {
         await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, undefined, { preview: false  });
       } catch (e) {
-        console.log(e);
         expect(e.message).toMatch(/Cannot find firebase project/);
       }
     });

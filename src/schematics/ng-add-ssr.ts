@@ -99,7 +99,7 @@ export function generateFirebaseJson(
 export const addFirebaseFunctionsDependencies = (tree: Tree, context: SchematicContext) => {
   addDependencies(
     tree,
-    {...defaultDependencies, ...firebaseFunctionsDependencies},
+    firebaseFunctionsDependencies,
     context
   );
 };

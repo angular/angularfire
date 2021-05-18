@@ -134,7 +134,22 @@
             "main": "server.ts",
             "tsConfig": "tsconfig.server.json",
             "bundleDependencies": true,
-            "externalDependencies": [ ],
+            "externalDependencies": [
+              "firebase",
+              "@firebase/app",
+              "@firebase/analytics",
+              "@firebase/auth",
+              "@firebase/component",
+              "@firebase/database",
+              "@firebase/firestore",
+              "@firebase/functions",
+              "@firebase/installations",
+              "@firebase/messaging",
+              "@firebase/storage",
+              "@firebase/performance",
+              "@firebase/remote-config",
+              "@firebase/util"
+            ],
             "sourceMap": true,
             "optimization": false
           },
@@ -181,11 +196,7 @@
         "deploy": {
           "builder": "@angular/fire:deploy",
           "options": {
-            "ssr": true,
-            "functionsNodeVersion": 12,
-            "functionsRuntimeOptions": {
-              "memory": "1GB"
-            }
+            "ssr": true
           }
         }
       }
