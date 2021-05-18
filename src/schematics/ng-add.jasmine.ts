@@ -370,7 +370,7 @@ describe('ng-add', () => {
     it('generates new files if starting from scratch', async () => {
       const result = await setupProject(tree, {
         firebaseProject: FIREBASE_PROJECT,
-        isUniversalProject: false,
+        universalProject: false,
         project: PROJECT_NAME
       });
       expect(result.read('firebase.json').toString()).toEqual(initialFirebaseJson);
@@ -381,7 +381,7 @@ describe('ng-add', () => {
     it('uses default project', async () => {
       const result = await setupProject(tree, {
         firebaseProject: FIREBASE_PROJECT,
-        isUniversalProject: false,
+        universalProject: false,
         project: undefined
       });
       expect(result.read('firebase.json').toString()).toEqual(overwriteFirebaseJson);
@@ -392,12 +392,12 @@ describe('ng-add', () => {
     it('overrides existing files', async () => {
       const tempTree = await setupProject(tree, {
         firebaseProject: FIREBASE_PROJECT,
-        isUniversalProject: false, project: PROJECT_NAME
+        universalProject: false, project: PROJECT_NAME
       });
       const result = await setupProject(tempTree, {
         firebaseProject: OTHER_FIREBASE_PROJECT_NAME,
         project: OTHER_PROJECT_NAME,
-        isUniversalProject: false
+        universalProject: false
       });
       expect(result.read('firebase.json').toString()).toEqual(projectFirebaseJson);
       expect(result.read('.firebaserc').toString()).toEqual(projectFirebaserc);
@@ -414,7 +414,7 @@ describe('ng-add', () => {
       expect(() =>
         setupProject(tree, {
           firebaseProject: FIREBASE_PROJECT,
-          isUniversalProject: false,
+          universalProject: false,
           project: undefined
         })
       ).toThrowError(
@@ -426,7 +426,7 @@ describe('ng-add', () => {
       expect(() =>
         setupProject(Tree.empty(), {
           firebaseProject: FIREBASE_PROJECT,
-          isUniversalProject: false,
+          universalProject: false,
           project: PROJECT_NAME
         })
       ).toThrowError(/Could not find angular.json/);
@@ -438,7 +438,7 @@ describe('ng-add', () => {
       expect(() =>
         setupProject(tree, {
           firebaseProject: FIREBASE_PROJECT,
-          isUniversalProject: false,
+          universalProject: false,
           project: PROJECT_NAME
         })
       ).toThrowError(/Could not parse angular.json/);
@@ -450,7 +450,7 @@ describe('ng-add', () => {
       expect(() =>
         setupProject(tree, {
           firebaseProject: FIREBASE_PROJECT,
-          isUniversalProject: false,
+          universalProject: false,
           project: PROJECT_NAME
         })
       ).toThrowError(/The specified Angular project is not defined in this workspace/);
@@ -467,7 +467,7 @@ describe('ng-add', () => {
       expect(() =>
         setupProject(tree, {
           firebaseProject: FIREBASE_PROJECT,
-          isUniversalProject: false,
+          universalProject: false,
           project: PROJECT_NAME
         })
       ).toThrowError(/Deploy requires an Angular project type of "application" in angular.json/);
@@ -484,7 +484,7 @@ describe('ng-add', () => {
       expect(() =>
         setupProject(tree, {
           firebaseProject: FIREBASE_PROJECT,
-          isUniversalProject: false,
+          universalProject: false,
           project: PROJECT_NAME
         })
       ).toThrowError(/Cannot read the output path/);
@@ -496,14 +496,14 @@ describe('ng-add', () => {
       tree.create('angular.json', JSON.stringify(generateAngularJson()));
       const tempTree = await setupProject(tree, {
         firebaseProject: FIREBASE_PROJECT,
-        isUniversalProject: false,
+        universalProject: false,
         project: PROJECT_NAME
       });
 
       expect(() =>
         setupProject(tempTree, {
           firebaseProject: FIREBASE_PROJECT,
-          isUniversalProject: false,
+          universalProject: false,
           project: PROJECT_NAME
         })
       ).toThrowError(/already exists in firebase.json/);
@@ -516,7 +516,7 @@ describe('ng-add', () => {
       expect(() =>
         setupProject(tree, {
           firebaseProject: FIREBASE_PROJECT,
-          isUniversalProject: false,
+          universalProject: false,
           project: PROJECT_NAME
         })
       ).toThrowError(/firebase.json: Unexpected token/);
@@ -529,7 +529,7 @@ describe('ng-add', () => {
       expect(() =>
         setupProject(tree, {
           firebaseProject: FIREBASE_PROJECT,
-          isUniversalProject: false,
+          universalProject: false,
           project: PROJECT_NAME
         })
       ).toThrowError(/.firebaserc: Unexpected token/);
@@ -542,14 +542,14 @@ describe('ng-add', () => {
       tree.create('angular.json', JSON.stringify(generateAngularJson()));
       const tempTree = await setupProject(tree, {
         firebaseProject: FIREBASE_PROJECT,
-        isUniversalProject: false,
+        universalProject: false,
         project: PROJECT_NAME
       });
 
       expect(() =>
         setupProject(tempTree, {
           firebaseProject: FIREBASE_PROJECT,
-          isUniversalProject: false,
+          universalProject: false,
           project: OTHER_PROJECT_NAME
         })
       ).toThrowError(/ already defined in .firebaserc/);
@@ -561,14 +561,14 @@ describe('ng-add', () => {
 
       const tempTree = await setupProject(tree, {
         firebaseProject: FIREBASE_PROJECT,
-        isUniversalProject: false,
+        universalProject: false,
         project: PROJECT_NAME
       });
 
       expect(() =>
         setupProject(tempTree, {
           firebaseProject: FIREBASE_PROJECT,
-          isUniversalProject: false,
+          universalProject: false,
           project: OTHER_PROJECT_NAME
         })
       ).toThrowError(/ already defined in .firebaserc/);
@@ -581,7 +581,7 @@ describe('ng-add', () => {
 
         expect(() => setupProject(tree, {
           firebaseProject: FIREBASE_PROJECT,
-          isUniversalProject: true,
+          universalProject: true,
           project: PROJECT_NAME
         })).toThrowError(/\(architect.server.options.outputPath\) of the Angular project "pie-ka-chu" in angular.json/);
       });
@@ -592,7 +592,7 @@ describe('ng-add', () => {
 
         const result = await setupProject(tree, {
           firebaseProject: FIREBASE_PROJECT,
-          isUniversalProject: true,
+          universalProject: true,
           project: PROJECT_NAME
         });
 
@@ -606,7 +606,7 @@ describe('ng-add', () => {
 
         const result = await setupProject(tree, {
           firebaseProject: FIREBASE_PROJECT,
-          isUniversalProject: true,
+          universalProject: true,
           project: PROJECT_NAME
         });
 
