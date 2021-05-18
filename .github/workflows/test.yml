@@ -211,7 +211,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     name: Publish (NPM)
-    needs: ['test', 'headless']
+    needs: ['build']
     if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/exp' || github.event_name == 'release' }}
     steps:
       - name: Setup node
