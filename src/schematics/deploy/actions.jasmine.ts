@@ -38,9 +38,12 @@ const initMocks = () => {
     deploy: (_: FirebaseDeployConfig) => Promise.resolve(),
     use: () => Promise.resolve(),
     logger: {
-      add: () => {
+      add: () => { },
+      logger: {
+        add: () => { }
       }
     },
+    cli: { version: () => '9.0.0' },
     serve: () => Promise.resolve()
   };
 

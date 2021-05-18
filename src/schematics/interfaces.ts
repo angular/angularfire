@@ -22,7 +22,6 @@ export interface FirebaseTools {
   logger: {
     // firebase-tools v8
     add: (...args: any[]) => any
-  } & {
     // firebase-tools v9
     logger: {
       add: (...args: any[]) => any;
