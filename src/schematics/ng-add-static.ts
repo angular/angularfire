@@ -10,6 +10,7 @@ import {
 import { FirebaseJSON, Workspace, WorkspaceProject } from './interfaces';
 
 import { default as defaultDependencies } from './versions.json';
+import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 
 function emptyFirebaseJson() {
   return {
@@ -72,12 +73,14 @@ export function generateFirebaseJson(
   overwriteIfExists(tree, path, stringifyFormatted(firebaseJson));
 }
 
-export const addFirebaseHostingDependencies = (tree: Tree, context: SchematicContext) => {
+export const addFirebaseHostingDependencies = () => async (tree: Tree, context: SchematicContext) => {
   addDependencies(
     tree,
     defaultDependencies,
     context
   );
+  context.addTask(new NodePackageInstallTask());
+  return tree;
 };
 
 export const setupStaticDeployment = (config: {

@@ -1,6 +1,7 @@
-import { SchematicsException, Tree, SchematicContext } from '@angular-devkit/schematics';
+import { SchematicsException, Tree, SchematicContext, noop } from '@angular-devkit/schematics';
 import {
   addDependencies,
+  DeployOptions,
   generateFirebaseRc,
   NgAddNormalizedOptions,
   overwriteIfExists,
@@ -8,9 +9,10 @@ import {
   stringifyFormatted
 } from './ng-add-common';
 import { FirebaseJSON, Workspace, WorkspaceProject } from './interfaces';
-
-import { default as defaultDependencies, firebaseFunctions as firebaseFunctionsDependencies } from './versions.json';
+import { getProject, projectTypePrompt } from './utils';
+import { firebaseFunctions as firebaseFunctionsDependencies } from './versions.json';
 import { dirname, join } from 'path';
+import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 
 // We consider a project to be a universal project if it has a `server` architect
 // target. If it does, it knows how to build the application's server.
@@ -96,12 +98,23 @@ export function generateFirebaseJson(
   overwriteIfExists(tree, path, stringifyFormatted(firebaseJson));
 }
 
-export const addFirebaseFunctionsDependencies = (tree: Tree, context: SchematicContext) => {
-  addDependencies(
-    tree,
-    firebaseFunctionsDependencies,
-    context
-  );
+export const addFirebaseFunctionsDependencies = (options: DeployOptions) => (tree: Tree, context: SchematicContext) => {
+  const {project} = getProject(options, tree);
+  projectTypePrompt(project).then(({universalProject}) => {
+    if (universalProject) {
+      (global as any).setupAsAngularUniversalApp = true;
+      addDependencies(
+        tree,
+        firebaseFunctionsDependencies,
+        context
+      );
+      context.addTask(new NodePackageInstallTask());
+      return tree;
+    } else {
+      (global as any).setupAsAngularUniversalApp = false;
+      return noop();
+    }
+  });
 };
 
 export const setupUniversalDeployment = (config: {
