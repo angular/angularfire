@@ -38,17 +38,13 @@ export const ngAddSetupProject = (
   options: DeployOptions
 ) => async (host: Tree, context: SchematicContext) => {
 
-  // HACK HACK HACK
-  // I'm still not able to resolve bluebird.... this is definately some sort
-  // of race condition.
-  await new Promise<void>(resolve => {
-    setInterval(() => {
-      try {
-        require('bluebird');
-        resolve();
-      } catch (e) { }
-    }, 100);
-  });
+  // I'm not able to resolve dependencies.... this is definately some sort of race condition.
+  // Failing on bluebird but there are a lot of things that aren't right. Error for now.
+  try {
+    require('firebase-tools');
+  } catch (e) {
+    throw new Error('The NodePackageInstallTask does not appear to have completed successfully or we ran into a race condition. Please run the `ng add @angular/fire` command again.');
+  }
 
   const projects = await listProjects();
   const { firebaseProject } = await projectPrompt(projects);

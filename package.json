@@ -58,6 +58,7 @@
     "husky": "^4.2.5",
     "inquirer": "^6.2.2",
     "inquirer-autocomplete-prompt": "^1.0.1",
+    "jsonc-parser": "^3.0.0",
     "open": "^7.0.3",
     "rxfire": "^3.9.7 || ^4.0.0",
     "rxjs": "^6.5.3",
@@ -65,8 +66,7 @@
     "tslib": "^1.10.0 || ^2.0.0",
     "ws": "^7.2.1",
     "xhr2": "^0.1.4",
-    "zone.js": "~0.11.4",
-    "jsonc-parser": "^3.0.0"
+    "zone.js": "~0.11.4"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.1",
@@ -79,7 +79,7 @@
     "@angular/cli": "^9.0.0 || ^10.0.0 || ^11.0.0 || ^12.0.0",
     "@angular/compiler-cli": "^9.0.0 || ^10.0.0 || ^11.0.0 || ^12.0.0",
     "@angular/platform-server": "^9.0.0 || ^10.0.0 || ^11.0.0 || ^12.0.0",
-    "@types/fs-extra": "^7.0.0",
+     "@types/fs-extra": "^7.0.0",
     "@types/gzip-size": "^5.1.1",
     "@types/inquirer": "^0.0.44",
     "@types/jasmine": "^3.3.13",
