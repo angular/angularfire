@@ -10,8 +10,8 @@ Cloud Functions for AngularFire is contained in the `@angular/fire/functions` mo
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
-import { AngularFireModule } from '@angular/fire';
-import { AngularFireFunctionsModule } from '@angular/fire/functions';
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFireFunctionsModule } from '@angular/fire/compat/functions';
 import { environment } from '../environments/environment';
 
 @NgModule({
@@ -32,7 +32,7 @@ Once the `AngularFireFunctionsModule` is registered you can inject the `AngularF
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireFunctions } from '@angular/fire/functions';
+import { AngularFireFunctions } from '@angular/fire/compat/functions';
 
 @Component({
   selector: 'app-component',
@@ -53,7 +53,7 @@ AngularFireFunctions is super easy. You create a function on the server side and
 ```ts
 
 import { Component } from '@angular/core';
-import { AngularFireFunctions } from '@angular/fire/functions';
+import { AngularFireFunctions } from '@angular/fire/compat/functions';
 
 @Component({
   selector: 'app-root',
@@ -77,7 +77,7 @@ Allow configuration of the Function's region by adding `REGION` to the `provider
 
 ```ts
 import { NgModule } from '@angular/core';
-import { AngularFireFunctionsModule, REGION } from '@angular/fire/functions';
+import { AngularFireFunctionsModule, REGION } from '@angular/fire/compat/functions';
 
 @NgModule({
   imports: [
@@ -100,7 +100,7 @@ Point callable Functions to the Cloud Function emulator by adding `USE_EMULATOR`
 
 ```ts
 import { NgModule } from '@angular/core';
-import { AngularFireFunctionsModule, USE_EMULATOR } from '@angular/fire/functions';
+import { AngularFireFunctionsModule, USE_EMULATOR } from '@angular/fire/compat/functions';
 
 @NgModule({
   imports: [
@@ -145,7 +145,7 @@ Deploy your hosting project to the new settings go into effect, finally configur
 
 ```ts
 import { NgModule } from '@angular/core';
-import { AngularFireFunctionsModule, ORIGIN, NEW_ORIGIN_BEHAVIOR } from '@angular/fire/functions';
+import { AngularFireFunctionsModule, ORIGIN, NEW_ORIGIN_BEHAVIOR } from '@angular/fire/compat/functions';
 
 @NgModule({
   imports: [

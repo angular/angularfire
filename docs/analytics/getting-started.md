@@ -27,7 +27,7 @@ CONFIG = InjectionToken<Config>;
 ### Usage:
 
 ```ts
-import { AngularFireAnalyticsModule } from '@angular/fire/analytics';
+import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
 
 @NgModule({
   imports: [
@@ -43,7 +43,7 @@ export class AppModule { }
 In your component you can then dependency inject `AngularFireAnalytics` and make calls against the SDK:
 
 ```ts
-import { AngularFireAnalytics } from '@angular/fire/analytics';
+import { AngularFireAnalytics } from '@angular/fire/compat/analytics';
 
 constructor(analytics: AngularFireAnalytics) {
   analytics.logEvent('custom_event', { ... });
@@ -55,7 +55,7 @@ constructor(analytics: AngularFireAnalytics) {
 You can log [`screen_view` events](https://firebase.google.com/docs/reference/js/firebase.analytics.Analytics.html#parameters_10) yourself of course, but AngularFire provides the `ScreenTrackingService` which automatically integrates with the Angular Router to provide Firebase with screen view tracking. You simply can integrate like so:
 
 ```ts
-import { AngularFireAnalyticsModule, ScreenTrackingService } from '@angular/fire/analytics';
+import { AngularFireAnalyticsModule, ScreenTrackingService } from '@angular/fire/compat/analytics';
 
 @NgModule({
   imports: [
@@ -77,7 +77,7 @@ To enrich your Analytics data you can track the currently signed in user by sett
 
 
 ```ts
-import { AngularFireAnalyticsModule, UserTrackingService } from '@angular/fire/analytics';
+import { AngularFireAnalyticsModule, UserTrackingService } from '@angular/fire/compat/analytics';
 
 @NgModule({
   imports: [
@@ -100,7 +100,7 @@ export class AppModule { }
 Using the `CONFIG` DI Token (*default: {}*) will allow you to configure Google Analytics. E.g, you could skip sending the initial `page_view` event, anonymize IP addresses, and disallow ads personalization signals for all events like so:
 
 ```ts
-import { AngularFireAnalyticsModule, CONFIG } from '@angular/fire/analytics';
+import { AngularFireAnalyticsModule, CONFIG } from '@angular/fire/compat/analytics';
 
 @NgModule({
   imports: [

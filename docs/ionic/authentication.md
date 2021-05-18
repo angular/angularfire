@@ -48,7 +48,7 @@ Go to [Firebase console](https://console.firebase.google.com/) then click **Add 
 In `login.service.ts` add this function: 
 ```ts
 
-import { AngularFireAuth } from '@angular/fire/auth';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 import firebase from 'firebase/app';
 import AuthProvider = firebase.auth.AuthProvider;
 

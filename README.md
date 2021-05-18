@@ -14,13 +14,25 @@ AngularFire smooths over the rough edges an Angular developer might encounter wh
 - **Google Analytics** - Zero-effort Angular Router awareness in Google Analytics
 - **Router Guards** - Guard your Angular routes with built-in Firebase Authentication checks
 
+---
+
+> **WARNING**: This branch is the work in progress for version 7 of AngularFire. [You can find version 6 here](https://github.com/angular/angularfire), if you're looking for documentation or to contribute to stable.
+
+---
+
 ## Example use
 
 ```ts
 import { Component } from '@angular/core';
-import { Firestore } from '@angular/fire';
-import { Observable, valueChanges } from 'rxjs';
+import { Firestore, collectionData } from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
 import { collection } from 'firebase/firestore';
+
+interface Item {
+  id: string,
+  name: string,
+  ...
+};
 
 @Component({
   selector: 'app-root',
@@ -33,9 +45,10 @@ import { collection } from 'firebase/firestore';
   `
 })
 export class MyApp {
-  item$: Observable<any[]>;
+  item$: Observable<Item[]>;
   constructor(firestore: Firestore) {
-    this.item$ = valueChanges(collection(firestore, 'items'));
+    const collection = collection(firestore, 'items');
+    this.item$ = collectionData(collection, 'id');
   }
 }
 ```
