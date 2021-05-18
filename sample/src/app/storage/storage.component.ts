@@ -25,7 +25,7 @@ export class StorageComponent implements OnInit {
 
   constructor(storage: AngularFireStorage, state: TransferState) {
     const icon = storage.ref('google-g.png');
-    const key = makeStateKey('google-icon-url');
+    const key = makeStateKey<unknown>('google-icon-url');
     const existing = state.get(key, undefined);
     this.downloadUrl$ = existing ? of(existing) : icon.getDownloadURL().pipe(
       trace('storage'),

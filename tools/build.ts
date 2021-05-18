@@ -1,7 +1,7 @@
 import { spawn } from 'child_process';
 import { copy, readFile, writeFile } from 'fs-extra';
 import { prettySize } from 'pretty-size';
-import { sync as gzipSync } from 'gzip-size';
+import { file as gzipSizeFile } from 'gzip-size';
 import { dirname, join } from 'path';
 import { keys as tsKeys } from 'ts-transformer-keys';
 import firebase from 'firebase/app';
@@ -87,10 +87,10 @@ async function compileSchematics() {
 }
 
 async function measure(module: string) {
-  const path = dest('bundles', `${module}.umd.min.js`);
+  const path = dest('bundles', `${module}.umd.js`);
   const file = await readFile(path);
-  const gzip = prettySize(gzipSync(file), true);
   const size = prettySize(file.byteLength, true);
+  const gzip = prettySize(await gzipSizeFile(path), true);
   return { size, gzip };
 }
 

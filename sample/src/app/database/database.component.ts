@@ -25,7 +25,7 @@ export class DatabaseComponent implements OnInit {
       this.testObjectValue$ = EMPTY;
     } else {
       const doc = database.object('test');
-      const key = makeStateKey(doc.query.toString());
+      const key = makeStateKey<unknown>(doc.query.toString());
       const existing = state.get(key, undefined);
       this.testObjectValue$ = doc.valueChanges().pipe(
         trace('database'),

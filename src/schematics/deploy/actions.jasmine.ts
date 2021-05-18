@@ -38,9 +38,12 @@ const initMocks = () => {
     deploy: (_: FirebaseDeployConfig) => Promise.resolve(),
     use: () => Promise.resolve(),
     logger: {
-      add: () => {
+      add: () => { },
+      logger: {
+        add: () => { }
       }
     },
+    cli: { version: () => '9.0.0' },
     serve: () => Promise.resolve()
   };
 
@@ -130,7 +133,6 @@ describe('Deploy Angular apps', () => {
       try {
         await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, undefined, { preview: false  });
       } catch (e) {
-        console.log(e);
         expect(e.message).toMatch(/Cannot find firebase project/);
       }
     });

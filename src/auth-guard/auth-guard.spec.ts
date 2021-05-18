@@ -6,6 +6,8 @@ import { Router, RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
 import { rando } from '../firestore/utils.spec';
 
+class B {}
+
 describe('AngularFireAuthGuard', () => {
   let app: FirebaseApp;
   let router: Router;
@@ -16,7 +18,7 @@ describe('AngularFireAuthGuard', () => {
         AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireAuthGuardModule,
         RouterModule.forRoot([
-          { path: 'a', redirectTo: '/', canActivate: [AngularFireAuthGuard] }
+          { path: 'a', component: B, canActivate: [AngularFireAuthGuard] }
         ])
       ],
       providers: [
@@ -28,8 +30,8 @@ describe('AngularFireAuthGuard', () => {
     router = TestBed.inject(Router);
   });
 
-  afterEach(done => {
-    app.delete().then(done, done);
+  afterEach(() => {
+    app.delete().catch();
   });
 
   it('should be injectable', () => {

@@ -34,7 +34,7 @@ describe('angularfire', () => {
 
   afterEach(() => {
     rootRef.remove();
-    app.delete();
+    app.delete().catch();
   });
 
   describe('ZoneScheduler', () => {
