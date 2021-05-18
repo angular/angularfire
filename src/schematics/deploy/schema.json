@@ -1,7 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "FirebaseDeploySchema",
-  // Include id field to remain compatible with older Angular
   "id": "FirebaseDeploySchema",
   "title": "Firebase Deploy",
   "description": "Ng Deploy target options for Firebase.",
