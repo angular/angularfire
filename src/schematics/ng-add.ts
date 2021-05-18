@@ -37,6 +37,19 @@ export const setupProject =
 export const ngAddSetupProject = (
   options: DeployOptions
 ) => async (host: Tree, context: SchematicContext) => {
+
+  // HACK HACK HACK
+  // I'm still not able to resolve bluebird.... this is definately some sort
+  // of race condition.
+  await new Promise<void>(resolve => {
+    setTimeout(() => {
+      try {
+        require('bluebird');
+        resolve();
+      } catch (e) { }
+    }, 100);
+  });
+
   const projects = await listProjects();
   const { firebaseProject } = await projectPrompt(projects);
   const { project } = getProject(options, host);
