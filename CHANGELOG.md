@@ -1,7 +1,11 @@
 <a name="6.1.5"></a>
 # [6.1.5](https://github.com/angular/angularfire/compare/6.1.4...6.1.5) (2021-05-17)
 
-* Support Angular 12 peer
+Support Angular 12 peer
+
+### Bug Fixes
+
+* **auth:** set the passed settings individually ([#2826](https://github.com/angular/angularfire/issues/2826)) ([984803d](https://github.com/angular/angularfire/commit/984803d))
 
 <a name="6.1.4"></a>
 # [6.1.4](https://github.com/angular/angularfire/compare/6.1.3...6.1.4) (2020-12-03)

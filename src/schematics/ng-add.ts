@@ -105,8 +105,13 @@ export const ngAdd = (options: DeployOptions) => (
 
   const {project} = getProject(options, host);
 
-  return projectTypePrompt(project).then(
-    ({ universalProject }: { universalProject: boolean }) => {
+  // In Angular 12 it appears I might need some sort of timeout to allow
+  // node_modules to resolve?
+  const timeout = new Promise(resolve => setTimeout(resolve, 1_000));
+
+  return timeout.
+    then(() => projectTypePrompt(project)).
+    then(({ universalProject }: { universalProject: boolean }) => {
       if (universalProject) {
         addFirebaseFunctionsDependencies(host, context);
       }
