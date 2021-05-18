@@ -9,12 +9,13 @@ eleventyNavigation:
 
 In this guide, we'll look at how to use `@angular/fire` to connect an Angular application with the Firebase Emulator Suite to start prototyping your apps.
 
-There are four supported emulators, all of them available at the Firebase suite workflow:
+There are five supported emulators, all of them available at the Firebase suite workflow:
 
 - [Authentication Emulator](https://firebase.google.com/docs/emulator-suite/connect_auth)
 - [Realtime Database Emulator](https://firebase.google.com/docs/emulator-suite/connect_rtdb)
 - [Cloud Firestore Emulator](https://firebase.google.com/docs/emulator-suite/connect_firestore)
 - [Cloud Functions Emulator](https://firebase.google.com/docs/emulator-suite/connect_functions)
+- [Cloud Storage Emulator](https://firebase.google.com/docs/emulator-suite/connect_storage)
 
 *The Auth Emulator only works with Firebase v8 and above, which is supported by `@angular/fire` 6.1.0 or higher*.
 
@@ -58,6 +59,9 @@ Follow the instructions to download whatever emulator you want to use then check
     },
     "pubsub": {
       "port": "8085"
+    },
+    "storage": {
+      "port": "9199"
     }
   }
 }
@@ -76,6 +80,7 @@ import { USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/auth';
 import { USE_EMULATOR as USE_DATABASE_EMULATOR } from '@angular/fire/database';
 import { USE_EMULATOR as USE_FIRESTORE_EMULATOR } from '@angular/fire/firestore';
 import { USE_EMULATOR as USE_FUNCTIONS_EMULATOR } from '@angular/fire/functions';
+import { USE_EMULATOR as USE_STORAGE_EMULATOR } from '@angular/fire/storage';
 
 @NgModule({
   // ... Existing configuration
@@ -85,6 +90,7 @@ import { USE_EMULATOR as USE_FUNCTIONS_EMULATOR } from '@angular/fire/functions'
     { provide: USE_DATABASE_EMULATOR, useValue: environment.useEmulators ? ['localhost', 9000] : undefined },
     { provide: USE_FIRESTORE_EMULATOR, useValue: environment.useEmulators ? ['localhost', 8080] : undefined },
     { provide: USE_FUNCTIONS_EMULATOR, useValue: environment.useEmulators ? ['localhost', 5001] : undefined },
+    { provide: USE_STORAGE_EMULATOR, useValue: environment.useEmulators ? ['localhost', 9199] : undefined },
   ]
 })
 export class AppModule { }
