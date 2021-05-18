@@ -16,17 +16,15 @@ function getWorkspace(
   if (configBuffer === null) {
     throw new SchematicsException(`Could not find angular.json`);
   }
-  const content = configBuffer.toString();
 
-  const { parse } = (require('jsonc-parser') as typeof import('jsonc-parser'));
+  // We can not depend on this library to have be included in older (or newer) Angular versions.
+  // Require here, since the schematic will add it to the package.json and install it before
+  // continuing.
+  const { parse }: typeof import('jsonc-parser') = require('jsonc-parser');
 
-  let workspace: Workspace;
-  try {
-    workspace = parse(
-      content,
-    ) as Workspace;
-  } catch (e) {
-    throw new SchematicsException(`Could not parse angular.json: ` + e.message);
+  const workspace = parse(configBuffer.toString()) as Workspace|undefined;
+  if (!workspace) {
+    throw new SchematicsException('Could not parse angular.json');
   }
 
   return {
