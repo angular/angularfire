@@ -13,8 +13,8 @@
     "test:typings": "node ./tools/run-typings-test.js",
     "test:build": "bash ./test/ng-build/build.sh",
     "test:all": "npm run test:node && npm run test:chrome-headless && npm run test:typings && npm run test:build",
-    "build": "ttsc -p tsconfig.build.json; node ./tools/build.js",
-    "build:jasmine": "tsc -p tsconfig.jasmine.json; cp ./dist/packages-dist/schematics/versions.json ./dist/out-tsc/jasmine/schematics",
+    "build": "ttsc -p tsconfig.build.json && node ./tools/build.js",
+    "build:jasmine": "tsc -p tsconfig.jasmine.json && cp ./dist/packages-dist/schematics/versions.json ./dist/out-tsc/jasmine/schematics",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 1"
   },
   "husky": {
@@ -37,6 +37,9 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/angular/angularfire/issues"
+  },
+  "engines": {
+    "node": "^8.13.0 || >=10.10.0"
   },
   "homepage": "https://github.com/angular/angularfire#readme",
   "dependencies": {
@@ -88,6 +91,7 @@
     "codelyzer": "^6.0.0",
     "concurrently": "^2.2.0",
     "conventional-changelog-cli": "^1.2.0",
+    "cross-spawn": "^7.0.3",
     "firebase-functions-test": "^0.2.2",
     "globalthis": "^1.0.1",
     "gzip-size": "^5.1.1",

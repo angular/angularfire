@@ -7,7 +7,7 @@ on:
     paths-ignore:
       - "**/*.md"
   pull_request:
-    branches: 
+    branches:
       - "**"
   release:
     types:
@@ -15,8 +15,11 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     name: Build
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -57,10 +60,11 @@ jobs:
           retention-days: 1
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: build
     strategy:
       matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
         node: ["10", "12", "14"]
         firebase: ["7", "8"]
       fail-fast: false
