@@ -81,7 +81,7 @@ export class AngularFireMessaging {
       subscribeOn(schedulers.outsideAngular),
       observeOn(schedulers.insideAngular),
       switchMap(async messaging => {
-        if (firebase.messaging.isSupported() && Notification.permission === 'granted') {
+        if (firebase.messaging.isSupported() && Notification.permission !== 'denied') {
           if (firebaseLTv8) {
             return await messaging.getToken();
           } else {
