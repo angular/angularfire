@@ -88,7 +88,7 @@ export class AngularFirestoreDocument<T = DocumentData> {
   valueChanges<K extends string>(options: { idField?: K } = {}): Observable<T | undefined> {
     return this.snapshotChanges().pipe(
       map(({ payload }) =>
-        options.idField ? {
+        options.idField && payload.exists ? {
           ...payload.data(),
           ...{ [options.idField]: payload.id }
         } as T & { [T in K]: string } : payload.data()
