@@ -86,6 +86,8 @@ export class AppModule { }
 ...
 
 constructor(remoteConfig: AngularFireRemoteConfig) {
+  remoteConfig.fetchAndActivate() // active remote config
+  
   remoteConfig.changes.pipe(
     filterFresh(172_800_000), // ensure we have values from at least 48 hours ago
     first(),
