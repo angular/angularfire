@@ -129,4 +129,22 @@ import { SETTINGS as FIRESTORE_SETTINGS } from '@angular/fire/firestore';
 export class AppModule { }
 ```
 
+### 6.X.X Update
+
+By default, when serving an app with an active auth emulator, a warning message is displayed in the browser.
+This message can be disabled by providing an option with the auth emulator DI Token : 
+
+```ts
+import { USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/auth';
+
+@NgModule({
+  // ... Existing configuration
+  providers: [
+    // ... Existing Providers
+    { provide: USE_AUTH_EMULATOR, useValue: environment.useEmulators ? ['localhost', 9099, {disableWarnings: true}] : undefined },
+  ]
+})
+export class AppModule { }
+```
+
 For older versions, please upgrade your app to latest version to get the advantages of these new features :rocket: 
