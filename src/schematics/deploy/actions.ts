@@ -40,9 +40,10 @@ const deployToHosting = (
       })
     ).then(({ deployProject }: { deployProject: boolean }) => {
       if (deployProject) {
+        const siteTarget = options.target ?? context.target!.project;
         return firebaseTools.deploy({
           // tslint:disable-next-line:no-non-null-assertion
-          only: 'hosting:' + context.target!.project,
+          only: 'hosting:' + siteTarget,
           cwd: workspaceRoot,
           token: firebaseToken,
         });
@@ -52,10 +53,10 @@ const deployToHosting = (
     });
 
   } else {
-
+    const siteTarget = options.target ?? context.target!.project;
     return firebaseTools.deploy({
       // tslint:disable-next-line:no-non-null-assertion
-      only: 'hosting:' + context.target!.project,
+      only: 'hosting:' + siteTarget,
       cwd: workspaceRoot,
       token: firebaseToken,
     });
@@ -184,7 +185,7 @@ export const deployToFunction = async (
       open(`http://localhost:${port}`);
     }, 1500);
 
-    return firebaseTools.serve({ port, targets: ['hosting', 'functions'], host: 'localhost'}).then(() =>
+    return firebaseTools.serve({ port, targets: ['hosting', 'functions'], host: 'localhost' }).then(() =>
       require('inquirer').prompt({
         type: 'confirm',
         name: 'deployProject',
@@ -192,9 +193,10 @@ export const deployToFunction = async (
       })
     ).then(({ deployProject }: { deployProject: boolean }) => {
       if (deployProject) {
+        const siteTarget = options.target ?? context.target!.project;
         return firebaseTools.deploy({
           // tslint:disable-next-line:no-non-null-assertion
-          only: `hosting:${context.target!.project},functions:ssr`,
+          only: `hosting:${siteTarget},functions:ssr`,
           cwd: workspaceRoot
         });
       } else {
@@ -202,9 +204,10 @@ export const deployToFunction = async (
       }
     });
   } else {
+    const siteTarget = options.target ?? context.target!.project;
     return firebaseTools.deploy({
       // tslint:disable-next-line:no-non-null-assertion
-      only: `hosting:${context.target!.project},functions:ssr`,
+      only: `hosting:${siteTarget},functions:ssr`,
       cwd: workspaceRoot,
       token: firebaseToken,
     });

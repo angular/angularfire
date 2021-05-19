@@ -73,6 +73,7 @@ export interface DeployBuilderSchema {
   buildTarget?: string;
   firebaseProject?: string;
   preview?: boolean;
+  target?: boolean;
   universalBuildTarget?: string;
   ssr?: boolean;
   functionsNodeVersion?: number;
