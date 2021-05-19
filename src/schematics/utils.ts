@@ -1,48 +1,132 @@
 import { readFileSync } from 'fs';
-import { FirebaseRc, Project, Workspace, WorkspaceProject } from './interfaces';
+import { FirebaseRc, FirebaseProject, Workspace, WorkspaceProject, FirebaseApp, FirebaseHostingSite, FirebaseTools } from './interfaces';
 import { join } from 'path';
 import { isUniversalApp } from './ng-add-ssr';
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
 import { DeployOptions } from './ng-add-common';
+import { FilterResult } from 'fuzzy';
 
-export async function listProjects() {
-  const firebase = require('firebase-tools');
-  await firebase.login();
-  return firebase.projects.list();
-}
+const NEW_OPTION = '~~angularfire-new~~';
+const DEFAULT_SITE_TYPE = 'DEFAULT_SITE';
+
+export const getFirebaseTools = (): FirebaseTools => {
+  globalThis.memoizedFirebaseTools ||= require('firebase-tools');
+  return globalThis.memoizedFirebaseTools;
+};
+
+const getFuzzy = (): typeof import('fuzzy') => {
+  globalThis.memoizedFuzzy ||= require('fuzzy');
+  return globalThis.memoizedFuzzy;
+};
+
+const getInquirer = (): typeof import('inquirer') => {
+  if (globalThis.memeoizedInquirer) {
+    return globalThis.memeoizedInquirer;
+  } else {
+    const inquirer = require('inquirer');
+    inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
+    globalThis.memeoizedInquirer = inquirer;
+    return inquirer;
+  }
+};
+
+const getJSONCParser = (): typeof import('jsonc-parser') => {
+  globalThis.memoizedJSONCParser ||= require('jsonc-parser');
+  return globalThis.memoizedJSONCParser;
+};
 
 // `fuzzy` passes either the original list of projects or an internal object
 // which contains the project as a property.
-const isProject = (elem: Project | { original: Project }): elem is Project => {
-  return (elem as { original: Project }).original === undefined;
+const isProject = (elem: FirebaseProject | FilterResult<FirebaseProject>): elem is FirebaseProject => {
+  return (elem as { original: FirebaseProject }).original === undefined;
 };
 
-const searchProjects = (projects: Project[]) => {
-  return (_: any, input: string) => {
-    return Promise.resolve(
-      require('fuzzy')
-        .filter(input, projects, {
-          extract(el: Project) {
-            return `${el.projectId} ${el.displayName}`;
-          }
-        })
-        .map((result: Project | { original: Project }) => {
-          let original: Project;
-          if (isProject(result)) {
-            original = result;
-          } else {
-            original = result.original;
-          }
-          return {
-            name: `${original.displayName} (${original.projectId})`,
-            title: original.displayName,
-            value: original.projectId
-          };
-        })
-    );
-  };
+const isApp = (elem: FirebaseApp | FilterResult<FirebaseApp>): elem is FirebaseApp => {
+  return (elem as { original: FirebaseApp }).original === undefined;
 };
 
+const isSite = (elem: FirebaseHostingSite | FilterResult<FirebaseHostingSite>): elem is FirebaseHostingSite => {
+  return (elem as { original: FirebaseHostingSite }).original === undefined;
+};
+
+export const searchProjects = (promise: Promise<FirebaseProject[]>) =>
+  (_: any, input: string) => promise.then(projects => {
+    projects.unshift({
+      projectId: NEW_OPTION,
+      displayName: '[CREATE NEW PROJECT]'
+    } as any);
+    return getFuzzy().filter(input, projects, {
+      extract(el) {
+        return `${el.projectId} ${el.displayName}`;
+      }
+    }).map((result) => {
+      let original: FirebaseProject;
+      if (isProject(result)) {
+        original = result;
+      } else {
+        original = result.original;
+      }
+      return {
+        name: original.displayName,
+        title: original.displayName,
+        value: original.projectId
+      };
+    });
+  });
+
+const shortAppId = (app?: FirebaseApp) => app && app.appId.split('/').pop();
+
+export const searchApps = (promise: Promise<FirebaseApp[]>) =>
+  (_: any, input: string) => promise.then(apps => {
+    apps.unshift({
+      appId: NEW_OPTION,
+      displayName: '[CREATE NEW APP]',
+    } as any);
+    return getFuzzy().filter(input, apps, {
+      extract(el: FirebaseApp) {
+        return el.displayName;
+      }
+    }).map((result) => {
+      let original: FirebaseApp;
+      if (isApp(result)) {
+        original = result;
+      } else {
+        original = result.original;
+      }
+      return {
+        name: original.displayName,
+        title: original.displayName,
+        value: shortAppId(original),
+      };
+    });
+  });
+
+const shortSiteName = (site?: FirebaseHostingSite) => site && site.name.split('/').pop();
+
+export const searchSites = (promise: Promise<FirebaseHostingSite[]>) =>
+  (_: any, input: string) => promise.then(sites => {
+    sites.unshift({
+      name: NEW_OPTION,
+      defaultUrl: '[CREATE NEW SITE]',
+    } as any);
+    return getFuzzy().filter(input, sites, {
+      extract(el) {
+        return el.defaultUrl;
+      }
+    }).map((result) => {
+      let original: FirebaseHostingSite;
+      if (isSite(result)) {
+        original = result;
+      } else {
+        original = result.original;
+      }
+      return {
+        name: original.defaultUrl,
+        title: original.defaultUrl,
+        value: shortSiteName(original),
+      };
+    });
+  });
 
 export function getWorkspace(
   host: Tree
@@ -55,10 +139,7 @@ export function getWorkspace(
     throw new SchematicsException(`Could not find angular.json`);
   }
 
-  // We can not depend on this library to have be included in older (or newer) Angular versions.
-  // Require here, since the schematic will add it to the package.json and install it before
-  // continuing.
-  const { parse }: typeof import('jsonc-parser') = require('jsonc-parser');
+  const { parse } = getJSONCParser();
 
   const workspace = parse(configBuffer.toString()) as Workspace|undefined;
   if (!workspace) {
@@ -97,23 +178,91 @@ export const getProject = (options: DeployOptions, host: Tree) => {
   return {project, projectName};
 };
 
-export const projectPrompt = (projects: Project[]) => {
-  const inquirer = require('inquirer');
-  inquirer.registerPrompt(
-    'autocomplete',
-    require('inquirer-autocomplete-prompt')
-  );
-  return inquirer.prompt({
+type Prompt = <K extends string, U= unknown>(questions: { name: K, source: (...args) =>
+  Promise<{ value: U }[]>, default?: U | ((o: U[]) => U | Promise<U>), [key: string]: any }) =>
+    Promise<{[T in K]: U }>;
+
+const autocomplete: Prompt = (questions) => getInquirer().prompt(questions);
+
+export const projectPrompt = async (defaultProject?: string) => {
+  const firebase = getFirebaseTools();
+  const projects = firebase.projects.list({});
+  const { projectId } = await autocomplete({
     type: 'autocomplete',
-    name: 'firebaseProject',
+    name: 'projectId',
     source: searchProjects(projects),
-    message: 'Please select a project:'
+    message: 'Please select a project:',
+    default: defaultProject,
   });
+  if (projectId === NEW_OPTION) {
+    const { projectId } = await getInquirer().prompt({
+      type: 'input',
+      name: 'projectId',
+      message: `Please specify a unique project id (cannot be modified afterward) [6-30 characters]:`,
+    });
+    const { displayName } = await getInquirer().prompt({
+      type: 'input',
+      name: 'displayName',
+      message: 'What would you like to call your project?',
+      default: projectId,
+    });
+    // TODO try/catch
+    const project = await firebase.projects.create(projectId, { displayName, nonInteractive: true });
+    // The default hosting site won't be returned on a new project (hosting.sites.list()) until we try to create one, intentionally trigger
+    // the `site YADA already exists in YADA` error to kick this
+    if (project.resources.hostingSite) {
+      await firebase.hosting.sites.create(project.resources.hostingSite,
+        { nonInteractive: true, project: project.projectId }
+      ).catch(it => undefined);
+    }
+    return project;
+  }
+  // tslint:disable-next-line:no-non-null-assertion
+  return (await projects).find(it => it.projectId === projectId)!;
+};
+
+export const appPrompt = async (apps: Promise<FirebaseApp[]>, project: FirebaseProject) => {
+  const { appId } = await autocomplete({
+    type: 'autocomplete',
+    name: 'appId',
+    source: searchApps(apps),
+    message: 'Please select an app:'
+  });
+  if (appId === NEW_OPTION) {
+    const { displayName } = await getInquirer().prompt({
+      type: 'input',
+      name: 'displayName',
+      message: 'What would you like to call your app?',
+    });
+    return await getFirebaseTools().apps.create('web', displayName, { nonInteractive: true, project: project.projectId });
+  }
+  // tslint:disable-next-line:no-non-null-assertion
+  return (await apps).find(it => shortAppId(it) === appId)!;
+};
+
+export const sitePrompt = async (sites: Promise<FirebaseHostingSite[]>, project: FirebaseProject) => {
+  const { siteName } = await autocomplete({
+    type: 'autocomplete',
+    name: 'siteName',
+    source: searchSites(sites),
+    message: 'Please select a hosting site:',
+    default: _ => sites.then(it => shortSiteName(it.find(it => it.type === DEFAULT_SITE_TYPE))),
+  });
+  if (siteName === NEW_OPTION) {
+    const { subdomain } = await getInquirer().prompt({
+      type: 'input',
+      name: 'subdomain',
+      message: 'Please provide an unique, URL-friendly id for the site (<id>.web.app):',
+    });
+    return await getFirebaseTools().hosting.sites.create(subdomain, { nonInteractive: true, project: project.projectId });
+  }
+  // tslint:disable-next-line:no-non-null-assertion
+  return (await sites).find(it => shortSiteName(it) === siteName)!;
 };
 
 export const projectTypePrompt = (project: WorkspaceProject): Promise<{ universalProject: boolean }> => {
   if (isUniversalApp(project)) {
-    return require('inquirer').prompt({
+    return getInquirer().prompt({
       type: 'confirm',
       name: 'universalProject',
       message: 'We detected an Angular Universal project. Do you want to deploy as a Firebase Function?'
@@ -126,12 +275,16 @@ export function getFirebaseProjectName(
   workspaceRoot: string,
   target: string
 ): string | undefined {
-  const rc: FirebaseRc = JSON.parse(
-    readFileSync(join(workspaceRoot, '.firebaserc'), 'UTF-8')
-  );
-  const targets = rc.targets || {};
-  const projects = Object.keys(targets || {});
-  return projects.find(
-    project => !!Object.keys(targets[project].hosting).find(t => t === target)
-  );
+  try {
+    const rc: FirebaseRc = JSON.parse(
+      readFileSync(join(workspaceRoot, '.firebaserc'), 'UTF-8')
+    );
+    const targets = rc.targets || {};
+    const projects = Object.keys(targets || {});
+    return projects.find(
+      project => !!Object.keys(targets[project].hosting).find(t => t === target)
+    );
+  } catch (e) {
+    return undefined;
+  }
 }

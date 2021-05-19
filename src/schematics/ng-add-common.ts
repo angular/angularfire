@@ -1,5 +1,5 @@
 import { SchematicsException, Tree, SchematicContext } from '@angular-devkit/schematics';
-import { FirebaseRc } from './interfaces';
+import { FirebaseApp, FirebaseHostingSite, FirebaseProject, FirebaseRc } from './interfaces';
 import * as semver from 'semver';
 
 export interface NgAddOptions {
@@ -8,8 +8,11 @@ export interface NgAddOptions {
 }
 
 export interface NgAddNormalizedOptions {
-  firebaseProject: string;
   project: string;
+  firebaseProject: FirebaseProject;
+  firebaseApp: FirebaseApp;
+  firebaseHostingSite: FirebaseHostingSite;
+  sdkConfig: {[key: string]: any};
 }
 
 export interface DeployOptions {

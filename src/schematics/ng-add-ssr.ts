@@ -180,7 +180,7 @@ export const setupUniversalDeployment = (config: {
   generateFirebaseRc(
     tree,
     '.firebaserc',
-    options.firebaseProject,
+    options.firebaseProject.projectId,
     options.project
   );
 
