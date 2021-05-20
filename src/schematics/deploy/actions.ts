@@ -254,16 +254,20 @@ export default async function deploy(
     const winston = require('winston');
     const tripleBeam = require('triple-beam');
 
-    firebaseTools.logger.add(
-      new winston.transports.Console({
-        level: 'info',
-        format: winston.format.printf((info) =>
-          [info.message, ...(info[tripleBeam.SPLAT] || [])]
-            .filter((chunk) => typeof chunk === 'string')
-            .join(' ')
-        )
-      })
-    );
+    const logger = new winston.transports.Console({
+      level: 'info',
+      format: winston.format.printf((info) =>
+        [info.message, ...(info[tripleBeam.SPLAT] || [])]
+          .filter((chunk) => typeof chunk === 'string')
+          .join(' ')
+      )
+    });
+
+    if (parseInt(firebaseTools.cli.version(), 10) >= 9) {
+      firebaseTools.logger.logger.add(logger);
+    } else {
+      firebaseTools.logger.add(logger);
+    }
 
     if (serverBuildTarget) {
       await deployToFunction(

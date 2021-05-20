@@ -3,7 +3,6 @@ import deploy, { DeployBuilderOptions } from './actions';
 import { BuildTarget } from '../interfaces';
 import { getFirebaseProjectName } from '../utils';
 
-
 // Call the createBuilder() function to create a builder. This mirrors
 // createJobHandler() but add typings specific to Architect Builders.
 export default createBuilder(
@@ -31,6 +30,7 @@ export default createBuilder(
     }
 
     try {
+      process.env.FIREBASE_DEPLOY_AGENT = 'angularfire';
       await deploy(
         require('firebase-tools'),
         context,

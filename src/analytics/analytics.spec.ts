@@ -22,7 +22,7 @@ describe('AngularFireAnalytics', () => {
   });
 
   afterEach(() => {
-    app.delete();
+    app.delete().catch();
   });
 
   it('should be exist', () => {
