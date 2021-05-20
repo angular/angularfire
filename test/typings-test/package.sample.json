@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@angular/firebase": "file:{{ANGULARFIRE_VERSION}}",
-    "firebase": "{{FIREBASE_VERSION}}",
     "@angular/common": "{{ANGULAR_VERSION}}",
     "@angular/compiler": "{{ANGULAR_VERSION}}",
     "@angular/core": "{{ANGULAR_VERSION}}",
-    "@angular/platform-browser": "{{ANGULAR_VERSION}}",
+    "@angular/firebase": "file:{{ANGULARFIRE_VERSION}}",
     "@angular/platform-browser-dynamic": "{{ANGULAR_VERSION}}",
+    "@angular/platform-browser": "{{ANGULAR_VERSION}}",
+    "@firebase/app-types": "{{FIREBASE_APP_TYPES_VERSION}}",
+    "firebase": "{{FIREBASE_VERSION}}",
     "zone.js": "{{ZONE_VERSION}}",
     "rxjs": "{{RXJS_VERSION}}",
     "typescript": "{{TYPESCRIPT_VERSION}}"
