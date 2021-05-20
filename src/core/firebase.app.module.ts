@@ -10,7 +10,7 @@ import {
   VERSION as NG_VERSION,
   Version,
 } from '@angular/core';
-import { FirebaseAppConfig, FirebaseOptions } from '@firebase/app-types';
+import type { FirebaseAppConfig, FirebaseOptions } from '@firebase/app-types';
 import firebase from 'firebase/app';
 
 export const FIREBASE_OPTIONS = new InjectionToken<FirebaseOptions>('angularfire2.app.options');
