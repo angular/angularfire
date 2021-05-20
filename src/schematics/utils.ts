@@ -221,7 +221,9 @@ export const projectPrompt = async (defaultProject?: string) => {
   return (await projects).find(it => it.projectId === projectId)!;
 };
 
-export const appPrompt = async (apps: Promise<FirebaseApp[]>, project: FirebaseProject) => {
+export const appPrompt = async ({ projectId: project }: FirebaseProject) => {
+  const firebase = getFirebaseTools();
+  const apps = firebase.apps.list('web', { project });
   const { appId } = await autocomplete({
     type: 'autocomplete',
     name: 'appId',
@@ -234,13 +236,15 @@ export const appPrompt = async (apps: Promise<FirebaseApp[]>, project: FirebaseP
       name: 'displayName',
       message: 'What would you like to call your app?',
     });
-    return await getFirebaseTools().apps.create('web', displayName, { nonInteractive: true, project: project.projectId });
+    return await firebase.apps.create('web', displayName, { nonInteractive: true, project });
   }
   // tslint:disable-next-line:no-non-null-assertion
   return (await apps).find(it => shortAppId(it) === appId)!;
 };
 
-export const sitePrompt = async (sites: Promise<FirebaseHostingSite[]>, project: FirebaseProject) => {
+export const sitePrompt = async ({ projectId: project }: FirebaseProject) => {
+  const firebase = getFirebaseTools();
+  const sites = firebase.hosting.sites.list({ project }).then(it => it.sites);
   const { siteName } = await autocomplete({
     type: 'autocomplete',
     name: 'siteName',
@@ -254,7 +258,7 @@ export const sitePrompt = async (sites: Promise<FirebaseHostingSite[]>, project:
       name: 'subdomain',
       message: 'Please provide an unique, URL-friendly id for the site (<id>.web.app):',
     });
-    return await getFirebaseTools().hosting.sites.create(subdomain, { nonInteractive: true, project: project.projectId });
+    return await firebase.hosting.sites.create(subdomain, { nonInteractive: true, project });
   }
   // tslint:disable-next-line:no-non-null-assertion
   return (await sites).find(it => shortSiteName(it) === siteName)!;

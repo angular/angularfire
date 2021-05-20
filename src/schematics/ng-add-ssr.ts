@@ -96,43 +96,24 @@ export function generateFirebaseJson(
   overwriteIfExists(tree, path, stringifyFormatted(firebaseJson));
 }
 
-export const addFirebaseFunctionsDependencies = (tree: Tree, context: SchematicContext) => {
-  addDependencies(
-    tree,
-    firebaseFunctionsDependencies,
-    context
-  );
-  context.addTask(new NodePackageInstallTask());
-  return tree;
-};
-
 export const setupUniversalDeployment = (config: {
   project: WorkspaceProject;
   options: NgAddNormalizedOptions;
   workspacePath: string;
   workspace: Workspace;
   tree: Tree;
+  context: SchematicContext;
 }) => {
   const { tree, workspacePath, workspace, options } = config;
   const project = workspace.projects[options.project];
 
-  if (
-    !project.architect ||
-    !project.architect.build ||
-    !project.architect.build.options ||
-    !project.architect.build.options.outputPath
-  ) {
+  if (!project.architect?.build?.options?.outputPath) {
     throw new SchematicsException(
       `Cannot read the output path (architect.build.options.outputPath) of the Angular project "${options.project}" in angular.json`
     );
   }
 
-  if (
-    !project.architect ||
-    !project.architect.server ||
-    !project.architect.server.options ||
-    !project.architect.server.options.outputPath
-  ) {
+  if (!project.architect?.server?.options?.outputPath) {
     throw new SchematicsException(
       `Cannot read the output path (architect.server.options.outputPath) of the Angular project "${options.project}" in angular.json`
     );
@@ -175,6 +156,14 @@ export const setupUniversalDeployment = (config: {
   };
 
   tree.overwrite(workspacePath, JSON.stringify(workspace, null, 2));
+
+  addDependencies(
+    tree,
+    firebaseFunctionsDependencies,
+    config.context
+  );
+
+  config.context.addTask(new NodePackageInstallTask());
 
   generateFirebaseJson(tree, 'firebase.json', options.project, staticOutput, serverOutput);
   generateFirebaseRc(
