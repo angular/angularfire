@@ -45,7 +45,7 @@ A `DocumentChangeAction` gives you the `type` and `payload` properties. The `typ
 interface DocumentChangeAction {
   //'added' | 'modified' | 'removed';
   type: DocumentChangeType;
-  payload: DocumentChange;
+  payload: DocumentSnapshot;
 }
 
 interface DocumentChange {
