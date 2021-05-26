@@ -10,6 +10,16 @@
       "description": "Target to build.",
       "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
     },
+    "prerenderBuildTarget": {
+      "type": "string",
+      "description": "Target to build.",
+      "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
+    },
+    "universalBuildTarget": {
+      "type": "string",
+      "description": "Target to build.",
+      "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
+    },
     "ssr": {
       "type": ["boolean", "string"],
       "description": "Should we attempt to deploy the function to Cloud Functions (true) / Cloud Run ('cloud-run') or just Hosting (false)"

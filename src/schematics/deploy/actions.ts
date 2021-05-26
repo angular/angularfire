@@ -315,7 +315,7 @@ export const deployToCloudRun = async (
   } catch (e) { }
 
   if (options.preview) {
-    throw new SchematicsException('Cloud Run preview not supported yet.');
+    throw new SchematicsException('Cloud Run preview not supported.');
   }
 
   console.log(options);
