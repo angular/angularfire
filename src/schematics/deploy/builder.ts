@@ -25,14 +25,14 @@ export default createBuilder(
     let prerenderBuildTarget: BuildTarget | undefined;
     if (options.prerender) {
       prerenderBuildTarget = {
-        name: options.prerenderBuildTarget || `${context.target.project}:prerender:production`
+        name: options.prerenderTarget || `${context.target.project}:prerender:production`
       };
     }
 
     let serverBuildTarget: BuildTarget | undefined;
     if (options.ssr) {
       serverBuildTarget = {
-        name: options.universalBuildTarget || `${context.target.project}:server:production`
+        name: options.serverTarget || options.universalBuildTarget || `${context.target.project}:server:production`
       };
     }
 

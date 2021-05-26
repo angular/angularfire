@@ -10,7 +10,12 @@
       "description": "Target to build.",
       "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
     },
-    "prerenderBuildTarget": {
+    "prerendeTarget": {
+      "type": "string",
+      "description": "Target to build.",
+      "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
+    },
+    "serverTarget": {
       "type": "string",
       "description": "Target to build.",
       "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"

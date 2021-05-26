@@ -110,7 +110,8 @@ export interface DeployBuilderSchema {
   firebaseProject?: string;
   preview?: boolean;
   universalBuildTarget?: string;
-  prerenderBuildTarget?: string;
+  serverTarget?: string;
+  prerenderTarget?: string;
   ssr?: boolean | string;
   prerender?: boolean;
   functionName?: string;
