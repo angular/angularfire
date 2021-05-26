@@ -107,7 +107,7 @@ export const setupStaticDeployment = (config: {
 
   project.architect.deploy = {
     builder: '@angular/fire:deploy',
-    options: {}
+    options: { prerender: options.prerender, ssr: false }
   };
 
   tree.overwrite(workspacePath, JSON.stringify(workspace, null, 2));
@@ -116,6 +116,7 @@ export const setupStaticDeployment = (config: {
     tree,
     '.firebaserc',
     options.firebaseProject.projectId,
+    options.firebaseHostingSite,
     options.project
   );
 

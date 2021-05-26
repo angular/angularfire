@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { FirebaseRc, FirebaseProject, Workspace, WorkspaceProject, FirebaseApp, FirebaseHostingSite, FirebaseTools } from './interfaces';
 import { join } from 'path';
-import { isUniversalApp } from './ng-add-ssr';
+import { isUniversalApp, hasPrerenderOption } from './ng-add-ssr';
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
 import { DeployOptions } from './ng-add-common';
 import { FilterResult } from 'fuzzy';
@@ -74,7 +74,7 @@ export const searchProjects = (promise: Promise<FirebaseProject[]>) =>
     });
   });
 
-const shortAppId = (app?: FirebaseApp) => app && app.appId.split('/').pop();
+const shortAppId = (app?: FirebaseApp) => app?.appId && app.appId.split('/').pop();
 
 export const searchApps = (promise: Promise<FirebaseApp[]>) =>
   (_: any, input: string) => promise.then(apps => {
@@ -101,7 +101,7 @@ export const searchApps = (promise: Promise<FirebaseApp[]>) =>
     });
   });
 
-const shortSiteName = (site?: FirebaseHostingSite) => site && site.name.split('/').pop();
+export const shortSiteName = (site?: FirebaseHostingSite) => site?.name && site.name.split('/').pop();
 
 export const searchSites = (promise: Promise<FirebaseHostingSite[]>) =>
   (_: any, input: string) => promise.then(sites => {
@@ -184,6 +184,29 @@ type Prompt = <K extends string, U= unknown>(questions: { name: K, source: (...a
 
 const autocomplete: Prompt = (questions) => getInquirer().prompt(questions);
 
+enum FEATURES {
+  Authentication = 'Authentication',
+  Analtyics = 'Google Analtyics',
+  Database = 'Realtime Database',
+  Functions = 'Cloud Functions',
+  Messaging = 'Cloud Messaging',
+  Performance = 'Performance Monitoring',
+  Firestore = 'Cloud Firestore',
+  Storage = 'Cloud Storage',
+  RemoteConfig = 'Remote Configuation',
+}
+
+export const featuresPrompt = async () => {
+  const choices = Object.entries(FEATURES).map(([value, name]) => ({ name, value }));
+  const { features } = await getInquirer().prompt({
+    type: 'checkbox',
+    name: 'features',
+    choices,
+    message: 'What features would you like to setup?',
+  });
+  console.log(features);
+};
+
 export const projectPrompt = async (defaultProject?: string) => {
   const firebase = getFirebaseTools();
   const projects = firebase.projects.list({});
@@ -244,6 +267,9 @@ export const appPrompt = async ({ projectId: project }: FirebaseProject) => {
 
 export const sitePrompt = async ({ projectId: project }: FirebaseProject) => {
   const firebase = getFirebaseTools();
+  if (!firebase.hosting.sites) {
+    return undefined;
+  }
   const sites = firebase.hosting.sites.list({ project }).then(it => it.sites);
   const { siteName } = await autocomplete({
     type: 'autocomplete',
@@ -264,15 +290,68 @@ export const sitePrompt = async ({ projectId: project }: FirebaseProject) => {
   return (await sites).find(it => shortSiteName(it) === siteName)!;
 };
 
-export const projectTypePrompt = (project: WorkspaceProject): Promise<{ universalProject: boolean }> => {
+export const prerenderPrompt = (project: WorkspaceProject, prerender: boolean): Promise<{ projectType: PROJECT_TYPE }> => {
   if (isUniversalApp(project)) {
     return getInquirer().prompt({
-      type: 'confirm',
-      name: 'universalProject',
-      message: 'We detected an Angular Universal project. Do you want to deploy as a Firebase Function?'
+      type: 'prompt',
+      name: 'prerender',
+      message: 'We detected an Angular Universal project. How would you like to render server-side content?',
+      default: true
     });
   }
-  return Promise.resolve({ universalProject: false });
+  return Promise.resolve({ projectType: PROJECT_TYPE.Static });
+};
+
+export const enum PROJECT_TYPE { Static, CloudFunctions, CloudRun }
+
+export const projectTypePrompt = async (project: WorkspaceProject) => {
+  let prerender = false;
+  let nodeVersion: string|undefined;
+  if (isUniversalApp(project)) {
+    if (hasPrerenderOption(project)) {
+      const { shouldPrerender } = await getInquirer().prompt({
+        type: 'confirm',
+        name: 'shouldPrerender',
+        message: 'Should we prerender before deployment?',
+        default: true
+      });
+      prerender = shouldPrerender;
+    }
+    const choices = [
+      { name: prerender ? 'Pre-render only' : 'Don\'t render universal content', value: PROJECT_TYPE.Static },
+      { name: 'Cloud Functions', value: PROJECT_TYPE.CloudFunctions },
+      { name: 'Cloud Run (beta)', value: PROJECT_TYPE.CloudRun },
+    ];
+    const { projectType } = await getInquirer().prompt({
+      type: 'list',
+      name: 'projectType',
+      choices,
+      message: 'How would you like to render server-side content?',
+      default: PROJECT_TYPE.CloudFunctions,
+    });
+    if (projectType === PROJECT_TYPE.CloudFunctions) {
+      const { newNodeVersion } = await getInquirer().prompt({
+        type: 'list',
+        name: 'newNodeVersion',
+        choices: ['10', '12', '14'],
+        message: 'What version of Node.js would you like to use?',
+        default: parseInt(process.versions.node, 10).toString(),
+      });
+      nodeVersion = newNodeVersion;
+    } else {
+      const fetch = require('node-fetch');
+      const { newNodeVersion } = await getInquirer().prompt({
+        type: 'input',
+        name: 'newNodeVersion',
+        message: 'What version of Node.js would you like to use?',
+        validate: it => fetch(`https://hub.docker.com/v2/repositories/library/node/tags/${it}-slim`).then(it => it.status === 200 || `Can't find node:${it}-slim docker image.`),
+        default: parseFloat(process.versions.node).toString(),
+      });
+      nodeVersion = newNodeVersion;
+    }
+    return { prerender, projectType, nodeVersion };
+  }
+  return { projectType: PROJECT_TYPE.Static, prerender, nodeVersion };
 };
 
 export function getFirebaseProjectName(

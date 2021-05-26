@@ -13,6 +13,7 @@ export interface FirebaseDeployConfig {
   cwd: string;
   only?: string;
   token?: string;
+  [key: string]: any;
 }
 
 export interface FirebaseApp {
@@ -109,8 +110,11 @@ export interface DeployBuilderSchema {
   firebaseProject?: string;
   preview?: boolean;
   universalBuildTarget?: string;
-  ssr?: boolean;
-  functionsNodeVersion?: number;
+  prerenderBuildTarget?: string;
+  ssr?: boolean | string;
+  prerender?: boolean;
+  functionName?: string;
+  functionsNodeVersion?: number|string;
   functionsRuntimeOptions?: RuntimeOptions;
 }
 
@@ -123,6 +127,8 @@ export interface FSHost {
   moveSync(src: string, dest: string): void;
   writeFileSync(src: string, data: string): void;
   renameSync(src: string, dest: string): void;
+  copySync(src: string, dest: string): void;
+  removeSync(src: string): void;
 }
 
 export interface WorkspaceProject {

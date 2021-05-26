@@ -10,13 +10,25 @@
       "description": "Target to build.",
       "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
     },
+    "ssr": {
+      "type": ["boolean", "string"],
+      "description": "Should we attempt to deploy the function to Cloud Functions (true) / Cloud Run ('cloud-run') or just Hosting (false)"
+    },
+    "prerender": {
+      "type": "boolean",
+      "description": "Prerender before deploy?"
+    },
     "firebaseProject": {
       "type": "string",
       "description": "The Firebase project name or project alias to use when deploying"
     },
+    "functionName": {
+      "type": "string",
+      "description": "The name of the Cloud Function or Cloud Run serviceId to deploy SSR to"
+    },
     "functionsNodeVersion": {
-      "type": "number",
-      "description": "Version of Node.js to run Cloud Functions on"
+      "type": ["number", "string"],
+      "description": "Version of Node.js to run Cloud Functions / Run on"
     },
     "functionsRuntimeOptions": {
       "type": "object",

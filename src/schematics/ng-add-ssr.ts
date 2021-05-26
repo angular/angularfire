@@ -1,4 +1,4 @@
-import { SchematicsException, Tree, SchematicContext, noop } from '@angular-devkit/schematics';
+import { SchematicsException, Tree, SchematicContext } from '@angular-devkit/schematics';
 import {
   addDependencies,
   generateFirebaseRc,
@@ -9,30 +9,26 @@ import {
 } from './ng-add-common';
 import { FirebaseJSON, Workspace, WorkspaceProject } from './interfaces';
 import { firebaseFunctions as firebaseFunctionsDependencies } from './versions.json';
-import { dirname, join } from 'path';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
+import { PROJECT_TYPE } from './utils';
 
 // We consider a project to be a universal project if it has a `server` architect
 // target. If it does, it knows how to build the application's server.
 export const isUniversalApp = (
   project: WorkspaceProject
-) => project.architect && project.architect.server;
+) => project.architect?.server;
 
-function emptyFirebaseJson(source: string) {
-  return {
-    hosting: [],
-    functions: {
-      source
-    }
-  };
-}
+export const hasPrerenderOption = (
+  project: WorkspaceProject
+) => project.architect?.prerender;
 
-function generateHostingConfig(project: string, dist: string) {
+function generateHostingConfig(project: string, dist: string, functionName: string, projectType: PROJECT_TYPE) {
   return {
     target: project,
-    public: join(dirname(dist), dist),
+    public: dist,
     ignore: ['**/.*'],
     headers: [{
+      // TODO check the hash style in the angular.json
       source: '*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].+(css|js)',
       headers: [{
         key: 'Cache-Control',
@@ -40,17 +36,20 @@ function generateHostingConfig(project: string, dist: string) {
       }]
     }],
     rewrites: [
-      {
+      projectType === PROJECT_TYPE.CloudFunctions ? {
         source: '**',
-        function: 'ssr'
+        function: functionName
+      } : {
+        source: '**',
+        run: { serviceId: functionName }
       }
     ]
   };
 }
 
-function generateFunctionsConfig(dist: string) {
+function generateFunctionsConfig(source: string) {
   return {
-    source: dirname(dist)
+    source
   };
 }
 
@@ -59,11 +58,13 @@ export function generateFirebaseJson(
   path: string,
   project: string,
   dist: string,
-  serverOutput: string
+  functionsOutput: string,
+  functionName: string,
+  projectType: PROJECT_TYPE,
 ) {
   const firebaseJson: FirebaseJSON = tree.exists(path)
     ? safeReadJSON(path, tree)
-    : emptyFirebaseJson(dirname(serverOutput));
+    : {};
 
   /* TODO do we want to prompt for override?
   if (
@@ -77,7 +78,7 @@ export function generateFirebaseJson(
     );
   }*/
 
-  const newConfig = generateHostingConfig(project, dist);
+  const newConfig = generateHostingConfig(project, dist, functionName, projectType);
   if (firebaseJson.hosting === undefined) {
     firebaseJson.hosting = newConfig;
   } else if (Array.isArray(firebaseJson.hosting)) {
@@ -91,7 +92,9 @@ export function generateFirebaseJson(
     firebaseJson.hosting = [firebaseJson.hosting, newConfig];
   }
 
-  firebaseJson.functions = generateFunctionsConfig(dist);
+  if (projectType === PROJECT_TYPE.CloudFunctions) {
+    firebaseJson.functions = generateFunctionsConfig(functionsOutput);
+  }
 
   overwriteIfExists(tree, path, stringifyFormatted(firebaseJson));
 }
@@ -103,6 +106,8 @@ export const setupUniversalDeployment = (config: {
   workspace: Workspace;
   tree: Tree;
   context: SchematicContext;
+  projectType: PROJECT_TYPE;
+  nodeVersion: string;
 }) => {
   const { tree, workspacePath, workspace, options } = config;
   const project = workspace.projects[options.project];
@@ -119,8 +124,23 @@ export const setupUniversalDeployment = (config: {
     );
   }
 
+  const ssrDirectory = config.projectType === PROJECT_TYPE.CloudFunctions ? '/functions' : '/run';
   const staticOutput = project.architect.build.options.outputPath;
   const serverOutput = project.architect.server.options.outputPath;
+  const functionsOutput = staticOutput.replace('/browser', ssrDirectory);
+  if (functionsOutput !== serverOutput.replace('/server', ssrDirectory)) {
+    // TODO prompt cause they're using non-standard directories
+    throw new SchematicsException(
+      `It looks like the project "${options.project}" in your angular.json is using non-standard output directories, AngularFire doesn't support this yet.`
+    );
+  }
+
+  // TODO clean this up a bit
+  const functionName = config.projectType === PROJECT_TYPE.CloudRun ?
+    `ssr-${options.project.replace('_', '-')}` :
+    `ssr_${options.project}`;
+
+  console.log({ functionName, staticOutput, serverOutput, functionsOutput });
 
   // Add firebase libraries to externalDependencies. For older versions of @firebase/firestore grpc native would cause issues when
   // bundled. While, it's using grpc-js now and doesn't have issues, ngcc tends to bundle the esm version of the libraries; which
@@ -151,7 +171,10 @@ export const setupUniversalDeployment = (config: {
   project.architect.deploy = {
     builder: '@angular/fire:deploy',
     options: {
-      ssr: true
+      ssr: config.projectType === PROJECT_TYPE.CloudRun ? 'cloud-run' : true,
+      prerender: options.prerender,
+      functionName,
+      functionsNodeVersion: config.nodeVersion,
     }
   };
 
@@ -165,11 +188,12 @@ export const setupUniversalDeployment = (config: {
 
   config.context.addTask(new NodePackageInstallTask());
 
-  generateFirebaseJson(tree, 'firebase.json', options.project, staticOutput, serverOutput);
+  generateFirebaseJson(tree, 'firebase.json', options.project, staticOutput, functionsOutput, functionName, config.projectType);
   generateFirebaseRc(
     tree,
     '.firebaserc',
     options.firebaseProject.projectId,
+    options.firebaseHostingSite,
     options.project
   );
 

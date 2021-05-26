@@ -1,5 +1,8 @@
-import { SchematicContext, Tree } from '@angular-devkit/schematics';
-import { projectPrompt, getWorkspace, getProject, projectTypePrompt, appPrompt, sitePrompt, getFirebaseTools, getFirebaseProjectName } from './utils';
+import { SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
+import {
+  projectPrompt, getWorkspace, getProject, projectTypePrompt, appPrompt, sitePrompt, getFirebaseTools, getFirebaseProjectName,
+  featuresPrompt, PROJECT_TYPE
+} from './utils';
 import { DeployOptions, NgAddNormalizedOptions } from './ng-add-common';
 import { setupUniversalDeployment } from './ng-add-ssr';
 import { addFirebaseHostingDependencies, setupStaticDeployment } from './ng-add-static';
@@ -9,9 +12,11 @@ export const setupProject =
   async (tree: Tree, context: SchematicContext, config: DeployOptions & {
     firebaseProject: FirebaseProject,
     firebaseApp: FirebaseApp,
-    firebaseHostingSite: FirebaseHostingSite,
+    firebaseHostingSite: FirebaseHostingSite|undefined,
     sdkConfig: {[key: string]: any}
-    universalProject: boolean
+    projectType: PROJECT_TYPE,
+    prerender: boolean,
+    nodeVersion: string|undefined,
   }) => {
     const { path: workspacePath, workspace } = getWorkspace(tree);
 
@@ -23,26 +28,34 @@ export const setupProject =
       firebaseApp: config.firebaseApp,
       firebaseHostingSite: config.firebaseHostingSite,
       sdkConfig: config.sdkConfig,
+      prerender: config.prerender,
     };
 
-    if (config.universalProject) {
-      return setupUniversalDeployment({
-        workspace,
-        workspacePath,
-        options,
-        tree,
-        context,
-        project
-      });
-    } else {
-      return setupStaticDeployment({
-        workspace,
-        workspacePath,
-        options,
-        tree,
-        context,
-        project
-      });
+    // TODO dry up by always doing the static work
+    switch (config.projectType) {
+      case PROJECT_TYPE.CloudFunctions:
+      case PROJECT_TYPE.CloudRun:
+        return setupUniversalDeployment({
+          workspace,
+          workspacePath,
+          options,
+          tree,
+          context,
+          project,
+          projectType: config.projectType,
+          // tslint:disable-next-line:no-non-null-assertion
+          nodeVersion: config.nodeVersion!,
+        });
+      case PROJECT_TYPE.Static:
+        return setupStaticDeployment({
+          workspace,
+          workspacePath,
+          options,
+          tree,
+          context,
+          project
+        });
+      default: throw(new SchematicsException(`Unimplemented PROJECT_TYPE ${config.projectType}`));
     }
 };
 
@@ -58,6 +71,8 @@ export const ngAddSetupProject = (
     throw new Error('The NodePackageInstallTask does not appear to have completed successfully or we ran into a race condition. Please run the `ng add @angular/fire` command again.');
   }
 
+  await featuresPrompt();
+
   const firebase = getFirebaseTools();
   await firebase.login();
 
@@ -67,7 +82,7 @@ export const ngAddSetupProject = (
 
   const firebaseProject = await projectPrompt(defaultProjectName);
 
-  const { universalProject } = await projectTypePrompt(ngProject);
+  const { projectType, prerender, nodeVersion } = await projectTypePrompt(ngProject);
 
   // TODO get default site from tree
   const firebaseHostingSite = await sitePrompt(firebaseProject);
@@ -76,7 +91,9 @@ export const ngAddSetupProject = (
   const firebaseApp = await appPrompt(firebaseProject);
   const { sdkConfig } = await firebase.apps.sdkconfig('web', firebaseApp.appId, { nonInteractive: true });
 
-  await setupProject(host, context, { ...options, firebaseProject, firebaseApp, firebaseHostingSite, sdkConfig, universalProject });
+  await setupProject(host, context, {
+    ...options, firebaseProject, firebaseApp, firebaseHostingSite, sdkConfig, projectType, prerender, nodeVersion
+  });
 
 };
 
