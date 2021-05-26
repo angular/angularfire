@@ -210,10 +210,12 @@ export const deployToFunction = async (
     defaultFunction(serverOut, options, functionName)
   );
 
-  fsHost.renameSync(
-    join(newStaticOut, 'index.html'),
-    join(newStaticOut, 'index.original.html')
-  );
+  try {
+    fsHost.renameSync(
+      join(newStaticOut, 'index.html'),
+      join(newStaticOut, 'index.original.html')
+    );
+  } catch (e) { }
 
   if (options.preview) {
 
@@ -307,10 +309,12 @@ export const deployToCloudRun = async (
     dockerfile(options)
   );
 
-  fsHost.renameSync(
-    join(newStaticOut, 'index.html'),
-    join(newStaticOut, 'index.original.html')
-  );
+  try {
+    fsHost.renameSync(
+      join(newStaticOut, 'index.html'),
+      join(newStaticOut, 'index.original.html')
+    );
+  } catch (e) { }
 
   if (options.preview) {
     throw new SchematicsException('Cloud Run preview not supported yet.');
