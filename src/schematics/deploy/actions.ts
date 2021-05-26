@@ -96,8 +96,6 @@ const defaultFsHost: FSHost = {
   removeSync,
 };
 
-const getVersionRange = (v: number|string) => `^${v}.0.0`;
-
 const findPackageVersion = (name: string) => {
   const match = execSync(`npm list ${name}`).toString().match(` ${escapeRegExp(name)}@.+\\w`);
   return match ? match[0].split(`${name}@`)[1].split(/\s/)[0] : null;
@@ -194,7 +192,7 @@ export const deployToFunction = async (
   const packageJson = getPackageJson(context, workspaceRoot, options);
   const nodeVersion = packageJson.engines.node;
 
-  if (!satisfies(process.versions.node, getVersionRange(nodeVersion))) {
+  if (!satisfies(process.versions.node, nodeVersion.toString())) {
     context.logger.warn(
       `⚠️ Your Node.js version (${process.versions.node}) does not match the Firebase Functions runtime (${nodeVersion}).`
     );
@@ -293,7 +291,7 @@ export const deployToCloudRun = async (
   const packageJson = getPackageJson(context, workspaceRoot, options, join(serverOut, 'main.js'));
   const nodeVersion = packageJson.engines.node;
 
-  if (!satisfies(process.versions.node, getVersionRange(nodeVersion))) {
+  if (!satisfies(process.versions.node, nodeVersion.toString())) {
     context.logger.warn(
       `⚠️ Your Node.js version (${process.versions.node}) does not match the Cloud Run runtime (${nodeVersion}).`
     );
