@@ -22,10 +22,17 @@ export default createBuilder(
 
     const staticBuildTarget = { name: options.buildTarget || `${context.target.project}:build:production` };
 
+    let prerenderBuildTarget: BuildTarget | undefined;
+    if (options.prerender) {
+      prerenderBuildTarget = {
+        name: options.prerenderTarget || `${context.target.project}:prerender:production`
+      };
+    }
+
     let serverBuildTarget: BuildTarget | undefined;
     if (options.ssr) {
       serverBuildTarget = {
-        name: options.universalBuildTarget || `${context.target.project}:server:production`
+        name: options.serverTarget || options.universalBuildTarget || `${context.target.project}:server:production`
       };
     }
 
@@ -36,6 +43,7 @@ export default createBuilder(
         context,
         staticBuildTarget,
         serverBuildTarget,
+        prerenderBuildTarget,
         firebaseProject,
         options,
         process.env.FIREBASE_TOKEN,

@@ -21,7 +21,7 @@ describe('AngularFireRemoteConfig', () => {
   });
 
   afterEach(() => {
-    app.delete().catch();
+    app.delete().catch(it => undefined);
   });
 
   it('should be exist', () => {
@@ -59,7 +59,7 @@ describe('AngularFireRemoteConfig with different app', () => {
   });
 
   afterEach(() => {
-    app.delete().catch();
+    app.delete().catch(it => undefined);
   });
 
   describe('<constructor>', () => {

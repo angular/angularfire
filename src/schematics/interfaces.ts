@@ -1,22 +1,58 @@
 import { RuntimeOptions } from 'firebase-functions';
 
-export interface Project {
+export interface FirebaseProject {
   projectId: string;
   projectNumber: string;
   displayName: string;
   name: string;
   resources: { [key: string]: string };
+  state: string;
 }
 
 export interface FirebaseDeployConfig {
   cwd: string;
   only?: string;
   token?: string;
+  [key: string]: any;
+}
+
+export interface FirebaseApp {
+  name: string;
+  displayName: string;
+  platform: string;
+  appId: string;
+  namespace: string;
+}
+
+export interface FirebaseHostingSite {
+  name: string;
+  defaultUrl: string;
+  type: string;
+}
+
+export interface FirebaseSDKConfig {
+  fileName: string;
+  fileContents: string;
+  sdkConfig: { [key: string]: string };
 }
 
 export interface FirebaseTools {
   projects: {
-    list(): Promise<Project[]>;
+    list(options: any): Promise<FirebaseProject[]>;
+    create(projectId: string|undefined, options: any): Promise<FirebaseProject>;
+  };
+
+  apps: {
+    list(platform: string|undefined, options: any): Promise<FirebaseApp[]>;
+    create(platform: string, displayName: string|undefined, options: any): Promise<FirebaseApp>;
+    sdkconfig(type: string, projectId: string, options: any): Promise<FirebaseSDKConfig>;
+  };
+
+  hosting: {
+    sites: {
+      list(options: any): Promise<{ sites: FirebaseHostingSite[]}>;
+      create(siteId: string, options: any): Promise<FirebaseHostingSite>;
+    }
   };
 
   logger: {
@@ -74,9 +110,24 @@ export interface DeployBuilderSchema {
   firebaseProject?: string;
   preview?: boolean;
   universalBuildTarget?: string;
-  ssr?: boolean;
-  functionsNodeVersion?: number;
+  serverTarget?: string;
+  prerenderTarget?: string;
+  ssr?: boolean | string;
+  prerender?: boolean;
+  functionName?: string;
+  functionsNodeVersion?: number|string;
   functionsRuntimeOptions?: RuntimeOptions;
+  cloudRunOptions?: Partial<CloudRunOptions>;
+}
+
+export interface CloudRunOptions {
+  cpus: number;
+  maxConcurrency: number | 'default';
+  maxInstances: number | 'default';
+  memory: string;
+  minInstances: number | 'default';
+  timeout: number;
+  vpcConnector: string;
 }
 
 export interface BuildTarget {
@@ -88,6 +139,8 @@ export interface FSHost {
   moveSync(src: string, dest: string): void;
   writeFileSync(src: string, data: string): void;
   renameSync(src: string, dest: string): void;
+  copySync(src: string, dest: string): void;
+  removeSync(src: string): void;
 }
 
 export interface WorkspaceProject {

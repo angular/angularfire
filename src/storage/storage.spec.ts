@@ -43,7 +43,7 @@ describe('AngularFireStorage', () => {
   });
 
   afterEach(() => {
-    app.delete().catch();
+    app.delete().catch(it => undefined);
   });
 
   it('should exist', () => {
@@ -245,7 +245,7 @@ describe('AngularFireStorage w/options', () => {
   });
 
   afterEach(() => {
-    app.delete().catch();
+    app.delete().catch(it => undefined);
   });
 
   describe('<constructor>', () => {

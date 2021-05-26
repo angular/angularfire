@@ -22,7 +22,7 @@ describe('AngularFireFunctions', () => {
   });
 
   afterEach(() => {
-    app.delete().catch();
+    app.delete().catch(it => undefined);
   });
 
   it('should exist', () => {
@@ -60,7 +60,7 @@ describe('AngularFireFunctions with different app', () => {
   });
 
   afterEach(() => {
-    app.delete().catch();
+    app.delete().catch(it => undefined);
   });
 
   describe('<constructor>', () => {

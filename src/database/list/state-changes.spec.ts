@@ -36,7 +36,7 @@ describe('stateChanges', () => {
   });
 
   afterEach(() => {
-    app.delete().catch();
+    app.delete().catch(it => undefined);
   });
 
   function prepareStateChanges(opts: { events?: ChildEvent[], skipnumber: number } = { skipnumber: 0 }) {

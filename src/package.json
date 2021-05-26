@@ -23,12 +23,32 @@
   "author": "angular,firebase",
   "license": "MIT",
   "peerDependencies": {
-    "@angular/common": "ANGULAR_VERSION",
-    "@angular/core": "ANGULAR_VERSION",
-    "@angular/platform-browser": "ANGULAR_VERSION",
-    "@angular/platform-browser-dynamic": "ANGULAR_VERSION",
-    "firebase": "FIREBASE_VERSION",
-    "rxjs": "RXJS_VERSION"
+    "@angular/common": "0.0.0",
+    "@angular/core": "0.0.0",
+    "@angular/platform-browser": "0.0.0",
+    "@angular/platform-browser-dynamic": "0.0.0",
+    "firebase": "0.0.0",
+    "rxjs": "0.0.0",
+    "firebase-tools": "0.0.0",
+    "@angular-devkit/architect": "0.0.0",
+    "fuzzy": "0.0.0",
+    "inquirer-autocomplete-prompt": "0.0.0",
+    "open": "0.0.0",
+    "jsonc-parser": "0.0.0",
+    "firebase-admin": "0.0.0",
+    "firebase-functions": "0.0.0",
+    "firebase-functions-test": "0.0.0"
+  },
+  "peerDependenciesMeta": {
+    "firebase-tools": { "optional": true },
+    "@angular-devkit/architect": { "optional": true },
+    "fuzzy": { "optional": true },
+    "inquirer-autocomplete-prompt": { "optional": true },
+    "open": { "optional": true },
+    "jsonc-parser": { "optional": true },
+    "firebase-admin": { "optional": true },
+    "firebase-functions": { "optional": true },
+    "firebase-functions-test": { "optional": true }
   },
   "dependencies": {
     "tslib": "^2.0.0"

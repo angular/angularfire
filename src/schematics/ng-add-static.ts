@@ -92,16 +92,12 @@ export const setupStaticDeployment = (config: {
   workspacePath: string;
   workspace: Workspace;
   tree: Tree;
+  context: SchematicContext;
 }) => {
   const { tree, workspacePath, workspace, options } = config;
   const project = workspace.projects[options.project];
 
-  if (
-    !project.architect ||
-    !project.architect.build ||
-    !project.architect.build.options ||
-    !project.architect.build.options.outputPath
-  ) {
+  if (!project.architect?.build?.options?.outputPath) {
     throw new SchematicsException(
       `Cannot read the output path (architect.build.options.outputPath) of the Angular project "${options.project}" in angular.json`
     );
@@ -111,7 +107,7 @@ export const setupStaticDeployment = (config: {
 
   project.architect.deploy = {
     builder: '@angular/fire:deploy',
-    options: {}
+    options: { prerender: options.prerender, ssr: false }
   };
 
   tree.overwrite(workspacePath, JSON.stringify(workspace, null, 2));
@@ -119,7 +115,8 @@ export const setupStaticDeployment = (config: {
   generateFirebaseRc(
     tree,
     '.firebaserc',
-    options.firebaseProject,
+    options.firebaseProject.projectId,
+    options.firebaseHostingSite,
     options.project
   );
 

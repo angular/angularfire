@@ -30,7 +30,7 @@ describe('AngularFireDatabase', () => {
   });
 
   afterEach(() => {
-    app.delete().catch();
+    app.delete().catch(it => undefined);
   });
 
   describe('<constructor>', () => {
@@ -85,7 +85,7 @@ describe('AngularFireDatabase w/options', () => {
   });
 
   afterEach(() => {
-    app.delete().catch();
+    app.delete().catch(it => undefined);
   });
 
   describe('<constructor>', () => {
