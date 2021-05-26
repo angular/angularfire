@@ -117,6 +117,17 @@ export interface DeployBuilderSchema {
   functionName?: string;
   functionsNodeVersion?: number|string;
   functionsRuntimeOptions?: RuntimeOptions;
+  cloudRunOptions?: Partial<CloudRunOptions>;
+}
+
+export interface CloudRunOptions {
+  cpus: number;
+  maxConcurrency: number | 'default';
+  maxInstances: number | 'default';
+  memory: string;
+  minInstances: number | 'default';
+  timeout: number;
+  vpcConnector: string;
 }
 
 export interface BuildTarget {
