@@ -1,6 +1,13 @@
 import { isDevMode, NgZone, Version } from '@angular/core';
+import { FirebaseApp, getApp, getApps } from 'firebase/app';
+import { ComponentContainer } from '@firebase/component';
 
 export const VERSION = new Version('ANGULARFIRE2_VERSION');
+
+// TODO is there a better way to get at the internal types?
+interface FirebaseAppWithContainer extends FirebaseApp {
+  container: ComponentContainer;
+}
 
 const IS_HMR = !!(module as any).hot;
 
@@ -10,10 +17,8 @@ const log = (level: 'log'|'error'|'info'|'warn', ...args: any) => {
   }
 };
 
-globalThis.ɵAngularfireInstanceCache ||= new Map();
-
 export function ɵcacheInstance<T>(cacheKey: any, moduleName: string, appName: string, fn: () => T, deps: any): T {
-  const [instance, cachedDeps] = globalThis.ɵAngularfireInstanceCache.get(cacheKey) || [];
+  const [, instance, cachedDeps] = globalThis.ɵAngularfireInstanceCache.find((it: any) => it[0] === cacheKey) || [];
   if (instance) {
     if (deps !== cachedDeps) {
       log('error', `${moduleName} was already initialized on the ${appName} Firebase App with different settings.${IS_HMR ? ' You may need to reload as Firebase is not HMR aware.' : ''}`);
@@ -21,18 +26,21 @@ export function ɵcacheInstance<T>(cacheKey: any, moduleName: string, appName: s
     return instance;
   } else {
     const newInstance = fn();
-    globalThis.ɵAngularfireInstanceCache.set(cacheKey, [newInstance, deps]);
+    globalThis.ɵAngularfireInstanceCache.push([cacheKey, newInstance, deps]);
     return newInstance;
   }
 }
 
-export function ɵsmartCacheInstance<T>(moduleName: string, fn: () => T, zone: NgZone): T {
-  const cached = ɵfetchCachedInstanceByDep<T>(fn);
-  if (cached) {
-    return cached as T;
+globalThis.ɵAngularfireInstanceCache ||= [];
+
+export function ɵmemoizeInstance<T>(fn: () => T, zone: NgZone): T {
+  const [, instance] = globalThis.ɵAngularfireInstanceCache.find((it: any) => matchDep(it[0], fn)) || [];
+  if (instance) {
+    return instance as T;
   } else {
+    // TODO catch and add HMR warning
     const instance = zone.runOutsideAngular(() => fn());
-    globalThis.ɵAngularfireInstanceCache.set([moduleName, (instance as any).name].join('.'), [instance, fn]);
+    globalThis.ɵAngularfireInstanceCache.push([fn, instance]);
     return instance;
   }
 }
@@ -45,20 +53,21 @@ function matchDep(a: any, b: any) {
   }
 }
 
-export function ɵfetchCachedInstanceByDep<T>(depToMatch: any) {
-  const match = Array.from(globalThis.ɵAngularfireInstanceCache.values()).
-    filter(it => it instanceof Array).
-    find(([, dep]) => matchDep(dep, depToMatch));
-  return match && match[0];
+export function ɵgetDefaultInstanceOf<T= unknown>(identifier: string): T|undefined  {
+  const defaultApp = getApp();
+  return ɵgetAllInstancesOf<T>(identifier, defaultApp)[0];
 }
 
-export function ɵfetchCachedInstance(cacheKey: any) {
-  const [instance] = globalThis.ɵAngularfireInstanceCache.get(cacheKey) || [];
-  return instance;
-}
-
-export function ɵfetchAllCachedInstances(prefix: any) {
-  return Array.from(globalThis.ɵAngularfireInstanceCache.keys()).
-    filter((k: string) => k.startsWith(prefix)).
-    map(k => globalThis.ɵAngularfireInstanceCache.get(k)[0]);
-}
+export const ɵgetAllInstancesOf = <T= unknown>(identifier: string, app?: FirebaseApp): Array<T> => {
+  const apps = app ? [app] : getApps();
+  const instances: Array<any> = [];
+  apps.forEach((app: FirebaseAppWithContainer) => {
+    const provider: any = app.container.getProvider(identifier as any);
+    provider.instances.forEach((instance: any) => {
+      if (!instances.includes(instance)) {
+        instances.push(instance);
+      }
+    });
+  });
+  return instances;
+};

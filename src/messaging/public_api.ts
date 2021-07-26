@@ -1,1 +1,1 @@
-export { Messaging, provideMessaging, MESSAGING_INSTANCES } from '@angular/fire';
+export { Messaging, provideMessaging, MessagingInstances } from '@angular/fire';

@@ -121,7 +121,7 @@ async function compileSchematics() {
 }
 
 async function measure(module: string) {
-  const path = dest('bundles', `${module}.umd.min.js`);
+  const path = dest('bundles', `${module}.umd.js`);
   const file = await readFile(path);
   const gzip = prettySize(gzipSync(file), true);
   const size = prettySize(file.byteLength, true);

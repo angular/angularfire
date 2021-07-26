@@ -1,7 +1,10 @@
-import { ApplicationRef, Component, Inject, Optional } from '@angular/core';
-import { FirebaseApp, Auth, AUTH_INSTANCES, FIREBASE_APPS } from '@angular/fire';
+import { ApplicationRef, Component, Inject, NgZone, Optional } from '@angular/core';
+import { FirebaseApp, Auth, FirebaseApps, AuthInstances, FunctionsInstances,
+  Functions, FirestoreInstances, Firestore } from '@angular/fire';
 import { authState } from '@angular/fire/auth';
-import { debounceTime } from 'rxjs/operators';
+import { debounceTime, distinct } from 'rxjs/operators';
+import { getApps } from '@firebase/app';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -35,14 +38,30 @@ export class AppComponent {
   constructor(
     public app: FirebaseApp,      // default Firebase App
     public auth: Auth, // default Firbase Auth
-    @Inject(FIREBASE_APPS) public apps: FirebaseApp[], // all initialized App instances
-    @Optional() @Inject(AUTH_INSTANCES) public authInstances: Auth[], // all initialized Auth instances
+    public apps: FirebaseApps, // all initialized App instances
+    public authInstances: AuthInstances, // all initialized Auth instances
+    public functions: Functions,
+    public functionsInstances: FunctionsInstances,
+    public firestore: Firestore,
+    public firestoreInstances: FirestoreInstances,
     appRef: ApplicationRef,
+    zone: NgZone,
   ) {
-    console.log(app, auth, apps, authInstances, 'hi!...');
+    console.log({app, auth, apps, authInstances, functions, functionsInstances, firestore, firestoreInstances});
     // onAuthStateChanged should destablize the zone
     // onAuthStateChanged(auth, it => console.log('onAuthStateChanged', it));
     authState(auth).subscribe(it => console.log('authState', it));
     appRef.isStable.pipe(debounceTime(200)).subscribe(it => console.log('isStable', it));
+    console.log((app as any).container.providers.keys());
+    zone.runOutsideAngular(() => {
+      setTimeout(async () => {
+        const functions = await import('./getFunctions');
+        functions.getFunctions(app);
+      }, 5000);
+      setTimeout(async () => {
+        const functions = await import('./getFunctions');
+        functions.getFunctions(app, 'asdf');
+      }, 10000);
+    });
   }
 }

@@ -22,9 +22,9 @@
     "@angular/platform-browser": "^12.0.0",
     "@angular/platform-browser-dynamic": "^12.0.0",
     "@angular/router": "^12.0.0",
-    "firebase": "9.0.0-beta.2",
+    "firebase": "9.0.0-beta.7",
     "lodash.isequal": "^4.5.0",
-    "rxfire": "6.0.0-canary.da26625",
+    "rxfire": "6.0.0-canary.d3cbd88",
     "rxjs": "~6.6.0",
     "tslib": "^2.1.0",
     "zone.js": "~0.11.4"

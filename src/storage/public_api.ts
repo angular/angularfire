@@ -1,2 +1,2 @@
-export { Storage, provideStorage, STORAGE_INSTANCES } from '@angular/fire';
+export { Storage, provideStorage, StorageInstances } from '@angular/fire';
 export * from './rxfire';

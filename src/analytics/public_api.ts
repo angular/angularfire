@@ -1,1 +1,1 @@
-export { Analytics, provideAnalytics, ANALYTICS_INSTANCES } from '@angular/fire';
+export { Analytics, provideAnalytics, AnalyticsInstances } from '@angular/fire';

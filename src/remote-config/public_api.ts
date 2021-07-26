@@ -1,2 +1,2 @@
-export { RemoteConfig, provideRemoteConfig, REMOTE_CONFIG_INSTANCES } from '@angular/fire';
+export { RemoteConfig, provideRemoteConfig, RemoteConfigInstances } from '@angular/fire';
 export * from './rxfire';

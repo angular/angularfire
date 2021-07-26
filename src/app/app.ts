@@ -1,4 +1,4 @@
-import { FirebaseApp as IFirebaseApp } from 'firebase/app';
+import { FirebaseApp as IFirebaseApp, getApps } from 'firebase/app';
 
 // Need to turn the FirebaseApp interface exported by firebase/app into a class
 // as types don't work in Angular DI. We want developers to be able to inject FirebaseApp like so
@@ -19,5 +19,13 @@ export interface FirebaseApp extends IFirebaseApp {}
 export class FirebaseApp {
   constructor(app: IFirebaseApp) {
     return app;
+  }
+}
+
+export interface FirebaseApps extends Array<IFirebaseApp> {}
+
+export class FirebaseApps {
+  constructor() {
+    return getApps();
   }
 }
