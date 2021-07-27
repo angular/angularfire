@@ -1,2 +1,3 @@
-export { Functions, provideFunctions, FunctionsInstances } from '@angular/fire';
+export { provideFunctions, FunctionsModule } from './functions.module';
+export { Functions, FunctionsInstances, functionInstance$ } from './functions';
 export * from './rxfire';

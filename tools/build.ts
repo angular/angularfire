@@ -11,7 +11,7 @@ const yada2 = tsKeys<typeof import('rxfire/auth')>();
 
 // TODO infer these from the package.json
 const MODULES = [
-  'core', 'compat', 'analytics', 'auth', 'database', 'firestore', 'functions',
+  'core', 'app', 'compat', 'analytics', 'auth', 'database', 'firestore', 'functions',
   'remote-config', 'storage', 'messaging', 'performance', 'compat/analytics',
   'compat/auth-guard', 'compat/auth', 'compat/database', 'compat/firestore',
   'compat/functions', 'compat/remote-config', 'compat/storage', 'compat/messaging',

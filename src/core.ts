@@ -62,7 +62,7 @@ export const ɵgetAllInstancesOf = <T= unknown>(identifier: string, app?: Fireba
   const apps = app ? [app] : getApps();
   const instances: Array<any> = [];
   apps.forEach((app: FirebaseAppWithContainer) => {
-    const provider: any = app.container.getProvider(identifier as any);
+    const provider: any = app.container.getProvider(identifier as never);
     provider.instances.forEach((instance: any) => {
       if (!instances.includes(instance)) {
         instances.push(instance);

@@ -1,25 +1,24 @@
 import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from '@angular/core';
-import { FirebaseDatabase } from 'firebase/database';
+import { FirebaseDatabase, getDatabase } from 'firebase/database';
 
-import { PROVIDED_AUTH_INSTANCES } from '../auth/auth.module';
-import { ɵgetDefaultInstanceOf, ɵmemoizeInstance } from '../core';
+import { AuthInstances } from '@angular/fire/auth';
+import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers } from '@angular/fire';
 import { Database, DatabaseInstances, DATABASE_PROVIDER_NAME } from './database';
-import { PROVIDED_FIREBASE_APPS } from '../app/app.module';
-import { ɵAngularFireSchedulers } from '../zones';
+import { getApp } from 'firebase/app';
+import { FirebaseApps } from '@angular/fire/app';
 
 export const PROVIDED_DATABASE_INSTANCES = new InjectionToken<Database[]>('angularfire2.database-instances');
 
-export function ɵdefaultDatabaseInstanceFactory(_: Database[]) {
-  const defaultDatabase = ɵgetDefaultInstanceOf<FirebaseDatabase>(DATABASE_PROVIDER_NAME);
+export function defaultDatabaseInstanceFactory(_: Database[]) {
+  const defaultDatabase = ɵgetDefaultInstanceOf<FirebaseDatabase>(DATABASE_PROVIDER_NAME) || getDatabase(getApp());
   return new Database(defaultDatabase);
 }
 
-// Hack: useFactory doesn't allow us to pass a lambda, so let's bind the arugments
-// Going this direction to cut down on DI token noise; also making it easier to support
-// multiple Firebase Apps
-export function ɵboundDatabaseInstanceFactory(zone: NgZone) {
-  const database = ɵmemoizeInstance<FirebaseDatabase>(this, zone);
-  return new Database(database);
+export function databaseInstanceFactory(fn: () => FirebaseDatabase) {
+  return (zone: NgZone) => {
+    const database = ɵmemoizeInstance<FirebaseDatabase>(fn, zone);
+    return new Database(database);
+  };
 }
 
 const DATABASE_INSTANCES_PROVIDER = {
@@ -31,7 +30,7 @@ const DATABASE_INSTANCES_PROVIDER = {
 
 const DEFAULT_DATABASE_INSTANCE_PROVIDER = {
   provide: Database,
-  useFactory: ɵdefaultDatabaseInstanceFactory,
+  useFactory: defaultDatabaseInstanceFactory,
   deps: [
     NgZone,
     [new Optional(), PROVIDED_DATABASE_INSTANCES ],
@@ -44,22 +43,22 @@ const DEFAULT_DATABASE_INSTANCE_PROVIDER = {
     DATABASE_INSTANCES_PROVIDER,
   ]
 })
-export class FirebaseDatabaseModule {
+export class DatabaseModule {
 }
 
-export function provideDatabase(fn: () => FirebaseDatabase): ModuleWithProviders<FirebaseDatabaseModule> {
+export function provideDatabase(fn: () => FirebaseDatabase): ModuleWithProviders<DatabaseModule> {
   return {
-    ngModule: FirebaseDatabaseModule,
+    ngModule: DatabaseModule,
     providers: [{
       provide: PROVIDED_DATABASE_INSTANCES,
-      useFactory: ɵboundDatabaseInstanceFactory.bind(fn),
+      useFactory: databaseInstanceFactory(fn),
       multi: true,
       deps: [
         NgZone,
         ɵAngularFireSchedulers,
-        [new Optional(), PROVIDED_FIREBASE_APPS ],
+        FirebaseApps,
         // Database+Auth work better if Auth is loaded first
-        [new Optional(), PROVIDED_AUTH_INSTANCES ],
+        [new Optional(), AuthInstances ],
       ]
     }]
   };

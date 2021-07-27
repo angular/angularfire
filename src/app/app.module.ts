@@ -1,20 +1,17 @@
 import {
-  Inject,
   InjectionToken,
   ModuleWithProviders,
   NgModule,
   NgZone,
   Optional,
-  PLATFORM_ID,
   VERSION as NG_VERSION,
 } from '@angular/core';
 import { FirebaseApp as IFirebaseApp, getApp, registerVersion } from 'firebase/app';
 
 import { FirebaseApp, FirebaseApps } from './app';
-import { VERSION, ɵmemoizeInstance } from '../core';
-import { ɵAngularFireSchedulers } from '../zones';
+import { VERSION, ɵmemoizeInstance, ɵAngularFireSchedulers } from '@angular/fire';
 
-export function ɵdefaultFirebaseAppFactory(_: FirebaseApp[]) {
+export function defaultFirebaseAppFactory(_: FirebaseApp[]) {
   return new FirebaseApp(getApp());
 }
 
@@ -28,7 +25,7 @@ export const PROVIDED_FIREBASE_APPS = new InjectionToken<Array<FirebaseApp>>('an
 // from the reserved URL.
 const DEFAULT_FIREBASE_APP_PROVIDER = {
   provide: FirebaseApp,
-  useFactory: ɵdefaultFirebaseAppFactory,
+  useFactory: defaultFirebaseAppFactory,
   deps: [
     [new Optional(), PROVIDED_FIREBASE_APPS ],
   ],
@@ -41,12 +38,11 @@ const FIREBASE_APPS_PROVIDER = {
   ],
 };
 
-// Hack: useFactory doesn't allow us to pass a lambda, so let's bind the arugments
-// Going this direction to cut down on DI token noise; also making it easier to support
-// multiple Firebase Apps
-export function ɵboundFirebaseAppFactory(zone: NgZone) {
-  const app = ɵmemoizeInstance<IFirebaseApp>(this, zone);
-  return new FirebaseApp(app);
+export function firebaseAppFactory(fn: () => IFirebaseApp) {
+  return (zone: NgZone) => {
+    const app = ɵmemoizeInstance<IFirebaseApp>(fn, zone);
+    return new FirebaseApp(app);
+  };
 }
 
 @NgModule({
@@ -55,7 +51,7 @@ export function ɵboundFirebaseAppFactory(zone: NgZone) {
     FIREBASE_APPS_PROVIDER,
   ]
 })
-export class AngularFireModule {
+export class FirebaseAppModule {
   constructor() {
     registerVersion('angularfire', VERSION.full, 'core');
     registerVersion('angular', NG_VERSION.full);
@@ -65,12 +61,12 @@ export class AngularFireModule {
 // Calling initializeApp({ ... }, 'name') multiple times will add more FirebaseApps into the FIREBASE_APPS
 // injection scope. This allows developers to more easily work with multiple Firebase Applications. Downside
 // is that DI for app name and options doesn't really make sense anymore.
-export function provideFirebaseApp(fn: () => IFirebaseApp): ModuleWithProviders<AngularFireModule> {
+export function provideFirebaseApp(fn: () => IFirebaseApp): ModuleWithProviders<FirebaseAppModule> {
   return {
-    ngModule: AngularFireModule,
+    ngModule: FirebaseAppModule,
     providers: [{
       provide: PROVIDED_FIREBASE_APPS,
-      useFactory: ɵboundFirebaseAppFactory.bind(fn),
+      useFactory: firebaseAppFactory(fn),
       multi: true,
       deps: [ NgZone, ɵAngularFireSchedulers ],
     }],

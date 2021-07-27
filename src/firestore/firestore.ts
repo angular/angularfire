@@ -1,5 +1,7 @@
 import { FirebaseFirestore } from 'firebase/firestore';
-import { ɵgetAllInstancesOf } from '../core';
+import { ɵgetAllInstancesOf } from '@angular/fire';
+import { from, timer } from 'rxjs';
+import { concatMap, distinct } from 'rxjs/operators';
 
 // see notes in core/firebase.app.module.ts for why we're building the class like this
 // tslint:disable-next-line:no-empty-interface
@@ -21,3 +23,8 @@ export class FirestoreInstances {
     return ɵgetAllInstancesOf<FirebaseFirestore>(FIRESTORE_PROVIDER_NAME);
   }
 }
+
+export const firestoreInstance$ = timer(0, 300).pipe(
+  concatMap(() => from(ɵgetAllInstancesOf<FirebaseFirestore>(FIRESTORE_PROVIDER_NAME))),
+  distinct(),
+);

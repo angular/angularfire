@@ -1,26 +1,23 @@
 import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from '@angular/core';
-import { FirebaseMessaging } from 'firebase/messaging';
-
-import { ɵgetDefaultInstanceOf, ɵmemoizeInstance } from '../core';
+import { FirebaseMessaging, getMessaging } from 'firebase/messaging';
+import { getApp } from 'firebase/app';
+import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers } from '@angular/fire';
 import { Messaging, MessagingInstances, MESSAGING_PROVIDER_NAME } from './messaging';
-import { PROVIDED_FIREBASE_APPS } from '../app/app.module';
-import { ɵAngularFireSchedulers } from '../zones';
+import { FirebaseApps } from '@angular/fire/app';
 
 export const PROVIDED_MESSAGING_INSTANCES = new InjectionToken<Messaging[]>('angularfire2.messaging-instances');
 
-export function ɵdefaultMessagingInstanceFactory(_: Messaging[]) {
-  const defaultAuth = ɵgetDefaultInstanceOf<FirebaseMessaging>(MESSAGING_PROVIDER_NAME);
+export function defaultMessagingInstanceFactory(_: Messaging[]) {
+  const defaultAuth = ɵgetDefaultInstanceOf<FirebaseMessaging>(MESSAGING_PROVIDER_NAME) || getMessaging(getApp());
   return new Messaging(defaultAuth);
 }
 
-// Hack: useFactory doesn't allow us to pass a lambda, so let's bind the arugments
-// Going this direction to cut down on DI token noise; also making it easier to support
-// multiple Firebase Apps
-export function ɵboundMessagingInstanceFactory(zone: NgZone) {
-  const messaging = ɵmemoizeInstance<FirebaseMessaging>(this, zone);
-  return new Messaging(messaging);
+export function messagingInstanceFactory(fn: () => FirebaseMessaging) {
+  return (zone: NgZone) => {
+    const messaging = ɵmemoizeInstance<FirebaseMessaging>(fn, zone);
+    return new Messaging(messaging);
+  };
 }
-
 
 const MESSAGING_INSTANCES_PROVIDER = {
   provide: MessagingInstances,
@@ -31,7 +28,7 @@ const MESSAGING_INSTANCES_PROVIDER = {
 
 const DEFAULT_MESSAGING_INSTANCE_PROVIDER = {
   provide: Messaging,
-  useFactory: ɵdefaultMessagingInstanceFactory,
+  useFactory: defaultMessagingInstanceFactory,
   deps: [
     NgZone,
     [new Optional(), PROVIDED_MESSAGING_INSTANCES ],
@@ -52,12 +49,12 @@ export function provideMessaging(fn: () => FirebaseMessaging): ModuleWithProvide
     ngModule: MessagingModule,
     providers: [{
       provide: PROVIDED_MESSAGING_INSTANCES,
-      useFactory: ɵboundMessagingInstanceFactory.bind(fn),
+      useFactory: messagingInstanceFactory(fn),
       multi: true,
       deps: [
         NgZone,
         ɵAngularFireSchedulers,
-        [new Optional(), PROVIDED_FIREBASE_APPS ]
+        FirebaseApps,
       ]
     }]
   };

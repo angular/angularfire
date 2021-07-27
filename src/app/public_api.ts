@@ -1,1 +1,2 @@
-export { FirebaseApp, provideFirebaseApp, FirebaseApps } from '@angular/fire';
+export { FirebaseApp, FirebaseApps, firebaseApp$ } from './app';
+export { provideFirebaseApp, FirebaseAppModule } from './app.module';

@@ -1,23 +1,22 @@
 import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from '@angular/core';
-import { Auth as FirebaseAuth } from 'firebase/auth';
-import { ɵgetDefaultInstanceOf, ɵmemoizeInstance } from '../core';
+import { Auth as FirebaseAuth, initializeAuth } from 'firebase/auth';
+import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers } from '@angular/fire';
 import { Auth, AuthInstances, AUTH_PROVIDER_NAME } from './auth';
-import { ɵAngularFireSchedulers } from '../zones';
-import { PROVIDED_FIREBASE_APPS } from '../app/app.module';
+import { getApp } from 'firebase/app';
+import { FirebaseApps } from '@angular/fire/app';
 
 export const PROVIDED_AUTH_INSTANCES = new InjectionToken<Auth[]>('angularfire2.auth-instances');
 
-export function ɵdefaultAuthInstanceFactory() {
-  const defaultAuth = ɵgetDefaultInstanceOf<FirebaseAuth>(AUTH_PROVIDER_NAME);
+export function defaultAuthInstanceFactory() {
+  const defaultAuth = ɵgetDefaultInstanceOf<FirebaseAuth>(AUTH_PROVIDER_NAME) || initializeAuth(getApp());
   return new Auth(defaultAuth);
 }
 
-// Hack: useFactory doesn't allow us to pass a lambda, so let's bind the arugments
-// Going this direction to cut down on DI token noise; also making it easier to support
-// multiple Firebase Apps
-export function ɵboundAuthInstanceFactory(zone: NgZone) {
-  const auth = ɵmemoizeInstance<FirebaseAuth>(this, zone);
-  return new Auth(auth);
+export function authInstanceFactory(fn: () => FirebaseAuth) {
+  return (zone: NgZone) => {
+    const auth = ɵmemoizeInstance<FirebaseAuth>(fn, zone);
+    return new Auth(auth);
+  };
 }
 
 const AUTH_INSTANCES_PROVIDER = {
@@ -29,7 +28,7 @@ const AUTH_INSTANCES_PROVIDER = {
 
 const DEFAULT_AUTH_INSTANCE_PROVIDER = {
   provide: Auth,
-  useFactory: ɵdefaultAuthInstanceFactory,
+  useFactory: defaultAuthInstanceFactory,
   deps: [
     NgZone,
     [new Optional(), PROVIDED_AUTH_INSTANCES ],
@@ -50,12 +49,12 @@ export function provideAuth(fn: () => FirebaseAuth): ModuleWithProviders<AuthMod
     ngModule: AuthModule,
     providers: [{
       provide: PROVIDED_AUTH_INSTANCES,
-      useFactory: ɵboundAuthInstanceFactory.bind(fn),
+      useFactory: authInstanceFactory(fn),
       multi: true,
       deps: [
         NgZone,
         ɵAngularFireSchedulers,
-        [new Optional(), PROVIDED_FIREBASE_APPS ]
+        FirebaseApps,
       ]
     }]
   };

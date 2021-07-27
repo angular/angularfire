@@ -1,13 +1,14 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { provideFirebaseApp, provideAuth, FirestoreModule } from '@angular/fire';
+import { provideFirebaseApp } from '@angular/fire/app';
+import { provideAuth } from '@angular/fire/auth';
 import { initializeApp, getApp } from 'firebase/app';
-import { initializeAuth, getAuth } from '@firebase/auth';
-
+import { initializeAuth } from 'firebase/auth';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { environment } from '../environments/environment';
-import { FunctionsModule  } from '@angular/fire';
+import { initializeFirestore } from 'firebase/firestore';
+import { provideFirestore } from '@angular/fire/firestore';
 
 @NgModule({
   declarations: [
@@ -22,14 +23,8 @@ import { FunctionsModule  } from '@angular/fire';
       app.automaticDataCollectionEnabled = false;
       return app;
     }),
-    provideAuth(() => getAuth()),
-    provideAuth(() => {
-      const auth = initializeAuth(getApp('second'));
-      auth.useDeviceLanguage();
-      return auth;
-    }),
-    FunctionsModule,
-    FirestoreModule,
+    provideAuth(() => initializeAuth(getApp())),
+    provideFirestore(() => initializeFirestore(getApp(), {}))
   ],
   providers: [ ],
   bootstrap: [AppComponent]

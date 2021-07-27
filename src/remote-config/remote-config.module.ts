@@ -1,24 +1,22 @@
 import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from '@angular/core';
-import { RemoteConfig as FirebaseRemoteConfig } from 'firebase/remote-config';
-
-import { ɵmemoizeInstance, ɵgetDefaultInstanceOf } from '../core';
+import { getRemoteConfig, RemoteConfig as FirebaseRemoteConfig } from 'firebase/remote-config';
+import { getApp } from 'firebase/app';
+import { ɵmemoizeInstance, ɵgetDefaultInstanceOf, ɵAngularFireSchedulers } from '@angular/fire';
 import { RemoteConfig, RemoteConfigInstances, REMOTE_CONFIG_PROVIDER_NAME } from './remote-config';
-import { PROVIDED_FIREBASE_APPS } from '../app/app.module';
-import { ɵAngularFireSchedulers } from '../zones';
+import { FirebaseApps } from '@angular/fire/app';
 
 export const PROVIDED_REMOTE_CONFIG_INSTANCES = new InjectionToken<RemoteConfig[]>('angularfire2.remote-config-instances');
 
-export function ɵdefaultRemoteConfigInstanceFactory(_: RemoteConfig[]) {
-  const defaultRemoteConfig = ɵgetDefaultInstanceOf<FirebaseRemoteConfig>(REMOTE_CONFIG_PROVIDER_NAME);
+export function defaultRemoteConfigInstanceFactory(_: RemoteConfig[]) {
+  const defaultRemoteConfig = ɵgetDefaultInstanceOf<FirebaseRemoteConfig>(REMOTE_CONFIG_PROVIDER_NAME) || getRemoteConfig(getApp());
   return new RemoteConfig(defaultRemoteConfig);
 }
 
-// Hack: useFactory doesn't allow us to pass a lambda, so let's bind the arugments
-// Going this direction to cut down on DI token noise; also making it easier to support
-// multiple Firebase Apps
-export function ɵboundRemoteConfigInstanceFactory(zone: NgZone) {
-  const remoteConfig = ɵmemoizeInstance<FirebaseRemoteConfig>(this, zone);
-  return new RemoteConfig(remoteConfig);
+export function remoteConfigInstanceFactory(fn: () => FirebaseRemoteConfig) {
+  return (zone: NgZone) => {
+    const remoteConfig = ɵmemoizeInstance<FirebaseRemoteConfig>(fn, zone);
+    return new RemoteConfig(remoteConfig);
+  };
 }
 
 const REMOTE_CONFIG_INSTANCES_PROVIDER = {
@@ -30,7 +28,7 @@ const REMOTE_CONFIG_INSTANCES_PROVIDER = {
 
 const DEFAULT_REMOTE_CONFIG_INSTANCE_PROVIDER = {
   provide: RemoteConfig,
-  useFactory: ɵdefaultRemoteConfigInstanceFactory,
+  useFactory: defaultRemoteConfigInstanceFactory,
   deps: [
     NgZone,
     [new Optional(), PROVIDED_REMOTE_CONFIG_INSTANCES ],
@@ -51,12 +49,12 @@ export function provideRemoteConfig(fn: () => FirebaseRemoteConfig): ModuleWithP
     ngModule: RemoteConfigModule,
     providers: [{
       provide: PROVIDED_REMOTE_CONFIG_INSTANCES,
-      useFactory: ɵboundRemoteConfigInstanceFactory.bind(fn),
+      useFactory: remoteConfigInstanceFactory(fn),
       multi: true,
       deps: [
         NgZone,
         ɵAngularFireSchedulers,
-        [new Optional(), PROVIDED_FIREBASE_APPS ]
+        FirebaseApps,
       ]
     }]
   };

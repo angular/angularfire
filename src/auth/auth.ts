@@ -1,5 +1,7 @@
 import { Auth as FirebaseAuth } from 'firebase/auth';
-import { ɵgetAllInstancesOf } from '../core';
+import { ɵgetAllInstancesOf } from '@angular/fire';
+import { from, timer } from 'rxjs';
+import { concatMap, distinct } from 'rxjs/operators';
 
 export const AUTH_PROVIDER_NAME = 'auth-exp';
 
@@ -21,3 +23,8 @@ export class AuthInstances {
     return ɵgetAllInstancesOf<FirebaseAuth>(AUTH_PROVIDER_NAME);
   }
 }
+
+export const authInstance$ = timer(0, 300).pipe(
+  concatMap(() => from(ɵgetAllInstancesOf<FirebaseAuth>(AUTH_PROVIDER_NAME))),
+  distinct(),
+);

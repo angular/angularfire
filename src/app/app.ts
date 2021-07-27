@@ -1,4 +1,6 @@
 import { FirebaseApp as IFirebaseApp, getApps } from 'firebase/app';
+import { from, timer } from 'rxjs';
+import { concatMap, distinct } from 'rxjs/operators';
 
 // Need to turn the FirebaseApp interface exported by firebase/app into a class
 // as types don't work in Angular DI. We want developers to be able to inject FirebaseApp like so
@@ -29,3 +31,8 @@ export class FirebaseApps {
     return getApps();
   }
 }
+
+export const firebaseApp$ = timer(0, 300).pipe(
+  concatMap(() => from(getApps())),
+  distinct(),
+);

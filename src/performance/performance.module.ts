@@ -1,26 +1,23 @@
 import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from '@angular/core';
-import { FirebasePerformance } from 'firebase/performance';
-
-import { ɵgetDefaultInstanceOf, ɵmemoizeInstance } from '../core';
+import { FirebasePerformance, initializePerformance } from 'firebase/performance';
+import { getApp } from 'firebase/app';
+import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers } from '@angular/fire';
 import { Performance, PerformanceInstances, PERFORMANCE_PROVIDER_NAME } from './performance';
-import { PROVIDED_FIREBASE_APPS } from '../app/app.module';
-import { ɵAngularFireSchedulers } from '../zones';
+import { FirebaseApps } from '@angular/fire/app';
 
 export const PROVIDED_PERFORMANCE_INSTANCES = new InjectionToken<Performance[]>('angularfire2.performance-instances');
 
-export function ɵdefaultPerformanceInstanceFactory(_: Performance[]) {
-  const defaultPerformance = ɵgetDefaultInstanceOf<FirebasePerformance>(PERFORMANCE_PROVIDER_NAME);
+export function defaultPerformanceInstanceFactory(_: Performance[]) {
+  const defaultPerformance = ɵgetDefaultInstanceOf<FirebasePerformance>(PERFORMANCE_PROVIDER_NAME) || initializePerformance(getApp());
   return new Performance(defaultPerformance);
 }
 
-// Hack: useFactory doesn't allow us to pass a lambda, so let's bind the arugments
-// Going this direction to cut down on DI token noise; also making it easier to support
-// multiple Firebase Apps
-export function ɵboundPerformanceInstanceFactory(zone: NgZone) {
-  const performance = ɵmemoizeInstance<FirebasePerformance>(this, zone);
-  return new Performance(performance);
+export function performanceInstanceFactory(fn: () => FirebasePerformance) {
+  return (zone: NgZone) => {
+    const performance = ɵmemoizeInstance<FirebasePerformance>(fn, zone);
+    return new Performance(performance);
+  };
 }
-
 
 const PERFORMANCE_INSTANCES_PROVIDER = {
   provide: PerformanceInstances,
@@ -31,7 +28,7 @@ const PERFORMANCE_INSTANCES_PROVIDER = {
 
 const DEFAULT_PERFORMANCE_INSTANCE_PROVIDER = {
   provide: Performance,
-  useFactory: ɵdefaultPerformanceInstanceFactory,
+  useFactory: defaultPerformanceInstanceFactory,
   deps: [
     NgZone,
     [new Optional(), PROVIDED_PERFORMANCE_INSTANCES ],
@@ -44,20 +41,20 @@ const DEFAULT_PERFORMANCE_INSTANCE_PROVIDER = {
     PERFORMANCE_INSTANCES_PROVIDER,
   ]
 })
-export class AngularFirePerformanceModule {
+export class PerformanceModule {
 }
 
-export function providePerformance(fn: () => FirebasePerformance): ModuleWithProviders<AngularFirePerformanceModule> {
+export function providePerformance(fn: () => FirebasePerformance): ModuleWithProviders<PerformanceModule> {
   return {
-    ngModule: AngularFirePerformanceModule,
+    ngModule: PerformanceModule,
     providers: [{
       provide: PROVIDED_PERFORMANCE_INSTANCES,
-      useFactory: ɵboundPerformanceInstanceFactory.bind(fn),
+      useFactory: performanceInstanceFactory(fn),
       multi: true,
       deps: [
         NgZone,
         ɵAngularFireSchedulers,
-        [new Optional(), PROVIDED_FIREBASE_APPS ]
+        FirebaseApps,
       ]
     }]
   };

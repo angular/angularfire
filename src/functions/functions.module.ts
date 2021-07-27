@@ -1,24 +1,22 @@
 import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from '@angular/core';
-import { Functions as FirebaseFunctions } from 'firebase/functions';
-
-import { ɵgetDefaultInstanceOf, ɵmemoizeInstance } from '../core';
+import { Functions as FirebaseFunctions, getFunctions } from 'firebase/functions';
+import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers } from '@angular/fire';
 import { Functions, FunctionsInstances, FUNCTIONS_PROVIDER_NAME } from './functions';
-import { PROVIDED_FIREBASE_APPS } from '../app/app.module';
-import { ɵAngularFireSchedulers } from '../zones';
+import { getApp } from 'firebase/app';
+import { FirebaseApps } from '@angular/fire/app';
 
 export const PROVIDED_FUNCTIONS_INSTANCES = new InjectionToken<Functions[]>('angularfire2.functions-instances');
 
-export function ɵdefaultFunctionsInstanceFactory(_: Functions[]) {
-  const defaultAuth = ɵgetDefaultInstanceOf<FirebaseFunctions>(FUNCTIONS_PROVIDER_NAME);
+export function defaultFunctionsInstanceFactory(_: Functions[]) {
+  const defaultAuth = ɵgetDefaultInstanceOf<FirebaseFunctions>(FUNCTIONS_PROVIDER_NAME) || getFunctions(getApp());
   return new Functions(defaultAuth);
 }
 
-// Hack: useFactory doesn't allow us to pass a lambda, so let's bind the arugments
-// Going this direction to cut down on DI token noise; also making it easier to support
-// multiple Firebase Apps
-export function ɵboundFunctionsInstanceFactory(zone: NgZone) {
-  const functions = ɵmemoizeInstance<FirebaseFunctions>(this, zone);
-  return new Functions(functions);
+export function functionsInstanceFactory(fn: () => FirebaseFunctions) {
+  return (zone: NgZone) => {
+    const functions = ɵmemoizeInstance<FirebaseFunctions>(fn, zone);
+    return new Functions(functions);
+  };
 }
 
 const FUNCTIONS_INSTANCES_PROVIDER = {
@@ -30,7 +28,7 @@ const FUNCTIONS_INSTANCES_PROVIDER = {
 
 const DEFAULT_FUNCTIONS_INSTANCE_PROVIDER = {
   provide: Functions,
-  useFactory: ɵdefaultFunctionsInstanceFactory,
+  useFactory: defaultFunctionsInstanceFactory,
   deps: [
     NgZone,
     [new Optional(), PROVIDED_FUNCTIONS_INSTANCES ],
@@ -51,12 +49,12 @@ export function provideFunctions(fn: () => FirebaseFunctions): ModuleWithProvide
     ngModule: FunctionsModule,
     providers: [{
       provide: PROVIDED_FUNCTIONS_INSTANCES,
-      useFactory: ɵboundFunctionsInstanceFactory.bind(fn),
+      useFactory: functionsInstanceFactory(fn),
       multi: true,
       deps: [
         NgZone,
         ɵAngularFireSchedulers,
-        [new Optional(), PROVIDED_FIREBASE_APPS ]
+        FirebaseApps,
       ]
     }]
   };

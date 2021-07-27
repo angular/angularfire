@@ -1,10 +1,9 @@
-import { ApplicationRef, Component, Inject, NgZone, Optional } from '@angular/core';
-import { FirebaseApp, Auth, FirebaseApps, AuthInstances, FunctionsInstances,
-  Functions, FirestoreInstances, Firestore } from '@angular/fire';
-import { authState } from '@angular/fire/auth';
-import { debounceTime, distinct } from 'rxjs/operators';
-import { getApps } from '@firebase/app';
-import { Observable } from 'rxjs';
+import { ApplicationRef, Component, NgZone } from '@angular/core';
+import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
+import { Auth, AuthInstances, authState } from '@angular/fire/auth';
+import { Firestore, FirestoreInstances } from '@angular/fire/firestore';
+import { functionInstance$ } from '@angular/fire/functions';
+import { debounceTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -36,18 +35,16 @@ import { Observable } from 'rxjs';
 export class AppComponent {
   title = 'sample';
   constructor(
-    public app: FirebaseApp,      // default Firebase App
+    public app: FirebaseApp, // default Firebase App
     public auth: Auth, // default Firbase Auth
     public apps: FirebaseApps, // all initialized App instances
     public authInstances: AuthInstances, // all initialized Auth instances
-    public functions: Functions,
-    public functionsInstances: FunctionsInstances,
     public firestore: Firestore,
     public firestoreInstances: FirestoreInstances,
     appRef: ApplicationRef,
     zone: NgZone,
   ) {
-    console.log({app, auth, apps, authInstances, functions, functionsInstances, firestore, firestoreInstances});
+    console.log({app, auth, apps, authInstances, firestore, firestoreInstances });
     // onAuthStateChanged should destablize the zone
     // onAuthStateChanged(auth, it => console.log('onAuthStateChanged', it));
     authState(auth).subscribe(it => console.log('authState', it));
@@ -63,5 +60,6 @@ export class AppComponent {
         functions.getFunctions(app, 'asdf');
       }, 10000);
     });
+    functionInstance$.subscribe(it => console.log('$', it));
   }
 }
