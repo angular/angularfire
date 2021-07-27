@@ -1,14 +1,13 @@
 import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from '@angular/core';
-import { Analytics as FirebaseAnalytics, initializeAnalytics } from 'firebase/analytics';
+import { Analytics as FirebaseAnalytics } from 'firebase/analytics';
 import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers } from '@angular/fire';
 import { Analytics, ANALYTICS_PROVIDER_NAME, AnalyticsInstances } from './analytics';
-import { getApp } from 'firebase/app';
 import { FirebaseApps } from '@angular/fire/app';
 
 export const PROVIDED_ANALYTICS_INSTANCES = new InjectionToken<Analytics[]>('angularfire2.analytics-instances');
 
 export function defaultAnalyticsInstanceFactory(_: Analytics[]) {
-  const defaultAnalytics = ɵgetDefaultInstanceOf<FirebaseAnalytics>(ANALYTICS_PROVIDER_NAME) || initializeAnalytics(getApp());
+  const defaultAnalytics = ɵgetDefaultInstanceOf<FirebaseAnalytics>(ANALYTICS_PROVIDER_NAME);
   return new Analytics(defaultAnalytics);
 }
 

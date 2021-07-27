@@ -1,6 +1,5 @@
 import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from '@angular/core';
-import { FirebaseMessaging, getMessaging } from 'firebase/messaging';
-import { getApp } from 'firebase/app';
+import { FirebaseMessaging } from 'firebase/messaging';
 import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers } from '@angular/fire';
 import { Messaging, MessagingInstances, MESSAGING_PROVIDER_NAME } from './messaging';
 import { FirebaseApps } from '@angular/fire/app';
@@ -8,7 +7,7 @@ import { FirebaseApps } from '@angular/fire/app';
 export const PROVIDED_MESSAGING_INSTANCES = new InjectionToken<Messaging[]>('angularfire2.messaging-instances');
 
 export function defaultMessagingInstanceFactory(_: Messaging[]) {
-  const defaultAuth = ɵgetDefaultInstanceOf<FirebaseMessaging>(MESSAGING_PROVIDER_NAME) || getMessaging(getApp());
+  const defaultAuth = ɵgetDefaultInstanceOf<FirebaseMessaging>(MESSAGING_PROVIDER_NAME);
   return new Messaging(defaultAuth);
 }
 

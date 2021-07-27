@@ -1,15 +1,14 @@
 import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from '@angular/core';
-import { FirebaseFirestore, initializeFirestore } from 'firebase/firestore';
+import { FirebaseFirestore } from 'firebase/firestore';
 import { AuthInstances  } from '@angular/fire/auth';
 import { ɵmemoizeInstance, ɵgetDefaultInstanceOf, ɵAngularFireSchedulers } from '@angular/fire';
 import { Firestore, FirestoreInstances, FIRESTORE_PROVIDER_NAME } from './firestore';
-import { getApp } from 'firebase/app';
 import { FirebaseApps } from '@angular/fire/app';
 
 export const PROVIDED_FIRESTORE_INSTANCES = new InjectionToken<Firestore[]>('angularfire2.firestore-instances');
 
 export function defaultFirestoreInstanceFactory(_: Firestore[]) {
-  const defaultFirestore = ɵgetDefaultInstanceOf<FirebaseFirestore>(FIRESTORE_PROVIDER_NAME) || initializeFirestore(getApp(), {});
+  const defaultFirestore = ɵgetDefaultInstanceOf<FirebaseFirestore>(FIRESTORE_PROVIDER_NAME);
   return new Firestore(defaultFirestore);
 }
 
@@ -19,7 +18,6 @@ export function firestoreInstanceFactory(fn: () => FirebaseFirestore) {
     return new Firestore(firestore);
   };
 }
-
 
 const FIRESTORE_INSTANCES_PROVIDER = {
   provide: FirestoreInstances,

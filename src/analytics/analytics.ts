@@ -1,7 +1,7 @@
 import { Analytics as FirebaseAnalytics } from 'firebase/analytics';
 import { ɵgetAllInstancesOf } from '@angular/fire';
 import { from, timer } from 'rxjs';
-import { concatMap, distinct, switchMap } from 'rxjs/operators';
+import { concatMap, distinct } from 'rxjs/operators';
 
 // see notes in core/firebase.app.module.ts for why we're building the class like this
 // tslint:disable-next-line:no-empty-interface

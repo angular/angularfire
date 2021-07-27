@@ -16,14 +16,7 @@
     ]
   },
   "angularCompilerOptions": {
-    "enableIvy": true,
-    "compilationMode": "partial",
-    "annotateForClosureCompiler": true,
-    "skipTemplateCodegen": true,
-    "strictMetadataEmit": true,
-    "fullTemplateTypeCheck": true,
-    "strictInjectionParameters": true,
-    "enableResourceInlining": true
+    "compilationMode": "partial"
   },
   "exclude": [
     "src/test.ts",

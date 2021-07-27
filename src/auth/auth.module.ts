@@ -1,14 +1,13 @@
 import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from '@angular/core';
-import { Auth as FirebaseAuth, initializeAuth } from 'firebase/auth';
+import { Auth as FirebaseAuth } from 'firebase/auth';
 import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers } from '@angular/fire';
 import { Auth, AuthInstances, AUTH_PROVIDER_NAME } from './auth';
-import { getApp } from 'firebase/app';
 import { FirebaseApps } from '@angular/fire/app';
 
 export const PROVIDED_AUTH_INSTANCES = new InjectionToken<Auth[]>('angularfire2.auth-instances');
 
 export function defaultAuthInstanceFactory() {
-  const defaultAuth = ɵgetDefaultInstanceOf<FirebaseAuth>(AUTH_PROVIDER_NAME) || initializeAuth(getApp());
+  const defaultAuth = ɵgetDefaultInstanceOf<FirebaseAuth>(AUTH_PROVIDER_NAME);
   return new Auth(defaultAuth);
 }
 

@@ -41,6 +41,7 @@
   },
   "defaultProject": "angularfire",
   "cli": {
+	"packageManager": "yarn",
     "analytics": "86795b8f-9036-4a53-929c-a7303453d677"
   }
 }

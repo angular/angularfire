@@ -1,6 +1,5 @@
 import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from '@angular/core';
-import { FirebasePerformance, initializePerformance } from 'firebase/performance';
-import { getApp } from 'firebase/app';
+import { FirebasePerformance } from 'firebase/performance';
 import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers } from '@angular/fire';
 import { Performance, PerformanceInstances, PERFORMANCE_PROVIDER_NAME } from './performance';
 import { FirebaseApps } from '@angular/fire/app';
@@ -8,7 +7,7 @@ import { FirebaseApps } from '@angular/fire/app';
 export const PROVIDED_PERFORMANCE_INSTANCES = new InjectionToken<Performance[]>('angularfire2.performance-instances');
 
 export function defaultPerformanceInstanceFactory(_: Performance[]) {
-  const defaultPerformance = ɵgetDefaultInstanceOf<FirebasePerformance>(PERFORMANCE_PROVIDER_NAME) || initializePerformance(getApp());
+  const defaultPerformance = ɵgetDefaultInstanceOf<FirebasePerformance>(PERFORMANCE_PROVIDER_NAME);
   return new Performance(defaultPerformance);
 }
 
