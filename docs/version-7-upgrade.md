@@ -85,38 +85,83 @@ AngularFire no longer provides observables and functions as class methods, evert
     </thead>
     <tbody>
         <tr>
-            <td rowspan="3">
-                <h4>AngularFirestore</h4>
-                <p><small>Since we no longer inject our own class (and to better support tree-shaking) use the JS SDK methods to get docs/collections.</small></p>
-            </td>
+            <th rowspan="3">AngularFirestore</th>
             <td>doc</td>
-<td>
+            <td rowspan="3">
+                <p><small>Since we no longer inject our own class (and to better support tree-shaking) use the JS SDK methods to get docs/collections.</small></p>
 
 ```ts
-import { doc } from 'firebase/firestore'
+import {
+    doc,
+    collection,
+    collectionGroup,
+} from 'firebase/firestore'
 ```
+
 </td>
         </tr>
         <tr>
             <td>collection</td>
-<td>
-
-```ts
-import { collection } from 'firebase/firestore'
-```
-</td>
         </tr>
         <tr>
             <td>collectionGroup</td>
-<td>
-
-```ts
-import { collectionGroup } from 'firebase/firestore'
-```
-</td>
         </tr>
         <tr>
             <th rowspan="7">AngularFirestoreDocument</th>
+            <td>set</td>
+            <td rowspan="4">
+
+```ts
+import {
+    setDoc,
+    updateDoc,
+    deleteDoc,
+    collection,
+} from 'firebase/firestore'
+```
+
+</td>
+        </tr>
+        <tr>
+            <td>update</td>
+        </tr>
+        <tr>
+            <td>delete</td>
+        </tr>
+        <tr>
+            <td>collection</td>
+        </tr>
+        <tr>
+            <td>snapshotChanges</td>
+            <td rowspan="2">
+
+```ts
+import {
+    snapshotChanges,
+    valueChanges,
+} from '@angular/fire/firestore'
+```
+
+</td>
+        </tr>
+        <tr>
+            <td>valueChanges</td>
+        </tr>
+        <tr>
+            <td>get</td>
+            <td>
+
+```ts
+import { doc } from '@angular/fire/firestore'
+```
+
+</td>
+        </tr>
+        <tr>
+            <td rowspan="7">
+                <h4>AngularFirestoreCollection</h4>
+                <p><small>Notes</small></p>
+            </td>
             <td>a</td>
 <td>
 
