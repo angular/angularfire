@@ -9162,10 +9162,10 @@ run-parallel@^1.1.9:
   dependencies:
     queue-microtask "^1.2.2"
 
-rxfire@6.0.0-canary.cee1afe:
-  version "6.0.0-canary.cee1afe"
-  resolved "https://registry.yarnpkg.com/rxfire/-/rxfire-6.0.0-canary.cee1afe.tgz#212318f2ccc034c25581f079c51f0d952164b4db"
-  integrity sha512-PySJryeUfnuMuYlC8U+X83PIe53G1s+OpQuzjjaMUQ3gc1z6aD4ZEWc/O3LzVQ3ywwO/X4AAO9hv4F0Q3+y79A==
+rxfire@6.0.0-canary.92c6c26:
+  version "6.0.0-canary.92c6c26"
+  resolved "https://registry.yarnpkg.com/rxfire/-/rxfire-6.0.0-canary.92c6c26.tgz#de888ac0ec975eb7860b4cee54aa15df90b9fec0"
+  integrity sha512-zqZZFTCFXqGNRIN/zciPVzylSw3drlkM3mojTZj4GALeUBtMI59/hmAEevbAxBQjNk4eiWj/4vFsPFJtzgT5qA==
   dependencies:
     tslib "^1.9.0 || ~2.1.0"
 

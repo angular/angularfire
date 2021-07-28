@@ -1,7 +1,8 @@
 import { ApplicationRef, Component, NgZone, Optional } from '@angular/core';
 import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
 import { Auth, AuthInstances, authState } from '@angular/fire/auth';
-import { Firestore, FirestoreInstances, firestoreInstance$ } from '@angular/fire/firestore';
+import { Firestore, FirestoreInstances } from '@angular/fire/firestore/lite';
+import { firestoreInstance$ } from '@angular/fire/firestore';
 import { debounceTime } from 'rxjs/operators';
 import { initializeFirestore$ } from './firestore';
 
@@ -39,8 +40,8 @@ export class AppComponent {
     public auth: Auth, // default Firbase Auth
     public apps: FirebaseApps, // all initialized App instances
     public authInstances: AuthInstances, // all initialized Auth instances
-    @Optional() public firestore: Firestore,
-    @Optional() public firestoreInstances: FirestoreInstances,
+    public firestore: Firestore,
+    public firestoreInstances: FirestoreInstances,
     appRef: ApplicationRef,
     zone: NgZone,
   ) {
@@ -49,7 +50,7 @@ export class AppComponent {
     // onAuthStateChanged(auth, it => console.log('onAuthStateChanged', it));
     authState(auth).subscribe(it => console.log('authState', it));
     appRef.isStable.pipe(debounceTime(200)).subscribe(it => console.log('isStable', it));
-    console.log((app as any).container.providers.keys());
+    console.log((app as any).container.providers);
     firestoreInstance$.subscribe(it => console.log('$', it));
     initializeFirestore$.subscribe(it => console.log('init', it));
   }

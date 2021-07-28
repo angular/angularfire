@@ -7,6 +7,8 @@ import { initializeAuth } from 'firebase/auth';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { environment } from '../environments/environment';
+import { provideFirestore } from '@angular/fire/firestore/lite';
+import { getFirestore } from 'firebase/firestore/lite';
 
 @NgModule({
   declarations: [
@@ -22,6 +24,7 @@ import { environment } from '../environments/environment';
       return app;
     }),
     provideAuth(() => initializeAuth(getApp())),
+    provideFirestore(() => getFirestore()),
   ],
   providers: [ ],
   bootstrap: [AppComponent]

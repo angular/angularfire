@@ -6,16 +6,13 @@ import { dirname, join } from 'path';
 import { keys as tsKeys } from 'ts-transformer-keys';
 import firebase from 'firebase/compat/app';
 
-const yada = tsKeys<typeof import('rxfire/database')>();
-const yada2 = tsKeys<typeof import('rxfire/auth')>();
-
 // TODO infer these from the package.json
 const MODULES = [
   'core', 'app', 'compat', 'analytics', 'auth', 'database', 'firestore', 'functions',
   'remote-config', 'storage', 'messaging', 'performance', 'compat/analytics',
   'compat/auth-guard', 'compat/auth', 'compat/database', 'compat/firestore',
   'compat/functions', 'compat/remote-config', 'compat/storage', 'compat/messaging',
-  'compat/performance'
+  'compat/performance', 'firestore/lite',
 ];
 const LAZY_MODULES = ['compat/analytics', 'compat/auth', 'compat/functions', 'compat/messaging', 'compat/remote-config'];
 const UMD_NAMES = MODULES.map(m => m === 'core' ? 'angular-fire' : `angular-fire-${m.replace('/', '-')}`);
@@ -45,6 +42,7 @@ export function ${exportName}(..._: Parameters<Before['${exportName}']>) {
     reexport('remote-config', 'rxfire', 'rxfire/remote-config', tsKeys<typeof import('rxfire/remote-config')>()),
     reexport('storage', 'rxfire', 'rxfire/storage', tsKeys<typeof import('rxfire/storage')>()),
     reexport('performance', 'rxfire', 'rxfire/performance', tsKeys<typeof import('rxfire/performance')>()),
+    reexport('firestore/lite', 'rxfire', 'rxfire/firestore/lite', tsKeys<typeof import('rxfire/firestore/lite')>()),
   ]);
 }
 
