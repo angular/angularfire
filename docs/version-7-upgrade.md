@@ -80,13 +80,16 @@ AngularFire no longer provides observables and functions as class methods, evert
     <thead>
         <tr>
             <th colspan="2">v6 / Compat</th>
-            <th>v7 Modular</th>
+            <th >v7 Modular</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td rowspan="3">AngularFirestore</td>
-            <td>collection</td>
+            <td rowspan="3">
+                <h4>AngularFirestore</h4>
+                <p><small>Since we no longer inject our own class (and to better support tree-shaking) use the JS SDK methods to get docs/collections.</small></p>
+            </td>
+            <td>doc</td>
 <td>
 
 ```ts
@@ -95,12 +98,86 @@ import { doc } from 'firebase/firestore'
 </td>
         </tr>
         <tr>
-            <td>doc</td>
-            <td><code>import { doc } from 'firebase/firestore'</code></td>
+            <td>collection</td>
+<td>
+
+```ts
+import { collection } from 'firebase/firestore'
+```
+</td>
         </tr>
         <tr>
             <td>collectionGroup</td>
-            <td><code>import { doc } from 'firebase/firestore'</code></td>
+<td>
+
+```ts
+import { collectionGroup } from 'firebase/firestore'
+```
+</td>
+        </tr>
+        <tr>
+            <th rowspan="7">AngularFirestoreDocument</th>
+            <td>a</td>
+<td>
+
+```ts
+import { collectionGroup } from 'firebase/firestore'
+```
+</td>
+        </tr>
+        <tr>
+            <td>a</td>
+<td>
+
+```ts
+import { collectionGroup } from 'firebase/firestore'
+```
+</td>
+        </tr>
+        <tr>
+            <td>a</td>
+<td>
+
+```ts
+import { collectionGroup } from 'firebase/firestore'
+```
+</td>
+        </tr>
+        <tr>
+            <td>a</td>
+<td>
+
+```ts
+import { collectionGroup } from 'firebase/firestore'
+```
+</td>
+        </tr>
+        <tr>
+            <td>a</td>
+<td>
+
+```ts
+import { collectionGroup } from 'firebase/firestore'
+```
+</td>
+        </tr>
+        <tr>
+            <td>a</td>
+<td>
+
+```ts
+import { collectionGroup } from 'firebase/firestore'
+```
+</td>
+        </tr>
+        <tr>
+            <td>a</td>
+<td>
+
+```ts
+import { collectionGroup } from 'firebase/firestore'
+```
+</td>
         </tr>
     </tbody>
 </table>
