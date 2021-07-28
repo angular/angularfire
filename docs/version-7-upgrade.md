@@ -87,7 +87,13 @@ AngularFire no longer provides observables and functions as class methods, evert
         <tr>
             <td rowspan="3">AngularFirestore</td>
             <td>collection</td>
-            <td><code class="language-ts">import { collection } from 'firebase/firestore'</code></td>
+            <td>
+
+```ts
+import { doc } from 'firebase/firestore'
+```
+
+            </td>
         </tr>
         <tr>
             <td>doc</td>
