@@ -1,5 +1,5 @@
 import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from '@angular/core';
-import { StorageService as FirebaseStorage } from 'firebase/storage';
+import { FirebaseStorage } from 'firebase/storage';
 import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers } from '@angular/fire';
 import { Storage, StorageInstances, STORAGE_PROVIDER_NAME } from './storage';
 import { FirebaseApps } from '@angular/fire/app';

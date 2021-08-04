@@ -1,4 +1,4 @@
-import { StorageService as FirebaseStorage } from 'firebase/storage';
+import { FirebaseStorage } from 'firebase/storage';
 import { ɵgetAllInstancesOf } from '@angular/fire';
 import { from, timer } from 'rxjs';
 import { concatMap, distinct } from 'rxjs/operators';

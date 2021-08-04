@@ -2,7 +2,7 @@ import {
   InjectionToken, Inject, isDevMode, ModuleWithProviders, NgModule, NgZone, Optional, PLATFORM_ID, VERSION as NG_VERSION, Version
 } from '@angular/core';
 import firebase from 'firebase/compat/app';
-import { FirebaseOptions, FirebaseAppConfig } from 'firebase/app';
+import { FirebaseOptions, FirebaseAppSettings } from 'firebase/app';
 import { VERSION } from '@angular/fire';
 import { FirebaseApp } from './firebase.app';
 
@@ -10,7 +10,7 @@ export const FIREBASE_OPTIONS = new InjectionToken<FirebaseOptions>('angularfire
 export const FIREBASE_APP_NAME = new InjectionToken<string | undefined>('angularfire2.app.name');
 
 
-export function ɵfirebaseAppFactory(options: FirebaseOptions, zone: NgZone, nameOrConfig?: string | FirebaseAppConfig | null) {
+export function ɵfirebaseAppFactory(options: FirebaseOptions, zone: NgZone, nameOrConfig?: string | FirebaseAppSettings | null) {
   const name = typeof nameOrConfig === 'string' && nameOrConfig || '[DEFAULT]';
   const config = typeof nameOrConfig === 'object' && nameOrConfig || {};
   config.name = config.name || name;
@@ -48,7 +48,7 @@ const FIREBASE_APP_PROVIDER = {
   providers: [FIREBASE_APP_PROVIDER]
 })
 export class AngularFireModule {
-  static initializeApp(options: FirebaseOptions, nameOrConfig?: string | FirebaseAppConfig): ModuleWithProviders<AngularFireModule> {
+  static initializeApp(options: FirebaseOptions, nameOrConfig?: string | FirebaseAppSettings): ModuleWithProviders<AngularFireModule> {
     return {
       ngModule: AngularFireModule,
       providers: [

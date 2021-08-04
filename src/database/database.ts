@@ -1,4 +1,4 @@
-import { FirebaseDatabase } from 'firebase/database';
+import { Database as FirebaseDatabase } from 'firebase/database';
 import { ɵgetAllInstancesOf } from '@angular/fire';
 import { from, timer } from 'rxjs';
 import { concatMap, distinct } from 'rxjs/operators';

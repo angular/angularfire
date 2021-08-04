@@ -1,4 +1,4 @@
-import { FirebaseFirestore } from 'firebase/firestore';
+import { Firestore as FirebaseFirestore } from 'firebase/firestore';
 import { ɵgetAllInstancesOf } from '@angular/fire';
 import { from, timer } from 'rxjs';
 import { concatMap, distinct } from 'rxjs/operators';

@@ -1,4 +1,4 @@
-import { FirebaseMessaging } from 'firebase/messaging';
+import { Messaging as FirebaseMessaging } from 'firebase/messaging';
 import { ɵgetAllInstancesOf } from '@angular/fire';
 import { from, timer } from 'rxjs';
 import { concatMap, distinct } from 'rxjs/operators';

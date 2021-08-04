@@ -1,5 +1,5 @@
 import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from '@angular/core';
-import { FirebaseFirestore } from 'firebase/firestore/lite';
+import { Firestore as FirebaseFirestore } from 'firebase/firestore/lite';
 import { AuthInstances  } from '@angular/fire/auth';
 import { ɵmemoizeInstance, ɵgetDefaultInstanceOf, ɵAngularFireSchedulers } from '@angular/fire';
 import { Firestore, FirestoreInstances, FIRESTORE_PROVIDER_NAME } from './lite';

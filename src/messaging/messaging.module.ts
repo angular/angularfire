@@ -1,5 +1,5 @@
 import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from '@angular/core';
-import { FirebaseMessaging } from 'firebase/messaging';
+import { Messaging as FirebaseMessaging } from 'firebase/messaging';
 import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers } from '@angular/fire';
 import { Messaging, MessagingInstances, MESSAGING_PROVIDER_NAME } from './messaging';
 import { FirebaseApps } from '@angular/fire/app';

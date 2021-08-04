@@ -1,5 +1,5 @@
 import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from '@angular/core';
-import { FirebaseDatabase } from 'firebase/database';
+import { Database as FirebaseDatabase } from 'firebase/database';
 
 import { AuthInstances } from '@angular/fire/auth';
 import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers } from '@angular/fire';
