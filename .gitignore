@@ -26,3 +26,4 @@ publish.sh
 # auto-gen files
 src/compat/**/base.ts
 src/**/rxfire.ts
+src/**/firebase.ts
