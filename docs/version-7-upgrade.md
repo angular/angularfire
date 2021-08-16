@@ -2,6 +2,8 @@
 
 Intended to be run with Angular 12, AngularFire 7.0 allows you to take full advtange of the new tree-shakable Firebase JS SDK (v9) while also providing a compatible expirience with the prior API.
 
+`ng update @angular/fire --next`
+
 ## Compatibility mode
 
 AngularFire v7.0 has a compatibility layer that supports the AngularFire v6.0 API. Just change your imports from `@angular/fire/*` to `@angular/fire/compat/*` and `firebase/*` to `firebase/compat/*`.
@@ -19,11 +21,10 @@ In order to better support the tree-shakability introduced in Firebase v9 & to r
 @NgModule({
     imports: [
         AngularFire.initalizeApp(config),
-        AngularFirestoreModule.enablePersistence({ synchronizeTabs: true }),
+        AngularFirestoreModule.enablePersistence(),
         AngularFireStorageModule,
     ],
     providers: [
-        { provide: SETTINGS, useValue: { ignoreUndefinedProperties: true } },
         { provide: USE_EMULATOR, useValue: ['localhost', 8080] },
     ],
 })
@@ -42,9 +43,6 @@ In order to better support the tree-shakability introduced in Firebase v9 & to r
         }),
         provideStorage(() => getStorage()),
     ],
-    providers: [
-        { provide: FIRESTORE_SETTINGS, useValue: { ignoreUndefinedProperties: true } },
-    ],
 })
 ```
 
@@ -54,8 +52,7 @@ Before when you injected Firebase JS SDK services into AngularFire they would be
 
 ```ts
 import { FirebaseApp } from '@angular/fire';
-import { Firestore } from '@angular/fire/firestore';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { Firestore, doc, onSnapshot } from '@angular/fire/firestore';
 
 @Component({})
 export class Foo {
@@ -63,8 +60,8 @@ export class Foo {
         app: FirebaseApp,
         firestore: Firestore, // Injects the instantiated Firestore instance
     ) {
-        // You can directly operate on the instance with the JS SDK
-        // NOTE: you will have to handle change-detection yourself
+        // You can directly operate on the instance with the JS SDK or use our "reexported"
+        // API calls for Zone.js wrapping
         onSnapshot(doc(firestore, 'foo/1'), snap => {
             // ...
         });
@@ -80,79 +77,103 @@ AngularFire no longer provides observables and functions as class methods, evert
     <thead>
         <tr>
             <th colspan="2">v6 / Compat</th>
-            <th >v7 Modular</th>
+            <th>v7 Modular</th>
         </tr>
     </thead>
     <tbody>
         <tr>
             <th rowspan="3">AngularFirestore</th>
             <td>doc</td>
-            <td rowspan="3">
-                <p><small>Since we no longer inject our own class (and to better support tree-shaking) use the JS SDK methods to get docs/collections.</small></p>
+            <td>
 
 ```ts
-import {
-    doc,
-    collection,
-    collectionGroup,
-} from 'firebase/firestore'
+import { doc } from '@angular/fire/firestore'
 ```
-
 </td>
         </tr>
         <tr>
             <td>collection</td>
+            <td>
+
+```ts
+import { collection } from '@angular/fire/firestore'
+```
+</td>
         </tr>
         <tr>
             <td>collectionGroup</td>
+            <td>
+
+```ts
+import { collectionGroup } from '@angular/fire/firestore'
+```
+</td>
         </tr>
         <tr>
             <th rowspan="7">AngularFirestoreDocument</th>
             <td>set</td>
-            <td rowspan="4">
+            <td>
 
 ```ts
-import {
-    setDoc,
-    updateDoc,
-    deleteDoc,
-    collection,
-} from 'firebase/firestore'
+import { setDoc } from '@angular/fire/firestore'
 ```
+</td>
 
 </td>
         </tr>
         <tr>
             <td>update</td>
+            <td>
+
+```ts
+import { updateDoc } from '@angular/fire/firestore'
+```
+</td>
         </tr>
         <tr>
             <td>delete</td>
+            <td>
+
+```ts
+import { deleteDoc } from '@angular/fire/firestore'
+```
+</td>
         </tr>
         <tr>
             <td>collection</td>
+            <td>
+
+```ts
+import { collection } from '@angular/fire/firestore'
+```
+</td>
         </tr>
         <tr>
             <td>snapshotChanges</td>
-            <td rowspan="2">
+            <td>
 
 ```ts
-import {
-    snapshotChanges,
-    valueChanges,
-} from '@angular/fire/firestore'
+import { docSnapshots } from '@angular/fire/firestore'
 ```
+</td>
 
 </td>
         </tr>
         <tr>
             <td>valueChanges</td>
+            <td>
+
+```ts
+import { docData } from '@angular/fire/firestore'
+```
+</td>
         </tr>
         <tr>
             <td>get</td>
             <td>
 
 ```ts
-import { doc } from '@angular/fire/firestore'
+import { get } from '@angular/fire/firestore'
 ```
 
 </td>
@@ -233,8 +254,12 @@ AngularFire does not lazy-load services any longer. We have provided a helper ob
 
 ```ts
 // firestore_operations.ts
-import { collection, getFirestore } from 'firebase/firestore';
-import { collectionData, firestoreInstance$ } from '@angular/fire/firestore';
+import {
+    collectionData,
+    firestoreInstance$,
+    collection,
+    getFirestore
+} from '@angular/fire/firestore';
 import { first } from 'rxjs/operators';
 
 export { getFirestore };
@@ -284,9 +309,6 @@ In AngularFire v7 working with multiple instances was difficult, in the new SDK 
         provideStorage(() => getStorage(getApp())),
         provideStorage(() => getStorage(getApp(), 'another bucket')),
         provideStorage(() => getStorage(getApp('anotherApp'))),
-    ],
-    providers: [
-        { provide: FIRESTORE_SETTINGS, useValue: { ignoreUndefinedProperties: true } },
     ],
 })
 ```

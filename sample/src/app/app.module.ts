@@ -1,9 +1,8 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { provideFirebaseApp } from '@angular/fire/app';
-import { provideAuth } from '@angular/fire/auth';
-import { initializeApp, getApp } from 'firebase/app';
-import { initializeAuth } from 'firebase/auth';
+import { provideFirebaseApp, getApp } from '@angular/fire/app';
+import { provideAuth, initializeAuth } from '@angular/fire/auth';
+import { initializeApp } from 'firebase/app';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { environment } from '../environments/environment';
