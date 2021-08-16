@@ -34,16 +34,22 @@ export const ngUpdate = (): Rule => (
     overwriteIfExists(host, 'package.json', stringifyFormatted(packageJson));
 
     host.visit(filePath => {
-        if (!filePath.endsWith('.ts')) {
+        if (
+            !filePath.endsWith('.ts') ||
+            filePath.endsWith('.d.ts') ||
+            filePath.startsWith('/node_modules')
+        ) {
             return;
         }
-        const content = host.read(filePath);
+        const content = host.read(filePath)?.toString();
         if (!content) {
             return;
         }
-        // rewrite imports from `@angular/fire/*` to `@angular/fire/compat/*`
-        // rewrite imports from `firebase/*` to `firebase/compat/*`
-        // rewrite imports from `@firebase/*` to `@firebase/compat/*`
+        // TODO clean this up
+        content.replace(/(?<key>import|export)\s+(?:(?<alias>[\w,{}\s\*]+)\s+from)?\s*(?:(["'])?firebase\/(?<ref>[@\w\s\\\/.-]+)\3?)\s*;/, "$1 $2 from $3firebase/compat/$4$3;");
+        content.replace(/(?<key>import|export)\s+(?:(?<alias>[\w,{}\s\*]+)\s+from)?\s*(?:(["'])?@firebase\/(?<ref>[@\w\s\\\/.-]+)\3?)\s*;/, "$1 $2 from $3@firebase/compat/$4$3;");
+        content.replace(/(?<key>import|export)\s+(?:(?<alias>[\w,{}\s\*]+)\s+from)?\s*(?:(["'])?@angular\/fire\/(?<ref>[@\w\s\\\/.-]+)\3?)\s*;/, "$1 $2 from $3@angular/fire/compat/$4$3;");
+        host.overwrite(filePath, content);
         console.log(filePath);
     });
 
