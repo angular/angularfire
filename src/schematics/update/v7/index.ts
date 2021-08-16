@@ -46,9 +46,9 @@ export const ngUpdate = (): Rule => (
             return;
         }
         // TODO clean this up
-        content.replace(/(?<key>import|export)\s+(?:(?<alias>[\w,{}\s\*]+)\s+from)?\s*(?:(["'])?firebase\/(?<ref>[@\w\s\\\/.-]+)\3?)\s*;/, "$1 $2 from $3firebase/compat/$4$3;");
-        content.replace(/(?<key>import|export)\s+(?:(?<alias>[\w,{}\s\*]+)\s+from)?\s*(?:(["'])?@firebase\/(?<ref>[@\w\s\\\/.-]+)\3?)\s*;/, "$1 $2 from $3@firebase/compat/$4$3;");
-        content.replace(/(?<key>import|export)\s+(?:(?<alias>[\w,{}\s\*]+)\s+from)?\s*(?:(["'])?@angular\/fire\/(?<ref>[@\w\s\\\/.-]+)\3?)\s*;/, "$1 $2 from $3@angular/fire/compat/$4$3;");
+        content.replace(/(?<key>import|export)\s+(?:(?<alias>[\w,{}\s\*]+)\s+from)?\s*(?:(["'])?firebase\/(?<ref>[@\w\s\\\/.-]+)\3?)\s*;/, '$1 $2 from $3firebase/compat/$4$3;');
+        content.replace(/(?<key>import|export)\s+(?:(?<alias>[\w,{}\s\*]+)\s+from)?\s*(?:(["'])?@firebase\/(?<ref>[@\w\s\\\/.-]+)\3?)\s*;/, '$1 $2 from $3@firebase/compat/$4$3;');
+        content.replace(/(?<key>import|export)\s+(?:(?<alias>[\w,{}\s\*]+)\s+from)?\s*(?:(["'])?@angular\/fire\/(?<ref>[@\w\s\\\/.-]+)\3?)\s*;/, '$1 $2 from $3@angular/fire/compat/$4$3;');
         host.overwrite(filePath, content);
         console.log(filePath);
     });
