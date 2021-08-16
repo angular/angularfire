@@ -1,6 +1,5 @@
 import { Rule, SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
-import { overwriteIfExists, safeReadJSON, stringifyFormatted } from 'src/schematics/ng-add-common';
-
+import { overwriteIfExists, safeReadJSON, stringifyFormatted } from '../../ng-add-common';
 import { default as defaultDependencies, firebaseFunctions } from '../../versions.json';
 
 export const ngUpdate = (): Rule => (
@@ -25,9 +24,9 @@ export const ngUpdate = (): Rule => (
     // TODO test if it's a SSR project in the JSON
     Object.keys(firebaseFunctions).forEach(depName => {
         const dep = firebaseFunctions[depName];
-        if (dep.dev) {
+        if (dep.dev && packageJson.devDependencies[depName]) {
             packageJson.devDependencies[depName] = dep.version;
-        } else {
+        } else if (packageJson.dependencies[depName]) {
             packageJson.dependencies[depName] = dep.version;
         }
     });
