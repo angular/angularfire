@@ -216,10 +216,10 @@
   dependencies:
     tslib "^2.2.0"
 
-"@angular/fire@7.0.0-canary.6fb0f6d":
-  version "7.0.0-canary.6fb0f6d"
-  resolved "https://registry.yarnpkg.com/@angular/fire/-/fire-7.0.0-canary.6fb0f6d.tgz#04d8871d84e5d4a9ddda39640c153709f62e4b76"
-  integrity sha512-X4V6VY5wKIQSig65OWDF6TCUWHs2/gcSz4jOmCz2wYLBob4RA0K4OWnvApMpbEntoh0TuTWWlqZgYFQ26t18Rw==
+"@angular/fire@7.0.0-canary.32f57c2":
+  version "7.0.0-canary.32f57c2"
+  resolved "https://registry.yarnpkg.com/@angular/fire/-/fire-7.0.0-canary.32f57c2.tgz#f22a08f8ab74968cf1d7ad3899c8172b58be6225"
+  integrity sha512-LniVulI209Z8GLa0rgrr43kJYW6dDIcaxhlRpq8/sv4x2eOKbwDGqnrnDPZkGwLbp7F19B61hLyMSO5aA7+IpA==
   dependencies:
     tslib "^2.0.0"
 
