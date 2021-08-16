@@ -3,7 +3,8 @@
   "ngPackage": {
     "lib": {
       "umdModuleIds": {
-        "rxfire/analytics": "rxfire-analytics"
+        "rxfire/analytics": "rxfire-analytics",
+        "firebase/analytics": "firebase-analytics"
       },
       "entryFile": "public_api.ts"
     }

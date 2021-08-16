@@ -1,0 +1,10 @@
+{
+  "$schema": "../../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "builders": {
+    "deploy": {
+      "implementation": "./deploy/builder",
+      "schema": "./deploy/schema.json",
+      "description": "Deploy builder"
+    }
+  }
+}

@@ -168,8 +168,9 @@ function spawnPromise(command: string, args: string[]) {
 async function compileSchematics() {
   await spawnPromise(`npx`, ['tsc', '-p', src('schematics', 'tsconfig.json')]);
   return Promise.all([
-    copy(src('builders.json'), dest('builders.json')),
-    copy(src('collection.json'), dest('collection.json')),
+    copy(src('schematics', 'builders.json'), dest('schematics', 'builders.json')),
+    copy(src('schematics', 'collection.json'), dest('schematics', 'collection.json')),
+    copy(src('schematics', 'migration.json'), dest('schematics', 'migration.json')),
     copy(src('schematics', 'deploy', 'schema.json'), dest('schematics', 'deploy', 'schema.json')),
     replaceSchematicVersions()
   ]);

@@ -3,7 +3,8 @@
   "ngPackage": {
     "lib": {
       "umdModuleIds": {
-        "rxfire/firestore": "rxfire-firestore"
+        "rxfire/firestore": "rxfire-firestore",
+        "firebase/firestore": "firebase-firestore"
       },
       "entryFile": "public_api.ts"
     }

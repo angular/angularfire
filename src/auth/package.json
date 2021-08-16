@@ -3,7 +3,8 @@
   "ngPackage": {
     "lib": {
       "umdModuleIds": {
-        "rxfire/auth": "rxfire-auth"
+        "rxfire/auth": "rxfire-auth",
+        "firebase/auth": "firebase-auth"
       },
       "entryFile": "public_api.ts"
     }

@@ -1,0 +1,15 @@
+{
+    "$schema": "../../node_modules/@angular-devkit/schematics/collection-schema.json",
+    "schematics": {
+        "migration-v7": {
+            "version": "7.0.0",
+            "description": "Update @angular/fire to v7",
+            "factory": "./update/v7/index#ngUpdate"
+        },
+        "ng-post-upgate": {
+            "description": "Print out results after ng-update",
+            "factory": "./public-api#ngPostUpdate",
+            "private": true
+        }
+    }
+}

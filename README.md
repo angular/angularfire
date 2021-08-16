@@ -24,9 +24,8 @@ AngularFire smooths over the rough edges an Angular developer might encounter wh
 
 ```ts
 import { Component } from '@angular/core';
-import { Firestore, collectionData } from '@angular/fire/firestore';
+import { Firestore, collectionData, collection } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
-import { collection } from 'firebase/firestore';
 
 interface Item {
   id: string,

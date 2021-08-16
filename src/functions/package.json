@@ -3,7 +3,8 @@
   "ngPackage": {
     "lib": {
       "umdModuleIds": {
-        "rxfire/functions": "rxfire-functions"
+        "rxfire/functions": "rxfire-functions",
+        "firebase/functions": "firebase-functions"
       },
       "entryFile": "public_api.ts"
     }
