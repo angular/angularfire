@@ -179,7 +179,7 @@ import { mergeMap } from 'rxjs/operators';
 @Component({
   selector: 'app-root',
   template: `
-  <button (click)="deleteMyToken()">
+  <button (click)="deleteToken()">
     Delete my token
   </button>
   `
