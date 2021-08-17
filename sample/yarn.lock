@@ -216,10 +216,8 @@
   dependencies:
     tslib "^2.2.0"
 
-"@angular/fire@7.0.0-alpha.3":
-  version "7.0.0-alpha.3"
-  resolved "https://registry.yarnpkg.com/@angular/fire/-/fire-7.0.0-alpha.3.tgz#d3b7c2414ffbc2ffbda6bb7c4f2bdf0779a40ce2"
-  integrity sha512-5S8olqo33OGNOn9/3fKQixHQBFUjNU3FelkC0ScBbMCjHC/nYoUukYLBWDhu/MwNX2RnfujFuMGUb41NPN9OFw==
+"@angular/fire@../dist/packages-dist":
+  version "7.0.0"
   dependencies:
     tslib "^2.0.0"
 

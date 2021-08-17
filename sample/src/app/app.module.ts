@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { provideFirebaseApp, getApp } from '@angular/fire/app';
+import { provideFirebaseApp, getApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, initializeAuth } from '@angular/fire/auth';
-import { initializeApp } from 'firebase/app';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { environment } from '../environments/environment';
+import { provideFirestore, getFirestore } from '@angular/fire/firestore/lite';
 
 @NgModule({
   declarations: [
@@ -21,6 +21,7 @@ import { environment } from '../environments/environment';
       return app;
     }),
     provideAuth(() => initializeAuth(getApp())),
+    provideFirestore(() => getFirestore()),
   ],
   providers: [ ],
   bootstrap: [AppComponent]

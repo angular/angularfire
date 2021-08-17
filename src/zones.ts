@@ -130,16 +130,18 @@ const zoneWrapFn = (it: (...args: any[]) => any) => {
   };
 };
 
-export const ɵzoneWrap = <T= Observable<any>|number>(it: (..._: any[]) => T, args: IArguments): T => {
-  for (let i = 0; i < args.length; i++) {
-    if (typeof args[i] === 'function') {
-      args[i] = zoneWrapFn(args[i]);
+export const ɵzoneWrap = <T= unknown>(it: T): T => {
+  return function() {
+    for (let i = 0; i < arguments.length; i++) {
+      if (typeof arguments[i] === 'function') {
+        arguments[i] = zoneWrapFn(arguments[i]);
+      }
     }
-  }
-  const ret = runOutsideAngular(() => it.apply(this, args));
-  if (ret instanceof Observable) {
-    return ret.pipe(keepUnstableUntilFirst) as any;
-  } else {
-    return run(() => ret);
-  }
+    const ret = runOutsideAngular(() => (it as any).apply(this, arguments));
+    if (ret instanceof Observable) {
+      return ret.pipe(keepUnstableUntilFirst) as any;
+    } else {
+      return run(() => ret);
+    }
+  } as any;
 };

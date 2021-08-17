@@ -4,6 +4,13 @@ Intended to be run with Angular 12, AngularFire 7.0 allows you to take full advt
 
 `ng update @angular/fire --next`
 
+## Breaking changes
+
+* Angular 12 is required
+* AngularFire now only works in Ivy applications
+* Firebase JS SDK v9 is required
+* The AngularFire v6 API surface has moved from `@angular/fire/*` to `@angular/fire/compat/*` (see compatibility mode)
+
 ## Compatibility mode
 
 AngularFire v7.0 has a compatibility layer that supports the AngularFire v6.0 API. Just change your imports from `@angular/fire/*` to `@angular/fire/compat/*` and `firebase/*` to `firebase/compat/*`.

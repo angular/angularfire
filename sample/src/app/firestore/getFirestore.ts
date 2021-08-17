@@ -1,1 +1,1 @@
-export { getFirestore } from 'firebase/firestore';
+export { getFirestore } from '@angular/fire/firestore';
