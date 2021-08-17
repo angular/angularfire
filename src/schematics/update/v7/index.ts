@@ -68,7 +68,7 @@ export const ngUpdate = (): Rule => (
             return substring;
         });
         if (content !== newContent) {
-            host.overwrite(filePath, content);
+            overwriteIfExists(host, filePath, newContent);
         }
     });
 
