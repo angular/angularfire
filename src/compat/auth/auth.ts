@@ -91,7 +91,9 @@ export class AngularFireAuth {
             auth.useDeviceLanguage();
           }
           if (settings) {
-            auth.settings = settings;
+            for (const [k, v] of Object.entries(settings)) {
+              auth.settings[k] = v;
+            }
           }
           if (persistence) {
             auth.setPersistence(persistence);
