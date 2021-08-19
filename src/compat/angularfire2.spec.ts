@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { CompilerFactory, NgModule, NgZone, PlatformRef } from '@angular/core';
-import { AngularFireModule, FirebaseApp, ɵZoneScheduler } from '@angular/fire/compat';
+import { AngularFireModule, FirebaseApp } from '@angular/fire/compat';
 import { Observable, of, Subject } from 'rxjs';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../utils';
@@ -8,7 +8,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import firebase from 'firebase/compat/app';
 import { tap } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
-import { ɵAngularFireSchedulers, keepUnstableUntilFirst } from '@angular/fire';
+import { ɵAngularFireSchedulers, keepUnstableUntilFirst, ɵZoneScheduler } from '@angular/fire';
 
 describe('angularfire', () => {
   let app: FirebaseApp;
