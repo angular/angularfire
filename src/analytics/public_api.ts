@@ -1,4 +1,3 @@
-export * from './analytics';
-export * from './analytics.module';
-export * from './screen-tracking.service';
-export * from './user-tracking.service';
+export { Analytics, AnalyticsInstances, analyticInstance$ } from './analytics';
+export { provideAnalytics, AnalyticsModule } from './analytics.module';
+export * from './firebase';

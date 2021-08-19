@@ -17,7 +17,7 @@ Replace your  `/src/app/app.component.ts` from previous step to look like below.
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireDatabase } from '@angular/fire/database';
+import { AngularFireDatabase } from '@angular/fire/compat/database';
 
 @Component({
   selector: 'app-root',
@@ -50,7 +50,7 @@ Update `/src/app/app.component.ts` to import `AngularFireList` from `@angular/fi
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireDatabase } from '@angular/fire/database';
+import { AngularFireDatabase } from '@angular/fire/compat/database';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -206,7 +206,7 @@ itemsRef.remove();
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireDatabase, AngularFireList } from '@angular/fire/database';
+import { AngularFireDatabase, AngularFireList } from '@angular/fire/compat/database';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
