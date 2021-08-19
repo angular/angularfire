@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { CompilerFactory, NgModule, NgZone, PlatformRef } from '@angular/core';
-import { AngularFireModule, FirebaseApp, ɵAngularFireSchedulers, ɵkeepUnstableUntilFirstFactory, ɵZoneScheduler } from '@angular/fire/compat';
+import { AngularFireModule, FirebaseApp, ɵZoneScheduler } from '@angular/fire/compat';
 import { Observable, of, Subject } from 'rxjs';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../utils';
@@ -8,6 +8,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import firebase from 'firebase/compat/app';
 import { tap } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
+import { ɵAngularFireSchedulers, keepUnstableUntilFirst } from '@angular/fire';
 
 describe('angularfire', () => {
   let app: FirebaseApp;
@@ -115,11 +116,10 @@ describe('angularfire', () => {
     });
 
     it('should re-schedule emissions asynchronously', done => {
-      const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(schedulers);
 
       let ran = false;
       of(null).pipe(
-        keepUnstableOp,
+        keepUnstableUntilFirst,
         tap(() => ran = true)
       ).subscribe(() => {
         expect(ran).toEqual(true);
@@ -131,14 +131,12 @@ describe('angularfire', () => {
 
     it(`should subscribe outside angular and observe inside angular`, done => {
 
-      const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(schedulers);
-
       insideZone.run(() => {
         new Observable(s => {
           expect(Zone.current).toEqual(outsideZone);
           s.next('test');
         }).pipe(
-          keepUnstableOp,
+          keepUnstableUntilFirst,
           tap(() => {
             expect(Zone.current).toEqual(insideZone);
           })
@@ -169,11 +167,10 @@ describe('angularfire', () => {
           outsideAngular: new ɵZoneScheduler(outsideZone, testScheduler),
           insideAngular: new ɵZoneScheduler(insideZone, testScheduler)
         };
-        const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(trackingSchedulers);
 
         const s = new Subject();
         s.pipe(
-          keepUnstableOp
+          keepUnstableUntilFirst
         ).subscribe(() => {
         }, err => {
           fail(err);
