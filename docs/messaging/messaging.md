@@ -20,8 +20,8 @@ Push Notifications for AngularFire are contained in the `@angular/fire/messaging
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
-import { AngularFireModule } from '@angular/fire';
-import { AngularFireMessagingModule } from '@angular/fire/messaging';
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFireMessagingModule } from '@angular/fire/compat/messaging';
 import { environment } from '../environments/environment';
 
 @NgModule({
@@ -85,7 +85,7 @@ Once you have the Firebase Messaging Service Worker set up and installed, you ne
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireMessaging } from '@angular/fire/messaging';
+import { AngularFireMessaging } from '@angular/fire/compat/messaging';
 
 @Component({
   selector: 'app-root',
@@ -111,7 +111,7 @@ Once you have the permission of the user, you need their token. You can do this 
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireMessaging } from '@angular/fire/messaging';
+import { AngularFireMessaging } from '@angular/fire/compat/messaging';
 import { mergeMapTo } from 'rxjs/operators';
 
 @Component({
@@ -143,7 +143,7 @@ An easier way of requesting permission and getting tokens is with the `requestTo
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireMessaging } from '@angular/fire/messaging';
+import { AngularFireMessaging } from '@angular/fire/compat/messaging';
 
 @Component({
   selector: 'app-root',
@@ -173,7 +173,7 @@ Need to delete a user's token? Not a problem.
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireMessaging } from '@angular/fire/messaging';
+import { AngularFireMessaging } from '@angular/fire/compat/messaging';
 import { mergeMap } from 'rxjs/operators';
 
 @Component({
@@ -204,7 +204,7 @@ Once you have a user's token and they are subscribed, you can listen to messages
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireMessaging } from '@angular/fire/messaging';
+import { AngularFireMessaging } from '@angular/fire/compat/messaging';
 
 @Component({
   selector: 'app-root',

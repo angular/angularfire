@@ -10,8 +10,8 @@ Cloud Storage for AngularFire is contained in the `@angular/fire/storage` module
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
-import { AngularFireModule } from '@angular/fire';
-import { AngularFireStorageModule } from '@angular/fire/storage';
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFireStorageModule } from '@angular/fire/compat/storage';
 import { environment } from '../environments/environment';
 
 @NgModule({
@@ -29,7 +29,7 @@ export class AppModule {}
 The `BUCKET` injection token can be used to customise the storage bucket.
 
 ```ts
-import {AngularFireStorageModule, BUCKET } from '@angular/fire/storage';
+import {AngularFireStorageModule, BUCKET } from '@angular/fire/compat/storage';
 
 @NgModule({
   providers: [
@@ -46,7 +46,7 @@ Once the `AngularFireStorageModule` is registered you can inject the `AngularFir
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireStorage } from '@angular/fire/storage';
+import { AngularFireStorage } from '@angular/fire/compat/storage';
 
 @Component({
   selector: 'app-component',
@@ -74,7 +74,7 @@ There are three options for uploading files.
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireStorage } from '@angular/fire/storage';
+import { AngularFireStorage } from '@angular/fire/compat/storage';
 
 @Component({
   selector: 'app-root',
@@ -97,7 +97,7 @@ export class AppComponent {
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireStorage } from '@angular/fire/storage';
+import { AngularFireStorage } from '@angular/fire/compat/storage';
 
 @Component({
   selector: 'app-root',
@@ -120,7 +120,7 @@ export class AppComponent {
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireStorage } from '@angular/fire/storage';
+import { AngularFireStorage } from '@angular/fire/compat/storage';
 
 @Component({
   selector: 'app-root',

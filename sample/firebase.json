@@ -2,7 +2,7 @@
   "hosting": [
     {
       "target": "sample",
-      "public": "dist/sample/dist/sample/browser",
+      "public": "dist/sample",
       "ignore": [
         "**/.*"
       ],
@@ -20,32 +20,9 @@
       "rewrites": [
         {
           "source": "**",
-          "function": "ssr"
+          "destination": "/index.html"
         }
       ]
     }
-  ],
-  "functions": {
-    "source": "dist/sample"
-  },
-  "emulators": {
-    "functions": {
-      "port": 5001
-    },
-    "firestore": {
-      "port": 8080
-    },
-    "database": {
-      "port": 9000
-    },
-    "hosting": {
-      "port": 5000
-    },
-    "auth": {
-      "port": 9099
-    },
-    "ui": {
-      "enabled": true
-    }
-  }
+  ]
 }
