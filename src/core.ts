@@ -54,8 +54,13 @@ function matchDep(a: any, b: any) {
 }
 
 export function ɵgetDefaultInstanceOf<T= unknown>(identifier: string): T|undefined  {
-  const defaultApp = getApp();
-  return ɵgetAllInstancesOf<T>(identifier, defaultApp)[0];
+  const defaultApp: FirebaseAppWithContainer = getApp() as any;
+  const provider = defaultApp.container.getProvider(identifier as never);
+  if (provider.isInitialized()) {
+    return provider.getImmediate();
+  } else {
+    return undefined;
+  }
 }
 
 export const ɵgetAllInstancesOf = <T= unknown>(identifier: string, app?: FirebaseApp): Array<T> => {
@@ -63,11 +68,13 @@ export const ɵgetAllInstancesOf = <T= unknown>(identifier: string, app?: Fireba
   const instances: Array<any> = [];
   apps.forEach((app: FirebaseAppWithContainer) => {
     const provider: any = app.container.getProvider(identifier as never);
-    provider.instances.forEach((instance: any) => {
-      if (!instances.includes(instance)) {
-        instances.push(instance);
-      }
-    });
+    if (provider.isInitialized()) {
+      provider.instances.forEach((instance: any) => {
+        if (!instances.includes(instance)) {
+          instances.push(instance);
+        }
+      });
+    }
   });
   return instances;
 };
