@@ -13,7 +13,7 @@ export class Database {
   }
 }
 
-export const DATABASE_PROVIDER_NAME = 'database';
+export const DATABASE_PROVIDER_NAME = 'database-exp';
 
 // tslint:disable-next-line:no-empty-interface
 export interface DatabaseInstances extends Array<FirebaseDatabase> {}

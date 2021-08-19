@@ -13,7 +13,7 @@ export class Firestore {
   }
 }
 
-export const FIRESTORE_PROVIDER_NAME = 'firestore';
+export const FIRESTORE_PROVIDER_NAME = 'firestore-exp';
 
 // tslint:disable-next-line:no-empty-interface
 export interface FirestoreInstances extends Array<FirebaseFirestore> {}

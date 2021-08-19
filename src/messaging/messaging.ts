@@ -13,7 +13,7 @@ export class Messaging {
   }
 }
 
-export const MESSAGING_PROVIDER_NAME = 'messaging';
+export const MESSAGING_PROVIDER_NAME = 'messaging-exp';
 
 // tslint:disable-next-line:no-empty-interface
 export interface MessagingInstances extends Array<FirebaseMessaging> {}

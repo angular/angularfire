@@ -13,7 +13,7 @@ export class Analytics {
   }
 }
 
-export const ANALYTICS_PROVIDER_NAME = 'analytics';
+export const ANALYTICS_PROVIDER_NAME = 'analytics-exp';
 
 // tslint:disable-next-line:no-empty-interface
 export interface AnalyticsInstances extends Array<FirebaseAnalytics> {}

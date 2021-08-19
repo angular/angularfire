@@ -13,7 +13,7 @@ export class Performance {
   }
 }
 
-export const PERFORMANCE_PROVIDER_NAME = 'performance';
+export const PERFORMANCE_PROVIDER_NAME = 'performance-exp';
 
 // tslint:disable-next-line:no-empty-interface
 export interface PerformanceInstances extends Array<FirebasePerformance> {}
