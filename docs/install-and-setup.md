@@ -13,7 +13,7 @@ The Angular CLI's `new` command will set up the latest Angular build in a new pr
 ### 2. Install AngularFire and Firebase
 
 ```bash
-ng add @angular/fire
+ng add @angular/fire@next
 ```
 
 Now that you have a new project setup, install AngularFire and Firebase from npm.

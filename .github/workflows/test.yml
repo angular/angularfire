@@ -158,61 +158,61 @@ jobs:
           mv angularfire-${{ github.run_id }} dist
           yarn test:${{ matrix.browser }}-headless
 
-  safari:
-    runs-on: macos-latest
-    needs: build
-    name: Test firebase@${{ matrix.firebase }} on safari
-    strategy:
-      matrix:
-        firebase: ["beta"]
-      fail-fast: false
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup node
-        uses: actions/setup-node@v2-beta
-        with:
-          node-version: '14'
-          check-latest: true
-      - name: node_modules cache
-        id: node_modules_cache
-        uses: actions/cache@v2
-        with:
-          path: ./node_modules
-          key: ${{ runner.os }}-14-${{ matrix.firebase }}-node_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-14-${{ matrix.firebase }}-node_modules-
-            ${{ runner.os }}-14-node_modules-
-      - name: Yarn offline cache
-        if: steps.node_modules_cache.outputs.cache-hit != 'true'
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm-packages-offline-cache
-          key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: yarn-offline
-      - name: Install deps
-        if: steps.node_modules_cache.outputs.cache-hit != 'true'
-        run: |
-          yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
-          yarn install --frozen-lockfile --prefer-offline
-          yarn add firebase@${{ matrix.firebase }} --prefer-offline
-      - name: Firebase emulator cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/firebase/emulators
-          key: firebase_emulators
-      - name: 'Download Artifacts'
-        uses: actions/download-artifact@v2
-      - name: Run tests
-        run: |
-          mv angularfire-${{ github.run_id }} dist
-          yarn test:safari
+#  safari:
+#    runs-on: macos-latest
+#    needs: build
+#    name: Test firebase@${{ matrix.firebase }} on safari
+#    strategy:
+#      matrix:
+#        firebase: ["beta"]
+#      fail-fast: false
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v2
+#      - name: Setup node
+#        uses: actions/setup-node@v2-beta
+#        with:
+#          node-version: '14'
+#          check-latest: true
+#      - name: node_modules cache
+#        id: node_modules_cache
+#        uses: actions/cache@v2
+#        with:
+#          path: ./node_modules
+#          key: ${{ runner.os }}-14-${{ matrix.firebase }}-node_modules-${{ hashFiles('yarn.lock') }}
+#          restore-keys: |
+#            ${{ runner.os }}-14-${{ matrix.firebase }}-node_modules-
+#            ${{ runner.os }}-14-node_modules-
+#      - name: Yarn offline cache
+#        if: steps.node_modules_cache.outputs.cache-hit != 'true'
+#        uses: actions/cache@v2
+#        with:
+#          path: ~/.npm-packages-offline-cache
+#          key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
+#          restore-keys: yarn-offline
+#      - name: Install deps
+#        if: steps.node_modules_cache.outputs.cache-hit != 'true'
+#        run: |
+#          yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
+#          yarn install --frozen-lockfile --prefer-offline
+#          yarn add firebase@${{ matrix.firebase }} --prefer-offline
+#      - name: Firebase emulator cache
+#        uses: actions/cache@v2
+#        with:
+#          path: ~/.cache/firebase/emulators
+#          key: firebase_emulators
+#      - name: 'Download Artifacts'
+#        uses: actions/download-artifact@v2
+#      - name: Run tests
+#        run: |
+#          mv angularfire-${{ github.run_id }} dist
+#          yarn test:safari
 
   publish:
     runs-on: ubuntu-latest
     name: Publish (NPM)
-    needs: ['build']
-    if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/exp' || github.event_name == 'release' }}
+    needs: ['build', 'test', 'headless']
+    if: ${{ github.ref == 'refs/heads/master' || github.event_name == 'release' }}
     steps:
       - name: Setup node
         uses: actions/setup-node@v2-beta

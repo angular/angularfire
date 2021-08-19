@@ -11,7 +11,7 @@ In this guide, we'll look at how to use `@angular/fire` to automatically deploy 
 First, you need to add the `@angular/fire` package to your project. In your Angular CLI project run:
 
 ```shell
-ng add @angular/fire
+ng add @angular/fire@next
 ```
 
 *Note that the command above assumes you have global Angular CLI installed. To install Angular CLI globally run `npm i -g @angular/cli`.*
@@ -53,7 +53,7 @@ In the end, your `angular.json` project will look like below:
 If you want to add deployment capabilities to a different project in your workspace, you can run:
 
 ```
-ng add @angular/fire --project=[PROJECT_NAME]
+ng add @angular/fire@next --project=[PROJECT_NAME]
 ```
 
 ## Step 2: deploying the project
