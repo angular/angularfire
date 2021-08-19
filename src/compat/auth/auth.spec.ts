@@ -2,7 +2,7 @@ import firebase from 'firebase/compat/app';
 import { Observable, Subject } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
 import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire/compat';
-import { AngularFireAuth, AngularFireAuthModule } from '@angular/fire/compat/auth';
+import { AngularFireAuth, AngularFireAuthModule, SETTINGS } from '@angular/fire/compat/auth';
 import { COMMON_CONFIG } from '../../test-config';
 import 'firebase/compat/auth';
 import { rando } from '../../utils';
@@ -22,6 +22,9 @@ describe('AngularFireAuth', () => {
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireAuthModule
+      ],
+      providers: [
+        { provide: SETTINGS, useValue: { appVerificationDisabledForTesting: true } }
       ]
     });
 
@@ -38,7 +41,7 @@ describe('AngularFireAuth', () => {
   });
 
   afterEach(() => {
-    app.delete();
+    app.delete().catch();
   });
 
   describe('Zones', () => {
@@ -70,6 +73,11 @@ describe('AngularFireAuth', () => {
 
   it('should have an initialized Firebase app', () => {
     expect(afAuth.name).toBeDefined();
+  });
+
+  it('should have disabled app verification for testing', async () => {
+    const app = await afAuth.app;
+    expect(app.auth().settings.appVerificationDisabledForTesting).toBe(true);
   });
 
   it('should emit auth updates through authState', (done: any) => {
@@ -142,7 +150,7 @@ describe('AngularFireAuth with different app', () => {
   });
 
   afterEach(() => {
-    app.delete();
+    app.delete().catch();
   });
 
   describe('<constructor>', () => {

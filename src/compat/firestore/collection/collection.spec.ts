@@ -50,7 +50,7 @@ describe('AngularFirestoreCollection', () => {
   });
 
   afterEach(() => {
-    app.delete();
+    app.delete().catch();
   });
 
   describe('valueChanges()', () => {

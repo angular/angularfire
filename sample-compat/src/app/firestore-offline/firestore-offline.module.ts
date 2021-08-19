@@ -4,6 +4,7 @@ import { FirebaseOptions } from 'firebase/app';
 import { USE_EMULATOR } from '@angular/fire/compat/firestore';
 import { AngularFirestore, SETTINGS, Settings } from '@angular/fire/compat/firestore';
 import { USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/compat/auth';
+import { ɵAngularFireSchedulers } from '@angular/fire';
 
 export const FIRESTORE_OFFLINE = new InjectionToken<AngularFirestore>('my.firestore');
 
@@ -15,9 +16,10 @@ export class AngularFirestoreOffline extends AngularFirestore {
         // tslint:disable-next-line:ban-types
         @Inject(PLATFORM_ID) platformId: Object,
         zone: NgZone,
+        schedulers: ɵAngularFireSchedulers,
         @Optional() @Inject(USE_EMULATOR) useEmulator: any,
       ) {
-        super(options, 'offline', true, settings, platformId, zone, { synchronizeTabs: true }, useEmulator);
+        super(options, 'offline', true, settings, platformId, zone, schedulers, { synchronizeTabs: true }, useEmulator);
       }
 }
 

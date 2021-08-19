@@ -22,8 +22,8 @@ export class FirestoreOfflineComponent implements OnInit {
 
   constructor(state: TransferState, firestore: AngularFirestoreOffline) {
     const doc = firestore.doc('test/1');
-    const key = makeStateKey(doc.ref.path);
-    const existing = state.get<any>(key, undefined);
+    const key = makeStateKey<unknown>(doc.ref.path);
+    const existing = state.get(key, undefined);
     this.testDocValue$ = firestore.doc('test/1').valueChanges().pipe(
       trace('firestore'),
       existing ? startWith(existing) : tap(it => state.set(key, it))

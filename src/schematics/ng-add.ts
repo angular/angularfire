@@ -1,68 +1,11 @@
-import { SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
-import { NodePackageInstallTask, RunSchematicTask } from '@angular-devkit/schematics/tasks';
-import { JsonParseMode, parseJson } from '@angular-devkit/core';
-import { listProjects, projectPrompt, projectTypePrompt } from './utils';
-import { Workspace } from './interfaces';
+import { SchematicContext, Tree } from '@angular-devkit/schematics';
+import { listProjects, projectPrompt, getWorkspace, getProject, projectTypePrompt } from './utils';
 import { DeployOptions, NgAddNormalizedOptions } from './ng-add-common';
 import { addFirebaseFunctionsDependencies, setupUniversalDeployment } from './ng-add-ssr';
 import { addFirebaseHostingDependencies, setupStaticDeployment } from './ng-add-static';
 
-function getWorkspace(
-  host: Tree
-): { path: string; workspace: Workspace } {
-  const possibleFiles = ['/angular.json', '/.angular.json'];
-  const path = possibleFiles.filter(p => host.exists(p))[0];
-
-  const configBuffer = host.read(path);
-  if (configBuffer === null) {
-    throw new SchematicsException(`Could not find angular.json`);
-  }
-  const content = configBuffer.toString();
-
-  let workspace: Workspace;
-  try {
-    workspace = (parseJson(
-      content,
-      JsonParseMode.Loose
-    ) as {}) as Workspace;
-  } catch (e) {
-    throw new SchematicsException(`Could not parse angular.json: ` + e.message);
-  }
-
-  return {
-    path,
-    workspace
-  };
-}
-
-const getProject = (options: DeployOptions, host: Tree) => {
-  const { workspace } = getWorkspace(host);
-  const projectName = options.project || workspace.defaultProject;
-
-  if (!projectName) {
-    throw new SchematicsException(
-      'No Angular project selected and no default project in the workspace'
-    );
-  }
-
-  const project = workspace.projects[projectName];
-  if (!project) {
-    throw new SchematicsException(
-      'The specified Angular project is not defined in this workspace'
-    );
-  }
-
-  if (project.projectType !== 'application') {
-    throw new SchematicsException(
-      `Deploy requires an Angular project type of "application" in angular.json`
-    );
-  }
-
-  return {project, projectName};
-};
-
 export const setupProject =
-  (host: Tree, options: DeployOptions & { isUniversalProject: boolean, firebaseProject: string }) => {
+  (host: Tree, options: DeployOptions & { firebaseProject: string, universalProject: boolean }) => {
     const { path: workspacePath, workspace } = getWorkspace(host);
 
     const {project, projectName} = getProject(options, host);
@@ -72,7 +15,7 @@ export const setupProject =
       firebaseProject: options.firebaseProject
     };
 
-    if (options.isUniversalProject) {
+    if (options.universalProject) {
       return setupUniversalDeployment({
         workspace,
         workspacePath,
@@ -80,45 +23,35 @@ export const setupProject =
         tree: host,
         project
       });
+    } else {
+      return setupStaticDeployment({
+        workspace,
+        workspacePath,
+        options: config,
+        tree: host,
+        project
+      });
     }
-    return setupStaticDeployment({
-      workspace,
-      workspacePath,
-      options: config,
-      tree: host,
-      project
-    });
-  };
+};
 
 export const ngAddSetupProject = (
-  options: DeployOptions & { isUniversalProject: boolean }
-) => async (host: Tree) => {
+  options: DeployOptions
+) => async (host: Tree, context: SchematicContext) => {
+
+  // I'm not able to resolve dependencies.... this is definately some sort of race condition.
+  // Failing on bluebird but there are a lot of things that aren't right. Error for now.
+  try {
+    require('firebase-tools');
+  } catch (e) {
+    throw new Error('The NodePackageInstallTask does not appear to have completed successfully or we ran into a race condition. Please run the `ng add @angular/fire` command again.');
+  }
+
   const projects = await listProjects();
   const { firebaseProject } = await projectPrompt(projects);
-  return setupProject(host, {...options, firebaseProject});
+  const { project } = getProject(options, host);
+  const { universalProject } = await projectTypePrompt(project);
+  if (universalProject) { host = addFirebaseFunctionsDependencies(host, context); }
+  return setupProject(host, {...options, firebaseProject, universalProject });
 };
 
-export const ngAdd = (options: DeployOptions) => (
-  host: Tree,
-  context: SchematicContext
-) => {
-
-  const {project} = getProject(options, host);
-
-  return projectTypePrompt(project).then(
-    ({ universalProject }: { universalProject: boolean }) => {
-      if (universalProject) {
-        addFirebaseFunctionsDependencies(host, context);
-      } else {
-        addFirebaseHostingDependencies(host, context);
-      }
-      const projectOptions: DeployOptions & { isUniversalProject: boolean } = {
-        ...options,
-        isUniversalProject: universalProject
-      };
-      context.addTask(new RunSchematicTask('ng-add-setup-project', projectOptions), [
-        context.addTask(new NodePackageInstallTask())
-      ]);
-    }
-  );
-};
+export const ngAdd = addFirebaseHostingDependencies;

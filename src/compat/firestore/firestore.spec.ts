@@ -26,7 +26,7 @@ describe('AngularFirestore', () => {
   });
 
   afterEach(() => {
-    app.delete();
+    app.delete().catch();
   });
 
   it('should be the properly initialized type', () => {
@@ -118,7 +118,7 @@ describe('AngularFirestore with different app', () => {
   });
 
   afterEach(() => {
-    app.delete();
+    app.delete().catch();
   });
 
   describe('<constructor>', () => {
@@ -159,7 +159,7 @@ describe('AngularFirestore without persistance', () => {
   });
 
   afterEach(() => {
-    app.delete();
+    app.delete().catch();
   });
 
   it('should not enable persistence', (done) => {

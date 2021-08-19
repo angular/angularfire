@@ -1,6 +1,7 @@
 import { SchematicsException, Tree, SchematicContext } from '@angular-devkit/schematics';
 import {
   addDependencies,
+  DeployOptions,
   generateFirebaseRc,
   NgAddNormalizedOptions,
   overwriteIfExists,
@@ -10,6 +11,7 @@ import {
 import { FirebaseJSON, Workspace, WorkspaceProject } from './interfaces';
 
 import { default as defaultDependencies } from './versions.json';
+import { NodePackageInstallTask, RunSchematicTask } from '@angular-devkit/schematics/tasks';
 
 function emptyFirebaseJson() {
   return {
@@ -72,12 +74,16 @@ export function generateFirebaseJson(
   overwriteIfExists(tree, path, stringifyFormatted(firebaseJson));
 }
 
-export const addFirebaseHostingDependencies = (tree: Tree, context: SchematicContext) => {
+export const addFirebaseHostingDependencies = (options: DeployOptions) => (tree: Tree, context: SchematicContext) => {
   addDependencies(
     tree,
     defaultDependencies,
     context
   );
+  context.addTask(new RunSchematicTask('ng-add-setup-project', options), [
+    context.addTask(new NodePackageInstallTask())
+  ]);
+  return tree;
 };
 
 export const setupStaticDeployment = (config: {
