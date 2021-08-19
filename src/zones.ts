@@ -110,15 +110,30 @@ export function observeInsideAngular<T>(obs$: Observable<T>): Observable<T> {
 
 export function keepUnstableUntilFirst<T>(obs$: Observable<T>): Observable<T> {
   const scheduler = getSchedulers();
-  obs$ = obs$.lift(
-    new BlockUntilFirstOperator(scheduler.ngZone)
-  );
-  return obs$.pipe(
-    // Run the subscribe body outside of Angular (e.g. calling Firebase SDK to add a listener to a change event)
-    subscribeOn(scheduler.outsideAngular),
-    // Run operators inside the angular zone (e.g. side effects via tap())
-    observeOn(scheduler.insideAngular)
-  );
+  return ɵkeepUnstableUntilFirstFactory(getSchedulers())(obs$);
+}
+
+/**
+ * Operator to block the zone until the first value has been emitted or the observable
+ * has completed/errored. This is used to make sure that universal waits until the first
+ * value from firebase but doesn't block the zone forever since the firebase subscription
+ * is still alive.
+ */
+export function ɵkeepUnstableUntilFirstFactory(schedulers: ɵAngularFireSchedulers) {
+  return function keepUnstableUntilFirst<T>(obs$: Observable<T>): Observable<T> {
+    obs$ = obs$.lift(
+      new BlockUntilFirstOperator(schedulers.ngZone)
+    );
+
+    return obs$.pipe(
+      // Run the subscribe body outside of Angular (e.g. calling Firebase SDK to add a listener to a change event)
+      subscribeOn(schedulers.outsideAngular),
+      // Run operators inside the angular zone (e.g. side effects via tap())
+      observeOn(schedulers.insideAngular)
+      // INVESTIGATE https://github.com/angular/angularfire/pull/2315
+      // share()
+    );
+  };
 }
 
 const zoneWrapFn = (it: (...args: any[]) => any) => {
