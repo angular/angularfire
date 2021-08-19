@@ -22,7 +22,11 @@ import { getFunctions, provideFunctions } from '@angular/fire/functions';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideFirebaseApp(() => {
+      const app = initializeApp(environment.firebase);
+      console.log(app);
+      return app;
+    }),
     provideFirebaseApp(() => {
       const app = initializeApp(environment.firebase, 'second');
       app.automaticDataCollectionEnabled = false;

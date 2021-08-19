@@ -13,7 +13,7 @@ export class RemoteConfig {
   }
 }
 
-export const REMOTE_CONFIG_PROVIDER_NAME = 'remote-config-exp';
+export const REMOTE_CONFIG_PROVIDER_NAME = 'remote-config';
 
 // tslint:disable-next-line:no-empty-interface
 export interface RemoteConfigInstances extends Array<FirebaseRemoteConfig> {}

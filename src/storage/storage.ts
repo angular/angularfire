@@ -13,7 +13,7 @@ export class Storage {
   }
 }
 
-export const STORAGE_PROVIDER_NAME = 'storage-exp';
+export const STORAGE_PROVIDER_NAME = 'storage';
 
 // tslint:disable-next-line:no-empty-interface
 export interface StorageInstances extends Array<FirebaseStorage> {}

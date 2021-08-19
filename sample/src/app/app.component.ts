@@ -60,7 +60,7 @@ export class AppComponent {
     authState(auth).subscribe(it => console.log('authState', it));
     appRef.isStable.pipe(distinctUntilChanged()).subscribe(it => console.log('isStable', it));
     this.myDocData = getDoc(doc(firestoreLite, 'animals/NJdGQCv1P92SWsp4nSE7'));
-    console.log(app);
+    console.log((app as any).container);
     // firestoreInstance$.subscribe(it => console.log('$', it));
     // initializeFirestore$.subscribe(it => console.log('init', it));
   }
