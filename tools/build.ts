@@ -32,7 +32,7 @@ function zoneWrapExports() {
     overrides: Record<string, OverrideOptions|null> = {}
   ) => {
     const imported = await import(path);
-    const toBeExported = exports.filter(it => overrides[it] !== null).map(importName => {
+    const toBeExported = exports.filter(it => !it.startsWith('_') && overrides[it] !== null).map(importName => {
       const zoneWrap = overrides[importName]?.zoneWrap ?? importName[0] !== importName[0].toUpperCase();
       const exportName = overrides[importName]?.exportName ?? importName;
       return [importName, exportName, zoneWrap];
@@ -63,6 +63,8 @@ ${zoneWrapped.map(([importName, exportName]) => `export const ${exportName} = ɵ
       inMemoryPersistence: { zoneWrap: false },
       indexedDBLocalPersistence: { zoneWrap: false },
       prodErrorMap: null,
+      cordovaPopupRedirectResolver: null,
+      reactNativeLocalPersistence: null,
     }),
     reexport('database', 'rxfire', 'rxfire/database', tsKeys<typeof import('rxfire/database')>()),
     reexport('database', 'firebase', 'firebase/database', tsKeys<typeof import('firebase/database')>()),
