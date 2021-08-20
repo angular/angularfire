@@ -54,8 +54,9 @@ function matchDep(a: any, b: any) {
 }
 
 export function ɵgetDefaultInstanceOf<T= unknown>(identifier: string): T|undefined  {
-  const defaultApp = getApp();
-  return ɵgetAllInstancesOf<T>(identifier, defaultApp)[0];
+  const defaultApp: FirebaseAppWithContainer = getApp() as any;
+  const provider = defaultApp.container.getProvider(identifier as never);
+  return provider.getImmediate();
 }
 
 export const ɵgetAllInstancesOf = <T= unknown>(identifier: string, app?: FirebaseApp): Array<T> => {

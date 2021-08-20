@@ -13,7 +13,7 @@ export class Functions {
   }
 }
 
-export const FUNCTIONS_PROVIDER_NAME = 'functions-exp';
+export const FUNCTIONS_PROVIDER_NAME = 'functions';
 
 // tslint:disable-next-line:no-empty-interface
 export interface FunctionsInstances extends Array<FirebaseFunctions> {}
