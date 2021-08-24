@@ -27,6 +27,7 @@
     "@angular/platform-browser-dynamic": "^12.0.0",
     "@angular/platform-server": "^12.0.0",
     "@angular/router": "^12.0.0",
+    "@angular/service-worker": "^12.0.0",
     "@nguniversal/express-engine": "12.1.0",
     "cross-fetch": "^3.1.4",
     "express": "^4.15.2",

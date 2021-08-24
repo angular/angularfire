@@ -7,6 +7,8 @@ import { getFunctions, provideFunctions } from '@angular/fire/functions';
 
 import { AppModule } from './app.module';
 import { AppComponent } from './app.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 
 @NgModule({
   imports: [
@@ -16,6 +18,10 @@ import { AppComponent } from './app.component';
     provideMessaging(() => getMessaging()),
     providePerformance(() => getPerformance()),
     provideFunctions(() => getFunctions()),
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: environment.production,
+      registrationStrategy: 'registerWhenStable:30000'
+    }),
   ],
   bootstrap: [AppComponent],
 })

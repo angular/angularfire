@@ -6,12 +6,16 @@ import { Firestore, FirestoreInstances, getDoc, doc, DocumentSnapshot } from '@a
 import { DocumentData } from 'rxfire/firestore/lite/interfaces';
 import { distinctUntilChanged } from 'rxjs/operators';
 import { Storage, StorageInstances } from '@angular/fire/storage';
-import { Messaging, MessagingInstances } from '@angular/fire/messaging';
+import { Messaging, MessagingInstances, onMessage } from '@angular/fire/messaging';
 import { RemoteConfig, RemoteConfigInstances } from '@angular/fire/remote-config';
 import { Functions, FunctionsInstances } from '@angular/fire/functions';
 import { Database, DatabaseInstances } from '@angular/fire/database';
 import { Analytics, AnalyticsInstances } from '@angular/fire/analytics';
 import { Performance, PerformanceInstances } from '@angular/fire/performance';
+import { getToken } from 'firebase/messaging';
+import { SwPush, ServiceWorkerModule } from '@angular/service-worker';
+
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -48,6 +52,8 @@ export class AppComponent {
     @Optional() performance: Performance,
     @Optional() performanceInstances: PerformanceInstances,
     appRef: ApplicationRef,
+    swPush: SwPush,
+    @Optional() serviceWorkerModule: ServiceWorkerModule,
   ) {
     console.log({
       app, auth, apps, authInstances, firestore, firestoreInstances,
@@ -59,6 +65,12 @@ export class AppComponent {
     authState(auth).subscribe(it => console.log('authState', it));
     appRef.isStable.pipe(distinctUntilChanged()).subscribe(it => console.log('isStable', it));
     this.myDocData = getDoc(doc(firestore, 'animals/NJdGQCv1P92SWsp4nSE7'));
-    this.myDocData.then(it => console.log(it.data()));
+    navigator.serviceWorker.register('firebase-messaging-sw.js', { type: 'module' }).then(serviceWorkerRegistration => {
+      getToken(messaging, {
+        serviceWorkerRegistration,
+        vapidKey: environment.vapidKey,
+      }).then(it => console.log(it));
+    });
+    onMessage(messaging, it => console.log('onMessage', it));
   }
 }
