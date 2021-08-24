@@ -13,7 +13,6 @@ import { Database, DatabaseInstances } from '@angular/fire/database';
 import { Analytics, AnalyticsInstances } from '@angular/fire/analytics';
 import { Performance, PerformanceInstances } from '@angular/fire/performance';
 import { getToken } from 'firebase/messaging';
-import { SwPush, ServiceWorkerModule } from '@angular/service-worker';
 
 import { environment } from '../environments/environment';
 
@@ -52,8 +51,6 @@ export class AppComponent {
     @Optional() performance: Performance,
     @Optional() performanceInstances: PerformanceInstances,
     appRef: ApplicationRef,
-    swPush: SwPush,
-    @Optional() serviceWorkerModule: ServiceWorkerModule,
   ) {
     console.log({
       app, auth, apps, authInstances, firestore, firestoreInstances,
