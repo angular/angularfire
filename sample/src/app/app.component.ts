@@ -1,10 +1,10 @@
-import { ApplicationRef, Component, NgZone } from '@angular/core';
+import { ApplicationRef, Component, Optional } from '@angular/core';
 import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
 import { Auth, AuthInstances, authState } from '@angular/fire/auth';
-import { Firestore as FirestoreLite, FirestoreInstances as FirestoreLiteInstances, getDoc, doc, DocumentSnapshot } from '@angular/fire/firestore/lite';
-import { Firestore, FirestoreInstances } from '@angular/fire/firestore';
+import { Firestore as FirestoreLite, FirestoreInstances as FirestoreLiteInstances } from '@angular/fire/firestore/lite';
+import { Firestore, FirestoreInstances, getDoc, doc, DocumentSnapshot } from '@angular/fire/firestore';
 import { DocumentData } from 'rxfire/firestore/lite/interfaces';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { distinctUntilChanged } from 'rxjs/operators';
 import { Storage, StorageInstances } from '@angular/fire/storage';
 import { Messaging, MessagingInstances } from '@angular/fire/messaging';
 import { RemoteConfig, RemoteConfigInstances } from '@angular/fire/remote-config';
@@ -29,26 +29,25 @@ export class AppComponent {
     auth: Auth, // default Firbase Auth
     apps: FirebaseApps, // all initialized App instances
     authInstances: AuthInstances, // all initialized Auth instances
-    firestoreLite: FirestoreLite,
-    firestoreLiteInstances: FirestoreLiteInstances,
-    firestore: Firestore,
-    firestoreInstances: FirestoreInstances,
+    @Optional() firestoreLite: FirestoreLite,
+    @Optional() firestoreLiteInstances: FirestoreLiteInstances,
+    @Optional() firestore: Firestore,
+    @Optional() firestoreInstances: FirestoreInstances,
     storage: Storage,
     storageInstances: StorageInstances,
-    messaging: Messaging,
-    messagingInstances: MessagingInstances,
-    remoteConfig: RemoteConfig,
-    remoteConfigInstances: RemoteConfigInstances,
-    functions: Functions,
-    functionsInstances: FunctionsInstances,
+    @Optional() messaging: Messaging,
+    @Optional() messagingInstances: MessagingInstances,
+    @Optional() remoteConfig: RemoteConfig,
+    @Optional() remoteConfigInstances: RemoteConfigInstances,
+    @Optional() functions: Functions,
+    @Optional() functionsInstances: FunctionsInstances,
     database: Database,
     databaseInstances: DatabaseInstances,
-    analytics: Analytics,
-    analyticsInstances: AnalyticsInstances,
-    performance: Performance,
-    performanceInstances: PerformanceInstances,
+    @Optional() analytics: Analytics,
+    @Optional() analyticsInstances: AnalyticsInstances,
+    @Optional() performance: Performance,
+    @Optional() performanceInstances: PerformanceInstances,
     appRef: ApplicationRef,
-    zone: NgZone,
   ) {
     console.log({
       app, auth, apps, authInstances, firestore, firestoreInstances,
@@ -59,9 +58,7 @@ export class AppComponent {
     });
     authState(auth).subscribe(it => console.log('authState', it));
     appRef.isStable.pipe(distinctUntilChanged()).subscribe(it => console.log('isStable', it));
-    this.myDocData = getDoc(doc(firestoreLite, 'animals/NJdGQCv1P92SWsp4nSE7'));
-    console.log((app as any).container);
-    // firestoreInstance$.subscribe(it => console.log('$', it));
-    // initializeFirestore$.subscribe(it => console.log('init', it));
+    this.myDocData = getDoc(doc(firestore, 'animals/NJdGQCv1P92SWsp4nSE7'));
+    this.myDocData.then(it => console.log(it.data()));
   }
 }
