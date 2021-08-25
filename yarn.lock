@@ -12275,10 +12275,10 @@ rx@2.3.24:
   resolved "https://registry.yarnpkg.com/rx/-/rx-2.3.24.tgz#14f950a4217d7e35daa71bbcbe58eff68ea4b2b7"
   integrity sha1-FPlQpCF9fjXapxu8vljv9o6ksrc=
 
-rxfire@6.0.0-rc.1:
-  version "6.0.0-rc.1"
-  resolved "https://registry.yarnpkg.com/rxfire/-/rxfire-6.0.0-rc.1.tgz#a3c95cdcecf5bd26823377d9836ecb5005156ea1"
-  integrity sha512-2wGzy/iMkYcBnTCwk1JNnX0tL0h/MXh9dki1bR+/rsxzr4S6T6uhLYAknp7lsPvbxSpvpis4io3k1yWXnUMjsQ==
+rxfire@6.0.0-canary.d81a565:
+  version "6.0.0-canary.d81a565"
+  resolved "https://registry.yarnpkg.com/rxfire/-/rxfire-6.0.0-canary.d81a565.tgz#d1242732d3e6c17dd2e6939a8096c5dbec623c8f"
+  integrity sha512-RvD7FkiBoz+odav4vjF9/kODLbuwaqsNGVw1s6lwjCO1oupGzMTqZlJ6KzEgMwGWoPl9jo/E/ouJfXlD9D9QEw==
   dependencies:
     tslib "^1.9.0 || ~2.1.0"
 
