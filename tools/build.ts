@@ -133,17 +133,6 @@ async function replacePackageCoreVersion() {
   });
 }
 
-async function replacePackageJsonVersions() {
-  const path = dest('package.json');
-  const root = await rootPackage;
-  const pkg = await import(path);
-  Object.keys(pkg.peerDependencies).forEach(peer => {
-    pkg.peerDependencies[peer] = root.dependencies[peer];
-  });
-  pkg.version = root.version;
-  return writeFile(path, JSON.stringify(pkg, null, 2));
-}
-
 async function replaceSchematicVersions() {
   const root = await rootPackage;
   const path = dest('schematics', 'versions.json');
@@ -211,7 +200,6 @@ async function buildLibrary() {
     copy(join(process.cwd(), 'README.md'), dest('README.md')),
     copy(join(process.cwd(), 'docs'), dest('docs')),
     compileSchematics(),
-    replacePackageJsonVersions(),
     replacePackageCoreVersion(),
     fixImportForLazyModules(),
   ]);
