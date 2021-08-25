@@ -13,10 +13,7 @@ import { ɵcacheInstance } from '@angular/fire';
 
 export const URL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
 
-// SEMVER(7): use Parameters to detirmine the useEmulator arguments
-// TODO(jamesdaniels): don't hardcode, but having tyepscript issues with firebase.database.Database
-// type UseEmulatorArguments = Parameters<typeof firebase.database.Database.prototype.useEmulator>;
-type UseEmulatorArguments = [string, number];
+type UseEmulatorArguments = Parameters<firebase.database.Database['useEmulator']>;
 export const USE_EMULATOR = new InjectionToken<UseEmulatorArguments>('angularfire2.database.use-emulator');
 
 @Injectable({

@@ -28,9 +28,7 @@ export const ENABLE_PERSISTENCE = new InjectionToken<boolean>('angularfire2.enab
 export const PERSISTENCE_SETTINGS = new InjectionToken<PersistenceSettings | undefined>('angularfire2.firestore.persistenceSettings');
 export const SETTINGS = new InjectionToken<Settings>('angularfire2.firestore.settings');
 
-// SEMVER(7): use Parameters to detirmine the useEmulator arguments
-// type UseEmulatorArguments = Parameters<typeof firebase.firestore.Firestore.prototype.useEmulator>;
-type UseEmulatorArguments = [string, number];
+type UseEmulatorArguments = Parameters<firebase.firestore.Firestore['useEmulator']>;
 export const USE_EMULATOR = new InjectionToken<UseEmulatorArguments>('angularfire2.firestore.use-emulator');
 
 /**

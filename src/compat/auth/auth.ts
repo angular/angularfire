@@ -12,7 +12,7 @@ import { ɵcacheInstance } from '@angular/fire';
 
 export interface AngularFireAuth extends ɵPromiseProxy<firebase.auth.Auth> {}
 
-type UseEmulatorArguments = [string, number];
+type UseEmulatorArguments = Parameters<firebase.auth.Auth['useEmulator']>;
 export const USE_EMULATOR = new InjectionToken<UseEmulatorArguments>('angularfire2.auth.use-emulator');
 
 export const SETTINGS = new InjectionToken<firebase.auth.AuthSettings>('angularfire2.auth.settings');
@@ -79,8 +79,7 @@ export class AngularFireAuth {
         return ɵcacheInstance(`${app.name}.auth`, 'AngularFireAuth', app.name, () => {
           const auth = zone.runOutsideAngular(() => app.auth());
           if (useEmulator) {
-            // Firebase Auth doesn't conform to the useEmulator convention, let's smooth that over
-            auth.useEmulator(`http://${useEmulator.join(':')}`);
+            auth.useEmulator(...useEmulator);
           }
           if (tenantId) {
             auth.tenantId = tenantId;
