@@ -148,8 +148,7 @@ export class AngularFireRemoteConfig {
         }
         return rc;
       }, [settings, defaultConfig])),
-      // tslint:disable-next-line
-      startWith(undefined),
+      startWith<firebase.remoteConfig.RemoteConfig, undefined>(undefined),
       shareReplay({ bufferSize: 1, refCount: false })
     );
 

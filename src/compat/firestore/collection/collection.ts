@@ -69,7 +69,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
     return source.pipe(
       // We want to filter out empty arrays, but always emit at first, so the developer knows
       // that the collection has been resolve; even if it's empty
-      startWith(undefined),
+      startWith<DocumentChangeAction<T>[], undefined>(undefined),
       pairwise(),
       filter(([prior, current]) => current.length > 0 || !prior),
       map(([prior, current]) => current),

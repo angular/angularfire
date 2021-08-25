@@ -133,7 +133,7 @@ export class ScreenTrackingService implements OnDestroy {
         groupBy(it => it[OUTLET_KEY]),
         mergeMap(it => it.pipe(
           distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
-          startWith(undefined),
+          startWith<any, any>(undefined),
           pairwise(),
           map(([prior, current]) =>
             prior ? {

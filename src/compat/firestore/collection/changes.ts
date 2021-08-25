@@ -1,7 +1,8 @@
 import { fromCollectionRef } from '../observable/fromRef';
 import { Observable, SchedulerLike } from 'rxjs';
 import { distinctUntilChanged, map, pairwise, scan, startWith } from 'rxjs/operators';
-import { DocumentChange, DocumentChangeAction, DocumentChangeType, Query } from '../interfaces';
+import { Action, QuerySnapshot, DocumentChange, DocumentChangeAction, DocumentChangeType, Query } from '../interfaces';
+import firebase from 'firebase/compat/app';
 
 /**
  * Return a stream of document changes on a query. These results are not in sort order but in
@@ -10,7 +11,7 @@ import { DocumentChange, DocumentChangeAction, DocumentChangeType, Query } from 
 export function docChanges<T>(query: Query, scheduler?: SchedulerLike): Observable<DocumentChangeAction<T>[]> {
   return fromCollectionRef(query, scheduler)
     .pipe(
-      startWith(undefined),
+      startWith<Action<QuerySnapshot<firebase.firestore.DocumentData>>, undefined>(undefined),
       pairwise(),
       map(([priorAction, action]) => {
         const docChanges = action.payload.docChanges();

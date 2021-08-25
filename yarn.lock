@@ -2909,7 +2909,7 @@ ajv@8.6.0:
     require-from-string "^2.0.2"
     uri-js "^4.2.2"
 
-ajv@^6.1.0, ajv@^6.12.2, ajv@^6.12.3, ajv@^6.12.4, ajv@^6.12.5:
+ajv@^6.1.0, ajv@^6.12.2, ajv@^6.12.3, ajv@^6.12.4, ajv@^6.12.5, ajv@^6.12.6:
   version "6.12.6"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-6.12.6.tgz#baf5a62e802b07d977034586f8c3baf5adf26df4"
   integrity sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==
@@ -6391,15 +6391,16 @@ firebase-functions@^3.6.0:
     express "^4.17.1"
     lodash "^4.17.14"
 
-"firebase-tools@^8.0.0 || ^9.0.0":
-  version "9.11.0"
-  resolved "https://registry.yarnpkg.com/firebase-tools/-/firebase-tools-9.11.0.tgz#a388e8bc66274903b0596551dd9a5956b73ccbb6"
-  integrity sha512-0yd7VVEeg7Iq1tyosLSEB2uhrCyOqQvYfMOQI2gz4hqct0P9grN2iN9UvuR4he60CU6siaTbO26ZGyEGvRfo8A==
+firebase-tools@^9.0.0:
+  version "9.16.5"
+  resolved "https://registry.yarnpkg.com/firebase-tools/-/firebase-tools-9.16.5.tgz#c6d38bded228fd2a5dfd781a42287c78dab66b86"
+  integrity sha512-dp/cvt+39wv5CO+MzX36snmRnvn5j7Nn73QfKiIvHXAT5Ek/fRJn2pWnaxP+bhd19SuEY1Buf8PcdlMl42hzlw==
   dependencies:
     "@google-cloud/pubsub" "^2.7.0"
     "@types/archiver" "^5.1.0"
     JSONStream "^1.2.1"
     abort-controller "^3.0.0"
+    ajv "^6.12.6"
     archiver "^5.0.0"
     body-parser "^1.19.0"
     chokidar "^3.0.2"
