@@ -1,3 +1,17 @@
+<a name="7.0.0"></a>
+# [7.0.0](https://github.com/angular/angularfire2/compare/6.1.5...7.0.0) (2021-08-25)
+
+### Breaking changes
+
+* Angular 12 is required
+* AngularFire now only works in Ivy applications
+* Firebase JS SDK v9 is required
+* The existing AngularFire v6 API surface has moved from `@angular/fire/*` to `@angular/fire/compat/*` (see compatibility mode)
+* New modular API surface available at `@angular/fire/*`
+* Various cleanup
+
+[See the v7 upgrade guide for more information.](https://github.com/angular/angularfire/blob/master/docs/version-7-upgrade.md)
+
 <a name="6.1.5"></a>
 # [6.1.5](https://github.com/angular/angularfire/compare/6.1.4...6.1.5) (2021-05-17)
 
