@@ -17,12 +17,24 @@ AngularFire smooths over the rough edges an Angular developer might encounter wh
 ## Example use
 
 ```ts
-import { Component } from '@angular/core';
+import { provideFirebaseApp, getApp, initializeApp } from '@angular/fire/app';
+import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+
+@NgModule({
+  imports: [
+    provideFirebaseApp(() => initializeApp({ ... })),
+    provideFirestore(() => getFirestore()),
+  ],
+  ...
+})
+export class AppModule { }
+```
+
+```ts
 import { Firestore, collectionData, collection } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 
 interface Item {
-  id: string,
   name: string,
   ...
 };
@@ -37,11 +49,11 @@ interface Item {
   </ul>
   `
 })
-export class MyApp {
+export class AppComponent {
   item$: Observable<Item[]>;
   constructor(firestore: Firestore) {
     const collection = collection(firestore, 'items');
-    this.item$ = collectionData(collection, 'id');
+    this.item$ = collectionData(collection);
   }
 }
 ```
