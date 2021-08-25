@@ -18,7 +18,17 @@ import { FirebaseApp, ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS 
 import { FirebaseOptions } from 'firebase/app';
 import { isPlatformServer } from '@angular/common';
 import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
+import {
+  AngularFireAuth,
+  USE_EMULATOR as USE_AUTH_EMULATOR,
+  SETTINGS as AUTH_SETTINGS,
+  TENANT_ID,
+  LANGUAGE_CODE,
+  USE_DEVICE_LANGUAGE,
+  PERSISTENCE,
+} from '@angular/fire/compat/auth';
 import { ɵcacheInstance } from '@angular/fire';
 
 /**
@@ -134,9 +144,44 @@ export class AngularFirestore {
     public schedulers: ɵAngularFireSchedulers,
     @Optional() @Inject(PERSISTENCE_SETTINGS) persistenceSettings: PersistenceSettings | null,
     @Optional() @Inject(USE_EMULATOR) _useEmulator: any,
+    @Optional() auth: AngularFireAuth,
+    @Optional() @Inject(USE_AUTH_EMULATOR) useAuthEmulator: any,
+    @Optional() @Inject(AUTH_SETTINGS) _settings: any, // can't use firebase.auth.AuthSettings here
+    @Optional() @Inject(TENANT_ID) tenantId: string | null,
+    @Optional() @Inject(LANGUAGE_CODE) languageCode: string | null,
+    @Optional() @Inject(USE_DEVICE_LANGUAGE) useDeviceLanguage: boolean | null,
+    @Optional() @Inject(PERSISTENCE) persistence: string | null,
   ) {
     const app = ɵfirebaseAppFactory(options, zone, name);
     const useEmulator: UseEmulatorArguments | null = _useEmulator;
+
+
+    if (auth) {
+      const authSettings: firebase.auth.AuthSettings | null = _settings;
+      ɵcacheInstance(`${app.name}.auth`, 'AngularFireAuth', app.name, () => {
+        const auth = zone.runOutsideAngular(() => app.auth());
+        if (useAuthEmulator) {
+          // @ts-ignore
+          auth.useEmulator(...useAuthEmulator);
+        }
+        if (tenantId) {
+          auth.tenantId = tenantId;
+        }
+        auth.languageCode = languageCode;
+        if (useDeviceLanguage) {
+          auth.useDeviceLanguage();
+        }
+        if (authSettings) {
+          for (const [k, v] of Object.entries(authSettings)) {
+            auth.settings[k] = v;
+          }
+        }
+        if (persistence) {
+          auth.setPersistence(persistence);
+        }
+        return auth;
+      }, [useAuthEmulator, tenantId, languageCode, useDeviceLanguage, authSettings, persistence]);
+    }
 
     [this.firestore, this.persistenceEnabled$] = ɵcacheInstance(`${app.name}.firestore`, 'AngularFirestore', app.name, () => {
       const firestore = zone.runOutsideAngular(() => app.firestore());

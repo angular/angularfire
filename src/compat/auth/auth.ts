@@ -84,8 +84,7 @@ export class AngularFireAuth {
           if (tenantId) {
             auth.tenantId = tenantId;
           }
-          // Feedback filed against beta.
-          // auth.languageCode = languageCode;
+          auth.languageCode = languageCode;
           if (useDeviceLanguage) {
             auth.useDeviceLanguage();
           }

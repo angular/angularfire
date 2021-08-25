@@ -127,7 +127,7 @@ async function replacePackageCoreVersion() {
   const root = await rootPackage;
   const replace = require('replace-in-file');
   return replace({
-    files: dest('**', '*.js'),
+    files: dest('**', '*'),
     from: 'ANGULARFIRE2_VERSION',
     to: root.version
   });

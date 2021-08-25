@@ -20,8 +20,9 @@ const log = (level: 'log'|'error'|'info'|'warn', ...args: any) => {
 export function ɵcacheInstance<T>(cacheKey: any, moduleName: string, appName: string, fn: () => T, deps: any): T {
   const [, instance, cachedDeps] = globalThis.ɵAngularfireInstanceCache.find((it: any) => it[0] === cacheKey) || [];
   if (instance) {
-    if (deps !== cachedDeps) {
+    if (!matchDep(deps, cachedDeps)) {
       log('error', `${moduleName} was already initialized on the ${appName} Firebase App with different settings.${IS_HMR ? ' You may need to reload as Firebase is not HMR aware.' : ''}`);
+      log('warn', {is: deps, was: cachedDeps});
     }
     return instance;
   } else {
