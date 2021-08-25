@@ -56,15 +56,8 @@ ${zoneWrapped.map(([importName, exportName]) => `export const ${exportName} = ɵ
     reexport('app', 'firebase', 'firebase/app', tsKeys<typeof import('firebase/app')>()),
     reexport('auth', 'rxfire', 'rxfire/auth', tsKeys<typeof import('rxfire/auth')>()),
     reexport('auth', 'firebase', 'firebase/auth', tsKeys<typeof import('firebase/auth')>(), {
-      browserLocalPersistence: { zoneWrap: false },
-      browserPopupRedirectResolver: { zoneWrap: false },
-      browserSessionPersistence: { zoneWrap: false },
-      debugErrorMap: null,
-      inMemoryPersistence: { zoneWrap: false },
-      indexedDBLocalPersistence: { zoneWrap: false },
-      prodErrorMap: null,
-      cordovaPopupRedirectResolver: null,
       reactNativeLocalPersistence: null,
+      cordovaPopupRedirectResolver: null,
     }),
     reexport('database', 'rxfire', 'rxfire/database', tsKeys<typeof import('rxfire/database')>()),
     reexport('database', 'firebase', 'firebase/database', tsKeys<typeof import('firebase/database')>()),
@@ -94,6 +87,7 @@ ${zoneWrapped.map(([importName, exportName]) => `export const ${exportName} = ɵ
     }),
     reexport('storage', 'firebase', 'firebase/storage', tsKeys<typeof import('firebase/storage')>()),
     reexport('performance', 'rxfire', 'rxfire/performance', tsKeys<typeof import('rxfire/performance')>(), {
+      getPerformance$: null,
       trace: null,
     }),
     reexport('performance', 'firebase', 'firebase/performance', tsKeys<typeof import('firebase/performance')>()),
@@ -133,21 +127,10 @@ async function replacePackageCoreVersion() {
   const root = await rootPackage;
   const replace = require('replace-in-file');
   return replace({
-    files: dest('**', '*.js'),
+    files: dest('**', '*'),
     from: 'ANGULARFIRE2_VERSION',
     to: root.version
   });
-}
-
-async function replacePackageJsonVersions() {
-  const path = dest('package.json');
-  const root = await rootPackage;
-  const pkg = await import(path);
-  Object.keys(pkg.peerDependencies).forEach(peer => {
-    pkg.peerDependencies[peer] = root.dependencies[peer];
-  });
-  pkg.version = root.version;
-  return writeFile(path, JSON.stringify(pkg, null, 2));
 }
 
 async function replaceSchematicVersions() {
@@ -217,7 +200,6 @@ async function buildLibrary() {
     copy(join(process.cwd(), 'README.md'), dest('README.md')),
     copy(join(process.cwd(), 'docs'), dest('docs')),
     compileSchematics(),
-    replacePackageJsonVersions(),
     replacePackageCoreVersion(),
     fixImportForLazyModules(),
   ]);

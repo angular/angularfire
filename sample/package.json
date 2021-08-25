@@ -9,7 +9,11 @@
     "analyze": "webpack-bundle-analyzer dist/sample/stats.json",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "dev:ssr": "ng run sample:serve-ssr",
+    "serve:ssr": "node dist/sample/server/main.js",
+    "build:ssr": "ng build && ng run sample:server",
+    "prerender": "ng run sample:prerender"
   },
   "private": true,
   "dependencies": {
@@ -21,12 +25,19 @@
     "@angular/forms": "^12.0.0",
     "@angular/platform-browser": "^12.0.0",
     "@angular/platform-browser-dynamic": "^12.0.0",
+    "@angular/platform-server": "^12.0.0",
     "@angular/router": "^12.0.0",
-    "firebase": "9.0.0-202171919375",
+    "@angular/service-worker": "^12.0.0",
+    "@nguniversal/express-engine": "12.1.0",
+    "cross-fetch": "^3.1.4",
+    "express": "^4.15.2",
+    "firebase": "9.0.0-2021724205917",
     "lodash.isequal": "^4.5.0",
-    "rxfire": "6.0.0-rc.0",
+    "rxfire": "6.0.0-rc.1",
     "rxjs": "~6.6.0",
     "tslib": "^2.1.0",
+    "ws": "^8.2.0",
+    "xhr2": "^0.2.1",
     "zone.js": "~0.11.4"
   },
   "devDependencies": {
@@ -34,6 +45,8 @@
     "@angular-devkit/build-angular": "^12.0.0",
     "@angular/cli": "^12.0.0",
     "@angular/compiler-cli": "^12.0.0",
+    "@nguniversal/builders": "^12.1.0",
+    "@types/express": "^4.17.0",
     "@types/jasmine": "~3.6.0",
     "@types/node": "^12.11.1",
     "firebase-tools": "^8.0.0",

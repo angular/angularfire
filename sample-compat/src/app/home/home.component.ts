@@ -19,5 +19,6 @@ import { FirebaseApp } from '@angular/fire/compat';
   styles: [``]
 })
 export class HomeComponent {
-  constructor(public readonly firebaseApp: FirebaseApp) {}
+  constructor(public readonly firebaseApp: FirebaseApp) {
+  }
 }

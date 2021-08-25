@@ -136,26 +136,53 @@ export function ɵkeepUnstableUntilFirstFactory(schedulers: ɵAngularFireSchedul
   };
 }
 
-const zoneWrapFn = (it: (...args: any[]) => any) => {
+const zoneWrapFn = (it: (...args: any[]) => any, macrotask: MacroTask) => {
   const _this = this;
   // function() is needed for the arguments object
   // tslint:disable-next-line:only-arrow-functions
   return function() {
+    setTimeout(() => {
+      if (macrotask.state === 'scheduled') {
+        macrotask.invoke();
+      }
+    }, 10);
     return run(() => it.apply(_this, arguments));
   };
 };
 
 export const ɵzoneWrap = <T= unknown>(it: T): T => {
+  // function() is needed for the arguments object
+  // tslint:disable-next-line:only-arrow-functions
   return function() {
+    let macrotask: MacroTask | undefined;
+    // if this is a callback function, e.g, onSnapshot, we should create a microtask and invoke it
+    // only once one of the callback functions is tripped.
     for (let i = 0; i < arguments.length; i++) {
       if (typeof arguments[i] === 'function') {
-        arguments[i] = zoneWrapFn(arguments[i]);
+        macrotask ||= run(() => Zone.current.scheduleMacroTask('firebaseZoneBlock', noop, {}, noop, noop));
+        // TODO create a microtask to track callback functions
+        arguments[i] = zoneWrapFn(arguments[i], macrotask);
       }
     }
     const ret = runOutsideAngular(() => (it as any).apply(this, arguments));
     if (ret instanceof Observable) {
       return ret.pipe(keepUnstableUntilFirst) as any;
+    } else if (ret instanceof Promise) {
+      return run(() => new Promise((resolve, reject) => ret.then(it => run(() => resolve(it)), reason => run(() => reject(reason)))));
+    } else if (typeof ret === 'function' && macrotask) {
+      // Handle unsubscribe
+      // function() is needed for the arguments object
+      // tslint:disable-next-line:only-arrow-functions
+      return function() {
+        setTimeout(() => {
+          if (macrotask.state === 'scheduled') {
+            macrotask.invoke();
+          }
+        }, 10);
+        return ret.apply(this, arguments);
+      };
     } else {
+      // TODO how do we handle storage uploads in Zone? and other stuff with cancel() etc?
       return run(() => ret);
     }
   } as any;

@@ -1,4 +1,5 @@
 import { Rule, SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
+import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { overwriteIfExists, safeReadJSON, stringifyFormatted } from '../../ng-add-common';
 import { default as defaultDependencies, firebaseFunctions } from '../../versions.json';
 
@@ -41,6 +42,7 @@ export const ngUpdate = (): Rule => (
     });
 
     overwriteIfExists(host, 'package.json', stringifyFormatted(packageJson));
+    context.addTask(new NodePackageInstallTask());
 
     host.visit(filePath => {
         if (

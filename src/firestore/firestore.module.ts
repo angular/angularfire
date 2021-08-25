@@ -9,6 +9,8 @@ export const PROVIDED_FIRESTORE_INSTANCES = new InjectionToken<Firestore[]>('ang
 
 export function defaultFirestoreInstanceFactory(_: Firestore[]) {
   const defaultFirestore = ɵgetDefaultInstanceOf<FirebaseFirestore>(FIRESTORE_PROVIDER_NAME);
+  // TODO how do I throw if it's undefined, unless @Optional(), is there an Angular NULL_INJECTOR token
+  // or something, can I use an @NgModule providers or something?
   return new Firestore(defaultFirestore);
 }
 

@@ -2,14 +2,14 @@
 
 Intended to be run with Angular 12, AngularFire 7.0 allows you to take full advtange of the new tree-shakable Firebase JS SDK (v9) while also providing a compatible expirience with the prior API.
 
-`ng update @angular/fire --next`
+`ng update @angular/fire`
 
 ## Breaking changes
 
 * Angular 12 is required
 * AngularFire now only works in Ivy applications
 * Firebase JS SDK v9 is required
-* The AngularFire v6 API surface has moved from `@angular/fire/*` to `@angular/fire/compat/*` (see compatibility mode)
+* The existing AngularFire v6 API surface has moved from `@angular/fire/*` to `@angular/fire/compat/*` (see compatibility mode)
 
 ## Compatibility mode
 
@@ -17,7 +17,9 @@ AngularFire v7.0 has a compatibility layer that supports the AngularFire v6.0 AP
 
 While not as tree-shakable as the new modular SDK, this allows you to upgrade and take advantage of the benefits of the new SDK ASAP.
 
-## Modular SDK
+**Most developers can stop here for now as the new API isn't feature complete.**
+
+## **NEW** Modular SDK
 
 ### Initialization
 
@@ -58,27 +60,73 @@ In order to better support the tree-shakability introduced in Firebase v9 & to r
 Before when you injected Firebase JS SDK services into AngularFire they would be lazy-loaded and a promise-proxy would be returned to you. In AngularFire v7 you get the intiated service directly. We no longer lazy load for you.
 
 ```ts
-import { FirebaseApp } from '@angular/fire';
-import { Firestore, doc, onSnapshot } from '@angular/fire/firestore';
+import { Firestore, doc, onSnapshot, DocumentReference, docSnapshots } from '@angular/fire/firestore';
 
 @Component({})
 export class Foo {
+    doc: DocumentReference;
     constructor(
-        app: FirebaseApp,
         firestore: Firestore, // Injects the instantiated Firestore instance
     ) {
-        // You can directly operate on the instance with the JS SDK or use our "reexported"
-        // API calls for Zone.js wrapping
-        onSnapshot(doc(firestore, 'foo/1'), snap => {
+        // You can directly operate on the instance with JS SDK methods which we've
+        // reexported in AngularFire
+        this.doc = doc(firestore, 'foo/1');
+        onSnapshot(doc, snap => {
             // ...
         });
+        // or use the convenience observables
+        docSnapshots(doc).subscribe(...);
+    }
+    async update() {
+        await updateDoc(this.doc, { ... });
+        ...
     }
 }
 ```
 
-### Class methods
+### Working with multiple apps / instances
 
-AngularFire no longer provides observables and functions as class methods, everthing is a implemented as a pure function that can be tree-shaken.
+In AngularFire v7 working with multiple instances was difficult, in the new SDK we have new DI tokens that make working with them much more straight forward.
+
+```ts
+@NgModule({
+    imports: [
+        provideFirebaseApp(() => initializeApp(config)),
+        provideFirebaseApp(() => initializeApp(config2, 'anotherApp')),
+        provideStorage(() => getStorage()),
+        provideStorage(() => getStorage(getApp(), 'anotherBucket')),
+        provideStorage(() => getStorage(getApp('anotherApp'))),
+    ],
+})
+```
+
+```ts
+import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
+import { Storage, StorageIsntances } from '@angular/fire/storage';
+
+export class Foo {
+    constructor(
+        defaultApp: FirebaseApp,       // Injects the default FirebaseApp
+        allFirebaseApps: FirebaseApps, // Injects an array of all initialized Firebase Apps
+        storage: Storage,                      // Injects the default storage instance
+        allStorageInstances: StorageInstances, // Injects an array of all the intialized storage instances
+    ) { }
+}
+```
+How the main injection tokens (i.e, `FirebaseApp`, `Storage`) function have changed from v7 but it should provide a much more powerful and intuitive API.
+
+### API
+
+Beyond Depdency Injection AngularFire is sporting an entirely new API:
+
+1) We no longer handle lazy-loading the Firebase JS SDK modules for you
+1) We no longer provide classes beyond Depedency Injection
+1) No more Proxy / Promise-Proxy
+1) We reexport and Zone-wrap all Firebase and RxFire APIs
+
+So developing with the new AngularFire is easy, you can use it just like the vanilla Firebase JS SDK. Just change all your `firebase/app` imports to `@angular/fire/app`, `firebase/firestore` to `@angular/fire/firestore`, `firebase/database` to `@angular/fire/database`, etc. Then if you're feeling comfortable with RXJS and would like to use some of our convenience operators you can just dip into that toolbox.
+
+#### Alternatives to v6 APIs
 
 <table>
     <thead>
@@ -94,7 +142,8 @@ AngularFire no longer provides observables and functions as class methods, evert
             <td>
 
 ```ts
-import { doc } from '@angular/fire/firestore'
+import { doc } from '@angular/fire/firestore';
+doc<T>(firestore, 'foo/bar') // DocumentReference<T>
 ```
 </td>
         </tr>
@@ -103,7 +152,8 @@ import { doc } from '@angular/fire/firestore'
             <td>
 
 ```ts
-import { collection } from '@angular/fire/firestore'
+import { collection } from '@angular/fire/firestore';
+collection<T>(firestore, 'foo') // CollectionReference<T>
 ```
 </td>
         </tr>
@@ -112,7 +162,8 @@ import { collection } from '@angular/fire/firestore'
             <td>
 
 ```ts
-import { collectionGroup } from '@angular/fire/firestore'
+import { collectionGroup } from '@angular/fire/firestore';
+collectionGroup<T>('foo') // Query<T>
 ```
 </td>
         </tr>
@@ -122,7 +173,8 @@ import { collectionGroup } from '@angular/fire/firestore'
             <td>
 
 ```ts
-import { setDoc } from '@angular/fire/firestore'
+import { setDoc } from '@angular/fire/firestore';
+setDoc(docRef, { ... }) // Promise<void>
 ```
 </td>
 
@@ -133,7 +185,8 @@ import { setDoc } from '@angular/fire/firestore'
             <td>
 
 ```ts
-import { updateDoc } from '@angular/fire/firestore'
+import { updateDoc } from '@angular/fire/firestore';
+updateDoc(docRef, { ... }) // Promise<void>
 ```
 </td>
         </tr>
@@ -142,7 +195,8 @@ import { updateDoc } from '@angular/fire/firestore'
             <td>
 
 ```ts
-import { deleteDoc } from '@angular/fire/firestore'
+import { deleteDoc } from '@angular/fire/firestore';
+deleteDoc(docRef) // Promise<void>
 ```
 </td>
         </tr>
@@ -151,7 +205,8 @@ import { deleteDoc } from '@angular/fire/firestore'
             <td>
 
 ```ts
-import { collection } from '@angular/fire/firestore'
+import { collection } from '@angular/fire/firestore';
+collection<T>(docRef, 'bar') // CollectionReference<T>
 ```
 </td>
         </tr>
@@ -160,7 +215,8 @@ import { collection } from '@angular/fire/firestore'
             <td>
 
 ```ts
-import { docSnapshots } from '@angular/fire/firestore'
+import { docSnapshots } from '@angular/fire/firestore';
+docSnapshot<T>(docRef) // Observable<DocumentSnapshot<T>>
 ```
 </td>
 
@@ -171,7 +227,8 @@ import { docSnapshots } from '@angular/fire/firestore'
             <td>
 
 ```ts
-import { docData } from '@angular/fire/firestore'
+import { docData } from '@angular/fire/firestore';
+docData<T>(docRef) // Observable<T>
 ```
 </td>
         </tr>
@@ -180,76 +237,10 @@ import { docData } from '@angular/fire/firestore'
             <td>
 
 ```ts
-import { get } from '@angular/fire/firestore'
+import { getDoc } from '@angular/fire/firestore';
+getDoc<T>(docRef) // Promise<DocumentSnapshot<T>>
 ```
 
-</td>
-        </tr>
-        <tr>
-            <td rowspan="7">
-                <h4>AngularFirestoreCollection</h4>
-                <p><small>Notes</small></p>
-            </td>
-            <td>a</td>
-<td>
-
-```ts
-import { collectionGroup } from 'firebase/firestore'
-```
-</td>
-        </tr>
-        <tr>
-            <td>a</td>
-<td>
-
-```ts
-import { collectionGroup } from 'firebase/firestore'
-```
-</td>
-        </tr>
-        <tr>
-            <td>a</td>
-<td>
-
-```ts
-import { collectionGroup } from 'firebase/firestore'
-```
-</td>
-        </tr>
-        <tr>
-            <td>a</td>
-<td>
-
-```ts
-import { collectionGroup } from 'firebase/firestore'
-```
-</td>
-        </tr>
-        <tr>
-            <td>a</td>
-<td>
-
-```ts
-import { collectionGroup } from 'firebase/firestore'
-```
-</td>
-        </tr>
-        <tr>
-            <td>a</td>
-<td>
-
-```ts
-import { collectionGroup } from 'firebase/firestore'
-```
-</td>
-        </tr>
-        <tr>
-            <td>a</td>
-<td>
-
-```ts
-import { collectionGroup } from 'firebase/firestore'
-```
 </td>
         </tr>
     </tbody>
@@ -268,6 +259,7 @@ import {
     getFirestore
 } from '@angular/fire/firestore';
 import { first } from 'rxjs/operators';
+import { IFoo } from '../interfaces';
 
 export { getFirestore };
 
@@ -303,34 +295,3 @@ export class Foo {
     }
 }
 ```
-
-### Working with multiple apps / instances
-
-In AngularFire v7 working with multiple instances was difficult, in the new SDK we have new DI tokens that make working with them much more straight forward.
-
-```ts
-@NgModule({
-    imports: [
-        provideFirebaseApp(() => initializeApp(config)),
-        provideFirebaseApp(() => initializeApp(config2, 'anotherApp')),
-        provideStorage(() => getStorage(getApp())),
-        provideStorage(() => getStorage(getApp(), 'another bucket')),
-        provideStorage(() => getStorage(getApp('anotherApp'))),
-    ],
-})
-```
-
-```ts
-import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
-import { Storage, StorageIsntances } from '@angular/fire/storage';
-
-export class Foo {
-    constructor(
-        defaultApp: FirebaseApp, // Injects the default FirebaseApp
-        firebaseApps: FirebaseApps, // Injects an array of all initialized Firebase Apps
-        storage: Storage, // Injects the default FirebaseApp's default storage instance
-        storageInstances: StorageInstances, // Injects an array of all the intialized storage instances
-    ) { }
-}
-```
-How the main injection tokens (i.e, `FirebaseApp`, `Storage`) function have changed from v7 but it should provide a much more powerful and intuitive API.

@@ -1,5 +1,5 @@
-importScripts('https://www.gstatic.com/firebasejs/7.21.1/firebase-app.js');
-importScripts('https://www.gstatic.com/firebasejs/7.21.1/firebase-messaging.js');
+importScripts('https://www.gstatic.com/firebasejs/9.0.0-20217250818/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.0.0-20217250818/firebase-messaging-compat.js');
 
 firebase.initializeApp({
     apiKey: 'AIzaSyA7CNE9aHbcSEbt9y03QReJ-Xr0nwKg7Yg',
@@ -12,4 +12,10 @@ firebase.initializeApp({
     measurementId: 'G-CBRYER9PJR'
 });
 
-const messaging = firebase.messaging();
+const isSupported = firebase.messaging.isSupported();
+if (isSupported) {
+    const messaging = firebase.messaging();
+    messaging.onBackgroundMessage(({ notification: { title, body, image } }) => {
+        self.registration.showNotification(title, { body, icon: image || '/assets/icons/icon-72x72.png' });
+    });
+}

@@ -13,9 +13,7 @@ import { ɵcacheInstance } from '@angular/fire';
 export const ORIGIN = new InjectionToken<string>('angularfire2.functions.origin');
 export const REGION = new InjectionToken<string>('angularfire2.functions.region');
 
-// SEMVER(7): use Parameters to detirmine the useEmulator arguments
-// type UseEmulatorArguments = Parameters<typeof firebase.functions.Functions.prototype.useEmulator>;
-type UseEmulatorArguments = [string, number];
+type UseEmulatorArguments = Parameters<firebase.functions.Functions['useEmulator']>;
 export const USE_EMULATOR = new InjectionToken<UseEmulatorArguments>('angularfire2.functions.use-emulator');
 
 // override httpsCallable for compatibility with 5.x

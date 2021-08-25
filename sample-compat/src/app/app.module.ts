@@ -1,5 +1,5 @@
 import { BrowserModule, BrowserTransferStateModule } from '@angular/platform-browser';
-import { isDevMode, NgModule } from '@angular/core';
+import { isDevMode, NgModule, APP_INITIALIZER } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -87,11 +87,10 @@ import { UpboatsComponent } from './upboats/upboats.component';
     { provide: REMOTE_CONFIG_DEFAULTS, useValue: { background_color: 'red' } },
     { provide: USE_DEVICE_LANGUAGE, useValue: true },
     { provide: VAPID_KEY, useValue: environment.vapidKey },
-    { provide: SERVICE_WORKER, useFactory: () =>
-      (typeof navigator !== 'undefined' && navigator.serviceWorker?.getRegistration()) ?? undefined
-    },
+    { provide: SERVICE_WORKER, useFactory: () => typeof navigator !== 'undefined' && navigator.serviceWorker?.getRegistration('firebase-messaging-sw.js') || undefined },
     { provide: APP_VERSION, useValue: '0.0.0' },
-    { provide: APP_NAME, useValue: 'Angular' }
+    { provide: APP_NAME, useValue: 'Angular' },
+    { provide: APP_INITIALIZER, useValue: () => typeof navigator !== 'undefined' && navigator.serviceWorker?.register('firebase-messaging-sw.js').catch(() => undefined) || Promise.resolve(), multi: true },
   ],
   bootstrap: [AppComponent]
 })
