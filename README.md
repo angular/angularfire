@@ -94,7 +94,11 @@ Neither AngularFire or Firebase ship with polyfills. To have compatability acros
 
 ## Developer Guide
 
-### **NEW:** Monitor usage of your application in production
+AngularFire has a new tree-shakable API, however this is still under active development and documentation is in the works, so we suggest most developers stick with the Compatiability API for the time being. [See the v7 upgrade guide for more information.](docs/version-7-upgrade.md). 
+
+This developer guide assumes you're using the Compatiability API (`@angular/fire/compat/*`).
+
+### Monitor usage of your application in production
 
 > `AngularFireAnalytics` provides a convenient method of interacting with Google Analytics in your Angular application. The provided `ScreenTrackingService` and `UserTrackingService` automatically log events when you're using the Angular Router or Firebase Authentication respectively. [Learn more about Google Analytics](https://firebase.google.com/docs/analytics).
 
@@ -144,7 +148,7 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 
 - [Getting started with Remote Config](docs/remote-config/getting-started.md)
 
-### **NEW:** Monitor your application performance in production
+### Monitor your application performance in production
 
 > Firebase Performance Monitoring is a service that helps you to gain insight into the performance characteristics of your iOS, Android, and web apps. [Learn more about Performance Monitoring](https://firebase.google.com/docs/perf-mon).
 
