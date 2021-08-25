@@ -60,20 +60,26 @@ In order to better support the tree-shakability introduced in Firebase v9 & to r
 Before when you injected Firebase JS SDK services into AngularFire they would be lazy-loaded and a promise-proxy would be returned to you. In AngularFire v7 you get the intiated service directly. We no longer lazy load for you.
 
 ```ts
-import { FirebaseApp } from '@angular/fire';
-import { Firestore, doc, onSnapshot } from '@angular/fire/firestore';
+import { Firestore, doc, onSnapshot, DocumentReference, docSnapshots } from '@angular/fire/firestore';
 
 @Component({})
 export class Foo {
+    doc: DocumentReference;
     constructor(
-        app: FirebaseApp,
         firestore: Firestore, // Injects the instantiated Firestore instance
     ) {
-        // You can directly operate on the instance with the JS SDK or use our "reexported"
-        // API calls for Zone.js wrapping
-        onSnapshot(doc(firestore, 'foo/1'), snap => {
+        // You can directly operate on the instance with JS SDK methods which we've
+        // reexported in AngularFire
+        this.doc = doc(firestore, 'foo/1');
+        onSnapshot(doc, snap => {
             // ...
         });
+        // or use the convenience observables
+        docSnapshots(doc).subscribe(...);
+    }
+    async update() {
+        await updateDoc(this.doc, { ... });
+        ...
     }
 }
 ```
