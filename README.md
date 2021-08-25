@@ -1,7 +1,7 @@
 # AngularFire
 The official [Angular](https://angular.io/) library for [Firebase](https://firebase.google.com/).
 
-<strong><pre>ng add @angular/fire@next</pre></strong>
+<strong><pre>ng add @angular/fire</pre></strong>
 
 AngularFire smooths over the rough edges an Angular developer might encounter when implementing the framework-agnostic [Firebase JS SDK](https://github.com/firebase/firebase-js-sdk) & aims to provide a more natural developer experience by conforming to Angular conventions.
 
@@ -13,12 +13,6 @@ AngularFire smooths over the rough edges an Angular developer might encounter wh
 - **Deploy schematics** - Get your Angular application deployed on Firebase Hosting with a single command
 - **Google Analytics** - Zero-effort Angular Router awareness in Google Analytics
 - **Router Guards** - Guard your Angular routes with built-in Firebase Authentication checks
-
----
-
-> **WARNING**: This branch is the work in progress for version 7 of AngularFire. [You can find version 6 here](https://github.com/angular/angularfire/tree/v6), if you're looking for documentation or to contribute to stable.
-
----
 
 ## Example use
 
@@ -60,7 +54,7 @@ AngularFire doesn't follow Angular's versioning as Firebase also has breaking ch
 
 | Angular | Firebase | AngularFire  |
 | --------|----------|--------------|
-| 12      | [9 <sup>beta</sup>](https://firebase.google.com/docs/web/learn-more#modular-version) | ^7.0 <sup>beta</sup> |
+| 12      | 9        | ^7.0         |
 | 12      | 7,8      | ^6.1.5       |
 | 11      | 7,8      | ^6.1         |
 | 10      | 8        | ^6.0.4       |
