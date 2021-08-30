@@ -1,3 +1,10 @@
+<a name="7.0.1"></a>
+# [7.0.1](https://github.com/angular/angularfire2/compare/7.0.0...7.0.1) (2021-08-30)
+
+### Bug fixes
+
+* **messaging:** `onMessage` will no longer destablize the Angular Zone
+
 <a name="7.0.0"></a>
 # [7.0.0](https://github.com/angular/angularfire2/compare/6.1.5...7.0.0) (2021-08-25)
 
@@ -7,8 +14,12 @@
 * AngularFire now only works in Ivy applications
 * Firebase JS SDK v9 is required
 * The existing AngularFire v6 API surface has moved from `@angular/fire/*` to `@angular/fire/compat/*` (see compatibility mode)
+* **compat/auth:** `USE_EMULATOR` DI token is now in the form of `['http://localhost:9099']`
+
+### Features
+
 * New modular API surface available at `@angular/fire/*`
-* Various cleanup
+* **compat/storage:** `USE_EMULATOR` DI token
 
 [See the v7 upgrade guide for more information.](https://github.com/angular/angularfire/blob/master/docs/version-7-upgrade.md)
 
