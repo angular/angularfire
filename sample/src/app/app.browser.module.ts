@@ -8,10 +8,12 @@ import { AppModule } from './app.module';
 import { AppComponent } from './app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+import { BrowserTransferStateModule } from '@angular/platform-browser';
 
 @NgModule({
   imports: [
     AppModule,
+    BrowserTransferStateModule,
     provideRemoteConfig(() => getRemoteConfig()),
     provideAnalytics(() => getAnalytics()),
     provideMessaging(() => getMessaging()),
