@@ -3,12 +3,12 @@ import { Firestore as FirebaseFirestore } from 'firebase/firestore/lite';
 import { AuthInstances  } from '@angular/fire/auth';
 import { ɵmemoizeInstance, ɵgetDefaultInstanceOf, ɵAngularFireSchedulers } from '@angular/fire';
 import { Firestore, FirestoreInstances, FIRESTORE_PROVIDER_NAME } from './lite';
-import { FirebaseApps } from '@angular/fire/app';
+import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
 
 export const PROVIDED_FIRESTORE_INSTANCES = new InjectionToken<Firestore[]>('angularfire2.firestore-lite-instances');
 
-export function defaultFirestoreInstanceFactory(_: Firestore[]) {
-  const defaultFirestore = ɵgetDefaultInstanceOf<FirebaseFirestore>(FIRESTORE_PROVIDER_NAME);
+export function defaultFirestoreInstanceFactory(provided: FirebaseFirestore[]|undefined, defaultApp: FirebaseApp) {
+  const defaultFirestore = ɵgetDefaultInstanceOf<FirebaseFirestore>(FIRESTORE_PROVIDER_NAME, provided, defaultApp);
   return new Firestore(defaultFirestore);
 }
 
@@ -30,8 +30,8 @@ const DEFAULT_FIRESTORE_INSTANCE_PROVIDER = {
   provide: Firestore,
   useFactory: defaultFirestoreInstanceFactory,
   deps: [
-    NgZone,
     [new Optional(), PROVIDED_FIRESTORE_INSTANCES ],
+    FirebaseApp,
   ]
 };
 

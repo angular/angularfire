@@ -5,6 +5,8 @@ import { DocumentData } from 'rxfire/firestore/lite/interfaces';
 import { distinctUntilChanged } from 'rxjs/operators';
 import { Messaging, onMessage } from '@angular/fire/messaging';
 import { getToken } from '@angular/fire/messaging';
+import { Storage } from '@angular/fire/storage';
+import { Functions } from '@angular/fire/functions';
 
 import { environment } from '../environments/environment';
 

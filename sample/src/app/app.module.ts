@@ -1,15 +1,17 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { provideFirebaseApp, initializeApp, getApp } from '@angular/fire/app';
 import { provideAuth, getAuth, connectAuthEmulator } from '@angular/fire/auth';
 import { getStorage, provideStorage, connectStorageEmulator } from '@angular/fire/storage';
 import { getDatabase, provideDatabase, connectDatabaseEmulator } from '@angular/fire/database';
 import { getFirestore, provideFirestore, connectFirestoreEmulator } from '@angular/fire/firestore';
 import { getFunctions, provideFunctions, connectFunctionsEmulator } from '@angular/fire/functions';
+import { FunctionsModule } from '@angular/fire/functions';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { environment } from '../environments/environment';
+
 
 @NgModule({
   declarations: [
@@ -18,6 +20,7 @@ import { environment } from '../environments/environment';
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),
     AppRoutingModule,
+    FunctionsModule,
     provideFirebaseApp(() => {
       const app = initializeApp(environment.firebase);
       return app;
@@ -42,18 +45,20 @@ import { environment } from '../environments/environment';
       return database;
     }),
     provideStorage(() => {
-      const storage = getStorage();
+      // While I've provided two instances this should be the default, since it
+      // uses the default app
+      const storage = getStorage(getApp(), 'another-bucket');
       if (environment.useEmulators) {
         connectStorageEmulator(storage, 'localhost', 9199);
       }
       return storage;
     }),
-    provideFunctions(() => {
-      const functions = getFunctions();
+    provideStorage(() => {
+      const storage = getStorage(getApp('second'));
       if (environment.useEmulators) {
-        connectFunctionsEmulator(functions, 'localhost', 5001);
+        connectStorageEmulator(storage, 'localhost', 9199);
       }
-      return functions;
+      return storage;
     }),
     provideFirestore(() => {
       const firestore = getFirestore();
@@ -61,6 +66,13 @@ import { environment } from '../environments/environment';
         connectFirestoreEmulator(firestore, 'localhost', 8080);
       }
       return firestore;
+    }),
+    provideFunctions(() => {
+      const functions = getFunctions();
+      if (environment.useEmulators) {
+        connectFunctionsEmulator(functions, 'localhost', 5001);
+      }
+      return functions;
     }),
   ],
   providers: [ ],

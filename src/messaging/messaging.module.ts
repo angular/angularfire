@@ -2,15 +2,17 @@ import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, APP_IN
 import { isSupported, Messaging as FirebaseMessaging } from 'firebase/messaging';
 import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers } from '@angular/fire';
 import { Messaging, MessagingInstances, MESSAGING_PROVIDER_NAME } from './messaging';
-import { FirebaseApps } from '@angular/fire/app';
+import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
 
 const PROVIDED_MESSAGING_INSTANCES = new InjectionToken<Messaging[]>('angularfire2.messaging-instances');
 const IS_SUPPORTED = new InjectionToken<boolean>('angularfire2.messaging.isSupported');
 
 const isSupportedSymbol = Symbol('angularfire2.messaging.isSupported');
 
-export function defaultMessagingInstanceFactory(isSupported: boolean) {
-  const defaultAuth = isSupported ? ɵgetDefaultInstanceOf<FirebaseMessaging>(MESSAGING_PROVIDER_NAME) : undefined;
+export function defaultMessagingInstanceFactory(isSupported: boolean, provided: FirebaseMessaging[]|undefined, defaultApp: FirebaseApp) {
+  const defaultAuth = isSupported ?
+    ɵgetDefaultInstanceOf<FirebaseMessaging>(MESSAGING_PROVIDER_NAME, provided, defaultApp) :
+    undefined;
   return new Messaging(defaultAuth);
 }
 
@@ -33,8 +35,8 @@ const DEFAULT_MESSAGING_INSTANCE_PROVIDER = {
   useFactory: defaultMessagingInstanceFactory,
   deps: [
     IS_SUPPORTED,
-    NgZone,
     [new Optional(), PROVIDED_MESSAGING_INSTANCES ],
+    FirebaseApp,
   ]
 };
 
