@@ -10,6 +10,7 @@ Intended to be run with Angular 12, AngularFire 7.0 allows you to take full advt
 * AngularFire now only works in Ivy applications
 * Firebase JS SDK v9 is required
 * The existing AngularFire v6 API surface has moved from `@angular/fire/*` to `@angular/fire/compat/*` (see compatibility mode)
+* **compat/auth:** `USE_EMULATOR` DI token is now in the form of `['http://localhost:9099']`
 
 ## Compatibility mode
 
@@ -216,7 +217,7 @@ collection<T>(docRef, 'bar') // CollectionReference<T>
 
 ```ts
 import { docSnapshots } from '@angular/fire/firestore';
-docSnapshot<T>(docRef) // Observable<DocumentSnapshot<T>>
+docSnapshots<T>(docRef) // Observable<DocumentSnapshot<T>>
 ```
 </td>
 
