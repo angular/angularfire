@@ -29,7 +29,7 @@ In order to better support the tree-shakability introduced in Firebase v9 & to r
 ```ts
 @NgModule({
     imports: [
-        AngularFire.initializeApp(config),
+        AngularFireModule.initializeApp(config),
         AngularFirestoreModule.enablePersistence(),
         AngularFireStorageModule,
     ],
