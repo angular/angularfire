@@ -54,9 +54,17 @@ function matchDep(a: any, b: any) {
   }
 }
 
-export function ɵgetDefaultInstanceOf<T= unknown>(identifier: string): T|undefined  {
-  const defaultApp: FirebaseAppWithContainer = getApp() as any;
-  const provider = defaultApp.container.getProvider(identifier as never);
+export function ɵgetDefaultInstanceOf<T= unknown>(identifier: string, provided: T[]|undefined, defaultApp: FirebaseApp): T|undefined  {
+  if (provided) {
+    // Was provide* only called once? If so grab that
+    if (provided.length === 1) { return provided[0]; }
+    const providedUsingDefaultApp = provided.filter((it: any) => it.app === defaultApp);
+    // Was provide* only called once, using the default app? If so use that
+    if (providedUsingDefaultApp.length === 1) { return providedUsingDefaultApp[0]; }
+  }
+  // Grab the default instance from the defaultApp
+  const defaultAppWithContainer: FirebaseAppWithContainer = defaultApp as any;
+  const provider = defaultAppWithContainer.container.getProvider(identifier as never);
   return provider.getImmediate();
 }
 

@@ -3,7 +3,6 @@ import { getRemoteConfig, provideRemoteConfig } from '@angular/fire/remote-confi
 import { getAnalytics, provideAnalytics } from '@angular/fire/analytics';
 import { getMessaging, provideMessaging } from '@angular/fire/messaging';
 import { getPerformance, providePerformance } from '@angular/fire/performance';
-import { getFunctions, provideFunctions } from '@angular/fire/functions';
 
 import { AppModule } from './app.module';
 import { AppComponent } from './app.component';
@@ -17,7 +16,6 @@ import { environment } from '../environments/environment';
     provideAnalytics(() => getAnalytics()),
     provideMessaging(() => getMessaging()),
     providePerformance(() => getPerformance()),
-    provideFunctions(() => getFunctions()),
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production,
       registrationStrategy: 'registerWhenStable:30000'

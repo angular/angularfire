@@ -28,6 +28,7 @@ import {
   LANGUAGE_CODE,
   USE_DEVICE_LANGUAGE,
   PERSISTENCE,
+  ɵauthFactory,
 } from '@angular/fire/compat/auth';
 import { ɵcacheInstance } from '@angular/fire';
 
@@ -146,7 +147,7 @@ export class AngularFirestore {
     @Optional() @Inject(USE_EMULATOR) _useEmulator: any,
     @Optional() auth: AngularFireAuth,
     @Optional() @Inject(USE_AUTH_EMULATOR) useAuthEmulator: any,
-    @Optional() @Inject(AUTH_SETTINGS) _settings: any, // can't use firebase.auth.AuthSettings here
+    @Optional() @Inject(AUTH_SETTINGS) authSettings: any, // can't use firebase.auth.AuthSettings here
     @Optional() @Inject(TENANT_ID) tenantId: string | null,
     @Optional() @Inject(LANGUAGE_CODE) languageCode: string | null,
     @Optional() @Inject(USE_DEVICE_LANGUAGE) useDeviceLanguage: boolean | null,
@@ -154,33 +155,9 @@ export class AngularFirestore {
   ) {
     const app = ɵfirebaseAppFactory(options, zone, name);
     const useEmulator: UseEmulatorArguments | null = _useEmulator;
-
-
+    
     if (auth) {
-      const authSettings: firebase.auth.AuthSettings | null = _settings;
-      ɵcacheInstance(`${app.name}.auth`, 'AngularFireAuth', app.name, () => {
-        const auth = zone.runOutsideAngular(() => app.auth());
-        if (useAuthEmulator) {
-          // @ts-ignore
-          auth.useEmulator(...useAuthEmulator);
-        }
-        if (tenantId) {
-          auth.tenantId = tenantId;
-        }
-        auth.languageCode = languageCode;
-        if (useDeviceLanguage) {
-          auth.useDeviceLanguage();
-        }
-        if (authSettings) {
-          for (const [k, v] of Object.entries(authSettings)) {
-            auth.settings[k] = v;
-          }
-        }
-        if (persistence) {
-          auth.setPersistence(persistence);
-        }
-        return auth;
-      }, [useAuthEmulator, tenantId, languageCode, useDeviceLanguage, authSettings, persistence]);
+      ɵauthFactory(app, zone, useAuthEmulator, tenantId, languageCode, useDeviceLanguage, authSettings, persistence);
     }
 
     [this.firestore, this.persistenceEnabled$] = ɵcacheInstance(`${app.name}.firestore`, 'AngularFirestore', app.name, () => {
