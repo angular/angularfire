@@ -46,7 +46,7 @@ import { environment } from '../environments/environment';
       if (environment.useEmulators) {
         connectStorageEmulator(storage, 'localhost', 9199);
       }
-      return storage; 
+      return storage;
     }),
     provideFunctions(() => {
       const functions = getFunctions();

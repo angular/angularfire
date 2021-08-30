@@ -179,7 +179,7 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
       }
     }
     if (ret instanceof Observable) {
-      return ret.pipe(keepUnstableUntilFirst) as any; 
+      return ret.pipe(keepUnstableUntilFirst) as any;
     } else if (ret instanceof Promise) {
       return run(() => new Promise((resolve, reject) => ret.then(it => run(() => resolve(it)), reason => run(() => reject(reason)))));
     } else if (typeof ret === 'function' && macrotask) {
