@@ -150,23 +150,36 @@ const zoneWrapFn = (it: (...args: any[]) => any, macrotask: MacroTask) => {
   };
 };
 
-export const ɵzoneWrap = <T= unknown>(it: T): T => {
+export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
   // function() is needed for the arguments object
   // tslint:disable-next-line:only-arrow-functions
   return function() {
     let macrotask: MacroTask | undefined;
-    // if this is a callback function, e.g, onSnapshot, we should create a microtask and invoke it
-    // only once one of the callback functions is tripped.
-    for (let i = 0; i < arguments.length; i++) {
-      if (typeof arguments[i] === 'function') {
-        macrotask ||= run(() => Zone.current.scheduleMacroTask('firebaseZoneBlock', noop, {}, noop, noop));
-        // TODO create a microtask to track callback functions
-        arguments[i] = zoneWrapFn(arguments[i], macrotask);
+    if (blockUntilFirst) {
+      // if this is a callback function, e.g, onSnapshot, we should create a microtask and invoke it
+      // only once one of the callback functions is tripped.
+      for (let i = 0; i < arguments.length; i++) {
+        if (typeof arguments[i] === 'function') {
+          macrotask ||= run(() => Zone.current.scheduleMacroTask('firebaseZoneBlock', noop, {}, noop, noop));
+          // TODO create a microtask to track callback functions
+          arguments[i] = zoneWrapFn(arguments[i], macrotask);
+        }
       }
     }
     const ret = runOutsideAngular(() => (it as any).apply(this, arguments));
+    if (!blockUntilFirst) {
+      if (ret instanceof Observable) {
+        const schedulers = getSchedulers();
+        return ret.pipe(
+          subscribeOn(schedulers.outsideAngular),
+          observeOn(schedulers.insideAngular),
+        );
+      } else {
+        return run(() => ret);
+      }
+    }
     if (ret instanceof Observable) {
-      return ret.pipe(keepUnstableUntilFirst) as any;
+      return ret.pipe(keepUnstableUntilFirst) as any; 
     } else if (ret instanceof Promise) {
       return run(() => new Promise((resolve, reject) => ret.then(it => run(() => resolve(it)), reason => run(() => reject(reason)))));
     } else if (typeof ret === 'function' && macrotask) {
@@ -175,7 +188,7 @@ export const ɵzoneWrap = <T= unknown>(it: T): T => {
       // tslint:disable-next-line:only-arrow-functions
       return function() {
         setTimeout(() => {
-          if (macrotask.state === 'scheduled') {
+          if (macrotask && macrotask.state === 'scheduled') {
             macrotask.invoke();
           }
         }, 10);
