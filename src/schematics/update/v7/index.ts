@@ -2,6 +2,7 @@ import { Rule, SchematicContext, SchematicsException, Tree } from '@angular-devk
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { overwriteIfExists, safeReadJSON, stringifyFormatted } from '../../ng-add-common';
 import { default as defaultDependencies, firebaseFunctions } from '../../versions.json';
+import { join } from 'path';
 
 const IMPORT_REGEX = /(?<key>import|export)\s+(?:(?<alias>[\w,{}\s\*]+)\s+from)?\s*(?:(?<quote>["'])?(?<ref>[@\w\s\\\/.-]+)\3?)\s*(?<term>[;\n])/g;
 interface ImportRegexMatch {
@@ -44,11 +45,18 @@ export const ngUpdate = (): Rule => (
     overwriteIfExists(host, 'package.json', stringifyFormatted(packageJson));
     context.addTask(new NodePackageInstallTask());
 
+    const angularJson = host.exists('angular.json') && safeReadJSON('angular.json', host);
+    if (packageJson === undefined) {
+        throw new SchematicsException('Could not locate angular.json');
+    }
+
+    const srcRoots: string[] = Object.values(angularJson.projects).map((it: any) => join('/', it.sourceRoot));
+
     host.visit(filePath => {
         if (
             !filePath.endsWith('.ts') ||
             filePath.endsWith('.d.ts') ||
-            filePath.startsWith('/node_modules')
+            !srcRoots.find(root => filePath.startsWith(root))
         ) {
             return;
         }
