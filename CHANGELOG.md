@@ -4,6 +4,8 @@
 ### Bug fixes
 
 * **messaging:** `onMessage` will no longer destablize the Angular Zone
+* **core:** Injected Classes now have a better fallback pattern for finding defaults, [#2909](https://github.com/angular/angularfire/issues/2909) allowing use of emulators and other config options as expected
+* **schematic:** upgrade schematic will no longer rewrite `.ts` files outside of your project root, [#2907](https://github.com/angular/angularfire/issues/2907)
 
 <a name="7.0.0"></a>
 # [7.0.0](https://github.com/angular/angularfire2/compare/6.1.5...7.0.0) (2021-08-25)
