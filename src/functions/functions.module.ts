@@ -3,6 +3,7 @@ import { Functions as FirebaseFunctions } from 'firebase/functions';
 import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers } from '@angular/fire';
 import { Functions, FunctionsInstances, FUNCTIONS_PROVIDER_NAME } from './functions';
 import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
+import { AuthInstances } from '@angular/fire/auth';
 
 export const PROVIDED_FUNCTIONS_INSTANCES = new InjectionToken<Functions[]>('angularfire2.functions-instances');
 
@@ -54,6 +55,8 @@ export function provideFunctions(fn: () => FirebaseFunctions): ModuleWithProvide
         NgZone,
         ɵAngularFireSchedulers,
         FirebaseApps,
+        // Defensively load Auth first, if provided
+        [new Optional(), AuthInstances ],
       ]
     }]
   };
