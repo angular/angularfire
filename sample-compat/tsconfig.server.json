@@ -10,8 +10,7 @@
   },
   "files": [
     "src/main.server.ts",
-    "server.ts",
-    "firestore-protos.ts"
+    "server.ts"
   ],
   "angularCompilerOptions": {
     "entryModule": "./src/app/app.server.module#AppServerModule"

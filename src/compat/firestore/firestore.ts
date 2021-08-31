@@ -155,7 +155,7 @@ export class AngularFirestore {
   ) {
     const app = ɵfirebaseAppFactory(options, zone, name);
     const useEmulator: UseEmulatorArguments | null = _useEmulator;
-    
+
     if (auth) {
       ɵauthFactory(app, zone, useAuthEmulator, tenantId, languageCode, useDeviceLanguage, authSettings, persistence);
     }
