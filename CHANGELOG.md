@@ -1,3 +1,10 @@
+<a name="7.0.2"></a>
+# [7.0.2](https://github.com/angular/angularfire2/compare/7.0.1...7.0.2) (2021-08-30)
+
+### Bug fixes
+
+* **types:** `firebase/*` types were not being reexported from the `@angular/fire/*` modules (modular)
+
 <a name="7.0.1"></a>
 # [7.0.1](https://github.com/angular/angularfire2/compare/7.0.0...7.0.1) (2021-08-30)
 
