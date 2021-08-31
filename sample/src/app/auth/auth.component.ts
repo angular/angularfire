@@ -1,11 +1,9 @@
 import { Component, OnInit, OnDestroy, PLATFORM_ID } from '@angular/core';
-import { Auth, authState, signInAnonymously, signOut } from '@angular/fire/auth';
+import { Auth, authState, signInAnonymously, signOut, User } from '@angular/fire/auth';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { traceUntilFirst } from '@angular/fire/performance';
 import { Inject } from '@angular/core';
-import { isPlatformServer } from '@angular/common';
-import { User } from 'firebase/auth';
 
 @Component({
   selector: 'app-auth',
