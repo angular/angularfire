@@ -93,6 +93,7 @@
     "codelyzer": "^6.0.0",
     "concurrently": "^2.2.0",
     "conventional-changelog-cli": "^1.2.0",
+    "file-loader": "^6.2.0",
     "firebase-functions-test": "^0.2.2",
     "globalthis": "^1.0.1",
     "gzip-size": "^5.1.1",

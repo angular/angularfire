@@ -24,13 +24,13 @@ export class MessagingComponent implements OnInit {
   constructor(@Optional() private messaging: Messaging) {
     if (messaging) {
       this.token$ = from(
-        navigator.serviceWorker.register('firebase-messaging-sw.js', { type: 'module' }).
-          then(serviceWorkerRegistration => {
-            return getToken(messaging, {
+        navigator.serviceWorker.register('firebase-messaging-sw.js', { type: 'module', scope: '__' }).
+          then(serviceWorkerRegistration =>
+            getToken(messaging, {
               serviceWorkerRegistration,
               vapidKey: environment.vapidKey,
-            });
-          }));
+            })
+          ));
       this.message$ = new Observable(sub => onMessage(messaging, it => sub.next(it)));
     }
   }

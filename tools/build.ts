@@ -5,6 +5,7 @@ import { file as gzipSizeFile } from 'gzip-size';
 import { dirname, join } from 'path';
 import { keys as tsKeys } from 'ts-transformer-keys';
 import firebase from 'firebase/compat/app';
+import * as glob from 'glob';
 
 // TODO infer these from the package.json
 const MODULES = [
@@ -101,6 +102,19 @@ ${zoneWrapped.map(([importName, exportName]) => `export const ${exportName} = ɵ
     }),
     reexport('firestore/lite', 'firebase', 'firebase/firestore/lite', tsKeys<typeof import('firebase/firestore/lite')>()),
   ]);
+}
+
+function webpackFirestoreProtos() {
+  return new Promise<void>((resolve, reject) => {
+    glob('./node_modules/@firebase/firestore/dist/src/protos/**/*.proto', {}, async (err, files) => {
+      if (err) { reject(err); }
+      const fileLoader = files.map(path =>
+        `require('file-loader?name=${path.replace('./node_modules/@firebase/firestore/dist/', '')}!${path.replace('./node_modules/', '../../')}');`
+      ).join('\n');
+      await writeFile('./dist/packages-dist/firestore-protos.js', fileLoader);
+      resolve();
+    });
+  });
 }
 
 function proxyPolyfillCompat() {
@@ -206,6 +220,7 @@ async function buildLibrary() {
     compileSchematics(),
     replacePackageCoreVersion(),
     fixImportForLazyModules(),
+    webpackFirestoreProtos(),
   ]);
 }
 
