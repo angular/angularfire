@@ -22,6 +22,7 @@ api-*.json
 angularfire.tgz
 unpack.sh
 publish.sh
+.firebase
 
 # auto-gen files
 src/compat/**/base.ts

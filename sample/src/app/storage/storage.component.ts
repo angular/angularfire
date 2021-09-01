@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Storage, ref, getDownloadURL } from '@angular/fire/storage';
-import { from, Observable, of } from 'rxjs';
-import { startWith, tap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { startWith, switchMap, tap } from 'rxjs/operators';
 import { makeStateKey, TransferState } from '@angular/platform-browser';
 import { traceUntilFirst } from '@angular/fire/performance';
 
@@ -22,14 +21,14 @@ export class StorageComponent implements OnInit {
 
   public readonly downloadUrl$: Observable<string>;
 
-  constructor(storage: Storage, state: TransferState) {
-    const icon = ref(storage, 'google-g.png');
+  constructor( state: TransferState) {
     const key = makeStateKey<string>('google-icon-url');
     const existing = state.get(key, undefined);
-    this.downloadUrl$ = existing ? of(existing) : from(getDownloadURL(icon)).pipe(
+    this.downloadUrl$ = existing ? of(existing) : of(undefined).pipe(
+      switchMap(() => import('./lazyStorage').then(({ iconUrl }) => iconUrl)),
       traceUntilFirst('storage'),
       tap(it => state.set(key, it)),
-      startWith(TRANSPARENT_PNG)
+      startWith(TRANSPARENT_PNG),
     );
   }
 

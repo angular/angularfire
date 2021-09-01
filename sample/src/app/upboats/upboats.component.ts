@@ -1,14 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map, startWith, tap } from 'rxjs/operators';
-import {
-  Firestore, collection, query, orderBy, fromRef,
-  doc, updateDoc, addDoc, increment, serverTimestamp
-} from '@angular/fire/firestore';
+import { Observable, of } from 'rxjs';
+import { concatMap, filter, startWith, switchMap, tap } from 'rxjs/operators';
 import { makeStateKey, TransferState } from '@angular/platform-browser';
 import { traceUntilFirst } from '@angular/fire/performance';
 
-type Animal = { name: string, upboats: number, id: string, hasPendingWrites: boolean };
+export type Animal = { name: string, upboats: number, id: string, hasPendingWrites: boolean };
 
 @Component({
   selector: 'app-upboats',
@@ -30,19 +26,15 @@ export class UpboatsComponent implements OnInit {
 
   public readonly animals: Observable<Animal[]>;
 
-  constructor(private firestore: Firestore, state: TransferState) {
-    const animalsCollection = collection(firestore, 'animals');
-    const animalsQuery = query(animalsCollection, orderBy('upboats', 'desc'), orderBy('updatedAt', 'desc'));
-    const key = makeStateKey<Animal[]>(animalsCollection.path);
+  constructor(state: TransferState) {
+    const key = makeStateKey<Animal[]>('ANIMALS');
     const existing = state.get(key, undefined);
-    this.animals = fromRef(animalsQuery).pipe(
+    this.animals = of(undefined).pipe(
+      switchMap(() => import('./lazyFirestore').then(({ snapshotChanges }) => snapshotChanges)),
+      switchMap(it => it),
       traceUntilFirst('animals'),
-      map(it => it.docs.map(change => ({
-        ...change.data(),
-        id: change.id,
-        hasPendingWrites: change.metadata.hasPendingWrites
-      } as Animal))),
-      existing ? startWith(existing) : tap(it => state.set<Animal[]>(key, it))
+      tap(it => state.set<Animal[]>(key, it)),
+      existing ? startWith(existing) : tap(),
     );
   }
 
@@ -50,28 +42,15 @@ export class UpboatsComponent implements OnInit {
   }
 
   async upboat(id: string) {
-    // TODO add rule
-    return await updateDoc(doc(this.firestore, `animals/${id}`), {
-      upboats: increment(1),
-      updatedAt: serverTimestamp(),
-    });
+    return await import('./lazyFirestore').then(({ upboat }) => upboat(id));
   }
 
   async downboat(id: string) {
-    // TODO add rule
-    return await updateDoc(doc(this.firestore, `animals/${id}`), {
-      upboats: increment(-1),
-      updatedAt: serverTimestamp(),
-    });
+    return await import('./lazyFirestore').then(({ downboat }) => downboat(id));
   }
 
   async newAnimal() {
-    // TODO add rule
-    return await addDoc(collection(this.firestore, 'animals'), {
-      name: prompt('Can haz name?'),
-      upboats: 1,
-      updatedAt: serverTimestamp(),
-    });
+    return await import('./lazyFirestore').then(({ newAnimal }) => newAnimal());
   }
 
 }

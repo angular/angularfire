@@ -121,7 +121,10 @@
         },
         "deploy": {
           "builder": "@angular/fire:deploy",
-          "options": {}
+          "options": {
+            "ssr": true,
+            "functionsNodeVersion": 14
+          }
         },
         "server": {
           "builder": "@angular-devkit/build-angular:server",
@@ -131,7 +134,10 @@
             "tsConfig": "tsconfig.server.json",
             "optimization": false,
             "sourceMap": true,
-            "extractLicenses": false
+            "extractLicenses": false,
+            "externalDependencies": [
+            ],
+            "bundleDependencies": true
           },
           "configurations": {
             "production": {

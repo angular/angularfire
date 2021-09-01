@@ -21,7 +21,7 @@ export class MessagingComponent implements OnInit {
   message$: Observable<any> = EMPTY;
   showRequest = false;
 
-  constructor(@Optional() private messaging: Messaging) {
+  constructor(@Optional() messaging: Messaging) {
     if (messaging) {
       this.token$ = from(
         navigator.serviceWorker.register('firebase-messaging-sw.js', { type: 'module', scope: '__' }).
