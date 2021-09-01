@@ -171,10 +171,12 @@ export const deployToFunction = async (
     defaultFunction(serverOut, options)
   );
 
-  fsHost.renameSync(
-    join(newClientPath, 'index.html'),
-    join(newClientPath, 'index.original.html')
-  );
+  try {
+    fsHost.renameSync(
+      join(newClientPath, 'index.html'),
+      join(newClientPath, 'index.original.html')
+    );
+  } catch (e) { }
 
   if (options.preview) {
     const port = 5000; // TODO make this configurable
