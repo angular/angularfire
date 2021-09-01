@@ -1,4 +1,4 @@
-import { Component, isDevMode, OnDestroy, OnInit } from '@angular/core';
+import { Component, isDevMode, OnDestroy, OnInit, Optional } from '@angular/core';
 import { Observable, of, Subscription } from 'rxjs';
 import { filter, startWith, switchMap, tap } from 'rxjs/operators';
 import { makeStateKey, TransferState } from '@angular/platform-browser';
@@ -19,9 +19,9 @@ export type Animal = {
     <ul>
       <li *ngFor="let animal of animals | async">
           <span>{{ animal.name }}</span>
-          <button (click)="upboat(animal.id)" [disabled]="!this.user">👍</button>
+          <button (click)="upboat(animal.id)" [disabled]="(this.user | async) === null">👍</button>
           <span>{{ animal.upboats }}</span>
-          <button (click)="downboat(animal.id)" [disabled]="!this.user">👎</button>
+          <button (click)="downboat(animal.id)" [disabled]="(this.user | async) === null">👎</button>
           <span *ngIf="animal.hasPendingWrites">🕒</span>
           <span>{{ animal.changeType }}</span>
       </li>
@@ -33,18 +33,22 @@ export type Animal = {
 export class UpboatsComponent implements OnInit {
 
   public readonly animals: Observable<Animal[]>;
-  public user: User|null = null;
+  public user: Observable<User|null>;
 
   get lazyFirestore() {
     return import('./lazyFirestore');
   }
 
-  constructor(state: TransferState, auth: Auth) {
+  constructor(state: TransferState, @Optional() auth: Auth) {
     const key = makeStateKey<Animal[]>('ANIMALS');
     const existing = state.get(key, undefined);
-    this.animals = user(auth).pipe(
-      tap(it => this.user = it),
-      existing ? filter(it => !!it) : tap(),
+    this.user = auth ? user(auth) : of(null);
+    const start: Observable<any> = auth ?
+      this.user.pipe(
+        existing ? filter(it => !!it) : tap()
+      ) :
+      of(undefined);
+    this.animals = start.pipe(
       switchMap(() => this.lazyFirestore),
       switchMap(({ snapshotChanges }) => snapshotChanges),
       traceUntilFirst('animals'),
