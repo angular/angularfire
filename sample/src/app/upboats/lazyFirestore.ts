@@ -1,5 +1,5 @@
 import {
-    collection, query, orderBy, collectionChanges as _collectionChanges, fromRef,
+    collection, query, orderBy, fromRef,
     updateDoc, doc, increment, serverTimestamp, addDoc
 } from '@angular/fire/firestore';
 import { map, tap } from 'rxjs/operators';
@@ -15,10 +15,6 @@ export const snapshotChanges = fromRef(animalsQuery, { includeMetadataChanges: t
         id: change.id,
         hasPendingWrites: change.metadata.hasPendingWrites
     } as Animal)))
-);
-
-export const collectionChanges = _collectionChanges(animalsQuery).pipe(
-    tap(it => console.log(it))
 );
 
 export const upboat = async (id: string) => {
