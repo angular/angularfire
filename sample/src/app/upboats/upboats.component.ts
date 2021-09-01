@@ -43,11 +43,9 @@ export class UpboatsComponent implements OnInit {
     const key = makeStateKey<Animal[]>('ANIMALS');
     const existing = state.get(key, undefined);
     this.user = auth ? user(auth) : of(null);
-    const start: Observable<any> = auth ?
-      this.user.pipe(
-        existing ? filter(it => !!it) : tap()
-      ) :
-      of(undefined);
+    const start = auth && existing ?
+      this.user.pipe(filter(it => !!it)) :
+      of(null);
     this.animals = start.pipe(
       switchMap(() => this.lazyFirestore),
       switchMap(({ snapshotChanges }) => snapshotChanges),
