@@ -11,7 +11,7 @@ import { environment } from '../environments/environment';
 import { BrowserTransferStateModule } from '@angular/platform-browser';
 import { provideAuth, connectAuthEmulator } from '@angular/fire/auth';
 
-import { initializeAuth, browserPopupRedirectResolver, indexedDBLocalPersistence } from 'firebase/auth';
+import { initializeAuth, browserPopupRedirectResolver, indexedDBLocalPersistence } from '@angular/fire/auth';
 
 @NgModule({
   imports: [
