@@ -136,16 +136,18 @@ export function ɵkeepUnstableUntilFirstFactory(schedulers: ɵAngularFireSchedul
   };
 }
 
-const zoneWrapFn = (it: (...args: any[]) => any, macrotask: MacroTask) => {
+const zoneWrapFn = (it: (...args: any[]) => any, macrotask: MacroTask|undefined) => {
   const _this = this;
   // function() is needed for the arguments object
   // tslint:disable-next-line:only-arrow-functions
   return function() {
-    setTimeout(() => {
-      if (macrotask.state === 'scheduled') {
-        macrotask.invoke();
-      }
-    }, 10);
+    if (macrotask) {
+      setTimeout(() => {
+        if (macrotask.state === 'scheduled') {
+          macrotask.invoke();
+        }
+      }, 10);
+    }
     return run(() => it.apply(_this, arguments));
   };
 };
@@ -155,15 +157,15 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
   // tslint:disable-next-line:only-arrow-functions
   return function() {
     let macrotask: MacroTask | undefined;
-    if (blockUntilFirst) {
-      // if this is a callback function, e.g, onSnapshot, we should create a microtask and invoke it
-      // only once one of the callback functions is tripped.
-      for (let i = 0; i < arguments.length; i++) {
-        if (typeof arguments[i] === 'function') {
+    // if this is a callback function, e.g, onSnapshot, we should create a microtask and invoke it
+    // only once one of the callback functions is tripped.
+    for (let i = 0; i < arguments.length; i++) {
+      if (typeof arguments[i] === 'function') {
+        if (blockUntilFirst) {
           macrotask ||= run(() => Zone.current.scheduleMacroTask('firebaseZoneBlock', noop, {}, noop, noop));
-          // TODO create a microtask to track callback functions
-          arguments[i] = zoneWrapFn(arguments[i], macrotask);
         }
+        // TODO create a microtask to track callback functions
+        arguments[i] = zoneWrapFn(arguments[i], macrotask);
       }
     }
     const ret = runOutsideAngular(() => (it as any).apply(this, arguments));
