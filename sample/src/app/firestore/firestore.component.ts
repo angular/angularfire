@@ -9,19 +9,22 @@ import { traceUntilFirst } from '@angular/fire/performance';
   template: `<p>
     Firestore!
     {{ testDocValue$ | async | json }}
+    {{ persistenceEnabled | async }}
   </p>`,
   styles: [``]
 })
 export class FirestoreComponent implements OnInit {
 
   public readonly testDocValue$: Observable<any>;
+  public persistenceEnabled: Promise<boolean> = Promise.resolve(false);
 
   constructor(state: TransferState) {
     const key = makeStateKey<unknown>('FIRESTORE');
     const existing = state.get(key, undefined);
     this.testDocValue$ = of(existing).pipe(
-      switchMap(() => import('./lazyFirestore').then(({ valueChanges }) => valueChanges)),
-      switchMap(it => it),
+      switchMap(() => import('./lazyFirestore')),
+      tap(({ persistenceEnabled }) => this.persistenceEnabled = persistenceEnabled),
+      switchMap(({ valueChanges }) => valueChanges),
       traceUntilFirst('firestore'),
       tap(it => state.set(key, it)),
       existing ? startWith(existing) : tap(),
