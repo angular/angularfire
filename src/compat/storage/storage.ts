@@ -12,6 +12,9 @@ export const BUCKET = new InjectionToken<string>('angularfire2.storageBucket');
 export const MAX_UPLOAD_RETRY_TIME = new InjectionToken<number>('angularfire2.storage.maxUploadRetryTime');
 export const MAX_OPERATION_RETRY_TIME = new InjectionToken<number>('angularfire2.storage.maxOperationRetryTime');
 
+type UseEmulatorArguments = Parameters<firebase.storage.Storage['useEmulator']>;
+export const USE_EMULATOR = new InjectionToken<UseEmulatorArguments>('angularfire2.storage.use-emulator');
+
 /**
  * AngularFireStorage Service
  *
@@ -35,10 +38,15 @@ export class AngularFireStorage {
     schedulers: ɵAngularFireSchedulers,
     @Optional() @Inject(MAX_UPLOAD_RETRY_TIME) maxUploadRetryTime: number | any,
     @Optional() @Inject(MAX_OPERATION_RETRY_TIME) maxOperationRetryTime: number | any,
+    @Optional() @Inject(USE_EMULATOR) _useEmulator: any,
   ) {
     const app = ɵfirebaseAppFactory(options, zone, name);
     this.storage = ɵcacheInstance(`${app.name}.storage.${storageBucket}`, 'AngularFireStorage', app.name, () => {
       const storage = zone.runOutsideAngular(() => app.storage(storageBucket || undefined));
+      const useEmulator = _useEmulator as UseEmulatorArguments|null;
+      if (useEmulator) {
+        storage.useEmulator(...useEmulator);
+      }
       if (maxUploadRetryTime) {
         storage.setMaxUploadRetryTime(maxUploadRetryTime);
       }

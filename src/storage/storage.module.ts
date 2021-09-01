@@ -2,12 +2,13 @@ import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from 
 import { FirebaseStorage } from 'firebase/storage';
 import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers } from '@angular/fire';
 import { Storage, StorageInstances, STORAGE_PROVIDER_NAME } from './storage';
-import { FirebaseApps } from '@angular/fire/app';
+import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
+import { AuthInstances } from '@angular/fire/auth';
 
 export const PROVIDED_STORAGE_INSTANCES = new InjectionToken<Storage[]>('angularfire2.storage-instances');
 
-export function defaultStorageInstanceFactory(_: Storage[]) {
-  const defaultAuth = ɵgetDefaultInstanceOf<FirebaseStorage>(STORAGE_PROVIDER_NAME);
+export function defaultStorageInstanceFactory(provided: FirebaseStorage[]|undefined, defaultApp: FirebaseApp) {
+  const defaultAuth = ɵgetDefaultInstanceOf<FirebaseStorage>(STORAGE_PROVIDER_NAME, provided, defaultApp);
   return new Storage(defaultAuth);
 }
 
@@ -29,8 +30,8 @@ const DEFAULT_STORAGE_INSTANCE_PROVIDER = {
   provide: Storage,
   useFactory: defaultStorageInstanceFactory,
   deps: [
-    NgZone,
     [new Optional(), PROVIDED_STORAGE_INSTANCES ],
+    FirebaseApp,
   ]
 };
 
@@ -54,6 +55,8 @@ export function provideStorage(fn: () => FirebaseStorage): ModuleWithProviders<S
         NgZone,
         ɵAngularFireSchedulers,
         FirebaseApps,
+        // Defensively load Auth first, if provided
+        [new Optional(), AuthInstances ],
       ]
     }]
   };

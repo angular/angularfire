@@ -2,12 +2,12 @@ import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from 
 import { Auth as FirebaseAuth } from 'firebase/auth';
 import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers } from '@angular/fire';
 import { Auth, AuthInstances, AUTH_PROVIDER_NAME } from './auth';
-import { FirebaseApps } from '@angular/fire/app';
+import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
 
 export const PROVIDED_AUTH_INSTANCES = new InjectionToken<Auth[]>('angularfire2.auth-instances');
 
-export function defaultAuthInstanceFactory() {
-  const defaultAuth = ɵgetDefaultInstanceOf<FirebaseAuth>(AUTH_PROVIDER_NAME);
+export function defaultAuthInstanceFactory(provided: FirebaseAuth[]|undefined, defaultApp: FirebaseApp) {
+  const defaultAuth = ɵgetDefaultInstanceOf<FirebaseAuth>(AUTH_PROVIDER_NAME, provided, defaultApp);
   return new Auth(defaultAuth);
 }
 
@@ -29,8 +29,8 @@ const DEFAULT_AUTH_INSTANCE_PROVIDER = {
   provide: Auth,
   useFactory: defaultAuthInstanceFactory,
   deps: [
-    NgZone,
     [new Optional(), PROVIDED_AUTH_INSTANCES ],
+    FirebaseApp,
   ]
 };
 

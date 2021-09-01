@@ -1,5 +1,5 @@
 import { BrowserModule, BrowserTransferStateModule } from '@angular/platform-browser';
-import { isDevMode, NgModule } from '@angular/core';
+import { isDevMode, NgModule, APP_INITIALIZER } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -21,7 +21,7 @@ import {
 import { FirestoreComponent } from './firestore/firestore.component';
 import { AngularFireDatabaseModule, USE_EMULATOR as USE_DATABASE_EMULATOR } from '@angular/fire/compat/database';
 import { AngularFirestoreModule, USE_EMULATOR as USE_FIRESTORE_EMULATOR, SETTINGS as FIRESTORE_SETTINGS } from '@angular/fire/compat/firestore';
-import { AngularFireStorageModule } from '@angular/fire/compat/storage';
+import { AngularFireStorageModule, USE_EMULATOR as USE_STORAGE_EMULATOR } from '@angular/fire/compat/storage';
 import { AngularFireAuthModule, USE_DEVICE_LANGUAGE, USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/compat/auth';
 import { AngularFireMessagingModule, SERVICE_WORKER, VAPID_KEY } from '@angular/fire/compat/messaging';
 import { AngularFireFunctionsModule, USE_EMULATOR as USE_FUNCTIONS_EMULATOR, ORIGIN as FUNCTIONS_ORIGIN } from '@angular/fire/compat/functions';
@@ -78,20 +78,19 @@ import { UpboatsComponent } from './upboats/upboats.component';
     { provide: FIRESTORE_SETTINGS, useValue: { ignoreUndefinedProperties: true } },
     { provide: ANALYTICS_DEBUG_MODE, useValue: true },
     { provide: COLLECTION_ENABLED, useValue: true },
-    { provide: USE_AUTH_EMULATOR, useValue: environment.useEmulators ? ['localhost', 9099] : undefined },
+    { provide: USE_AUTH_EMULATOR, useValue: environment.useEmulators ? ['http://localhost:9099'] : undefined },
     { provide: USE_DATABASE_EMULATOR, useValue: environment.useEmulators ? ['localhost', 9000] : undefined },
     { provide: USE_FIRESTORE_EMULATOR, useValue: environment.useEmulators ? ['localhost', 8080] : undefined },
     { provide: USE_FUNCTIONS_EMULATOR, useValue: environment.useEmulators ? ['localhost', 5001] : undefined },
+    { provide: USE_STORAGE_EMULATOR, useValue: environment.useEmulators ? ['localhost', 9199] : undefined },
     { provide: FUNCTIONS_ORIGIN, useFactory: () => isDevMode() || typeof location === 'undefined' ? undefined : location.origin },
     { provide: REMOTE_CONFIG_SETTINGS, useFactory: () => isDevMode() ? { minimumFetchIntervalMillis: 10_000 } : {} },
     { provide: REMOTE_CONFIG_DEFAULTS, useValue: { background_color: 'red' } },
     { provide: USE_DEVICE_LANGUAGE, useValue: true },
     { provide: VAPID_KEY, useValue: environment.vapidKey },
-    { provide: SERVICE_WORKER, useFactory: () =>
-      (typeof navigator !== 'undefined' && navigator.serviceWorker?.getRegistration()) ?? undefined
-    },
+    { provide: SERVICE_WORKER, useFactory: () => typeof navigator !== 'undefined' && navigator.serviceWorker?.register('firebase-messaging-sw.js', { scope: '__' }) || undefined },
     { provide: APP_VERSION, useValue: '0.0.0' },
-    { provide: APP_NAME, useValue: 'Angular' }
+    { provide: APP_NAME, useValue: 'Angular' },
   ],
   bootstrap: [AppComponent]
 })

@@ -263,11 +263,7 @@ export default async function deploy(
       )
     });
 
-    if (parseInt(firebaseTools.cli.version(), 10) >= 9) {
-      firebaseTools.logger.logger.add(logger);
-    } else {
-      firebaseTools.logger.add(logger);
-    }
+    firebaseTools.logger.logger.add(logger);
 
     if (serverBuildTarget) {
       await deployToFunction(

@@ -73,7 +73,7 @@ describe('fromRef', () => {
       done();
     }, err => {
       console.error(err);
-      expect(false).toEqual(true, 'Shouldnt error');
+      expect(false).withContext('Shouldnt error').toEqual(true);
       done();
     }, () => {
       expect(testScheduler.schedule).toHaveBeenCalled();

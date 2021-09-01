@@ -28,7 +28,7 @@ export function fromRef<R, T>(ref: DocumentReference<T> | Query<T>, scheduler?: 
 export function fromDocRef<T>(ref: DocumentReference<T>, scheduler?: SchedulerLike): Observable<Action<DocumentSnapshot<T>>> {
   return fromRef<DocumentSnapshot<T>, T>(ref, scheduler)
     .pipe(
-      startWith(undefined),
+      startWith<DocumentSnapshot<T>, undefined>(undefined),
       pairwise(),
       map(([priorPayload, payload]) => {
         if (!payload.exists) {
