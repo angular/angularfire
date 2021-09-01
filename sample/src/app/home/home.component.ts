@@ -18,6 +18,6 @@ import { FirebaseApp } from '@angular/fire/app';
 })
 export class HomeComponent {
   constructor(public readonly firebaseApp: FirebaseApp) {
-    console.log(firebaseApp);
+
   }
 }

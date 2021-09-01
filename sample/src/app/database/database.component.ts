@@ -22,8 +22,8 @@ export class DatabaseComponent implements OnInit {
     const key = makeStateKey<any>('DATABASE');
     const existing = state.get(key, undefined);
     this.testObjectValue$ = of(undefined).pipe(
-      switchMap(() => import('./lazyDatabase').then(({ valueChanges }) => valueChanges)),
-      switchMap(it => it),
+      switchMap(() => import('./lazyDatabase')),
+      switchMap(({valueChanges}) => valueChanges),
       traceUntilFirst('database'),
       tap(it => state.set(key, it)),
       existing ? startWith(existing) : tap(),

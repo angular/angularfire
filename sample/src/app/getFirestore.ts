@@ -6,4 +6,4 @@ if (environment.useEmulators) {
     connectFirestoreEmulator(firestore, 'localhost', 8080);
 }
 
-export const persistenceEnabled = enableMultiTabIndexedDbPersistence(firestore).then(() => true);
+export const persistenceEnabled = enableMultiTabIndexedDbPersistence(firestore).then(() => true, () => false);

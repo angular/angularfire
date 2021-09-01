@@ -25,7 +25,8 @@ export class StorageComponent implements OnInit {
     const key = makeStateKey<string>('google-icon-url');
     const existing = state.get(key, undefined);
     this.downloadUrl$ = existing ? of(existing) : of(undefined).pipe(
-      switchMap(() => import('./lazyStorage').then(({ iconUrl }) => iconUrl)),
+      switchMap(() => import('./lazyStorage')),
+      switchMap(({ iconUrl }) => iconUrl),
       traceUntilFirst('storage'),
       tap(it => state.set(key, it)),
       startWith(TRANSPARENT_PNG),
