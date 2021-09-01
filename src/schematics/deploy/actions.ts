@@ -96,9 +96,8 @@ const getPackageJson = (context: BuilderContext, workspaceRoot: string, options:
     const angularJson = JSON.parse(readFileSync(join(workspaceRoot, 'angular.json')).toString());
     // tslint:disable-next-line:no-non-null-assertion
     const server = angularJson.projects[context.target!.project].architect.server;
-    const serverOptions = server && server.options;
-    const externalDependencies = serverOptions && serverOptions.externalDependencies || [];
-    const bundleDependencies = serverOptions && serverOptions.bundleDependencies;
+    const externalDependencies = server?.options?.externalDependencies || [];
+    const bundleDependencies = server?.options?.bundleDependencies ?? true;
     if (bundleDependencies !== true) {
       if (existsSync(join(workspaceRoot, 'package.json'))) {
         const packageJson = JSON.parse(readFileSync(join(workspaceRoot, 'package.json')).toString());
