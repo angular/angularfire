@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, Inject, Optional } from '@angular/core';
 import { FirebaseApp } from '@angular/fire/app';
+import { Response } from 'express';
+import { RESPONSE } from '@nguniversal/express-engine/tokens';
 
 @Component({
   selector: 'app-home',
@@ -17,7 +19,12 @@ import { FirebaseApp } from '@angular/fire/app';
   styles: [``]
 })
 export class HomeComponent {
-  constructor(public readonly firebaseApp: FirebaseApp) {
-
+  constructor(
+    public readonly firebaseApp: FirebaseApp,
+    @Optional() @Inject(RESPONSE) response: Response,
+  ) {
+    if (response) {
+      response.setHeader('Cache-Control', 'public,max-age=600');
+    }
   }
 }

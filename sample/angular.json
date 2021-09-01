@@ -136,8 +136,7 @@
             "sourceMap": true,
             "extractLicenses": false,
             "externalDependencies": [
-            ],
-            "bundleDependencies": true
+            ]
           },
           "configurations": {
             "production": {
