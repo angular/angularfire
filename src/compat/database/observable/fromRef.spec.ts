@@ -38,7 +38,7 @@ describe('fromRef', () => {
   });
 
   afterEach(() => {
-    app.delete().catch();
+    app.delete().catch(() => undefined);
   });
 
   it('it should be async by default', (done) => {
@@ -167,7 +167,7 @@ describe('fromRef', () => {
 
   describe('events', () => {
 
-    it('should stream back a child_added event', async (done: any) => {
+    it('should stream back a child_added event', done => {
       const itemRef = ref(rando());
       itemRef.set(batch);
       const obs = fromRef(itemRef, 'child_added');
@@ -185,7 +185,7 @@ describe('fromRef', () => {
       });
     });
 
-    it('should stream back a child_changed event', async (done: any) => {
+    it('should stream back a child_changed event', done => {
       const itemRef = ref(rando());
       itemRef.set(batch);
       const obs = fromRef(itemRef, 'child_changed');
@@ -202,7 +202,7 @@ describe('fromRef', () => {
       itemRef.child(key).update({ name });
     });
 
-    it('should stream back a child_removed event', async (done: any) => {
+    it('should stream back a child_removed event', done => {
       const itemRef = ref(rando());
       itemRef.set(batch);
       const obs = fromRef(itemRef, 'child_removed');
@@ -219,7 +219,7 @@ describe('fromRef', () => {
       itemRef.child(key).remove();
     });
 
-    it('should stream back a child_moved event', async (done: any) => {
+    it('should stream back a child_moved event', done => {
       const itemRef = ref(rando());
       itemRef.set(batch);
       const obs = fromRef(itemRef, 'child_moved');

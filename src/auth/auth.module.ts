@@ -7,23 +7,14 @@ import { registerVersion } from 'firebase/app';
 
 export const PROVIDED_AUTH_INSTANCES = new InjectionToken<Auth[]>('angularfire2.auth-instances');
 
-export function defaultAuthInstanceFactory(
-  provided: FirebaseAuth[]|undefined,
-  defaultApp: FirebaseApp,
-  // tslint:disable-next-line:ban-types
-  platformId: Object
-) {
+export function defaultAuthInstanceFactory(provided: FirebaseAuth[]|undefined, defaultApp: FirebaseApp) {
   const defaultAuth = ɵgetDefaultInstanceOf<FirebaseAuth>(AUTH_PROVIDER_NAME, provided, defaultApp);
-  (defaultAuth as any)._logFramework(`angularfire-${platformId}`);
   return new Auth(defaultAuth);
 }
 
 export function authInstanceFactory(fn: () => FirebaseAuth) {
-  // tslint:disable-next-line:ban-types
-  return (zone: NgZone, platformId: Object) => {
-    const auth = ɵmemoizeInstance<FirebaseAuth>(fn, zone);
-    (auth as any)._logFramework(`angularfire-${platformId}`);
-    return new Auth(auth);
+  return (zone: NgZone) => {
+    return ɵmemoizeInstance<FirebaseAuth>(fn, zone);
   };
 }
 

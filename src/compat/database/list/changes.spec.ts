@@ -36,7 +36,7 @@ describe('listChanges', () => {
   });
 
   afterEach(() => {
-    app.delete().catch();
+    app.delete().catch(() => undefined);
   });
 
   describe('events', () => {

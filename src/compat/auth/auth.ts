@@ -25,11 +25,8 @@ export const ɵauthFactory = (
   app: FirebaseApp, zone: NgZone, useEmulator: UseEmulatorArguments|null,
   tenantId: string, languageCode: string|null, useDeviceLanguage: boolean|null,
   settings: firebase.auth.AuthSettings|null, persistence: string|null,
-  // tslint:disable-next-line:ban-types
-  platformId: Object,
 ) => ɵcacheInstance(`${app.name}.auth`, 'AngularFireAuth', app.name, () => {
   const auth = zone.runOutsideAngular(() => app.auth());
-  (auth as any)._logFramework(`angularfire-${platformId}-compat`);
   if (useEmulator) {
     auth.useEmulator(...useEmulator);
   }
@@ -103,7 +100,7 @@ export class AngularFireAuth {
       observeOn(schedulers.outsideAngular),
       switchMap(() => zone.runOutsideAngular(() => import('firebase/compat/auth'))),
       map(() => ɵfirebaseAppFactory(options, zone, name)),
-      map(app => ɵauthFactory(app, zone, useEmulator, tenantId, languageCode, useDeviceLanguage, settings, persistence, platformId)),
+      map(app => ɵauthFactory(app, zone, useEmulator, tenantId, languageCode, useDeviceLanguage, settings, persistence)),
       shareReplay({ bufferSize: 1, refCount: false }),
     );
 

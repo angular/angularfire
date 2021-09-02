@@ -3,13 +3,9 @@ import { PersistenceSettings } from './interfaces';
 import { AngularFirestore, ENABLE_PERSISTENCE, PERSISTENCE_SETTINGS } from './firestore';
 import firebase from 'firebase/compat/app';
 import { VERSION } from '@angular/fire';
-import { FirebaseApp } from '@angular/fire/compat';
 
 @NgModule({
-  providers: [{
-    provide: AngularFirestore,
-    deps: [ FirebaseApp, ],
-  }]
+  providers: [ AngularFirestore ]
 })
 export class AngularFirestoreModule {
   constructor() {

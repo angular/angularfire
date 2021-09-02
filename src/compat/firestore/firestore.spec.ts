@@ -1,5 +1,5 @@
 import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire/compat';
-import { AngularFirestore, SETTINGS, AngularFirestoreModule, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
+import { AngularFirestore, USE_EMULATOR, AngularFirestoreModule, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
 
 import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../test-config';
@@ -17,7 +17,7 @@ describe('AngularFirestore', () => {
         AngularFirestoreModule.enablePersistence()
       ],
       providers: [
-        { provide: SETTINGS, useValue: { host: 'localhost:8080', ssl: false } }
+        { provide: USE_EMULATOR, useValue: ['localhost', 8080] }
       ]
     });
 
@@ -26,7 +26,7 @@ describe('AngularFirestore', () => {
   });
 
   afterEach(() => {
-    app.delete().catch();
+    app.delete().catch(() => undefined);
   });
 
   it('should be the properly initialized type', () => {
@@ -108,7 +108,7 @@ describe('AngularFirestore with different app', () => {
       providers: [
         { provide: FIREBASE_APP_NAME, useValue: firebaseAppName },
         { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG },
-        { provide: SETTINGS, useValue: { host: 'localhost:8080', ssl: false } }
+        { provide: USE_EMULATOR, useValue: ['localhost', 8080] }
       ]
     });
 
@@ -118,7 +118,7 @@ describe('AngularFirestore with different app', () => {
   });
 
   afterEach(() => {
-    app.delete().catch();
+    app.delete().catch(() => undefined);
   });
 
   describe('<constructor>', () => {
@@ -150,7 +150,7 @@ describe('AngularFirestore without persistance', () => {
         AngularFirestoreModule
       ],
       providers: [
-        { provide: SETTINGS, useValue: { host: 'localhost:8080', ssl: false } }
+        { provide: USE_EMULATOR, useValue: ['localhost', 8080] }
       ]
     });
 
@@ -159,7 +159,7 @@ describe('AngularFirestore without persistance', () => {
   });
 
   afterEach(() => {
-    app.delete().catch();
+    app.delete().catch(() => undefined);
   });
 
   it('should not enable persistence', (done) => {

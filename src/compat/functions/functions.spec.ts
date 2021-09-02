@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire/compat';
-import { AngularFireFunctions, AngularFireFunctionsModule, ORIGIN, REGION } from '@angular/fire/compat/functions';
+import { AngularFireFunctions, AngularFireFunctionsModule, USE_EMULATOR, REGION } from '@angular/fire/compat/functions';
 import { COMMON_CONFIG } from '../../test-config';
 import 'firebase/compat/functions';
 import { rando } from '../../utils';
@@ -22,7 +22,7 @@ describe('AngularFireFunctions', () => {
   });
 
   afterEach(() => {
-    app.delete().catch();
+    app.delete().catch(() => undefined);
   });
 
   it('should exist', () => {
@@ -50,7 +50,7 @@ describe('AngularFireFunctions with different app', () => {
       providers: [
         { provide: FIREBASE_APP_NAME, useValue: firebaseAppName },
         { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG },
-        { provide: ORIGIN, useValue: 'http://0.0.0.0:9999' },
+        { provide: USE_EMULATOR, useValue: ['localhost', 9999] },
         { provide: REGION, useValue: 'asia-northeast1' }
       ]
     });
@@ -60,7 +60,7 @@ describe('AngularFireFunctions with different app', () => {
   });
 
   afterEach(() => {
-    app.delete().catch();
+    app.delete().catch(() => undefined);
   });
 
   describe('<constructor>', () => {
