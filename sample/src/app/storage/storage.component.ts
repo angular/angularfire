@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFireStorage } from '@angular/fire/storage';
 import { Observable, of } from 'rxjs';
-import { startWith, tap } from 'rxjs/operators';
+import { startWith, switchMap, tap } from 'rxjs/operators';
 import { makeStateKey, TransferState } from '@angular/platform-browser';
-import { trace } from '@angular/fire/performance';
+import { traceUntilFirst } from '@angular/fire/performance';
 
 const TRANSPARENT_PNG
   = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
@@ -14,7 +13,6 @@ const TRANSPARENT_PNG
     <p>
       Storage!
       <img [src]="downloadUrl$ | async" width="64" height="64" />
-      <br><small>{{ 'google-g.png' | getDownloadURL | json }}</small>
     </p>
   `,
   styles: []
@@ -23,14 +21,15 @@ export class StorageComponent implements OnInit {
 
   public readonly downloadUrl$: Observable<string>;
 
-  constructor(storage: AngularFireStorage, state: TransferState) {
-    const icon = storage.ref('google-g.png');
-    const key = makeStateKey('google-icon-url');
+  constructor( state: TransferState) {
+    const key = makeStateKey<string>('google-icon-url');
     const existing = state.get(key, undefined);
-    this.downloadUrl$ = existing ? of(existing) : icon.getDownloadURL().pipe(
-      trace('storage'),
+    this.downloadUrl$ = existing ? of(existing) : of(undefined).pipe(
+      switchMap(() => import('./lazyStorage')),
+      switchMap(({ iconUrl }) => iconUrl),
+      traceUntilFirst('storage'),
       tap(it => state.set(key, it)),
-      startWith(TRANSPARENT_PNG)
+      startWith(TRANSPARENT_PNG),
     );
   }
 

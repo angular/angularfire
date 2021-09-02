@@ -1,19 +1,15 @@
-import { Component, OnInit, OnDestroy, PLATFORM_ID } from '@angular/core';
-import { AngularFireAuth } from '@angular/fire/auth';
-import firebase from 'firebase/app';
-import { Subscription } from 'rxjs';
+import { Component, OnInit, OnDestroy, Optional } from '@angular/core';
+import { Auth, authState, signInAnonymously, signOut, User } from '@angular/fire/auth';
+import { EMPTY, Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { trace } from '@angular/fire/performance';
-import { Inject } from '@angular/core';
-import { isPlatformServer } from '@angular/common';
+import { traceUntilFirst } from '@angular/fire/performance';
 
 @Component({
   selector: 'app-auth',
   template: `
     <p>
       Auth!
-      {{ (auth.user | async)?.uid | json }}
-      {{ (auth.credential | async)?.additionalUserInfo.isNewUser | json }}
+      {{ (user | async)?.uid | json }}
       <button (click)="login()" *ngIf="showLoginButton">Log in with Google</button>
       <button (click)="loginAnonymously()" *ngIf="showLoginButton">Log in anonymously</button>
       <button (click)="logout()" *ngIf="showLogoutButton">Log out</button>
@@ -24,15 +20,16 @@ import { isPlatformServer } from '@angular/common';
 export class AuthComponent implements OnInit, OnDestroy {
 
   private readonly userDisposable: Subscription|undefined;
+  public readonly user: Observable<User | null> = EMPTY;
 
   showLoginButton = false;
   showLogoutButton = false;
 
-  constructor(public readonly auth: AngularFireAuth, @Inject(PLATFORM_ID) platformId: object) {
-
-    if (!isPlatformServer(platformId)) {
-      this.userDisposable = this.auth.authState.pipe(
-        trace('auth'),
+  constructor(@Optional() private auth: Auth) {
+    if (auth) {
+      this.user = authState(this.auth);
+      this.userDisposable = authState(this.auth).pipe(
+        traceUntilFirst('auth'),
         map(u => !!u)
       ).subscribe(isLoggedIn => {
         this.showLoginButton = !isLoggedIn;
@@ -50,18 +47,16 @@ export class AuthComponent implements OnInit, OnDestroy {
   }
 
   async login() {
-    const user = await this.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-    // TODO sign into offline app
+    const { GoogleAuthProvider, signInWithPopup } = await import('./GoogleAuthProvider');
+    return await signInWithPopup(this.auth, new GoogleAuthProvider());
   }
 
   async loginAnonymously() {
-    const user = await this.auth.signInAnonymously();
-    // TODO sign into offline app
+    return await signInAnonymously(this.auth);
   }
 
-  logout() {
-    this.auth.signOut();
-    // TODO sign out of offline app
+  async logout() {
+    return await signOut(this.auth);
   }
 
 }

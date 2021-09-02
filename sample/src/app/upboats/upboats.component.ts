@@ -1,65 +1,75 @@
-import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map, startWith, tap } from 'rxjs/operators';
-import { AngularFirestoreOffline } from '../firestore-offline/firestore-offline.module';
-import firebase from 'firebase/app';
+import { Component, OnInit, Optional } from '@angular/core';
+import { Observable, of } from 'rxjs';
+import { filter, shareReplay, startWith, switchMap, tap } from 'rxjs/operators';
 import { makeStateKey, TransferState } from '@angular/platform-browser';
-import { trace } from '@angular/fire/performance';
+import { traceUntilFirst } from '@angular/fire/performance';
+import { Auth, user, User } from '@angular/fire/auth';
 
-type Animal = { name: string, upboats: number, id: string, hasPendingWrites: boolean };
+export type Animal = {
+  name: string,
+  upboats: number,
+  id: string,
+  hasPendingWrites: boolean,
+  changeType: string,
+};
 
 @Component({
   selector: 'app-upboats',
-  templateUrl: './upboats.component.html',
-  styleUrls: ['./upboats.component.css']
+  template: `
+    <ul>
+      <li *ngFor="let animal of animals | async">
+          <span>{{ animal.name }}</span>
+          <button (click)="upboat(animal.id)" [disabled]="(this.user | async) === null">👍</button>
+          <span>{{ animal.upboats }}</span>
+          <button (click)="downboat(animal.id)" [disabled]="(this.user | async) === null">👎</button>
+          <span *ngIf="animal.hasPendingWrites">🕒</span>
+          <span>{{ animal.changeType }}</span>
+      </li>
+    </ul>
+    <button (click)="newAnimal()" [disabled]="!this.user">New animal</button>
+  `,
+  styles: []
 })
 export class UpboatsComponent implements OnInit {
 
-  public animals: Observable<Animal[]>;
+  public readonly animals: Observable<Animal[]>;
+  public user: Observable<User|null>;
 
-  constructor(private firestore: AngularFirestoreOffline, state: TransferState) {
-    const collection = firestore.collection<Animal>('animals', ref =>
-      ref.orderBy('upboats', 'desc').orderBy('updatedAt', 'desc')
-    );
-    const key = makeStateKey(collection.ref.path);
+  get lazyFirestore() {
+    return import('./lazyFirestore');
+  }
+
+  constructor(state: TransferState, @Optional() auth: Auth) {
+    const key = makeStateKey<Animal[]>('ANIMALS');
     const existing = state.get(key, undefined);
-    this.animals = collection.snapshotChanges().pipe(
-      trace('animals'),
-      map(it => it.map(change => ({
-        ...change.payload.doc.data(),
-        id: change.payload.doc.id,
-        hasPendingWrites: change.payload.doc.metadata.hasPendingWrites
-      }))),
-      existing ? startWith(existing) : tap(it => state.set(key, it))
+    // INVESTIGATE why do I need to share user to keep the zone stable?
+    // perhaps it related to why N+1 renders fail
+    this.user = auth ? user(auth).pipe(shareReplay({ bufferSize: 1, refCount: false })) : of(null);
+    const start = auth && existing ?
+      this.user.pipe(filter(it => !!it)) :
+      of(null);
+    this.animals = start.pipe(
+      switchMap(() => this.lazyFirestore),
+      switchMap(({ snapshotChanges }) => snapshotChanges),
+      traceUntilFirst('animals'),
+      tap(it => state.set<Animal[]>(key, it)),
+      existing ? startWith(existing) : tap(),
     );
   }
 
   ngOnInit(): void {
   }
 
-  upboat(id: string) {
-    // TODO add rule
-    this.firestore.doc(`animals/${id}`).update({
-      upboats: firebase.firestore.FieldValue.increment(1),
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-    });
+  async upboat(id: string) {
+    await (await this.lazyFirestore).upboat(id);
   }
 
-  downboat(id: string) {
-    // TODO add rule
-    this.firestore.doc(`animals/${id}`).update({
-      upboats: firebase.firestore.FieldValue.increment(-1),
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-    });
+  async downboat(id: string) {
+    await (await this.lazyFirestore).downboat(id);
   }
 
-  newAnimal() {
-    // TODO add rule
-    this.firestore.collection('animals').add({
-      name: prompt('Can haz name?'),
-      upboats: 1,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-    });
+  async newAnimal() {
+    await (await this.lazyFirestore).newAnimal();
   }
 
 }

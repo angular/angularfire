@@ -15,14 +15,6 @@
               "value": "public,max-age=31536000,immutable"
             }
           ]
-        }, {
-          "source": "*-sw.js",
-          "headers": [
-            {
-              "key": "Cache-Control",
-              "value": "no-cache"
-            }
-          ]
         }
       ],
       "rewrites": [
@@ -35,25 +27,5 @@
   ],
   "functions": {
     "source": "dist/sample"
-  },
-  "emulators": {
-    "functions": {
-      "port": 5001
-    },
-    "firestore": {
-      "port": 8080
-    },
-    "database": {
-      "port": 9000
-    },
-    "hosting": {
-      "port": 5000
-    },
-    "auth": {
-      "port": 9099
-    },
-    "ui": {
-      "enabled": true
-    }
   }
 }

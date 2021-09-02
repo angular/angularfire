@@ -3,8 +3,8 @@
   "name": "@angular/fire",
   "version": "ANGULARFIRE2_VERSION",
   "description": "The official Angular library for Firebase.",
-  "schematics": "./collection.json",
-  "builders": "./builders.json",
+  "schematics": "./schematics/collection.json",
+  "builders": "./schematics/builders.json",
   "keywords": [
     "angular",
     "firebase",
@@ -23,12 +23,13 @@
   "author": "angular,firebase",
   "license": "MIT",
   "peerDependencies": {
-    "@angular/common": "ANGULAR_VERSION",
-    "@angular/core": "ANGULAR_VERSION",
-    "@angular/platform-browser": "ANGULAR_VERSION",
-    "@angular/platform-browser-dynamic": "ANGULAR_VERSION",
-    "firebase": "FIREBASE_VERSION",
-    "rxjs": "RXJS_VERSION"
+    "@angular/common": "^12.0.0",
+    "@angular/core": "^12.0.0",
+    "@angular/platform-browser": "^12.0.0",
+    "@angular/platform-browser-dynamic": "^12.0.0",
+    "firebase": "^9.0.0",
+    "rxfire": "^6.0.0",
+    "rxjs": "~6.6.0"
   },
   "dependencies": {
     "tslib": "^2.0.0"
@@ -42,8 +43,11 @@
         "tslib": "tslib",
         "rxjs": "rxjs"
       },
-      "entryFile": "core/public_api.ts"
+      "entryFile": "public_api.ts"
     },
     "dest": "../dist/packages-dist"
+  },
+  "ng-update": {
+    "migrations": "./schematics/migration.json"
   }
 }

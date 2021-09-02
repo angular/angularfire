@@ -1,10 +1,8 @@
-import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
-import { AngularFireDatabase } from '@angular/fire/database';
-import { EMPTY, Observable } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { Observable, of } from 'rxjs';
 import { makeStateKey, TransferState } from '@angular/platform-browser';
-import { startWith, tap } from 'rxjs/operators';
-import { trace } from '@angular/fire/performance';
-import { isPlatformServer } from '@angular/common';
+import { startWith, switchMap, tap } from 'rxjs/operators';
+import { traceUntilFirst } from '@angular/fire/performance';
 
 @Component({
   selector: 'app-database',
@@ -20,18 +18,16 @@ export class DatabaseComponent implements OnInit {
 
   public readonly testObjectValue$: Observable<any>;
 
-  constructor(state: TransferState, database: AngularFireDatabase, @Inject(PLATFORM_ID) platformId: object) {
-    if (isPlatformServer(platformId)) {
-      this.testObjectValue$ = EMPTY;
-    } else {
-      const doc = database.object('test');
-      const key = makeStateKey(doc.query.toString());
-      const existing = state.get(key, undefined);
-      this.testObjectValue$ = doc.valueChanges().pipe(
-        trace('database'),
-        existing ? startWith(existing) : tap(it => state.set(key, it))
-      );
-    }
+  constructor(state: TransferState) {
+    const key = makeStateKey<any>('DATABASE');
+    const existing = state.get(key, undefined);
+    this.testObjectValue$ = of(undefined).pipe(
+      switchMap(() => import('./lazyDatabase')),
+      switchMap(({valueChanges}) => valueChanges),
+      traceUntilFirst('database'),
+      tap(it => state.set(key, it)),
+      existing ? startWith(existing) : tap(),
+    );
   }
 
   ngOnInit(): void {

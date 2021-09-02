@@ -1,8 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { AngularFireMessaging } from '@angular/fire/messaging';
-import { trace } from '@angular/fire/performance';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Component, OnInit, Optional } from '@angular/core';
+import { Messaging, getToken, onMessage } from '@angular/fire/messaging';
+import { EMPTY, from, Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-messaging',
@@ -18,23 +17,29 @@ import { tap } from 'rxjs/operators';
 })
 export class MessagingComponent implements OnInit {
 
-  token$: Observable<any>;
-  message$: Observable<any>;
+  token$: Observable<any> = EMPTY;
+  message$: Observable<any> = EMPTY;
   showRequest = false;
 
-  constructor(public readonly messaging: AngularFireMessaging) {
-    this.message$ = messaging.messages;
-    this.token$ = messaging.tokenChanges.pipe(
-      trace('token'),
-      tap(token => this.showRequest = !token)
-    );
+  constructor(@Optional() messaging: Messaging) {
+    if (messaging) {
+      this.token$ = from(
+        navigator.serviceWorker.register('firebase-messaging-sw.js', { type: 'module', scope: '__' }).
+          then(serviceWorkerRegistration =>
+            getToken(messaging, {
+              serviceWorkerRegistration,
+              vapidKey: environment.vapidKey,
+            })
+          ));
+      this.message$ = new Observable(sub => onMessage(messaging, it => sub.next(it)));
+    }
   }
 
   ngOnInit(): void {
   }
 
   request() {
-    this.messaging.requestPermission.subscribe(console.log, console.error);
+    Notification.requestPermission();
   }
 
 }

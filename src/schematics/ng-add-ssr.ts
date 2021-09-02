@@ -1,4 +1,4 @@
-import { SchematicsException, Tree, SchematicContext } from '@angular-devkit/schematics';
+import { SchematicsException, Tree, SchematicContext, noop } from '@angular-devkit/schematics';
 import {
   addDependencies,
   generateFirebaseRc,
@@ -8,9 +8,9 @@ import {
   stringifyFormatted
 } from './ng-add-common';
 import { FirebaseJSON, Workspace, WorkspaceProject } from './interfaces';
-
-import { default as defaultDependencies, firebaseFunctions as firebaseFunctionsDependencies } from './versions.json';
+import { firebaseFunctions as firebaseFunctionsDependencies } from './versions.json';
 import { dirname, join } from 'path';
+import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 
 // We consider a project to be a universal project if it has a `server` architect
 // target. If it does, it knows how to build the application's server.
@@ -99,9 +99,11 @@ export function generateFirebaseJson(
 export const addFirebaseFunctionsDependencies = (tree: Tree, context: SchematicContext) => {
   addDependencies(
     tree,
-    {...defaultDependencies, ...firebaseFunctionsDependencies},
+    firebaseFunctionsDependencies,
     context
   );
+  context.addTask(new NodePackageInstallTask());
+  return tree;
 };
 
 export const setupUniversalDeployment = (config: {

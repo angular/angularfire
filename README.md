@@ -17,9 +17,27 @@ AngularFire smooths over the rough edges an Angular developer might encounter wh
 ## Example use
 
 ```ts
-import { Component } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { provideFirebaseApp, getApp, initializeApp } from '@angular/fire/app';
+import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+
+@NgModule({
+  imports: [
+    provideFirebaseApp(() => initializeApp({ ... })),
+    provideFirestore(() => getFirestore()),
+  ],
+  ...
+})
+export class AppModule { }
+```
+
+```ts
+import { Firestore, collectionData, collection } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
+
+interface Item {
+  name: string,
+  ...
+};
 
 @Component({
   selector: 'app-root',
@@ -31,10 +49,11 @@ import { Observable } from 'rxjs';
   </ul>
   `
 })
-export class MyApp {
-  item$: Observable<any[]>;
-  constructor(firestore: AngularFirestore) {
-    this.item$ = firestore.collection('items').valueChanges();
+export class AppComponent {
+  item$: Observable<Item[]>;
+  constructor(firestore: Firestore) {
+    const collection = collection(firestore, 'items');
+    this.item$ = collectionData(collection);
   }
 }
 ```
@@ -47,6 +66,8 @@ AngularFire doesn't follow Angular's versioning as Firebase also has breaking ch
 
 | Angular | Firebase | AngularFire  |
 | --------|----------|--------------|
+| 12      | 9        | ^7.0         |
+| 12      | 7,8      | ^6.1.5       |
 | 11      | 7,8      | ^6.1         |
 | 10      | 8        | ^6.0.4       |
 | 10      | 7        | ^6.0.3       |
@@ -77,7 +98,7 @@ Neither AngularFire or Firebase ship with polyfills. To have compatability acros
 
 [Stackblitz Template](https://stackblitz.com/edit/angular-fire-start) - Remember to set your Firebase configuration in `app/app.module.ts`.
 
-[Upgrading to v6.0? Check out our guide.](docs/version-6-upgrade.md)
+[Upgrading to v7.0? Check out our guide.](docs/version-7-upgrade.md)
 
 **Having troubles?** Get help on our [Q&A board](https://github.com/angular/angularfire/discussions?discussions_q=category%3AQ%26A), the official [Firebase Mailing List](https://groups.google.com/forum/#!forum/firebase-talk), the [Firebase Community Slack](https://firebase.community/) (`#angularfire2`), the [Angular Community Discord](http://discord.gg/angular) (`#firebase`), [Gitter](https://gitter.im/angular/angularfire2), the [Firebase subreddit](https://www.reddit.com/r/firebase), or [Stack Overflow](https://stackoverflow.com/questions/tagged/angularfire2).
 
@@ -85,7 +106,11 @@ Neither AngularFire or Firebase ship with polyfills. To have compatability acros
 
 ## Developer Guide
 
-### **NEW:** Monitor usage of your application in production
+AngularFire has a new tree-shakable API, however this is still under active development and documentation is in the works, so we suggest most developers stick with the Compatiability API for the time being. [See the v7 upgrade guide for more information.](docs/version-7-upgrade.md). 
+
+This developer guide assumes you're using the Compatiability API (`@angular/fire/compat/*`).
+
+### Monitor usage of your application in production
 
 > `AngularFireAnalytics` provides a convenient method of interacting with Google Analytics in your Angular application. The provided `ScreenTrackingService` and `UserTrackingService` automatically log events when you're using the Angular Router or Firebase Authentication respectively. [Learn more about Google Analytics](https://firebase.google.com/docs/analytics).
 
@@ -135,7 +160,7 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 
 - [Getting started with Remote Config](docs/remote-config/getting-started.md)
 
-### **NEW:** Monitor your application performance in production
+### Monitor your application performance in production
 
 > Firebase Performance Monitoring is a service that helps you to gain insight into the performance characteristics of your iOS, Android, and web apps. [Learn more about Performance Monitoring](https://firebase.google.com/docs/perf-mon).
 

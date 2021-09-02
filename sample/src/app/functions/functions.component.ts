@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFireFunctions } from '@angular/fire/functions';
+import { Functions, httpsCallableData } from '@angular/fire/functions';
 import { EMPTY, Observable } from 'rxjs';
 
 @Component({
@@ -15,16 +15,15 @@ import { EMPTY, Observable } from 'rxjs';
 })
 export class FunctionsComponent implements OnInit {
 
-  response$: Observable<any>;
+  response$: Observable<any> = EMPTY;
 
-  constructor(public readonly functions: AngularFireFunctions) {
-    this.response$ = EMPTY;
+  constructor() {
   }
 
   ngOnInit(): void {}
 
-  request() {
-    this.response$ = this.functions.httpsCallable('yada', { timeout: 3 })({});
+  async request() {
+    this.response$ = (await import('./lazyFunctions')).yadaFunction({});
   }
 
 }

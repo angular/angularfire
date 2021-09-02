@@ -2,10 +2,11 @@
   "$schema": "../../node_modules/ng-packagr/package.schema.json",
   "ngPackage": {
     "lib": {
-      "entryFile": "public_api.ts",
       "umdModuleIds": {
-        "firebase/app": "firebase"
-      }
+        "rxfire/auth": "rxfire-auth",
+        "firebase/auth": "firebase-auth"
+      },
+      "entryFile": "public_api.ts"
     }
   }
 }
