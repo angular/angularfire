@@ -3,6 +3,8 @@ import { Inject, Injectable, NgZone, OnDestroy, PLATFORM_ID } from '@angular/cor
 import { AngularFireAnalytics } from './analytics';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Subscription } from 'rxjs';
+import firebase from 'firebase/compat/app';
+import { VERSION } from '@angular/fire';
 
 @Injectable()
 export class UserTrackingService implements OnDestroy {
@@ -18,7 +20,7 @@ export class UserTrackingService implements OnDestroy {
     auth: AngularFireAuth,
     zone: NgZone,
   ) {
-
+    firebase.registerVersion('angularfire', VERSION.full, 'compat-user-tracking');
     if (!isPlatformServer(platformId)) {
       let resolveInitialized;
       this.initialized = zone.runOutsideAngular(() => new Promise(resolve => resolveInitialized = resolve));

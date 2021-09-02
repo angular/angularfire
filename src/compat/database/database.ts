@@ -54,7 +54,7 @@ export class AngularFireDatabase {
     const app = ɵfirebaseAppFactory(options, zone, name);
 
     if (auth) {
-      ɵauthFactory(app, zone, useAuthEmulator, tenantId, languageCode, useDeviceLanguage, authSettings, persistence);
+      ɵauthFactory(app, zone, useAuthEmulator, tenantId, languageCode, useDeviceLanguage, authSettings, persistence, platformId);
     }
 
     this.database = ɵcacheInstance(`${app.name}.database.${databaseURL}`, 'AngularFireDatabase', app.name, () => {

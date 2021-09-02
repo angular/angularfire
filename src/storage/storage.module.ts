@@ -1,9 +1,10 @@
 import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from '@angular/core';
 import { FirebaseStorage } from 'firebase/storage';
-import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers } from '@angular/fire';
+import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
 import { Storage, StorageInstances, STORAGE_PROVIDER_NAME } from './storage';
 import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
 import { AuthInstances } from '@angular/fire/auth';
+import { registerVersion } from 'firebase/app';
 
 export const PROVIDED_STORAGE_INSTANCES = new InjectionToken<Storage[]>('angularfire2.storage-instances');
 
@@ -42,6 +43,9 @@ const DEFAULT_STORAGE_INSTANCE_PROVIDER = {
   ]
 })
 export class StorageModule {
+  constructor() {
+    registerVersion('angularfire', VERSION.full, 'gcs');
+  }
 }
 
 export function provideStorage(fn: () => FirebaseStorage): ModuleWithProviders<StorageModule> {

@@ -157,7 +157,7 @@ export class AngularFirestore {
     const useEmulator: UseEmulatorArguments | null = _useEmulator;
 
     if (auth) {
-      ɵauthFactory(app, zone, useAuthEmulator, tenantId, languageCode, useDeviceLanguage, authSettings, persistence);
+      ɵauthFactory(app, zone, useAuthEmulator, tenantId, languageCode, useDeviceLanguage, authSettings, persistence, platformId);
     }
 
     [this.firestore, this.persistenceEnabled$] = ɵcacheInstance(`${app.name}.firestore`, 'AngularFirestore', app.name, () => {

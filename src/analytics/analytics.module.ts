@@ -1,8 +1,9 @@
 import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, APP_INITIALIZER } from '@angular/core';
 import { Analytics as FirebaseAnalytics, isSupported } from 'firebase/analytics';
-import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers } from '@angular/fire';
+import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
 import { Analytics, ANALYTICS_PROVIDER_NAME, AnalyticsInstances } from './analytics';
 import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
+import { registerVersion } from 'firebase/app';
 
 const PROVIDED_ANALYTICS_INSTANCES = new InjectionToken<Analytics[]>('angularfire2.analytics-instances');
 const IS_SUPPORTED = new InjectionToken<boolean>('angularfire2.analytics.isSupported');
@@ -52,6 +53,9 @@ const DEFAULT_ANALYTICS_INSTANCE_PROVIDER = {
   ]
 })
 export class AnalyticsModule {
+  constructor() {
+    registerVersion('angularfire', VERSION.full, 'analytics');
+  }
 }
 
 export function provideAnalytics(fn: () => FirebaseAnalytics): ModuleWithProviders<AnalyticsModule> {
