@@ -2,7 +2,7 @@ import { ApplicationRef, Injectable, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { first, tap } from 'rxjs/operators';
 
-const IS_STABLE_START_MARK = '_isStableStart';
+const IS_STABLE_START_MARK = 'Zone';
 const IS_STABLE_END_MARK = '_isStableEnd';
 
 function markStarts() {
