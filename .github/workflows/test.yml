@@ -29,10 +29,11 @@ jobs:
         id: node_modules_cache
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-14-9-node_modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-14-9-9-node_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-14-9-node_modules-
-            ${{ runner.os }}-14-node_modules-
+            ${{ runner.os }}-14-9-9-node_modules-
+            ${{ runner.os }}-14-9
+            ${{ runner.os }}-14
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         uses: actions/cache@v2
@@ -64,8 +65,9 @@ jobs:
         os: [ ubuntu-latest, macos-latest, windows-latest]
         node: ["12", "14", "16"]
         firebase: ["9"]
+        firebaseTools: ["9"]
       fail-fast: false
-    name: Test firebase@${{ matrix.firebase }} on ${{ matrix.os }} w/Node.js ${{ matrix.node }}
+    name: Test firebase@${{ matrix.firebase }} firebase-tools@${{ matrix.firebaseTools }} on ${{ matrix.os }} Node.js ${{ matrix.node }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -79,10 +81,10 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-node_modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-${{ matrix.firebaseTools }}-node_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-node_modules-
-            ${{ runner.os }}-${{ matrix.node }}-node_modules-
+            ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-${{ matrix.firebaseTools }}-node_modules-
+            ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebaseTools }}-node_modules-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         uses: actions/cache@v2
@@ -96,6 +98,7 @@ jobs:
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
           yarn install --frozen-lockfile --prefer-offline --ignore-engines
           yarn add firebase@${{ matrix.firebase }} --prefer-offline --ignore-engines
+          yarn add firebase-tools@${{ matrix.firebaseTools }} --prefer-offline --ignore-engines
       - name: Firebase emulator cache
         uses: actions/cache@v2
         with:
@@ -129,10 +132,11 @@ jobs:
         id: node_modules_cache
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-${{ matrix.node }}-9-node_modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-${{ matrix.node }}-9-9-node_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.node }}-9-node_modules-
-            ${{ runner.os }}-${{ matrix.node }}-node_modules-
+            ${{ runner.os }}-${{ matrix.node }}-9-9-node_modules-
+            ${{ runner.os }}-${{ matrix.node }}-9
+            ${{ runner.os }}-${{ matrix.node }}
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         uses: actions/cache@v2

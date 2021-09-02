@@ -2,6 +2,7 @@ import { JsonObject, logging } from '@angular-devkit/core';
 import { BuilderContext, BuilderRun, ScheduleOptions, Target } from '@angular-devkit/architect';
 import { BuildTarget, FirebaseDeployConfig, FirebaseTools, FSHost } from '../interfaces';
 import deploy, { deployToFunction } from './actions';
+import { join } from 'path';
 import 'jasmine';
 
 let context: BuilderContext;
@@ -191,8 +192,8 @@ describe('universal deployment', () => {
     const packageArgs = spy.calls.argsFor(0);
 
     expect(packageArgs).toEqual([
-      'dist/dist/browser/index.html',
-      'dist/dist/browser/index.original.html'
+      join('dist', 'dist', 'browser', 'index.html'),
+      join('dist', 'dist', 'browser', 'index.original.html')
     ]);
   });
 

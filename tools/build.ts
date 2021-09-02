@@ -1,4 +1,4 @@
-import { spawn } from 'child_process';
+import { spawn } from 'cross-spawn';
 import { copy, readFile, writeFile } from 'fs-extra';
 import { prettySize } from 'pretty-size';
 import { file as gzipSizeFile } from 'gzip-size';
