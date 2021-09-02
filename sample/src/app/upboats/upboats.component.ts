@@ -1,6 +1,6 @@
-import { Component, isDevMode, OnDestroy, OnInit, Optional } from '@angular/core';
-import { Observable, of, Subscription } from 'rxjs';
-import { filter, startWith, switchMap, tap } from 'rxjs/operators';
+import { Component, OnInit, Optional } from '@angular/core';
+import { Observable, of } from 'rxjs';
+import { filter, shareReplay, startWith, switchMap, tap } from 'rxjs/operators';
 import { makeStateKey, TransferState } from '@angular/platform-browser';
 import { traceUntilFirst } from '@angular/fire/performance';
 import { Auth, user, User } from '@angular/fire/auth';
@@ -42,7 +42,9 @@ export class UpboatsComponent implements OnInit {
   constructor(state: TransferState, @Optional() auth: Auth) {
     const key = makeStateKey<Animal[]>('ANIMALS');
     const existing = state.get(key, undefined);
-    this.user = auth ? user(auth) : of(null);
+    // INVESTIGATE why do I need to share user to keep the zone stable?
+    // perhaps it related to why N+1 renders fail
+    this.user = auth ? user(auth).pipe(shareReplay({ bufferSize: 1, refCount: false })) : of(null);
     const start = auth && existing ?
       this.user.pipe(filter(it => !!it)) :
       of(null);

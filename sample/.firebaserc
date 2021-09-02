@@ -6,13 +6,6 @@
           "aftest-94085"
         ]
       }
-    },
-    "aftest-12345": {
-      "hosting": {
-        "sample": [
-          "aftest-12345"
-        ]
-      }
     }
   }
 }
