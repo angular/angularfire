@@ -32,8 +32,8 @@ jobs:
           key: ${{ runner.os }}-14-9-9-node_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-14-9-9-node_modules-
-            ${{ runner.os }}-14-9
-            ${{ runner.os }}-14
+            ${{ runner.os }}-14-9-
+            ${{ runner.os }}-14-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         uses: actions/cache@v2
@@ -84,7 +84,8 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-${{ matrix.firebaseTools }}-node_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-${{ matrix.firebaseTools }}-node_modules-
-            ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebaseTools }}-node_modules-
+            ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-
+            ${{ runner.os }}-${{ matrix.node }}-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         uses: actions/cache@v2
@@ -135,8 +136,8 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.node }}-9-9-node_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-${{ matrix.node }}-9-9-node_modules-
-            ${{ runner.os }}-${{ matrix.node }}-9
-            ${{ runner.os }}-${{ matrix.node }}
+            ${{ runner.os }}-${{ matrix.node }}-9-
+            ${{ runner.os }}-${{ matrix.node }}-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         uses: actions/cache@v2
@@ -175,10 +176,11 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-14-${{ matrix.firebase }}-node_modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-14-${{ matrix.firebase }}-9-node_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-14-${{ matrix.firebase }}-node_modules-
-            ${{ runner.os }}-14-node_modules-
+            ${{ runner.os }}-14-${{ matrix.firebase }}-9-node_modules-
+            ${{ runner.os }}-14-9-
+            ${{ runner.os }}-14-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         uses: actions/cache@v2
@@ -225,10 +227,11 @@ jobs:
 #        uses: actions/cache@v2
 #        with:
 #          path: ./node_modules
-#          key: ${{ runner.os }}-14-${{ matrix.firebase }}-node_modules-${{ hashFiles('yarn.lock') }}
+#          key: ${{ runner.os }}-14-${{ matrix.firebase }}-9-node_modules-${{ hashFiles('yarn.lock') }}
 #          restore-keys: |
-#            ${{ runner.os }}-14-${{ matrix.firebase }}-node_modules-
-#            ${{ runner.os }}-14-node_modules-
+#            ${{ runner.os }}-14-${{ matrix.firebase }}-9-node_modules-
+#            ${{ runner.os }}-14-${{ matrix.firebase }}-
+#            ${{ runner.os }}-14-
 #      - name: Yarn offline cache
 #        if: steps.node_modules_cache.outputs.cache-hit != 'true'
 #        uses: actions/cache@v2
