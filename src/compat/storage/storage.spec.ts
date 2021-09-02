@@ -2,7 +2,7 @@ import { forkJoin } from 'rxjs';
 import { mergeMap, tap } from 'rxjs/operators';
 import { TestBed } from '@angular/core/testing';
 import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire/compat';
-import { AngularFireStorage, AngularFireStorageModule, AngularFireUploadTask, BUCKET, fromTask } from '@angular/fire/compat/storage';
+import { AngularFireStorage, AngularFireStorageModule, AngularFireUploadTask, BUCKET, fromTask, USE_EMULATOR } from '@angular/fire/compat/storage';
 import { COMMON_CONFIG } from '../../test-config';
 import { rando } from '../../utils';
 import { ChangeDetectorRef } from '@angular/core';
@@ -33,7 +33,8 @@ describe('AngularFireStorage', () => {
         AngularFireStorageModule,
       ],
       providers: [
-        ChangeDetectorRef
+        ChangeDetectorRef,
+        { provide: USE_EMULATOR, useValue: ['localhost', 9199] }
       ]
     });
 
@@ -43,7 +44,7 @@ describe('AngularFireStorage', () => {
   });
 
   afterEach(() => {
-    app.delete().catch();
+    app.delete().catch(() => undefined);
   });
 
   it('should exist', () => {
@@ -236,7 +237,8 @@ describe('AngularFireStorage w/options', () => {
       providers: [
         { provide: FIREBASE_APP_NAME, useValue: firebaseAppName },
         { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG },
-        { provide: BUCKET, useValue: storageBucket }
+        { provide: BUCKET, useValue: storageBucket },
+        { provide: USE_EMULATOR, useValue: ['localhost', 9199] },
       ]
     });
 
@@ -245,7 +247,7 @@ describe('AngularFireStorage w/options', () => {
   });
 
   afterEach(() => {
-    app.delete().catch();
+    app.delete().catch(() => undefined);
   });
 
   describe('<constructor>', () => {
@@ -285,7 +287,7 @@ describe('AngularFireStorage w/options', () => {
             // get the url download
             mergeMap(() => ref.getDownloadURL()),
             // assert the URL
-            tap(url => expect(url).toMatch(new RegExp(`https:\\/\\/firebasestorage\\.googleapis\\.com\\/v0\\/b\\/${storageBucket}\\/o\\/${name}`))),
+            tap(url => expect(url).toMatch(new RegExp(`http:\\/\\/localhost:9199\\/v0\\/b\\/${storageBucket}\\/o\\/${name}`))),
             // Delete the file
             mergeMap(() => ref.delete())
           )

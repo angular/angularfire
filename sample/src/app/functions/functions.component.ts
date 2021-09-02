@@ -15,16 +15,15 @@ import { EMPTY, Observable } from 'rxjs';
 })
 export class FunctionsComponent implements OnInit {
 
-  response$: Observable<any>;
+  response$: Observable<any> = EMPTY;
 
-  constructor(public readonly functions: Functions) {
-    this.response$ = EMPTY;
+  constructor() {
   }
 
   ngOnInit(): void {}
 
-  request() {
-    this.response$ = httpsCallableData(this.functions, 'yada', { timeout: 3_000 })({});
+  async request() {
+    this.response$ = (await import('./lazyFunctions')).yadaFunction({});
   }
 
 }

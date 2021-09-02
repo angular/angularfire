@@ -31,7 +31,7 @@ describe('AngularFireAuthGuard', () => {
   });
 
   afterEach(() => {
-    app.delete().catch();
+    app.delete().catch(() => undefined);
   });
 
   it('should be injectable', () => {

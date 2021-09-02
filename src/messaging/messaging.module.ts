@@ -1,8 +1,9 @@
 import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, APP_INITIALIZER } from '@angular/core';
 import { isSupported, Messaging as FirebaseMessaging } from 'firebase/messaging';
-import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers } from '@angular/fire';
+import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
 import { Messaging, MessagingInstances, MESSAGING_PROVIDER_NAME } from './messaging';
 import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
+import { registerVersion } from 'firebase/app';
 
 const PROVIDED_MESSAGING_INSTANCES = new InjectionToken<Messaging[]>('angularfire2.messaging-instances');
 const IS_SUPPORTED = new InjectionToken<boolean>('angularfire2.messaging.isSupported');
@@ -52,6 +53,9 @@ const DEFAULT_MESSAGING_INSTANCE_PROVIDER = {
   ]
 })
 export class MessagingModule {
+  constructor() {
+    registerVersion('angularfire', VERSION.full, 'fcm');
+  }
 }
 
 export function provideMessaging(fn: () => FirebaseMessaging): ModuleWithProviders<MessagingModule> {

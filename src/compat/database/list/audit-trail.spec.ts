@@ -36,7 +36,7 @@ describe('auditTrail', () => {
   });
 
   afterEach(() => {
-    app.delete().catch();
+    app.delete().catch(() => undefined);
   });
 
   function prepareAuditTrail(opts: { events?: ChildEvent[], skipnumber: number } = { skipnumber: 0 }) {

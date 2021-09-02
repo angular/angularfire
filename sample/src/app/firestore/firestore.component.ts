@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Firestore, doc, docData } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
-import { startWith, tap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { startWith, switchMap, tap } from 'rxjs/operators';
 import { makeStateKey, TransferState } from '@angular/platform-browser';
 import { traceUntilFirst } from '@angular/fire/performance';
 
@@ -10,20 +9,25 @@ import { traceUntilFirst } from '@angular/fire/performance';
   template: `<p>
     Firestore!
     {{ testDocValue$ | async | json }}
+    {{ persistenceEnabled | async }}
   </p>`,
   styles: [``]
 })
 export class FirestoreComponent implements OnInit {
 
   public readonly testDocValue$: Observable<any>;
+  public persistenceEnabled: Promise<boolean> = Promise.resolve(false);
 
-  constructor(state: TransferState, firestore: Firestore) {
-    const ref = doc(firestore, 'test/1');
-    const key = makeStateKey<unknown>(ref.path);
+  constructor(state: TransferState) {
+    const key = makeStateKey<unknown>('FIRESTORE');
     const existing = state.get(key, undefined);
-    this.testDocValue$ = docData(ref).pipe(
+    this.testDocValue$ = of(existing).pipe(
+      switchMap(() => import('./lazyFirestore')),
+      tap(({ persistenceEnabled }) => this.persistenceEnabled = persistenceEnabled),
+      switchMap(({ valueChanges }) => valueChanges),
       traceUntilFirst('firestore'),
-      existing ? startWith(existing) : tap(it => state.set(key, it))
+      tap(it => state.set(key, it)),
+      existing ? startWith(existing) : tap(),
     );
   }
 

@@ -1,3 +1,15 @@
+<a name="7.0.3"></a>
+# [7.0.3](https://github.com/angular/angularfire/compare/7.0.2...7.0.3) (2021-09-02)
+
+
+### Bug fixes
+
+* **auth:** `@angular/fire/auth` was Zone wrapping some `firebase/auth` exports it shouldn't have been
+* **messaging:** `onMessage`'s callback should fire inside the Angular Zone
+* **schematics:** `ng deploy` SSR should assume `bundleDependencies` defaults to true
+* **schematics:** `ng deploy` SSR should not fail if an `index.html` does not exist ([#2765](https://github.com/angular/angularfire/issues/2765))
+
+
 <a name="7.0.2"></a>
 # [7.0.2](https://github.com/angular/angularfire2/compare/7.0.1...7.0.2) (2021-08-30)
 

@@ -1,9 +1,8 @@
-import { Component, OnInit, OnDestroy, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, OnDestroy, Optional } from '@angular/core';
 import { Auth, authState, signInAnonymously, signOut, User } from '@angular/fire/auth';
-import { Observable, Subscription } from 'rxjs';
+import { EMPTY, Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { traceUntilFirst } from '@angular/fire/performance';
-import { Inject } from '@angular/core';
 
 @Component({
   selector: 'app-auth',
@@ -21,20 +20,22 @@ import { Inject } from '@angular/core';
 export class AuthComponent implements OnInit, OnDestroy {
 
   private readonly userDisposable: Subscription|undefined;
-  public readonly user: Observable<User | null>;
+  public readonly user: Observable<User | null> = EMPTY;
 
   showLoginButton = false;
   showLogoutButton = false;
 
-  constructor(public readonly auth: Auth, @Inject(PLATFORM_ID) platformId: object) {
-    this.user = authState(this.auth);
-    this.userDisposable = authState(this.auth).pipe(
-      traceUntilFirst('auth'),
-      map(u => !!u)
-    ).subscribe(isLoggedIn => {
-      this.showLoginButton = !isLoggedIn;
-      this.showLogoutButton = isLoggedIn;
-    });
+  constructor(@Optional() private auth: Auth) {
+    if (auth) {
+      this.user = authState(this.auth);
+      this.userDisposable = authState(this.auth).pipe(
+        traceUntilFirst('auth'),
+        map(u => !!u)
+      ).subscribe(isLoggedIn => {
+        this.showLoginButton = !isLoggedIn;
+        this.showLogoutButton = isLoggedIn;
+      });
+    }
   }
 
   ngOnInit(): void { }

@@ -1,5 +1,5 @@
-import { ApplicationRef, Component } from '@angular/core';
-import { distinctUntilChanged } from 'rxjs/operators';
+import { ApplicationRef, Component, isDevMode } from '@angular/core';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -13,6 +13,13 @@ export class AppComponent {
   constructor(
     appRef: ApplicationRef,
   ) {
-    appRef.isStable.pipe(distinctUntilChanged()).subscribe(it => console.log('isStable', it));
+    if (isDevMode()) {
+      appRef.isStable.pipe(
+        debounceTime(200),
+        distinctUntilChanged(),
+      ).subscribe(it => {
+        console.log('isStable', it);
+      });
+    }
   }
 }
