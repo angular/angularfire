@@ -115,6 +115,7 @@ jobs:
       matrix:
         os: [macos-latest, windows-latest]
         node: ["12", "14", "16"]
+      fail-fast: false
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -143,8 +144,7 @@ jobs:
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
-          yarn config set yarn-offline-mirror-pruning true
-          yarn install --frozen-lockfile --prefer-offline
+          yarn install --frozen-lockfile --prefer-offline --ignore-engines
       - name: Build
         id: yarn-pack-dir
         run: yarn build
