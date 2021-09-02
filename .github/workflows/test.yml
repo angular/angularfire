@@ -117,9 +117,11 @@ jobs:
     name: Contribute ${{ matrix.os }} on Node.js ${{ matrix.node }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
         node: ["12", "14", "16"]
       fail-fast: false
+    # ubuntu w/Node 14 is what we build with, skip
+    if: ${{ matrix.os }} != 'ubuntu-latest' || ${{ matrix.node }} != 14
     steps:
       - name: Checkout
         uses: actions/checkout@v2

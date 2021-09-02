@@ -246,7 +246,12 @@ async function buildDocs() {
     const entryPoint = typedoc.children.find((c: any) => c.name === '"public_api"');
     const allChildren = [].concat(...typedoc.children.map(child =>
       // TODO chop out the working directory and filename
-      child.children ? child.children.map(c => ({ ...c, path: dirname(child.originalName.split(process.cwd())[1]) })) : []
+      child.children ?
+        child.children.map(c => {
+          console.log(child.originalName, process.cwd());
+          return { ...c, path: dirname(child.originalName.split(process.cwd())[1]) };
+        }) :
+        []
     ));
     return (entryPoint.children || [])
       .filter(c => c.name[0] !== 'ɵ' && c.name[0] !== '_' /* private */)
