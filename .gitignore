@@ -23,8 +23,3 @@ angularfire.tgz
 unpack.sh
 publish.sh
 .firebase
-
-# auto-gen files
-src/compat/**/base.ts
-src/**/rxfire.ts
-src/**/firebase.ts
