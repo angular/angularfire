@@ -2,14 +2,15 @@ import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from 
 import { Database as FirebaseDatabase } from 'firebase/database';
 
 import { AuthInstances } from '@angular/fire/auth';
-import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers } from '@angular/fire';
+import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
 import { Database, DatabaseInstances, DATABASE_PROVIDER_NAME } from './database';
-import { FirebaseApps } from '@angular/fire/app';
+import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
+import { registerVersion } from 'firebase/app';
 
 export const PROVIDED_DATABASE_INSTANCES = new InjectionToken<Database[]>('angularfire2.database-instances');
 
-export function defaultDatabaseInstanceFactory(_: Database[]) {
-  const defaultDatabase = ɵgetDefaultInstanceOf<FirebaseDatabase>(DATABASE_PROVIDER_NAME);
+export function defaultDatabaseInstanceFactory(provided: FirebaseDatabase[]|undefined, defaultApp: FirebaseApp) {
+  const defaultDatabase = ɵgetDefaultInstanceOf<FirebaseDatabase>(DATABASE_PROVIDER_NAME, provided, defaultApp);
   return new Database(defaultDatabase);
 }
 
@@ -31,8 +32,8 @@ const DEFAULT_DATABASE_INSTANCE_PROVIDER = {
   provide: Database,
   useFactory: defaultDatabaseInstanceFactory,
   deps: [
-    NgZone,
     [new Optional(), PROVIDED_DATABASE_INSTANCES ],
+    FirebaseApp,
   ]
 };
 
@@ -43,6 +44,9 @@ const DEFAULT_DATABASE_INSTANCE_PROVIDER = {
   ]
 })
 export class DatabaseModule {
+  constructor() {
+    registerVersion('angularfire', VERSION.full, 'rtdb');
+  }
 }
 
 export function provideDatabase(fn: () => FirebaseDatabase): ModuleWithProviders<DatabaseModule> {

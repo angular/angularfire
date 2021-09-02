@@ -1,3 +1,49 @@
+<a name="7.0.3"></a>
+# [7.0.3](https://github.com/angular/angularfire/compare/7.0.2...7.0.3) (2021-09-02)
+
+
+### Bug fixes
+
+* **auth:** `@angular/fire/auth` was Zone wrapping some `firebase/auth` exports it shouldn't have been
+* **messaging:** `onMessage`'s callback should fire inside the Angular Zone
+* **schematics:** `ng deploy` SSR should assume `bundleDependencies` defaults to true
+* **schematics:** `ng deploy` SSR should not fail if an `index.html` does not exist ([#2765](https://github.com/angular/angularfire/issues/2765))
+
+
+<a name="7.0.2"></a>
+# [7.0.2](https://github.com/angular/angularfire2/compare/7.0.1...7.0.2) (2021-08-30)
+
+### Bug fixes
+
+* **types:** `firebase/*` types were not being reexported from the `@angular/fire/*` modules (modular)
+
+<a name="7.0.1"></a>
+# [7.0.1](https://github.com/angular/angularfire2/compare/7.0.0...7.0.1) (2021-08-30)
+
+### Bug fixes
+
+* **messaging:** `onMessage` will no longer destablize the Angular Zone
+* **core:** Injected Classes now have a better fallback pattern for finding defaults, [#2909](https://github.com/angular/angularfire/issues/2909) allowing use of emulators and other config options as expected
+* **schematic:** upgrade schematic will no longer rewrite `.ts` files outside of your project root, [#2907](https://github.com/angular/angularfire/issues/2907)
+
+<a name="7.0.0"></a>
+# [7.0.0](https://github.com/angular/angularfire2/compare/6.1.5...7.0.0) (2021-08-25)
+
+### Breaking changes
+
+* Angular 12 is required
+* AngularFire now only works in Ivy applications
+* Firebase JS SDK v9 is required
+* The existing AngularFire v6 API surface has moved from `@angular/fire/*` to `@angular/fire/compat/*` (see compatibility mode)
+* **compat/auth:** `USE_EMULATOR` DI token is now in the form of `['http://localhost:9099']`
+
+### Features
+
+* New modular API surface available at `@angular/fire/*`
+* **compat/storage:** `USE_EMULATOR` DI token
+
+[See the v7 upgrade guide for more information.](https://github.com/angular/angularfire/blob/master/docs/version-7-upgrade.md)
+
 <a name="6.1.5"></a>
 # [6.1.5](https://github.com/angular/angularfire/compare/6.1.4...6.1.5) (2021-05-17)
 

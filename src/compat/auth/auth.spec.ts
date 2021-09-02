@@ -41,7 +41,7 @@ describe('AngularFireAuth', () => {
   });
 
   afterEach(() => {
-    app.delete().catch();
+    app.delete().catch(() => undefined);
   });
 
   describe('Zones', () => {
@@ -72,7 +72,7 @@ describe('AngularFireAuth', () => {
   });
 
   it('should have an initialized Firebase app', () => {
-    expect(afAuth.name).toBeDefined();
+    expect(afAuth.app).toBeDefined();
   });
 
   it('should have disabled app verification for testing', async () => {
@@ -150,7 +150,7 @@ describe('AngularFireAuth with different app', () => {
   });
 
   afterEach(() => {
-    app.delete().catch();
+    app.delete().catch(() => undefined);
   });
 
   describe('<constructor>', () => {
@@ -160,15 +160,13 @@ describe('AngularFireAuth with different app', () => {
     });
 
     it('should have an initialized Firebase app', () => {
-      expect(afAuth.name).toBeDefined();
+      expect(afAuth.app).toBeDefined();
     });
 
-    /*
-    TODO(jamesdaniels): Figure out why name is resolving to undefined
     it('should have an initialized Firebase app instance member', async () => {
-      const appName = await afAuth.name;
-      expect(appName).toEqual(firebaseAppName);
-    });*/
+      const itsApp = await afAuth.app;
+      expect(itsApp).toEqual(app);
+    });
   });
 
 });

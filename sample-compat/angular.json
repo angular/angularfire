@@ -135,7 +135,9 @@
             "main": "server.ts",
             "tsConfig": "tsconfig.server.json",
             "bundleDependencies": true,
-            "externalDependencies": [ ],
+            "externalDependencies": [
+              "firebase/compat/app"
+            ],
             "sourceMap": true,
             "optimization": false
           },

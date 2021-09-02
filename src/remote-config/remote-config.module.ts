@@ -1,13 +1,14 @@
 import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from '@angular/core';
 import { RemoteConfig as FirebaseRemoteConfig } from 'firebase/remote-config';
-import { ɵmemoizeInstance, ɵgetDefaultInstanceOf, ɵAngularFireSchedulers } from '@angular/fire';
+import { ɵmemoizeInstance, ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
 import { RemoteConfig, RemoteConfigInstances, REMOTE_CONFIG_PROVIDER_NAME } from './remote-config';
-import { FirebaseApps } from '@angular/fire/app';
+import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
+import { registerVersion } from 'firebase/app';
 
 export const PROVIDED_REMOTE_CONFIG_INSTANCES = new InjectionToken<RemoteConfig[]>('angularfire2.remote-config-instances');
 
-export function defaultRemoteConfigInstanceFactory(_: RemoteConfig[]) {
-  const defaultRemoteConfig = ɵgetDefaultInstanceOf<FirebaseRemoteConfig>(REMOTE_CONFIG_PROVIDER_NAME);
+export function defaultRemoteConfigInstanceFactory(provided: FirebaseRemoteConfig[]|undefined, defaultApp: FirebaseApp) {
+  const defaultRemoteConfig = ɵgetDefaultInstanceOf<FirebaseRemoteConfig>(REMOTE_CONFIG_PROVIDER_NAME, provided, defaultApp);
   return new RemoteConfig(defaultRemoteConfig);
 }
 
@@ -29,8 +30,8 @@ const DEFAULT_REMOTE_CONFIG_INSTANCE_PROVIDER = {
   provide: RemoteConfig,
   useFactory: defaultRemoteConfigInstanceFactory,
   deps: [
-    NgZone,
     [new Optional(), PROVIDED_REMOTE_CONFIG_INSTANCES ],
+    FirebaseApp,
   ]
 };
 
@@ -41,6 +42,9 @@ const DEFAULT_REMOTE_CONFIG_INSTANCE_PROVIDER = {
   ]
 })
 export class RemoteConfigModule {
+  constructor() {
+    registerVersion('angularfire', VERSION.full, 'rc');
+  }
 }
 
 export function provideRemoteConfig(fn: () => FirebaseRemoteConfig): ModuleWithProviders<RemoteConfigModule> {

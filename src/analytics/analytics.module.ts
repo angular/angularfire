@@ -1,19 +1,25 @@
-import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from '@angular/core';
-import { Analytics as FirebaseAnalytics } from 'firebase/analytics';
-import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers } from '@angular/fire';
+import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, APP_INITIALIZER } from '@angular/core';
+import { Analytics as FirebaseAnalytics, isSupported } from 'firebase/analytics';
+import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
 import { Analytics, ANALYTICS_PROVIDER_NAME, AnalyticsInstances } from './analytics';
-import { FirebaseApps } from '@angular/fire/app';
+import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
+import { registerVersion } from 'firebase/app';
 
-export const PROVIDED_ANALYTICS_INSTANCES = new InjectionToken<Analytics[]>('angularfire2.analytics-instances');
+const PROVIDED_ANALYTICS_INSTANCES = new InjectionToken<Analytics[]>('angularfire2.analytics-instances');
+const IS_SUPPORTED = new InjectionToken<boolean>('angularfire2.analytics.isSupported');
 
-export function defaultAnalyticsInstanceFactory(_: Analytics[]) {
-  const defaultAnalytics = ɵgetDefaultInstanceOf<FirebaseAnalytics>(ANALYTICS_PROVIDER_NAME);
+const isSupportedSymbol = Symbol('angularfire2.analytics.isSupported');
+
+export function defaultAnalyticsInstanceFactory(isSupported: boolean, provided: FirebaseAnalytics[]|undefined, defaultApp: FirebaseApp) {
+  const defaultAnalytics = isSupported ?
+    ɵgetDefaultInstanceOf<FirebaseAnalytics>(ANALYTICS_PROVIDER_NAME, provided, defaultApp) :
+    undefined;
   return new Analytics(defaultAnalytics);
 }
 
 export function analyticsInstanceFactory(fn: () => FirebaseAnalytics) {
-  return (zone: NgZone) => {
-    const analytics = ɵmemoizeInstance<FirebaseAnalytics>(fn, zone);
+  return (zone: NgZone, isSupported: boolean) => {
+    const analytics = isSupported ? ɵmemoizeInstance<FirebaseAnalytics>(fn, zone) : undefined;
     return new Analytics(analytics);
   };
 }
@@ -29,8 +35,9 @@ const DEFAULT_ANALYTICS_INSTANCE_PROVIDER = {
   provide: Analytics,
   useFactory: defaultAnalyticsInstanceFactory,
   deps: [
-    NgZone,
+    IS_SUPPORTED,
     [new Optional(), PROVIDED_ANALYTICS_INSTANCES ],
+    FirebaseApp,
   ]
 };
 
@@ -38,20 +45,32 @@ const DEFAULT_ANALYTICS_INSTANCE_PROVIDER = {
   providers: [
     DEFAULT_ANALYTICS_INSTANCE_PROVIDER,
     ANALYTICS_INSTANCES_PROVIDER,
+    {
+      provide: APP_INITIALIZER,
+      useValue: () => isSupported().then(it => globalThis[isSupportedSymbol] = it),
+      multi: true,
+    },
   ]
 })
 export class AnalyticsModule {
+  constructor() {
+    registerVersion('angularfire', VERSION.full, 'analytics');
+  }
 }
 
 export function provideAnalytics(fn: () => FirebaseAnalytics): ModuleWithProviders<AnalyticsModule> {
   return {
     ngModule: AnalyticsModule,
     providers: [{
+      provide: IS_SUPPORTED,
+      useFactory: () => globalThis[isSupportedSymbol],
+    }, {
       provide: PROVIDED_ANALYTICS_INSTANCES,
       useFactory: analyticsInstanceFactory(fn),
       multi: true,
       deps: [
         NgZone,
+        IS_SUPPORTED,
         ɵAngularFireSchedulers,
         FirebaseApps,
       ]

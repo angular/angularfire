@@ -23,13 +23,13 @@
   "author": "angular,firebase",
   "license": "MIT",
   "peerDependencies": {
-    "@angular/common": "ANGULAR_VERSION",
-    "@angular/core": "ANGULAR_VERSION",
-    "@angular/platform-browser": "ANGULAR_VERSION",
-    "@angular/platform-browser-dynamic": "ANGULAR_VERSION",
-    "firebase": "FIREBASE_VERSION",
-    "rxfire": "RXFIRE_VERSION",
-    "rxjs": "RXJS_VERSION"
+    "@angular/common": "^12.0.0",
+    "@angular/core": "^12.0.0",
+    "@angular/platform-browser": "^12.0.0",
+    "@angular/platform-browser-dynamic": "^12.0.0",
+    "firebase": "^9.0.0",
+    "rxfire": "^6.0.0",
+    "rxjs": "~6.6.0"
   },
   "dependencies": {
     "tslib": "^2.0.0"

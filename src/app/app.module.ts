@@ -1,9 +1,11 @@
 import {
+  Inject,
   InjectionToken,
   ModuleWithProviders,
   NgModule,
   NgZone,
   Optional,
+  PLATFORM_ID,
   VERSION as NG_VERSION,
 } from '@angular/core';
 import { FirebaseApp as IFirebaseApp, getApp, registerVersion } from 'firebase/app';
@@ -11,7 +13,9 @@ import { FirebaseApp as IFirebaseApp, getApp, registerVersion } from 'firebase/a
 import { FirebaseApp, FirebaseApps } from './app';
 import { VERSION, ɵmemoizeInstance, ɵAngularFireSchedulers } from '@angular/fire';
 
-export function defaultFirebaseAppFactory(_: FirebaseApp[]) {
+export function defaultFirebaseAppFactory(provided: FirebaseApp[]|undefined) {
+  // Use the provided app, if there is only one, otherwise fetch the default app
+  if (provided && provided.length === 1) { return provided[0]; }
   return new FirebaseApp(getApp());
 }
 
@@ -52,9 +56,11 @@ export function firebaseAppFactory(fn: () => IFirebaseApp) {
   ]
 })
 export class FirebaseAppModule {
-  constructor() {
+  // tslint:disable-next-line:ban-types
+  constructor(@Inject(PLATFORM_ID) platformId: Object) {
     registerVersion('angularfire', VERSION.full, 'core');
-    registerVersion('angular', NG_VERSION.full);
+    registerVersion('angularfire', VERSION.full, 'app');
+    registerVersion('angular', NG_VERSION.full, platformId.toString());
   }
 }
 

@@ -3,7 +3,7 @@ import { Observable, of, from, merge, Subject } from 'rxjs';
 import { switchMap, map, observeOn, shareReplay, first, filter, switchMapTo, subscribeOn } from 'rxjs/operators';
 import { ɵAngularFireSchedulers, keepUnstableUntilFirst } from '@angular/fire';
 import { ɵlazySDKProxy, ɵPromiseProxy, ɵapplyMixins } from '@angular/fire/compat';
-import {  ɵfirebaseAppFactory, FIREBASE_OPTIONS, FIREBASE_APP_NAME } from '@angular/fire/compat';
+import { ɵfirebaseAppFactory, FIREBASE_OPTIONS, FIREBASE_APP_NAME, FirebaseApp } from '@angular/fire/compat';
 import { FirebaseOptions } from 'firebase/app';
 import firebase from 'firebase/compat/app';
 import { isPlatformServer } from '@angular/common';
@@ -12,7 +12,7 @@ import { ɵcacheInstance } from '@angular/fire';
 
 export interface AngularFireAuth extends ɵPromiseProxy<firebase.auth.Auth> {}
 
-type UseEmulatorArguments = [string, number];
+type UseEmulatorArguments = Parameters<firebase.auth.Auth['useEmulator']>;
 export const USE_EMULATOR = new InjectionToken<UseEmulatorArguments>('angularfire2.auth.use-emulator');
 
 export const SETTINGS = new InjectionToken<firebase.auth.AuthSettings>('angularfire2.auth.settings');
@@ -20,6 +20,33 @@ export const TENANT_ID = new InjectionToken<string>('angularfire2.auth.tenant-id
 export const LANGUAGE_CODE = new InjectionToken<string>('angularfire2.auth.langugage-code');
 export const USE_DEVICE_LANGUAGE = new InjectionToken<boolean>('angularfire2.auth.use-device-language');
 export const PERSISTENCE = new InjectionToken<string>('angularfire.auth.persistence');
+
+export const ɵauthFactory = (
+  app: FirebaseApp, zone: NgZone, useEmulator: UseEmulatorArguments|null,
+  tenantId: string, languageCode: string|null, useDeviceLanguage: boolean|null,
+  settings: firebase.auth.AuthSettings|null, persistence: string|null,
+) => ɵcacheInstance(`${app.name}.auth`, 'AngularFireAuth', app.name, () => {
+  const auth = zone.runOutsideAngular(() => app.auth());
+  if (useEmulator) {
+    auth.useEmulator(...useEmulator);
+  }
+  if (tenantId) {
+    auth.tenantId = tenantId;
+  }
+  auth.languageCode = languageCode;
+  if (useDeviceLanguage) {
+    auth.useDeviceLanguage();
+  }
+  if (settings) {
+    for (const [k, v] of Object.entries(settings)) {
+      auth.settings[k] = v;
+    }
+  }
+  if (persistence) {
+    auth.setPersistence(persistence);
+  }
+  return auth;
+}, [useEmulator, tenantId, languageCode, useDeviceLanguage, settings, persistence]);
 
 @Injectable({
   providedIn: 'any'
@@ -60,8 +87,8 @@ export class AngularFireAuth {
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
     schedulers: ɵAngularFireSchedulers,
-    @Optional() @Inject(USE_EMULATOR) _useEmulator: any, // can't use the tuple here
-    @Optional() @Inject(SETTINGS) _settings: any, // can't use firebase.auth.AuthSettings here
+    @Optional() @Inject(USE_EMULATOR) useEmulator: any, // can't use the tuple here
+    @Optional() @Inject(SETTINGS) settings: any, // can't use firebase.auth.AuthSettings here
     @Optional() @Inject(TENANT_ID) tenantId: string | null,
     @Optional() @Inject(LANGUAGE_CODE) languageCode: string | null,
     @Optional() @Inject(USE_DEVICE_LANGUAGE) useDeviceLanguage: boolean | null,
@@ -73,34 +100,7 @@ export class AngularFireAuth {
       observeOn(schedulers.outsideAngular),
       switchMap(() => zone.runOutsideAngular(() => import('firebase/compat/auth'))),
       map(() => ɵfirebaseAppFactory(options, zone, name)),
-      map(app => zone.runOutsideAngular(() => {
-        const useEmulator: UseEmulatorArguments | null = _useEmulator;
-        const settings: firebase.auth.AuthSettings | null = _settings;
-        return ɵcacheInstance(`${app.name}.auth`, 'AngularFireAuth', app.name, () => {
-          const auth = zone.runOutsideAngular(() => app.auth());
-          if (useEmulator) {
-            // Firebase Auth doesn't conform to the useEmulator convention, let's smooth that over
-            auth.useEmulator(`http://${useEmulator.join(':')}`);
-          }
-          if (tenantId) {
-            auth.tenantId = tenantId;
-          }
-          // Feedback filed against beta.
-          // auth.languageCode = languageCode;
-          if (useDeviceLanguage) {
-            auth.useDeviceLanguage();
-          }
-          if (settings) {
-            for (const [k, v] of Object.entries(settings)) {
-              auth.settings[k] = v;
-            }
-          }
-          if (persistence) {
-            auth.setPersistence(persistence);
-          }
-          return auth;
-        }, [useEmulator, tenantId, languageCode, useDeviceLanguage, settings, persistence]);
-      })),
+      map(app => ɵauthFactory(app, zone, useEmulator, tenantId, languageCode, useDeviceLanguage, settings, persistence)),
       shareReplay({ bufferSize: 1, refCount: false }),
     );
 

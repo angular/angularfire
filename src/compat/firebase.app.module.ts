@@ -60,7 +60,8 @@ export class AngularFireModule {
 
   // tslint:disable-next-line:ban-types
   constructor(@Inject(PLATFORM_ID) platformId: Object) {
-    firebase.registerVersion('angularfire', VERSION.full, `compat-${platformId.toString()}`);
-    firebase.registerVersion('angular', NG_VERSION.full);
+    firebase.registerVersion('angularfire', VERSION.full, 'core');
+    firebase.registerVersion('angularfire', VERSION.full, 'app-compat');
+    firebase.registerVersion('angular', NG_VERSION.full, platformId.toString());
   }
 }

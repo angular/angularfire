@@ -14,6 +14,8 @@ import { AngularFireAnalytics } from './analytics';
 import { Title } from '@angular/platform-browser';
 import { isPlatformBrowser } from '@angular/common';
 import { UserTrackingService } from './user-tracking.service';
+import firebase from 'firebase/compat/app';
+import { VERSION } from '@angular/fire';
 
 const FIREBASE_EVENT_ORIGIN_KEY = 'firebase_event_origin';
 const FIREBASE_PREVIOUS_SCREEN_CLASS_KEY = 'firebase_previous_class';
@@ -66,6 +68,7 @@ export class ScreenTrackingService implements OnDestroy {
     zone: NgZone,
     @Optional() userTrackingService: UserTrackingService,
   ) {
+    firebase.registerVersion('angularfire', VERSION.full, 'compat-screen-tracking');
     if (!router || !isPlatformBrowser(platformId)) {
       return this;
     }
@@ -133,7 +136,7 @@ export class ScreenTrackingService implements OnDestroy {
         groupBy(it => it[OUTLET_KEY]),
         mergeMap(it => it.pipe(
           distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
-          startWith(undefined),
+          startWith<any, any>(undefined),
           pairwise(),
           map(([prior, current]) =>
             prior ? {

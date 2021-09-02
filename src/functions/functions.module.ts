@@ -1,13 +1,15 @@
 import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from '@angular/core';
 import { Functions as FirebaseFunctions } from 'firebase/functions';
-import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers } from '@angular/fire';
+import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
 import { Functions, FunctionsInstances, FUNCTIONS_PROVIDER_NAME } from './functions';
-import { FirebaseApps } from '@angular/fire/app';
+import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
+import { AuthInstances } from '@angular/fire/auth';
+import { registerVersion } from 'firebase/app';
 
 export const PROVIDED_FUNCTIONS_INSTANCES = new InjectionToken<Functions[]>('angularfire2.functions-instances');
 
-export function defaultFunctionsInstanceFactory(_: Functions[]) {
-  const defaultAuth = ɵgetDefaultInstanceOf<FirebaseFunctions>(FUNCTIONS_PROVIDER_NAME);
+export function defaultFunctionsInstanceFactory(provided: FirebaseFunctions[]|undefined, defaultApp: FirebaseApp) {
+  const defaultAuth = ɵgetDefaultInstanceOf<FirebaseFunctions>(FUNCTIONS_PROVIDER_NAME, provided, defaultApp);
   return new Functions(defaultAuth);
 }
 
@@ -29,8 +31,8 @@ const DEFAULT_FUNCTIONS_INSTANCE_PROVIDER = {
   provide: Functions,
   useFactory: defaultFunctionsInstanceFactory,
   deps: [
-    NgZone,
     [new Optional(), PROVIDED_FUNCTIONS_INSTANCES ],
+    FirebaseApp,
   ]
 };
 
@@ -41,6 +43,9 @@ const DEFAULT_FUNCTIONS_INSTANCE_PROVIDER = {
   ]
 })
 export class FunctionsModule {
+  constructor() {
+    registerVersion('angularfire', VERSION.full, 'fn');
+  }
 }
 
 export function provideFunctions(fn: () => FirebaseFunctions): ModuleWithProviders<FunctionsModule> {
@@ -54,6 +59,8 @@ export function provideFunctions(fn: () => FirebaseFunctions): ModuleWithProvide
         NgZone,
         ɵAngularFireSchedulers,
         FirebaseApps,
+        // Defensively load Auth first, if provided
+        [new Optional(), AuthInstances ],
       ]
     }]
   };

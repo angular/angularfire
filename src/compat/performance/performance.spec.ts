@@ -21,7 +21,7 @@ describe('AngularFirePerformance', () => {
   });
 
   afterEach(() => {
-    app.delete().catch();
+    app.delete().catch(() => undefined);
   });
 
   it('should exist', () => {
