@@ -237,7 +237,7 @@ async function buildDocs() {
   await Promise.all(MODULES.map(module => spawnPromise('npx', ['typedoc', `${module === 'core' ? './src' : `./src/${module}`}`, '--json', `./dist/typedocs/${module}.json`])));
   const entries = await Promise.all(MODULES.map(async (module) => {
 
-    const buffer = await readFile(`./dist/typedocs/${module}.json`);
+    const buffer = await readFile(join(process.cwd(), 'dist', 'typedocs', `${module}.json`));
     const typedoc = JSON.parse(buffer.toString());
     if (!typedoc.children) {
       console.error('typedoc fail', module);
@@ -248,7 +248,6 @@ async function buildDocs() {
       // TODO chop out the working directory and filename
       child.children ?
         child.children.map(c => {
-          console.log(child.originalName, process.cwd());
           return { ...c, path: dirname(child.originalName.split(process.cwd())[1]) };
         }) :
         []
