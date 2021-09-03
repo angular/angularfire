@@ -2,7 +2,7 @@ import { from, Observable } from 'rxjs';
 import { fromCollectionRef } from '../observable/fromRef';
 import { filter, map, scan } from 'rxjs/operators';
 import firebase from 'firebase/compat/app';
-import { keepUnstableUntilFirst, observeInsideAngular } from '@angular/fire';
+import { keepUnstableUntilFirst } from '@angular/fire';
 
 import { DocumentChangeAction, DocumentChangeType, DocumentData, Query } from '../interfaces';
 import { validateEventsArray } from '../collection/collection';
@@ -108,7 +108,7 @@ export class AngularFirestoreCollectionGroup<T = DocumentData> {
    */
   get(options?: firebase.firestore.GetOptions) {
     return from(this.query.get(options)).pipe(
-      observeInsideAngular
+      keepUnstableUntilFirst
     );
   }
 
