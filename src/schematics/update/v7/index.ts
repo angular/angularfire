@@ -50,7 +50,10 @@ export const ngUpdate = (): Rule => (
         throw new SchematicsException('Could not locate angular.json');
     }
 
-    const srcRoots: string[] = Object.values(angularJson.projects).map((it: any) => join('/', it.sourceRoot));
+    // TODO investigate if this is correct in Windows
+    const srcRoots: string[] = Object.values(angularJson.projects).map((it: any) =>
+        join(...['/', it.root, it.sourceRoot].filter(it => !!it))
+    );
 
     host.visit(filePath => {
         if (
