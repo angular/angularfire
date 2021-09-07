@@ -1,3 +1,15 @@
+<a name="7.0.4"></a>
+# [7.0.4](https://github.com/angular/angularfire/compare/7.0.3...7.0.4) (2021-09-07)
+
+
+### Bug Fixes
+
+* **compat/database:** Zone should be destabilized on get ([#2923](https://github.com/angular/angularfire/issues/2923)) ([c006da8](https://github.com/angular/angularfire/commit/c006da8))
+* **compat/perf:** AFP should not error in Jest ([#2920](https://github.com/angular/angularfire/issues/2920)) ([b0e147e](https://github.com/angular/angularfire/commit/b0e147e))
+* **schematics:** ng upgrade when e2e is present ([#2927](https://github.com/angular/angularfire/issues/2927)) ([9071faa](https://github.com/angular/angularfire/commit/9071faa))
+
+
+
 <a name="7.0.3"></a>
 # [7.0.3](https://github.com/angular/angularfire/compare/7.0.2...7.0.3) (2021-09-02)
 
