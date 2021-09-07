@@ -1,7 +1,7 @@
 import { from, Observable } from 'rxjs';
 import { filter, map, pairwise, scan, startWith } from 'rxjs/operators';
 import firebase from 'firebase/compat/app';
-import { keepUnstableUntilFirst, observeInsideAngular } from '@angular/fire';
+import { keepUnstableUntilFirst } from '@angular/fire';
 
 import { CollectionReference, DocumentChangeAction, DocumentChangeType, DocumentData, DocumentReference, Query } from '../interfaces';
 import { docChanges, sortedChanges } from './changes';
@@ -129,7 +129,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
    */
   get(options?: firebase.firestore.GetOptions) {
     return from(this.query.get(options)).pipe(
-      observeInsideAngular,
+      keepUnstableUntilFirst,
     );
   }
 
