@@ -5,13 +5,7 @@ import { makeStateKey, TransferState } from '@angular/platform-browser';
 import { traceUntilFirst } from '@angular/fire/performance';
 import { Auth, user, User } from '@angular/fire/auth';
 
-export type Animal = {
-  name: string,
-  upboats: number,
-  id: string,
-  hasPendingWrites: boolean,
-  changeType: string,
-};
+import type { Animal } from './lazyFirestore';
 
 @Component({
   selector: 'app-upboats',
@@ -19,11 +13,10 @@ export type Animal = {
     <ul>
       <li *ngFor="let animal of animals | async">
           <span>{{ animal.name }}</span>
-          <button (click)="upboat(animal.id)" [disabled]="(this.user | async) === null">👍</button>
+          <button (click)="upboat(animal.id)" [disabled]="animal.fromCache || currentlyVotingOn.includes(animal.id) || (this.user | async) === null">👍</button>
           <span>{{ animal.upboats }}</span>
-          <button (click)="downboat(animal.id)" [disabled]="(this.user | async) === null">👎</button>
+          <button (click)="downboat(animal.id)" [disabled]="animal.fromCache || currentlyVotingOn.includes(animal.id) || (this.user | async) === null">👎</button>
           <span *ngIf="animal.hasPendingWrites">🕒</span>
-          <span>{{ animal.changeType }}</span>
       </li>
     </ul>
     <button (click)="newAnimal()" [disabled]="!this.user">New animal</button>
@@ -33,7 +26,8 @@ export type Animal = {
 export class UpboatsComponent implements OnInit {
 
   public readonly animals: Observable<Animal[]>;
-  public user: Observable<User|null>;
+  public readonly user: Observable<User|null>;
+  public readonly currentlyVotingOn: Array<string> = [];
 
   get lazyFirestore() {
     return import('./lazyFirestore');
@@ -52,7 +46,10 @@ export class UpboatsComponent implements OnInit {
       switchMap(() => this.lazyFirestore),
       switchMap(({ snapshotChanges }) => snapshotChanges),
       traceUntilFirst('animals'),
-      tap(it => state.set<Animal[]>(key, it)),
+      tap(it => {
+        const cachedAnimals = it.map(animal => ({ ...animal, fromCache: true }));
+        state.set<Animal[]>(key, cachedAnimals);
+      }),
       existing ? startWith(existing) : tap(),
     );
   }
@@ -61,11 +58,15 @@ export class UpboatsComponent implements OnInit {
   }
 
   async upboat(id: string) {
+    const index = this.currentlyVotingOn.push(id) - 1;
     await (await this.lazyFirestore).upboat(id);
+    delete this.currentlyVotingOn[index];
   }
 
   async downboat(id: string) {
+    const index = this.currentlyVotingOn.push(id) - 1;
     await (await this.lazyFirestore).downboat(id);
+    delete this.currentlyVotingOn[index];
   }
 
   async newAnimal() {

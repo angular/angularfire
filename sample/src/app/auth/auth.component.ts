@@ -3,6 +3,7 @@ import { Auth, authState, signInAnonymously, signOut, User } from '@angular/fire
 import { EMPTY, Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { traceUntilFirst } from '@angular/fire/performance';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-auth',
@@ -10,8 +11,7 @@ import { traceUntilFirst } from '@angular/fire/performance';
     <p>
       Auth!
       {{ (user | async)?.uid | json }}
-      <button (click)="login()" *ngIf="showLoginButton">Log in with Google</button>
-      <button (click)="loginAnonymously()" *ngIf="showLoginButton">Log in anonymously</button>
+      <button routerLink="/login" *ngIf="showLoginButton">Log in</button>
       <button (click)="logout()" *ngIf="showLogoutButton">Log out</button>
     </p>
   `,
@@ -25,7 +25,7 @@ export class AuthComponent implements OnInit, OnDestroy {
   showLoginButton = false;
   showLogoutButton = false;
 
-  constructor(@Optional() private auth: Auth) {
+  constructor(@Optional() private auth: Auth, private router: Router) {
     if (auth) {
       this.user = authState(this.auth);
       this.userDisposable = authState(this.auth).pipe(
@@ -44,15 +44,6 @@ export class AuthComponent implements OnInit, OnDestroy {
     if (this.userDisposable) {
       this.userDisposable.unsubscribe();
     }
-  }
-
-  async login() {
-    const { GoogleAuthProvider, signInWithPopup } = await import('./GoogleAuthProvider');
-    return await signInWithPopup(this.auth, new GoogleAuthProvider());
-  }
-
-  async loginAnonymously() {
-    return await signInAnonymously(this.auth);
   }
 
   async logout() {

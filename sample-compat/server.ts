@@ -1,4 +1,5 @@
-import 'zone.js/node';
+import 'zone.js/dist/zone-node';
+import 'zone.js/dist/zone-patch-rxjs';
 
 import { ngExpressEngine } from '@nguniversal/express-engine';
 import * as express from 'express';
@@ -7,12 +8,6 @@ import { join } from 'path';
 import { AppServerModule,  } from './src/main.server';
 import { APP_BASE_HREF } from '@angular/common';
 import { existsSync } from 'fs';
-
-// Polyfill XMLHttpRequest and WS for Firebase
-/* tslint:disable:no-string-literal */
-global['XMLHttpRequest'] = require('xhr2');
-global['WebSocket'] = require('ws');
-/* tslint:enable:no-string-literal */
 
 import '@angular/fire/firestore-protos';
 
