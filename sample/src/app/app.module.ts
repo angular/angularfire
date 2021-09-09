@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { InjectionToken, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { FunctionsModule } from '@angular/fire/functions';
@@ -15,6 +15,10 @@ import { FunctionsComponent } from './functions/functions.component';
 import { MessagingComponent } from './messaging/messaging.component';
 import { RemoteConfigComponent } from './remote-config/remote-config.component';
 import { StorageComponent } from './storage/storage.component';
+
+import type { app } from 'firebase-admin';
+
+export const FIREBASE_ADMIN = new InjectionToken<app.App>('firebase-admin');
 
 @NgModule({
   declarations: [

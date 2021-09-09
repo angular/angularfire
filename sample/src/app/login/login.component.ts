@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Optional } from '@angular/core';
 import { Auth, GoogleAuthProvider, signInWithPopup, signInAnonymously } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 
@@ -17,7 +17,7 @@ export class LoginComponent implements OnInit {
 
   redirect = ['/'];
 
-  constructor(private auth: Auth, private router: Router) {
+  constructor(@Optional() private auth: Auth, private router: Router) {
   }
 
   ngOnInit(): void {

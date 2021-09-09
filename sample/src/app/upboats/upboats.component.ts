@@ -1,9 +1,11 @@
-import { Component, OnInit, Optional } from '@angular/core';
+import { Component, Inject, NgZone, OnInit, Optional } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { filter, shareReplay, startWith, switchMap, tap } from 'rxjs/operators';
 import { makeStateKey, TransferState } from '@angular/platform-browser';
 import { traceUntilFirst } from '@angular/fire/performance';
 import { Auth, user, User } from '@angular/fire/auth';
+import { FIREBASE_ADMIN } from '../app.module';
+import type { app } from 'firebase-admin';
 
 import type { Animal } from './lazyFirestore';
 
@@ -12,11 +14,11 @@ import type { Animal } from './lazyFirestore';
   template: `
     <ul>
       <li *ngFor="let animal of animals | async">
-          <span>{{ animal.name }}</span>
-          <button (click)="upboat(animal.id)" [disabled]="animal.fromCache || currentlyVotingOn.includes(animal.id) || (this.user | async) === null">👍</button>
-          <span>{{ animal.upboats }}</span>
-          <button (click)="downboat(animal.id)" [disabled]="animal.fromCache || currentlyVotingOn.includes(animal.id) || (this.user | async) === null">👎</button>
-          <span *ngIf="animal.hasPendingWrites">🕒</span>
+        <span>{{ animal.name }}</span>
+        <button (click)="animal.upboat()" [disabled]="animal.fromCache || (this.user | async) === null">👍</button>
+        <span>{{ animal.upboats }}</span>
+        <button (click)="animal.downboat()" [disabled]="animal.fromCache || (this.user | async) === null">👎</button>
+        <span *ngIf="animal.hasPendingWrites">🕒</span>
       </li>
     </ul>
     <button (click)="newAnimal()" [disabled]="!this.user">New animal</button>
@@ -27,13 +29,17 @@ export class UpboatsComponent implements OnInit {
 
   public readonly animals: Observable<Animal[]>;
   public readonly user: Observable<User|null>;
-  public readonly currentlyVotingOn: Array<string> = [];
 
   get lazyFirestore() {
     return import('./lazyFirestore');
   }
 
-  constructor(state: TransferState, @Optional() auth: Auth) {
+  constructor(
+    state: TransferState,
+    @Optional() auth: Auth,
+    @Optional() @Inject(FIREBASE_ADMIN) admin: app.App,
+    zone: NgZone,
+  ) {
     const key = makeStateKey<Animal[]>('ANIMALS');
     const existing = state.get(key, undefined);
     // INVESTIGATE why do I need to share user to keep the zone stable?
@@ -44,29 +50,17 @@ export class UpboatsComponent implements OnInit {
       of(null);
     this.animals = start.pipe(
       switchMap(() => this.lazyFirestore),
-      switchMap(({ snapshotChanges }) => snapshotChanges),
+      switchMap(({ snapshotChanges }) => snapshotChanges(state, zone, admin)),
       traceUntilFirst('animals'),
       tap(it => {
-        const cachedAnimals = it.map(animal => ({ ...animal, fromCache: true }));
-        state.set<Animal[]>(key, cachedAnimals);
+        const cachedAnimals = it.map(animal => ({ ...animal, hasPendingWrites: false, fromCache: true }));
+        state.set(key, cachedAnimals);
       }),
       existing ? startWith(existing) : tap(),
     );
   }
 
   ngOnInit(): void {
-  }
-
-  async upboat(id: string) {
-    const index = this.currentlyVotingOn.push(id) - 1;
-    await (await this.lazyFirestore).upboat(id);
-    delete this.currentlyVotingOn[index];
-  }
-
-  async downboat(id: string) {
-    const index = this.currentlyVotingOn.push(id) - 1;
-    await (await this.lazyFirestore).downboat(id);
-    delete this.currentlyVotingOn[index];
   }
 
   async newAnimal() {
