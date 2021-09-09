@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { makeStateKey, TransferState } from '@angular/platform-browser';
-import { startWith, tap } from 'rxjs/operators';
 import { traceUntilFirst } from '@angular/fire/performance';
 import { Database, objectVal, ref } from '@angular/fire/database';
 
@@ -19,14 +17,10 @@ export class DatabaseComponent implements OnInit {
 
   public readonly testObjectValue$: Observable<any>;
 
-  constructor(database: Database, state: TransferState) {
-    const key = makeStateKey<any>('DATABASE');
-    const existing = state.get(key, undefined);
+  constructor(database: Database) {
     const doc = ref(database, 'test');
     this.testObjectValue$ = objectVal(doc).pipe(
-      traceUntilFirst('database'),
-      tap(it => state.set(key, it)),
-      existing ? startWith(existing) : tap(),
+      traceUntilFirst('database')
     );
   }
 

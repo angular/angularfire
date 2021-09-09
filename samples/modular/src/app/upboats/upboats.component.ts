@@ -1,7 +1,6 @@
 import { Component, OnInit, Optional } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { shareReplay, startWith, tap } from 'rxjs/operators';
-import { makeStateKey, TransferState } from '@angular/platform-browser';
+import { shareReplay } from 'rxjs/operators';
 import { traceUntilFirst } from '@angular/fire/performance';
 import { Auth, user, User } from '@angular/fire/auth';
 import { addDoc, collection, collectionData, doc, Firestore, increment, orderBy, query, serverTimestamp, updateDoc } from '@angular/fire/firestore';
@@ -34,15 +33,14 @@ export class UpboatsComponent implements OnInit {
   public readonly animals: Observable<Animal[]>;
   public user: Observable<User|null>;
 
-  constructor(private readonly firestore: Firestore, state: TransferState, @Optional() auth: Auth) {
-    const key = makeStateKey<Animal[]>('ANIMALS');
-    const existing = state.get(key, undefined);
+  constructor(private readonly firestore: Firestore, @Optional() auth: Auth) {
     // INVESTIGATE why do I need to share user to keep the zone stable?
     // perhaps it related to why N+1 renders fail
     this.user = auth ? user(auth).pipe(shareReplay({ bufferSize: 1, refCount: false })) : of(null);
     const animalsCollection = collection(firestore, 'animals').withConverter<Animal>({
       fromFirestore: snapshot => {
-        const { name, id, upboats } = snapshot.data();
+        const { name, upboats } = snapshot.data();
+        const { id } = snapshot;
         const { hasPendingWrites } = snapshot.metadata;
         return { id, name, upboats, hasPendingWrites };
       },
@@ -52,9 +50,7 @@ export class UpboatsComponent implements OnInit {
     const animalsQuery = query(animalsCollection, orderBy('upboats', 'desc'), orderBy('updatedAt', 'desc'));
 
     this.animals = collectionData(animalsQuery).pipe(
-      traceUntilFirst('animals'),
-      tap(it => state.set<Animal[]>(key, it)),
-      existing ? startWith(existing) : tap(),
+      traceUntilFirst('animals')
     );
   }
 

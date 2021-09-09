@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { startWith, switchMap, tap } from 'rxjs/operators';
-import { makeStateKey, TransferState } from '@angular/platform-browser';
+import { from, Observable } from 'rxjs';
+import { startWith } from 'rxjs/operators';
+import { TransferState } from '@angular/platform-browser';
 import { traceUntilFirst } from '@angular/fire/performance';
 import { getDownloadURL, ref, Storage } from '@angular/fire/storage';
 import { keepUnstableUntilFirst } from '@angular/fire';
@@ -23,15 +23,11 @@ export class StorageComponent implements OnInit {
 
   public readonly downloadUrl$: Observable<string>;
 
-  constructor(storage: Storage, state: TransferState) {
-    const key = makeStateKey<string>('google-icon-url');
-    const existing = state.get(key, undefined);
+  constructor(storage: Storage) {
     const icon = ref(storage, 'google-g.png');
-    this.downloadUrl$ = existing ? of(existing) : of(undefined).pipe(
-      switchMap(() => getDownloadURL(icon)),
+    this.downloadUrl$ = from(getDownloadURL(icon)).pipe(
       keepUnstableUntilFirst,
       traceUntilFirst('storage'),
-      tap(it => state.set(key, it)),
       startWith(TRANSPARENT_PNG),
     );
   }

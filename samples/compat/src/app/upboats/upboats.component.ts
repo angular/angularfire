@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, startWith, tap } from 'rxjs/operators';
-import { AngularFirestoreOffline } from '../firestore-offline/firestore-offline.module';
 import firebase from 'firebase/compat/app';
 import { makeStateKey, TransferState } from '@angular/platform-browser';
 import { trace } from '@angular/fire/compat/performance';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 
 type Animal = { name: string, upboats: number, id: string, hasPendingWrites: boolean };
 
@@ -17,12 +17,11 @@ export class UpboatsComponent implements OnInit {
 
   public animals: Observable<Animal[]>;
 
-  constructor(private firestore: AngularFirestoreOffline, state: TransferState) {
+  constructor(private firestore: AngularFirestore) {
     const collection = firestore.collection<Animal>('animals', ref =>
       ref.orderBy('upboats', 'desc').orderBy('updatedAt', 'desc')
     );
     const key = makeStateKey<Animal[]>(collection.ref.path);
-    const existing = state.get(key, undefined);
     this.animals = collection.snapshotChanges().pipe(
       trace('animals'),
       map(it => it.map(change => ({
@@ -30,7 +29,6 @@ export class UpboatsComponent implements OnInit {
         id: change.payload.doc.id,
         hasPendingWrites: change.payload.doc.metadata.hasPendingWrites
       }))),
-      existing ? startWith(existing) : tap(it => state.set<Animal[]>(key, it))
     );
   }
 

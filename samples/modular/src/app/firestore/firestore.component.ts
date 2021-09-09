@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { startWith, tap } from 'rxjs/operators';
-import { makeStateKey, TransferState } from '@angular/platform-browser';
+import { persistenceEnabled as _persistenceEnabled } from '../app.module';
 import { traceUntilFirst } from '@angular/fire/performance';
 import { doc, docData, Firestore } from '@angular/fire/firestore';
 
@@ -17,16 +16,12 @@ import { doc, docData, Firestore } from '@angular/fire/firestore';
 export class FirestoreComponent implements OnInit {
 
   public readonly testDocValue$: Observable<any>;
-  public persistenceEnabled: Promise<boolean> = Promise.resolve(false);
+  public readonly persistenceEnabled = _persistenceEnabled;
 
-  constructor(firestore: Firestore, state: TransferState) {
-    const key = makeStateKey<unknown>('FIRESTORE');
-    const existing = state.get(key, undefined);
+  constructor(firestore: Firestore) {
     const ref = doc(firestore, 'test/1');
     this.testDocValue$ = docData(ref).pipe(
-      traceUntilFirst('firestore'),
-      tap(it => state.set(key, it)),
-      existing ? startWith(existing) : tap(),
+      traceUntilFirst('firestore')
     );
   }
 

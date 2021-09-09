@@ -29,7 +29,6 @@ export class AuthComponent implements OnInit, OnDestroy {
   showLogoutButton = false;
 
   constructor(public readonly auth: AngularFireAuth, @Inject(PLATFORM_ID) platformId: object) {
-
     if (!isPlatformServer(platformId)) {
       this.userDisposable = this.auth.authState.pipe(
         trace('auth'),

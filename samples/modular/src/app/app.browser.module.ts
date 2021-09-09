@@ -8,7 +8,6 @@ import { AppModule } from './app.module';
 import { AppComponent } from './app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
-import { BrowserTransferStateModule } from '@angular/platform-browser';
 import { provideAuth, connectAuthEmulator } from '@angular/fire/auth';
 
 import { initializeAuth, browserPopupRedirectResolver, indexedDBLocalPersistence } from '@angular/fire/auth';
@@ -16,7 +15,6 @@ import { initializeAuth, browserPopupRedirectResolver, indexedDBLocalPersistence
 @NgModule({
   imports: [
     AppModule,
-    BrowserTransferStateModule,
     provideRemoteConfig(() => getRemoteConfig()),
     provideAnalytics(() => getAnalytics()),
     provideMessaging(() => getMessaging()),
