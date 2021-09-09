@@ -2,3 +2,4 @@ src/**/firebase.ts linguist-generated=true
 src/**/rxfire.ts linguist-generated=true
 src/compat/**/base.ts linguist-generated=true
 samples/**/* linguist-generated=true
+yarn.lock linguist-generated=true
