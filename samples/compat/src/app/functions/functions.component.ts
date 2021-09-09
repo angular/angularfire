@@ -24,7 +24,7 @@ export class FunctionsComponent implements OnInit {
   ngOnInit(): void {}
 
   request() {
-    this.response$ = this.functions.httpsCallable('yada', { timeout: 3 })({});
+    this.response$ = this.functions.httpsCallable('yada', { timeout: 3_000 })({});
   }
 
 }

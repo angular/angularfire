@@ -1,5 +1,5 @@
-import { BrowserModule, BrowserTransferStateModule } from '@angular/platform-browser';
-import { isDevMode, NgModule, APP_INITIALIZER } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { isDevMode, NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -35,8 +35,6 @@ import { HomeComponent } from './home/home.component';
 import { AuthComponent } from './auth/auth.component';
 import { MessagingComponent } from './messaging/messaging.component';
 import { FunctionsComponent } from './functions/functions.component';
-import { FirestoreOfflineComponent } from './firestore-offline/firestore-offline.component';
-import { FirestoreOfflineModule } from './firestore-offline/firestore-offline.module';
 import { UpboatsComponent } from './upboats/upboats.component';
 
 @NgModule({
@@ -44,7 +42,6 @@ import { UpboatsComponent } from './upboats/upboats.component';
     AppComponent,
     StorageComponent,
     FirestoreComponent,
-    FirestoreOfflineComponent,
     DatabaseComponent,
     RemoteConfigComponent,
     HomeComponent,
@@ -55,13 +52,12 @@ import { UpboatsComponent } from './upboats/upboats.component';
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),
-    BrowserTransferStateModule,
     AppRoutingModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireStorageModule,
     AngularFireDatabaseModule,
-    AngularFirestoreModule,
+    AngularFirestoreModule.enablePersistence({ synchronizeTabs: true }),
     AngularFireAuthModule,
     AngularFireAuthGuardModule,
     AngularFireRemoteConfigModule,
@@ -69,7 +65,6 @@ import { UpboatsComponent } from './upboats/upboats.component';
     AngularFireAnalyticsModule,
     AngularFireFunctionsModule,
     AngularFirePerformanceModule,
-    FirestoreOfflineModule
   ],
   providers: [
     UserTrackingService,

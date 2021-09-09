@@ -3,14 +3,14 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --hmr",
+    "start": "cd ../.emulator && firebase emulators:exec --import seed \"cd ../advanced && ng serve --hmr\"",
     "build": "ng build --stats-json",
     "build:prod": "ng build --configuration production --stats-json",
     "analyze": "webpack-bundle-analyzer dist/sample/browser/stats.json",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
-    "dev:ssr": "ng run sample:serve-ssr",
+    "dev:ssr": "cd ../.emulator && firebase emulators:exec --import seed \"cd ../advanced && ng run sample:serve-ssr\"",
     "serve:ssr": "node dist/sample/server/main.js",
     "build:ssr": "ng build && ng run sample:server",
     "prerender": "ng run sample:prerender"

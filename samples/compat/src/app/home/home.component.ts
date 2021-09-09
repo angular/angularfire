@@ -8,7 +8,6 @@ import { FirebaseApp } from '@angular/fire/compat';
     {{ firebaseApp.name }}
     <app-database></app-database>
     <app-firestore></app-firestore>
-    <app-firestore-offline></app-firestore-offline>
     <app-upboats></app-upboats>
     <app-storage></app-storage>
     <app-auth></app-auth>
