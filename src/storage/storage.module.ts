@@ -5,6 +5,7 @@ import { Storage, StorageInstances, STORAGE_PROVIDER_NAME } from './storage';
 import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
 import { AuthInstances } from '@angular/fire/auth';
 import { registerVersion } from 'firebase/app';
+import { AppCheckInstances } from '@angular/fire/app-check';
 
 export const PROVIDED_STORAGE_INSTANCES = new InjectionToken<Storage[]>('angularfire2.storage-instances');
 
@@ -61,6 +62,7 @@ export function provideStorage(fn: () => FirebaseStorage): ModuleWithProviders<S
         FirebaseApps,
         // Defensively load Auth first, if provided
         [new Optional(), AuthInstances ],
+        [new Optional(), AppCheckInstances ],
       ]
     }]
   };
