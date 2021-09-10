@@ -36,6 +36,7 @@
     "rxfire": "^6.0.0",
     "rxjs": "~6.6.0",
     "tslib": "^2.1.0",
+    "webpack": "^5.35.0",
     "zone.js": "~0.11.4"
   },
   "devDependencies": {
