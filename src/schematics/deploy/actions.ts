@@ -8,6 +8,7 @@ import { defaultFunction, defaultPackage, DEFAULT_FUNCTION_NAME, dockerfile } fr
 import { satisfies } from 'semver';
 import * as open from 'open';
 import { SchematicsException } from '@angular-devkit/schematics';
+import { firebaseFunctions } from '../versions.json';
 
 const DEFAULT_EMULATOR_PORT = 5000;
 const DEFAULT_EMULATOR_HOST = 'localhost';
@@ -111,18 +112,14 @@ const findPackageVersion = (name: string) => {
 };
 
 const getPackageJson = (context: BuilderContext, workspaceRoot: string, options: DeployBuilderOptions, main?: string) => {
-  const dependencies: Record<string, string> = options.ssr === 'cloud-run' ? {} : {
-    'firebase-functions': 'latest'
-  };
-  const devDependencies: Record<string, string> = options.ssr === 'cloud-run' ? {} : {};
-  Object.keys(dependencies).forEach((dependency: string) => {
-    const packageVersion = findPackageVersion(dependency);
-    if (packageVersion) { dependencies[dependency] = packageVersion; }
-  });
-  Object.keys(devDependencies).forEach((devDependency: string) => {
-    const packageVersion = findPackageVersion(devDependency);
-    if (packageVersion) { devDependencies[devDependency] = packageVersion; }
-  });
+  const dependencies: Record<string, string> = {};
+  const devDependencies: Record<string, string> = {};
+  if (options.ssr !== 'cloud-run') {
+    Object.keys(firebaseFunctions).forEach(name => {
+      const { version, dev } = firebaseFunctions[name];
+      (dev ? devDependencies : dependencies)[name] = version;
+    });
+  }
   if (existsSync(join(workspaceRoot, 'angular.json'))) {
     const angularJson = JSON.parse(readFileSync(join(workspaceRoot, 'angular.json')).toString());
     // tslint:disable-next-line:no-non-null-assertion

@@ -10,6 +10,7 @@ import { NgAddNormalizedOptions, DeployOptions, FirebaseJSON, Workspace, Workspa
 
 import { default as defaultDependencies } from './versions.json';
 import { NodePackageInstallTask, RunSchematicTask } from '@angular-devkit/schematics/tasks';
+import { shortSiteName } from './utils';
 
 function emptyFirebaseJson() {
   return {
@@ -102,6 +103,8 @@ export const setupStaticDeployment = (config: {
       prerender: options.prerender,
       ssr: false,
       browserTarget: options.browserTarget,
+      firebaseProject: options.firebaseProject.projectId,
+      firebaseHostingSite: shortSiteName(options.firebaseHostingSite),
       ...(options.serverTarget ? {serverTarget: options.serverTarget} : {}),
       ...(options.prerenderTarget ? {prerenderTarget: options.prerenderTarget} : {}),
     }

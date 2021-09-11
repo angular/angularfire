@@ -122,15 +122,17 @@
         "deploy": {
           "builder": "@angular/fire:deploy",
           "options": {
-            "ssr": "cloud-run",
+            "ssr": "cloud-functions",
             "prerender": true,
-            "functionName": "ssr-sample",
+            "firebaseProject": "aftest-94085",
+            "firebaseHostingSite": "aftest-94085",
+            "functionName": "ssr_sample",
             "functionsNodeVersion": "16",
             "region": "us-central1",
             "browserTarget": "sample:build:production",
             "serverTarget": "sample:server:production",
             "prerenderTarget": "sample:prerender:production",
-            "outputPath": "dist/sample/run"
+            "outputPath": "dist/sample/functions"
           }
         },
         "server": {

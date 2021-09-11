@@ -1,6 +1,6 @@
 import { SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
 import {
-  projectPrompt, getWorkspace, getProject, projectTypePrompt, appPrompt, sitePrompt, getFirebaseTools, getFirebaseProjectName,
+  projectPrompt, getWorkspace, getProject, projectTypePrompt, appPrompt, sitePrompt, getFirebaseTools, getFirebaseProjectNameFromHost,
   featuresPrompt, PROJECT_TYPE, FEATURES,
 } from './utils';
 import { setupUniversalDeployment } from './ng-add-ssr';
@@ -16,7 +16,7 @@ export const setupProject =
     projectType: PROJECT_TYPE,
     prerender: boolean,
     nodeVersion?: string,
-    browserTarge?: string,
+    browserTarget?: string,
     serverTarget?: string,
     prerenderTarget?: string,
   }) => {
@@ -87,7 +87,7 @@ export const ngAddSetupProject = (
 
     const { project: ngProject, projectName: ngProjectName } = getProject(options, host);
 
-    const [ defaultProjectName, defaultHostingSite ] = getFirebaseProjectName(host, ngProjectName);
+    const [ defaultProjectName, defaultHostingSite ] = getFirebaseProjectNameFromHost(host, ngProjectName);
 
     const firebaseProject = await projectPrompt(defaultProjectName);
 

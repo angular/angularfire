@@ -9,7 +9,7 @@ import {
 import { FirebaseJSON, Workspace, WorkspaceProject, NgAddNormalizedOptions } from './interfaces';
 import { firebaseFunctions as firebaseFunctionsDependencies } from './versions.json';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
-import { PROJECT_TYPE } from './utils';
+import { PROJECT_TYPE, shortSiteName } from './utils';
 
 function generateHostingConfig(project: string, dist: string, functionName: string, projectType: PROJECT_TYPE) {
   return {
@@ -127,6 +127,8 @@ export const setupUniversalDeployment = (config: {
     options: {
       ssr: config.projectType === PROJECT_TYPE.CloudRun ? 'cloud-run' : 'cloud-functions',
       prerender: options.prerender,
+      firebaseProject: options.firebaseProject.projectId,
+      firebaseHostingSite: shortSiteName(options.firebaseHostingSite),
       functionName,
       functionsNodeVersion: config.nodeVersion,
       region: 'us-central1',

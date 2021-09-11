@@ -20,9 +20,7 @@
       "rewrites": [
         {
           "source": "**",
-          "run": {
-            "serviceId": "ssr-sample"
-          }
+          "function": "ssr_sample"
         }
       ]
     }

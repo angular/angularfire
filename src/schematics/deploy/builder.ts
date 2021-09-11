@@ -1,7 +1,7 @@
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import deploy, { DeployBuilderOptions } from './actions';
 import { BuildTarget } from '../interfaces';
-import { getFirebaseProjectName } from '../utils';
+import { getFirebaseProjectNameFromFs } from '../utils';
 
 // Call the createBuilder() function to create a builder. This mirrors
 // createJobHandler() but add typings specific to Architect Builders.
@@ -11,13 +11,25 @@ export default createBuilder(
       throw new Error('Cannot deploy the application without a target');
     }
 
-    const firebaseProject = options.firebaseProject || getFirebaseProjectName(
+    const [defaultFirebaseProject, defulatFirebaseHostingSite] = getFirebaseProjectNameFromFs(
       context.workspaceRoot,
       context.target.project
-    )[0];
+    );
 
+    const firebaseProject = options.firebaseProject || defaultFirebaseProject;
     if (!firebaseProject) {
-      throw new Error('Cannot find firebase project for your app in .firebaserc');
+      throw new Error('Cannot detirmine the Firebase Project from your angular.json or .firebaserc');
+    }
+    if (firebaseProject !== defaultFirebaseProject) {
+      throw new Error('The Firebase Project specified by your angular.json or .firebaserc is in conflict');
+    }
+
+    const firebaseHostingSite = options.firebaseHostingSite || defulatFirebaseHostingSite;
+    if (!firebaseHostingSite) {
+      throw new Error(`Cannot detirmine the Firebase Hosting Site from your angular.json or .firebaserc`);
+    }
+    if (firebaseHostingSite !== defulatFirebaseHostingSite) {
+      throw new Error('The Firebase Hosting Site specified by your angular.json or .firebaserc is in conflict');
     }
 
     const staticBuildTarget = { name: options.browserTarget || options.buildTarget || `${context.target.project}:build:production` };
