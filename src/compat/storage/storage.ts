@@ -1,12 +1,12 @@
 import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
 import { createStorageRef } from './ref';
-import { Observable } from 'rxjs';
-import { ɵAngularFireSchedulers, ɵcacheInstance, keepUnstableUntilFirst } from '@angular/fire';
+import { ɵAngularFireSchedulers, ɵcacheInstance } from '@angular/fire';
 import { FirebaseOptions } from 'firebase/app';
 import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire/compat';
 import { UploadMetadata } from './interfaces';
 import 'firebase/compat/storage';
 import firebase from 'firebase/compat/app';
+import { AppCheckInstances } from '@angular/fire/app-check';
 
 export const BUCKET = new InjectionToken<string>('angularfire2.storageBucket');
 export const MAX_UPLOAD_RETRY_TIME = new InjectionToken<number>('angularfire2.storage.maxUploadRetryTime');
@@ -39,6 +39,7 @@ export class AngularFireStorage {
     @Optional() @Inject(MAX_UPLOAD_RETRY_TIME) maxUploadRetryTime: number | any,
     @Optional() @Inject(MAX_OPERATION_RETRY_TIME) maxOperationRetryTime: number | any,
     @Optional() @Inject(USE_EMULATOR) _useEmulator: any,
+    @Optional() _appCheckInstances: AppCheckInstances,
   ) {
     const app = ɵfirebaseAppFactory(options, zone, name);
     this.storage = ɵcacheInstance(`${app.name}.storage.${storageBucket}`, 'AngularFireStorage', app.name, () => {

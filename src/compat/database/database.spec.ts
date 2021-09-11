@@ -48,7 +48,7 @@ describe('AngularFireDatabase', () => {
       const schedulers = new ɵAngularFireSchedulers(zone);
       const database = new AngularFireDatabase(
         app.options, rando(), undefined, {}, zone, schedulers, undefined, undefined,
-        undefined, undefined, undefined, undefined, undefined, undefined
+        undefined, undefined, undefined, undefined, undefined, undefined, undefined,
       );
       expect(database instanceof AngularFireDatabase).toEqual(true);
       // try { database.database.app.delete().then(done, done); } catch(e) { done(); }

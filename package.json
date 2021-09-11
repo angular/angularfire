@@ -1,6 +1,6 @@
 {
   "name": "@angular/fire",
-  "version": "7.0.4",
+  "version": "7.1.0",
   "description": "The official Angular library for Firebase.",
   "private": true,
   "scripts": {
@@ -68,13 +68,7 @@
     "semver": "^7.1.3",
     "tslib": "^2.1.0",
     "webpack": "^5.35.0",
-    "ws": "^7.2.1",
-    "xhr2": "^0.1.4",
     "zone.js": "~0.11.4"
-  },
-  "optionalDependencies": {
-    "bufferutil": "^4.0.1",
-    "utf-8-validate": "^5.0.2"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^12.0.0",

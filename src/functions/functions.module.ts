@@ -5,6 +5,7 @@ import { Functions, FunctionsInstances, FUNCTIONS_PROVIDER_NAME } from './functi
 import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
 import { AuthInstances } from '@angular/fire/auth';
 import { registerVersion } from 'firebase/app';
+import { AppCheckInstances } from '@angular/fire/app-check';
 
 export const PROVIDED_FUNCTIONS_INSTANCES = new InjectionToken<Functions[]>('angularfire2.functions-instances');
 
@@ -61,6 +62,7 @@ export function provideFunctions(fn: () => FirebaseFunctions): ModuleWithProvide
         FirebaseApps,
         // Defensively load Auth first, if provided
         [new Optional(), AuthInstances ],
+        [new Optional(), AppCheckInstances ],
       ]
     }]
   };

@@ -164,7 +164,7 @@ collection<T>(firestore, 'foo') // CollectionReference<T>
 
 ```ts
 import { collectionGroup } from '@angular/fire/firestore';
-collectionGroup<T>('foo') // Query<T>
+collectionGroup<T>(firestore, 'foo') // Query<T>
 ```
 </td>
         </tr>

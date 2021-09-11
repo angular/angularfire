@@ -31,6 +31,7 @@ import {
   ɵauthFactory,
 } from '@angular/fire/compat/auth';
 import { ɵcacheInstance } from '@angular/fire';
+import { AppCheckInstances } from '@angular/fire/app-check';
 
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
@@ -152,6 +153,7 @@ export class AngularFirestore {
     @Optional() @Inject(LANGUAGE_CODE) languageCode: string | null,
     @Optional() @Inject(USE_DEVICE_LANGUAGE) useDeviceLanguage: boolean | null,
     @Optional() @Inject(PERSISTENCE) persistence: string | null,
+    @Optional() _appCheckInstances: AppCheckInstances,
   ) {
     const app = ɵfirebaseAppFactory(options, zone, name);
     const useEmulator: UseEmulatorArguments | null = _useEmulator;
