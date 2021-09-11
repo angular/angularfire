@@ -1,6 +1,7 @@
 import { Component, OnInit, Optional } from '@angular/core';
 import { Messaging, getToken, onMessage } from '@angular/fire/messaging';
 import { EMPTY, from, Observable } from 'rxjs';
+import { share, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -8,8 +9,8 @@ import { environment } from 'src/environments/environment';
   template: `
     <p>
       Messaging!
-      {{ token$ | async | json }}
-      {{ message$ | async | json }}
+      <code>{{ token$ | async | slice:0:12 }}<ng-container *ngIf="(token$ | async) !== null">&hellip;</ng-container></code>
+      &nbsp;<code>{{ message$ | async | json }}</code>
       <button (click)="request()" *ngIf="showRequest">Request FCM token</button>
     </p>
   `,
@@ -30,8 +31,13 @@ export class MessagingComponent implements OnInit {
               serviceWorkerRegistration,
               vapidKey: environment.vapidKey,
             })
-          ));
-      this.message$ = new Observable(sub => onMessage(messaging, it => sub.next(it)));
+          )).pipe(
+            tap(token => console.log('FCM', {token})),
+            share(),
+          );
+      this.message$ = new Observable(sub => onMessage(messaging, it => sub.next(it))).pipe(
+        tap(token => console.log('FCM', {token})),
+      );
     }
   }
 

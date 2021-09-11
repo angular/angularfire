@@ -28,6 +28,8 @@ import { AngularFireFunctionsModule, USE_EMULATOR as USE_FUNCTIONS_EMULATOR, ORI
 import { AngularFireRemoteConfigModule, SETTINGS as REMOTE_CONFIG_SETTINGS, DEFAULTS as REMOTE_CONFIG_DEFAULTS } from '@angular/fire/compat/remote-config';
 import { AngularFirePerformanceModule, PerformanceMonitoringService } from '@angular/fire/compat/performance';
 import { AngularFireAuthGuardModule } from '@angular/fire/compat/auth-guard';
+import { provideAppCheck, initializeAppCheck, ReCaptchaV3Provider, CustomProvider } from '@angular/fire/app-check';
+
 import { DatabaseComponent } from './database/database.component';
 import { StorageComponent } from './storage/storage.component';
 import { RemoteConfigComponent } from './remote-config/remote-config.component';
@@ -36,6 +38,10 @@ import { AuthComponent } from './auth/auth.component';
 import { MessagingComponent } from './messaging/messaging.component';
 import { FunctionsComponent } from './functions/functions.component';
 import { UpboatsComponent } from './upboats/upboats.component';
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+
+// @ts-ignore
+const isNode = () => typeof process !== 'undefined' && process.versions?.node;
 
 @NgModule({
   declarations: [
@@ -65,6 +71,13 @@ import { UpboatsComponent } from './upboats/upboats.component';
     AngularFireAnalyticsModule,
     AngularFireFunctionsModule,
     AngularFirePerformanceModule,
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideAppCheck(() =>  {
+      const provider = isNode() ?
+        new CustomProvider({ getToken: () => Promise.reject() }) :
+        new ReCaptchaV3Provider(environment.recaptcha3SiteKey);
+      return initializeAppCheck(undefined, { provider, isTokenAutoRefreshEnabled: true });
+    }),
   ],
   providers: [
     UserTrackingService,
@@ -78,7 +91,6 @@ import { UpboatsComponent } from './upboats/upboats.component';
     { provide: USE_FIRESTORE_EMULATOR, useValue: environment.useEmulators ? ['localhost', 8080] : undefined },
     { provide: USE_FUNCTIONS_EMULATOR, useValue: environment.useEmulators ? ['localhost', 5001] : undefined },
     { provide: USE_STORAGE_EMULATOR, useValue: environment.useEmulators ? ['localhost', 9199] : undefined },
-    { provide: FUNCTIONS_ORIGIN, useFactory: () => isDevMode() || typeof location === 'undefined' ? undefined : location.origin },
     { provide: REMOTE_CONFIG_SETTINGS, useFactory: () => isDevMode() ? { minimumFetchIntervalMillis: 10_000 } : {} },
     { provide: REMOTE_CONFIG_DEFAULTS, useValue: { background_color: 'red' } },
     { provide: USE_DEVICE_LANGUAGE, useValue: true },

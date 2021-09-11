@@ -6,11 +6,14 @@ import { traceUntilFirst } from '@angular/fire/performance';
 
 @Component({
   selector: 'app-firestore',
-  template: `<p>
-    Firestore!
-    {{ testDocValue$ | async | json }}
-    {{ persistenceEnabled | async }}
-  </p>`,
+  template: `
+    <p>
+      Firestore!
+      <code>{{ testDocValue$ | async | json }}</code>
+      <br>
+      <small>Persistence enabled: <code>{{ (persistenceEnabled | async) ?? false }}</code></small>
+    </p>
+  `,
   styles: [``]
 })
 export class FirestoreComponent implements OnInit {

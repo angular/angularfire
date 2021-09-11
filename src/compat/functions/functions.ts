@@ -9,6 +9,7 @@ import firebase from 'firebase/compat/app';
 import { proxyPolyfillCompat } from './base';
 import { HttpsCallableOptions } from '@firebase/functions-types';
 import { ɵcacheInstance } from '@angular/fire';
+import { AppCheckInstances } from '@angular/fire/app-check';
 
 export const ORIGIN = new InjectionToken<string>('angularfire2.functions.origin');
 export const REGION = new InjectionToken<string>('angularfire2.functions.region');
@@ -35,6 +36,7 @@ export class AngularFireFunctions {
     @Optional() @Inject(REGION) region: string | null,
     @Optional() @Inject(ORIGIN) origin: string | null,
     @Optional() @Inject(USE_EMULATOR) _useEmulator: any, // can't use the tuple here
+    @Optional() _appCheckInstances: AppCheckInstances,
   ) {
     const useEmulator: UseEmulatorArguments | null = _useEmulator;
 

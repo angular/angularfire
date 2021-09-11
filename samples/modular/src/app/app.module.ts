@@ -2,6 +2,10 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { connectFunctionsEmulator, FunctionsModule, getFunctions, provideFunctions } from '@angular/fire/functions';
+import { connectFirestoreEmulator, getFirestore, provideFirestore, enableMultiTabIndexedDbPersistence } from '@angular/fire/firestore';
+import { connectDatabaseEmulator, getDatabase, provideDatabase } from '@angular/fire/database';
+import { connectStorageEmulator, getStorage, provideStorage } from '@angular/fire/storage';
+import { provideAppCheck, CustomProvider, ReCaptchaV3Provider, initializeAppCheck } from '@angular/fire/app-check';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -15,9 +19,7 @@ import { FunctionsComponent } from './functions/functions.component';
 import { MessagingComponent } from './messaging/messaging.component';
 import { RemoteConfigComponent } from './remote-config/remote-config.component';
 import { StorageComponent } from './storage/storage.component';
-import { connectFirestoreEmulator, getFirestore, provideFirestore, enableMultiTabIndexedDbPersistence } from '@angular/fire/firestore';
-import { connectDatabaseEmulator, getDatabase, provideDatabase } from '@angular/fire/database';
-import { connectStorageEmulator, getStorage, provideStorage } from '@angular/fire/storage';
+import { AppCheckComponent } from './app-check/app-check.component';
 
 let resolvePersistenceEnabled: (enabled: boolean) => void;
 
@@ -25,9 +27,12 @@ export const persistenceEnabled = new Promise<boolean>(resolve => {
   resolvePersistenceEnabled = resolve;
 });
 
+const isNode = () => typeof process !== 'undefined' && process.versions?.node;
+
 @NgModule({
   declarations: [
     AppComponent,
+    AppCheckComponent,
     HomeComponent,
     UpboatsComponent,
     AuthComponent,
@@ -74,6 +79,12 @@ export const persistenceEnabled = new Promise<boolean>(resolve => {
           connectFunctionsEmulator(functions, 'localhost', 5001);
       }
       return functions;
+    }),
+    provideAppCheck(() =>  {
+      const provider = isNode() ?
+        new CustomProvider({ getToken: () => Promise.reject() }) :
+        new ReCaptchaV3Provider(environment.recaptcha3SiteKey);
+      return initializeAppCheck(undefined, { provider, isTokenAutoRefreshEnabled: true });
     }),
   ],
   providers: [ ],

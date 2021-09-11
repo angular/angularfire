@@ -1,24 +1,27 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Optional } from '@angular/core';
 import { RemoteConfig, getAllChanges } from '@angular/fire/remote-config';
 import { traceUntilFirst } from '@angular/fire/performance';
-import { Observable } from 'rxjs';
+import { EMPTY, Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-remote-config',
-  template: `
-    <p>
-      Remote Config!
-      {{ change$ | async | json }}
-    </p>
-  `,
+  template: `<ng-container *ngIf="change$ | async"></ng-container>`,
   styles: []
 })
 export class RemoteConfigComponent implements OnInit {
 
   readonly change$: Observable<any>;
 
-  constructor(public readonly remoteConfig: RemoteConfig) {
-    this.change$ = getAllChanges(this.remoteConfig).pipe(traceUntilFirst('remote-config'));
+  constructor(@Optional() remoteConfig: RemoteConfig) {
+    if (remoteConfig) {
+      this.change$ = getAllChanges(remoteConfig).pipe(
+        traceUntilFirst('remote-config'),
+        tap(it => console.log('REMOTE CONFIG', it)),
+      );
+    } else {
+      this.change$ = EMPTY;
+    }
   }
 
   ngOnInit(): void {

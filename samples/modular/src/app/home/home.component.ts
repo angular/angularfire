@@ -10,9 +10,11 @@ import { RESPONSE } from '@nguniversal/express-engine/tokens';
     {{ firebaseApp.name }}
     <app-upboats></app-upboats>
     <app-auth></app-auth>
+    <app-app-check></app-app-check>
     <app-database></app-database>
     <app-firestore></app-firestore>
     <app-messaging></app-messaging>
+    <app-remote-config></app-remote-config>
     <app-storage></app-storage>
     <app-functions></app-functions>
   `,

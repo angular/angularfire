@@ -8,8 +8,9 @@ import { doc, docData, Firestore } from '@angular/fire/firestore';
   selector: 'app-firestore',
   template: `<p>
     Firestore!
-    {{ testDocValue$ | async | json }}
-    {{ persistenceEnabled | async }}
+    <code>{{ testDocValue$ | async | json }}</code>
+    <br>
+    <small>Persistence enabled: <code>{{ (persistenceEnabled | async) ?? false }}</code></small>
   </p>`,
   styles: [``]
 })
