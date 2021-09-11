@@ -1,6 +1,8 @@
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectorRef, NgModule, OnDestroy, Pipe, PipeTransform } from '@angular/core';
-import { Observable } from 'rxjs';
+import { ChangeDetectorRef, NgModule, OnDestroy, Optional, Pipe, PipeTransform } from '@angular/core';
+import { makeStateKey, TransferState } from '@angular/platform-browser';
+import { Observable, of } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { AngularFireStorage } from '../storage';
 
 /** to be used with in combination with | async */
@@ -14,14 +16,22 @@ export class GetDownloadURLPipe implements PipeTransform, OnDestroy {
   private path: string;
   private downloadUrl$: Observable<any>;
 
-  constructor(private storage: AngularFireStorage, cdr: ChangeDetectorRef) {
+  constructor(
+    private storage: AngularFireStorage,
+    cdr: ChangeDetectorRef,
+    @Optional() private state: TransferState
+  ) {
     this.asyncPipe = new AsyncPipe(cdr);
   }
 
   transform(path: string) {
     if (path !== this.path) {
       this.path = path;
-      this.downloadUrl$ = this.storage.ref(path).getDownloadURL();
+      const key = makeStateKey<string>(`|getDownloadURL|${path}`);
+      const existing = this.state?.get(key, undefined);
+      this.downloadUrl$ = existing ? of(existing) : this.storage.ref(path).getDownloadURL().pipe(
+        tap(it => this.state?.set(key, it))
+      );
     }
     return this.asyncPipe.transform(this.downloadUrl$);
   }
