@@ -24,11 +24,10 @@ import { AngularFirestoreModule, USE_EMULATOR as USE_FIRESTORE_EMULATOR, SETTING
 import { AngularFireStorageModule, USE_EMULATOR as USE_STORAGE_EMULATOR } from '@angular/fire/compat/storage';
 import { AngularFireAuthModule, USE_DEVICE_LANGUAGE, USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/compat/auth';
 import { AngularFireMessagingModule, SERVICE_WORKER, VAPID_KEY } from '@angular/fire/compat/messaging';
-import { AngularFireFunctionsModule, USE_EMULATOR as USE_FUNCTIONS_EMULATOR, ORIGIN as FUNCTIONS_ORIGIN } from '@angular/fire/compat/functions';
+import { AngularFireFunctionsModule, USE_EMULATOR as USE_FUNCTIONS_EMULATOR } from '@angular/fire/compat/functions';
 import { AngularFireRemoteConfigModule, SETTINGS as REMOTE_CONFIG_SETTINGS, DEFAULTS as REMOTE_CONFIG_DEFAULTS } from '@angular/fire/compat/remote-config';
 import { AngularFirePerformanceModule, PerformanceMonitoringService } from '@angular/fire/compat/performance';
 import { AngularFireAuthGuardModule } from '@angular/fire/compat/auth-guard';
-import { provideAppCheck, initializeAppCheck, ReCaptchaV3Provider, CustomProvider } from '@angular/fire/app-check';
 
 import { DatabaseComponent } from './database/database.component';
 import { StorageComponent } from './storage/storage.component';
@@ -39,9 +38,6 @@ import { MessagingComponent } from './messaging/messaging.component';
 import { FunctionsComponent } from './functions/functions.component';
 import { UpboatsComponent } from './upboats/upboats.component';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
-
-// @ts-ignore
-const isNode = () => typeof process !== 'undefined' && process.versions?.node;
 
 @NgModule({
   declarations: [
@@ -71,13 +67,8 @@ const isNode = () => typeof process !== 'undefined' && process.versions?.node;
     AngularFireAnalyticsModule,
     AngularFireFunctionsModule,
     AngularFirePerformanceModule,
+    // provide modular style for AppCheck, see app.browser/server
     provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideAppCheck(() =>  {
-      const provider = isNode() ?
-        new CustomProvider({ getToken: () => Promise.reject() }) :
-        new ReCaptchaV3Provider(environment.recaptcha3SiteKey);
-      return initializeAppCheck(undefined, { provider, isTokenAutoRefreshEnabled: true });
-    }),
   ],
   providers: [
     UserTrackingService,

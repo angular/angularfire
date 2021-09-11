@@ -1,19 +1,17 @@
 import { NgModule } from '@angular/core';
-import { ServerModule } from '@angular/platform-server';
-import { provideAppCheck, CustomProvider, initializeAppCheck } from '@angular/fire/app-check';
-
 import { AppModule } from './app.module';
 import { AppComponent } from './app.component';
+import { environment } from '../environments/environment';
+import { provideAppCheck, initializeAppCheck, ReCaptchaV3Provider } from '@angular/fire/app-check';
 
 @NgModule({
   imports: [
     AppModule,
-    ServerModule,
     provideAppCheck(() =>  {
-      const provider = new CustomProvider({ getToken: () => Promise.reject() });
+      const provider = new ReCaptchaV3Provider(environment.recaptcha3SiteKey);
       return initializeAppCheck(undefined, { provider, isTokenAutoRefreshEnabled: true });
     }),
   ],
   bootstrap: [AppComponent],
 })
-export class AppServerModule {}
+export class AppBrowserModule {}
