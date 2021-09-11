@@ -2,7 +2,6 @@ import { InjectionToken, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { FunctionsModule } from '@angular/fire/functions';
-import { provideAppCheck, initializeAppCheck, ReCaptchaV3Provider, CustomProvider } from '@angular/fire/app-check';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -19,8 +18,6 @@ import { StorageComponent } from './storage/storage.component';
 
 import type { app } from 'firebase-admin';
 import { AppCheckComponent } from './app-check/app-check.component';
-
-const isNode = () => typeof process !== 'undefined' && process.versions?.node;
 
 export const FIREBASE_ADMIN = new InjectionToken<app.App>('firebase-admin');
 
@@ -43,12 +40,6 @@ export const FIREBASE_ADMIN = new InjectionToken<app.App>('firebase-admin');
     AppRoutingModule,
     FunctionsModule,
     provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideAppCheck(() =>  {
-      const provider = isNode() ?
-        new CustomProvider({ getToken: () => Promise.reject() }) :
-        new ReCaptchaV3Provider(environment.recaptcha3SiteKey);
-      return initializeAppCheck(undefined, { provider, isTokenAutoRefreshEnabled: true });
-    }),
   ],
   providers: [ ],
   bootstrap: [ ],

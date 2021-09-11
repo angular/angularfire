@@ -9,6 +9,11 @@ import { AppServerModule } from './src/main.server';
 import { APP_BASE_HREF } from '@angular/common';
 import { existsSync } from 'fs';
 
+// These polyfills are for app-check Node.js
+// @ts-ignore
+globalThis.self = globalThis;
+globalThis.fetch = require('node-fetch').default;
+
 import '@angular/fire/firestore-protos';
 
 // The Express app is exported so that it can be used by serverless Functions.

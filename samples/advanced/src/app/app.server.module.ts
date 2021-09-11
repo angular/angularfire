@@ -4,12 +4,17 @@ import * as admin from 'firebase-admin';
 
 import { AppModule, FIREBASE_ADMIN } from './app.module';
 import { AppComponent } from './app.component';
+import { initializeAppCheck, provideAppCheck, CustomProvider } from '@angular/fire/app-check';
 
 @NgModule({
   imports: [
     AppModule,
     ServerModule,
     ServerTransferStateModule,
+    provideAppCheck(() =>  {
+      const provider = new CustomProvider({ getToken: () => Promise.reject() });
+      return initializeAppCheck(undefined, { provider, isTokenAutoRefreshEnabled: true });
+    }),
   ],
   providers: [{
     provide: FIREBASE_ADMIN, useFactory: () => admin.apps[0] || admin.initializeApp(

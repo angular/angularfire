@@ -5,7 +5,6 @@ import { connectFunctionsEmulator, FunctionsModule, getFunctions, provideFunctio
 import { connectFirestoreEmulator, getFirestore, provideFirestore, enableMultiTabIndexedDbPersistence } from '@angular/fire/firestore';
 import { connectDatabaseEmulator, getDatabase, provideDatabase } from '@angular/fire/database';
 import { connectStorageEmulator, getStorage, provideStorage } from '@angular/fire/storage';
-import { provideAppCheck, CustomProvider, ReCaptchaV3Provider, initializeAppCheck } from '@angular/fire/app-check';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -26,8 +25,6 @@ let resolvePersistenceEnabled: (enabled: boolean) => void;
 export const persistenceEnabled = new Promise<boolean>(resolve => {
   resolvePersistenceEnabled = resolve;
 });
-
-const isNode = () => typeof process !== 'undefined' && process.versions?.node;
 
 @NgModule({
   declarations: [
@@ -79,12 +76,6 @@ const isNode = () => typeof process !== 'undefined' && process.versions?.node;
           connectFunctionsEmulator(functions, 'localhost', 5001);
       }
       return functions;
-    }),
-    provideAppCheck(() =>  {
-      const provider = isNode() ?
-        new CustomProvider({ getToken: () => Promise.reject() }) :
-        new ReCaptchaV3Provider(environment.recaptcha3SiteKey);
-      return initializeAppCheck(undefined, { provider, isTokenAutoRefreshEnabled: true });
     }),
   ],
   providers: [ ],
