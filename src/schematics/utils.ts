@@ -373,20 +373,18 @@ export const projectTypePrompt = async (project: WorkspaceProject, name: string)
 };
 
 export function getFirebaseProjectName(
-  workspaceRoot: string,
+  host: Tree,
   target: string
 ): [string|undefined, string|undefined] {
-  try {
-    const rc: FirebaseRc = JSON.parse(
-      readFileSync(join(workspaceRoot, '.firebaserc'), 'UTF-8')
-    );
-    const defaultProject = rc.projects?.default;
-    const project = Object.keys(rc.targets || {}).find(
-      project => !!rc.targets?.[project]?.hosting?.[target]
-    );
-    const site = project && rc.targets?.[project]?.hosting?.[target]?.[0];
-    return [project || defaultProject, site];
-  } catch (e) {
+  const buffer = host.read('/.firebaserc');
+  if (!buffer) {
     return [undefined, undefined];
   }
+  const rc: FirebaseRc = JSON.parse(buffer.toString());
+  const defaultProject = rc.projects?.default;
+  const project = Object.keys(rc.targets || {}).find(
+    project => !!rc.targets?.[project]?.hosting?.[target]
+  );
+  const site = project && rc.targets?.[project]?.hosting?.[target]?.[0];
+  return [project || defaultProject, site];
 }

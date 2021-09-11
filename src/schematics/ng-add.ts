@@ -15,10 +15,10 @@ export const setupProject =
     sdkConfig: Record<string, string>|undefined,
     projectType: PROJECT_TYPE,
     prerender: boolean,
-    nodeVersion: string|undefined,
-    browserTarget: string|undefined,
-    serverTarget: string|undefined,
-    prerenderTarget: string|undefined,
+    nodeVersion?: string,
+    browserTarge?: string,
+    serverTarget?: string,
+    prerenderTarget?: string,
   }) => {
     const { path: workspacePath, workspace } = getWorkspace(tree);
 
@@ -87,26 +87,17 @@ export const ngAddSetupProject = (
 
     const { project: ngProject, projectName: ngProjectName } = getProject(options, host);
 
-    const [ defaultProjectName, defaultHostingSite ] = getFirebaseProjectName('./', ngProjectName);
+    const [ defaultProjectName, defaultHostingSite ] = getFirebaseProjectName(host, ngProjectName);
 
     const firebaseProject = await projectPrompt(defaultProjectName);
 
-    let projectType: PROJECT_TYPE = PROJECT_TYPE.Static;
-    let prerender = false;
-    let nodeVersion: string|undefined;
-    let browserTarget: string|undefined;
-    let serverTarget: string|undefined;
-    let prerenderTarget: string|undefined;
+    let hosting = { projectType: PROJECT_TYPE.Static, prerender: false };
     let firebaseHostingSite: FirebaseHostingSite|undefined;
 
     if (features.includes(FEATURES.Hosting)) {
+      // TODO read existing settings from angular.json, if available
       const results = await projectTypePrompt(ngProject, ngProjectName);
-      projectType = results.projectType;
-      prerender = results.prerender;
-      nodeVersion = results.nodeVersion;
-      browserTarget = results.browserTarget;
-      serverTarget = results.serverTarget;
-      prerenderTarget = results.prerenderTarget;
+      hosting = { ...hosting, ...results };
       firebaseHostingSite = await sitePrompt(firebaseProject, defaultHostingSite);
     }
 
@@ -124,8 +115,7 @@ export const ngAddSetupProject = (
     }
 
     await setupProject(host, context, features, {
-      ...options, firebaseProject, firebaseApp, firebaseHostingSite, sdkConfig,
-      projectType, prerender, nodeVersion, browserTarget, serverTarget, prerenderTarget,
+      ...options, ...hosting, firebaseProject, firebaseApp, firebaseHostingSite, sdkConfig,
     });
 
   }
