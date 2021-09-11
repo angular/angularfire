@@ -15,7 +15,8 @@ export const environment = {
     appId: '1:480362569154:web:2fe6f75104cdfb82f50a5b',
     measurementId: 'G-CBRYER9PJR'
   },
-  vapidKey: 'BIDPctnXHQDIjcOXxDS6qQcz-QTws7bL8v7UPgFnS1Ky5BZL3jS3-XXfxwRHmAUMOk7pXme7ttOBvVoIfX57PEo'
+  vapidKey: 'BIDPctnXHQDIjcOXxDS6qQcz-QTws7bL8v7UPgFnS1Ky5BZL3jS3-XXfxwRHmAUMOk7pXme7ttOBvVoIfX57PEo',
+  recaptcha3SiteKey: 'UNUSED_IN_DEVELOPMENT',
 };
 
 /*

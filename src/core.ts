@@ -34,6 +34,14 @@ export function ɵcacheInstance<T>(cacheKey: any, moduleName: string, appName: s
 
 globalThis.ɵAngularfireInstanceCache ||= [];
 
+// AppCheck stuff, here so we can get a jump on it. It's too late in the evaluation
+// if we do this in the app-check module
+if (typeof process !== 'undefined' && process.env?.FIREBASE_APPCHECK_DEBUG_TOKEN) {
+  globalThis.FIREBASE_APPCHECK_DEBUG_TOKEN ??= process.env.FIREBASE_APPCHECK_DEBUG_TOKEN;
+} else if (isDevMode()) {
+  globalThis.FIREBASE_APPCHECK_DEBUG_TOKEN ??= true;
+}
+
 export function ɵmemoizeInstance<T>(fn: () => T, zone: NgZone): T {
   const [, instance] = globalThis.ɵAngularfireInstanceCache.find((it: any) => matchDep(it[0], fn)) || [];
   if (instance) {

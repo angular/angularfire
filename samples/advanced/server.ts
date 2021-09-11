@@ -11,6 +11,11 @@ import { existsSync } from 'fs';
 
 import '@angular/fire/firestore-protos';
 
+// These polyfills are for app-check Node.js
+// @ts-ignore
+globalThis.self = globalThis;
+globalThis.fetch = require('node-fetch').default;
+
 // The Express app is exported so that it can be used by serverless Functions.
 export function app(): express.Express {
   const server = express();
