@@ -20,7 +20,7 @@ export default createBuilder(
       throw new Error('Cannot find firebase project for your app in .firebaserc');
     }
 
-    const staticBuildTarget = { name: options.buildTarget || `${context.target.project}:build:production` };
+    const staticBuildTarget = { name: options.browserTarget || options.buildTarget || `${context.target.project}:build:production` };
 
     let prerenderBuildTarget: BuildTarget | undefined;
     if (options.prerender) {
