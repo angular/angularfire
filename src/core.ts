@@ -1,5 +1,5 @@
 import { isDevMode, NgZone, Version } from '@angular/core';
-import { FirebaseApp, getApp, getApps } from 'firebase/app';
+import { FirebaseApp, getApps } from 'firebase/app';
 import { ComponentContainer } from '@firebase/component';
 
 export const VERSION = new Version('ANGULARFIRE2_VERSION');
@@ -34,11 +34,13 @@ export function ɵcacheInstance<T>(cacheKey: any, moduleName: string, appName: s
 
 globalThis.ɵAngularfireInstanceCache ||= [];
 
+// HACK HACK HACK
 // AppCheck stuff, here so we can get a jump on it. It's too late in the evaluation
-// if we do this in the app-check module
+// if we do this in the app-check module. globalThis.ngDevMode allows me to test if
+// Angular is in DevMode before Angular initializes.
 if (typeof process !== 'undefined' && process.env?.FIREBASE_APPCHECK_DEBUG_TOKEN) {
   globalThis.FIREBASE_APPCHECK_DEBUG_TOKEN ??= process.env.FIREBASE_APPCHECK_DEBUG_TOKEN;
-} else if (isDevMode()) {
+} else if (globalThis.ngDevMode) {
   globalThis.FIREBASE_APPCHECK_DEBUG_TOKEN ??= true;
 }
 

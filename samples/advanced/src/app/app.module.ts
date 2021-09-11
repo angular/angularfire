@@ -20,6 +20,8 @@ import { StorageComponent } from './storage/storage.component';
 import type { app } from 'firebase-admin';
 import { AppCheckComponent } from './app-check/app-check.component';
 
+const isNode = () => typeof process !== 'undefined' && process.versions?.node;
+
 export const FIREBASE_ADMIN = new InjectionToken<app.App>('firebase-admin');
 
 @NgModule({
@@ -42,7 +44,7 @@ export const FIREBASE_ADMIN = new InjectionToken<app.App>('firebase-admin');
     FunctionsModule,
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAppCheck(() =>  {
-      const provider = typeof process !== 'undefined' && process.versions?.node ?
+      const provider = isNode() ?
         new CustomProvider({ getToken: () => Promise.reject() }) :
         new ReCaptchaV3Provider(environment.recaptcha3SiteKey);
       return initializeAppCheck(undefined, { provider, isTokenAutoRefreshEnabled: true });

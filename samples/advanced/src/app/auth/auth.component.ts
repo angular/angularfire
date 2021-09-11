@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
   template: `
     <p>
       Auth!
-      {{ (user | async)?.uid | json }}
+      <code>{{ (user | async)?.uid }}</code>
       <button routerLink="/login" *ngIf="showLoginButton">Log in</button>
       <button (click)="logout()" *ngIf="showLogoutButton">Log out</button>
     </p>

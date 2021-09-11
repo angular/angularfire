@@ -1,4 +1,4 @@
-import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, PLATFORM_ID } from '@angular/core';
+import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, PLATFORM_ID, isDevMode } from '@angular/core';
 import { AppCheck as FirebaseAppCheck } from 'firebase/app-check';
 import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
 import { AppCheck, AppCheckInstances, APP_CHECK_PROVIDER_NAME } from './app-check';
@@ -15,6 +15,13 @@ export function defaultAppCheckInstanceFactory(provided: FirebaseAppCheck[]|unde
 
 export function appCheckInstanceFactory(fn: () => FirebaseAppCheck) {
   return (zone: NgZone) => {
+    // This isn't supported by the JS SDK yet, I've put in the feature request
+    // for the time being I've written a hack in core.ts
+    /* if (typeof process !== 'undefined' && process.env?.FIREBASE_APPCHECK_DEBUG_TOKEN) {
+      globalThis.FIREBASE_APPCHECK_DEBUG_TOKEN ??= process.env.FIREBASE_APPCHECK_DEBUG_TOKEN;
+    } else if (isDevMode()) {
+      globalThis.FIREBASE_APPCHECK_DEBUG_TOKEN ??= true;
+    } */
     return ɵmemoizeInstance<FirebaseAppCheck>(fn, zone);
   };
 }

@@ -7,7 +7,7 @@ import { EMPTY, Observable } from 'rxjs';
   template: `
     <p>
       Functions!
-      {{ response$ | async | json }}
+      <code>{{ response$ | async | json }}</code>
       <button (click)="request()">Call!</button>
     </p>
   `,

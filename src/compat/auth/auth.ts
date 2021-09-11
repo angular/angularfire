@@ -9,6 +9,7 @@ import firebase from 'firebase/compat/app';
 import { isPlatformServer } from '@angular/common';
 import { proxyPolyfillCompat } from './base';
 import { ɵcacheInstance } from '@angular/fire';
+import { AppCheckInstances } from '@angular/fire/app-check';
 
 export interface AngularFireAuth extends ɵPromiseProxy<firebase.auth.Auth> {}
 
@@ -93,6 +94,7 @@ export class AngularFireAuth {
     @Optional() @Inject(LANGUAGE_CODE) languageCode: string | null,
     @Optional() @Inject(USE_DEVICE_LANGUAGE) useDeviceLanguage: boolean | null,
     @Optional() @Inject(PERSISTENCE) persistence: string | null,
+    @Optional() _appCheckInstances: AppCheckInstances,
   ) {
     const logins = new Subject<Required<firebase.auth.UserCredential>>();
 

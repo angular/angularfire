@@ -9,7 +9,7 @@ import { traceUntilFirst } from '@angular/fire/performance';
   template: `
     <p>
       Auth!
-      {{ (user | async)?.uid | json }}
+      <code>{{ (user | async)?.uid }}</code>
       <button (click)="login()" *ngIf="showLoginButton">Log in with Google</button>
       <button (click)="loginAnonymously()" *ngIf="showLoginButton">Log in anonymously</button>
       <button (click)="logout()" *ngIf="showLogoutButton">Log out</button>

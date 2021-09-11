@@ -8,7 +8,7 @@ import { Database, objectVal, ref } from '@angular/fire/database';
   template: `
     <p>
       Database!
-      {{ testObjectValue$ | async | json }}
+      <code>{{ testObjectValue$ | async | json }}</code>
     </p>
   `,
   styles: []

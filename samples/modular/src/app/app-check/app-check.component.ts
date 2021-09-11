@@ -21,8 +21,8 @@ export class AppCheckComponent implements OnInit {
 
   constructor(appCheck: AppCheck) {
     this.change$ = from(getToken(appCheck)).pipe(
-      keepUnstableUntilFirst,
       traceUntilFirst('app-check'),
+      keepUnstableUntilFirst,
       share(),
     );
   }

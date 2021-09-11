@@ -9,7 +9,7 @@ import { traceUntilFirst } from '@angular/fire/performance';
   template: `
     <p>
       Database!
-      {{ testObjectValue$ | async | json }}
+      <code>{{ testObjectValue$ | async | json }}</code>
     </p>
   `,
   styles: []
