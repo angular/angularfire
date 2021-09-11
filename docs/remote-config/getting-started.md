@@ -66,7 +66,7 @@ Providing `DEFAULTS ({[key: string]: string | number | boolean})` tells `Angular
 ## Putting it all together
 
 ```ts
-import { AngularFireRemoteConfigModule, DEFAULTS, SETTINGS } from '@angular/fire/remote-config';
+import { AngularFireRemoteConfigModule, DEFAULTS, SETTINGS } from '@angular/fire/compat/remote-config';
 
 @NgModule({
   imports: [

@@ -17,9 +17,27 @@ AngularFire smooths over the rough edges an Angular developer might encounter wh
 ## Example use
 
 ```ts
-import { Component } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { provideFirebaseApp, getApp, initializeApp } from '@angular/fire/app';
+import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+
+@NgModule({
+  imports: [
+    provideFirebaseApp(() => initializeApp({ ... })),
+    provideFirestore(() => getFirestore()),
+  ],
+  ...
+})
+export class AppModule { }
+```
+
+```ts
+import { Firestore, collectionData, collection } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
+
+interface Item {
+  name: string,
+  ...
+};
 
 @Component({
   selector: 'app-root',
@@ -31,10 +49,11 @@ import { Observable } from 'rxjs';
   </ul>
   `
 })
-export class MyApp {
-  item$: Observable<any[]>;
-  constructor(firestore: AngularFirestore) {
-    this.item$ = firestore.collection('items').valueChanges();
+export class AppComponent {
+  item$: Observable<Item[]>;
+  constructor(firestore: Firestore) {
+    const collection = collection(firestore, 'items');
+    this.item$ = collectionData(collection);
   }
 }
 ```
@@ -47,7 +66,7 @@ AngularFire doesn't follow Angular's versioning as Firebase also has breaking ch
 
 | Angular | Firebase | AngularFire  |
 | --------|----------|--------------|
-| 12      | [9 <sup>beta</sup>](https://firebase.google.com/docs/web/learn-more#modular-version) | [^7.0 <sup>beta</sup>](https://github.com/angular/angularfire/tree/exp) |
+| 12      | 9        | ^7.0         |
 | 12      | 7,8      | ^6.1.5       |
 | 11      | 7,8      | ^6.1         |
 | 10      | 8        | ^6.0.4       |
@@ -68,8 +87,7 @@ Neither AngularFire or Firebase ship with polyfills. To have compatability acros
 | Various ES5+ features  | IE 11<br>Safari &lt; 10 | [`core-js/stable`](https://github.com/zloirock/core-js#readme) | MIT |
 | `globalThis` | [IE 11<br>Chrome &lt; 71<br>Safari &lt; 12.1<br>iOS &lt; 12.2<br>Node &lt; 12](https://caniuse.com/mdn-javascript_builtins_globalthis) | [`globalThis`](https://github.com/es-shims/globalThis#readme) | MIT |
 | `Proxy` | [IE 11<br>Safari &lt; 10](https://caniuse.com/proxy) | [`proxy-polyfill`](https://github.com/GoogleChrome/proxy-polyfill#readme) | Apache 2.0 |
-| `fetch` | [IE 11<br>Node<br>Safari &lt; 10.1<br>iOS &lt; 10.3](https://caniuse.com/fetch) | [`cross-fetch`](https://github.com/lquixada/cross-fetch#readme) | MIT |
-| `Headers` | [IE 11<br>Node<br>Safari &lt; 10.1<br>iOS Safari](https://caniuse.com/mdn-api_headers) | [`cross-fetch`](https://github.com/lquixada/cross-fetch#readme) | MIT |
+| `fetch` | [IE 11<br>Safari &lt; 10.1<br>iOS &lt; 10.3](https://caniuse.com/fetch) | [`cross-fetch`](https://github.com/lquixada/cross-fetch#readme) | MIT |
 
 ## Resources
 
@@ -79,15 +97,29 @@ Neither AngularFire or Firebase ship with polyfills. To have compatability acros
 
 [Stackblitz Template](https://stackblitz.com/edit/angular-fire-start) - Remember to set your Firebase configuration in `app/app.module.ts`.
 
-[Upgrading to v6.0? Check out our guide.](docs/version-6-upgrade.md)
+[Upgrading to v7.0? Check out our guide.](docs/version-7-upgrade.md)
 
-**Having troubles?** Get help on our [Q&A board](https://github.com/angular/angularfire/discussions?discussions_q=category%3AQ%26A), the official [Firebase Mailing List](https://groups.google.com/forum/#!forum/firebase-talk), the [Firebase Community Slack](https://firebase.community/) (`#angularfire2`), the [Angular Community Discord](http://discord.gg/angular) (`#firebase`), [Gitter](https://gitter.im/angular/angularfire2), the [Firebase subreddit](https://www.reddit.com/r/firebase), or [Stack Overflow](https://stackoverflow.com/questions/tagged/angularfire2).
+### Sample apps
+
+We have three sample apps in this repository:
+
+1. [`samples/compat`](samples/compat) a kitchen sink application that demonstrates use of the "compatability" API
+1. [`samples/modular`](samples/modular) a kitchen sink application that demonstrates the new tree-shakable API
+1. [`samples/advanced`](samples/advanced) the same app as `samples/modular` but demonstrates more advanced concepts such as Angular Universal state-transfer, dynamically importing Firebase feature modules, and Firestore data bundling.
+
+### Having troubles?
+
+Get help on our [Q&A board](https://github.com/angular/angularfire/discussions?discussions_q=category%3AQ%26A), the official [Firebase Mailing List](https://groups.google.com/forum/#!forum/firebase-talk), the [Firebase Community Slack](https://firebase.community/) (`#angularfire2`), the [Angular Community Discord](http://discord.gg/angular) (`#firebase`), [Gitter](https://gitter.im/angular/angularfire2), the [Firebase subreddit](https://www.reddit.com/r/firebase), or [Stack Overflow](https://stackoverflow.com/questions/tagged/angularfire2).
 
 > **NOTE:** AngularFire is maintained by Googlers but is not a supported Firebase product. Questions on the mailing list and issues filed here are answered on a <strong>best-effort basis</strong> by maintainers and other community members. If you are able to reproduce a problem with Firebase <em>outside of AngularFire's implementation</em>, please [file an issue on the Firebase JS SDK](https://github.com/firebase/firebase-js-sdk/issues) or reach out to the personalized [Firebase support channel](https://firebase.google.com/support/).
 
 ## Developer Guide
 
-### **NEW:** Monitor usage of your application in production
+AngularFire has a new tree-shakable API, however this is still under active development and documentation is in the works, so we suggest most developers stick with the Compatiability API for the time being. [See the v7 upgrade guide for more information.](docs/version-7-upgrade.md). 
+
+This developer guide assumes you're using the Compatiability API (`@angular/fire/compat/*`).
+
+### Monitor usage of your application in production
 
 > `AngularFireAnalytics` provides a convenient method of interacting with Google Analytics in your Angular application. The provided `ScreenTrackingService` and `UserTrackingService` automatically log events when you're using the Angular Router or Firebase Authentication respectively. [Learn more about Google Analytics](https://firebase.google.com/docs/analytics).
 
@@ -137,7 +169,7 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 
 - [Getting started with Remote Config](docs/remote-config/getting-started.md)
 
-### **NEW:** Monitor your application performance in production
+### Monitor your application performance in production
 
 > Firebase Performance Monitoring is a service that helps you to gain insight into the performance characteristics of your iOS, Android, and web apps. [Learn more about Performance Monitoring](https://firebase.google.com/docs/perf-mon).
 

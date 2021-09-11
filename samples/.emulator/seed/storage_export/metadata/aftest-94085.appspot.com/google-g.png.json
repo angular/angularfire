@@ -1,0 +1,19 @@
+{
+  "name": "google-g.png",
+  "bucket": "aftest-94085.appspot.com",
+  "contentType": "image/png",
+  "metageneration": 1,
+  "generation": 1631220526565,
+  "storageClass": "STANDARD",
+  "etag": "someETag",
+  "contentDisposition": "inline",
+  "contentEncoding": "identity",
+  "downloadTokens": [
+    "7553ce27-5bd0-409d-843b-25ff4d792740"
+  ],
+  "timeCreated": "2021-09-09T20:48:46.564Z",
+  "updated": "2021-09-09T20:48:46.567Z",
+  "size": 9916,
+  "md5Hash": "3NH+6XyxOMx2hUhq9d4hxQ==",
+  "crc32c": "2188947963"
+}

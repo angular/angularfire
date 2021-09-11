@@ -1,6 +1,8 @@
 import { Tree } from '@angular-devkit/schematics';
 import { setupProject } from './ng-add';
 import 'jasmine';
+import { join } from '@angular-devkit/core';
+import { join as pathJoin } from 'path';
 
 const PROJECT_NAME = 'pie-ka-chu';
 const PROJECT_ROOT = 'pirojok';
@@ -335,7 +337,7 @@ const projectAngularJson = `{
 const universalFirebaseJson = {
   hosting: [{
     target: 'pie-ka-chu',
-    public: 'dist/dist/ikachu',
+    public: pathJoin('dist', 'dist', 'ikachu'),
     ignore: [
       '**/.*'
     ],

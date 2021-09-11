@@ -112,12 +112,9 @@ const findPackageVersion = (name: string) => {
 
 const getPackageJson = (context: BuilderContext, workspaceRoot: string, options: DeployBuilderOptions, main?: string) => {
   const dependencies: Record<string, string> = options.ssr === 'cloud-run' ? {} : {
-    'firebase-admin': 'latest',
     'firebase-functions': 'latest'
   };
-  const devDependencies: Record<string, string> = options.ssr === 'cloud-run' ? {} : {
-    'firebase-functions-test': 'latest'
-  };
+  const devDependencies: Record<string, string> = options.ssr === 'cloud-run' ? {} : {};
   Object.keys(dependencies).forEach((dependency: string) => {
     const packageVersion = findPackageVersion(dependency);
     if (packageVersion) { dependencies[dependency] = packageVersion; }
@@ -130,21 +127,20 @@ const getPackageJson = (context: BuilderContext, workspaceRoot: string, options:
     const angularJson = JSON.parse(readFileSync(join(workspaceRoot, 'angular.json')).toString());
     // tslint:disable-next-line:no-non-null-assertion
     const server = angularJson.projects[context.target!.project].architect.server;
-    const serverOptions = server && server.options;
-    const externalDependencies = serverOptions && serverOptions.externalDependencies || [];
-    const bundleDependencies = serverOptions && serverOptions.bundleDependencies;
-    if (bundleDependencies === false) {
+    const externalDependencies = server?.options?.externalDependencies || [];
+    const bundleDependencies = server?.options?.bundleDependencies ?? true;
+    if (bundleDependencies) {
+      externalDependencies.forEach(externalDependency => {
+        const packageVersion = findPackageVersion(externalDependency);
+        if (packageVersion) { dependencies[externalDependency] = packageVersion; }
+      });
+    } else {
       if (existsSync(join(workspaceRoot, 'package.json'))) {
         const packageJson = JSON.parse(readFileSync(join(workspaceRoot, 'package.json')).toString());
         Object.keys(packageJson.dependencies).forEach((dependency: string) => {
           dependencies[dependency] = packageJson.dependencies[dependency];
         });
       } // TODO should we throw?
-    } else {
-      externalDependencies.forEach(externalDependency => {
-        const packageVersion = findPackageVersion(externalDependency);
-        if (packageVersion) { dependencies[externalDependency] = packageVersion; }
-      });
     }
   }
   // Override the local development version when developing
@@ -432,11 +428,7 @@ export default async function deploy(
       })
     });
 
-    if (parseInt(firebaseTools.cli.version(), 10) >= 9) {
-      firebaseTools.logger.logger.add(logger);
-    } else {
-      firebaseTools.logger.add(logger);
-    }
+    firebaseTools.logger.logger.add(logger);
 
     if (serverBuildTarget) {
       if (options.ssr === 'cloud-run') {

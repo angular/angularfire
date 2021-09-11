@@ -46,7 +46,7 @@ Open `/src/app/app.module.ts`, inject the Firebase providers, and specify your F
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
-import { AngularFireModule } from '@angular/fire';
+import { AngularFireModule } from '@angular/fire/compat';
 import { environment } from '../environments/environment';
 
 @NgModule({
@@ -70,9 +70,9 @@ For example if your application was using both Google Analytics and the Firestor
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
-import { AngularFireModule } from '@angular/fire';
-import { AngularFireAnalyticsModule } from '@angular/fire/analytics';
-import { AngularFirestoreModule } from '@angular/fire/firestore';
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
+import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { environment } from '../environments/environment';
 
 @NgModule({
@@ -94,7 +94,7 @@ Open `/src/app/app.component.ts`, and make sure to modify/delete any tests to ge
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 
 @Component({
   selector: 'app-root',
@@ -114,7 +114,7 @@ In `/src/app/app.component.ts`:
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Observable } from 'rxjs';
 
 @Component({

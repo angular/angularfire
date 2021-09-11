@@ -1,0 +1,13 @@
+{
+  "$schema": "../../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "schematics": {
+    "ng-add": {
+      "description": "Add firebase deploy schematic",
+      "factory": "./public_api#ngAdd"
+    },
+    "ng-add-setup-project": {
+      "description": "Setup ng deploy",
+      "factory": "./public_api#ngAddSetupProject"
+    }
+  }
+}
