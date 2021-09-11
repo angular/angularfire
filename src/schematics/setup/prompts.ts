@@ -1,5 +1,5 @@
 import * as fuzzy from 'fuzzy';
-import inquirer from 'inquirer';
+import * as inquirer from 'inquirer';
 import { FEATURES, FirebaseApp, FirebaseHostingSite, FirebaseProject, PROJECT_TYPE, WorkspaceProject } from '../interfaces';
 import { hasPrerenderOption, isUniversalApp, shortAppId, shortSiteName } from '../utils';
 import { getFirebaseTools } from '../firebaseTools';

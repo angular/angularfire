@@ -28,13 +28,29 @@ const initMocks = () => {
     renameSync(_: string, __: string) {
     },
     writeFileSync(_: string, __: string) {
+    },
+    copySync(_: string, __: string) {
+    },
+    removeSync(_: string) {
     }
   };
 
   firebaseMock = {
     login: () => Promise.resolve(),
     projects: {
-      list: () => Promise.resolve([])
+      list: () => Promise.resolve([]),
+      create: () => Promise.reject(),
+    },
+    apps: {
+      list: () => Promise.resolve([]),
+      create: () => Promise.reject(),
+      sdkconfig: () => Promise.resolve({ fileName: '_', fileContents: '', sdkConfig: {}, }),
+    },
+    hosting: {
+      sites: {
+        list: () => Promise.resolve({sites: []}),
+        create: () => Promise.reject(),
+      }
     },
     deploy: (_: FirebaseDeployConfig) => Promise.resolve(),
     use: () => Promise.resolve(),
@@ -86,19 +102,22 @@ describe('Deploy Angular apps', () => {
 
   it('should call login', async () => {
     const spy = spyOn(firebaseMock, 'login');
-    await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, FIREBASE_PROJECT, { preview: false });
+    await deploy(
+      firebaseMock, context, STATIC_BUILD_TARGET, undefined,
+      undefined, undefined, { projectId: FIREBASE_PROJECT, preview: false }
+    );
     expect(spy).toHaveBeenCalled();
   });
 
   it('should not call login', async () => {
     const spy = spyOn(firebaseMock, 'login');
-    await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, FIREBASE_PROJECT, { preview: false }, FIREBASE_TOKEN);
+    await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined,  undefined, undefined, { preview: false }, FIREBASE_TOKEN);
     expect(spy).not.toHaveBeenCalled();
   });
 
   it('should invoke the builder', async () => {
     const spy = spyOn(context, 'scheduleTarget').and.callThrough();
-    await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, FIREBASE_PROJECT, { preview: false });
+    await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined,  undefined, undefined, { preview: false });
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith({
       target: 'build',
@@ -113,14 +132,14 @@ describe('Deploy Angular apps', () => {
       options: {}
     };
     const spy = spyOn(context, 'scheduleTarget').and.callThrough();
-    await deploy(firebaseMock, context, buildTarget, undefined, FIREBASE_PROJECT, { preview: false });
+    await deploy(firebaseMock, context, buildTarget, undefined,  undefined, undefined, { preview: false });
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith({ target: 'prerender', project: PROJECT }, {});
   });
 
   it('should invoke firebase.deploy', async () => {
     const spy = spyOn(firebaseMock, 'deploy').and.callThrough();
-    await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, FIREBASE_PROJECT, { preview: false }, FIREBASE_TOKEN);
+    await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined,  undefined, undefined, { preview: false }, FIREBASE_TOKEN);
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith({
       cwd: 'cwd',
@@ -132,7 +151,7 @@ describe('Deploy Angular apps', () => {
   describe('error handling', () => {
     it('throws if there is no firebase project', async () => {
       try {
-        await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, undefined, { preview: false  });
+        await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, undefined, undefined, { preview: false  });
       } catch (e) {
         expect(e.message).toMatch(/Cannot find firebase project/);
       }
@@ -141,7 +160,7 @@ describe('Deploy Angular apps', () => {
     it('throws if there is no target project', async () => {
       context.target = undefined;
       try {
-        await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, FIREBASE_PROJECT, { preview: false });
+        await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, undefined, undefined, { preview: false });
       } catch (e) {
         expect(e.message).toMatch(/Cannot execute the build target/);
       }

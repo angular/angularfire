@@ -1,16 +1,16 @@
 import { RuntimeOptions } from 'firebase-functions';
 
 export enum FEATURES {
-  Authentication = 'Authentication',
-  Analytics = 'Analytics',
-  Database = 'Realtime Database',
-  Functions = 'Cloud Functions',
+  // Authentication = 'Authentication',
+  // Analytics = 'Analytics',
+  // Database = 'Realtime Database',
+  // Functions = 'Cloud Functions',
   Hosting = 'Hosting',
-  Messaging = 'Cloud Messaging',
-  Performance = 'Performance Monitoring',
-  Firestore = 'Firestore',
-  Storage = 'Storage',
-  RemoteConfig = 'Remote Config',
+  // Messaging = 'Cloud Messaging',
+  // Performance = 'Performance Monitoring',
+  // Firestore = 'Firestore',
+  // Storage = 'Storage',
+  // RemoteConfig = 'Remote Config',
 }
 
 export const enum PROJECT_TYPE { Static, CloudFunctions, CloudRun }

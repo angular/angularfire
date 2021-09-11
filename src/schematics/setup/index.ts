@@ -12,9 +12,9 @@ import { getFirebaseTools } from '../firebaseTools';
 export const setupProject =
   async (tree: Tree, context: SchematicContext, features: FEATURES[], config: DeployOptions & {
     firebaseProject: FirebaseProject,
-    firebaseApp: FirebaseApp|undefined,
-    firebaseHostingSite: FirebaseHostingSite|undefined,
-    sdkConfig: Record<string, string>|undefined,
+    firebaseApp?: FirebaseApp,
+    firebaseHostingSite?: FirebaseHostingSite,
+    sdkConfig?: Record<string, string>,
     projectType: PROJECT_TYPE,
     prerender: boolean,
     nodeVersion?: string,

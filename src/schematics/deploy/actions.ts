@@ -11,7 +11,7 @@ import { SchematicsException } from '@angular-devkit/schematics';
 import { firebaseFunctionsDependencies } from '../versions.json';
 import winston from 'winston';
 import tripleBeam from 'triple-beam';
-import inquirer from 'inquirer';
+import * as inquirer from 'inquirer';
 
 const DEFAULT_EMULATOR_PORT = 5000;
 const DEFAULT_EMULATOR_HOST = 'localhost';
