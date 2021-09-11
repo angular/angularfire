@@ -5,24 +5,13 @@ import { first, tap } from 'rxjs/operators';
 const IS_STABLE_START_MARK = 'Zone';
 const IS_STABLE_END_MARK = '_isStableEnd';
 
-function markStarts() {
-    if (typeof(window) !== 'undefined' && window.performance && window.performance.mark) {
-        window.performance.mark(IS_STABLE_START_MARK);
-        return true;
-    } else {
-        return false;
-    }
-}
-
-const started = markStarts();
-
 @Injectable()
 export class PerformanceMonitoringService implements OnDestroy {
 
     private disposable: Subscription|undefined;
 
     constructor(appRef: ApplicationRef) {
-        if (started && window.performance.mark) {
+        if (typeof window !== 'undefined' && window.performance?.mark) {
             this.disposable = appRef.isStable.pipe(
                 first(it => it),
                 tap(() => {

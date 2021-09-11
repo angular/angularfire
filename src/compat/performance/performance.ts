@@ -52,7 +52,7 @@ export class AngularFirePerformance {
 }
 
 const trace$ = (traceId: string) => {
-  if (typeof window !== 'undefined' && window.performance && window.performance.mark) {
+  if (typeof window !== 'undefined' && window.performance?.mark) {
     const entries = window.performance.getEntriesByName(traceId, 'measure') || [];
     const startMarkName = `_${traceId}Start[${entries.length}]`;
     const endMarkName = `_${traceId}End[${entries.length}]`;
