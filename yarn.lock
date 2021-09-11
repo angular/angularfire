@@ -6374,7 +6374,7 @@ firebase-functions-test@^0.2.2:
     "@types/lodash" "^4.14.104"
     lodash "^4.17.5"
 
-firebase-functions@^3.0.0:
+firebase-functions@^3.6.0:
   version "3.15.5"
   resolved "https://registry.yarnpkg.com/firebase-functions/-/firebase-functions-3.15.5.tgz#d0b9d719c88332048f59ee3ecda5755cb0dabda2"
   integrity sha512-w5Twk7txwfPFasx+i25f0U4fLiSa06XvwOIoEwazGYLPOLe18b2jCDQ9X8aeJm8S7FZE40ODWGVTLtF6dX6xHg==
