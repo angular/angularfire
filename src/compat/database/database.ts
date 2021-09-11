@@ -20,6 +20,7 @@ import {
 } from '@angular/fire/compat/auth';
 import firebase from 'firebase/compat/app';
 import { ɵcacheInstance } from '@angular/fire';
+import { AppCheckInstances } from '@angular/fire/app-check';
 
 export const URL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
 
@@ -48,6 +49,7 @@ export class AngularFireDatabase {
     @Optional() @Inject(LANGUAGE_CODE) languageCode: string | null,
     @Optional() @Inject(USE_DEVICE_LANGUAGE) useDeviceLanguage: boolean | null,
     @Optional() @Inject(PERSISTENCE) persistence: string | null,
+    @Optional() _appCheckInstances: AppCheckInstances,
   ) {
 
     const useEmulator: UseEmulatorArguments | null = _useEmulator;

@@ -5,6 +5,7 @@ import { ɵmemoizeInstance, ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, VER
 import { Firestore, FirestoreInstances, FIRESTORE_PROVIDER_NAME } from './firestore';
 import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
 import { registerVersion } from 'firebase/app';
+import { AppCheckInstances } from '@angular/fire/app-check';
 
 export const PROVIDED_FIRESTORE_INSTANCES = new InjectionToken<Firestore[]>('angularfire2.firestore-instances');
 
@@ -63,6 +64,7 @@ export function provideFirestore(fn: () => FirebaseFirestore): ModuleWithProvide
         FirebaseApps,
         // Firestore+Auth work better if Auth is loaded first
         [new Optional(), AuthInstances ],
+        [new Optional(), AppCheckInstances ],
       ]
     }]
   };

@@ -1,0 +1,19 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "animals",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "upboats",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "updatedAt",
+          "order": "DESCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

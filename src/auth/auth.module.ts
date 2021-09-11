@@ -4,6 +4,7 @@ import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers, VER
 import { Auth, AuthInstances, AUTH_PROVIDER_NAME } from './auth';
 import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
 import { registerVersion } from 'firebase/app';
+import { AppCheckInstances } from '@angular/fire/app-check';
 
 export const PROVIDED_AUTH_INSTANCES = new InjectionToken<Auth[]>('angularfire2.auth-instances');
 
@@ -59,6 +60,7 @@ export function provideAuth(fn: () => FirebaseAuth): ModuleWithProviders<AuthMod
         PLATFORM_ID,
         ɵAngularFireSchedulers,
         FirebaseApps,
+        [new Optional(), AppCheckInstances ],
       ]
     }]
   };

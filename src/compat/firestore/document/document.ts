@@ -2,7 +2,7 @@ import { from, Observable } from 'rxjs';
 import { keepUnstableUntilFirst } from '@angular/fire';
 import { Action, DocumentData, DocumentReference, DocumentSnapshot, QueryFn, SetOptions } from '../interfaces';
 import { fromDocRef } from '../observable/fromRef';
-import { map, observeOn } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { AngularFirestore, associateQuery } from '../firestore';
 import { AngularFirestoreCollection } from '../collection/collection';
 import firebase from 'firebase/compat/app';
@@ -102,7 +102,7 @@ export class AngularFirestoreDocument<T = DocumentData> {
    */
   get(options?: firebase.firestore.GetOptions) {
     return from(this.ref.get(options)).pipe(
-      observeOn(this.afs.schedulers.insideAngular),
+      keepUnstableUntilFirst,
     );
   }
 }
