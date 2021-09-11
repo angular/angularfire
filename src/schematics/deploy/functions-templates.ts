@@ -33,7 +33,7 @@ export const defaultPackage = (
 export const defaultFunction = (
   path: string,
   options: DeployBuilderOptions,
-  functionName: string,
+  functionName: string|undefined,
 ) => `const functions = require('firebase-functions');
 
 // Increase readability in Cloud Logging

@@ -143,6 +143,7 @@ export interface DeployBuilderSchema {
   functionsNodeVersion?: number|string;
   functionsRuntimeOptions?: RuntimeOptions;
   cloudRunOptions?: Partial<CloudRunOptions>;
+  outputPath?: string;
 }
 
 export interface CloudRunOptions {

@@ -143,10 +143,6 @@ const getPackageJson = (context: BuilderContext, workspaceRoot: string, options:
       } // TODO should we throw?
     }
   }
-  // Override the local development version when developing
-  if (dependencies['@angular/fire'] === 'file:../angularfire/dist/packages-dist') {
-    dependencies['@angular/fire'] = 'ANGULARFIRE2_VERSION';
-  }
   // TODO should we throw?
   return defaultPackage(dependencies, devDependencies, options, main);
 };
@@ -179,9 +175,9 @@ export const deployToFunction = async (
   const staticOut = staticBuildOptions.outputPath;
   const serverOut = serverBuildOptions.outputPath;
 
-  // TODO pull these from firebase config
-  const functionsOut = staticBuildOptions.outputPath.replace('/browser', '/functions');
-  const functionName = `ssr_${staticBuildTarget.name.split(':')[0]}`;
+  // TODO replace firebase config
+  const functionsOut = options.outputPath || staticBuildOptions.outputPath.replace('/browser', '/functions');
+  const functionName = options.functionName;
 
   const newStaticOut = join(functionsOut, staticOut);
   const newServerOut = join(functionsOut, serverOut);
@@ -213,12 +209,14 @@ export const deployToFunction = async (
     defaultFunction(serverOut, options, functionName)
   );
 
-  try {
-    fsHost.renameSync(
-      join(newStaticOut, 'index.html'),
-      join(newStaticOut, 'index.original.html')
-    );
-  } catch (e) { }
+  if (!options.prerender) {
+    try {
+      fsHost.renameSync(
+        join(newStaticOut, 'index.html'),
+        join(newStaticOut, 'index.original.html')
+      );
+    } catch (e) { }
+  }
 
   if (options.preview) {
 
@@ -279,8 +277,8 @@ export const deployToCloudRun = async (
   const serverOut = serverBuildOptions.outputPath;
 
   // TODO pull these from firebase config
-  const cloudRunOut = staticBuildOptions.outputPath.replace('/browser', '/run');
-  const serviceId = options.functionName ?? DEFAULT_FUNCTION_NAME;
+  const cloudRunOut = options.outputPath || staticBuildOptions.outputPath.replace('/browser', '/run');
+  const serviceId = options.functionName || DEFAULT_FUNCTION_NAME;
 
   const newStaticOut = join(cloudRunOut, staticOut);
   const newServerOut = join(cloudRunOut, serverOut);
@@ -312,12 +310,14 @@ export const deployToCloudRun = async (
     dockerfile(options)
   );
 
-  try {
-    fsHost.renameSync(
-      join(newStaticOut, 'index.html'),
-      join(newStaticOut, 'index.original.html')
-    );
-  } catch (e) { }
+  if (!options.prerender) {
+    try {
+      fsHost.renameSync(
+        join(newStaticOut, 'index.html'),
+        join(newStaticOut, 'index.original.html')
+      );
+    } catch (e) { }
+  }
 
   if (options.preview) {
     throw new SchematicsException('Cloud Run preview not supported.');

@@ -53,6 +53,10 @@
       "type": "string",
       "description": "The region to deploy Cloud Functions or Cloud Run to"
     },
+    "outputPath": {
+      "type": "string",
+      "description": "Where to output the deploy artifacts"
+    },
     "functionsRuntimeOptions": {
       "type": "object",
       "description": "Runtime options for Cloud Functions, if deploying to Cloud Functions"

@@ -113,16 +113,9 @@ export const setupUniversalDeployment = (config: {
     );
   }
 
-  const ssrDirectory = config.projectType === PROJECT_TYPE.CloudFunctions ? '/functions' : '/run';
+  const ssrDirectory = config.projectType === PROJECT_TYPE.CloudFunctions ? 'functions' : 'run';
   const staticOutput = project.architect.build.options.outputPath;
-  const serverOutput = project.architect.server.options.outputPath;
-  const functionsOutput = staticOutput.replace('/browser', ssrDirectory);
-  if (functionsOutput !== serverOutput.replace('/server', ssrDirectory)) {
-    // TODO prompt cause they're using non-standard directories
-    throw new SchematicsException(
-      `It looks like the project "${options.project}" in your angular.json is using non-standard output directories, AngularFire doesn't support this yet.`
-    );
-  }
+  const functionsOutput = `dist/${options.project}/${ssrDirectory}`;
 
   // TODO clean this up a bit
   const functionName = config.projectType === PROJECT_TYPE.CloudRun ?
@@ -136,10 +129,11 @@ export const setupUniversalDeployment = (config: {
       prerender: options.prerender,
       functionName,
       functionsNodeVersion: config.nodeVersion,
-      browserTarget: options.browserTarget,
       region: 'us-central1',
+      browserTarget: options.browserTarget,
       ...(options.serverTarget ? {serverTarget: options.serverTarget} : {}),
       ...(options.prerenderTarget ? {prerenderTarget: options.prerenderTarget} : {}),
+      outputPath: functionsOutput,
     }
   };
 
