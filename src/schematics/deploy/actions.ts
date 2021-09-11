@@ -323,8 +323,6 @@ export const deployToCloudRun = async (
     throw new SchematicsException('Cloud Run preview not supported.');
   }
 
-  console.log(options);
-
   const deployArguments: Array<any> = [];
   const cloudRunOptions = options.cloudRunOptions || {};
   Object.entries(DEFAULT_CLOUD_RUN_OPTIONS).forEach(([k, v]) => {
@@ -343,7 +341,7 @@ export const deployToCloudRun = async (
 
   context.logger.info(`📦 Deploying to Cloud Run`);
   await spawnAsync(`gcloud builds submit ${cloudRunOut} --tag gcr.io/${options.firebaseProject}/${serviceId} --project ${options.firebaseProject} --quiet`);
-  await spawnAsync(`gcloud run deploy ${serviceId} --image gcr.io/${options.firebaseProject}/${serviceId} --project ${options.firebaseProject} ${deployArguments.join(' ')} --platform managed --allow-unauthenticated --region=us-central1 --quiet`);
+  await spawnAsync(`gcloud run deploy ${serviceId} --image gcr.io/${options.firebaseProject}/${serviceId} --project ${options.firebaseProject} ${deployArguments.join(' ')} --platform managed --allow-unauthenticated --region=${options.region} --quiet`);
 
   // TODO deploy cloud run
   return await firebaseTools.deploy({

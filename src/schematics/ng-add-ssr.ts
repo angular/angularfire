@@ -2,25 +2,14 @@ import { SchematicsException, Tree, SchematicContext } from '@angular-devkit/sch
 import {
   addDependencies,
   generateFirebaseRc,
-  NgAddNormalizedOptions,
   overwriteIfExists,
   safeReadJSON,
   stringifyFormatted
 } from './ng-add-common';
-import { FirebaseJSON, Workspace, WorkspaceProject } from './interfaces';
+import { FirebaseJSON, Workspace, WorkspaceProject, NgAddNormalizedOptions } from './interfaces';
 import { firebaseFunctions as firebaseFunctionsDependencies } from './versions.json';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { PROJECT_TYPE } from './utils';
-
-// We consider a project to be a universal project if it has a `server` architect
-// target. If it does, it knows how to build the application's server.
-export const isUniversalApp = (
-  project: WorkspaceProject
-) => project.architect?.server;
-
-export const hasPrerenderOption = (
-  project: WorkspaceProject
-) => project.architect?.prerender;
 
 function generateHostingConfig(project: string, dist: string, functionName: string, projectType: PROJECT_TYPE) {
   return {
@@ -140,41 +129,17 @@ export const setupUniversalDeployment = (config: {
     `ssr-${options.project.replace('_', '-')}` :
     `ssr_${options.project}`;
 
-  console.log({ functionName, staticOutput, serverOutput, functionsOutput });
-
-  // Add firebase libraries to externalDependencies. For older versions of @firebase/firestore grpc native would cause issues when
-  // bundled. While, it's using grpc-js now and doesn't have issues, ngcc tends to bundle the esm version of the libraries; which
-  // is problematic for SSR (references to Window, etc.) Let's just mark all of them as external so we know the CJS is used.
-  const externalDependencies: string[] = project.architect.server.options.externalDependencies || [];
-  [
-    'firebase',
-    '@firebase/app',
-    '@firebase/analytics',
-    '@firebase/app',
-    '@firebase/auth',
-    '@firebase/component',
-    '@firebase/database',
-    '@firebase/firestore',
-    '@firebase/functions',
-    '@firebase/installations',
-    '@firebase/messaging',
-    '@firebase/storage',
-    '@firebase/performance',
-    '@firebase/remote-config',
-    '@firebase/util'
-  ].forEach(dep => {
-    if (!externalDependencies.includes(dep)) { externalDependencies.push(dep); }
-  });
-
-  project.architect.server.options.externalDependencies = externalDependencies;
-
   project.architect.deploy = {
     builder: '@angular/fire:deploy',
     options: {
-      ssr: config.projectType === PROJECT_TYPE.CloudRun ? 'cloud-run' : true,
+      ssr: config.projectType === PROJECT_TYPE.CloudRun ? 'cloud-run' : 'cloud-functions',
       prerender: options.prerender,
       functionName,
       functionsNodeVersion: config.nodeVersion,
+      browserTarget: options.browserTarget,
+      region: 'us-central1',
+      ...(options.serverTarget ? {serverTarget: options.serverTarget} : {}),
+      ...(options.prerenderTarget ? {prerenderTarget: options.prerenderTarget} : {}),
     }
   };
 

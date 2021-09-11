@@ -1,22 +1,24 @@
 import { SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
 import {
   projectPrompt, getWorkspace, getProject, projectTypePrompt, appPrompt, sitePrompt, getFirebaseTools, getFirebaseProjectName,
-  featuresPrompt, PROJECT_TYPE
+  featuresPrompt, PROJECT_TYPE, FEATURES,
 } from './utils';
-import { DeployOptions, NgAddNormalizedOptions } from './ng-add-common';
 import { setupUniversalDeployment } from './ng-add-ssr';
 import { addFirebaseHostingDependencies, setupStaticDeployment } from './ng-add-static';
-import { FirebaseApp, FirebaseHostingSite, FirebaseProject } from './interfaces';
+import { FirebaseApp, FirebaseHostingSite, FirebaseProject, DeployOptions, NgAddNormalizedOptions } from './interfaces';
 
 export const setupProject =
-  async (tree: Tree, context: SchematicContext, config: DeployOptions & {
+  async (tree: Tree, context: SchematicContext, features: FEATURES[], config: DeployOptions & {
     firebaseProject: FirebaseProject,
-    firebaseApp: FirebaseApp,
+    firebaseApp: FirebaseApp|undefined,
     firebaseHostingSite: FirebaseHostingSite|undefined,
-    sdkConfig: {[key: string]: any}
+    sdkConfig: Record<string, string>|undefined,
     projectType: PROJECT_TYPE,
     prerender: boolean,
     nodeVersion: string|undefined,
+    browserTarget: string|undefined,
+    serverTarget: string|undefined,
+    prerenderTarget: string|undefined,
   }) => {
     const { path: workspacePath, workspace } = getWorkspace(tree);
 
@@ -29,72 +31,104 @@ export const setupProject =
       firebaseHostingSite: config.firebaseHostingSite,
       sdkConfig: config.sdkConfig,
       prerender: config.prerender,
+      browserTarget: config.browserTarget,
+      serverTarget: config.serverTarget,
+      prerenderTarget: config.prerenderTarget,
     };
 
-    // TODO dry up by always doing the static work
-    switch (config.projectType) {
-      case PROJECT_TYPE.CloudFunctions:
-      case PROJECT_TYPE.CloudRun:
-        return setupUniversalDeployment({
-          workspace,
-          workspacePath,
-          options,
-          tree,
-          context,
-          project,
-          projectType: config.projectType,
-          // tslint:disable-next-line:no-non-null-assertion
-          nodeVersion: config.nodeVersion!,
-        });
-      case PROJECT_TYPE.Static:
-        return setupStaticDeployment({
-          workspace,
-          workspacePath,
-          options,
-          tree,
-          context,
-          project
-        });
-      default: throw(new SchematicsException(`Unimplemented PROJECT_TYPE ${config.projectType}`));
+    if (features.includes(FEATURES.Hosting)) {
+      // TODO dry up by always doing the static work
+      switch (config.projectType) {
+        case PROJECT_TYPE.CloudFunctions:
+        case PROJECT_TYPE.CloudRun:
+          return setupUniversalDeployment({
+            workspace,
+            workspacePath,
+            options,
+            tree,
+            context,
+            project,
+            projectType: config.projectType,
+            // tslint:disable-next-line:no-non-null-assertion
+            nodeVersion: config.nodeVersion!,
+          });
+        case PROJECT_TYPE.Static:
+          return setupStaticDeployment({
+            workspace,
+            workspacePath,
+            options,
+            tree,
+            context,
+            project
+          });
+        default: throw(new SchematicsException(`Unimplemented PROJECT_TYPE ${config.projectType}`));
+      }
     }
 };
 
 export const ngAddSetupProject = (
   options: DeployOptions
 ) => async (host: Tree, context: SchematicContext) => {
-
   // I'm not able to resolve dependencies.... this is definately some sort of race condition.
   // Failing on bluebird but there are a lot of things that aren't right. Error for now.
   try {
-    require('firebase-tools');
+    getFirebaseTools();
   } catch (e) {
     throw new Error('The NodePackageInstallTask does not appear to have completed successfully or we ran into a race condition. Please run the `ng add @angular/fire` command again.');
   }
 
-  await featuresPrompt();
+  const features = await featuresPrompt();
 
-  const firebase = getFirebaseTools();
-  await firebase.login();
+  if (features.length > 0) {
 
-  // TODO get the default project name from the tree, rather than FS
-  const { project: ngProject, projectName: ngProjectName } = getProject(options, host);
-  const defaultProjectName = getFirebaseProjectName('./', ngProjectName);
+    const firebase = getFirebaseTools();
 
-  const firebaseProject = await projectPrompt(defaultProjectName);
+    await firebase.login();
 
-  const { projectType, prerender, nodeVersion } = await projectTypePrompt(ngProject);
+    const { project: ngProject, projectName: ngProjectName } = getProject(options, host);
 
-  // TODO get default site from tree
-  const firebaseHostingSite = await sitePrompt(firebaseProject);
+    const [ defaultProjectName, defaultHostingSite ] = getFirebaseProjectName('./', ngProjectName);
 
-  // TODO get default app from tree (environment config)
-  const firebaseApp = await appPrompt(firebaseProject);
-  const { sdkConfig } = await firebase.apps.sdkconfig('web', firebaseApp.appId, { nonInteractive: true });
+    const firebaseProject = await projectPrompt(defaultProjectName);
 
-  await setupProject(host, context, {
-    ...options, firebaseProject, firebaseApp, firebaseHostingSite, sdkConfig, projectType, prerender, nodeVersion
-  });
+    let projectType: PROJECT_TYPE = PROJECT_TYPE.Static;
+    let prerender = false;
+    let nodeVersion: string|undefined;
+    let browserTarget: string|undefined;
+    let serverTarget: string|undefined;
+    let prerenderTarget: string|undefined;
+    let firebaseHostingSite: FirebaseHostingSite|undefined;
 
+    if (features.includes(FEATURES.Hosting)) {
+      const results = await projectTypePrompt(ngProject, ngProjectName);
+      projectType = results.projectType;
+      prerender = results.prerender;
+      nodeVersion = results.nodeVersion;
+      browserTarget = results.browserTarget;
+      serverTarget = results.serverTarget;
+      prerenderTarget = results.prerenderTarget;
+      firebaseHostingSite = await sitePrompt(firebaseProject, defaultHostingSite);
+    }
+
+    let firebaseApp: FirebaseApp|undefined;
+    let sdkConfig: Record<string, string>|undefined;
+
+    if (features.find(it => it !== FEATURES.Hosting)) {
+
+      const defaultAppId = firebaseHostingSite?.appId;
+      firebaseApp = await appPrompt(firebaseProject, defaultAppId);
+
+      const result = await firebase.apps.sdkconfig('web', firebaseApp.appId, { nonInteractive: true });
+      sdkConfig = result.sdkConfig;
+
+    }
+
+    await setupProject(host, context, features, {
+      ...options, firebaseProject, firebaseApp, firebaseHostingSite, sdkConfig,
+      projectType, prerender, nodeVersion, browserTarget, serverTarget, prerenderTarget,
+    });
+
+  }
 };
 
 export const ngAdd = addFirebaseHostingDependencies;

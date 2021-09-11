@@ -1,5 +1,26 @@
 import { RuntimeOptions } from 'firebase-functions';
 
+export interface NgAddOptions {
+  firebaseProject: string;
+  project?: string;
+}
+
+export interface NgAddNormalizedOptions {
+  project: string;
+  firebaseProject: FirebaseProject;
+  firebaseApp: FirebaseApp|undefined;
+  firebaseHostingSite: FirebaseHostingSite|undefined;
+  sdkConfig: Record<string, string>|undefined;
+  prerender: boolean;
+  browserTarget: string|undefined;
+  serverTarget: string|undefined;
+  prerenderTarget: string|undefined;
+}
+
+export interface DeployOptions {
+  project: string;
+}
+
 export interface FirebaseProject {
   projectId: string;
   projectNumber: string;
@@ -28,6 +49,7 @@ export interface FirebaseHostingSite {
   name: string;
   defaultUrl: string;
   type: string;
+  appId: string|undefined;
 }
 
 export interface FirebaseSDKConfig {
@@ -103,16 +125,19 @@ export interface FirebaseRcTarget {
 
 export interface FirebaseRc {
   targets?: Record<string, FirebaseRcTarget>;
+  projects?: Record<string, string>;
 }
 
 export interface DeployBuilderSchema {
   buildTarget?: string;
+  browserTarget?: string;
   firebaseProject?: string;
   preview?: boolean;
   universalBuildTarget?: string;
   serverTarget?: string;
   prerenderTarget?: string;
   ssr?: boolean | string;
+  region?: string;
   prerender?: boolean;
   functionName?: string;
   functionsNodeVersion?: number|string;
@@ -145,7 +170,12 @@ export interface FSHost {
 
 export interface WorkspaceProject {
   projectType?: string;
-  architect?: Record<string, { builder: string; options?: Record<string, any> }>;
+  architect?: Record<string, {
+    builder: string;
+    options?: Record<string, any>,
+    configurations?: Record<string, Record<string, any>>,
+    defaultConfiguration?: string,
+  }>;
 }
 
 export interface Workspace {

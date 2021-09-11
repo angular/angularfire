@@ -122,8 +122,14 @@
         "deploy": {
           "builder": "@angular/fire:deploy",
           "options": {
-            "ssr": true,
-            "functionsNodeVersion": 16
+            "ssr": "cloud-run",
+            "prerender": true,
+            "functionName": "ssr-sample",
+            "functionsNodeVersion": "16",
+            "browserTarget": "sample:build:production",
+            "region": "us-central1",
+            "serverTarget": "sample:server:production",
+            "prerenderTarget": "sample:prerender:production"
           }
         },
         "server": {
@@ -135,8 +141,7 @@
             "optimization": false,
             "sourceMap": true,
             "extractLicenses": false,
-            "externalDependencies": [
-            ]
+            "externalDependencies": []
           },
           "configurations": {
             "production": {

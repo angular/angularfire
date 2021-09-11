@@ -14,7 +14,7 @@ export default createBuilder(
     const firebaseProject = options.firebaseProject || getFirebaseProjectName(
       context.workspaceRoot,
       context.target.project
-    );
+    )[0];
 
     if (!firebaseProject) {
       throw new Error('Cannot find firebase project for your app in .firebaserc');

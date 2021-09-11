@@ -1,13 +1,22 @@
 import { readFileSync } from 'fs';
-import { FirebaseRc, FirebaseProject, Workspace, WorkspaceProject, FirebaseApp, FirebaseHostingSite, FirebaseTools } from './interfaces';
+import { FirebaseRc, FirebaseProject, Workspace, WorkspaceProject, FirebaseApp, FirebaseHostingSite, FirebaseTools, DeployOptions } from './interfaces';
 import { join } from 'path';
-import { isUniversalApp, hasPrerenderOption } from './ng-add-ssr';
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
-import { DeployOptions } from './ng-add-common';
 import { FilterResult } from 'fuzzy';
 
 const NEW_OPTION = '~~angularfire-new~~';
 const DEFAULT_SITE_TYPE = 'DEFAULT_SITE';
+
+// We consider a project to be a universal project if it has a `server` architect
+// target. If it does, it knows how to build the application's server.
+export const isUniversalApp = (
+  project: WorkspaceProject
+) => project.architect?.server;
+
+export const hasPrerenderOption = (
+  project: WorkspaceProject
+) => project.architect?.prerender;
+
 
 export const getFirebaseTools = (): FirebaseTools => {
   globalThis.memoizedFirebaseTools ||= require('firebase-tools');
@@ -184,27 +193,29 @@ type Prompt = <K extends string, U= unknown>(questions: { name: K, source: (...a
 
 const autocomplete: Prompt = (questions) => getInquirer().prompt(questions);
 
-enum FEATURES {
+export enum FEATURES {
   Authentication = 'Authentication',
-  Analtyics = 'Google Analtyics',
+  Analytics = 'Analytics',
   Database = 'Realtime Database',
   Functions = 'Cloud Functions',
+  Hosting = 'Hosting',
   Messaging = 'Cloud Messaging',
   Performance = 'Performance Monitoring',
-  Firestore = 'Cloud Firestore',
-  Storage = 'Cloud Storage',
-  RemoteConfig = 'Remote Configuation',
+  Firestore = 'Firestore',
+  Storage = 'Storage',
+  RemoteConfig = 'Remote Config',
 }
 
-export const featuresPrompt = async () => {
+export const featuresPrompt = async (): Promise<FEATURES[]> => {
   const choices = Object.entries(FEATURES).map(([value, name]) => ({ name, value }));
   const { features } = await getInquirer().prompt({
     type: 'checkbox',
     name: 'features',
     choices,
     message: 'What features would you like to setup?',
+    default: [FEATURES.Hosting],
   });
-  console.log(features);
+  return features;
 };
 
 export const projectPrompt = async (defaultProject?: string) => {
@@ -244,14 +255,15 @@ export const projectPrompt = async (defaultProject?: string) => {
   return (await projects).find(it => it.projectId === projectId)!;
 };
 
-export const appPrompt = async ({ projectId: project }: FirebaseProject) => {
+export const appPrompt = async ({ projectId: project }: FirebaseProject, defaultAppId: string|undefined) => {
   const firebase = getFirebaseTools();
   const apps = firebase.apps.list('web', { project });
   const { appId } = await autocomplete({
     type: 'autocomplete',
     name: 'appId',
     source: searchApps(apps),
-    message: 'Please select an app:'
+    message: 'Please select an app:',
+    default: defaultAppId,
   });
   if (appId === NEW_OPTION) {
     const { displayName } = await getInquirer().prompt({
@@ -265,7 +277,7 @@ export const appPrompt = async ({ projectId: project }: FirebaseProject) => {
   return (await apps).find(it => shortAppId(it) === appId)!;
 };
 
-export const sitePrompt = async ({ projectId: project }: FirebaseProject) => {
+export const sitePrompt = async ({ projectId: project }: FirebaseProject, defaultSite: string|undefined) => {
   const firebase = getFirebaseTools();
   if (!firebase.hosting.sites) {
     return undefined;
@@ -276,7 +288,7 @@ export const sitePrompt = async ({ projectId: project }: FirebaseProject) => {
     name: 'siteName',
     source: searchSites(sites),
     message: 'Please select a hosting site:',
-    default: _ => sites.then(it => shortSiteName(it.find(it => it.type === DEFAULT_SITE_TYPE))),
+    default: _ => sites.then(it => shortSiteName(it.find(it => shortSiteName(it) === defaultSite || it.type === DEFAULT_SITE_TYPE))),
   });
   if (siteName === NEW_OPTION) {
     const { subdomain } = await getInquirer().prompt({
@@ -304,11 +316,17 @@ export const prerenderPrompt = (project: WorkspaceProject, prerender: boolean): 
 
 export const enum PROJECT_TYPE { Static, CloudFunctions, CloudRun }
 
-export const projectTypePrompt = async (project: WorkspaceProject) => {
+export const projectTypePrompt = async (project: WorkspaceProject, name: string) => {
   let prerender = false;
   let nodeVersion: string|undefined;
+  let serverTarget: string|undefined;
+  let browserTarget = `${name}:build:${project.architect?.build?.defaultConfiguration || 'production'}`;
+  let prerenderTarget: string|undefined;
   if (isUniversalApp(project)) {
+    serverTarget = `${name}:server:${project.architect?.server?.defaultConfiguration || 'production'}`;
+    browserTarget = `${name}:build:${project.architect?.build?.defaultConfiguration || 'production'}`;
     if (hasPrerenderOption(project)) {
+      prerenderTarget = `${name}:prerender:${project.architect?.prerender?.defaultConfiguration || 'production'}`;
       const { shouldPrerender } = await getInquirer().prompt({
         type: 'confirm',
         name: 'shouldPrerender',
@@ -320,7 +338,7 @@ export const projectTypePrompt = async (project: WorkspaceProject) => {
     const choices = [
       { name: prerender ? 'Pre-render only' : 'Don\'t render universal content', value: PROJECT_TYPE.Static },
       { name: 'Cloud Functions', value: PROJECT_TYPE.CloudFunctions },
-      { name: 'Cloud Run (beta)', value: PROJECT_TYPE.CloudRun },
+      { name: 'Cloud Run', value: PROJECT_TYPE.CloudRun },
     ];
     const { projectType } = await getInquirer().prompt({
       type: 'list',
@@ -333,12 +351,12 @@ export const projectTypePrompt = async (project: WorkspaceProject) => {
       const { newNodeVersion } = await getInquirer().prompt({
         type: 'list',
         name: 'newNodeVersion',
-        choices: ['10', '12', '14'],
+        choices: ['12', '14', '16'],
         message: 'What version of Node.js would you like to use?',
         default: parseInt(process.versions.node, 10).toString(),
       });
       nodeVersion = newNodeVersion;
-    } else {
+    } else if (projectType === PROJECT_TYPE.CloudRun) {
       const fetch = require('node-fetch');
       const { newNodeVersion } = await getInquirer().prompt({
         type: 'input',
@@ -349,25 +367,26 @@ export const projectTypePrompt = async (project: WorkspaceProject) => {
       });
       nodeVersion = newNodeVersion;
     }
-    return { prerender, projectType, nodeVersion };
+    return { prerender, projectType, nodeVersion, browserTarget, serverTarget, prerenderTarget };
   }
-  return { projectType: PROJECT_TYPE.Static, prerender, nodeVersion };
+  return { projectType: PROJECT_TYPE.Static, prerender, nodeVersion, browserTarget, serverTarget, prerenderTarget };
 };
 
 export function getFirebaseProjectName(
   workspaceRoot: string,
   target: string
-): string | undefined {
+): [string|undefined, string|undefined] {
   try {
     const rc: FirebaseRc = JSON.parse(
       readFileSync(join(workspaceRoot, '.firebaserc'), 'UTF-8')
     );
-    const targets = rc.targets || {};
-    const projects = Object.keys(targets || {});
-    return projects.find(
-      project => !!Object.keys(targets[project].hosting).find(t => t === target)
+    const defaultProject = rc.projects?.default;
+    const project = Object.keys(rc.targets || {}).find(
+      project => !!rc.targets?.[project]?.hosting?.[target]
     );
+    const site = project && rc.targets?.[project]?.hosting?.[target]?.[0];
+    return [project || defaultProject, site];
   } catch (e) {
-    return undefined;
+    return [undefined, undefined];
   }
 }

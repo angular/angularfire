@@ -1,7 +1,6 @@
 import { DeployBuilderOptions } from './actions';
 
-// TODO allow these to be configured
-export const DEFAULT_NODE_VERSION = 10;
+export const DEFAULT_NODE_VERSION = 14;
 export const DEFAULT_FUNCTION_NAME = 'ssr';
 
 const DEFAULT_FUNCTION_REGION = 'us-central1';
@@ -42,8 +41,8 @@ require("firebase-functions/lib/logger/compat");
 
 const expressApp = require('./${path}/main').app();
 
-exports.${functionName} = functions
-  .region('${DEFAULT_FUNCTION_REGION}')
+exports.${functionName || DEFAULT_FUNCTION_NAME} = functions
+  .region('${options.region || DEFAULT_FUNCTION_REGION}')
   .runWith(${JSON.stringify(options.functionsRuntimeOptions || DEFAULT_RUNTIME_OPTIONS)})
   .https
   .onRequest(expressApp);

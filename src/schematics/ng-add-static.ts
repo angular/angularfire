@@ -1,14 +1,12 @@
 import { SchematicsException, Tree, SchematicContext } from '@angular-devkit/schematics';
 import {
   addDependencies,
-  DeployOptions,
   generateFirebaseRc,
-  NgAddNormalizedOptions,
   overwriteIfExists,
   safeReadJSON,
   stringifyFormatted
 } from './ng-add-common';
-import { FirebaseJSON, Workspace, WorkspaceProject } from './interfaces';
+import { NgAddNormalizedOptions, DeployOptions, FirebaseJSON, Workspace, WorkspaceProject } from './interfaces';
 
 import { default as defaultDependencies } from './versions.json';
 import { NodePackageInstallTask, RunSchematicTask } from '@angular-devkit/schematics/tasks';
@@ -50,23 +48,16 @@ export function generateFirebaseJson(
     ? safeReadJSON(path, tree)
     : emptyFirebaseJson();
 
-  /* TODO do we want to prompt for override?
-  if (
-    firebaseJson.hosting &&
-    ((Array.isArray(firebaseJson.hosting) &&
-      firebaseJson.hosting.find(config => config.target === project)) ||
-      (firebaseJson.hosting as FirebaseHostingConfig).target === project)
-  ) {
-    throw new SchematicsException(
-      `Target ${project} already exists in firebase.json`
-    );
-  }*/
-
   const newConfig = generateHostingConfig(project, dist);
   if (firebaseJson.hosting === undefined) {
     firebaseJson.hosting = newConfig;
   } else if (Array.isArray(firebaseJson.hosting)) {
-    firebaseJson.hosting.push(newConfig);
+    const targetIndex = firebaseJson.hosting.findIndex(it => it.target === newConfig.target);
+    if (targetIndex) {
+      firebaseJson.hosting[targetIndex] = newConfig;
+    } else {
+      firebaseJson.hosting.push(newConfig);
+    }
   } else {
     firebaseJson.hosting = [firebaseJson.hosting, newConfig];
   }
@@ -107,7 +98,13 @@ export const setupStaticDeployment = (config: {
 
   project.architect.deploy = {
     builder: '@angular/fire:deploy',
-    options: { prerender: options.prerender, ssr: false }
+    options: {
+      prerender: options.prerender,
+      ssr: false,
+      browserTarget: options.browserTarget,
+      ...(options.serverTarget ? {serverTarget: options.serverTarget} : {}),
+      ...(options.prerenderTarget ? {prerenderTarget: options.prerenderTarget} : {}),
+    }
   };
 
   tree.overwrite(workspacePath, JSON.stringify(workspace, null, 2));

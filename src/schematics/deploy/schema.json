@@ -9,7 +9,12 @@
       "description": "Target to build.",
       "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
     },
-    "prerendeTarget": {
+    "browserTarget": {
+      "type": "string",
+      "description": "Target to build.",
+      "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
+    },
+    "prerenderTarget": {
       "type": "string",
       "description": "Target to build.",
       "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
@@ -26,7 +31,7 @@
     },
     "ssr": {
       "type": ["boolean", "string"],
-      "description": "Should we attempt to deploy the function to Cloud Functions (true) / Cloud Run ('cloud-run') or just Hosting (false)"
+      "description": "Should we attempt to deploy the function to Cloud Functions (true or 'cloud-functions') / Cloud Run ('cloud-run') or just Hosting (false)"
     },
     "prerender": {
       "type": "boolean",
@@ -43,6 +48,10 @@
     "functionsNodeVersion": {
       "type": ["number", "string"],
       "description": "Version of Node.js to run Cloud Functions / Run on"
+    },
+    "region": {
+      "type": "string",
+      "description": "The region to deploy Cloud Functions or Cloud Run to"
     },
     "functionsRuntimeOptions": {
       "type": "object",

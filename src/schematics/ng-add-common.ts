@@ -1,25 +1,7 @@
 import { SchematicsException, Tree, SchematicContext } from '@angular-devkit/schematics';
-import { FirebaseApp, FirebaseHostingSite, FirebaseProject, FirebaseRc } from './interfaces';
+import { FirebaseHostingSite, FirebaseRc } from './interfaces';
 import * as semver from 'semver';
 import { shortSiteName } from './utils';
-
-export interface NgAddOptions {
-  firebaseProject: string;
-  project?: string;
-}
-
-export interface NgAddNormalizedOptions {
-  project: string;
-  firebaseProject: FirebaseProject;
-  firebaseApp: FirebaseApp;
-  firebaseHostingSite: FirebaseHostingSite|undefined;
-  sdkConfig: {[key: string]: any};
-  prerender: boolean;
-}
-
-export interface DeployOptions {
-  project: string;
-}
 
 export const stringifyFormatted = (obj: any) => JSON.stringify(obj, null, 2);
 
@@ -76,6 +58,7 @@ export function generateFirebaseRc(
     firebaseHostingSite,
     project
   );
+  firebaseRc.projects = { default: firebaseProject };
 
   overwriteIfExists(tree, path, stringifyFormatted(firebaseRc));
 }
