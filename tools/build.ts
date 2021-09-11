@@ -161,11 +161,11 @@ async function replaceSchematicVersions() {
   const root = await rootPackage;
   const path = dest('schematics', 'versions.json');
   const dependencies = await import(path);
-  Object.keys(dependencies.default).forEach(name => {
-    dependencies.default[name].version = root.dependencies[name] || root.devDependencies[name];
+  Object.keys(dependencies.peerDependencies).forEach(name => {
+    dependencies.peerDependencies[name].version = root.dependencies[name] || root.devDependencies[name];
   });
-  Object.keys(dependencies.firebaseFunctions).forEach(name => {
-    dependencies.firebaseFunctions[name].version = root.dependencies[name] || root.devDependencies[name];
+  Object.keys(dependencies.firebaseFunctionsDependencies).forEach(name => {
+    dependencies.firebaseFunctionsDependencies[name].version = root.dependencies[name] || root.devDependencies[name];
   });
   return writeFile(path, JSON.stringify(dependencies, null, 2));
 }
@@ -181,6 +181,8 @@ async function compileSchematics() {
     copy(src('schematics', 'collection.json'), dest('schematics', 'collection.json')),
     copy(src('schematics', 'migration.json'), dest('schematics', 'migration.json')),
     copy(src('schematics', 'deploy', 'schema.json'), dest('schematics', 'deploy', 'schema.json')),
+    copy(src('schematics', 'add', 'schema.json'), dest('schematics', 'add', 'schema.json')),
+    copy(src('schematics', 'setup', 'schema.json'), dest('schematics', 'setup', 'schema.json')),
     replaceSchematicVersions()
   ]);
 }

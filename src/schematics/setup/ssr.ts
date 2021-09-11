@@ -5,11 +5,11 @@ import {
   overwriteIfExists,
   safeReadJSON,
   stringifyFormatted
-} from './ng-add-common';
-import { FirebaseJSON, Workspace, WorkspaceProject, NgAddNormalizedOptions } from './interfaces';
-import { firebaseFunctions as firebaseFunctionsDependencies } from './versions.json';
+} from '../common';
+import { FirebaseJSON, Workspace, WorkspaceProject, NgAddNormalizedOptions, PROJECT_TYPE } from '../interfaces';
+import { firebaseFunctionsDependencies } from '../versions.json';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
-import { PROJECT_TYPE, shortSiteName } from './utils';
+import { shortSiteName } from '../utils';
 
 function generateHostingConfig(project: string, dist: string, functionName: string, projectType: PROJECT_TYPE) {
   return {
@@ -54,18 +54,6 @@ export function generateFirebaseJson(
   const firebaseJson: FirebaseJSON = tree.exists(path)
     ? safeReadJSON(path, tree)
     : {};
-
-  /* TODO do we want to prompt for override?
-  if (
-    firebaseJson.hosting &&
-    ((Array.isArray(firebaseJson.hosting) &&
-      firebaseJson.hosting.find(config => config.target === project)) ||
-      (<FirebaseHostingConfig>firebaseJson.hosting).target === project)
-  ) {
-    throw new SchematicsException(
-      `Target ${project} already exists in firebase.json`
-    );
-  }*/
 
   const newConfig = generateHostingConfig(project, dist, functionName, projectType);
   if (firebaseJson.hosting === undefined) {

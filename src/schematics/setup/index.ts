@@ -1,11 +1,13 @@
 import { SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
+import { getWorkspace, getProject, getFirebaseProjectNameFromHost } from '../utils';
+import { projectTypePrompt, appPrompt, sitePrompt, projectPrompt, featuresPrompt } from './prompts';
+import { setupUniversalDeployment } from './ssr';
+import { setupStaticDeployment } from './static';
 import {
-  projectPrompt, getWorkspace, getProject, projectTypePrompt, appPrompt, sitePrompt, getFirebaseTools, getFirebaseProjectNameFromHost,
-  featuresPrompt, PROJECT_TYPE, FEATURES,
-} from './utils';
-import { setupUniversalDeployment } from './ng-add-ssr';
-import { addFirebaseHostingDependencies, setupStaticDeployment } from './ng-add-static';
-import { FirebaseApp, FirebaseHostingSite, FirebaseProject, DeployOptions, NgAddNormalizedOptions } from './interfaces';
+  FirebaseApp, FirebaseHostingSite, FirebaseProject, DeployOptions, NgAddNormalizedOptions,
+  FEATURES, PROJECT_TYPE
+} from '../interfaces';
+import { getFirebaseTools } from '../firebaseTools';
 
 export const setupProject =
   async (tree: Tree, context: SchematicContext, features: FEATURES[], config: DeployOptions & {
@@ -69,25 +71,17 @@ export const setupProject =
 export const ngAddSetupProject = (
   options: DeployOptions
 ) => async (host: Tree, context: SchematicContext) => {
-  // I'm not able to resolve dependencies.... this is definately some sort of race condition.
-  // Failing on bluebird but there are a lot of things that aren't right. Error for now.
-  try {
-    getFirebaseTools();
-  } catch (e) {
-    throw new Error('The NodePackageInstallTask does not appear to have completed successfully or we ran into a race condition. Please run the `ng add @angular/fire` command again.');
-  }
-
   const features = await featuresPrompt();
 
   if (features.length > 0) {
 
-    const firebase = getFirebaseTools();
+    const firebaseTools = await getFirebaseTools();
 
-    await firebase.login();
+    await firebaseTools.login();
 
     const { project: ngProject, projectName: ngProjectName } = getProject(options, host);
 
-    const [ defaultProjectName, defaultHostingSite ] = getFirebaseProjectNameFromHost(host, ngProjectName);
+    const [ defaultProjectName ] = getFirebaseProjectNameFromHost(host, ngProjectName);
 
     const firebaseProject = await projectPrompt(defaultProjectName);
 
@@ -98,7 +92,7 @@ export const ngAddSetupProject = (
       // TODO read existing settings from angular.json, if available
       const results = await projectTypePrompt(ngProject, ngProjectName);
       hosting = { ...hosting, ...results };
-      firebaseHostingSite = await sitePrompt(firebaseProject, defaultHostingSite);
+      firebaseHostingSite = await sitePrompt(firebaseProject);
     }
 
     let firebaseApp: FirebaseApp|undefined;
@@ -109,7 +103,7 @@ export const ngAddSetupProject = (
       const defaultAppId = firebaseHostingSite?.appId;
       firebaseApp = await appPrompt(firebaseProject, defaultAppId);
 
-      const result = await firebase.apps.sdkconfig('web', firebaseApp.appId, { nonInteractive: true });
+      const result = await firebaseTools.apps.sdkconfig('web', firebaseApp.appId, { nonInteractive: true });
       sdkConfig = result.sdkConfig;
 
     }
@@ -120,5 +114,3 @@ export const ngAddSetupProject = (
 
   }
 };
-
-export const ngAdd = addFirebaseHostingDependencies;

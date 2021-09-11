@@ -4,11 +4,11 @@
         "migration-v7": {
             "version": "7.0.0",
             "description": "Update @angular/fire to v7",
-            "factory": "./public_api#ngUpdateV7"
+            "factory": "./update/v7#ngUpdate"
         },
         "ng-post-upgate": {
             "description": "Print out results after ng-update",
-            "factory": "./public_api#ngPostUpdate",
+            "factory": "./update#ngPostUpdate",
             "private": true
         }
     }

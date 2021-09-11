@@ -1,16 +1,13 @@
 import { SchematicsException, Tree, SchematicContext } from '@angular-devkit/schematics';
 import {
-  addDependencies,
   generateFirebaseRc,
   overwriteIfExists,
   safeReadJSON,
   stringifyFormatted
-} from './ng-add-common';
-import { NgAddNormalizedOptions, DeployOptions, FirebaseJSON, Workspace, WorkspaceProject } from './interfaces';
+} from '../common';
+import { NgAddNormalizedOptions, FirebaseJSON, Workspace, WorkspaceProject } from '../interfaces';
 
-import { default as defaultDependencies } from './versions.json';
-import { NodePackageInstallTask, RunSchematicTask } from '@angular-devkit/schematics/tasks';
-import { shortSiteName } from './utils';
+import { shortSiteName } from '../utils';
 
 function emptyFirebaseJson() {
   return {
@@ -54,7 +51,7 @@ export function generateFirebaseJson(
     firebaseJson.hosting = newConfig;
   } else if (Array.isArray(firebaseJson.hosting)) {
     const targetIndex = firebaseJson.hosting.findIndex(it => it.target === newConfig.target);
-    if (targetIndex) {
+    if (targetIndex > -1) {
       firebaseJson.hosting[targetIndex] = newConfig;
     } else {
       firebaseJson.hosting.push(newConfig);
@@ -65,18 +62,6 @@ export function generateFirebaseJson(
 
   overwriteIfExists(tree, path, stringifyFormatted(firebaseJson));
 }
-
-export const addFirebaseHostingDependencies = (options: DeployOptions) => (tree: Tree, context: SchematicContext) => {
-  addDependencies(
-    tree,
-    defaultDependencies,
-    context
-  );
-  context.addTask(new RunSchematicTask('ng-add-setup-project', options), [
-    context.addTask(new NodePackageInstallTask())
-  ]);
-  return tree;
-};
 
 export const setupStaticDeployment = (config: {
   project: WorkspaceProject;

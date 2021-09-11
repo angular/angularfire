@@ -6,9 +6,12 @@ import { join } from 'path';
 import { execSync, spawn, SpawnOptionsWithoutStdio } from 'child_process';
 import { defaultFunction, defaultPackage, DEFAULT_FUNCTION_NAME, dockerfile } from './functions-templates';
 import { satisfies } from 'semver';
-import * as open from 'open';
+import open from 'open';
 import { SchematicsException } from '@angular-devkit/schematics';
-import { firebaseFunctions } from '../versions.json';
+import { firebaseFunctionsDependencies } from '../versions.json';
+import winston from 'winston';
+import tripleBeam from 'triple-beam';
+import inquirer from 'inquirer';
 
 const DEFAULT_EMULATOR_PORT = 5000;
 const DEFAULT_EMULATOR_HOST = 'localhost';
@@ -78,7 +81,7 @@ const deployToHosting = async (
       nonInteractive: true
     });
 
-    const { deployProject } = await require('inquirer').prompt({
+    const { deployProject } = await inquirer.prompt({
       type: 'confirm',
       name: 'deployProject',
       message: 'Would you like to deploy your application to Firebase Hosting?'
@@ -115,8 +118,8 @@ const getPackageJson = (context: BuilderContext, workspaceRoot: string, options:
   const dependencies: Record<string, string> = {};
   const devDependencies: Record<string, string> = {};
   if (options.ssr !== 'cloud-run') {
-    Object.keys(firebaseFunctions).forEach(name => {
-      const { version, dev } = firebaseFunctions[name];
+    Object.keys(firebaseFunctionsDependencies).forEach(name => {
+      const { version, dev } = firebaseFunctionsDependencies[name];
       (dev ? devDependencies : dependencies)[name] = version;
     });
   }
@@ -225,7 +228,7 @@ export const deployToFunction = async (
       nonInteractive: true
     });
 
-    const { deployProject} = await require('inquirer').prompt({
+    const { deployProject} = await inquirer.prompt({
       type: 'confirm',
       name: 'deployProject',
       message: 'Would you like to deploy your application to Firebase Hosting & Cloud Functions?'
@@ -405,59 +408,52 @@ export default async function deploy(
 
   options.firebaseProject = firebaseProject;
 
-  try {
-    const winston: typeof import('winston') = require('winston');
-    const tripleBeam = require('triple-beam');
-
-    const logger = new winston.transports.Console({
-      level: 'info',
-      format: winston.format.printf((info) => {
-        const emulator = info[tripleBeam.SPLAT]?.[1]?.metadata?.emulator;
-        const plainText = info[tripleBeam.SPLAT]?.[0]?.replace(/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]/g, '');
-        if (emulator?.name === 'hosting' && plainText.startsWith('Local server: ')) {
-          open(plainText.split(': ')[1]);
-        }
-        return [info.message, ...(info[tripleBeam.SPLAT] || [])]
-          .filter((chunk) => typeof chunk === 'string')
-          .join(' ');
-      })
-    });
-
-    firebaseTools.logger.logger.add(logger);
-
-    if (serverBuildTarget) {
-      if (options.ssr === 'cloud-run') {
-        await deployToCloudRun(
-          firebaseTools,
-          context,
-          context.workspaceRoot,
-          staticBuildTarget,
-          serverBuildTarget,
-          options,
-          firebaseToken,
-        );
-      } else {
-        await deployToFunction(
-          firebaseTools,
-          context,
-          context.workspaceRoot,
-          staticBuildTarget,
-          serverBuildTarget,
-          options,
-          firebaseToken,
-        );
+  const logger = new winston.transports.Console({
+    level: 'info',
+    format: winston.format.printf((info) => {
+      const emulator = info[tripleBeam.SPLAT as any]?.[1]?.metadata?.emulator;
+      const plainText = info[tripleBeam.SPLAT as any]?.[0]?.replace(/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]/g, '');
+      if (emulator?.name === 'hosting' && plainText.startsWith('Local server: ')) {
+        open(plainText.split(': ')[1]);
       }
-    } else {
-      await deployToHosting(
+      return [info.message, ...(info[tripleBeam.SPLAT as any] || [])]
+        .filter((chunk) => typeof chunk === 'string')
+        .join(' ');
+    })
+  });
+
+  firebaseTools.logger.logger.add(logger);
+
+  if (serverBuildTarget) {
+    if (options.ssr === 'cloud-run') {
+      await deployToCloudRun(
         firebaseTools,
         context,
         context.workspaceRoot,
+        staticBuildTarget,
+        serverBuildTarget,
+        options,
+        firebaseToken,
+      );
+    } else {
+      await deployToFunction(
+        firebaseTools,
+        context,
+        context.workspaceRoot,
+        staticBuildTarget,
+        serverBuildTarget,
         options,
         firebaseToken,
       );
     }
-
-  } catch (e) {
-    context.logger.error(e.message || e);
+  } else {
+    await deployToHosting(
+      firebaseTools,
+      context,
+      context.workspaceRoot,
+      options,
+      firebaseToken,
+    );
   }
+
 }

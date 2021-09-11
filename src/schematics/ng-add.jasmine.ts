@@ -1,7 +1,6 @@
 import { Tree } from '@angular-devkit/schematics';
-import { setupProject } from './ng-add';
+import { setupProject } from './add/setup';
 import 'jasmine';
-import { join } from '@angular-devkit/core';
 import { join as pathJoin } from 'path';
 
 const PROJECT_NAME = 'pie-ka-chu';

@@ -2,6 +2,7 @@ import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/ar
 import deploy, { DeployBuilderOptions } from './actions';
 import { BuildTarget } from '../interfaces';
 import { getFirebaseProjectNameFromFs } from '../utils';
+import { getFirebaseTools } from '../firebaseTools';
 
 // Call the createBuilder() function to create a builder. This mirrors
 // createJobHandler() but add typings specific to Architect Builders.
@@ -51,7 +52,7 @@ export default createBuilder(
     try {
       process.env.FIREBASE_DEPLOY_AGENT = 'angularfire';
       await deploy(
-        require('firebase-tools'),
+        (await getFirebaseTools()),
         context,
         staticBuildTarget,
         serverBuildTarget,
