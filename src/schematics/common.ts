@@ -76,6 +76,9 @@ export const addDependencies = (
     throw new SchematicsException('Could not locate package.json');
   }
 
+  packageJson.devDependencies ??= {};
+  packageJson.dependencies ??= {};
+
   Object.keys(deps).forEach(depName => {
     const dep = deps[depName];
     const existingDeps = dep.dev ? packageJson.devDependencies : packageJson.dependencies;

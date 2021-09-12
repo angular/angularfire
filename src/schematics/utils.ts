@@ -21,10 +21,10 @@ export function getWorkspace(
   host: Tree
 ): { path: string; workspace: Workspace } {
   const possibleFiles = ['/angular.json', '/.angular.json'];
-  const path = possibleFiles.filter(p => host.exists(p))[0];
+  const path: string|undefined = possibleFiles.filter(p => host.exists(p))[0];
 
-  const configBuffer = host.read(path);
-  if (configBuffer === null) {
+  const configBuffer = path && host.read(path);
+  if (!configBuffer) {
     throw new SchematicsException(`Could not find angular.json`);
   }
 

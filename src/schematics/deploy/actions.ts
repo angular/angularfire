@@ -9,7 +9,7 @@ import { satisfies } from 'semver';
 import open from 'open';
 import { SchematicsException } from '@angular-devkit/schematics';
 import { firebaseFunctionsDependencies } from '../versions.json';
-import winston from 'winston';
+import * as winston from 'winston';
 import tripleBeam from 'triple-beam';
 import * as inquirer from 'inquirer';
 
