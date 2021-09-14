@@ -206,8 +206,8 @@ deleteDoc(docRef) // Promise<void>
             <td>
 
 ```ts
-import { collection } from '@angular/fire/firestore';
-collection<T>(docRef, 'bar') // CollectionReference<T>
+import { collectionData } from '@angular/fire/firestore';
+collectionData<T>(collectionRef) // Observable<T>
 ```
 </td>
         </tr>
