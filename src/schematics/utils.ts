@@ -5,7 +5,7 @@ import { SchematicsException, Tree } from '@angular-devkit/schematics';
 import ts from '@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { findNode, addImportToModule, insertImport } from '@schematics/angular/utility/ast-utils';
 import { InsertChange, ReplaceChange, applyToUpdateRecorder, Change } from '@schematics/angular/utility/change';
-import { findModuleFromOptions, buildRelativePath } from '@schematics/angular/utility/find-module';
+import { buildRelativePath } from '@schematics/angular/utility/find-module';
 import { overwriteIfExists } from './common';
 
 // We consider a project to be a universal project if it has a `server` architect
@@ -151,16 +151,35 @@ export function addEnvironmentEntry(
   return host;
 }
 
-export function addToNgModule(host: Tree, options: { sourcePath: string, features: FEATURES[]}) {
+// TODO rewrite using typescript
+export function addFixesToServer(host: Tree, options: { sourcePath: string, features: FEATURES[]}) {
+  const serverPath = `/server.ts`;
 
-  const modulePath = findModuleFromOptions(host, {
-    name: 'app',
-    path: options.sourcePath,
-  });
-
-  if (!modulePath) {
+  if (!host.exists(serverPath)) {
     return host;
   }
+
+  const text = host.read(serverPath);
+  if (text === null) {
+    throw new SchematicsException(`File ${serverPath} does not exist.`);
+  }
+  const sourceText = text.toString('utf-8');
+  const addZonePatch = !sourceText.includes('import \'zone.js/dist/zone-patch-rxjs\';');
+  const addFirestorePatch = options.features.includes(FEATURES.Firestore) &&
+    !sourceText.includes('import \'@angular/fire/firestore-protos\';');
+
+  if (addZonePatch || addFirestorePatch) {
+    overwriteIfExists(host, serverPath, sourceText.replace('import \'zone.js/dist/zone-node\';', `import 'zone.js/dist/zone-node';
+${addZonePatch ? 'import \'zone.js/dist/zone-patch-rxjs\';' : ''}
+${addFirestorePatch ? 'import \'@angular/fire/firestore-protos\';' : ''}`));
+  }
+
+  return host;
+}
+
+export function addToNgModule(host: Tree, options: { sourcePath: string, features: FEATURES[]}) {
+
+  const modulePath = `/${options.sourcePath}/app/app.module.ts`;
 
   if (!host.exists(modulePath)) {
     throw new Error(`Specified module path ${modulePath} does not exist`);

@@ -21,6 +21,9 @@ const SERVER_BUILD_TARGET: BuildTarget = {
   name: `${PROJECT}:server:production`
 };
 
+const login = () => Promise.resolve();
+login.list = () => Promise.resolve([{ user: { email: 'foo@bar.baz' }}]);
+
 const initMocks = () => {
   fsHost = {
     moveSync(_: string, __: string) {
@@ -36,7 +39,7 @@ const initMocks = () => {
   };
 
   firebaseMock = {
-    login: () => Promise.resolve(),
+    login,
     projects: {
       list: () => Promise.resolve([]),
       create: () => Promise.reject(),

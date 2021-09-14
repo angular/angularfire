@@ -1,5 +1,8 @@
 import { SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
-import { getWorkspace, getProject, getFirebaseProjectNameFromHost, addEnvironmentEntry, addToNgModule, addIgnoreFiles } from '../utils';
+import {
+  getWorkspace, getProject, getFirebaseProjectNameFromHost, addEnvironmentEntry,
+  addToNgModule, addIgnoreFiles, addFixesToServer
+} from '../utils';
 import { projectTypePrompt, appPrompt, sitePrompt, projectPrompt, featuresPrompt } from './prompts';
 import { setupUniversalDeployment } from './ssr';
 import { setupStaticDeployment } from './static';
@@ -34,6 +37,7 @@ export const setupProject =
     const featuresToImport = features.filter(it => it !== FEATURES.Hosting);
     if (featuresToImport.length > 0) {
       addToNgModule(tree, { features: featuresToImport, sourcePath });
+      addFixesToServer(tree, { features: featuresToImport, sourcePath });
     }
 
     if (config.sdkConfig) {
@@ -112,6 +116,8 @@ export const ngAddSetupProject = (
     const firebaseTools = await getFirebaseTools();
 
     await firebaseTools.login();
+    const users = await firebaseTools.login.list();
+    console.log(`Logged into Firebase as ${users.map(it => it.user.email).join(', ')}.`);
 
     const { project: ngProject, projectName: ngProjectName } = getProject(options, host);
 
