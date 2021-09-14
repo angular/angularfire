@@ -369,7 +369,7 @@ const projectAngularJson = `{
 const universalFirebaseJson = {
   hosting: [{
     target: 'pie-ka-chu',
-    public: pathJoin('dist', 'ikachu'),
+    public: 'dist/ikachu',
     ignore: [
       '**/.*'
     ],
@@ -388,7 +388,7 @@ const universalFirebaseJson = {
     ]
   }],
   functions: {
-    source: pathJoin('dist', 'pie-ka-chu', 'functions')
+    source: 'dist/pie-ka-chu/functions'
   }
 };
 
