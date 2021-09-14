@@ -112,6 +112,8 @@ export const ngAddSetupProject = (
     const firebaseTools = await getFirebaseTools();
 
     await firebaseTools.login();
+    const users = await firebaseTools.login.list();
+    console.log(`Logged into Firebase as ${users.map(it => it.user.email).join(', ')}.`);
 
     const { project: ngProject, projectName: ngProjectName } = getProject(options, host);
 

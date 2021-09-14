@@ -118,7 +118,9 @@ export interface FirebaseTools {
     version(): string;
   };
 
-  login(): Promise<void>;
+  login: {
+    list(): Promise<{user: Record<string, any>}[]>;
+  } & (() => Promise<void>);
 
   deploy(config: FirebaseDeployConfig): Promise<any>;
 
