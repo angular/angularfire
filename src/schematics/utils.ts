@@ -151,13 +151,59 @@ export function addEnvironmentEntry(
   return host;
 }
 
+
+export function addFixesToServer(host: Tree, options: { sourcePath: string, features: FEATURES[]}) {
+  const serverPath = `/server.ts`;
+
+  if (!host.exists(serverPath)) {
+    return host;
+  }
+
+  const text = host.read(serverPath);
+  if (text === null) {
+    throw new SchematicsException(`File ${serverPath} does not exist.`);
+  }
+  const sourceText = text.toString('utf-8');
+
+  const source = ts.createSourceFile(
+    serverPath,
+    sourceText,
+    ts.ScriptTarget.Latest,
+    true
+  );
+
+  const changes: Array<Change> = [];
+
+  changes.push(
+    insertImport(source, serverPath, undefined as any, 'zone.js/dist/zone-patch-rxjs'),
+  );
+
+  if (options.features.includes(FEATURES.Firestore)) {
+    changes.push(
+      insertImport(source, serverPath, undefined as any, '@angular/fire/firestore-protos'),
+    );
+  }
+
+  const recorder = host.beginUpdate(serverPath);
+  applyToUpdateRecorder(recorder, changes);
+  host.commitUpdate(recorder);
+
+  // TODO add a side-effect import rather than go back and edit
+
+  const text2 = host.read(serverPath);
+  if (text2 === null) {
+    throw new SchematicsException(`File ${serverPath} does not exist.`);
+  }
+  const sourceText2 = text.toString('utf-8');
+
+  overwriteIfExists(host, serverPath, sourceText2.replace(/^import \{ undefined \} from /g, 'import '));
+
+  return host;
+}
+
 export function addToNgModule(host: Tree, options: { sourcePath: string, features: FEATURES[]}) {
 
   const modulePath = `/${options.sourcePath}/app/app.module.ts`;
-
-  if (!modulePath) {
-    return host;
-  }
 
   if (!host.exists(modulePath)) {
     throw new Error(`Specified module path ${modulePath} does not exist`);
