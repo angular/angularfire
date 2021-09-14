@@ -157,7 +157,7 @@ jobs:
       - name: Build
         run: yarn build
       - name: Test
-        run: yarn build
+        run: yarn test
 
   headless:
     runs-on: ubuntu-latest
