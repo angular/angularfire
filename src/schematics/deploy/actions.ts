@@ -2,7 +2,7 @@ import { BuilderContext, targetFromTargetString } from '@angular-devkit/architec
 import { BuildTarget, CloudRunOptions, DeployBuilderSchema, FirebaseTools, FSHost } from '../interfaces';
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'fs';
 import { copySync, removeSync } from 'fs-extra';
-import { join } from 'path';
+import { dirname, join } from 'path';
 import { execSync, spawn, SpawnOptionsWithoutStdio } from 'child_process';
 import { defaultFunction, defaultPackage, DEFAULT_FUNCTION_NAME, dockerfile } from './functions-templates';
 import { satisfies } from 'semver';
@@ -175,20 +175,21 @@ export const deployToFunction = async (
   const staticOut = staticBuildOptions.outputPath;
   const serverOut = serverBuildOptions.outputPath;
 
-  // TODO replace firebase config
-  const functionsOut = options.outputPath || staticBuildOptions.outputPath.replace('/browser', '/functions');
-  const functionName = options.functionName;
+  const functionsOut = options.outputPath || dirname(serverOut);
+  const functionName = options.functionName || DEFAULT_FUNCTION_NAME;
 
   const newStaticOut = join(functionsOut, staticOut);
   const newServerOut = join(functionsOut, serverOut);
 
-  // This is needed because in the server output there's a hardcoded dependency on $cwd/dist/browser,
-  // This assumes that we've deployed our application dist directory and we're running the server
-  // in the parent directory. To have this precondition, we move dist/browser to dist/dist/browser
-  // since the firebase function runs the server from dist.
-  fsHost.removeSync(functionsOut);
-  fsHost.copySync(staticOut, newStaticOut);
-  fsHost.copySync(serverOut, newServerOut);
+  // New behavior vs. old
+  if (options.outputPath) {
+    fsHost.removeSync(functionsOut);
+    fsHost.copySync(staticOut, newStaticOut);
+    fsHost.copySync(serverOut, newServerOut);
+  } else {
+    fsHost.moveSync(staticOut, newStaticOut);
+    fsHost.moveSync(serverOut, newServerOut);
+  }
 
   const packageJson = getPackageJson(context, workspaceRoot, options);
   const nodeVersion = packageJson.engines.node;
@@ -218,13 +219,15 @@ export const deployToFunction = async (
     } catch (e) { }
   }
 
+  // tslint:disable-next-line:no-non-null-assertion
+  const project = context.target!.project;
+
   if (options.preview) {
 
     await firebaseTools.serve({
       port: DEFAULT_EMULATOR_PORT,
       host: DEFAULT_EMULATOR_HOST,
-      // tslint:disable-next-line:no-non-null-assertion
-      targets: [`hosting:${context.target!.project}`, `functions:${functionName}`],
+      targets: [`hosting:${project}`, `functions:${functionName}`],
       nonInteractive: true
     });
 
@@ -238,8 +241,7 @@ export const deployToFunction = async (
   }
 
   return await firebaseTools.deploy({
-    // tslint:disable-next-line:no-non-null-assertion
-    only: `hosting:${context.target!.project},functions:${functionName}`,
+    only: `hosting:${project},functions:${functionName}`,
     cwd: workspaceRoot,
     token: firebaseToken,
     nonInteractive: true,
@@ -412,9 +414,12 @@ export default async function deploy(
     level: 'info',
     format: winston.format.printf((info) => {
       const emulator = info[tripleBeam.SPLAT as any]?.[1]?.metadata?.emulator;
-      const plainText = info[tripleBeam.SPLAT as any]?.[0]?.replace(/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]/g, '');
-      if (emulator?.name === 'hosting' && plainText.startsWith('Local server: ')) {
-        open(plainText.split(': ')[1]);
+      const text = info[tripleBeam.SPLAT as any]?.[0];
+      if (text?.replace) {
+        const plainText = text.replace(/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]/g, '');
+        if (emulator?.name === 'hosting' && plainText.startsWith('Local server: ')) {
+          open(plainText.split(': ')[1]);
+        }
       }
       return [info.message, ...(info[tripleBeam.SPLAT as any] || [])]
         .filter((chunk) => typeof chunk === 'string')
