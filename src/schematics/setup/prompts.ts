@@ -118,6 +118,32 @@ export const featuresPrompt = async (): Promise<FEATURES[]> => {
   return features;
 };
 
+export const userPrompt = async (): Promise<Record<string, any>> => {
+  const firebaseTools = await getFirebaseTools();
+  const users = await firebaseTools.login.list();
+  if (!users || users.length === 0) {
+    await firebaseTools.login(); // first login isn't returning anything of value
+    const user = await firebaseTools.login();
+    return user;
+  } else {
+    const defaultUser = await firebaseTools.login();
+    const options = users.map(({user}) => ({ name: user.email, value: user }));
+    const newOption = { name: '[Login as another user]', value: NEW_OPTION };
+    const { user } = await inquirer.prompt({
+      type: 'list',
+      name: 'user',
+      choices: [newOption].concat(options as any), // TODO types
+      message: 'Which user would you like to use?',
+      default: options.find(it => it.value.email === defaultUser.email)?.value,
+    });
+    if (user === NEW_OPTION) {
+      const { user } = await firebaseTools.login.add();
+      return user;
+    }
+    return user;
+  }
+};
+
 export const projectPrompt = async (defaultProject?: string) => {
   const firebaseTools = await getFirebaseTools();
   const projects = firebaseTools.projects.list({});

@@ -367,8 +367,8 @@ export default async function deploy(
 ) {
   if (!firebaseToken) {
     await firebaseTools.login();
-    const users = await firebaseTools.login.list();
-    console.log(`Logged into Firebase as ${users.map(it => it.user.email).join(', ')}.`);
+    const user = await firebaseTools.login();
+    console.log(`Logged into Firebase as ${user.email}.`);
   }
 
   if (prerenderBuildTarget) {
