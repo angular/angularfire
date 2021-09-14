@@ -154,7 +154,6 @@ export function addEnvironmentEntry(
 export function addToNgModule(host: Tree, options: { sourcePath: string, features: FEATURES[]}) {
 
   const modulePath = `/${options.sourcePath}/app/app.module.ts`;
-  console.log(modulePath);
 
   if (!modulePath) {
     return host;
