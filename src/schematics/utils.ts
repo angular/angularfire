@@ -20,8 +20,7 @@ export const shortSiteName = (site?: FirebaseHostingSite) => site?.name && site.
 export function getWorkspace(
   host: Tree
 ): { path: string; workspace: Workspace } {
-  const possibleFiles = ['/angular.json', '/.angular.json'];
-  const path: string|undefined = possibleFiles.filter(p => host.exists(p))[0];
+  const path = '/angular.json';
 
   const configBuffer = path && host.read(path);
   if (!configBuffer) {

@@ -21,6 +21,7 @@ export const setupProject =
     browserTarget?: string,
     serverTarget?: string,
     prerenderTarget?: string,
+    project: string,
   }) => {
     const { path: workspacePath, workspace } = getWorkspace(tree);
 
@@ -71,7 +72,7 @@ export const setupProject =
 export const ngAddSetupProject = (
   options: DeployOptions
 ) => async (host: Tree, context: SchematicContext) => {
-  const features = await featuresPrompt();
+  const features = [FEATURES.Hosting]; // await featuresPrompt();
 
   if (features.length > 0) {
 

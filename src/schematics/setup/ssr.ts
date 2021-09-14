@@ -57,7 +57,7 @@ export function generateFirebaseJson(
 
   const newConfig = generateHostingConfig(project, dist, functionName, projectType);
   if (firebaseJson.hosting === undefined) {
-    firebaseJson.hosting = newConfig;
+    firebaseJson.hosting = [newConfig];
   } else if (Array.isArray(firebaseJson.hosting)) {
     const existingConfigIndex = firebaseJson.hosting.findIndex(config => config.target === newConfig.target);
     if (existingConfigIndex > -1) {

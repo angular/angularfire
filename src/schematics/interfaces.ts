@@ -1,11 +1,11 @@
 import { RuntimeOptions } from 'firebase-functions';
 
 export enum FEATURES {
+  Hosting = 'ng deploy -- Hosting',
   // Authentication = 'Authentication',
   // Analytics = 'Analytics',
   // Database = 'Realtime Database',
   // Functions = 'Cloud Functions',
-  Hosting = 'Hosting',
   // Messaging = 'Cloud Messaging',
   // Performance = 'Performance Monitoring',
   // Firestore = 'Firestore',

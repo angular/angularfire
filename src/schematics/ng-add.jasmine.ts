@@ -1,4 +1,4 @@
-import { Tree } from '@angular-devkit/schematics';
+import { SchematicsException, Tree } from '@angular-devkit/schematics';
 import { setupProject } from './setup';
 import 'jasmine';
 import { join as pathJoin } from 'path';
@@ -369,7 +369,7 @@ const projectAngularJson = `{
 const universalFirebaseJson = {
   hosting: [{
     target: 'pie-ka-chu',
-    public: pathJoin('dist', 'dist', 'ikachu'),
+    public: pathJoin('dist', 'ikachu'),
     ignore: [
       '**/.*'
     ],
@@ -383,12 +383,12 @@ const universalFirebaseJson = {
     rewrites: [
       {
         source: '**',
-        function: 'ssr'
+        function: 'ssr_pie-ka-chu'
       }
     ]
   }],
   functions: {
-    source: 'dist'
+    source: pathJoin('dist', 'pie-ka-chu', 'functions')
   }
 };
 
@@ -418,7 +418,7 @@ describe('ng-add', () => {
       const result = await setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
         projectType: PROJECT_TYPE.Static,
-        project: PROJECT_NAME,
+        project: undefined,
         prerender: false,
       });
       expect(result.read('firebase.json').toString()).toEqual(overwriteFirebaseJson);
@@ -446,61 +446,53 @@ describe('ng-add', () => {
   });
 
   describe('error handling', () => {
-    it('fails if project not defined', () => {
+    it('fails if project not defined', async () => {
       const tree = Tree.empty();
       const angularJSON = generateAngularJson();
       delete angularJSON.defaultProject;
       tree.create('angular.json', JSON.stringify(angularJSON));
       tree.create('package.json', JSON.stringify(generatePackageJson()));
-      expectAsync(() =>
-        setupProject(tree, {} as any, [FEATURES.Hosting], {
-          firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-          projectType: PROJECT_TYPE.Static,
-          project: PROJECT_NAME,
-          prerender: false,
-        })
-      ).toBeRejectedWith(
-        /No Angular project selected and no default project in the workspace/
+      await expectAsync(setupProject(tree, {} as any, [FEATURES.Hosting], {
+        firebaseProject: { projectId: FIREBASE_PROJECT } as any,
+        projectType: PROJECT_TYPE.Static,
+        project: undefined,
+        prerender: false,
+      })).toBeRejectedWith(
+        new SchematicsException('No Angular project selected and no default project in the workspace')
       );
     });
 
     it('Should throw if angular.json not found', async () => {
-      expectAsync(() =>
-        setupProject(Tree.empty(), {} as any, [FEATURES.Hosting], {
-          firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-          projectType: PROJECT_TYPE.Static,
-          project: PROJECT_NAME,
-          prerender: false,
-        })
-      ).toBeRejectedWith(/Could not find angular.json/);
+      await expectAsync(setupProject(Tree.empty(), {} as any, [FEATURES.Hosting], {
+        firebaseProject: { projectId: FIREBASE_PROJECT } as any,
+        projectType: PROJECT_TYPE.Static,
+        project: PROJECT_NAME,
+        prerender: false,
+      })).toBeRejectedWith(new SchematicsException('Could not find angular.json'));
     });
 
     it('Should throw if angular.json  can not be parsed', async () => {
       const tree = Tree.empty();
       tree.create('angular.json', 'hi');
       tree.create('package.json', JSON.stringify(generatePackageJson()));
-      expectAsync(() =>
-        setupProject(tree, {} as any, [FEATURES.Hosting], {
-          firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-          projectType: PROJECT_TYPE.Static,
-          project: PROJECT_NAME,
-          prerender: false,
-        })
-      ).toBeRejectedWith(/Could not parse angular.json/);
+      await expectAsync(setupProject(tree, {} as any, [FEATURES.Hosting], {
+        firebaseProject: { projectId: FIREBASE_PROJECT } as any,
+        projectType: PROJECT_TYPE.Static,
+        project: PROJECT_NAME,
+        prerender: false,
+      })).toBeRejectedWith(new SchematicsException('Could not parse angular.json'));
     });
 
     it('Should throw if specified project does not exist ', async () => {
       const tree = Tree.empty();
       tree.create('angular.json', JSON.stringify({ projects: {} }));
       tree.create('package.json', JSON.stringify(generatePackageJson()));
-      expectAsync(() =>
-        setupProject(tree, {} as any, [FEATURES.Hosting], {
-          firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-          projectType: PROJECT_TYPE.Static,
-          project: PROJECT_NAME,
-          prerender: false,
-        })
-      ).toBeRejectedWith(/The specified Angular project is not defined in this workspace/);
+      await expectAsync(setupProject(tree, {} as any, [FEATURES.Hosting], {
+        firebaseProject: { projectId: FIREBASE_PROJECT } as any,
+        projectType: PROJECT_TYPE.Static,
+        project: PROJECT_NAME,
+        prerender: false,
+      })).toBeRejectedWith(new SchematicsException('The specified Angular project is not defined in this workspace'));
     });
 
     it('Should throw if specified project is not application', async () => {
@@ -512,14 +504,12 @@ describe('ng-add', () => {
         })
       );
       tree.create('package.json', JSON.stringify(generatePackageJson()));
-      expectAsync(() =>
-        setupProject(tree, {} as any, [FEATURES.Hosting], {
-          firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-          projectType: PROJECT_TYPE.Static,
-          project: PROJECT_NAME,
-          prerender: false,
-        })
-      ).toBeRejectedWith(/Deploy requires an Angular project type of "application" in angular.json/);
+      await expectAsync(setupProject(tree, {} as any, [FEATURES.Hosting], {
+        firebaseProject: { projectId: FIREBASE_PROJECT } as any,
+        projectType: PROJECT_TYPE.Static,
+        project: PROJECT_NAME,
+        prerender: false,
+      })).toBeRejectedWith(new SchematicsException('Deploy requires an Angular project type of "application" in angular.json'));
     });
 
     it('Should throw if app does not have architect configured', async () => {
@@ -531,14 +521,14 @@ describe('ng-add', () => {
         })
       );
       tree.create('package.json', JSON.stringify(generatePackageJson()));
-      expectAsync(() =>
-        setupProject(tree, {} as any, [FEATURES.Hosting], {
-          firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-          projectType: PROJECT_TYPE.Static,
-          project: PROJECT_NAME,
-          prerender: false,
-        })
-      ).toBeRejectedWith(/Cannot read the output path/);
+      await expectAsync(setupProject(tree, {} as any, [FEATURES.Hosting], {
+        firebaseProject: { projectId: FIREBASE_PROJECT } as any,
+        projectType: PROJECT_TYPE.Static,
+        project: PROJECT_NAME,
+        prerender: false,
+      })).toBeRejectedWith(
+        new SchematicsException('Cannot read the output path (architect.build.options.outputPath) of the Angular project "pie-ka-chu" in angular.json')
+      );
     });
 
     /* TODO do something other than throw
@@ -578,14 +568,14 @@ describe('ng-add', () => {
       tree.create('angular.json', JSON.stringify(generateAngularJson()));
       tree.create('package.json', JSON.stringify(generatePackageJson()));
       tree.create('.firebaserc', `I'm broken 😔`);
-      expectAsync(() =>
-        setupProject(tree, {} as any, [FEATURES.Hosting], {
-          firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-          projectType: PROJECT_TYPE.Static,
-          project: PROJECT_NAME,
-          prerender: false,
-        })
-      ).toBeRejectedWith(/.firebaserc: Unexpected token/);
+      await expectAsync(setupProject(tree, {} as any, [FEATURES.Hosting], {
+        firebaseProject: { projectId: FIREBASE_PROJECT } as any,
+        projectType: PROJECT_TYPE.Static,
+        project: PROJECT_NAME,
+        prerender: false,
+      })).toBeRejectedWith(
+        new SchematicsException('Error when parsing .firebaserc: Unexpected token I in JSON at position 0')
+      );
     });
 
     /* TODO do something else
@@ -633,12 +623,14 @@ describe('ng-add', () => {
         tree.create('angular.json', JSON.stringify(generateAngularJson()));
         tree.create('package.json', JSON.stringify(generatePackageJson()));
 
-        expectAsync(() => setupProject(tree, {} as any, [FEATURES.Hosting], {
+        await expectAsync(setupProject(tree, {} as any, [FEATURES.Hosting], {
           firebaseProject: { projectId: FIREBASE_PROJECT } as any,
           projectType: PROJECT_TYPE.CloudFunctions,
           project: PROJECT_NAME,
           prerender: false,
-        })).toBeRejectedWith(/\(architect.server.options.outputPath\) of the Angular project "pie-ka-chu" in angular.json/);
+        })).toBeRejectedWith(
+          new SchematicsException('Cannot read the output path (architect.server.options.outputPath) of the Angular project "pie-ka-chu" in angular.json')
+        );
       });
 
       it('should add a @angular/fire builder', async () => {
@@ -646,7 +638,8 @@ describe('ng-add', () => {
         tree.create('angular.json', JSON.stringify(generateAngularJsonWithServer()));
         tree.create('package.json', JSON.stringify(generatePackageJson()));
 
-        const result = await setupProject(tree, {} as any, [FEATURES.Hosting], {
+        // TODO mock addTask
+        const result = await setupProject(tree, {addTask: () => {}} as any, [FEATURES.Hosting], {
           firebaseProject: { projectId: FIREBASE_PROJECT } as any,
           projectType: PROJECT_TYPE.CloudFunctions,
           project: PROJECT_NAME,
@@ -654,7 +647,7 @@ describe('ng-add', () => {
         });
 
         const workspace = JSON.parse((await result.read('angular.json')).toString());
-        expect(workspace.projects['pie-ka-chu'].architect.deploy.options.ssr).toBeTrue();
+        expect(workspace.projects['pie-ka-chu'].architect.deploy.options.ssr).toEqual('cloud-functions');
       });
 
       it('should configure firebase.json', async () => {
@@ -662,7 +655,8 @@ describe('ng-add', () => {
         tree.create('angular.json', JSON.stringify(generateAngularJsonWithServer()));
         tree.create('package.json', JSON.stringify(generatePackageJson()));
 
-        const result = await setupProject(tree, {} as any, [FEATURES.Hosting], {
+        // TODO mock addTask
+        const result = await setupProject(tree, {addTask: () => {}} as any, [FEATURES.Hosting], {
           firebaseProject: { projectId: FIREBASE_PROJECT } as any,
           projectType: PROJECT_TYPE.CloudFunctions,
           project: PROJECT_NAME,
