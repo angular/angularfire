@@ -1,7 +1,7 @@
 import { JsonObject, logging } from '@angular-devkit/core';
 import { BuilderContext, BuilderRun, ScheduleOptions, Target } from '@angular-devkit/architect';
 import { BuildTarget, FirebaseDeployConfig, FirebaseTools, FSHost } from '../interfaces';
-import deploy, { deployToFunction } from './actions';
+import deploy, { deployToFunction } from '@angular/fire/schematics/deploy/actions';
 import { join } from 'path';
 import 'jasmine';
 
