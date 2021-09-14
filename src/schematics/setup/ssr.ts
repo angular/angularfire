@@ -131,7 +131,11 @@ export const setupUniversalDeployment = (config: {
 
   addDependencies(
     tree,
-    firebaseFunctionsDependencies,
+    Object.entries(firebaseFunctionsDependencies).reduce((acc, [dep, deets]) => {
+      deets.dev = true;
+      acc[dep] = deets;
+      return acc;
+    }, {}),
     config.context
   );
 
