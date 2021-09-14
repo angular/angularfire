@@ -5,7 +5,7 @@ import { SchematicsException, Tree } from '@angular-devkit/schematics';
 import ts from '@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { findNode, addImportToModule, insertImport } from '@schematics/angular/utility/ast-utils';
 import { InsertChange, ReplaceChange, applyToUpdateRecorder, Change } from '@schematics/angular/utility/change';
-import { findModuleFromOptions, buildRelativePath } from '@schematics/angular/utility/find-module';
+import { buildRelativePath } from '@schematics/angular/utility/find-module';
 import { overwriteIfExists } from './common';
 
 // We consider a project to be a universal project if it has a `server` architect
@@ -153,10 +153,8 @@ export function addEnvironmentEntry(
 
 export function addToNgModule(host: Tree, options: { sourcePath: string, features: FEATURES[]}) {
 
-  const modulePath = findModuleFromOptions(host, {
-    name: 'app',
-    path: options.sourcePath,
-  });
+  const modulePath = `/${options.sourcePath}/app/app.module.ts`;
+  console.log(modulePath);
 
   if (!modulePath) {
     return host;
