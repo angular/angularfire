@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { FirebaseRc, Workspace, WorkspaceProject, FirebaseApp, FirebaseHostingSite, DeployOptions, FEATURES } from './interfaces';
+import { FirebaseRc, Workspace, WorkspaceProject, FirebaseApp, DeployOptions, FEATURES } from './interfaces';
 import { join } from 'path';
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
 import ts from '@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript';
@@ -19,8 +19,6 @@ export const hasPrerenderOption = (
 ) => project.architect?.prerender;
 
 export const shortAppId = (app?: FirebaseApp) => app?.appId && app.appId.split('/').pop();
-
-export const shortSiteName = (site?: FirebaseHostingSite) => site?.name && site.name.split('/').pop();
 
 export function getWorkspace(
   host: Tree

@@ -1,8 +1,9 @@
 import * as fuzzy from 'fuzzy';
 import * as inquirer from 'inquirer';
 import { featureOptions, FEATURES, FirebaseApp, FirebaseHostingSite, FirebaseProject, PROJECT_TYPE, WorkspaceProject } from '../interfaces';
-import { hasPrerenderOption, isUniversalApp, shortAppId, shortSiteName } from '../utils';
+import { hasPrerenderOption, isUniversalApp, shortAppId } from '../utils';
 import { getFirebaseTools } from '../firebaseTools';
+import { shortSiteName } from '../common';
 
 inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
 
