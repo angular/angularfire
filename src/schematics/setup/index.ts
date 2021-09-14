@@ -11,7 +11,6 @@ import {
   FEATURES, PROJECT_TYPE
 } from '../interfaces';
 import { getFirebaseTools } from '../firebaseTools';
-import { overwriteIfExists } from '../common';
 import { writeFileSync } from 'fs';
 
 export const setupProject =
@@ -112,6 +111,9 @@ export const ngAddSetupProject = (
   options: DeployOptions
 ) => async (host: Tree, context: SchematicContext) => {
 
+  // TODO is there a public API for this?
+  const projectRoot: string = (host as any)._backend._root;
+
   const features = await featuresPrompt();
 
   if (features.length > 0) {
@@ -122,13 +124,13 @@ export const ngAddSetupProject = (
     if (!host.exists('/firebase.json')) { writeFileSync('firebase.json', '{}'); }
 
     const user = await userPrompt();
-    await firebaseTools.login.use(user.email);
+    await firebaseTools.login.use(user.email, { projectRoot });
 
     const { project: ngProject, projectName: ngProjectName } = getProject(options, host);
 
     const [ defaultProjectName ] = getFirebaseProjectNameFromHost(host, ngProjectName);
 
-    const firebaseProject = await projectPrompt(defaultProjectName);
+    const firebaseProject = await projectPrompt(defaultProjectName, { projectRoot });
 
     let hosting = { projectType: PROJECT_TYPE.Static, prerender: false };
     let firebaseHostingSite: FirebaseHostingSite|undefined;
@@ -137,7 +139,7 @@ export const ngAddSetupProject = (
       // TODO read existing settings from angular.json, if available
       const results = await projectTypePrompt(ngProject, ngProjectName);
       hosting = { ...hosting, ...results };
-      firebaseHostingSite = await sitePrompt(firebaseProject);
+      firebaseHostingSite = await sitePrompt(firebaseProject, { projectRoot });
     }
 
     let firebaseApp: FirebaseApp|undefined;
@@ -146,9 +148,9 @@ export const ngAddSetupProject = (
     if (features.find(it => it !== FEATURES.Hosting)) {
 
       const defaultAppId = firebaseHostingSite?.appId;
-      firebaseApp = await appPrompt(firebaseProject, defaultAppId);
+      firebaseApp = await appPrompt(firebaseProject, defaultAppId, { projectRoot });
 
-      const result = await firebaseTools.apps.sdkconfig('web', firebaseApp.appId, { nonInteractive: true });
+      const result = await firebaseTools.apps.sdkconfig('web', firebaseApp.appId, { nonInteractive: true, projectRoot });
       sdkConfig = result.sdkConfig;
 
     }

@@ -78,7 +78,8 @@ const deployToHosting = async (
       host: DEFAULT_EMULATOR_HOST,
       // tslint:disable-next-line:no-non-null-assertion
       targets: [`hosting:${context.target!.project}`],
-      nonInteractive: true
+      nonInteractive: true,
+      projectRoot: workspaceRoot,
     });
 
     const { deployProject } = await inquirer.prompt({
@@ -97,6 +98,7 @@ const deployToHosting = async (
     cwd: workspaceRoot,
     token: firebaseToken,
     nonInteractive: true,
+    projectRoot: workspaceRoot,
   });
 
 };
@@ -228,7 +230,8 @@ export const deployToFunction = async (
       port: DEFAULT_EMULATOR_PORT,
       host: DEFAULT_EMULATOR_HOST,
       targets: [`hosting:${project}`, `functions:${functionName}`],
-      nonInteractive: true
+      nonInteractive: true,
+      projectRoot: workspaceRoot,
     });
 
     const { deployProject} = await inquirer.prompt({
@@ -245,6 +248,7 @@ export const deployToFunction = async (
     cwd: workspaceRoot,
     token: firebaseToken,
     nonInteractive: true,
+    projectRoot: workspaceRoot,
   });
 
 };
@@ -352,6 +356,7 @@ export const deployToCloudRun = async (
     cwd: workspaceRoot,
     token: firebaseToken,
     nonInteractive: true,
+    projectRoot: workspaceRoot,
   });
 };
 
@@ -367,7 +372,7 @@ export default async function deploy(
 ) {
   if (!firebaseToken) {
     await firebaseTools.login();
-    const user = await firebaseTools.login();
+    const user = await firebaseTools.login({ projectRoot: context.workspaceRoot });
     console.log(`Logged into Firebase as ${user.email}.`);
   }
 
@@ -405,7 +410,10 @@ export default async function deploy(
   }
 
   try {
-    await firebaseTools.use(firebaseProject, { project: firebaseProject });
+    await firebaseTools.use(firebaseProject, {
+      project: firebaseProject,
+      projectRoot: context.workspaceRoot,
+    });
   } catch (e) {
     throw new Error(`Cannot select firebase project '${firebaseProject}'`);
   }

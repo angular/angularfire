@@ -118,23 +118,23 @@ export const featuresPrompt = async (): Promise<FEATURES[]> => {
   return features;
 };
 
-export const userPrompt = async (): Promise<Record<string, any>> => {
+export const userPrompt = async (options = {}): Promise<Record<string, any>> => {
   const firebaseTools = await getFirebaseTools();
   const users = await firebaseTools.login.list();
   if (!users || users.length === 0) {
     await firebaseTools.login(); // first login isn't returning anything of value
-    const user = await firebaseTools.login();
+    const user = await firebaseTools.login(options);
     return user;
   } else {
-    const defaultUser = await firebaseTools.login();
-    const options = users.map(({user}) => ({ name: user.email, value: user }));
-    const newOption = { name: '[Login as another user]', value: NEW_OPTION };
+    const defaultUser = await firebaseTools.login(options);
+    const choices = users.map(({user}) => ({ name: user.email, value: user }));
+    const newChoice = { name: '[Login as another user]', value: NEW_OPTION };
     const { user } = await inquirer.prompt({
       type: 'list',
       name: 'user',
-      choices: [newOption].concat(options as any), // TODO types
+      choices: [newChoice].concat(choices as any), // TODO types
       message: 'Which user would you like to use?',
-      default: options.find(it => it.value.email === defaultUser.email)?.value,
+      default: choices.find(it => it.value.email === defaultUser.email)?.value,
     });
     if (user === NEW_OPTION) {
       const { user } = await firebaseTools.login.add();
@@ -144,9 +144,9 @@ export const userPrompt = async (): Promise<Record<string, any>> => {
   }
 };
 
-export const projectPrompt = async (defaultProject?: string) => {
+export const projectPrompt = async (defaultProject: string|undefined, options = {}) => {
   const firebaseTools = await getFirebaseTools();
-  const projects = firebaseTools.projects.list({});
+  const projects = firebaseTools.projects.list(options);
   const { projectId } = await autocomplete({
     type: 'autocomplete',
     name: 'projectId',
@@ -166,15 +166,15 @@ export const projectPrompt = async (defaultProject?: string) => {
       message: 'What would you like to call your project?',
       default: projectId,
     });
-    return await firebaseTools.projects.create(projectId, { displayName, nonInteractive: true });
+    return await firebaseTools.projects.create(projectId, { ...options, displayName, nonInteractive: true });
   }
   // tslint:disable-next-line:no-non-null-assertion
   return (await projects).find(it => it.projectId === projectId)!;
 };
 
-export const appPrompt = async ({ projectId: project }: FirebaseProject, defaultAppId: string|undefined) => {
+export const appPrompt = async ({ projectId: project }: FirebaseProject, defaultAppId: string|undefined, options = {}) => {
   const firebaseTools = await getFirebaseTools();
-  const apps = firebaseTools.apps.list('web', { project });
+  const apps = firebaseTools.apps.list('web', { ...options, project });
   const { appId } = await autocomplete({
     type: 'autocomplete',
     name: 'appId',
@@ -188,18 +188,15 @@ export const appPrompt = async ({ projectId: project }: FirebaseProject, default
       name: 'displayName',
       message: 'What would you like to call your app?',
     });
-    return await firebaseTools.apps.create('web', displayName, { nonInteractive: true, project });
+    return await firebaseTools.apps.create('web', displayName, { ...options, nonInteractive: true, project });
   }
   // tslint:disable-next-line:no-non-null-assertion
   return (await apps).find(it => shortAppId(it) === appId)!;
 };
 
-export const sitePrompt = async ({ projectId: project }: FirebaseProject) => {
+export const sitePrompt = async ({ projectId: project }: FirebaseProject, options = {}) => {
   const firebaseTools = await getFirebaseTools();
-  if (!firebaseTools.hosting.sites) {
-    return undefined;
-  }
-  const sites = firebaseTools.hosting.sites.list({ project }).then(it => {
+  const sites = firebaseTools.hosting.sites.list({ ...options, project }).then(it => {
     if (it.sites.length === 0) {
       // newly created projects don't return their default site, stub one
       return [{
@@ -225,7 +222,7 @@ export const sitePrompt = async ({ projectId: project }: FirebaseProject) => {
       name: 'subdomain',
       message: 'Please provide an unique, URL-friendly id for the site (<id>.web.app):',
     });
-    return await firebaseTools.hosting.sites.create(subdomain, { nonInteractive: true, project });
+    return await firebaseTools.hosting.sites.create(subdomain, { ...options, nonInteractive: true, project });
   }
   // tslint:disable-next-line:no-non-null-assertion
   return (await sites).find(it => shortSiteName(it) === siteName)!;
