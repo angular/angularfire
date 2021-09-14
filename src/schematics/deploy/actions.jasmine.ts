@@ -190,6 +190,28 @@ describe('universal deployment', () => {
     const packageArgs = spy.calls.argsFor(0);
     const functionArgs = spy.calls.argsFor(1);
 
+    expect(packageArgs[0]).toBe(join('dist', 'package.json'));
+    expect(functionArgs[0]).toBe(join('dist', 'index.js'));
+  });
+
+  it('should create a firebase function (new)', async () => {
+    const spy = spyOn(fsHost, 'writeFileSync');
+    await deployToFunction(
+      firebaseMock,
+      context,
+      '/home/user',
+      STATIC_BUILD_TARGET,
+      SERVER_BUILD_TARGET,
+      { preview: false, outputPath: join('dist', 'functions') },
+      undefined,
+      fsHost
+    );
+
+    expect(spy).toHaveBeenCalledTimes(2);
+
+    const packageArgs = spy.calls.argsFor(0);
+    const functionArgs = spy.calls.argsFor(1);
+
     expect(packageArgs[0]).toBe(join('dist', 'functions', 'package.json'));
     expect(functionArgs[0]).toBe(join('dist', 'functions', 'index.js'));
   });
@@ -203,6 +225,29 @@ describe('universal deployment', () => {
       STATIC_BUILD_TARGET,
       SERVER_BUILD_TARGET,
       { preview: false  },
+      undefined,
+      fsHost
+    );
+
+    expect(spy).toHaveBeenCalledTimes(1);
+
+    const packageArgs = spy.calls.argsFor(0);
+
+    expect(packageArgs).toEqual([
+      join('dist', 'dist', 'browser', 'index.html'),
+      join('dist', 'dist', 'browser', 'index.original.html')
+    ]);
+  });
+
+  it('should rename the index.html file in the nested dist (new)', async () => {
+    const spy = spyOn(fsHost, 'renameSync');
+    await deployToFunction(
+      firebaseMock,
+      context,
+      '/home/user',
+      STATIC_BUILD_TARGET,
+      SERVER_BUILD_TARGET,
+      { preview: false, outputPath: join('dist', 'functions') },
       undefined,
       fsHost
     );
