@@ -155,7 +155,8 @@ jobs:
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
           yarn install --frozen-lockfile --prefer-offline --ignore-engines
       - name: Build
-        id: yarn-pack-dir
+        run: yarn build
+      - name: Test
         run: yarn build
 
   headless:
