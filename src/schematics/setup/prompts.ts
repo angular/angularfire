@@ -128,12 +128,12 @@ export const userPrompt = async (options: {}): Promise<Record<string, any>> => {
   } else {
     const defaultUser = await firebaseTools.login(options);
     const choices = users.map(({user}) => ({ name: user.email, value: user }));
-    const newChoice = { name: '[Login as another user]', value: NEW_OPTION };
+    const newChoice = { name: '[Login in with another account]', value: NEW_OPTION };
     const { user } = await inquirer.prompt({
       type: 'list',
       name: 'user',
       choices: [newChoice].concat(choices as any), // TODO types
-      message: 'Which user would you like to use?',
+      message: 'Which Firebase account would you like to use?',
       default: choices.find(it => it.value.email === defaultUser.email)?.value,
     });
     if (user === NEW_OPTION) {
