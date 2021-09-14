@@ -153,12 +153,11 @@ export function addEnvironmentEntry(
   return host;
 }
 
-// TODO options
-export function addToNgModule(host: Tree, options: any) {
+export function addToNgModule(host: Tree, options: { sourcePath: string, features: FEATURES[]}) {
 
   const modulePath = findModuleFromOptions(host, {
     name: 'app',
-    path: 'src',
+    path: options.sourcePath,
   });
 
   if (!modulePath) {
@@ -184,7 +183,7 @@ export function addToNgModule(host: Tree, options: any) {
 
   const environmentsPath = buildRelativePath(
     modulePath,
-    `/src/environments/environment`
+    `/${options.sourcePath}/environments/environment`
   );
 
   const changes: Array<Change> = [];

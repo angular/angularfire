@@ -27,16 +27,16 @@ export const setupProject =
 
     const { project, projectName } = getProject(config, tree);
 
+    const sourcePath = [project.root, project.sourceRoot].filter(it => !!it).join('/');
+
     addIgnoreFiles(tree);
 
     const featuresToImport = features.filter(it => it !== FEATURES.Hosting);
     if (featuresToImport.length > 0) {
-      addToNgModule(tree, { features: featuresToImport });
+      addToNgModule(tree, { features: featuresToImport, sourcePath });
     }
 
     if (config.sdkConfig) {
-      // TODO read config and iterate over substitutions
-      //      is there a nice api for turning an object into source?
       const source = `
   firebase: {
 ${Object.entries(config.sdkConfig).reduce(
@@ -44,7 +44,20 @@ ${Object.entries(config.sdkConfig).reduce(
     [] as string[]
 ).join(',\n')},
   }`;
-      addEnvironmentEntry(tree, 'src/environments/environment.ts', source);
+
+      const environmentPath = `${sourcePath}/environments/environment.ts`;
+      addEnvironmentEntry(tree, `/${environmentPath}`, source);
+
+      // Iterate over the replacements for the environment file and add the config
+      Object.values(project.architect || {}).forEach(builder => {
+        Object.values(builder.configurations || {}).forEach(configuration => {
+          (configuration.fileReplacements || []).forEach((replacement: any) => {
+            if (replacement.replace === environmentPath) {
+              addEnvironmentEntry(tree, `/${replacement.with}`, source);
+            }
+          });
+        });
+      });
     }
 
     const options: NgAddNormalizedOptions = {

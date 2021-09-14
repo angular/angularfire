@@ -199,6 +199,8 @@ export interface FSHost {
 }
 
 export interface WorkspaceProject {
+  root: string;
+  sourceRoot?: string;
   projectType?: string;
   architect?: Record<string, {
     builder: string;
