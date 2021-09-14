@@ -9,7 +9,7 @@ import {
 import { FirebaseJSON, Workspace, WorkspaceProject, NgAddNormalizedOptions, PROJECT_TYPE } from '../interfaces';
 import { firebaseFunctionsDependencies } from '../versions.json';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
-import { shortSiteName } from '../utils';
+import { shortSiteName } from '../common';
 
 function generateHostingConfig(project: string, dist: string, functionName: string, projectType: PROJECT_TYPE) {
   return {

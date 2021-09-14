@@ -6,8 +6,7 @@ import {
   stringifyFormatted
 } from '../common';
 import { NgAddNormalizedOptions, FirebaseJSON, Workspace, WorkspaceProject } from '../interfaces';
-
-import { shortSiteName } from '../utils';
+import { shortSiteName } from '../common';
 
 function emptyFirebaseJson() {
   return {

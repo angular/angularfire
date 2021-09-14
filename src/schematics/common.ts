@@ -1,7 +1,8 @@
 import { SchematicsException, Tree, SchematicContext } from '@angular-devkit/schematics';
 import { FirebaseHostingSite, FirebaseRc } from './interfaces';
 import * as semver from 'semver';
-import { shortSiteName } from './utils';
+
+export const shortSiteName = (site?: FirebaseHostingSite) => site?.name && site.name.split('/').pop();
 
 export const stringifyFormatted = (obj: any) => JSON.stringify(obj, null, 2);
 
