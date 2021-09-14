@@ -1,5 +1,5 @@
 import { SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
-import { getWorkspace, getProject, getFirebaseProjectNameFromHost } from '../utils';
+import { getWorkspace, getProject, getFirebaseProjectNameFromHost, addEnvironmentEntry, addToNgModule } from '../utils';
 import { projectTypePrompt, appPrompt, sitePrompt, projectPrompt, featuresPrompt } from './prompts';
 import { setupUniversalDeployment } from './ssr';
 import { setupStaticDeployment } from './static';
@@ -26,6 +26,24 @@ export const setupProject =
     const { path: workspacePath, workspace } = getWorkspace(tree);
 
     const { project, projectName } = getProject(config, tree);
+
+    const featuresToImport = features.filter(it => it !== FEATURES.Hosting);
+    if (featuresToImport.length > 0) {
+      addToNgModule(tree, { features: featuresToImport });
+    }
+
+    if (config.sdkConfig) {
+      // TODO read config and iterate over substitutions
+      //      is there a nice api for turning an object into source?
+      const source = `
+  firebase: {
+${Object.entries(config.sdkConfig).reduce(
+    (c, [k, v]) => c.concat(`    ${k}: '${v}'`),
+    [] as string[]
+).join(',\n')},
+  }`;
+      addEnvironmentEntry(tree, 'src/environments/environment.ts', source);
+    }
 
     const options: NgAddNormalizedOptions = {
       project: projectName,
@@ -72,7 +90,7 @@ export const setupProject =
 export const ngAddSetupProject = (
   options: DeployOptions
 ) => async (host: Tree, context: SchematicContext) => {
-  const features = [FEATURES.Hosting]; // await featuresPrompt();
+  const features = await featuresPrompt();
 
   if (features.length > 0) {
 

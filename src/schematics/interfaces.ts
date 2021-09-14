@@ -1,17 +1,30 @@
 import { RuntimeOptions } from 'firebase-functions';
 
-export enum FEATURES {
-  Hosting = 'ng deploy -- Hosting',
-  // Authentication = 'Authentication',
-  // Analytics = 'Analytics',
-  // Database = 'Realtime Database',
-  // Functions = 'Cloud Functions',
-  // Messaging = 'Cloud Messaging',
-  // Performance = 'Performance Monitoring',
-  // Firestore = 'Firestore',
-  // Storage = 'Storage',
-  // RemoteConfig = 'Remote Config',
+export const enum FEATURES {
+  Hosting,
+  Authentication,
+  Analytics,
+  Database,
+  Functions,
+  Messaging,
+  Performance,
+  Firestore,
+  Storage,
+  RemoteConfig,
 }
+
+export const featureOptions = [
+  { name: 'ng deploy -- hosting', value: FEATURES.Hosting },
+  { name: 'Authentication', value: FEATURES.Authentication },
+  { name: 'Firestore', value: FEATURES.Firestore },
+  { name: 'Realtime Database', value: FEATURES.Database },
+  { name: 'Analytics', value: FEATURES.Analytics },
+  { name: 'Cloud Functions (callable)', value: FEATURES.Functions },
+  { name: 'Cloud Messaging', value: FEATURES.Messaging },
+  { name: 'Performance Monitoring', value: FEATURES.Performance },
+  { name: 'Cloud Storage', value: FEATURES.Storage },
+  { name: 'Remote Config', value: FEATURES.RemoteConfig },
+];
 
 export const enum PROJECT_TYPE { Static, CloudFunctions, CloudRun }
 

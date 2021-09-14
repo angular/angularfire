@@ -1,6 +1,6 @@
 import * as fuzzy from 'fuzzy';
 import * as inquirer from 'inquirer';
-import { FEATURES, FirebaseApp, FirebaseHostingSite, FirebaseProject, PROJECT_TYPE, WorkspaceProject } from '../interfaces';
+import { featureOptions, FEATURES, FirebaseApp, FirebaseHostingSite, FirebaseProject, PROJECT_TYPE, WorkspaceProject } from '../interfaces';
 import { hasPrerenderOption, isUniversalApp, shortAppId, shortSiteName } from '../utils';
 import { getFirebaseTools } from '../firebaseTools';
 
@@ -107,11 +107,10 @@ const autocomplete: Prompt = (questions) => inquirer.prompt(questions);
 
 
 export const featuresPrompt = async (): Promise<FEATURES[]> => {
-  const choices = Object.entries(FEATURES).map(([value, name]) => ({ name, value }));
   const { features } = await inquirer.prompt({
     type: 'checkbox',
     name: 'features',
-    choices,
+    choices: featureOptions,
     message: 'What features would you like to setup?',
     default: [FEATURES.Hosting],
   });
