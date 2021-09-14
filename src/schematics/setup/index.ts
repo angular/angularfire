@@ -12,6 +12,7 @@ import {
 } from '../interfaces';
 import { getFirebaseTools } from '../firebaseTools';
 import { writeFileSync } from 'fs';
+import { join } from 'path';
 
 export const setupProject =
   async (tree: Tree, context: SchematicContext, features: FEATURES[], config: DeployOptions & {
@@ -121,7 +122,7 @@ export const ngAddSetupProject = (
     const firebaseTools = await getFirebaseTools();
 
     // Add the firebase files if they don't exist already so login.use works
-    if (!host.exists('/firebase.json')) { writeFileSync('firebase.json', '{}'); }
+    if (!host.exists('/firebase.json')) { writeFileSync(join(projectRoot, 'firebase.json'), '{}'); }
 
     const user = await userPrompt();
     await firebaseTools.login.use(user.email, { projectRoot });
