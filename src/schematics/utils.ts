@@ -151,7 +151,7 @@ export function addEnvironmentEntry(
   return host;
 }
 
-
+// TODO rewrite using typescript
 export function addFixesToServer(host: Tree, options: { sourcePath: string, features: FEATURES[]}) {
   const serverPath = `/server.ts`;
 
@@ -164,39 +164,15 @@ export function addFixesToServer(host: Tree, options: { sourcePath: string, feat
     throw new SchematicsException(`File ${serverPath} does not exist.`);
   }
   const sourceText = text.toString('utf-8');
+  const addZonePatch = !sourceText.includes('import \'zone.js/dist/zone-patch-rxjs\';');
+  const addFirestorePatch = options.features.includes(FEATURES.Firestore) &&
+    !sourceText.includes('import \'@angular/fire/firestore-protos\';');
 
-  const source = ts.createSourceFile(
-    serverPath,
-    sourceText,
-    ts.ScriptTarget.Latest,
-    true
-  );
-
-  const changes: Array<Change> = [];
-
-  changes.push(
-    insertImport(source, serverPath, undefined as any, 'zone.js/dist/zone-patch-rxjs'),
-  );
-
-  if (options.features.includes(FEATURES.Firestore)) {
-    changes.push(
-      insertImport(source, serverPath, undefined as any, '@angular/fire/firestore-protos'),
-    );
+  if (addZonePatch || addFirestorePatch) {
+    overwriteIfExists(host, serverPath, sourceText.replace('import \'zone.js/dist/zone-node\';', `import 'zone.js/dist/zone-node';
+${addZonePatch ? 'import \'zone.js/dist/zone-patch-rxjs\';' : ''}
+${addFirestorePatch ? 'import \'@angular/fire/firestore-protos\';' : ''}`));
   }
-
-  const recorder = host.beginUpdate(serverPath);
-  applyToUpdateRecorder(recorder, changes);
-  host.commitUpdate(recorder);
-
-  // TODO add a side-effect import rather than go back and edit
-
-  const text2 = host.read(serverPath);
-  if (text2 === null) {
-    throw new SchematicsException(`File ${serverPath} does not exist.`);
-  }
-  const sourceText2 = text.toString('utf-8');
-
-  overwriteIfExists(host, serverPath, sourceText2.replace(/^import \{ undefined \} from /g, 'import '));
 
   return host;
 }
