@@ -124,7 +124,7 @@ export const ngAddSetupProject = (
     // Add the firebase files if they don't exist already so login.use works
     if (!host.exists('/firebase.json')) { writeFileSync(join(projectRoot, 'firebase.json'), '{}'); }
 
-    const user = await userPrompt();
+    const user = await userPrompt({ projectRoot });
     await firebaseTools.login.use(user.email, { projectRoot });
 
     const { project: ngProject, projectName: ngProjectName } = getProject(options, host);

@@ -118,7 +118,7 @@ export const featuresPrompt = async (): Promise<FEATURES[]> => {
   return features;
 };
 
-export const userPrompt = async (options = {}): Promise<Record<string, any>> => {
+export const userPrompt = async (options: {}): Promise<Record<string, any>> => {
   const firebaseTools = await getFirebaseTools();
   const users = await firebaseTools.login.list();
   if (!users || users.length === 0) {
@@ -144,7 +144,7 @@ export const userPrompt = async (options = {}): Promise<Record<string, any>> => 
   }
 };
 
-export const projectPrompt = async (defaultProject: string|undefined, options = {}) => {
+export const projectPrompt = async (defaultProject: string|undefined, options: {}) => {
   const firebaseTools = await getFirebaseTools();
   const projects = firebaseTools.projects.list(options);
   const { projectId } = await autocomplete({
@@ -172,7 +172,7 @@ export const projectPrompt = async (defaultProject: string|undefined, options = 
   return (await projects).find(it => it.projectId === projectId)!;
 };
 
-export const appPrompt = async ({ projectId: project }: FirebaseProject, defaultAppId: string|undefined, options = {}) => {
+export const appPrompt = async ({ projectId: project }: FirebaseProject, defaultAppId: string|undefined, options: {}) => {
   const firebaseTools = await getFirebaseTools();
   const apps = firebaseTools.apps.list('web', { ...options, project });
   const { appId } = await autocomplete({
@@ -194,7 +194,7 @@ export const appPrompt = async ({ projectId: project }: FirebaseProject, default
   return (await apps).find(it => shortAppId(it) === appId)!;
 };
 
-export const sitePrompt = async ({ projectId: project }: FirebaseProject, options = {}) => {
+export const sitePrompt = async ({ projectId: project }: FirebaseProject, options: {}) => {
   const firebaseTools = await getFirebaseTools();
   const sites = firebaseTools.hosting.sites.list({ ...options, project }).then(it => {
     if (it.sites.length === 0) {
@@ -226,18 +226,6 @@ export const sitePrompt = async ({ projectId: project }: FirebaseProject, option
   }
   // tslint:disable-next-line:no-non-null-assertion
   return (await sites).find(it => shortSiteName(it) === siteName)!;
-};
-
-export const prerenderPrompt = (project: WorkspaceProject, prerender: boolean): Promise<{ projectType: PROJECT_TYPE }> => {
-  if (isUniversalApp(project)) {
-    return inquirer.prompt({
-      type: 'prompt',
-      name: 'prerender',
-      message: 'We detected an Angular Universal project. How would you like to render server-side content?',
-      default: true
-    });
-  }
-  return Promise.resolve({ projectType: PROJECT_TYPE.Static });
 };
 
 export const projectTypePrompt = async (project: WorkspaceProject, name: string) => {
