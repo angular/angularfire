@@ -3,7 +3,7 @@ import {
   getWorkspace, getProject, getFirebaseProjectNameFromHost, addEnvironmentEntry,
   addToNgModule, addIgnoreFiles, addFixesToServer
 } from '../utils';
-import { projectTypePrompt, appPrompt, sitePrompt, projectPrompt, featuresPrompt } from './prompts';
+import { projectTypePrompt, appPrompt, sitePrompt, projectPrompt, featuresPrompt, userPrompt } from './prompts';
 import { setupUniversalDeployment } from './ssr';
 import { setupStaticDeployment } from './static';
 import {
@@ -11,6 +11,8 @@ import {
   FEATURES, PROJECT_TYPE
 } from '../interfaces';
 import { getFirebaseTools } from '../firebaseTools';
+import { writeFileSync } from 'fs';
+import { join } from 'path';
 
 export const setupProject =
   async (tree: Tree, context: SchematicContext, features: FEATURES[], config: DeployOptions & {
@@ -109,21 +111,27 @@ ${Object.entries(config.sdkConfig).reduce(
 export const ngAddSetupProject = (
   options: DeployOptions
 ) => async (host: Tree, context: SchematicContext) => {
+
+  // TODO is there a public API for this?
+  const projectRoot: string = (host as any)._backend._root;
+
   const features = await featuresPrompt();
 
   if (features.length > 0) {
 
     const firebaseTools = await getFirebaseTools();
 
-    await firebaseTools.login();
-    const users = await firebaseTools.login.list();
-    console.log(`Logged into Firebase as ${users.map(it => it.user.email).join(', ')}.`);
+    // Add the firebase files if they don't exist already so login.use works
+    if (!host.exists('/firebase.json')) { writeFileSync(join(projectRoot, 'firebase.json'), '{}'); }
+
+    const user = await userPrompt({ projectRoot });
+    await firebaseTools.login.use(user.email, { projectRoot });
 
     const { project: ngProject, projectName: ngProjectName } = getProject(options, host);
 
     const [ defaultProjectName ] = getFirebaseProjectNameFromHost(host, ngProjectName);
 
-    const firebaseProject = await projectPrompt(defaultProjectName);
+    const firebaseProject = await projectPrompt(defaultProjectName, { projectRoot });
 
     let hosting = { projectType: PROJECT_TYPE.Static, prerender: false };
     let firebaseHostingSite: FirebaseHostingSite|undefined;
@@ -132,7 +140,7 @@ export const ngAddSetupProject = (
       // TODO read existing settings from angular.json, if available
       const results = await projectTypePrompt(ngProject, ngProjectName);
       hosting = { ...hosting, ...results };
-      firebaseHostingSite = await sitePrompt(firebaseProject);
+      firebaseHostingSite = await sitePrompt(firebaseProject, { projectRoot });
     }
 
     let firebaseApp: FirebaseApp|undefined;
@@ -141,9 +149,9 @@ export const ngAddSetupProject = (
     if (features.find(it => it !== FEATURES.Hosting)) {
 
       const defaultAppId = firebaseHostingSite?.appId;
-      firebaseApp = await appPrompt(firebaseProject, defaultAppId);
+      firebaseApp = await appPrompt(firebaseProject, defaultAppId, { projectRoot });
 
-      const result = await firebaseTools.apps.sdkconfig('web', firebaseApp.appId, { nonInteractive: true });
+      const result = await firebaseTools.apps.sdkconfig('web', firebaseApp.appId, { nonInteractive: true, projectRoot });
       sdkConfig = result.sdkConfig;
 
     }

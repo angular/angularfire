@@ -21,8 +21,10 @@ const SERVER_BUILD_TARGET: BuildTarget = {
   name: `${PROJECT}:server:production`
 };
 
-const login = () => Promise.resolve();
+const login = () => Promise.resolve({ user: { email: 'foo@bar.baz' }});
 login.list = () => Promise.resolve([{ user: { email: 'foo@bar.baz' }}]);
+login.add = () => Promise.resolve([{ user: { email: 'foo@bar.baz' }}]);
+login.use = () => Promise.resolve('foo@bar.baz');
 
 const initMocks = () => {
   fsHost = {
@@ -104,7 +106,7 @@ describe('Deploy Angular apps', () => {
   beforeEach(() => initMocks());
 
   it('should call login', async () => {
-    const spy = spyOn(firebaseMock, 'login');
+    const spy = spyOn(firebaseMock, 'login').and.resolveTo({ email: 'foo@bar.baz' });
     await deploy(
       firebaseMock, context, STATIC_BUILD_TARGET, undefined,
       undefined, undefined, { projectId: FIREBASE_PROJECT, preview: false }
@@ -149,6 +151,7 @@ describe('Deploy Angular apps', () => {
       only: 'hosting:' + PROJECT,
       token: FIREBASE_TOKEN,
       nonInteractive: true,
+      projectRoot: 'cwd',
     });
   });
 

@@ -120,7 +120,9 @@ export interface FirebaseTools {
 
   login: {
     list(): Promise<{user: Record<string, any>}[]>;
-  } & (() => Promise<void>);
+    add(): Promise<Record<string, any>>;
+    use(email: string, options?: {}): Promise<string>;
+  } & ((options?: {}) => Promise<Record<string, any>>);
 
   deploy(config: FirebaseDeployConfig): Promise<any>;
 
