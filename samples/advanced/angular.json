@@ -122,8 +122,17 @@
         "deploy": {
           "builder": "@angular/fire:deploy",
           "options": {
-            "ssr": true,
-            "functionsNodeVersion": 16
+            "ssr": "cloud-functions",
+            "prerender": true,
+            "firebaseProject": "aftest-94085",
+            "firebaseHostingSite": "aftest-94085",
+            "functionName": "ssr_sample",
+            "functionsNodeVersion": "16",
+            "region": "us-central1",
+            "browserTarget": "sample:build:production",
+            "serverTarget": "sample:server:production",
+            "prerenderTarget": "sample:prerender:production",
+            "outputPath": "dist/sample/functions"
           }
         },
         "server": {
@@ -135,8 +144,7 @@
             "optimization": false,
             "sourceMap": true,
             "extractLicenses": false,
-            "externalDependencies": [
-            ]
+            "externalDependencies": []
           },
           "configurations": {
             "production": {

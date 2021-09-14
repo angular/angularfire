@@ -1,17 +1,13 @@
 import { SchematicsException, Tree, SchematicContext } from '@angular-devkit/schematics';
 import {
-  addDependencies,
-  DeployOptions,
   generateFirebaseRc,
-  NgAddNormalizedOptions,
   overwriteIfExists,
   safeReadJSON,
   stringifyFormatted
-} from './ng-add-common';
-import { FirebaseJSON, Workspace, WorkspaceProject } from './interfaces';
+} from '../common';
+import { NgAddNormalizedOptions, FirebaseJSON, Workspace, WorkspaceProject } from '../interfaces';
 
-import { default as defaultDependencies } from './versions.json';
-import { NodePackageInstallTask, RunSchematicTask } from '@angular-devkit/schematics/tasks';
+import { shortSiteName } from '../utils';
 
 function emptyFirebaseJson() {
   return {
@@ -50,23 +46,16 @@ export function generateFirebaseJson(
     ? safeReadJSON(path, tree)
     : emptyFirebaseJson();
 
-  /* TODO do we want to prompt for override?
-  if (
-    firebaseJson.hosting &&
-    ((Array.isArray(firebaseJson.hosting) &&
-      firebaseJson.hosting.find(config => config.target === project)) ||
-      (firebaseJson.hosting as FirebaseHostingConfig).target === project)
-  ) {
-    throw new SchematicsException(
-      `Target ${project} already exists in firebase.json`
-    );
-  }*/
-
   const newConfig = generateHostingConfig(project, dist);
   if (firebaseJson.hosting === undefined) {
     firebaseJson.hosting = newConfig;
   } else if (Array.isArray(firebaseJson.hosting)) {
-    firebaseJson.hosting.push(newConfig);
+    const targetIndex = firebaseJson.hosting.findIndex(it => it.target === newConfig.target);
+    if (targetIndex > -1) {
+      firebaseJson.hosting[targetIndex] = newConfig;
+    } else {
+      firebaseJson.hosting.push(newConfig);
+    }
   } else {
     firebaseJson.hosting = [firebaseJson.hosting, newConfig];
   }
@@ -74,34 +63,18 @@ export function generateFirebaseJson(
   overwriteIfExists(tree, path, stringifyFormatted(firebaseJson));
 }
 
-export const addFirebaseHostingDependencies = (options: DeployOptions) => (tree: Tree, context: SchematicContext) => {
-  addDependencies(
-    tree,
-    defaultDependencies,
-    context
-  );
-  context.addTask(new RunSchematicTask('ng-add-setup-project', options), [
-    context.addTask(new NodePackageInstallTask())
-  ]);
-  return tree;
-};
-
 export const setupStaticDeployment = (config: {
   project: WorkspaceProject;
   options: NgAddNormalizedOptions;
   workspacePath: string;
   workspace: Workspace;
   tree: Tree;
+  context: SchematicContext;
 }) => {
   const { tree, workspacePath, workspace, options } = config;
   const project = workspace.projects[options.project];
 
-  if (
-    !project.architect ||
-    !project.architect.build ||
-    !project.architect.build.options ||
-    !project.architect.build.options.outputPath
-  ) {
+  if (!project.architect?.build?.options?.outputPath) {
     throw new SchematicsException(
       `Cannot read the output path (architect.build.options.outputPath) of the Angular project "${options.project}" in angular.json`
     );
@@ -111,7 +84,15 @@ export const setupStaticDeployment = (config: {
 
   project.architect.deploy = {
     builder: '@angular/fire:deploy',
-    options: {}
+    options: {
+      prerender: options.prerender,
+      ssr: false,
+      browserTarget: options.browserTarget,
+      firebaseProject: options.firebaseProject.projectId,
+      firebaseHostingSite: shortSiteName(options.firebaseHostingSite),
+      ...(options.serverTarget ? {serverTarget: options.serverTarget} : {}),
+      ...(options.prerenderTarget ? {prerenderTarget: options.prerenderTarget} : {}),
+    }
   };
 
   tree.overwrite(workspacePath, JSON.stringify(workspace, null, 2));
@@ -119,7 +100,8 @@ export const setupStaticDeployment = (config: {
   generateFirebaseRc(
     tree,
     '.firebaserc',
-    options.firebaseProject,
+    options.firebaseProject.projectId,
+    options.firebaseHostingSite,
     options.project
   );
 

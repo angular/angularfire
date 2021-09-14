@@ -1,20 +1,7 @@
 import { SchematicsException, Tree, SchematicContext } from '@angular-devkit/schematics';
-import { FirebaseRc } from './interfaces';
+import { FirebaseHostingSite, FirebaseRc } from './interfaces';
 import * as semver from 'semver';
-
-export interface NgAddOptions {
-  firebaseProject: string;
-  project?: string;
-}
-
-export interface NgAddNormalizedOptions {
-  firebaseProject: string;
-  project: string;
-}
-
-export interface DeployOptions {
-  project: string;
-}
+import { shortSiteName } from './utils';
 
 export const stringifyFormatted = (obj: any) => JSON.stringify(obj, null, 2);
 
@@ -36,12 +23,11 @@ function emptyFirebaseRc() {
   };
 }
 
-function generateFirebaseRcTarget(firebaseProject: string, project: string) {
+function generateFirebaseRcTarget(firebaseProject: string, firebaseHostingSite: FirebaseHostingSite|undefined, project: string) {
   return {
     hosting: {
       [project]: [
-        // TODO(kirjs): Generally site name is consistent with the project name, but there are edge cases.
-        firebaseProject
+        shortSiteName(firebaseHostingSite) ?? firebaseProject
       ]
     }
   };
@@ -51,6 +37,7 @@ export function generateFirebaseRc(
   tree: Tree,
   path: string,
   firebaseProject: string,
+  firebaseHostingSite: FirebaseHostingSite|undefined,
   project: string
 ) {
   const firebaseRc: FirebaseRc = tree.exists(path)
@@ -58,18 +45,12 @@ export function generateFirebaseRc(
     : emptyFirebaseRc();
 
   firebaseRc.targets = firebaseRc.targets || {};
-
-  /* TODO do we want to prompt?
-  if (firebaseProject in firebaseRc.targets) {
-    throw new SchematicsException(
-      `Firebase project ${firebaseProject} already defined in .firebaserc`
-    );
-  }*/
-
   firebaseRc.targets[firebaseProject] = generateFirebaseRcTarget(
     firebaseProject,
+    firebaseHostingSite,
     project
   );
+  firebaseRc.projects = { default: firebaseProject };
 
   overwriteIfExists(tree, path, stringifyFormatted(firebaseRc));
 }
@@ -95,28 +76,27 @@ export const addDependencies = (
     throw new SchematicsException('Could not locate package.json');
   }
 
+  packageJson.devDependencies ??= {};
+  packageJson.dependencies ??= {};
+
   Object.keys(deps).forEach(depName => {
     const dep = deps[depName];
-    if (dep.dev) {
-      const existingVersion = packageJson.devDependencies[depName];
-      if (existingVersion) {
+    const existingDeps = dep.dev ? packageJson.devDependencies : packageJson.dependencies;
+    const existingVersion = existingDeps[depName];
+    if (existingVersion) {
+      try {
         if (!semver.intersects(existingVersion, dep.version)) {
           context.logger.warn(`⚠️ The ${depName} devDependency specified in your package.json (${existingVersion}) does not fulfill AngularFire's dependency (${dep.version})`);
           // TODO offer to fix
         }
-      } else {
-        packageJson.devDependencies[depName] = dep.version;
-      }
-    } else {
-      const existingVersion = packageJson.dependencies[depName];
-      if (existingVersion) {
-        if (!semver.intersects(existingVersion, dep.version)) {
-          context.logger.warn(`⚠️ The ${depName} dependency specified in your package.json (${existingVersion}) does not fulfill AngularFire's dependency (${dep.version})`);
+      } catch (e) {
+        if (existingVersion !== dep.version) {
+          context.logger.warn(`⚠️ The ${depName} devDependency specified in your package.json (${existingVersion}) does not fulfill AngularFire's dependency (${dep.version})`);
           // TODO offer to fix
         }
-      } else {
-        packageJson.dependencies[depName] = dep.version;
       }
+    } else {
+      existingDeps[depName] = dep.version;
     }
   });
 

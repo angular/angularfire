@@ -7,6 +7,7 @@
         "removeComments": true,
         "strictNullChecks": true,
         "resolveJsonModule": true,
+        "esModuleInterop": true,
         "lib": [
             "es2015",
             "dom",
@@ -20,5 +21,12 @@
         "module": "commonjs",
         "outDir": "../../dist/packages-dist/schematics"
     },
-    "files": ["public_api.ts"]
+    "files": [
+        "update/index.ts",
+        "deploy/actions.ts",
+        "deploy/builder.ts",
+        "add/index.ts",
+        "setup/index.ts",
+        "update/v7/index.ts",
+    ]
 }

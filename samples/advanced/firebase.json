@@ -2,7 +2,7 @@
   "hosting": [
     {
       "target": "sample",
-      "public": "dist/sample/dist/sample/browser",
+      "public": "dist/sample/browser",
       "ignore": [
         "**/.*"
       ],
@@ -20,12 +20,12 @@
       "rewrites": [
         {
           "source": "**",
-          "function": "ssr"
+          "function": "ssr_sample"
         }
       ]
     }
   ],
   "functions": {
-    "source": "dist/sample"
+    "source": "dist/sample/functions"
   }
 }

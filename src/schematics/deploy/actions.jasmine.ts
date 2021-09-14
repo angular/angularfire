@@ -1,7 +1,7 @@
 import { JsonObject, logging } from '@angular-devkit/core';
 import { BuilderContext, BuilderRun, ScheduleOptions, Target } from '@angular-devkit/architect';
 import { BuildTarget, FirebaseDeployConfig, FirebaseTools, FSHost } from '../interfaces';
-import deploy, { deployToFunction } from './actions';
+import deploy, { deployToFunction } from '@angular/fire/schematics/deploy/actions';
 import { join } from 'path';
 import 'jasmine';
 
@@ -28,13 +28,29 @@ const initMocks = () => {
     renameSync(_: string, __: string) {
     },
     writeFileSync(_: string, __: string) {
+    },
+    copySync(_: string, __: string) {
+    },
+    removeSync(_: string) {
     }
   };
 
   firebaseMock = {
     login: () => Promise.resolve(),
     projects: {
-      list: () => Promise.resolve([])
+      list: () => Promise.resolve([]),
+      create: () => Promise.reject(),
+    },
+    apps: {
+      list: () => Promise.resolve([]),
+      create: () => Promise.reject(),
+      sdkconfig: () => Promise.resolve({ fileName: '_', fileContents: '', sdkConfig: {}, }),
+    },
+    hosting: {
+      sites: {
+        list: () => Promise.resolve({sites: []}),
+        create: () => Promise.reject(),
+      }
     },
     deploy: (_: FirebaseDeployConfig) => Promise.resolve(),
     use: () => Promise.resolve(),
@@ -86,19 +102,22 @@ describe('Deploy Angular apps', () => {
 
   it('should call login', async () => {
     const spy = spyOn(firebaseMock, 'login');
-    await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, FIREBASE_PROJECT, { preview: false });
+    await deploy(
+      firebaseMock, context, STATIC_BUILD_TARGET, undefined,
+      undefined, undefined, { projectId: FIREBASE_PROJECT, preview: false }
+    );
     expect(spy).toHaveBeenCalled();
   });
 
   it('should not call login', async () => {
     const spy = spyOn(firebaseMock, 'login');
-    await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, FIREBASE_PROJECT, { preview: false }, FIREBASE_TOKEN);
+    await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined,  undefined, undefined, { preview: false }, FIREBASE_TOKEN);
     expect(spy).not.toHaveBeenCalled();
   });
 
   it('should invoke the builder', async () => {
     const spy = spyOn(context, 'scheduleTarget').and.callThrough();
-    await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, FIREBASE_PROJECT, { preview: false });
+    await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined,  undefined, undefined, { preview: false });
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith({
       target: 'build',
@@ -113,26 +132,27 @@ describe('Deploy Angular apps', () => {
       options: {}
     };
     const spy = spyOn(context, 'scheduleTarget').and.callThrough();
-    await deploy(firebaseMock, context, buildTarget, undefined, FIREBASE_PROJECT, { preview: false });
+    await deploy(firebaseMock, context, buildTarget, undefined,  undefined, undefined, { preview: false });
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith({ target: 'prerender', project: PROJECT }, {});
   });
 
   it('should invoke firebase.deploy', async () => {
     const spy = spyOn(firebaseMock, 'deploy').and.callThrough();
-    await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, FIREBASE_PROJECT, { preview: false }, FIREBASE_TOKEN);
+    await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined,  undefined, undefined, { preview: false }, FIREBASE_TOKEN);
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith({
       cwd: 'cwd',
       only: 'hosting:' + PROJECT,
-      token: FIREBASE_TOKEN
+      token: FIREBASE_TOKEN,
+      nonInteractive: true,
     });
   });
 
   describe('error handling', () => {
     it('throws if there is no firebase project', async () => {
       try {
-        await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, undefined, { preview: false  });
+        await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, undefined, undefined, { preview: false  });
       } catch (e) {
         expect(e.message).toMatch(/Cannot find firebase project/);
       }
@@ -141,7 +161,7 @@ describe('Deploy Angular apps', () => {
     it('throws if there is no target project', async () => {
       context.target = undefined;
       try {
-        await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, FIREBASE_PROJECT, { preview: false });
+        await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, undefined, undefined, { preview: false });
       } catch (e) {
         expect(e.message).toMatch(/Cannot execute the build target/);
       }
@@ -174,6 +194,28 @@ describe('universal deployment', () => {
     expect(functionArgs[0]).toBe(join('dist', 'index.js'));
   });
 
+  it('should create a firebase function (new)', async () => {
+    const spy = spyOn(fsHost, 'writeFileSync');
+    await deployToFunction(
+      firebaseMock,
+      context,
+      '/home/user',
+      STATIC_BUILD_TARGET,
+      SERVER_BUILD_TARGET,
+      { preview: false, outputPath: join('dist', 'functions') },
+      undefined,
+      fsHost
+    );
+
+    expect(spy).toHaveBeenCalledTimes(2);
+
+    const packageArgs = spy.calls.argsFor(0);
+    const functionArgs = spy.calls.argsFor(1);
+
+    expect(packageArgs[0]).toBe(join('dist', 'functions', 'package.json'));
+    expect(functionArgs[0]).toBe(join('dist', 'functions', 'index.js'));
+  });
+
   it('should rename the index.html file in the nested dist', async () => {
     const spy = spyOn(fsHost, 'renameSync');
     await deployToFunction(
@@ -194,6 +236,29 @@ describe('universal deployment', () => {
     expect(packageArgs).toEqual([
       join('dist', 'dist', 'browser', 'index.html'),
       join('dist', 'dist', 'browser', 'index.original.html')
+    ]);
+  });
+
+  it('should rename the index.html file in the nested dist (new)', async () => {
+    const spy = spyOn(fsHost, 'renameSync');
+    await deployToFunction(
+      firebaseMock,
+      context,
+      '/home/user',
+      STATIC_BUILD_TARGET,
+      SERVER_BUILD_TARGET,
+      { preview: false, outputPath: join('dist', 'functions') },
+      undefined,
+      fsHost
+    );
+
+    expect(spy).toHaveBeenCalledTimes(1);
+
+    const packageArgs = spy.calls.argsFor(0);
+
+    expect(packageArgs).toEqual([
+      join('dist', 'functions', 'dist', 'browser', 'index.html'),
+      join('dist', 'functions', 'dist', 'browser', 'index.original.html')
     ]);
   });
 
