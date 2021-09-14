@@ -1,5 +1,5 @@
 import { SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
-import { getWorkspace, getProject, getFirebaseProjectNameFromHost, addEnvironmentEntry, addToNgModule } from '../utils';
+import { getWorkspace, getProject, getFirebaseProjectNameFromHost, addEnvironmentEntry, addToNgModule, addIgnoreFiles } from '../utils';
 import { projectTypePrompt, appPrompt, sitePrompt, projectPrompt, featuresPrompt } from './prompts';
 import { setupUniversalDeployment } from './ssr';
 import { setupStaticDeployment } from './static';
@@ -26,6 +26,8 @@ export const setupProject =
     const { path: workspacePath, workspace } = getWorkspace(tree);
 
     const { project, projectName } = getProject(config, tree);
+
+    addIgnoreFiles(tree);
 
     const featuresToImport = features.filter(it => it !== FEATURES.Hosting);
     if (featuresToImport.length > 0) {

@@ -6,6 +6,7 @@ import ts from '@schematics/angular/third_party/github.com/Microsoft/TypeScript/
 import { findNode, addImportToModule, insertImport } from '@schematics/angular/utility/ast-utils';
 import { InsertChange, ReplaceChange, applyToUpdateRecorder, Change } from '@schematics/angular/utility/change';
 import { findModuleFromOptions, buildRelativePath } from '@schematics/angular/utility/find-module';
+import { overwriteIfExists } from './common';
 
 // We consider a project to be a universal project if it has a `server` architect
 // target. If it does, it knows how to build the application's server.
@@ -113,9 +114,13 @@ export function addEnvironmentEntry(
   filePath: string,
   data: string,
 ): Tree {
+  if (!host.exists(filePath)) {
+    throw new Error(`File ${filePath} does not exist`);
+  }
+
   const buffer = host.read(filePath);
   if (!buffer) {
-    throw new SchematicsException(`File ${filePath} does not exist`);
+    throw new SchematicsException(`Cannot read ${filePath}`);
   }
   const sourceFile = ts.createSourceFile(filePath, buffer.toString('utf-8'), ts.ScriptTarget.Latest, true);
 
@@ -291,3 +296,27 @@ export function addToNgModule(host: Tree, options: any) {
 
   return host;
 }
+
+export const addIgnoreFiles = (host: Tree) => {
+  const path = '/.gitignore';
+  if (!host.exists(path)) {
+    return host;
+  }
+
+  const buffer = host.read(path);
+  if (!buffer) {
+    return host;
+  }
+
+  const content = buffer.toString();
+  if (!content.includes('# Firebase')) {
+    overwriteIfExists(host, path, content.concat(`
+# Firebase
+.firebase
+*-debug.log
+.runtimeconfig.json
+`));
+  }
+
+  return host;
+};
