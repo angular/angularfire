@@ -113,8 +113,8 @@ const defaultFsHost: FSHost = {
 };
 
 const findPackageVersion = (packageManager: string, name: string) => {
-  const match = execSync(`${packageManager} list ${name}`).toString().match(`[^|\w]${escapeRegExp(name)}[@|\w].+\\w`);
-  return match ? match[0].split(new RegExp(`${escapeRegExp(name)}[@|\w]`))[1].split(/\s/)[0] : null;
+  const match = execSync(`${packageManager} list ${name}`).toString().match(`[^|\s]${escapeRegExp(name)}[@| ][^\s]+(\s.+)?$`);
+  return match ? match[0].split(new RegExp(`${escapeRegExp(name)}[@| ]`))[1].split(/\s/)[0] : null;
 };
 
 const getPackageJson = (context: BuilderContext, workspaceRoot: string, options: DeployBuilderOptions, main?: string) => {
