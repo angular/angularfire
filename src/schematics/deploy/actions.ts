@@ -79,7 +79,6 @@ const deployToHosting = async (
     await firebaseTools.serve({
       port: DEFAULT_EMULATOR_PORT,
       host: DEFAULT_EMULATOR_HOST,
-      // tslint:disable-next-line:no-non-null-assertion
       targets: [`hosting:${siteTarget}`],
       nonInteractive: true,
       projectRoot: workspaceRoot,
@@ -96,7 +95,6 @@ const deployToHosting = async (
   }
 
   return await firebaseTools.deploy({
-    // tslint:disable-next-line:no-non-null-assertion
     only: `hosting:${siteTarget}`,
     cwd: workspaceRoot,
     token: firebaseToken,
@@ -357,7 +355,6 @@ export const deployToCloudRun = async (
   
   // TODO deploy cloud run
   return await firebaseTools.deploy({
-    // tslint:disable-next-line:no-non-null-assertion
     only: `hosting:${siteTarget}`,
     cwd: workspaceRoot,
     token: firebaseToken,
