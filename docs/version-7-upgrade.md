@@ -53,31 +53,31 @@ import { getMessaging, provideMessaging } from '@angular/fire/messaging';
 import { getPerformance, providePerformance } from '@angular/fire/performance';
 
 @NgModule({
-    imports: [        
+    imports: [
         provideFirebaseApp(() => initializeApp(config)),
         provideAuth(() => {
           const auth = getAuth();
-          if (emulator) connectAuthEmulator(auth, `localhost:${authPort}`);
+          if (emulator) connectAuthEmulator(auth, `http://localhost:${authPort}`);
           return auth;
         }),
         provideDatabase(() => {
           const database = getDatabase();
-          if (emulator) connectDatabaseEmulator(database, 'localhost', databasePort);
+          if (emulator) connectDatabaseEmulator(database, 'http://localhost', databasePort);
           return database;
         }),
         provideFunctions(() => {
           const functions = getFunctions();
-          if (emulator) connectFunctionsEmulator(functions, 'localhost', functionsPort);
+          if (emulator) connectFunctionsEmulator(functions, 'http://localhost', functionsPort);
           return functions;
         }),
         provideStorage(() => {
           const storage = getStorage();
-          if (emulator) connectStorageEmulator(storage, 'localhost', storagePort);
+          if (emulator) connectStorageEmulator(storage, 'http://localhost', storagePort);
           return storage;
         }),
         provideFirestore(() => {
           const firestore = getFirestore();
-          if (emulator) connectFirestoreEmulator(firestore, 'localhost', firestorePort);
+          if (emulator) connectFirestoreEmulator(firestore, 'http://localhost', firestorePort);
           enableIndexedDbPersistence(firestore);
           return firestore;
         }),
