@@ -38,9 +38,8 @@ globalThis.ɵAngularfireInstanceCache ||= [];
 // AppCheck stuff, here so we can get a jump on it. It's too late in the evaluation
 // if we do this in the app-check module. globalThis.ngDevMode allows me to test if
 // Angular is in DevMode before Angular initializes.
-if (typeof process !== 'undefined' && process.env?.FIREBASE_APPCHECK_DEBUG_TOKEN) {
-  globalThis.FIREBASE_APPCHECK_DEBUG_TOKEN ??= process.env.FIREBASE_APPCHECK_DEBUG_TOKEN;
-} else if (globalThis.ngDevMode) {
+// Only do this in the browser, for Node we have the admin sdk
+if ((typeof process === 'undefined' || !process.versions?.node) && globalThis.ngDevMode) {
   globalThis.FIREBASE_APPCHECK_DEBUG_TOKEN ??= true;
 }
 

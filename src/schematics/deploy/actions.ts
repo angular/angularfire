@@ -70,7 +70,7 @@ const deployToHosting = async (
   options: DeployBuilderOptions,
   firebaseToken?: string,
 ) => {
-  
+
   // tslint:disable-next-line:no-non-null-assertion
   const siteTarget = options.target ?? context.target!.project;
 
@@ -112,9 +112,9 @@ const defaultFsHost: FSHost = {
   removeSync,
 };
 
-const findPackageVersion = (name: string) => {
-  const match = execSync(`npm list ${name}`).toString().match(` ${escapeRegExp(name)}@.+\\w`);
-  return match ? match[0].split(`${name}@`)[1].split(/\s/)[0] : null;
+const findPackageVersion = (packageManager: string, name: string) => {
+  const match = execSync(`${packageManager} list ${name}`).toString().match(`[^|\s]${escapeRegExp(name)}[@| ][^\s]+(\s.+)?$`);
+  return match ? match[0].split(new RegExp(`${escapeRegExp(name)}[@| ]`))[1].split(/\s/)[0] : null;
 };
 
 const getPackageJson = (context: BuilderContext, workspaceRoot: string, options: DeployBuilderOptions, main?: string) => {
@@ -128,13 +128,14 @@ const getPackageJson = (context: BuilderContext, workspaceRoot: string, options:
   }
   if (existsSync(join(workspaceRoot, 'angular.json'))) {
     const angularJson = JSON.parse(readFileSync(join(workspaceRoot, 'angular.json')).toString());
+    const packageManager = angularJson.cli?.packageManager ?? 'npm';
     // tslint:disable-next-line:no-non-null-assertion
     const server = angularJson.projects[context.target!.project].architect.server;
     const externalDependencies = server?.options?.externalDependencies || [];
     const bundleDependencies = server?.options?.bundleDependencies ?? true;
     if (bundleDependencies) {
       externalDependencies.forEach(externalDependency => {
-        const packageVersion = findPackageVersion(externalDependency);
+        const packageVersion = findPackageVersion(packageManager, externalDependency);
         if (packageVersion) { dependencies[externalDependency] = packageVersion; }
       });
     } else {
@@ -352,7 +353,7 @@ export const deployToCloudRun = async (
 
   // tslint:disable-next-line:no-non-null-assertion
   const siteTarget = options.target ?? context.target!.project;
-  
+
   // TODO deploy cloud run
   return await firebaseTools.deploy({
     only: `hosting:${siteTarget}`,

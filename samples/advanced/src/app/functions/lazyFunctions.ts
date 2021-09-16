@@ -1,9 +1,7 @@
-import { connectFunctionsEmulator, getFunctions, httpsCallableData } from '@angular/fire/functions';
-import { environment } from '../../environments/environment';
+import { getFunctions, httpsCallableData } from '@angular/fire/functions';
+import { connectFunctionsEmulatorInDevMode } from '../emulators';
 
 const functions = getFunctions();
-if (environment.useEmulators) {
-    connectFunctionsEmulator(functions, 'localhost', 5001);
-}
+connectFunctionsEmulatorInDevMode(functions);
 
 export const yadaFunction = httpsCallableData(functions, 'yada', { timeout: 3_000 });
