@@ -70,14 +70,16 @@ const deployToHosting = async (
   options: DeployBuilderOptions,
   firebaseToken?: string,
 ) => {
+  
+  // tslint:disable-next-line:no-non-null-assertion
+  const siteTarget = options.target ?? context.target!.project;
 
   if (options.preview) {
 
     await firebaseTools.serve({
       port: DEFAULT_EMULATOR_PORT,
       host: DEFAULT_EMULATOR_HOST,
-      // tslint:disable-next-line:no-non-null-assertion
-      targets: [`hosting:${context.target!.project}`],
+      targets: [`hosting:${siteTarget}`],
       nonInteractive: true,
       projectRoot: workspaceRoot,
     });
@@ -93,8 +95,7 @@ const deployToHosting = async (
   }
 
   return await firebaseTools.deploy({
-    // tslint:disable-next-line:no-non-null-assertion
-    only: 'hosting:' + context.target!.project,
+    only: `hosting:${siteTarget}`,
     cwd: workspaceRoot,
     token: firebaseToken,
     nonInteractive: true,
@@ -222,14 +223,14 @@ export const deployToFunction = async (
   }
 
   // tslint:disable-next-line:no-non-null-assertion
-  const project = context.target!.project;
+  const siteTarget = options.target ?? context.target!.project;
 
   if (options.preview) {
 
     await firebaseTools.serve({
       port: DEFAULT_EMULATOR_PORT,
       host: DEFAULT_EMULATOR_HOST,
-      targets: [`hosting:${project}`, `functions:${functionName}`],
+      targets: [`hosting:${siteTarget}`, `functions:${functionName}`],
       nonInteractive: true,
       projectRoot: workspaceRoot,
     });
@@ -244,7 +245,7 @@ export const deployToFunction = async (
   }
 
   return await firebaseTools.deploy({
-    only: `hosting:${project},functions:${functionName}`,
+    only: `hosting:${siteTarget},functions:${functionName}`,
     cwd: workspaceRoot,
     token: firebaseToken,
     nonInteractive: true,
@@ -349,10 +350,12 @@ export const deployToCloudRun = async (
   await spawnAsync(`gcloud builds submit ${cloudRunOut} --tag gcr.io/${options.firebaseProject}/${serviceId} --project ${options.firebaseProject} --quiet`);
   await spawnAsync(`gcloud run deploy ${serviceId} --image gcr.io/${options.firebaseProject}/${serviceId} --project ${options.firebaseProject} ${deployArguments.join(' ')} --platform managed --allow-unauthenticated --region=${options.region} --quiet`);
 
+  // tslint:disable-next-line:no-non-null-assertion
+  const siteTarget = options.target ?? context.target!.project;
+  
   // TODO deploy cloud run
   return await firebaseTools.deploy({
-    // tslint:disable-next-line:no-non-null-assertion
-    only: `hosting:${context.target!.project}`,
+    only: `hosting:${siteTarget}`,
     cwd: workspaceRoot,
     token: firebaseToken,
     nonInteractive: true,

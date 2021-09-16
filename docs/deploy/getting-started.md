@@ -141,3 +141,64 @@ The above configuration specifies the following:
 3. `ng deploy projectName --prod` or `ng deploy projectName --configuration='production'` will deploy `projectName` with production build settings to your production environment.
 
 All of the options are optional. If you do not specify a `buildTarget`, it defaults to a production build (`projectName:build:production`). If you do not specify a `firebaseProject`, it defaults to the first matching deploy target found in your `.firebaserc` (where your projectName is the same as your Firebase deploy target name). The `configurations` section is also optional.
+
+### Working with multiple project sites
+
+For example, if you have muti sites config in firebase.json like this:
+```
+{
+  "hosting": [
+    {
+      "target": "custom-site",
+      "public": "public/my-custom-site",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
+    }
+  ],
+```
+
+If you have multiple build targets and deploy targets, it is possible to specify them in your `angular.json` or `workspace.json`.
+
+It is possible to use either your project name or project alias in `siteTarget`.
+
+You may specify a `siteTarget` in your `options` as follows:
+
+```json
+"deploy": {
+    "builder": "@angular/fire:deploy",
+    "options": {
+        "buildTarget": "projectName:build",
+        "firebaseProject": "developmentProject",
+        "siteTarget": "yourDefaultSiteTarget"
+    },
+    "configurations": {
+        "production": {
+            "buildTarget": "projectName:build:production",
+            "firebaseProject": "productionProject",
+            "siteTarget": "yourProdSiteTarget"
+        },
+        "storybook": {
+            "buildTarget": "projectName:build-storybook",
+            "firebaseProject": "developmentProject",
+            "siteTarget": "yourStorybookSiteTarget"
+        }
+    }
+}
+```
+
+The above configuration specifies the following:
+
+1. `ng deploy` will deploy the default project with default configuration.
+2. `ng deploy projectName` will deploy the specified project with default configuration.
+3. `ng deploy projectName --configuration=storybook --siteTarget=mySiteTarget` will deploy `projectName` to `mySiteTarget` with configuration`storybook`.
+
+All of the options are optional

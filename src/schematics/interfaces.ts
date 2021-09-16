@@ -166,6 +166,7 @@ export interface DeployBuilderSchema {
   firebaseProject?: string;
   firebaseHostingSite?: string;
   preview?: boolean;
+  target?: boolean;
   universalBuildTarget?: string;
   serverTarget?: string;
   prerenderTarget?: string;

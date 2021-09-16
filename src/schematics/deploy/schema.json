@@ -41,6 +41,10 @@
       "type": "string",
       "description": "The Firebase project name or project alias to use when deploying"
     },
+    "target": {
+      "type": "string",
+      "description": "The Firebase hosting target in firebase.json for multi-site"
+    },
     "firebaseHostingSite": {
       "type": "string",
       "description": "The Firebase Hosting site to deploy to"
