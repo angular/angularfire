@@ -1,10 +1,8 @@
-import { ref, getStorage, connectStorageEmulator, getDownloadURL } from '@angular/fire/storage';
-import { environment } from '../../environments/environment';
+import { ref, getStorage, getDownloadURL } from '@angular/fire/storage';
+import { connectStorageEmulatorInDevMode } from '../emulators';
 
 export const storage = getStorage();
-if (environment.useEmulators) {
-    connectStorageEmulator(storage, 'localhost', 9199);
-}
+connectStorageEmulatorInDevMode(storage);
 
 const icon = ref(storage, 'google-g.png');
 

@@ -9,10 +9,11 @@ import { AppComponent } from './app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { BrowserTransferStateModule } from '@angular/platform-browser';
-import { provideAuth, connectAuthEmulator } from '@angular/fire/auth';
+import { provideAuth } from '@angular/fire/auth';
 
 import { initializeAuth, browserPopupRedirectResolver, indexedDBLocalPersistence } from '@angular/fire/auth';
 import { initializeAppCheck, provideAppCheck, ReCaptchaV3Provider } from '@angular/fire/app-check';
+import { connectAuthEmulatorInDevMode } from './emulators';
 
 @NgModule({
   imports: [
@@ -26,9 +27,7 @@ import { initializeAppCheck, provideAppCheck, ReCaptchaV3Provider } from '@angul
         persistence: indexedDBLocalPersistence,
         popupRedirectResolver: browserPopupRedirectResolver,
       });
-      if (environment.useEmulators) {
-        connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
-      }
+      connectAuthEmulatorInDevMode(auth);
       return auth;
     }),
     provideAppCheck(() =>  {
