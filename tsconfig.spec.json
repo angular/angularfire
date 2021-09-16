@@ -11,7 +11,7 @@
       "src/test.ts"
     ],
     "include": [
-      "src/root.spec.ts",
+      "src/**/*.spec.ts",
       "src/**/*.d.ts",
       "node_modules/zone.js/dist/zone.js.d.ts"
     ]

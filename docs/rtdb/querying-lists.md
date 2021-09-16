@@ -79,7 +79,7 @@ size$.next('small');
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireDatabase, AngularFireAction } from '@angular/fire/database';
+import { AngularFireDatabase, AngularFireAction } from '@angular/fire/compat/database';
 import { Observable, Subscription, BehaviorSubject } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 

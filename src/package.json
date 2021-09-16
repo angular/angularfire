@@ -3,8 +3,8 @@
   "name": "@angular/fire",
   "version": "ANGULARFIRE2_VERSION",
   "description": "The official Angular library for Firebase.",
-  "schematics": "./collection.json",
-  "builders": "./builders.json",
+  "schematics": "./schematics/collection.json",
+  "builders": "./schematics/builders.json",
   "keywords": [
     "angular",
     "firebase",
@@ -23,15 +23,31 @@
   "author": "angular,firebase",
   "license": "MIT",
   "peerDependencies": {
-    "@angular/common": "ANGULAR_VERSION",
-    "@angular/core": "ANGULAR_VERSION",
-    "@angular/platform-browser": "ANGULAR_VERSION",
-    "@angular/platform-browser-dynamic": "ANGULAR_VERSION",
-    "firebase": "FIREBASE_VERSION",
-    "rxjs": "RXJS_VERSION"
+    "@angular/common": "^12.0.0",
+    "@angular/core": "^12.0.0",
+    "@angular/platform-browser": "^12.0.0",
+    "@angular/platform-browser-dynamic": "^12.0.0",
+    "@angular-devkit/schematics": "^12.0.0",
+    "@angular-devkit/architect": "> 0.1200.0 < 0.1300.0",
+    "@schematics/angular": "^12.0.0",
+    "firebase": "^9.0.0",
+    "rxfire": "^6.0.0",
+    "rxjs": "~6.6.0"
   },
   "dependencies": {
-    "tslib": "^2.0.0"
+    "tslib": "^2.0.0",
+    "fuzzy": "^0.1.3",
+    "inquirer-autocomplete-prompt": "^1.0.1",
+    "open": "^8.0.0",
+    "jsonc-parser": "^3.0.0",
+    "ora": "^5.3.0",
+    "winston": "^3.0.0",
+    "triple-beam": "^1.3.0",
+    "node-fetch": "^2.6.1",
+    "semver": "^7.1.3",
+    "inquirer": "^8.1.1",
+    "fs-extra": "^8.0.1",
+    "file-loader": "^6.2.0"
   },
   "ngPackage": {
     "lib": {
@@ -42,8 +58,17 @@
         "tslib": "tslib",
         "rxjs": "rxjs"
       },
-      "entryFile": "core/public_api.ts"
+      "entryFile": "public_api.ts"
     },
-    "dest": "../dist/packages-dist"
+    "dest": "../dist/packages-dist",
+    "allowedNonPeerDependencies": [
+      "fuzzy", "inquirer-autocomplete-prompt",
+      "open", "jsonc-parser", "ora", "winston",
+      "triple-beam", "@schematics/angular", "node-fetch",
+      "semver", "inquirer", "fs-extra", "file-loader"
+    ]
+  },
+  "ng-update": {
+    "migrations": "./schematics/migration.json"
   }
 }

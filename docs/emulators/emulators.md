@@ -69,10 +69,10 @@ Each module (database, firestore, auth, function) provides `USE_EMULATOR` token 
 Import these tokens at your `app.module.ts` as follow:
 
 ```ts
-import { USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/auth';
-import { USE_EMULATOR as USE_DATABASE_EMULATOR } from '@angular/fire/database';
-import { USE_EMULATOR as USE_FIRESTORE_EMULATOR } from '@angular/fire/firestore';
-import { USE_EMULATOR as USE_FUNCTIONS_EMULATOR } from '@angular/fire/functions';
+import { USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/compat/auth';
+import { USE_EMULATOR as USE_DATABASE_EMULATOR } from '@angular/fire/compat/database';
+import { USE_EMULATOR as USE_FIRESTORE_EMULATOR } from '@angular/fire/compat/firestore';
+import { USE_EMULATOR as USE_FUNCTIONS_EMULATOR } from '@angular/fire/compat/functions';
 
 @NgModule({
   // ... Existing configuration
@@ -93,7 +93,7 @@ Also you can opt-in the new way of setting the Cloud Functions [origin](https://
 
 ```ts
 import { isDevMode, NgModule } from '@angular/core';
-import { ORIGIN as FUNCTIONS_ORIGIN, NEW_ORIGIN_BEHAVIOR } from '@angular/fire/functions';
+import { ORIGIN as FUNCTIONS_ORIGIN, NEW_ORIGIN_BEHAVIOR } from '@angular/fire/compat/functions';
 
 @NgModule({
   // ... Existing configuration
@@ -111,9 +111,9 @@ export class AppModule { }
 With the exception of the Auth Emulator, the old way of setting the `host` and `port` for each emulator was done using a different set of tokens by passing the entire url path as string.
 
 ```ts
-import { URL as DATABASE_URL } from '@angular/fire/database';
-import { ORIGIN as FUNCTIONS_ORIGIN } from '@angular/fire/functions';
-import { SETTINGS as FIRESTORE_SETTINGS } from '@angular/fire/firestore';
+import { URL as DATABASE_URL } from '@angular/fire/compat/database';
+import { ORIGIN as FUNCTIONS_ORIGIN } from '@angular/fire/compat/functions';
+import { SETTINGS as FIRESTORE_SETTINGS } from '@angular/fire/compat/firestore';
 
 @NgModule({
   // ... Existing configuration

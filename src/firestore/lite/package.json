@@ -1,0 +1,12 @@
+{
+  "$schema": "../../../node_modules/ng-packagr/package.schema.json",
+  "ngPackage": {
+    "lib": {
+      "umdModuleIds": {
+        "rxfire/firestore/lite": "rxfire-firestore-lite",
+        "firebase/firestore/lite": "firebase-firestore-lite"
+      },
+      "entryFile": "public_api.ts"
+    }
+  }
+}
