@@ -42,16 +42,48 @@ In order to better support the tree-shakability introduced in Firebase v9 & to r
 
 **Modular SDK:**
 ```ts
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { connectAuthEmulator, getAuth, provideAuth } from '@angular/fire/auth';
+import { connectDatabaseEmulator, getDatabase, provideDatabase } from '@angular/fire/database';
+import { connectFirestoreEmulator, getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { connectFunctionsEmulator, getFunctions, provideFunctions } from '@angular/fire/functions';
+import { connectStorageEmulator, getStorage, provideStorage } from '@angular/fire/storage';
+import { getAnalytics, provideAnalytics } from '@angular/fire/analytics';
+import { getMessaging, provideMessaging } from '@angular/fire/messaging';
+import { getPerformance, providePerformance } from '@angular/fire/performance';
+
 @NgModule({
-    imports: [
+    imports: [        
         provideFirebaseApp(() => initializeApp(config)),
-        provideFirestore(() => {
-            const firestore = getFirestore();
-            connectEmulator(firestore, 'localhost', 8080);
-            enableIndexedDbPersistence(firestore);
-            return firestore;
+        provideAuth(() => {
+          const auth = getAuth();
+          if (emulator) connectAuthEmulator(auth, `localhost:${authPort}`);
+          return auth;
         }),
-        provideStorage(() => getStorage()),
+        provideDatabase(() => {
+          const database = getDatabase();
+          if (emulator) connectDatabaseEmulator(database, 'localhost', databasePort);
+          return database;
+        }),
+        provideFunctions(() => {
+          const functions = getFunctions();
+          if (emulator) connectFunctionsEmulator(functions, 'localhost', functionsPort);
+          return functions;
+        }),
+        provideStorage(() => {
+          const storage = getStorage();
+          if (emulator) connectStorageEmulator(storage, 'localhost', storagePort);
+          return storage;
+        }),
+        provideFirestore(() => {
+          const firestore = getFirestore();
+          if (emulator) connectFirestoreEmulator(firestore, 'localhost', firestorePort);
+          enableIndexedDbPersistence(firestore);
+          return firestore;
+        }),
+        provideAnalytics(() => getAnalytics()),
+        providePerformance(() => getPerformance()),
+        provideMessaging(() => getMessaging())
     ],
 })
 ```
