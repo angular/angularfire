@@ -21,7 +21,7 @@
     "@angular/common": "^12.0.0",
     "@angular/compiler": "^12.0.0",
     "@angular/core": "^12.0.0",
-    "@angular/fire": "../../dist/packages-dist",
+    "@angular/fire": "../../angular-fire-7.1.0.tgz",
     "@angular/forms": "^12.0.0",
     "@angular/platform-browser": "^12.0.0",
     "@angular/platform-browser-dynamic": "^12.0.0",
