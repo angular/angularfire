@@ -1,6 +1,6 @@
-import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from '@angular/core';
+import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, Injector } from '@angular/core';
 import { FirebaseStorage } from 'firebase/storage';
-import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
+import { ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
 import { Storage, StorageInstances, STORAGE_PROVIDER_NAME } from './storage';
 import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
 import { AuthInstances } from '@angular/fire/auth';
@@ -10,13 +10,13 @@ import { AppCheckInstances } from '@angular/fire/app-check';
 export const PROVIDED_STORAGE_INSTANCES = new InjectionToken<Storage[]>('angularfire2.storage-instances');
 
 export function defaultStorageInstanceFactory(provided: FirebaseStorage[]|undefined, defaultApp: FirebaseApp) {
-  const defaultAuth = ɵgetDefaultInstanceOf<FirebaseStorage>(STORAGE_PROVIDER_NAME, provided, defaultApp);
-  return new Storage(defaultAuth);
+  const defaultStorage = ɵgetDefaultInstanceOf<FirebaseStorage>(STORAGE_PROVIDER_NAME, provided, defaultApp);
+  return defaultStorage && new Storage(defaultStorage);
 }
 
-export function storageInstanceFactory(fn: () => FirebaseStorage) {
-  return (zone: NgZone) => {
-    const storage = ɵmemoizeInstance<FirebaseStorage>(fn, zone);
+export function storageInstanceFactory(fn: (injector: Injector) => FirebaseStorage) {
+  return (zone: NgZone, injector: Injector) => {
+    const storage = zone.runOutsideAngular(() => fn(injector));
     return new Storage(storage);
   };
 }
@@ -58,6 +58,7 @@ export function provideStorage(fn: () => FirebaseStorage): ModuleWithProviders<S
       multi: true,
       deps: [
         NgZone,
+        Injector,
         ɵAngularFireSchedulers,
         FirebaseApps,
         // Defensively load Auth first, if provided

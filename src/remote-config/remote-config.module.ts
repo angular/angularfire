@@ -1,20 +1,29 @@
-import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from '@angular/core';
+import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, PLATFORM_ID, Injector } from '@angular/core';
 import { RemoteConfig as FirebaseRemoteConfig } from 'firebase/remote-config';
-import { ɵmemoizeInstance, ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
+import { ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
 import { RemoteConfig, RemoteConfigInstances, REMOTE_CONFIG_PROVIDER_NAME } from './remote-config';
 import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
 import { registerVersion } from 'firebase/app';
+import { isPlatformBrowser } from '@angular/common';
 
 export const PROVIDED_REMOTE_CONFIG_INSTANCES = new InjectionToken<RemoteConfig[]>('angularfire2.remote-config-instances');
 
-export function defaultRemoteConfigInstanceFactory(provided: FirebaseRemoteConfig[]|undefined, defaultApp: FirebaseApp) {
+export function defaultRemoteConfigInstanceFactory(
+  provided: FirebaseRemoteConfig[]|undefined,
+  defaultApp: FirebaseApp,
+  // tslint:disable-next-line:ban-types
+  platform: Object
+) {
+  if (!isPlatformBrowser(platform)) { return null; }
   const defaultRemoteConfig = ɵgetDefaultInstanceOf<FirebaseRemoteConfig>(REMOTE_CONFIG_PROVIDER_NAME, provided, defaultApp);
-  return new RemoteConfig(defaultRemoteConfig);
+  return defaultRemoteConfig && new RemoteConfig(defaultRemoteConfig);
 }
 
-export function remoteConfigInstanceFactory(fn: () => FirebaseRemoteConfig) {
-  return (zone: NgZone) => {
-    const remoteConfig = ɵmemoizeInstance<FirebaseRemoteConfig>(fn, zone);
+export function remoteConfigInstanceFactory(fn: (injector: Injector) => FirebaseRemoteConfig) {
+  // tslint:disable-next-line:ban-types
+  return (zone: NgZone, platform: Object, injector: Injector) => {
+    if (!isPlatformBrowser(platform)) { return null; }
+    const remoteConfig = zone.runOutsideAngular(() => fn(injector));
     return new RemoteConfig(remoteConfig);
   };
 }
@@ -32,6 +41,7 @@ const DEFAULT_REMOTE_CONFIG_INSTANCE_PROVIDER = {
   deps: [
     [new Optional(), PROVIDED_REMOTE_CONFIG_INSTANCES ],
     FirebaseApp,
+    PLATFORM_ID,
   ]
 };
 
@@ -56,6 +66,8 @@ export function provideRemoteConfig(fn: () => FirebaseRemoteConfig): ModuleWithP
       multi: true,
       deps: [
         NgZone,
+        PLATFORM_ID,
+        Injector,
         ɵAngularFireSchedulers,
         FirebaseApps,
       ]

@@ -4,11 +4,10 @@ import { map, observeOn, shareReplay, switchMap } from 'rxjs/operators';
 import { ɵAngularFireSchedulers } from '@angular/fire';
 import { ɵlazySDKProxy, ɵPromiseProxy, ɵapplyMixins } from '@angular/fire/compat';
 import { FirebaseOptions } from 'firebase/app';
-import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire/compat';
+import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance } from '@angular/fire/compat';
 import firebase from 'firebase/compat/app';
 import { proxyPolyfillCompat } from './base';
 import { HttpsCallableOptions } from '@firebase/functions-types';
-import { ɵcacheInstance } from '@angular/fire';
 import { AppCheckInstances } from '@angular/fire/app-check';
 
 export const ORIGIN = new InjectionToken<string>('angularfire2.functions.origin');

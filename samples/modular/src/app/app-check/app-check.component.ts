@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { getToken, AppCheck } from '@angular/fire/app-check';
 import { traceUntilFirst } from '@angular/fire/performance';
-import { from, Observable } from 'rxjs';
+import { EMPTY, from, Observable } from 'rxjs';
 import { keepUnstableUntilFirst } from '@angular/fire';
-import { share, tap } from 'rxjs/operators';
+import { share } from 'rxjs/operators';
 
 @Component({
   selector: 'app-app-check',
@@ -20,11 +20,15 @@ export class AppCheckComponent implements OnInit {
   readonly change$: Observable<any>;
 
   constructor(appCheck: AppCheck) {
-    this.change$ = from(getToken(appCheck)).pipe(
-      traceUntilFirst('app-check'),
-      keepUnstableUntilFirst,
-      share(),
-    );
+    if (appCheck) {
+      this.change$ = from(getToken(appCheck)).pipe(
+        traceUntilFirst('app-check'),
+        keepUnstableUntilFirst,
+        share(),
+      );
+    } else {
+      this.change$ = EMPTY;
+    }
   }
 
   ngOnInit(): void {

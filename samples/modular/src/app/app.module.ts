@@ -5,6 +5,11 @@ import { connectFunctionsEmulator, FunctionsModule, getFunctions, provideFunctio
 import { connectFirestoreEmulator, getFirestore, provideFirestore, enableMultiTabIndexedDbPersistence } from '@angular/fire/firestore';
 import { connectDatabaseEmulator, getDatabase, provideDatabase } from '@angular/fire/database';
 import { connectStorageEmulator, getStorage, provideStorage } from '@angular/fire/storage';
+import { getRemoteConfig, provideRemoteConfig } from '@angular/fire/remote-config';
+import { getAnalytics, provideAnalytics, ScreenTrackingService, UserTrackingService } from '@angular/fire/analytics';
+import { getMessaging, provideMessaging } from '@angular/fire/messaging';
+import { provideAuth, connectAuthEmulator, getAuth } from '@angular/fire/auth';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -44,6 +49,20 @@ export const persistenceEnabled = new Promise<boolean>(resolve => {
     BrowserModule.withServerTransition({ appId: 'serverApp' }),
     AppRoutingModule,
     FunctionsModule,
+    provideRemoteConfig(() => getRemoteConfig()),
+    provideAnalytics(() => getAnalytics()),
+    provideMessaging(() => getMessaging()),
+    provideAuth(() => {
+      const auth = getAuth();
+      if (environment.useEmulators) {
+        connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
+      }
+      return auth;
+    }),
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: environment.production,
+      registrationStrategy: 'registerWhenStable:30000'
+    }),
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideFirestore(() => {
       const firestore = getFirestore();

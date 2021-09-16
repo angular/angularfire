@@ -1,6 +1,6 @@
-import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, PLATFORM_ID } from '@angular/core';
+import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, Injector } from '@angular/core';
 import { Auth as FirebaseAuth } from 'firebase/auth';
-import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
+import { ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
 import { Auth, AuthInstances, AUTH_PROVIDER_NAME } from './auth';
 import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
 import { registerVersion } from 'firebase/app';
@@ -10,12 +10,13 @@ export const PROVIDED_AUTH_INSTANCES = new InjectionToken<Auth[]>('angularfire2.
 
 export function defaultAuthInstanceFactory(provided: FirebaseAuth[]|undefined, defaultApp: FirebaseApp) {
   const defaultAuth = ɵgetDefaultInstanceOf<FirebaseAuth>(AUTH_PROVIDER_NAME, provided, defaultApp);
-  return new Auth(defaultAuth);
+  return defaultAuth && new Auth(defaultAuth);
 }
 
-export function authInstanceFactory(fn: () => FirebaseAuth) {
-  return (zone: NgZone) => {
-    return ɵmemoizeInstance<FirebaseAuth>(fn, zone);
+export function authInstanceFactory(fn: (injector: Injector) => FirebaseAuth) {
+  return (zone: NgZone, injector: Injector) => {
+    const auth = zone.runOutsideAngular(() => fn(injector));
+    return new Auth(auth);
   };
 }
 
@@ -32,7 +33,6 @@ const DEFAULT_AUTH_INSTANCE_PROVIDER = {
   deps: [
     [new Optional(), PROVIDED_AUTH_INSTANCES ],
     FirebaseApp,
-    PLATFORM_ID,
   ]
 };
 
@@ -57,7 +57,7 @@ export function provideAuth(fn: () => FirebaseAuth): ModuleWithProviders<AuthMod
       multi: true,
       deps: [
         NgZone,
-        PLATFORM_ID,
+        Injector,
         ɵAngularFireSchedulers,
         FirebaseApps,
         [new Optional(), AppCheckInstances ],

@@ -5,7 +5,7 @@ import { createListReference } from './list/create-reference';
 import { createObjectReference } from './object/create-reference';
 import { ɵAngularFireSchedulers } from '@angular/fire';
 import { FirebaseOptions } from 'firebase/app';
-import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire/compat';
+import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance } from '@angular/fire/compat';
 import 'firebase/compat/auth';
 import 'firebase/compat/database';
 import {
@@ -19,7 +19,6 @@ import {
   ɵauthFactory,
 } from '@angular/fire/compat/auth';
 import firebase from 'firebase/compat/app';
-import { ɵcacheInstance } from '@angular/fire';
 import { AppCheckInstances } from '@angular/fire/app-check';
 
 export const URL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');

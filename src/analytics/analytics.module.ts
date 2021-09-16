@@ -1,9 +1,11 @@
-import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, APP_INITIALIZER } from '@angular/core';
+import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, APP_INITIALIZER, Injector } from '@angular/core';
 import { Analytics as FirebaseAnalytics, isSupported } from 'firebase/analytics';
-import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
+import { ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
 import { Analytics, ANALYTICS_PROVIDER_NAME, AnalyticsInstances } from './analytics';
 import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
 import { registerVersion } from 'firebase/app';
+import { ScreenTrackingService } from './screen-tracking.service';
+import { UserTrackingService } from './user-tracking.service';
 
 const PROVIDED_ANALYTICS_INSTANCES = new InjectionToken<Analytics[]>('angularfire2.analytics-instances');
 const IS_SUPPORTED = new InjectionToken<boolean>('angularfire2.analytics.isSupported');
@@ -11,15 +13,15 @@ const IS_SUPPORTED = new InjectionToken<boolean>('angularfire2.analytics.isSuppo
 const isSupportedSymbol = Symbol('angularfire2.analytics.isSupported');
 
 export function defaultAnalyticsInstanceFactory(isSupported: boolean, provided: FirebaseAnalytics[]|undefined, defaultApp: FirebaseApp) {
-  const defaultAnalytics = isSupported ?
-    ɵgetDefaultInstanceOf<FirebaseAnalytics>(ANALYTICS_PROVIDER_NAME, provided, defaultApp) :
-    undefined;
-  return new Analytics(defaultAnalytics);
+  if (!isSupported) { return null; }
+  const defaultAnalytics = ɵgetDefaultInstanceOf<FirebaseAnalytics>(ANALYTICS_PROVIDER_NAME, provided, defaultApp);
+  return defaultAnalytics && new Analytics(defaultAnalytics);
 }
 
-export function analyticsInstanceFactory(fn: () => FirebaseAnalytics) {
-  return (zone: NgZone, isSupported: boolean) => {
-    const analytics = isSupported ? ɵmemoizeInstance<FirebaseAnalytics>(fn, zone) : undefined;
+export function analyticsInstanceFactory(fn: (injector: Injector) => FirebaseAnalytics) {
+  return (zone: NgZone, isSupported: boolean, injector: Injector) => {
+    if (!isSupported) { return null; }
+    const analytics = zone.runOutsideAngular(() => fn(injector));
     return new Analytics(analytics);
   };
 }
@@ -53,12 +55,15 @@ const DEFAULT_ANALYTICS_INSTANCE_PROVIDER = {
   ]
 })
 export class AnalyticsModule {
-  constructor() {
+  constructor(
+    @Optional() _screenTracking: ScreenTrackingService,
+    @Optional() _userTracking: UserTrackingService,
+  ) {
     registerVersion('angularfire', VERSION.full, 'analytics');
   }
 }
 
-export function provideAnalytics(fn: () => FirebaseAnalytics): ModuleWithProviders<AnalyticsModule> {
+export function provideAnalytics(fn: (injector: Injector) => FirebaseAnalytics): ModuleWithProviders<AnalyticsModule> {
   return {
     ngModule: AnalyticsModule,
     providers: [{
@@ -71,6 +76,7 @@ export function provideAnalytics(fn: () => FirebaseAnalytics): ModuleWithProvide
       deps: [
         NgZone,
         IS_SUPPORTED,
+        Injector,
         ɵAngularFireSchedulers,
         FirebaseApps,
       ]

@@ -246,24 +246,7 @@
 
 "@angular/fire@../../angular-fire-7.1.0.tgz":
   version "7.1.0"
-  resolved "../../angular-fire-7.1.0.tgz#09c9450ae2d6290d22a9c57ce2246d1c4ded7f10"
-  dependencies:
-    file-loader "^6.2.0"
-    fs-extra "^8.0.1"
-    fuzzy "^0.1.3"
-    inquirer "^8.1.1"
-    inquirer-autocomplete-prompt "^1.0.1"
-    jsonc-parser "^3.0.0"
-    node-fetch "^2.6.1"
-    open "^8.0.0"
-    ora "^5.3.0"
-    semver "^7.1.3"
-    triple-beam "^1.3.0"
-    tslib "^2.0.0"
-    winston "^3.0.0"
-
-"@angular/fire@../../dist/packages-dist":
-  version "7.1.0"
+  resolved "../../angular-fire-7.1.0.tgz#749a0443e5974789fbdc5a3b31237aa6506d7b7e"
   dependencies:
     file-loader "^6.2.0"
     fs-extra "^8.0.1"
@@ -9982,6 +9965,11 @@ triple-beam@^1.2.0, triple-beam@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/triple-beam/-/triple-beam-1.3.0.tgz#a595214c7298db8339eeeee083e4d10bd8cb8dd9"
   integrity sha512-XrHUvV5HpdLmIj4uVMxHggLbFSZYIn7HEWsqePZcI50pco+MPqJ50wMGY794X7AOOhxOBAjbkqfAbEe/QMp2Lw==
+
+ts-mixer@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/ts-mixer/-/ts-mixer-6.0.0.tgz#4e631d3a36e3fa9521b973b132e8353bc7267f9f"
+  integrity sha512-nXIb1fvdY5CBSrDIblLn73NW0qRDk5yJ0Sk1qPBF560OdJfQp9jhl+0tzcY09OZ9U+6GpeoI9RjwoIKFIoB9MQ==
 
 ts-node@~9.1.1:
   version "9.1.1"

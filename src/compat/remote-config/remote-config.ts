@@ -17,12 +17,11 @@ import {
 import { ɵAngularFireSchedulers, keepUnstableUntilFirst } from '@angular/fire';
 import { ɵlazySDKProxy, ɵPromiseProxy, ɵapplyMixins } from '@angular/fire/compat';
 import { FirebaseOptions } from 'firebase/app';
-import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire/compat';
+import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance } from '@angular/fire/compat';
 import { isPlatformBrowser } from '@angular/common';
 import firebase from 'firebase/compat/app';
 import { Settings } from './interfaces';
 import { proxyPolyfillCompat } from './base';
-import { ɵcacheInstance } from '@angular/fire';
 
 export interface ConfigTemplate {
   [key: string]: string | number | boolean;

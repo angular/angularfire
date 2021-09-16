@@ -9,58 +9,19 @@ interface FirebaseAppWithContainer extends FirebaseApp {
   container: ComponentContainer;
 }
 
-const IS_HMR = !!(module as any).hot;
-
-const log = (level: 'log'|'error'|'info'|'warn', ...args: any) => {
-  if (isDevMode() && typeof console !== 'undefined') {
-    console[level](...args);
-  }
-};
-
-export function ɵcacheInstance<T>(cacheKey: any, moduleName: string, appName: string, fn: () => T, deps: any): T {
-  const [, instance, cachedDeps] = globalThis.ɵAngularfireInstanceCache.find((it: any) => it[0] === cacheKey) || [];
-  if (instance) {
-    if (!matchDep(deps, cachedDeps)) {
-      log('error', `${moduleName} was already initialized on the ${appName} Firebase App with different settings.${IS_HMR ? ' You may need to reload as Firebase is not HMR aware.' : ''}`);
-      log('warn', {is: deps, was: cachedDeps});
-    }
-    return instance;
-  } else {
-    const newInstance = fn();
-    globalThis.ɵAngularfireInstanceCache.push([cacheKey, newInstance, deps]);
-    return newInstance;
-  }
-}
-
-globalThis.ɵAngularfireInstanceCache ||= [];
+const LOCALHOSTS = ['localhost', '0.0.0.0', '127.0.0.1'];
 
 // HACK HACK HACK
 // AppCheck stuff, here so we can get a jump on it. It's too late in the evaluation
 // if we do this in the app-check module. globalThis.ngDevMode allows me to test if
 // Angular is in DevMode before Angular initializes.
 // Only do this in the browser, for Node we have the admin sdk
-if ((typeof process === 'undefined' || !process.versions?.node) && globalThis.ngDevMode) {
+if ((
+  typeof process === 'undefined' || !process.versions?.node
+) && (
+  globalThis.ngDevMode || typeof window !== 'undefined' && LOCALHOSTS.includes(window.location.hostname)
+)) {
   globalThis.FIREBASE_APPCHECK_DEBUG_TOKEN ??= true;
-}
-
-export function ɵmemoizeInstance<T>(fn: () => T, zone: NgZone): T {
-  const [, instance] = globalThis.ɵAngularfireInstanceCache.find((it: any) => matchDep(it[0], fn)) || [];
-  if (instance) {
-    return instance as T;
-  } else {
-    // TODO catch and add HMR warning
-    const instance = zone.runOutsideAngular(() => fn());
-    globalThis.ɵAngularfireInstanceCache.push([fn, instance]);
-    return instance;
-  }
-}
-
-function matchDep(a: any, b: any) {
-  try {
-    return a.toString() === b.toString();
-  } catch (_) {
-    return a === b;
-  }
 }
 
 export function ɵgetDefaultInstanceOf<T= unknown>(identifier: string, provided: T[]|undefined, defaultApp: FirebaseApp): T|undefined  {
@@ -74,7 +35,7 @@ export function ɵgetDefaultInstanceOf<T= unknown>(identifier: string, provided:
   // Grab the default instance from the defaultApp
   const defaultAppWithContainer: FirebaseAppWithContainer = defaultApp as any;
   const provider = defaultAppWithContainer.container.getProvider(identifier as never);
-  return provider.getImmediate();
+  return provider.getImmediate({ optional: true });
 }
 
 export const ɵgetAllInstancesOf = <T= unknown>(identifier: string, app?: FirebaseApp): Array<T> => {

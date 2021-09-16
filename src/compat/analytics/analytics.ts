@@ -3,11 +3,10 @@ import { EMPTY, of } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { map, shareReplay, switchMap, observeOn } from 'rxjs/operators';
 import { ɵAngularFireSchedulers } from '@angular/fire';
-import { ɵlazySDKProxy, ɵPromiseProxy, ɵapplyMixins } from '@angular/fire/compat';
+import { ɵlazySDKProxy, ɵPromiseProxy, ɵapplyMixins, ɵcacheInstance } from '@angular/fire/compat';
 import { FirebaseApp } from '@angular/fire/compat';
 import firebase from 'firebase/compat/app';
 import { proxyPolyfillCompat } from './base';
-import { ɵcacheInstance } from '@angular/fire';
 import { isSupported } from 'firebase/analytics';
 
 export interface Config {
