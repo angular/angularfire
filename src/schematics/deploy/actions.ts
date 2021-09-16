@@ -353,7 +353,7 @@ export const deployToCloudRun = async (
 
   // tslint:disable-next-line:no-non-null-assertion
   const siteTarget = options.target ?? context.target!.project;
-  
+
   // TODO deploy cloud run
   return await firebaseTools.deploy({
     only: `hosting:${siteTarget}`,
