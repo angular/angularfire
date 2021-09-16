@@ -104,6 +104,15 @@ const initialFirebaseJson = `{
               \"value\": \"public,max-age=31536000,immutable\"
             }
           ]
+        },
+        {
+          \"source\": \"/@(ngsw-worker.js|ngsw.json)\",
+          \"headers\": [
+            {
+              \"key\": \"Cache-Control\",
+              \"value\": \"no-cache\"
+            }
+          ]
         }
       ],
       \"rewrites\": [
@@ -182,6 +191,15 @@ const overwriteFirebaseJson = `{
             {
               \"key\": \"Cache-Control\",
               \"value\": \"public,max-age=31536000,immutable\"
+            }
+          ]
+        },
+        {
+          \"source\": \"/@(ngsw-worker.js|ngsw.json)\",
+          \"headers\": [
+            {
+              \"key\": \"Cache-Control\",
+              \"value\": \"no-cache\"
             }
           ]
         }
@@ -264,6 +282,15 @@ const projectFirebaseJson = `{
               \"value\": \"public,max-age=31536000,immutable\"
             }
           ]
+        },
+        {
+          \"source\": \"/@(ngsw-worker.js|ngsw.json)\",
+          \"headers\": [
+            {
+              \"key\": \"Cache-Control\",
+              \"value\": \"no-cache\"
+            }
+          ]
         }
       ],
       \"rewrites\": [
@@ -286,6 +313,15 @@ const projectFirebaseJson = `{
             {
               \"key\": \"Cache-Control\",
               \"value\": \"public,max-age=31536000,immutable\"
+            }
+          ]
+        },
+        {
+          \"source\": \"/@(ngsw-worker.js|ngsw.json)\",
+          \"headers\": [
+            {
+              \"key\": \"Cache-Control\",
+              \"value\": \"no-cache\"
             }
           ]
         }
@@ -379,6 +415,12 @@ const universalFirebaseJson = {
         key: 'Cache-Control',
         value: 'public,max-age=31536000,immutable'
       }]
+    }, {
+      source: '/@(ngsw-worker.js|ngsw.json)',
+      headers: [{
+        key: 'Cache-Control',
+        value: 'no-cache',
+      }],
     }],
     rewrites: [
       {
