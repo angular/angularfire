@@ -62,22 +62,22 @@ import { getPerformance, providePerformance } from '@angular/fire/performance';
         }),
         provideDatabase(() => {
           const database = getDatabase();
-          if (emulator) connectDatabaseEmulator(database, 'http://localhost', databasePort);
+          if (emulator) connectDatabaseEmulator(database, 'localhost', databasePort);
           return database;
         }),
         provideFunctions(() => {
           const functions = getFunctions();
-          if (emulator) connectFunctionsEmulator(functions, 'http://localhost', functionsPort);
+          if (emulator) connectFunctionsEmulator(functions, 'localhost', functionsPort);
           return functions;
         }),
         provideStorage(() => {
           const storage = getStorage();
-          if (emulator) connectStorageEmulator(storage, 'http://localhost', storagePort);
+          if (emulator) connectStorageEmulator(storage, 'localhost', storagePort);
           return storage;
         }),
         provideFirestore(() => {
           const firestore = getFirestore();
-          if (emulator) connectFirestoreEmulator(firestore, 'http://localhost', firestorePort);
+          if (emulator) connectFirestoreEmulator(firestore, 'localhost', firestorePort);
           enableIndexedDbPersistence(firestore);
           return firestore;
         }),
