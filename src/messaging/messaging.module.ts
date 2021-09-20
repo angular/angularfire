@@ -58,7 +58,7 @@ export class MessagingModule {
   }
 }
 
-export function provideMessaging(fn: () => FirebaseMessaging): ModuleWithProviders<MessagingModule> {
+export function provideMessaging(fn: () => FirebaseMessaging, ...deps: any[]): ModuleWithProviders<MessagingModule> {
   return {
     ngModule: MessagingModule,
     providers: [{
@@ -74,6 +74,7 @@ export function provideMessaging(fn: () => FirebaseMessaging): ModuleWithProvide
         Injector,
         ɵAngularFireSchedulers,
         FirebaseApps,
+        ...deps,
       ],
     }]
   };

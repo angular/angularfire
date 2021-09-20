@@ -49,7 +49,7 @@ export class DatabaseModule {
   }
 }
 
-export function provideDatabase(fn: () => FirebaseDatabase): ModuleWithProviders<DatabaseModule> {
+export function provideDatabase(fn: () => FirebaseDatabase, ...deps: any[]): ModuleWithProviders<DatabaseModule> {
   return {
     ngModule: DatabaseModule,
     providers: [{
@@ -64,6 +64,7 @@ export function provideDatabase(fn: () => FirebaseDatabase): ModuleWithProviders
         // Database+Auth work better if Auth is loaded first
         [new Optional(), AuthInstances ],
         [new Optional(), AppCheckInstances ],
+        ...deps,
       ]
     }]
   };

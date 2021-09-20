@@ -262,6 +262,23 @@
     tslib "^2.0.0"
     winston "^3.0.0"
 
+"@angular/fire@../../dist/packages-dist":
+  version "7.1.0"
+  dependencies:
+    file-loader "^6.2.0"
+    fs-extra "^8.0.1"
+    fuzzy "^0.1.3"
+    inquirer "^8.1.1"
+    inquirer-autocomplete-prompt "^1.0.1"
+    jsonc-parser "^3.0.0"
+    node-fetch "^2.6.1"
+    open "^8.0.0"
+    ora "^5.3.0"
+    semver "^7.1.3"
+    triple-beam "^1.3.0"
+    tslib "^2.0.0"
+    winston "^3.0.0"
+
 "@angular/forms@^12.0.0":
   version "12.2.5"
   resolved "https://registry.yarnpkg.com/@angular/forms/-/forms-12.2.5.tgz#c190c1873ba856101323037147a0be906817bc82"

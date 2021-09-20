@@ -56,7 +56,7 @@ export class AppCheckModule {
   }
 }
 
-export function provideAppCheck(fn: (injector: Injector) => FirebaseAppCheck): ModuleWithProviders<AppCheckModule> {
+export function provideAppCheck(fn: (injector: Injector) => FirebaseAppCheck, ...deps: any[]): ModuleWithProviders<AppCheckModule> {
   return {
     ngModule: AppCheckModule,
     providers: [{
@@ -68,6 +68,7 @@ export function provideAppCheck(fn: (injector: Injector) => FirebaseAppCheck): M
         Injector,
         ɵAngularFireSchedulers,
         FirebaseApps,
+        ...deps,
       ]
     }]
   };

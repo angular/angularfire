@@ -63,7 +63,7 @@ export class AnalyticsModule {
   }
 }
 
-export function provideAnalytics(fn: (injector: Injector) => FirebaseAnalytics): ModuleWithProviders<AnalyticsModule> {
+export function provideAnalytics(fn: (injector: Injector) => FirebaseAnalytics, ...deps: any[]): ModuleWithProviders<AnalyticsModule> {
   return {
     ngModule: AnalyticsModule,
     providers: [{
@@ -79,6 +79,7 @@ export function provideAnalytics(fn: (injector: Injector) => FirebaseAnalytics):
         Injector,
         ɵAngularFireSchedulers,
         FirebaseApps,
+        ...deps,
       ]
     }]
   };

@@ -48,7 +48,7 @@ export class AuthModule {
   }
 }
 
-export function provideAuth(fn: () => FirebaseAuth): ModuleWithProviders<AuthModule> {
+export function provideAuth(fn: () => FirebaseAuth, ...deps: any[]): ModuleWithProviders<AuthModule> {
   return {
     ngModule: AuthModule,
     providers: [{
@@ -61,6 +61,7 @@ export function provideAuth(fn: () => FirebaseAuth): ModuleWithProviders<AuthMod
         ɵAngularFireSchedulers,
         FirebaseApps,
         [new Optional(), AppCheckInstances ],
+        ...deps,
       ]
     }]
   };

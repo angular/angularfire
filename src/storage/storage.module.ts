@@ -49,7 +49,7 @@ export class StorageModule {
   }
 }
 
-export function provideStorage(fn: () => FirebaseStorage): ModuleWithProviders<StorageModule> {
+export function provideStorage(fn: () => FirebaseStorage, ...deps: any[]): ModuleWithProviders<StorageModule> {
   return {
     ngModule: StorageModule,
     providers: [{
@@ -64,6 +64,7 @@ export function provideStorage(fn: () => FirebaseStorage): ModuleWithProviders<S
         // Defensively load Auth first, if provided
         [new Optional(), AuthInstances ],
         [new Optional(), AppCheckInstances ],
+        ...deps,
       ]
     }]
   };

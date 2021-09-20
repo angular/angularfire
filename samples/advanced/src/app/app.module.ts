@@ -1,7 +1,8 @@
-import { InjectionToken, NgModule } from '@angular/core';
+import { InjectionToken, NgModule, Optional } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { FunctionsModule } from '@angular/fire/functions';
+import { initializeAppCheck, provideAppCheck, ReCaptchaV3Provider, CustomProvider } from '@angular/fire/app-check';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -40,6 +41,21 @@ export const FIREBASE_ADMIN = new InjectionToken<app.App>('firebase-admin');
     AppRoutingModule,
     FunctionsModule,
     provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideAppCheck((injector) =>  {
+      const admin = injector.get(FIREBASE_ADMIN, null);
+      if (admin) {
+        const provider = new CustomProvider({ getToken: () =>
+          admin.
+          appCheck().
+          createToken(environment.firebase.appId, { ttlMillis: 604_800_000, /* 1 week */ }).
+          then(({ token, ttlMillis: expireTimeMillis }) => ({ token, expireTimeMillis } ))
+        });
+        return initializeAppCheck(undefined, { provider, isTokenAutoRefreshEnabled: false });
+      } else {
+        const provider = new ReCaptchaV3Provider(environment.recaptcha3SiteKey);
+        return initializeAppCheck(undefined, { provider, isTokenAutoRefreshEnabled: true });
+      }
+    }, [new Optional(), FIREBASE_ADMIN]),
   ],
   providers: [ ],
   bootstrap: [ ],

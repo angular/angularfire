@@ -49,7 +49,7 @@ export class FirestoreModule {
   }
 }
 
-export function provideFirestore(fn: () => FirebaseFirestore): ModuleWithProviders<FirestoreModule> {
+export function provideFirestore(fn: () => FirebaseFirestore, ...deps: any[]): ModuleWithProviders<FirestoreModule> {
   return {
     ngModule: FirestoreModule,
     providers: [{
@@ -64,6 +64,7 @@ export function provideFirestore(fn: () => FirebaseFirestore): ModuleWithProvide
         // Firestore+Auth work better if Auth is loaded first
         [new Optional(), AuthInstances ],
         [new Optional(), AppCheckInstances ],
+        ...deps,
       ]
     }]
   };

@@ -57,7 +57,7 @@ export class PerformanceModule {
   }
 }
 
-export function providePerformance(fn: () => FirebasePerformance): ModuleWithProviders<PerformanceModule> {
+export function providePerformance(fn: () => FirebasePerformance, ...deps: any[]): ModuleWithProviders<PerformanceModule> {
   return {
     ngModule: PerformanceModule,
     providers: [{
@@ -70,6 +70,7 @@ export function providePerformance(fn: () => FirebasePerformance): ModuleWithPro
         Injector,
         ɵAngularFireSchedulers,
         FirebaseApps,
+        ...deps,
       ]
     }]
   };
