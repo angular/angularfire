@@ -103,7 +103,7 @@ In AngularFire v7 working with multiple instances was difficult, in the new SDK 
 
 ```ts
 import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
-import { Storage, StorageIsntances } from '@angular/fire/storage';
+import { Storage, StorageInstances } from '@angular/fire/storage';
 
 export class Foo {
     constructor(
