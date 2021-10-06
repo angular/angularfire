@@ -65,7 +65,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: build
     continue-on-error: ${{ matrix.firebase == 'canary' || matrix.ng == 'next' }}
-    if: matrix.browser == '' || matrix.node == '14' && matrix.os == 'ubuntu-latest'
+    if: ${{ matrix.browser == '' || matrix.node == '14' && matrix.os == 'ubuntu-latest' }}
     strategy:
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest]
