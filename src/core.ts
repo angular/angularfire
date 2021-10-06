@@ -9,21 +9,6 @@ interface FirebaseAppWithContainer extends FirebaseApp {
   container: ComponentContainer;
 }
 
-const LOCALHOSTS = ['localhost', '0.0.0.0', '127.0.0.1'];
-
-// HACK HACK HACK
-// AppCheck stuff, here so we can get a jump on it. It's too late in the evaluation
-// if we do this in the app-check module. globalThis.ngDevMode allows me to test if
-// Angular is in DevMode before Angular initializes.
-// Only do this in the browser, for Node we have the admin sdk
-if ((
-  typeof process === 'undefined' || !process.versions?.node
-) && (
-  globalThis.ngDevMode || typeof window !== 'undefined' && LOCALHOSTS.includes(window.location.hostname)
-)) {
-  globalThis.FIREBASE_APPCHECK_DEBUG_TOKEN ??= true;
-}
-
 export function ɵgetDefaultInstanceOf<T= unknown>(identifier: string, provided: T[]|undefined, defaultApp: FirebaseApp): T|undefined  {
   if (provided) {
     // Was provide* only called once? If so grab that
