@@ -140,10 +140,10 @@ jobs:
         firebaseTools: ["9"]
         rxjs: ["7"]
         ng: ["12", "next"]
-      exclude:
-        # standard configuration
-        - firebase: 9
-          ng: 12
+        exclude:
+          # standard configuration
+          - firebase: 9
+            ng: 12
       fail-fast: false
     name: Canary firebase@${{ matrix.firebase }} firebase-tools@${{ matrix.firebaseTools }} ng@${{ matrix.ng }} rxjs@${{ matrix.rxjs}} on ${{ matrix.os }} Node.js ${{ matrix.node }}
     steps:
