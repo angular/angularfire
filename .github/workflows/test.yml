@@ -64,16 +64,23 @@ jobs:
   test:
     runs-on: ${{ matrix.os }}
     needs: build
+    continue-on-error: ${{ matrix.firebase }} == 'canary'
     strategy:
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest]
         node: ["12", "14", "16"]
-        firebase: ["9"]
+        firebase: ["9", "canary"]
         firebaseTools: ["9"]
         rxjs: ["6", "7"]
         ng: ["12"]
+        browser: [""]
+        include:
+          - browser: chrome
+            node: 14
+          - browser: firefox
+            node: 14
       fail-fast: false
-    name: Test firebase@${{ matrix.firebase }} firebase-tools@${{ matrix.firebaseTools }} ng@${{ matrix.ng }} rxjs@${{ matrix.rxjs}} on ${{ matrix.os }} Node.js ${{ matrix.node }}
+    name: Test firebase@${{ matrix.firebase }} firebase-tools@${{ matrix.firebaseTools }} ng@${{ matrix.ng }} rxjs@${{ matrix.rxjs}} on ${{ matrix.os }} Node.js ${{ matrix.node }} ${{ matrix.browser }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -118,12 +125,16 @@ jobs:
         with:
           path: ~/.cache/firebase/emulators
           key: firebase_emulators
-      - name: 'Download Artifacts'
+      - name: Download Artifacts
         uses: actions/download-artifact@v2
-      - name: Run tests
-        run: |
-          mv angularfire-${{ github.run_id }} dist
-          yarn test:node
+      - name: Relocate Artifacts
+        run: mv angularfire-${{ github.run_id }} dist
+      - name: Run node tests
+        if: ${{ matrix.browser }} == ''
+        run: yarn test:node
+      - name: Run browser test
+        if: ${{ matrix.browser }} != ''
+        run: yarn test:${{ matrix.browser }}-headless
 
   contribute:
     runs-on: ${{ matrix.os }}
@@ -173,73 +184,20 @@ jobs:
       - name: Build
         run: yarn build
       - name: Test
+        continue-on-error: ${{ matrix.os }} == 'windows-latest'
         run: yarn test
 
-  headless:
+  test_and_contribute:
     runs-on: ubuntu-latest
-    needs: build
-    name: Test firebase@${{ matrix.firebase }} rxjs@${{ matrix.rxjs }} ng@${{ matrix.ng }} on ${{ matrix.browser }}
-    strategy:
-      matrix:
-        firebase: ["9"]
-        rxjs: ["6", "7"]
-        ng: ["12"]
-        browser: ["chrome", "firefox"]
-      fail-fast: false
+    name: Test & contribute ✅
+    needs: ['test', 'contribute']
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup node
-        uses: actions/setup-node@v2-beta
-        with:
-          node-version: '14'
-          check-latest: true
-      - name: node_modules cache
-        id: node_modules_cache
-        uses: actions/cache@v2
-        with:
-          path: ./node_modules
-          key: ${{ runner.os }}-14-${{ matrix.ng }}-${{ matrix.firebase }}-9-${{ matrix.rxjs }}-node_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-14-${{ matrix.ng }}-${{ matrix.firebase }}-9-${{ matrix.rxjs }}-node_modules-
-            ${{ runner.os }}-14-${{ matrix.ng }}-${{ matrix.firebase }}-9-
-            ${{ runner.os }}-14-${{ matrix.ng }}-${{ matrix.firebase }}-
-            ${{ runner.os }}-14-${{ matrix.ng }}-
-            ${{ runner.os }}-14-
-      - name: Yarn offline cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm-packages-offline-cache
-          key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: yarn-offline
-      - name: Configure yarn
-        run: |
-          yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
-          yarn config set ignore-engines true
-      - name: Yarn install
-        if: steps.node_modules_cache.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile --prefer-offline
-      - name: Bump deps
-        run: |
-          yarn add firebase@${{ matrix.firebase }}
-          yarn add rxjs@${{ matrix.rxjs }} --prefer-offline
-          npx ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty --force || true
-      - name: Firebase emulator cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/firebase/emulators
-          key: firebase_emulators
-      - name: 'Download Artifacts'
-        uses: actions/download-artifact@v2
-      - name: Run tests
-        run: |
-          mv angularfire-${{ github.run_id }} dist
-          yarn test:${{ matrix.browser }}-headless
+      - run: true
 
   publish:
     runs-on: ubuntu-latest
     name: Publish (NPM)
-    needs: ['build', 'test', 'headless']
+    needs: ['build', 'test']
     if: ${{ github.ref == 'refs/heads/master' || github.event_name == 'release' }}
     steps:
       - name: Setup node
