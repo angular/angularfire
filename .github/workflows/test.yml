@@ -107,7 +107,7 @@ jobs:
           yarn add firebase@${{ matrix.firebase }} --prefer-offline --ignore-engines
           yarn add firebase-tools@${{ matrix.firebaseTools }} --prefer-offline --ignore-engines
           yarn add rxjs@${{ matrix.rxjs }} --prefer-offline --ignore-engines
-          ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty
+          npx ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty
       - name: Firebase emulator cache
         uses: actions/cache@v2
         with:
@@ -214,7 +214,7 @@ jobs:
           yarn install --frozen-lockfile --prefer-offline
           yarn add firebase@${{ matrix.firebase }} --prefer-offline
           yarn add rxjs@${{ matrix.rxjs }} --prefer-offline
-          ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty
+          npx ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty
       - name: Firebase emulator cache
         uses: actions/cache@v2
         with:
