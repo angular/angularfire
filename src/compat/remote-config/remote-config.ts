@@ -18,10 +18,10 @@ import { ɵAngularFireSchedulers, keepUnstableUntilFirst } from '@angular/fire';
 import { ɵlazySDKProxy, ɵPromiseProxy, ɵapplyMixins } from '@angular/fire/compat';
 import { FirebaseOptions } from 'firebase/app';
 import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance } from '@angular/fire/compat';
-import { isPlatformBrowser } from '@angular/common';
 import firebase from 'firebase/compat/app';
 import { Settings } from './interfaces';
 import { proxyPolyfillCompat } from './base';
+import { isSupported } from 'firebase/remote-config';
 
 export interface ConfigTemplate {
   [key: string]: string | number | boolean;
@@ -134,8 +134,8 @@ export class AngularFireRemoteConfig {
   ) {
     const remoteConfig$ = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
-      switchMap(() => isPlatformBrowser(platformId) ? import('firebase/compat/remote-config') : EMPTY),
-      switchMap(() => import('@firebase/remote-config')),
+      switchMap(() => isSupported()),
+      switchMap(isSupported => isSupported ? import('firebase/compat/remote-config') : EMPTY),
       map(() => ɵfirebaseAppFactory(options, zone, name)),
       map(app => ɵcacheInstance(`${app.name}.remote-config`, 'AngularFireRemoteConfig', app.name, () => {
         const rc = app.remoteConfig();
