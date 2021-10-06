@@ -32,7 +32,11 @@
     "@schematics/angular": "^12.0.0",
     "firebase": "^9.0.0",
     "rxfire": "^6.0.0",
-    "rxjs": "~6.6.0"
+    "rxjs": "~6.6.0",
+    "firebase-tools": "^9.9.0"
+  },
+  "peerDependenciesMeta": {
+    "firebase-tools": { "optional": true }
   },
   "dependencies": {
     "tslib": "^2.0.0",

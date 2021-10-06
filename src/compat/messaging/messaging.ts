@@ -2,9 +2,9 @@ import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } fro
 import firebase from 'firebase/compat/app';
 import { concat, EMPTY, Observable, of } from 'rxjs';
 import { catchError, defaultIfEmpty, map, mergeMap, observeOn, switchMap, switchMapTo, shareReplay, subscribeOn } from 'rxjs/operators';
-import { ɵAngularFireSchedulers, ɵcacheInstance } from '@angular/fire';
+import { ɵAngularFireSchedulers } from '@angular/fire';
 import { ɵlazySDKProxy, ɵPromiseProxy, ɵapplyMixins } from '@angular/fire/compat';
-import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire/compat';
+import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance } from '@angular/fire/compat';
 import { FirebaseOptions } from 'firebase/app';
 import { proxyPolyfillCompat } from './base';
 import { isSupported } from 'firebase/messaging';

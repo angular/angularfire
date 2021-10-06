@@ -1,6 +1,7 @@
 import {
   Inject,
   InjectionToken,
+  Injector,
   ModuleWithProviders,
   NgModule,
   NgZone,
@@ -11,7 +12,7 @@ import {
 import { FirebaseApp as IFirebaseApp, getApp, registerVersion } from 'firebase/app';
 
 import { FirebaseApp, FirebaseApps } from './app';
-import { VERSION, ɵmemoizeInstance, ɵAngularFireSchedulers } from '@angular/fire';
+import { VERSION, ɵAngularFireSchedulers } from '@angular/fire';
 
 export function defaultFirebaseAppFactory(provided: FirebaseApp[]|undefined) {
   // Use the provided app, if there is only one, otherwise fetch the default app
@@ -42,9 +43,9 @@ const FIREBASE_APPS_PROVIDER = {
   ],
 };
 
-export function firebaseAppFactory(fn: () => IFirebaseApp) {
-  return (zone: NgZone) => {
-    const app = ɵmemoizeInstance<IFirebaseApp>(fn, zone);
+export function firebaseAppFactory(fn: (injector: Injector) => IFirebaseApp) {
+  return (zone: NgZone, injector: Injector) => {
+    const app = zone.runOutsideAngular(() => fn(injector));
     return new FirebaseApp(app);
   };
 }
@@ -67,14 +68,19 @@ export class FirebaseAppModule {
 // Calling initializeApp({ ... }, 'name') multiple times will add more FirebaseApps into the FIREBASE_APPS
 // injection scope. This allows developers to more easily work with multiple Firebase Applications. Downside
 // is that DI for app name and options doesn't really make sense anymore.
-export function provideFirebaseApp(fn: () => IFirebaseApp): ModuleWithProviders<FirebaseAppModule> {
+export function provideFirebaseApp(fn: () => IFirebaseApp, ...deps: any[]): ModuleWithProviders<FirebaseAppModule> {
   return {
     ngModule: FirebaseAppModule,
     providers: [{
       provide: PROVIDED_FIREBASE_APPS,
       useFactory: firebaseAppFactory(fn),
       multi: true,
-      deps: [ NgZone, ɵAngularFireSchedulers ],
+      deps: [
+        NgZone,
+        Injector,
+        ɵAngularFireSchedulers,
+        ...deps,
+      ],
     }],
   };
 }

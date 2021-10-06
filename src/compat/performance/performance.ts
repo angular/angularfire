@@ -2,8 +2,7 @@ import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } fro
 import { EMPTY, Observable, of, Subscription } from 'rxjs';
 import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import firebase from 'firebase/compat/app';
-import { ɵapplyMixins, ɵlazySDKProxy, ɵPromiseProxy } from '@angular/fire/compat';
-import { ɵcacheInstance } from '@angular/fire';
+import { ɵapplyMixins, ɵlazySDKProxy, ɵPromiseProxy, ɵcacheInstance } from '@angular/fire/compat';
 import { FirebaseApp } from '@angular/fire/compat';
 import { isPlatformBrowser } from '@angular/common';
 import { proxyPolyfillCompat } from './base';

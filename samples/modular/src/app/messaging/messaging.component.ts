@@ -23,6 +23,7 @@ export class MessagingComponent implements OnInit {
   showRequest = false;
 
   constructor(@Optional() messaging: Messaging) {
+    console.log('messaging', messaging);
     if (messaging) {
       this.token$ = from(
         navigator.serviceWorker.register('firebase-messaging-sw.js', { type: 'module', scope: '__' }).

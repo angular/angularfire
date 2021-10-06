@@ -14,7 +14,7 @@ import { AngularFirestoreDocument } from './document/document';
 import { AngularFirestoreCollection } from './collection/collection';
 import { AngularFirestoreCollectionGroup } from './collection-group/collection-group';
 import { ɵAngularFireSchedulers } from '@angular/fire';
-import { FirebaseApp, ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire/compat';
+import { FirebaseApp, ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance } from '@angular/fire/compat';
 import { FirebaseOptions } from 'firebase/app';
 import { isPlatformServer } from '@angular/common';
 import firebase from 'firebase/compat/app';
@@ -30,7 +30,6 @@ import {
   PERSISTENCE,
   ɵauthFactory,
 } from '@angular/fire/compat/auth';
-import { ɵcacheInstance } from '@angular/fire';
 import { AppCheckInstances } from '@angular/fire/app-check';
 
 /**

@@ -1,8 +1,8 @@
 import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
 import { createStorageRef } from './ref';
-import { ɵAngularFireSchedulers, ɵcacheInstance } from '@angular/fire';
+import { ɵAngularFireSchedulers } from '@angular/fire';
 import { FirebaseOptions } from 'firebase/app';
-import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire/compat';
+import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance } from '@angular/fire/compat';
 import { UploadMetadata } from './interfaces';
 import 'firebase/compat/storage';
 import firebase from 'firebase/compat/app';

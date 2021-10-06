@@ -65,6 +65,9 @@ ${zoneWrapped.map(([importName, exportName]) => `export const ${exportName} = ɵ
     reexport('auth', 'firebase', 'firebase/auth', tsKeys<typeof import('firebase/auth')>(), {
       debugErrorMap: null,
       inMemoryPersistence: null,
+      browserLocalPersistence: null,
+      browserSessionPersistence: null,
+      indexedDBLocalPersistence: null,
       prodErrorMap: null,
     }),
     reexport('database', 'rxfire', 'rxfire/database', tsKeys<typeof import('rxfire/database')>()),

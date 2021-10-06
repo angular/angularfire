@@ -1,6 +1,6 @@
-import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, APP_INITIALIZER } from '@angular/core';
+import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, APP_INITIALIZER, Injector } from '@angular/core';
 import { isSupported, Messaging as FirebaseMessaging } from 'firebase/messaging';
-import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
+import { ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
 import { Messaging, MessagingInstances, MESSAGING_PROVIDER_NAME } from './messaging';
 import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
 import { registerVersion } from 'firebase/app';
@@ -11,15 +11,15 @@ const IS_SUPPORTED = new InjectionToken<boolean>('angularfire2.messaging.isSuppo
 const isSupportedSymbol = Symbol('angularfire2.messaging.isSupported');
 
 export function defaultMessagingInstanceFactory(isSupported: boolean, provided: FirebaseMessaging[]|undefined, defaultApp: FirebaseApp) {
-  const defaultAuth = isSupported ?
-    ɵgetDefaultInstanceOf<FirebaseMessaging>(MESSAGING_PROVIDER_NAME, provided, defaultApp) :
-    undefined;
-  return new Messaging(defaultAuth);
+  if (!isSupported) { return null; }
+  const defaultMessaging = ɵgetDefaultInstanceOf<FirebaseMessaging>(MESSAGING_PROVIDER_NAME, provided, defaultApp);
+  return defaultMessaging && new Messaging(defaultMessaging);
 }
 
-export function messagingInstanceFactory(fn: () => FirebaseMessaging) {
-  return (zone: NgZone, isSupported: boolean) => {
-    const messaging = isSupported ? ɵmemoizeInstance<FirebaseMessaging>(fn, zone) : undefined;
+export function messagingInstanceFactory(fn: (injector: Injector) => FirebaseMessaging) {
+  return (zone: NgZone, isSupported: boolean, injector: Injector) => {
+    if (!isSupported) { return null; }
+    const messaging = zone.runOutsideAngular(() => fn(injector));
     return new Messaging(messaging);
   };
 }
@@ -58,7 +58,7 @@ export class MessagingModule {
   }
 }
 
-export function provideMessaging(fn: () => FirebaseMessaging): ModuleWithProviders<MessagingModule> {
+export function provideMessaging(fn: () => FirebaseMessaging, ...deps: any[]): ModuleWithProviders<MessagingModule> {
   return {
     ngModule: MessagingModule,
     providers: [{
@@ -71,8 +71,10 @@ export function provideMessaging(fn: () => FirebaseMessaging): ModuleWithProvide
       deps: [
         NgZone,
         IS_SUPPORTED,
+        Injector,
         ɵAngularFireSchedulers,
         FirebaseApps,
+        ...deps,
       ],
     }]
   };

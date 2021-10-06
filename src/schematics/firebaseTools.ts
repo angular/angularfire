@@ -41,8 +41,8 @@ export const getFirebaseTools = () => globalThis.firebaseTools ?
         globalThis.firebaseTools = firebaseTools;
         const version = firebaseTools.cli.version();
         console.log(`Using firebase-tools version ${version}`);
-        if (parseInt(version, 10) !== 9) {
-            console.error('firebase-tools version 9 is required');
+        if (parseFloat(version) < 9.9) {
+            console.error('firebase-tools version 9.9+ is required, please upgrade');
             return Promise.reject();
         }
         return firebaseTools;

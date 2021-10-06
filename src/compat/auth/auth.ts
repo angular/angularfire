@@ -3,12 +3,11 @@ import { Observable, of, from, merge, Subject } from 'rxjs';
 import { switchMap, map, observeOn, shareReplay, first, filter, switchMapTo, subscribeOn } from 'rxjs/operators';
 import { ɵAngularFireSchedulers, keepUnstableUntilFirst } from '@angular/fire';
 import { ɵlazySDKProxy, ɵPromiseProxy, ɵapplyMixins } from '@angular/fire/compat';
-import { ɵfirebaseAppFactory, FIREBASE_OPTIONS, FIREBASE_APP_NAME, FirebaseApp } from '@angular/fire/compat';
+import { ɵfirebaseAppFactory, FIREBASE_OPTIONS, FIREBASE_APP_NAME, FirebaseApp, ɵcacheInstance } from '@angular/fire/compat';
 import { FirebaseOptions } from 'firebase/app';
 import firebase from 'firebase/compat/app';
 import { isPlatformServer } from '@angular/common';
 import { proxyPolyfillCompat } from './base';
-import { ɵcacheInstance } from '@angular/fire';
 import { AppCheckInstances } from '@angular/fire/app-check';
 
 export interface AngularFireAuth extends ɵPromiseProxy<firebase.auth.Auth> {}

@@ -1,6 +1,6 @@
-import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from '@angular/core';
+import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, Injector } from '@angular/core';
 import { Functions as FirebaseFunctions } from 'firebase/functions';
-import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
+import { ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
 import { Functions, FunctionsInstances, FUNCTIONS_PROVIDER_NAME } from './functions';
 import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
 import { AuthInstances } from '@angular/fire/auth';
@@ -11,12 +11,12 @@ export const PROVIDED_FUNCTIONS_INSTANCES = new InjectionToken<Functions[]>('ang
 
 export function defaultFunctionsInstanceFactory(provided: FirebaseFunctions[]|undefined, defaultApp: FirebaseApp) {
   const defaultAuth = ɵgetDefaultInstanceOf<FirebaseFunctions>(FUNCTIONS_PROVIDER_NAME, provided, defaultApp);
-  return new Functions(defaultAuth);
+  return defaultAuth && new Functions(defaultAuth);
 }
 
-export function functionsInstanceFactory(fn: () => FirebaseFunctions) {
-  return (zone: NgZone) => {
-    const functions = ɵmemoizeInstance<FirebaseFunctions>(fn, zone);
+export function functionsInstanceFactory(fn: (injector: Injector) => FirebaseFunctions) {
+  return (zone: NgZone, injector: Injector) => {
+    const functions = zone.runOutsideAngular(() => fn(injector));
     return new Functions(functions);
   };
 }
@@ -49,7 +49,7 @@ export class FunctionsModule {
   }
 }
 
-export function provideFunctions(fn: () => FirebaseFunctions): ModuleWithProviders<FunctionsModule> {
+export function provideFunctions(fn: () => FirebaseFunctions, ...deps: any[]): ModuleWithProviders<FunctionsModule> {
   return {
     ngModule: FunctionsModule,
     providers: [{
@@ -58,11 +58,13 @@ export function provideFunctions(fn: () => FirebaseFunctions): ModuleWithProvide
       multi: true,
       deps: [
         NgZone,
+        Injector,
         ɵAngularFireSchedulers,
         FirebaseApps,
         // Defensively load Auth first, if provided
         [new Optional(), AuthInstances ],
         [new Optional(), AppCheckInstances ],
+        ...deps,
       ]
     }]
   };
