@@ -7,10 +7,14 @@ import { registerVersion } from 'firebase/app';
 import { ScreenTrackingService } from './screen-tracking.service';
 import { UserTrackingService } from './user-tracking.service';
 
-const PROVIDED_ANALYTICS_INSTANCES = new InjectionToken<Analytics[]>('angularfire2.analytics-instances');
+export const PROVIDED_ANALYTICS_INSTANCE_FACTORIES = new InjectionToken<Array<(injector: Injector) => Analytics>>('angularfire2.analytics-instances.factory');
+export const PROVIDED_ANALYTICS_INSTANCES = new InjectionToken<Analytics[]>('angularfire2.analytics-instances');
 const IS_SUPPORTED = new InjectionToken<boolean>('angularfire2.analytics.isSupported');
 
-const isSupportedSymbol = Symbol('angularfire2.analytics.isSupported');
+const isSupportedValueSymbol = Symbol('angularfire2.analytics.isSupported.value');
+export const isSupportedPromiseSymbol = Symbol('angularfire2.analytics.isSupported');
+
+globalThis[isSupportedPromiseSymbol] ||= isSupported().then(it => globalThis[isSupportedValueSymbol] = it);
 
 export function defaultAnalyticsInstanceFactory(isSupported: boolean, provided: FirebaseAnalytics[]|undefined, defaultApp: FirebaseApp) {
   if (!isSupported) { return null; }
@@ -49,9 +53,9 @@ const DEFAULT_ANALYTICS_INSTANCE_PROVIDER = {
     ANALYTICS_INSTANCES_PROVIDER,
     {
       provide: APP_INITIALIZER,
-      useValue: () => isSupported().then(it => globalThis[isSupportedSymbol] = it),
+      useValue: () => globalThis[isSupportedPromiseSymbol],
       multi: true,
-    },
+    }
   ]
 })
 export class AnalyticsModule {
@@ -68,7 +72,11 @@ export function provideAnalytics(fn: (injector: Injector) => FirebaseAnalytics, 
     ngModule: AnalyticsModule,
     providers: [{
       provide: IS_SUPPORTED,
-      useFactory: () => globalThis[isSupportedSymbol],
+      useFactory: () => globalThis[isSupportedValueSymbol],
+    }, {
+      provide: PROVIDED_ANALYTICS_INSTANCE_FACTORIES,
+      useValue: fn,
+      multi: true,
     }, {
       provide: PROVIDED_ANALYTICS_INSTANCES,
       useFactory: analyticsInstanceFactory(fn),

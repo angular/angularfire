@@ -19,6 +19,7 @@ import { StorageComponent } from './storage/storage.component';
 
 import type { app } from 'firebase-admin';
 import { AppCheckComponent } from './app-check/app-check.component';
+import { ScreenTrackingService, UserTrackingService } from '@angular/fire/analytics';
 
 export const FIREBASE_ADMIN = new InjectionToken<app.App>('firebase-admin');
 
@@ -57,7 +58,10 @@ export const FIREBASE_ADMIN = new InjectionToken<app.App>('firebase-admin');
       }
     }, [new Optional(), FIREBASE_ADMIN]),
   ],
-  providers: [ ],
+  providers: [
+    UserTrackingService,
+    ScreenTrackingService,
+  ],
   bootstrap: [ ],
 })
 export class AppModule { }
