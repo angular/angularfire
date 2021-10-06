@@ -103,11 +103,12 @@ jobs:
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
-          yarn install --frozen-lockfile --prefer-offline --ignore-engines
+          yarn config set ignore-engines true
+          yarn install --frozen-lockfile --prefer-offline
           yarn add firebase@${{ matrix.firebase }}
-          yarn add firebase-tools@${{ matrix.firebaseTools }} --ignore-engines
+          yarn add firebase-tools@${{ matrix.firebaseTools }}
           yarn add rxjs@${{ matrix.rxjs }} --prefer-offline
-          npx ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty || true
+          npx ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty --force || true
       - name: Firebase emulator cache
         uses: actions/cache@v2
         with:
@@ -163,7 +164,8 @@ jobs:
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
-          yarn install --frozen-lockfile --prefer-offline --ignore-engines
+          yarn config set ignore-engines true
+          yarn install --frozen-lockfile --prefer-offline
       - name: Build
         run: yarn build
       - name: Test
@@ -211,10 +213,11 @@ jobs:
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
+          yarn config set ignore-engines true
           yarn install --frozen-lockfile --prefer-offline
           yarn add firebase@${{ matrix.firebase }}
           yarn add rxjs@${{ matrix.rxjs }} --prefer-offline
-          npx ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty || true
+          npx ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty --force || true
       - name: Firebase emulator cache
         uses: actions/cache@v2
         with:
