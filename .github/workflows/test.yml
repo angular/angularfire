@@ -65,6 +65,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: build
     continue-on-error: ${{ matrix.firebase == 'canary' }}
+    if: ${{ matrix.browser == '' }} || ${{ matrix.browser == 'ubuntu-latest' }} && ${{ matrix.node == '14' }}
     strategy:
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest]
@@ -74,15 +75,6 @@ jobs:
         rxjs: ["6", "7"]
         ng: ["12"]
         browser: ["", "chrome", "firefox"]
-        exclude:
-          - browser: chrome
-            node: 12
-          - browser: chrome
-            node: 16
-          - browser: firefox
-            node: 12
-          - browser: firefox
-            node: 16
       fail-fast: false
     name: Test firebase@${{ matrix.firebase }} firebase-tools@${{ matrix.firebaseTools }} ng@${{ matrix.ng }} rxjs@${{ matrix.rxjs}} on ${{ matrix.os }} Node.js ${{ matrix.node }} ${{ matrix.browser }}
     steps:
