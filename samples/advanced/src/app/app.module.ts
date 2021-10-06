@@ -43,7 +43,7 @@ export const FIREBASE_ADMIN = new InjectionToken<app.App>('firebase-admin');
     FunctionsModule,
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAppCheck((injector) =>  {
-      const admin = injector.get(FIREBASE_ADMIN, null);
+      const admin = injector.get<app.App|null>(FIREBASE_ADMIN, null);
       if (admin) {
         const provider = new CustomProvider({ getToken: () =>
           admin.
