@@ -12,6 +12,8 @@ on:
   release:
     types:
       - published
+  schedule:
+    - cron: 0 0 * * 1-5
 
 jobs:
   build:
