@@ -104,10 +104,10 @@ jobs:
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
           yarn install --frozen-lockfile --prefer-offline --ignore-engines
-          yarn add firebase@${{ matrix.firebase }} --prefer-offline --ignore-engines
-          yarn add firebase-tools@${{ matrix.firebaseTools }} --prefer-offline --ignore-engines
-          yarn add rxjs@${{ matrix.rxjs }} --prefer-offline --ignore-engines
-          npx ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty
+          yarn add firebase@${{ matrix.firebase }}
+          yarn add firebase-tools@${{ matrix.firebaseTools }} --ignore-engines
+          yarn add rxjs@${{ matrix.rxjs }} --prefer-offline
+          npx ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty || true
       - name: Firebase emulator cache
         uses: actions/cache@v2
         with:
@@ -212,9 +212,9 @@ jobs:
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
           yarn install --frozen-lockfile --prefer-offline
-          yarn add firebase@${{ matrix.firebase }} --prefer-offline
+          yarn add firebase@${{ matrix.firebase }}
           yarn add rxjs@${{ matrix.rxjs }} --prefer-offline
-          npx ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty
+          npx ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty || true
       - name: Firebase emulator cache
         uses: actions/cache@v2
         with:
