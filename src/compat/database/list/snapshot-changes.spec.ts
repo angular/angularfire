@@ -62,7 +62,8 @@ describe('snapshotChanges', () => {
   it('should handle multiple subscriptions (hot)', (done) => {
     const { snapChanges, ref } = prepareSnapshotChanges();
     const sub = snapChanges.subscribe(() => {
-    }).add(done);
+    });
+    sub.add(done);
     snapChanges.pipe(take(1)).subscribe(actions => {
       const data = actions.map(a => a.payload.val());
       expect(data).toEqual(items);
