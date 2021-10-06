@@ -64,7 +64,7 @@ jobs:
   test:
     runs-on: ${{ matrix.os }}
     needs: build
-    continue-on-error: ${{ matrix.firebase }} == 'canary'
+    continue-on-error: ${{ matrix.firebase == 'canary' }}
     strategy:
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest]
@@ -130,10 +130,10 @@ jobs:
       - name: Relocate Artifacts
         run: mv angularfire-${{ github.run_id }} dist
       - name: Run node tests
-        if: ${{ matrix.browser }} == ''
+        if: ${{ matrix.browser == '' }}
         run: yarn test:node
       - name: Run browser test
-        if: ${{ matrix.browser }} != ''
+        if: ${{ matrix.browser != '' }}
         run: yarn test:${{ matrix.browser }}-headless
 
   contribute:
@@ -184,7 +184,8 @@ jobs:
       - name: Build
         run: yarn build
       - name: Test
-        continue-on-error: ${{ matrix.os }} == 'windows-latest'
+        # TODO figure out why windows-latest tests are failing
+        continue-on-error: ${{ matrix.os == 'windows-latest' }}
         run: yarn test
 
   test_and_contribute:
