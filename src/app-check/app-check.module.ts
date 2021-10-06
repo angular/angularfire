@@ -1,28 +1,31 @@
-import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, PLATFORM_ID, isDevMode } from '@angular/core';
+import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, PLATFORM_ID, isDevMode, Injector } from '@angular/core';
 import { AppCheck as FirebaseAppCheck } from 'firebase/app-check';
-import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
+import { ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
 import { AppCheck, AppCheckInstances, APP_CHECK_PROVIDER_NAME } from './app-check';
 import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
 import { registerVersion } from 'firebase/app';
+import { isPlatformServer } from '@angular/common';
 
 export const PROVIDED_APP_CHECK_INSTANCES = new InjectionToken<AppCheck[]>('angularfire2.app-check-instances');
 export const APP_CHECK_NAMESPACE_SYMBOL = Symbol('angularfire2.app-check.namespace');
 
 export function defaultAppCheckInstanceFactory(provided: FirebaseAppCheck[]|undefined, defaultApp: FirebaseApp) {
   const defaultAppCheck = ɵgetDefaultInstanceOf<FirebaseAppCheck>(APP_CHECK_PROVIDER_NAME, provided, defaultApp);
-  return new AppCheck(defaultAppCheck);
+  return defaultAppCheck && new AppCheck(defaultAppCheck);
 }
 
-export function appCheckInstanceFactory(fn: () => FirebaseAppCheck) {
-  return (zone: NgZone) => {
-    // This isn't supported by the JS SDK yet, I've put in the feature request
-    // for the time being I've written a hack in core.ts
-    /* if (typeof process !== 'undefined' && process.env?.FIREBASE_APPCHECK_DEBUG_TOKEN) {
-      globalThis.FIREBASE_APPCHECK_DEBUG_TOKEN ??= process.env.FIREBASE_APPCHECK_DEBUG_TOKEN;
-    } else if (isDevMode()) {
+const LOCALHOSTS = ['localhost', '0.0.0.0', '127.0.0.1'];
+const isLocalhost = typeof window !== 'undefined' && LOCALHOSTS.includes(window.location.hostname);
+
+export function appCheckInstanceFactory(fn: (injector: Injector) => FirebaseAppCheck) {
+  // tslint:disable-next-line:ban-types
+  return (zone: NgZone, injector: Injector, platformId: Object) => {
+    // Node should use admin token provider, browser devmode and localhost should use debug token
+    if (!isPlatformServer(platformId) && (isDevMode() || isLocalhost)) {
       globalThis.FIREBASE_APPCHECK_DEBUG_TOKEN ??= true;
-    } */
-    return ɵmemoizeInstance<FirebaseAppCheck>(fn, zone);
+    }
+    const appCheck = zone.runOutsideAngular(() => fn(injector));
+    return new AppCheck(appCheck);
   };
 }
 
@@ -55,7 +58,7 @@ export class AppCheckModule {
   }
 }
 
-export function provideAppCheck(fn: () => FirebaseAppCheck): ModuleWithProviders<AppCheckModule> {
+export function provideAppCheck(fn: (injector: Injector) => FirebaseAppCheck, ...deps: any[]): ModuleWithProviders<AppCheckModule> {
   return {
     ngModule: AppCheckModule,
     providers: [{
@@ -64,9 +67,11 @@ export function provideAppCheck(fn: () => FirebaseAppCheck): ModuleWithProviders
       multi: true,
       deps: [
         NgZone,
+        Injector,
         PLATFORM_ID,
         ɵAngularFireSchedulers,
         FirebaseApps,
+        ...deps,
       ]
     }]
   };

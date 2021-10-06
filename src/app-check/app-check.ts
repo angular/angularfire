@@ -19,7 +19,6 @@ export class AppCheck {
 export interface AppCheckInstances extends Array<FirebaseAppCheck> {}
 
 export class AppCheckInstances {
-  // tslint:disable-next-line:ban-types
   constructor() {
     return ɵgetAllInstancesOf<FirebaseAppCheck>(APP_CHECK_PROVIDER_NAME);
   }

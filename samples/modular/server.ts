@@ -10,8 +10,6 @@ import { APP_BASE_HREF } from '@angular/common';
 import { existsSync } from 'fs';
 
 // These polyfills are for app-check Node.js
-// @ts-ignore
-globalThis.self = globalThis;
 globalThis.fetch = require('node-fetch').default;
 
 import '@angular/fire/firestore-protos';

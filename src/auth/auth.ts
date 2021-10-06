@@ -19,7 +19,6 @@ export class Auth {
 export interface AuthInstances extends Array<FirebaseAuth> {}
 
 export class AuthInstances {
-  // tslint:disable-next-line:ban-types
   constructor() {
     return ɵgetAllInstancesOf<FirebaseAuth>(AUTH_PROVIDER_NAME);
   }

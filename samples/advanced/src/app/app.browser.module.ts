@@ -12,7 +12,6 @@ import { BrowserTransferStateModule } from '@angular/platform-browser';
 import { provideAuth } from '@angular/fire/auth';
 
 import { initializeAuth, browserPopupRedirectResolver, indexedDBLocalPersistence } from '@angular/fire/auth';
-import { initializeAppCheck, provideAppCheck, ReCaptchaV3Provider } from '@angular/fire/app-check';
 import { connectAuthEmulatorInDevMode } from './emulators';
 
 @NgModule({
@@ -29,10 +28,6 @@ import { connectAuthEmulatorInDevMode } from './emulators';
       });
       connectAuthEmulatorInDevMode(auth);
       return auth;
-    }),
-    provideAppCheck(() =>  {
-      const provider = new ReCaptchaV3Provider(environment.recaptcha3SiteKey);
-      return initializeAppCheck(undefined, { provider, isTokenAutoRefreshEnabled: true });
     }),
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production,

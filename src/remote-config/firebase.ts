@@ -12,6 +12,7 @@ import {
   getRemoteConfig as _getRemoteConfig,
   getString as _getString,
   getValue as _getValue,
+  isSupported as _isSupported,
   setLogLevel as _setLogLevel
 } from 'firebase/remote-config';
 
@@ -25,4 +26,5 @@ export const getNumber = ɵzoneWrap(_getNumber, true);
 export const getRemoteConfig = ɵzoneWrap(_getRemoteConfig, true);
 export const getString = ɵzoneWrap(_getString, true);
 export const getValue = ɵzoneWrap(_getValue, true);
+export const isSupported = ɵzoneWrap(_isSupported, true);
 export const setLogLevel = ɵzoneWrap(_setLogLevel, true);

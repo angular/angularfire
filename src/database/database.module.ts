@@ -1,7 +1,7 @@
-import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders } from '@angular/core';
+import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, Injector } from '@angular/core';
 import { Database as FirebaseDatabase } from 'firebase/database';
 import { AuthInstances } from '@angular/fire/auth';
-import { ɵgetDefaultInstanceOf, ɵmemoizeInstance, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
+import { ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
 import { Database, DatabaseInstances, DATABASE_PROVIDER_NAME } from './database';
 import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
 import { registerVersion } from 'firebase/app';
@@ -11,12 +11,12 @@ export const PROVIDED_DATABASE_INSTANCES = new InjectionToken<Database[]>('angul
 
 export function defaultDatabaseInstanceFactory(provided: FirebaseDatabase[]|undefined, defaultApp: FirebaseApp) {
   const defaultDatabase = ɵgetDefaultInstanceOf<FirebaseDatabase>(DATABASE_PROVIDER_NAME, provided, defaultApp);
-  return new Database(defaultDatabase);
+  return defaultDatabase && new Database(defaultDatabase);
 }
 
-export function databaseInstanceFactory(fn: () => FirebaseDatabase) {
-  return (zone: NgZone) => {
-    const database = ɵmemoizeInstance<FirebaseDatabase>(fn, zone);
+export function databaseInstanceFactory(fn: (injector: Injector) => FirebaseDatabase) {
+  return (zone: NgZone, injector: Injector) => {
+    const database = zone.runOutsideAngular(() => fn(injector));
     return new Database(database);
   };
 }
@@ -49,7 +49,7 @@ export class DatabaseModule {
   }
 }
 
-export function provideDatabase(fn: () => FirebaseDatabase): ModuleWithProviders<DatabaseModule> {
+export function provideDatabase(fn: () => FirebaseDatabase, ...deps: any[]): ModuleWithProviders<DatabaseModule> {
   return {
     ngModule: DatabaseModule,
     providers: [{
@@ -58,11 +58,13 @@ export function provideDatabase(fn: () => FirebaseDatabase): ModuleWithProviders
       multi: true,
       deps: [
         NgZone,
+        Injector,
         ɵAngularFireSchedulers,
         FirebaseApps,
         // Database+Auth work better if Auth is loaded first
         [new Optional(), AuthInstances ],
         [new Optional(), AppCheckInstances ],
+        ...deps,
       ]
     }]
   };

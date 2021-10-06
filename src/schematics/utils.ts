@@ -3,7 +3,7 @@ import { FirebaseRc, Workspace, WorkspaceProject, FirebaseApp, DeployOptions, FE
 import { join } from 'path';
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
 import ts from '@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript';
-import { findNode, addImportToModule, insertImport } from '@schematics/angular/utility/ast-utils';
+import { findNode, addImportToModule, addProviderToModule, insertImport } from '@schematics/angular/utility/ast-utils';
 import { InsertChange, ReplaceChange, applyToUpdateRecorder, Change } from '@schematics/angular/utility/change';
 import { buildRelativePath } from '@schematics/angular/utility/find-module';
 import { overwriteIfExists } from './common';
@@ -217,10 +217,11 @@ export function addToNgModule(host: Tree, options: { sourcePath: string, feature
     options.features.includes(FEATURES.Analytics) &&
     !findNode(source, ts.SyntaxKind.Identifier, 'provideAnalytics')
   ) {
-    // TODO add user and screen tracking service
     changes.push(
-      insertImport(source, modulePath, ['provideAnalytics', 'getAnalytics'] as any, '@angular/fire/analytics'),
+      insertImport(source, modulePath, ['provideAnalytics', 'getAnalytics', 'ScreenTrackingService', 'UserTrackingService'] as any, '@angular/fire/analytics'),
       ...addImportToModule(source, modulePath, `provideAnalytics(() => getAnalytics())`, null as any),
+      ...addProviderToModule(source, modulePath, `ScreenTrackingService`, null as any),
+      ...addProviderToModule(source, modulePath, `UserTrackingService`, null as any),
     );
   }
 
