@@ -131,6 +131,7 @@ jobs:
   # TODO dry up
   canary:
     runs-on: ${{ matrix.os }}
+    if: ${{ github.ref == 'refs/heads/master' }}
     needs: [ 'build', 'test' ]
     strategy:
       matrix:
