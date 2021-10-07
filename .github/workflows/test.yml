@@ -252,9 +252,10 @@ jobs:
         continue-on-error: true
         run: yarn test
 
+  # Break the branch protection test into a seperate step, so we can manage the matrix more easily
   test_and_contribute:
     runs-on: ubuntu-latest
-    name: Test & contribute ✅
+    name: Branch protection
     needs: ['test', 'contribute']
     steps:
       - run: true
