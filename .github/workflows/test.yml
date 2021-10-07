@@ -123,7 +123,9 @@ jobs:
       - name: Relocate Artifacts
         run: mv angularfire-${{ github.run_id }} dist
       - name: Test node
-        run: yarn test:node
+        run: |
+          yarn build:jasmine
+          yarn test:node
       - name: Test browser
         if: matrix.os == 'ubuntu-latest' && matrix.node == '14' && matrix.firebaseTools == '9'
         run: yarn test:chrome-headless
@@ -196,7 +198,9 @@ jobs:
       - name: Relocate Artifacts
         run: mv angularfire-${{ github.run_id }} dist
       - name: Test node
-        run: yarn test:node
+        run: |
+          yarn build:jasmine
+          yarn test:node
       - name: Test browser
         if: matrix.os == 'ubuntu-latest' && matrix.node == '14' && matrix.firebaseTools == '9'
         run: yarn test:chrome-headless
