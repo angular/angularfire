@@ -49,7 +49,7 @@ export class FirestoreModule {
   }
 }
 
-export function provideFirestore(fn: () => FirebaseFirestore, ...deps: any[]): ModuleWithProviders<FirestoreModule> {
+export function provideFirestore(fn: (injector: Injector) => FirebaseFirestore, ...deps: any[]): ModuleWithProviders<FirestoreModule> {
   return {
     ngModule: FirestoreModule,
     providers: [{

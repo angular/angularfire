@@ -9,12 +9,12 @@ import { UserTrackingService } from './user-tracking.service';
 
 export const PROVIDED_ANALYTICS_INSTANCE_FACTORIES = new InjectionToken<Array<(injector: Injector) => Analytics>>('angularfire2.analytics-instances.factory');
 export const PROVIDED_ANALYTICS_INSTANCES = new InjectionToken<Analytics[]>('angularfire2.analytics-instances');
-const IS_SUPPORTED = new InjectionToken<boolean>('angularfire2.analytics.isSupported');
+export const IS_SUPPORTED = new InjectionToken<boolean>('angularfire2.analytics.isSupported');
 
-const isSupportedValueSymbol = Symbol('angularfire2.analytics.isSupported.value');
-export const isSupportedPromiseSymbol = Symbol('angularfire2.analytics.isSupported');
+export const isSupportedValueSymbol = '__angularfire_symbol__analyticsIsSupportedValue';
+export const isSupportedPromiseSymbol = '__angularfire_symbol__analyticsIsSupported';
 
-globalThis[isSupportedPromiseSymbol] ||= isSupported().then(it => globalThis[isSupportedValueSymbol] = it);
+globalThis[isSupportedPromiseSymbol] ||= isSupported().then(it => globalThis[isSupportedValueSymbol] ??= it);
 
 export function defaultAnalyticsInstanceFactory(isSupported: boolean, provided: FirebaseAnalytics[]|undefined, defaultApp: FirebaseApp) {
   if (!isSupported) { return null; }
@@ -72,6 +72,7 @@ export function provideAnalytics(fn: (injector: Injector) => FirebaseAnalytics, 
     ngModule: AnalyticsModule,
     providers: [{
       provide: IS_SUPPORTED,
+      // TODO throw if this hasn't been resolved yet
       useFactory: () => globalThis[isSupportedValueSymbol],
     }, {
       provide: PROVIDED_ANALYTICS_INSTANCE_FACTORIES,

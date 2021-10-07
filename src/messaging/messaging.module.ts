@@ -6,9 +6,12 @@ import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
 import { registerVersion } from 'firebase/app';
 
 const PROVIDED_MESSAGING_INSTANCES = new InjectionToken<Messaging[]>('angularfire2.messaging-instances');
-const IS_SUPPORTED = new InjectionToken<boolean>('angularfire2.messaging.isSupported');
+export const IS_SUPPORTED = new InjectionToken<boolean>('angularfire2.messaging.isSupported');
 
-const isSupportedSymbol = Symbol('angularfire2.messaging.isSupported');
+export const isSupportedValueSymbol = '__angularfire_symbol__messagingIsSupportedValue';
+export const isSupportedPromiseSymbol = '__angularfire_symbol__messagingIsSupported';
+
+globalThis[isSupportedPromiseSymbol] ||= isSupported().then(it => globalThis[isSupportedValueSymbol] ??= it);
 
 export function defaultMessagingInstanceFactory(isSupported: boolean, provided: FirebaseMessaging[]|undefined, defaultApp: FirebaseApp) {
   if (!isSupported) { return null; }
@@ -47,7 +50,7 @@ const DEFAULT_MESSAGING_INSTANCE_PROVIDER = {
     MESSAGING_INSTANCES_PROVIDER,
     {
       provide: APP_INITIALIZER,
-      useValue: () => isSupported().then(it => globalThis[isSupportedSymbol] = it),
+      useValue: () => globalThis[isSupportedPromiseSymbol],
       multi: true,
     },
   ]
@@ -63,7 +66,8 @@ export function provideMessaging(fn: () => FirebaseMessaging, ...deps: any[]): M
     ngModule: MessagingModule,
     providers: [{
       provide: IS_SUPPORTED,
-      useFactory: () => globalThis[isSupportedSymbol],
+      // TODO throw if this hasn't been resolved yet
+      useFactory: () => globalThis[isSupportedValueSymbol],
     }, {
       provide: PROVIDED_MESSAGING_INSTANCES,
       useFactory: messagingInstanceFactory(fn),
