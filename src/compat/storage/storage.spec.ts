@@ -129,6 +129,8 @@ describe('AngularFireStorage', () => {
         // TODO investigate, this doesn't appear to work...
         // https://github.com/firebase/firebase-js-sdk/issues/4158
         // expect(lastSnap.state).toEqual('canceled');
+        expect(emissionCount).toEqual(1);
+        expect(lastSnap.state).toEqual('running');
         done();
       }, done.fail);
     });
