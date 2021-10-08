@@ -5,12 +5,14 @@ import {
   deleteToken as _deleteToken,
   getMessaging as _getMessaging,
   getToken as _getToken,
-  isSupported as _isSupported,
   onMessage as _onMessage
 } from 'firebase/messaging';
+
+export {
+  isSupported
+} from './overrides';
 
 export const deleteToken = ɵzoneWrap(_deleteToken, true);
 export const getMessaging = ɵzoneWrap(_getMessaging, true);
 export const getToken = ɵzoneWrap(_getToken, true);
-export const isSupported = ɵzoneWrap(_isSupported, true);
 export const onMessage = ɵzoneWrap(_onMessage, false);

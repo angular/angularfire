@@ -4,7 +4,6 @@ import { ɵzoneWrap } from '@angular/fire';
 import {
   getAnalytics as _getAnalytics,
   initializeAnalytics as _initializeAnalytics,
-  isSupported as _isSupported,
   logEvent as _logEvent,
   setAnalyticsCollectionEnabled as _setAnalyticsCollectionEnabled,
   setCurrentScreen as _setCurrentScreen,
@@ -13,9 +12,12 @@ import {
   setUserProperties as _setUserProperties
 } from 'firebase/analytics';
 
+export {
+  isSupported
+} from './overrides';
+
 export const getAnalytics = ɵzoneWrap(_getAnalytics, true);
 export const initializeAnalytics = ɵzoneWrap(_initializeAnalytics, true);
-export const isSupported = ɵzoneWrap(_isSupported, true);
 export const logEvent = ɵzoneWrap(_logEvent, true);
 export const setAnalyticsCollectionEnabled = ɵzoneWrap(_setAnalyticsCollectionEnabled, true);
 export const setCurrentScreen = ɵzoneWrap(_setCurrentScreen, true);

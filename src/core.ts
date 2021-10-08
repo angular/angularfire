@@ -1,9 +1,9 @@
 import { Version } from '@angular/core';
 import { FirebaseApp, getApps } from 'firebase/app';
 import { ComponentContainer } from '@firebase/component';
-import { isSupported as firebaseIsRemoteConfigSupported } from 'firebase/remote-config';
-import { isSupported as firebaseIsMessagingSupported } from 'firebase/messaging';
-import { isSupported as firebaseIsAnalyticsSupported } from 'firebase/analytics';
+import { isSupported as isRemoteConfigSupported } from 'firebase/remote-config';
+import { isSupported as isMessagingSupported } from 'firebase/messaging';
+import { isSupported as isAnalyticsSupported } from 'firebase/analytics';
 
 export const VERSION = new Version('ANGULARFIRE2_VERSION');
 
@@ -14,15 +14,15 @@ const isRemoteConfigSupportedPromiseSymbol = '__angularfire_symbol__remoteConfig
 const isMessagingSupportedValueSymbol = '__angularfire_symbol__messagingIsSupportedValue';
 const isMessagingSupportedPromiseSymbol = '__angularfire_symbol__messagingIsSupported';
 
-globalThis[isAnalyticsSupportedPromiseSymbol] ||= firebaseIsAnalyticsSupported().then(it =>
+globalThis[isAnalyticsSupportedPromiseSymbol] ||= isAnalyticsSupported().then(it =>
   globalThis[isAnalyticsSupportedValueSymbol] = it
 );
 
-globalThis[isMessagingSupportedPromiseSymbol] ||= firebaseIsMessagingSupported().then(it =>
+globalThis[isMessagingSupportedPromiseSymbol] ||= isMessagingSupported().then(it =>
   globalThis[isMessagingSupportedValueSymbol] = it
 );
 
-globalThis[isRemoteConfigSupportedPromiseSymbol] ||= firebaseIsRemoteConfigSupported().then(it =>
+globalThis[isRemoteConfigSupportedPromiseSymbol] ||= isRemoteConfigSupported().then(it =>
   globalThis[isRemoteConfigSupportedValueSymbol] = it
 );
 

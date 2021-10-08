@@ -1,10 +1,11 @@
 import { Injectable, Injector, NgZone, OnDestroy } from '@angular/core';
-import { Analytics } from './analytics';
 import { Subscription } from 'rxjs';
-import { VERSION, ɵisAnalyticsSupportedFactory } from '@angular/fire';
+import { VERSION } from '@angular/fire';
 import { Auth, authState } from '@angular/fire/auth';
 import { registerVersion } from 'firebase/app';
-import { setUserId } from './firebase';
+
+import { Analytics } from './analytics';
+import { setUserId, isSupported } from './firebase';
 
 @Injectable()
 export class UserTrackingService implements OnDestroy {
@@ -20,7 +21,10 @@ export class UserTrackingService implements OnDestroy {
     registerVersion('angularfire', VERSION.full, 'user-tracking');
     let resolveInitialized: () => void;
     this.initialized = zone.runOutsideAngular(() => new Promise(resolve => { resolveInitialized = resolve; }));
-    ɵisAnalyticsSupportedFactory.async().then(() => {
+    // The APP_INITIALIZER that is making isSupported() sync for the sake of convenient DI
+    // may not be done when services are initialized. Guard the functionality by first ensuring
+    // that the (global) promise has resolved, then get Analytics from the injector.
+    isSupported().then(() => {
       const analytics = injector.get(Analytics);
       if (analytics) {
         this.disposables = [

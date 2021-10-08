@@ -3,11 +3,11 @@ import { of, Subscription, Observable } from 'rxjs';
 import { distinctUntilChanged, filter, groupBy, map, mergeMap, pairwise, startWith, switchMap } from 'rxjs/operators';
 import { ActivationEnd, Router, ɵEmptyOutletComponent } from '@angular/router';
 import { Title } from '@angular/platform-browser';
-import { VERSION, ɵisAnalyticsSupportedFactory } from '@angular/fire';
+import { VERSION } from '@angular/fire';
 import { registerVersion } from 'firebase/app';
 
 import { Analytics } from './analytics';
-import { logEvent } from './firebase';
+import { logEvent, isSupported } from './firebase';
 import { UserTrackingService } from './user-tracking.service';
 
 const FIREBASE_EVENT_ORIGIN_KEY = 'firebase_event_origin';
@@ -154,7 +154,10 @@ export class ScreenTrackingService implements OnDestroy {
     injector: Injector,
   ) {
     registerVersion('angularfire', VERSION.full, 'screen-tracking');
-    ɵisAnalyticsSupportedFactory.async().then(() => {
+    // The APP_INITIALIZER that is making isSupported() sync for the sake of convenient DI
+    // may not be done when services are initialized. Guard the functionality by first ensuring
+    // that the (global) promise has resolved, then get Analytics from the injector.
+    isSupported().then(() => {
       const analytics = injector.get(Analytics);
       if (!router || !analytics) { return; }
       zone.runOutsideAngular(() => {

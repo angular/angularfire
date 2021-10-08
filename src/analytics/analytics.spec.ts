@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { FirebaseApp, provideFirebaseApp, getApp, initializeApp, deleteApp } from '@angular/fire/app';
-import { Analytics, provideAnalytics, getAnalytics } from '@angular/fire/analytics';
+import { Analytics, provideAnalytics, getAnalytics, isSupported } from '@angular/fire/analytics';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../utils';
 
@@ -9,6 +9,13 @@ describe('Analytics', () => {
   let analytics: Analytics;
   let providedAnalytics: Analytics;
   let appName: string;
+
+  beforeAll(done => {
+    // The APP_INITIALIZER that is making isSupported() sync for DI may not
+    // be done evaulating by the time we inject from the TestBed. Guard the
+    // functionality by ensuring that the (global) promise has resolved.
+    isSupported().then(() => done());
+  });
 
   describe('single injection', () => {
 
