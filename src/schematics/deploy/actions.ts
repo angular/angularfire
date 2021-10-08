@@ -110,6 +110,7 @@ const defaultFsHost: FSHost = {
   renameSync,
   copySync,
   removeSync,
+  existsSync,
 };
 
 const findPackageVersion = (packageManager: string, name: string) => {
@@ -176,14 +177,14 @@ export const deployToFunction = async (
     );
   }
 
-  const staticOut = staticBuildOptions.outputPath;
-  const serverOut = serverBuildOptions.outputPath;
+  const staticOut = join(workspaceRoot, staticBuildOptions.outputPath);
+  const serverOut = join(workspaceRoot, serverBuildOptions.outputPath);
 
-  const functionsOut = options.outputPath || dirname(serverOut);
+  const functionsOut = options.outputPath ? join(workspaceRoot, options.outputPath) : dirname(serverOut);
   const functionName = options.functionName || DEFAULT_FUNCTION_NAME;
 
-  const newStaticOut = join(functionsOut, staticOut);
-  const newServerOut = join(functionsOut, serverOut);
+  const newStaticOut = join(functionsOut, staticBuildOptions.outputPath);
+  const newServerOut = join(functionsOut, serverBuildOptions.outputPath);
 
   // New behavior vs. old
   if (options.outputPath) {
@@ -204,14 +205,15 @@ export const deployToFunction = async (
     );
   }
 
+  const functionsPackageJsonPath = join(functionsOut, 'package.json');
   fsHost.writeFileSync(
-    join(functionsOut, 'package.json'),
+    functionsPackageJsonPath,
     JSON.stringify(packageJson, null, 2)
   );
 
   fsHost.writeFileSync(
     join(functionsOut, 'index.js'),
-    defaultFunction(serverOut, options, functionName)
+    defaultFunction(serverBuildOptions.outputPath, options, functionName)
   );
 
   if (!options.prerender) {
@@ -226,10 +228,10 @@ export const deployToFunction = async (
   // tslint:disable-next-line:no-non-null-assertion
   const siteTarget = options.target ?? context.target!.project;
 
-  try {
-    execSync(`npm --prefix ${functionsOut} i`);
-  } catch (e) {
-    console.warn(e.messsage);
+  if (fsHost.existsSync(functionsPackageJsonPath)) {
+    execSync(`npm --prefix ${functionsOut} install`);
+  } else {
+    console.error(`No package.json exists at ${functionsOut}`);
   }
 
   if (options.preview) {
@@ -287,15 +289,14 @@ export const deployToCloudRun = async (
     );
   }
 
-  const staticOut = staticBuildOptions.outputPath;
-  const serverOut = serverBuildOptions.outputPath;
+  const staticOut = join(workspaceRoot, staticBuildOptions.outputPath);
+  const serverOut = join(workspaceRoot, serverBuildOptions.outputPath);
 
-  // TODO pull these from firebase config
-  const cloudRunOut = options.outputPath || staticBuildOptions.outputPath.replace('/browser', '/run');
+  const cloudRunOut = options.outputPath ? join(workspaceRoot, options.outputPath) : join(dirname(serverOut), 'run');
   const serviceId = options.functionName || DEFAULT_FUNCTION_NAME;
 
-  const newStaticOut = join(cloudRunOut, staticOut);
-  const newServerOut = join(cloudRunOut, serverOut);
+  const newStaticOut = join(cloudRunOut, staticBuildOptions.outputPath);
+  const newServerOut = join(cloudRunOut, serverBuildOptions.outputPath);
 
   // This is needed because in the server output there's a hardcoded dependency on $cwd/dist/browser,
   // This assumes that we've deployed our application dist directory and we're running the server
@@ -305,7 +306,7 @@ export const deployToCloudRun = async (
   fsHost.copySync(staticOut, newStaticOut);
   fsHost.copySync(serverOut, newServerOut);
 
-  const packageJson = getPackageJson(context, workspaceRoot, options, join(serverOut, 'main.js'));
+  const packageJson = getPackageJson(context, workspaceRoot, options, join(serverBuildOptions.outputPath, 'main.js'));
   const nodeVersion = packageJson.engines.node;
 
   if (!satisfies(process.versions.node, nodeVersion.toString())) {

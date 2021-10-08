@@ -26,6 +26,8 @@ login.list = () => Promise.resolve([{ user: { email: 'foo@bar.baz' }}]);
 login.add = () => Promise.resolve([{ user: { email: 'foo@bar.baz' }}]);
 login.use = () => Promise.resolve('foo@bar.baz');
 
+const workspaceRoot = join('home', 'user');
+
 const initMocks = () => {
   fsHost = {
     moveSync(_: string, __: string) {
@@ -37,7 +39,10 @@ const initMocks = () => {
     copySync(_: string, __: string) {
     },
     removeSync(_: string) {
-    }
+    },
+    existsSync(_: string) {
+      return false;
+    },
   };
 
   firebaseMock = {
@@ -183,7 +188,7 @@ describe('universal deployment', () => {
     await deployToFunction(
       firebaseMock,
       context,
-      '/home/user',
+      workspaceRoot,
       STATIC_BUILD_TARGET,
       SERVER_BUILD_TARGET,
       { preview: false  },
@@ -196,8 +201,8 @@ describe('universal deployment', () => {
     const packageArgs = spy.calls.argsFor(0);
     const functionArgs = spy.calls.argsFor(1);
 
-    expect(packageArgs[0]).toBe(join('dist', 'package.json'));
-    expect(functionArgs[0]).toBe(join('dist', 'index.js'));
+    expect(packageArgs[0]).toBe(join(workspaceRoot, 'dist', 'package.json'));
+    expect(functionArgs[0]).toBe(join(workspaceRoot, 'dist', 'index.js'));
   });
 
   it('should create a firebase function (new)', async () => {
@@ -205,7 +210,7 @@ describe('universal deployment', () => {
     await deployToFunction(
       firebaseMock,
       context,
-      '/home/user',
+      workspaceRoot,
       STATIC_BUILD_TARGET,
       SERVER_BUILD_TARGET,
       { preview: false, outputPath: join('dist', 'functions') },
@@ -218,8 +223,8 @@ describe('universal deployment', () => {
     const packageArgs = spy.calls.argsFor(0);
     const functionArgs = spy.calls.argsFor(1);
 
-    expect(packageArgs[0]).toBe(join('dist', 'functions', 'package.json'));
-    expect(functionArgs[0]).toBe(join('dist', 'functions', 'index.js'));
+    expect(packageArgs[0]).toBe(join(workspaceRoot, 'dist', 'functions', 'package.json'));
+    expect(functionArgs[0]).toBe(join(workspaceRoot, 'dist', 'functions', 'index.js'));
   });
 
   it('should rename the index.html file in the nested dist', async () => {
@@ -227,7 +232,7 @@ describe('universal deployment', () => {
     await deployToFunction(
       firebaseMock,
       context,
-      '/home/user',
+      workspaceRoot,
       STATIC_BUILD_TARGET,
       SERVER_BUILD_TARGET,
       { preview: false  },
@@ -240,8 +245,8 @@ describe('universal deployment', () => {
     const packageArgs = spy.calls.argsFor(0);
 
     expect(packageArgs).toEqual([
-      join('dist', 'dist', 'browser', 'index.html'),
-      join('dist', 'dist', 'browser', 'index.original.html')
+      join(workspaceRoot, 'dist', 'dist', 'browser', 'index.html'),
+      join(workspaceRoot, 'dist', 'dist', 'browser', 'index.original.html')
     ]);
   });
 
@@ -250,7 +255,7 @@ describe('universal deployment', () => {
     await deployToFunction(
       firebaseMock,
       context,
-      '/home/user',
+      workspaceRoot,
       STATIC_BUILD_TARGET,
       SERVER_BUILD_TARGET,
       { preview: false, outputPath: join('dist', 'functions') },
@@ -263,8 +268,8 @@ describe('universal deployment', () => {
     const packageArgs = spy.calls.argsFor(0);
 
     expect(packageArgs).toEqual([
-      join('dist', 'functions', 'dist', 'browser', 'index.html'),
-      join('dist', 'functions', 'dist', 'browser', 'index.original.html')
+      join(workspaceRoot, 'dist', 'functions', 'dist', 'browser', 'index.html'),
+      join(workspaceRoot, 'dist', 'functions', 'dist', 'browser', 'index.original.html')
     ]);
   });
 
@@ -273,7 +278,7 @@ describe('universal deployment', () => {
     await deployToFunction(
       firebaseMock,
       context,
-      '/home/user',
+      workspaceRoot,
       STATIC_BUILD_TARGET,
       SERVER_BUILD_TARGET,
       { preview: false },
