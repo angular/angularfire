@@ -20,7 +20,7 @@ export const defaultPackage = (
   description: 'Angular Universal Application',
   main: main ?? 'index.js',
   scripts: {
-    start: main ? `node ./${main}` : 'firebase functions:shell',
+    start: main ? `node ${main}` : 'firebase functions:shell',
   },
   engines: {
     node: (options.functionsNodeVersion || DEFAULT_NODE_VERSION).toString()
