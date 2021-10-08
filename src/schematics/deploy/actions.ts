@@ -226,10 +226,13 @@ export const deployToFunction = async (
   // tslint:disable-next-line:no-non-null-assertion
   const siteTarget = options.target ?? context.target!.project;
 
-  try {
-    execSync(`npm --prefix ${functionsOut} i`);
-  } catch (e) {
-    console.warn(e.messsage);
+  const functionsAbsolutePath = join(workspaceRoot, functionsOut);
+  if (existsSync(join(functionsAbsolutePath, 'package.json'))) {
+    try {
+      execSync(`npm --prefix ${functionsOut} install`);
+    } catch (e) {
+      console.warn(e.messsage);
+    }
   }
 
   if (options.preview) {
