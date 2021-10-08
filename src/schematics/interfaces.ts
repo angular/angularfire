@@ -201,6 +201,7 @@ export interface FSHost {
   renameSync(src: string, dest: string): void;
   copySync(src: string, dest: string): void;
   removeSync(src: string): void;
+  existsSync(src: string): boolean;
 }
 
 export interface WorkspaceProject {

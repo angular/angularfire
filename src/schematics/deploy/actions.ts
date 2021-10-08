@@ -110,6 +110,7 @@ const defaultFsHost: FSHost = {
   renameSync,
   copySync,
   removeSync,
+  existsSync,
 };
 
 const findPackageVersion = (packageManager: string, name: string) => {
@@ -176,14 +177,14 @@ export const deployToFunction = async (
     );
   }
 
-  const staticOut = staticBuildOptions.outputPath;
-  const serverOut = serverBuildOptions.outputPath;
+  const staticOut = join(workspaceRoot, staticBuildOptions.outputPath);
+  const serverOut = join(workspaceRoot, serverBuildOptions.outputPath);
 
-  const functionsOut = options.outputPath || dirname(serverOut);
+  const functionsOut = options.outputPath ? join(workspaceRoot, options.outputPath) : dirname(serverOut);
   const functionName = options.functionName || DEFAULT_FUNCTION_NAME;
 
-  const newStaticOut = join(functionsOut, staticOut);
-  const newServerOut = join(functionsOut, serverOut);
+  const newStaticOut = join(functionsOut, staticBuildOptions.outputPath);
+  const newServerOut = join(functionsOut, serverBuildOptions.outputPath);
 
   // New behavior vs. old
   if (options.outputPath) {
@@ -204,8 +205,9 @@ export const deployToFunction = async (
     );
   }
 
+  const functionsPackageJsonPath = join(functionsOut, 'package.json');
   fsHost.writeFileSync(
-    join(functionsOut, 'package.json'),
+    functionsPackageJsonPath,
     JSON.stringify(packageJson, null, 2)
   );
 
@@ -226,13 +228,10 @@ export const deployToFunction = async (
   // tslint:disable-next-line:no-non-null-assertion
   const siteTarget = options.target ?? context.target!.project;
 
-  const functionsAbsolutePath = join(workspaceRoot, functionsOut);
-  if (existsSync(join(functionsAbsolutePath, 'package.json'))) {
-    try {
-      execSync(`npm --prefix ${functionsOut} install`);
-    } catch (e) {
-      console.warn(e.messsage);
-    }
+  if (fsHost.existsSync(functionsPackageJsonPath)) {
+    execSync(`npm --prefix ${functionsOut} install`);
+  } else {
+    console.error(`No package.json exists at ${functionsOut}`);
   }
 
   if (options.preview) {
