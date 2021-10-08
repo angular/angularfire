@@ -3,9 +3,6 @@ import { FirebaseApp, provideFirebaseApp, getApp, initializeApp, deleteApp } fro
 import { Messaging, provideMessaging, getMessaging } from '@angular/fire/messaging';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../utils';
-import { isSupportedValueSymbol } from './messaging.module';
-
-globalThis[isSupportedValueSymbol] = true;
 
 describe('Messaging', () => {
   let app: FirebaseApp;

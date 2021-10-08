@@ -3,9 +3,6 @@ import { FirebaseApp, provideFirebaseApp, getApp, initializeApp, deleteApp } fro
 import { RemoteConfig, provideRemoteConfig, getRemoteConfig } from '@angular/fire/remote-config';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../utils';
-import { isSupportedValueSymbol } from './remote-config.module';
-
-globalThis[isSupportedValueSymbol] = true;
 
 describe('RemoteConfig', () => {
   let app: FirebaseApp;

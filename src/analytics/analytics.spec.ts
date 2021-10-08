@@ -3,9 +3,6 @@ import { FirebaseApp, provideFirebaseApp, getApp, initializeApp, deleteApp } fro
 import { Analytics, provideAnalytics, getAnalytics } from '@angular/fire/analytics';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../utils';
-import { isSupportedValueSymbol } from './analytics.module';
-
-globalThis[isSupportedValueSymbol] = true;
 
 describe('Analytics', () => {
   let app: FirebaseApp;

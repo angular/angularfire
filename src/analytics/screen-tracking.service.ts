@@ -1,16 +1,14 @@
-import { Inject, ComponentFactoryResolver, Injectable, NgZone, OnDestroy, Optional, Injector } from '@angular/core';
+import { ComponentFactoryResolver, Injectable, NgZone, OnDestroy, Optional, Injector } from '@angular/core';
 import { of, Subscription, Observable } from 'rxjs';
 import { distinctUntilChanged, filter, groupBy, map, mergeMap, pairwise, startWith, switchMap } from 'rxjs/operators';
 import { ActivationEnd, Router, ɵEmptyOutletComponent } from '@angular/router';
 import { Title } from '@angular/platform-browser';
-import { VERSION } from '@angular/fire';
-import { FirebaseApp } from '@angular/fire/app';
+import { VERSION, ɵisAnalyticsSupportedFactory } from '@angular/fire';
 import { registerVersion } from 'firebase/app';
 
 import { Analytics } from './analytics';
 import { logEvent } from './firebase';
 import { UserTrackingService } from './user-tracking.service';
-import { analyticsInstanceFactory, defaultAnalyticsInstanceFactory, isSupportedPromiseSymbol, PROVIDED_ANALYTICS_INSTANCE_FACTORIES } from './analytics.module';
 
 const FIREBASE_EVENT_ORIGIN_KEY = 'firebase_event_origin';
 const FIREBASE_PREVIOUS_SCREEN_CLASS_KEY = 'firebase_previous_class';
@@ -153,28 +151,20 @@ export class ScreenTrackingService implements OnDestroy {
     componentFactoryResolver: ComponentFactoryResolver,
     zone: NgZone,
     @Optional() userTrackingService: UserTrackingService,
-    firebaseApp: FirebaseApp,
-    @Inject(PROVIDED_ANALYTICS_INSTANCE_FACTORIES) analyticsInstanceFactories: Array<(injector: Injector) => Analytics>,
     injector: Injector,
   ) {
     registerVersion('angularfire', VERSION.full, 'screen-tracking');
-    if (!router) { return this; }
-    // Analytics is not ready to be injected yet, as the APP_INITIALIZER hasn't evulated yet, do this the hard way
-    const analyticsInstance: Promise<Analytics|null> = globalThis[isSupportedPromiseSymbol].then((isSupported: boolean) => {
-      const analyticsInstances = analyticsInstanceFactories.map(fn => analyticsInstanceFactory(fn)(zone, isSupported, injector));
-      return defaultAnalyticsInstanceFactory(isSupported, analyticsInstances, firebaseApp);
-    });
-    zone.runOutsideAngular(() => {
-      this.disposable = ɵscreenViewEvent(router, title, componentFactoryResolver).pipe(
-        switchMap(async params => {
-          if (userTrackingService) {
-            await userTrackingService.initialized;
-          }
-          const analytics = await analyticsInstance;
-          if (!analytics) { return; }
-          return logEvent(analytics, SCREEN_VIEW_EVENT, params);
-        })
-      ).subscribe();
+    ɵisAnalyticsSupportedFactory.async().then(() => {
+      const analytics = injector.get(Analytics);
+      if (!router || !analytics) { return; }
+      zone.runOutsideAngular(() => {
+        this.disposable = ɵscreenViewEvent(router, title, componentFactoryResolver).pipe(
+          switchMap(async params => {
+            if (userTrackingService) { await userTrackingService.initialized; }
+            return logEvent(analytics, SCREEN_VIEW_EVENT, params);
+          })
+        ).subscribe();
+      });
     });
   }
 

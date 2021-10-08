@@ -1,8 +1,58 @@
-import { isDevMode, NgZone, Version } from '@angular/core';
+import { Version } from '@angular/core';
 import { FirebaseApp, getApps } from 'firebase/app';
 import { ComponentContainer } from '@firebase/component';
+import { isSupported as firebaseIsRemoteConfigSupported } from 'firebase/remote-config';
+import { isSupported as firebaseIsMessagingSupported } from 'firebase/messaging';
+import { isSupported as firebaseIsAnalyticsSupported } from 'firebase/analytics';
 
 export const VERSION = new Version('ANGULARFIRE2_VERSION');
+
+const isAnalyticsSupportedValueSymbol = '__angularfire_symbol__analyticsIsSupportedValue';
+const isAnalyticsSupportedPromiseSymbol = '__angularfire_symbol__analyticsIsSupported';
+const isRemoteConfigSupportedValueSymbol = '__angularfire_symbol__remoteConfigIsSupportedValue';
+const isRemoteConfigSupportedPromiseSymbol = '__angularfire_symbol__remoteConfigIsSupported';
+const isMessagingSupportedValueSymbol = '__angularfire_symbol__messagingIsSupportedValue';
+const isMessagingSupportedPromiseSymbol = '__angularfire_symbol__messagingIsSupported';
+
+globalThis[isAnalyticsSupportedPromiseSymbol] ||= firebaseIsAnalyticsSupported().then(it =>
+  globalThis[isAnalyticsSupportedValueSymbol] = it
+);
+
+globalThis[isMessagingSupportedPromiseSymbol] ||= firebaseIsMessagingSupported().then(it =>
+  globalThis[isMessagingSupportedValueSymbol] = it
+);
+
+globalThis[isRemoteConfigSupportedPromiseSymbol] ||= firebaseIsRemoteConfigSupported().then(it =>
+  globalThis[isRemoteConfigSupportedValueSymbol] = it
+);
+
+// TODO fix the error message on these and reexport .async as isSupported
+export const ɵisMessagingSupportedFactory = {
+  async: () => globalThis[isMessagingSupportedPromiseSymbol],
+  sync: () => {
+    const ret = globalThis[isMessagingSupportedValueSymbol];
+    if (ret === undefined) { throw new Error('APP_INITIALIZER hasn\'t finished running yet...'); }
+    return ret;
+  }
+};
+
+export const ɵisRemoteConfigSupportedFactory = {
+  async: () => globalThis[isRemoteConfigSupportedPromiseSymbol],
+  sync: () => {
+    const ret = globalThis[isRemoteConfigSupportedValueSymbol];
+    if (ret === undefined) { throw new Error('APP_INITIALIZER hasn\'t finished running yet...'); }
+    return ret;
+  }
+};
+
+export const ɵisAnalyticsSupportedFactory = {
+  async: () => globalThis[isAnalyticsSupportedPromiseSymbol],
+  sync: () => {
+    const ret = globalThis[isAnalyticsSupportedValueSymbol];
+    if (ret === undefined) { throw new Error('APP_INITIALIZER hasn\'t finished running yet...'); }
+    return ret;
+  }
+};
 
 // TODO is there a better way to get at the internal types?
 interface FirebaseAppWithContainer extends FirebaseApp {
