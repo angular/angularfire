@@ -18,11 +18,11 @@
 ### Misc.
 
 * `Analytics`, `RemoteConfig`, and `Messaging` can be `null` if `isSupported()` returns false, this guards against runtime failures in unsupported environments at the cost of null checking
-* Require Firebase 7.1 peer
+* Require Firebase 9.1 peer
 * `ng add` installs firebase-tools globally, this also addressed the race condition
 * Requires firebase-tools 9.9+ peer (optional)
 * Moved peer dependencies for the schematics to proper dependencies
-* Mark compatability with rxjs 7
+* Mark compatibility with rxjs 7
 * Increase the accuracy of performance marks
 * `ng deploy` echos out the firebase-tools version and the user
 * Error message improvements
