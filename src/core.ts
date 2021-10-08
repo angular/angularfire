@@ -26,12 +26,16 @@ globalThis[isRemoteConfigSupportedPromiseSymbol] ||= isRemoteConfigSupported().t
   globalThis[isRemoteConfigSupportedValueSymbol] = it
 );
 
-// TODO fix the error message on these and reexport .async as isSupported
+const isSupportedError = (module: string) =>
+  `The APP_INITIALIZER that is "making" isSupported() sync for the sake of convenient DI has not resolved in this
+context. Rather than injecting ${module} in the constructor, first ensure that ${module} is supported by calling
+\`await isSupported()\`, then retrieve the instance from the injector manually \`injector.get(${module})\`.`;
+
 export const ɵisMessagingSupportedFactory = {
   async: () => globalThis[isMessagingSupportedPromiseSymbol],
   sync: () => {
     const ret = globalThis[isMessagingSupportedValueSymbol];
-    if (ret === undefined) { throw new Error('APP_INITIALIZER hasn\'t finished running yet...'); }
+    if (ret === undefined) { throw new Error(isSupportedError('Messaging')); }
     return ret;
   }
 };
@@ -40,7 +44,7 @@ export const ɵisRemoteConfigSupportedFactory = {
   async: () => globalThis[isRemoteConfigSupportedPromiseSymbol],
   sync: () => {
     const ret = globalThis[isRemoteConfigSupportedValueSymbol];
-    if (ret === undefined) { throw new Error('APP_INITIALIZER hasn\'t finished running yet...'); }
+    if (ret === undefined) { throw new Error(isSupportedError('RemoteConfig')); }
     return ret;
   }
 };
@@ -49,7 +53,7 @@ export const ɵisAnalyticsSupportedFactory = {
   async: () => globalThis[isAnalyticsSupportedPromiseSymbol],
   sync: () => {
     const ret = globalThis[isAnalyticsSupportedValueSymbol];
-    if (ret === undefined) { throw new Error('APP_INITIALIZER hasn\'t finished running yet...'); }
+    if (ret === undefined) { throw new Error(isSupportedError('Analytics')); }
     return ret;
   }
 };

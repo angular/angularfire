@@ -12,8 +12,9 @@ describe('Analytics', () => {
 
   beforeAll(done => {
     // The APP_INITIALIZER that is making isSupported() sync for DI may not
-    // be done evaulating by the time we inject from the TestBed. Guard the
-    // functionality by ensuring that the (global) promise has resolved.
+    // be done evaulating by the time we inject from the TestBed. We can
+    // ensure correct behavior by waiting for the (global) isSuppported() promise
+    // to resolve.
     isSupported().then(() => done());
   });
 

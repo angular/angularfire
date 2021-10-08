@@ -88,7 +88,11 @@ export class ɵAngularFireSchedulers {
 
 function getSchedulers() {
   const schedulers = globalThis.ɵAngularFireScheduler as ɵAngularFireSchedulers|undefined;
-  if (!schedulers) { throw new Error('AngularFireModule has not been provided'); }
+  if (!schedulers) {
+    throw new Error(
+`Either AngularFireModule has not been provided in your AppModule (this can be done manually or implictly using
+provideFirebaseApp) or you're calling an AngularFire method outside of an NgModule (which is not supported).`);
+  }
   return schedulers;
 }
 
