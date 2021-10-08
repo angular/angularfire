@@ -105,6 +105,8 @@ ${Object.entries(config.sdkConfig).reduce(
           });
         default: throw(new SchematicsException(`Unimplemented PROJECT_TYPE ${config.projectType}`));
       }
+    } else {
+      return Promise.resolve();
     }
 };
 
