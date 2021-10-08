@@ -1,3 +1,20 @@
+<a name="7.1.0"></a>
+# [7.1.0](https://github.com/angular/angularfire/compare/7.1.0-rc.5...7.1.0) (2021-10-08)
+
+### Features
+
+* **auth-guard:** modular auth guards ([#3001](https://github.com/angular/angularfire/issues/3001)) ([3ae6ce5](https://github.com/angular/angularfire/commit/3ae6ce5))
+* **schematics:** setup wizard on `ng add`, allow deployment to Cloud Run, and add more configuration options to `ng deploy` ([#2836](https://github.com/angular/angularfire/issues/2836)) ([72d3c2e](https://github.com/angular/angularfire/commit/72d3c2e))
+* **compat/storage**: Adding list function ([#2960](https://github.com/angular/angularfire/issues/2960)) ([ea544b](https://github.com/angular/angularfire/commit/8ea544b))
+* **app-check**: Support Firebase AppCheck ([#2940](https://github.com/angular/angularfire/issues/2940)) ([337116f](https://github.com/angular/angularfire/commit/337116f))
+* **compat/storage**: Transfer state support for the `getDownloadURL` pipe ([#2921](https://github.com/angular/angularfire/issues/2921)) ([d6cfe16](https://github.com/angular/angularfire/commit/d6cfe16))
+
+### Misc.
+
+* Mark compatability with the RXJS 7 peer ([#2998](https://github.com/angular/angularfire/issues/2998)) ([c0df294](https://github.com/angular/angularfire/commit/c0df294)))
+* Increase the accuracy of performance marks ([#2921](https://github.com/angular/angularfire/issues/2921)) ([d6cfe16](https://github.com/angular/angularfire/commit/d6cfe16))
+* **compat/storage**: Type fixes `getDownloadURL` pipe ([#2921](https://github.com/angular/angularfire/issues/2921)) ([d6cfe16](https://github.com/angular/angularfire/commit/d6cfe16))
+
 <a name="7.0.4"></a>
 # [7.0.4](https://github.com/angular/angularfire/compare/7.0.3...7.0.4) (2021-09-07)
 

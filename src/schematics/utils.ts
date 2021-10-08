@@ -220,8 +220,7 @@ export function addToNgModule(host: Tree, options: { sourcePath: string, feature
     changes.push(
       insertImport(source, modulePath, ['provideAnalytics', 'getAnalytics', 'ScreenTrackingService', 'UserTrackingService'] as any, '@angular/fire/analytics'),
       ...addImportToModule(source, modulePath, `provideAnalytics(() => getAnalytics())`, null as any),
-      ...addProviderToModule(source, modulePath, `ScreenTrackingService`, null as any),
-      ...addProviderToModule(source, modulePath, `UserTrackingService`, null as any),
+      ...addProviderToModule(source, modulePath, ['ScreenTrackingService', 'UserTrackingService'] as any, null as any),
     );
   }
 
