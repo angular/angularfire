@@ -20,7 +20,7 @@ describe('Firestore-lite', () => {
                 provideFirestore(() => {
                     providedFirestore = getFirestore(getApp(appName));
                     connectFirestoreEmulator(providedFirestore, 'localhost', 8080);
-                    return provideFirestore;
+                    return providedFirestore;
                 }),
             ],
         });
@@ -33,7 +33,7 @@ describe('Firestore-lite', () => {
     });
 
     it('should be injectable', () => {
-        expect(firestore).toBeTruthy();
+        expect(providedFirestore).toBeTruthy();
         expect(firestore).toEqual(providedFirestore);
         expect(firestore.app).toEqual(app);
     });
