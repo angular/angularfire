@@ -1,3 +1,32 @@
+<a name="7.1.0"></a>
+# [7.1.0](https://github.com/angular/angularfire/compare/7.0.4...7.1.0) (2021-10-08)
+
+### Features
+
+* **auth-guard:** modular auth guards now available ([#3001](https://github.com/angular/angularfire/issues/3001)) ([3ae6ce5](https://github.com/angular/angularfire/commit/3ae6ce5))
+* **schematics:** setup wizard on `ng add`, allow deployment to Cloud Run, and add more configuration options to `ng deploy` ([#2836](https://github.com/angular/angularfire/issues/2836)) ([72d3c2e](https://github.com/angular/angularfire/commit/72d3c2e))
+* **compat/storage**: Adding list function ([#2960](https://github.com/angular/angularfire/issues/2960)) ([ea544b](https://github.com/angular/angularfire/commit/8ea544b))
+* **app-check**: Add AppCheck ([#2940](https://github.com/angular/angularfire/issues/2940)) ([337116f](https://github.com/angular/angularfire/commit/337116f))
+* **compat/storage**: Transfer state support for the `getDownloadURL` pipe ([#2921](https://github.com/angular/angularfire/issues/2921)) ([d6cfe16](https://github.com/angular/angularfire/commit/d6cfe16))
+* **analytics**: modular versions of `ScreenTrackingService` and `UserTrackingService` now available ([#2963](https://github.com/angular/angularfire/issues/2963)) ([d724d81](https://github.com/angular/angularfire/commit/d724d81))
+* **core**: `provide*` methods can pass dependencies & the factory can use the injector for more advanced configuration ([#2963](https://github.com/angular/angularfire/issues/2963)) ([d724d81](https://github.com/angular/angularfire/commit/d724d81))
+
+### Bug Fixes
+
+* **compat/storage**: Type fixes for `.child` ([#2921](https://github.com/angular/angularfire/issues/2921)) ([d6cfe16](https://github.com/angular/angularfire/commit/d6cfe16))
+
+### Misc.
+
+* `Analytics`, `RemoteConfig`, and `Messaging` can be `null` if `isSupported()` returns false, this guards against runtime failures in unsupported environments at the cost of null checking
+* Require Firebase 7.1 peer
+* `ng add` installs firebase-tools globally, this also addressed the race condition
+* Requires firebase-tools 9.9+ peer (optional)
+* Moved peer dependencies for the schematics to proper dependencies
+* Mark compatability with rxjs 7
+* Increase the accuracy of performance marks
+* `ng deploy` echos out the firebase-tools version and the user
+* Error message improvements
+
 <a name="7.0.4"></a>
 # [7.0.4](https://github.com/angular/angularfire/compare/7.0.3...7.0.4) (2021-09-07)
 

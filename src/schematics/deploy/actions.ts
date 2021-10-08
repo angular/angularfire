@@ -226,6 +226,8 @@ export const deployToFunction = async (
   // tslint:disable-next-line:no-non-null-assertion
   const siteTarget = options.target ?? context.target!.project;
 
+  execSync(`npm --prefix ${functionsOut} i`);
+
   if (options.preview) {
 
     await firebaseTools.serve({
