@@ -166,7 +166,7 @@ export const projectPrompt = async (defaultProject: string|undefined, options: {
       message: 'What would you like to call your project?',
       default: projectId,
     });
-    return await firebaseTools.projects.create(projectId, { ...options, displayName, nonInteractive: true });
+    return await firebaseTools.projects.create(projectId, { account: (options as any).account, displayName, nonInteractive: true });
   }
   // tslint:disable-next-line:no-non-null-assertion
   return (await projects).find(it => it.projectId === projectId)!;

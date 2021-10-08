@@ -59,8 +59,8 @@ export const FIREBASE_ADMIN = new InjectionToken<app.App>('firebase-admin');
     }, [new Optional(), FIREBASE_ADMIN]),
   ],
   providers: [
-    UserTrackingService,
     ScreenTrackingService,
+    UserTrackingService,
   ],
   bootstrap: [ ],
 })

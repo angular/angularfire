@@ -131,7 +131,7 @@ export const ngAddSetupProject = (
 
     const [ defaultProjectName ] = getFirebaseProjectNameFromHost(host, ngProjectName);
 
-    const firebaseProject = await projectPrompt(defaultProjectName, { projectRoot });
+    const firebaseProject = await projectPrompt(defaultProjectName, { projectRoot, account: user.email });
 
     let hosting = { projectType: PROJECT_TYPE.Static, prerender: false };
     let firebaseHostingSite: FirebaseHostingSite|undefined;
