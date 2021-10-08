@@ -226,7 +226,11 @@ export const deployToFunction = async (
   // tslint:disable-next-line:no-non-null-assertion
   const siteTarget = options.target ?? context.target!.project;
 
-  execSync(`npm --prefix ${functionsOut} i`);
+  try {
+    execSync(`npm --prefix ${functionsOut} i`);
+  } catch (e) {
+    console.warn(e.messsage);
+  }
 
   if (options.preview) {
 
