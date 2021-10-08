@@ -13,7 +13,7 @@
 
 ### Bug Fixes
 
-* **compat/storage**: Type fixes `getDownloadURL` pipe ([#2921](https://github.com/angular/angularfire/issues/2921)) ([d6cfe16](https://github.com/angular/angularfire/commit/d6cfe16))
+* **compat/storage**: Type fixes for `.child` ([#2921](https://github.com/angular/angularfire/issues/2921)) ([d6cfe16](https://github.com/angular/angularfire/commit/d6cfe16))
 
 ### Misc.
 
@@ -25,6 +25,7 @@
 * Mark compatability with rxjs 7
 * Increase the accuracy of performance marks
 * `ng deploy` echos out the firebase-tools version and the user
+* Error message improvements
 
 <a name="7.0.4"></a>
 # [7.0.4](https://github.com/angular/angularfire/compare/7.0.3...7.0.4) (2021-09-07)
