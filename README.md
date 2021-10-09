@@ -123,14 +123,14 @@ This developer guide assimes you're using the new tree-shakable AngularFire API,
   <tr>
     <td>
 
-### [Analytics](docs/analytics.md)
+### [Analytics](docs/analytics.md#analytics)
 ```ts
 import { } from '@angular/fire/analytics';
 ```
 </td>
     <td>
 
-### [Authentication](docs/auth.md)
+### [Authentication](docs/auth.md#authentication)
 ```ts
 import { } from '@angular/fire/auth';
 ```
@@ -139,14 +139,14 @@ import { } from '@angular/fire/auth';
   <tr>
     <td>
 
-### [Cloud Firestore](docs/firestore.md)
+### [Cloud Firestore](docs/firestore.md#cloud-firestore#cloud-firestore)
 ```ts
 import { } from '@angular/fire/firestore';
 ```
 </td>
     <td>
 
-### [Cloud Functions](docs/functions.md)
+### [Cloud Functions](docs/functions.md#cloud-functions)
 ```ts
 import { } from '@angular/fire/functions';
 ```
@@ -155,14 +155,14 @@ import { } from '@angular/fire/functions';
   <tr>
     <td>
 
-### [Cloud Messaging](docs/messaging.md)
+### [Cloud Messaging](docs/messaging.md#cloud-messaging)
 ```ts
 import { } from '@angular/fire/messaging';
 ```
 </td>
     <td>
 
-### [Cloud Storage](docs/storage.md)
+### [Cloud Storage](docs/storage.md#cloud-storage)
 ```ts
 import { } from '@angular/fire/storage';
 ```
@@ -171,14 +171,14 @@ import { } from '@angular/fire/storage';
   <tr>
     <td>
 
-### [Performance Monitoring](docs/performance.md)
+### [Performance Monitoring](docs/performance.md#performance-monitoring)
 ```ts
 import { } from '@angular/fire/performance';
 ```
 </td>
     <td>
 
-### [Realtime Database](docs/database.md)
+### [Realtime Database](docs/database.md#realtime-database)
 ```ts
 import { } from '@angular/fire/database';
 ```
@@ -187,14 +187,14 @@ import { } from '@angular/fire/database';
   <tr>
     <td>
 
-### [Remote Config](docs/remote-config.md)
+### [Remote Config](docs/remote-config.md#remote-config)
 ```ts
 import { } from '@angular/fire/remote-config';
 ```
 </td>
     <td>
 
-### [App Check](docs/app-check.md)
+### [App Check](docs/app-check.md#app-check)
 ```ts
 import { } from '@angular/fire/app-check';
 ```
