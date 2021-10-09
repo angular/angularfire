@@ -201,3 +201,9 @@ import { } from '@angular/fire/app-check';
 </td>
   </tr>
 </table>
+
+### Deploying to production
+
+* Firebase Hosting
+* Angular Universal: Cloud Functions
+* Angular Universal: Cloud Run
