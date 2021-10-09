@@ -1,5 +1,7 @@
 # Getting started with Performance Monitoring
 
+> **NOTE**: [AngularFire has a new tree-shakable API](../../README.md#developer-guide), you're looking at the documentation for the compatability version of the library. [See the v7 upgrade guide for more information on this change.](../version-7-upgrade.md).
+
 ## Automatic page load tracing
 
 Understand your Angular application's real-world performance with [Firebase Performance Monitoring](https://firebase.google.com/docs/perf-mon). Performance Monitoring automatically provides a trace for **page load** when you add `AngularFirePerformanceModule` into your App Module's imports.

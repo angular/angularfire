@@ -2,6 +2,8 @@
 
 > Cloud Storage is designed to help you quickly and easily store and serve user-generated content, such as photos and videos.
 
+> **NOTE**: [AngularFire has a new tree-shakable API](../../README.md#developer-guide), you're looking at the documentation for the compatability version of the library. [See the v7 upgrade guide for more information on this change.](../version-7-upgrade.md).
+
 ### Import the `NgModule`
 
 Cloud Storage for AngularFire is contained in the `@angular/fire/storage` module namespace. Import the `AngularFireStorageModule` in your `NgModule`. This sets up the `AngularFireStorage` service for dependency injection.

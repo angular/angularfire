@@ -1,5 +1,7 @@
 # 4. Querying lists
 
+> **NOTE**: [AngularFire has a new tree-shakable API](../../README.md#developer-guide), you're looking at the documentation for the compatability version of the library. [See the v7 upgrade guide for more information on this change.](../version-7-upgrade.md).
+
 ## Creating a query with primitive/scalar values
 
 Queries are created by building on the [`firebase.database.Reference`](https://firebase.google.com/docs/reference/js/firebase.database.Reference).

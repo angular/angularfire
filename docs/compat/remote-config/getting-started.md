@@ -2,6 +2,8 @@
 
 `AngularFireRemoteConfig` dynamically imports the `firebase/remote-config` library on demand, provides convenience observables, pipes, and a promisified version of the [Firebase Remote Config SDK (`firebase.remoteConfig.RemoteConfig`)](https://firebase.google.com/docs/reference/js/firebase.remoteconfig.RemoteConfig).
 
+> **NOTE**: [AngularFire has a new tree-shakable API](../../README.md#developer-guide), you're looking at the documentation for the compatability version of the library. [See the v7 upgrade guide for more information on this change.](../version-7-upgrade.md).
+
 ### API:
 
 ```ts

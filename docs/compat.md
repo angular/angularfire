@@ -5,7 +5,9 @@ The official [Angular](https://angular.io/) library for [Firebase](https://fireb
 
 ## Compatibility Developer Guide
 
-AngularFire has a new tree-shakable API, you're looking at the documentation for the compatability version of the library. [See the v7 upgrade guide for more information.](version-7-upgrade.md).
+AngularFire has a new tree-shakable API, you're looking at the documentation for the compatability version of the library. [Find the new developer guide here](../README.md#developer-guide).
+
+[See the v7 upgrade guide for more information on this change.](version-7-upgrade.md).
 
 ### Monitor usage of your application in production
 

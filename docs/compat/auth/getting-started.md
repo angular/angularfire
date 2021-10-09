@@ -6,6 +6,8 @@
 `firebase.auth.Auth` instance, allowing you to log users in, out, etc. [See
 the Firebase docs for more information on what methods are available.](https://firebase.google.com/docs/reference/js/firebase.auth.Auth)
 
+> **NOTE**: [AngularFire has a new tree-shakable API](../../README.md#developer-guide), you're looking at the documentation for the compatability version of the library. [See the v7 upgrade guide for more information on this change.](../version-7-upgrade.md).
+
 **Example app:**
 
 ```ts
