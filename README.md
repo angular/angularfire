@@ -115,20 +115,22 @@ Get help on our [Q&A board](https://github.com/angular/angularfire/discussions?d
 
 ## Developer Guide
 
-This developer guide assimes you're using the new tree-shakable AngularFire API, [if you're looking for the compatability API you can find the documentation here](docs/compat.md). [See the v7 upgrade guide for more information.](docs/version-7-upgrade.md).
+This developer guide assimes you're using the new tree-shakable AngularFire API, [if you're looking for the compatability API you can find the documentation here](docs/compat.md).
+
+[See the v7 upgrade guide for more information on this change.](docs/version-7-upgrade.md).
 
 <table>
   <tr>
     <td>
 
-### Analytics
+### [Analytics](docs/analytics.md)
 ```ts
 import { } from '@angular/fire/analytics';
 ```
 </td>
     <td>
 
-### Authentication
+### [Authentication](docs/auth.md)
 ```ts
 import { } from '@angular/fire/auth';
 ```
@@ -137,14 +139,14 @@ import { } from '@angular/fire/auth';
   <tr>
     <td>
 
-### Cloud Firestore
+### [Cloud Firestore](docs/firestore.md)
 ```ts
 import { } from '@angular/fire/firestore';
 ```
 </td>
     <td>
 
-### Cloud Functions
+### [Cloud Functions](docs/functions.md)
 ```ts
 import { } from '@angular/fire/functions';
 ```
@@ -153,14 +155,14 @@ import { } from '@angular/fire/functions';
   <tr>
     <td>
 
-### Cloud Messaging
+### [Cloud Messaging](docs/messaging.md)
 ```ts
 import { } from '@angular/fire/messaging';
 ```
 </td>
     <td>
 
-### Cloud Storage
+### [Cloud Storage](docs/storage.md)
 ```ts
 import { } from '@angular/fire/storage';
 ```
@@ -169,14 +171,14 @@ import { } from '@angular/fire/storage';
   <tr>
     <td>
 
-### Performance Monitoring
+### [Performance Monitoring](docs/performance.md)
 ```ts
 import { } from '@angular/fire/performance';
 ```
 </td>
     <td>
 
-### Realtime Database
+### [Realtime Database](docs/database.md)
 ```ts
 import { } from '@angular/fire/database';
 ```
@@ -185,14 +187,14 @@ import { } from '@angular/fire/database';
   <tr>
     <td>
 
-### Remote Config
+### [Remote Config](docs/remote-config.md)
 ```ts
 import { } from '@angular/fire/remote-config';
 ```
 </td>
     <td>
 
-### App Check
+### [App Check](docs/app-check.md)
 ```ts
 import { } from '@angular/fire/app-check';
 ```
