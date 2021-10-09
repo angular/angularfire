@@ -3,7 +3,7 @@
 > Cloud Firestore is a NoSQL, document-oriented database. Unlike a SQL database, there are no tables or rows. Instead, you store data in *documents*, which are organized into *collections*.
 Each *document* contains a set of key-value pairs. Cloud Firestore is optimized for storing large collections of small documents.
 
-> **NOTE**: [AngularFire has a new tree-shakable API](../../README.md#developer-guide), you're looking at the documentation for the compatability version of the library. [See the v7 upgrade guide for more information on this change.](../version-7-upgrade.md).
+> **NOTE**: [AngularFire has a new tree-shakable API](../../../README.md#developer-guide), you're looking at the documentation for the compatability version of the library. [See the v7 upgrade guide for more information on this change.](../../version-7-upgrade.md).
 
 ## Using `AngularFirestoreDocument`
 

@@ -2,7 +2,7 @@
 
 In this guide, we'll look at how to use `@angular/fire` to connect an Angular application with Firebase Emulator Suite to start prototyping your apps.
 
-> **NOTE**: [AngularFire has a new tree-shakable API](../../README.md#developer-guide), you're looking at the documentation for the compatability version of the library. [See the v7 upgrade guide for more information on this change.](../version-7-upgrade.md).
+> **NOTE**: [AngularFire has a new tree-shakable API](../../../README.md#developer-guide), you're looking at the documentation for the compatability version of the library. [See the v7 upgrade guide for more information on this change.](../../version-7-upgrade.md).
 
 There are four supported emulators, all of them available at the Firebase suite workflow:
 
