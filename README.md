@@ -121,10 +121,10 @@ This developer guide assimes you're using the new tree-shakable AngularFire API,
   <tr>
     <td>
       <h3>Analytics</h3>
-
 ```ts
 import { } from 'firebase/analytics';
 ```
+
 
     </td>
     <td>
@@ -132,6 +132,7 @@ import { } from 'firebase/analytics';
 ```ts
 import { } from 'firebase/auth';
 ```
+
 
     </td>
   </tr>
