@@ -1,3 +1,7 @@
+<small>
+<a href="..">AngularFire</a> &#10097; <a href="../README.md#developer-guide">Developer Guide</a> &#10097; Analytics
+</small>
+
 # Analytics
 
 What is Analytics?
