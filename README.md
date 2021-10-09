@@ -120,60 +120,82 @@ This developer guide assimes you're using the new tree-shakable AngularFire API,
 <table>
   <tr>
     <td>
-      <h3>Analytics</h3>
 
+### Analytics
 ```ts
-import { } from 'firebase/analytics';
+import { } from '@angular/fire/analytics';
 ```
-
-    </td>
+</td>
     <td>
-      <h3>Authentication</h3>
 
+### Authentication
 ```ts
-import { } from 'firebase/auth';
+import { } from '@angular/fire/auth';
 ```
+</td>
+  </tr>
+  <tr>
+    <td>
 
-    </td>
+### Cloud Firestore
+```ts
+import { } from '@angular/fire/firestore';
+```
+</td>
+    <td>
+
+### Cloud Functions
+```ts
+import { } from '@angular/fire/functions';
+```
+</td>
   </tr>
   <tr>
     <td>
-      Cloud Firestore for Web
-      import { } from 'firebase/firestore';
-    </td>
+
+### Cloud Messaging
+```ts
+import { } from '@angular/fire/messaging';
+```
+</td>
     <td>
-      Cloud Functions for Web
-      import { } from 'firebase/functions';
-    </td>
+
+### Cloud Storage
+```ts
+import { } from '@angular/fire/storage';
+```
+</td>
   </tr>
   <tr>
     <td>
-      Cloud Messaging for Web
-      import { } from 'firebase/messaging';
-    </td>
+
+### Performance Monitoring
+```ts
+import { } from '@angular/fire/performance';
+```
+</td>
     <td>
-      Cloud Storage for Web
-      import { } from 'firebase/storage';
-    </td>
+
+### Realtime Database
+```ts
+import { } from '@angular/fire/database';
+```
+</td>
   </tr>
   <tr>
     <td>
-      Performance Monitoring for Web
-      import { } from 'firebase/performance';
-    </td>
+
+### Remote Config
+```ts
+import { } from '@angular/fire/remote-config';
+```
+</td>
     <td>
-      Realtime Database for Web
-      import { } from 'firebase/database';
-    </td>
-  </tr>
-  <tr>
-    <td>
-      Remote Config for Web
-      import { } from 'firebase/remote-config';
-    </td>
-    <td>
-      App Check for Web
-      import { } from 'firebase/app-check';
-    </td>
+
+### App Check
+```ts
+import { } from '@angular/fire/app-check';
+```
+</td>
   </tr>
 </table>
