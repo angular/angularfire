@@ -115,86 +115,64 @@ Get help on our [Q&A board](https://github.com/angular/angularfire/discussions?d
 
 ## Developer Guide
 
-AngularFire has a new tree-shakable API, however this is still under active development and documentation is in the works, so we suggest most developers stick with the Compatiability API for the time being. [See the v7 upgrade guide for more information.](docs/version-7-upgrade.md). 
+This developer guide assimes you're using the new tree-shakable AngularFire API, [if you're looking for the compatability API you can find the documentation here](docs/compat.md). [See the v7 upgrade guide for more information.](docs/version-7-upgrade.md).
 
-This developer guide assumes you're using the Compatiability API (`@angular/fire/compat/*`).
+<table>
+  <tr>
+    <td>
+      <h3>Analytics</h3>
 
-### Monitor usage of your application in production
+```ts
+import { } from 'firebase/analytics';
+```
 
-> `AngularFireAnalytics` provides a convenient method of interacting with Google Analytics in your Angular application. The provided `ScreenTrackingService` and `UserTrackingService` automatically log events when you're using the Angular Router or Firebase Authentication respectively. [Learn more about Google Analytics](https://firebase.google.com/docs/analytics).
+    </td>
+    <td>
+      <h3>Authentication</h3>
+```ts
+import { } from 'firebase/auth';
+```
 
-- [Getting started with Google Analytics](docs/analytics/getting-started.md)
-
-### Interacting with your database(s)
-
-Firebase offers two cloud-based, client-accessible database solutions that support realtime data syncing. [Learn about the differences between them in the Firebase Documentation](https://firebase.google.com/docs/firestore/rtdb-vs-firestore).
-
-#### Cloud Firestore
-
-> `AngularFirestore` allows you to work with Cloud Firestore, the new flagship database for mobile app development. It improves on the successes of Realtime Database with a new, more intuitive data model. Cloud Firestore also features richer, faster queries and scales better than Realtime Database.
-
-- [Documents](docs/firestore/documents.md)
-- [Collections](docs/firestore/collections.md)
-- [Querying Collections](docs/firestore/querying-collections.md)
-- [Offline data](docs/firestore/offline-data.md)
-
-#### Realtime Database
-
-> `AngularFireDatabase` allows you to work with the Realtime Database, Firebase's original database. It's an efficient, low-latency solution for mobile apps that require synced states across clients in realtime.
-
-- [Objects](docs/rtdb/objects.md)
-- [Lists](docs/rtdb/lists.md)
-- [Querying lists](docs/rtdb/querying-lists.md)
-
-### Authenticate users
-
-- [Getting started with Firebase Authentication](docs/auth/getting-started.md)
-- [Route users with AngularFire guards](docs/auth/router-guards.md)
-
-### Local Emulator Suite
-
-- [Getting started with Firebase Emulator Suite](docs/emulators/emulators.md)
-
-### Upload files
-
-- [Getting started with Cloud Storage](docs/storage/storage.md)
-
-### Receive push notifications
-
-- [Getting started with Firebase Messaging](docs/messaging/messaging.md)
-
-### **BETA:** Change behavior and appearance of your application without deploying
-
-> Firebase Remote Config is a cloud service that lets you change the behavior and appearance of your app without requiring users to download an app update. [Learn more about Remote Config](https://firebase.google.com/docs/remote-config).
-
-- [Getting started with Remote Config](docs/remote-config/getting-started.md)
-
-### Monitor your application performance in production
-
-> Firebase Performance Monitoring is a service that helps you to gain insight into the performance characteristics of your iOS, Android, and web apps. [Learn more about Performance Monitoring](https://firebase.google.com/docs/perf-mon).
-
-- [Getting started with Performance Monitoring](docs/performance/getting-started.md)
-
-### Directly call Cloud Functions
-
-- [Getting started with Callable Functions](docs/functions/functions.md)
-
-### Deploying your application
-
-> Firebase Hosting is production-grade web content hosting for developers. With Hosting, you can quickly and easily deploy web apps and static content to a global content delivery network (CDN) with a single command.
-
-- [Deploy your application on Firebase Hosting](docs/deploy/getting-started.md)
-
-#### Server-side rendering
-
-> Angular Universal is a technology that allows you to run your Angular application on a server. This allows you to generate your HTML in a process called server-side rendering (SSR). AngularFire is compatible with server-side rendering; allowing you to take advantage of the Search Engine Optimization, link previews, the performance gains granted by the technology, and more. [Learn more about Angular Universal](https://angular.io/guide/universal).
-
-- [Getting started with Angular Universal](docs/universal/getting-started.md)
-- [Deploying your Universal application on Cloud Functions for Firebase](docs/universal/cloud-functions.md)
-- [Prerendering your Universal application](docs/universal/prerendering.md)
-
-### Ionic
-
-- [Installation and Setup with Ionic CLI](docs/ionic/cli.md)
-- [Using AngularFire with Ionic 2](docs/ionic/v2.md)
-- [Using AngularFire with Ionic 3](docs/ionic/v3.md)
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Cloud Firestore for Web
+      import { } from 'firebase/firestore';
+    </td>
+    <td>
+      Cloud Functions for Web
+      import { } from 'firebase/functions';
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Cloud Messaging for Web
+      import { } from 'firebase/messaging';
+    </td>
+    <td>
+      Cloud Storage for Web
+      import { } from 'firebase/storage';
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Performance Monitoring for Web
+      import { } from 'firebase/performance';
+    </td>
+    <td>
+      Realtime Database for Web
+      import { } from 'firebase/database';
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Remote Config for Web
+      import { } from 'firebase/remote-config';
+    </td>
+    <td>
+      App Check for Web
+      import { } from 'firebase/app-check';
+    </td>
+  </tr>
+</table>
