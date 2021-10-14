@@ -139,7 +139,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest ]
         node: ["14"]
-        firebase: ["9", "canary"]
+        firebase: ["9", "canary", "next"]
         firebaseTools: ["9"]
         rxjs: ["7"]
         ng: ["12", "next"]
