@@ -1,3 +1,10 @@
+<a name="7.1.1"></a>
+# [7.1.1](https://github.com/angular/angularfire/compare/7.1.0...7.1.1) (2021-10-18)
+
+### Bug Fixes
+
+* **schematics:** Fix ng add on Windows ([#3022](https://github.com/angular/angularfire/issues/3022)) ([6ed7aef](https://github.com/angular/angularfire/commit/6ed7aef)), closes [#3016](https://github.com/angular/angularfire/issues/3016)
+
 <a name="7.1.0"></a>
 # [7.1.0](https://github.com/angular/angularfire/compare/7.0.4...7.1.0) (2021-10-08)
 
