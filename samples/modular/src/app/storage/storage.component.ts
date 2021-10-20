@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { from, Observable } from 'rxjs';
 import { startWith } from 'rxjs/operators';
-import { TransferState } from '@angular/platform-browser';
 import { traceUntilFirst } from '@angular/fire/performance';
 import { getDownloadURL, ref, Storage } from '@angular/fire/storage';
 import { keepUnstableUntilFirst } from '@angular/fire';
