@@ -24,7 +24,7 @@ export type Animal = {
           <span *ngIf="animal.hasPendingWrites">🕒</span>
       </li>
     </ul>
-    <button (click)="newAnimal()" [disabled]="!this.user">New animal</button>
+    <button (click)="newAnimal()" [disabled]="(this.user | async) === null">New animal</button>
   `,
   styles: []
 })
