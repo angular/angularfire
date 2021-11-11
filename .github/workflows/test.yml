@@ -31,7 +31,7 @@ jobs:
         id: node_modules_cache
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-14-9-9-6-node_modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-14-12-9-9-6-node_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-14-12-9-9-6-node_modules-
             ${{ runner.os }}-14-12-9-9-
@@ -71,7 +71,7 @@ jobs:
         firebase: ["9"]
         firebaseTools: ["9"]
         rxjs: ["6", "7"]
-        ng: ["12"]
+        ng: ["12", "13"]
       fail-fast: false
     name: Test firebase@${{ matrix.firebase }} firebase-tools@${{ matrix.firebaseTools }} ng@${{ matrix.ng }} rxjs@${{ matrix.rxjs}} on ${{ matrix.os }} Node.js ${{ matrix.node }}
     steps:
@@ -142,7 +142,7 @@ jobs:
         firebase: ["9", "canary", "next"]
         firebaseTools: ["9"]
         rxjs: ["7"]
-        ng: ["12", "next"]
+        ng: ["12", "13", "next"]
         exclude:
           # standard configuration
           - firebase: 9
