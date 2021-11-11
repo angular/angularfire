@@ -11887,11 +11887,6 @@ redeyed@~2.1.0:
   dependencies:
     esprima "~4.0.0"
 
-reflect-metadata@0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/reflect-metadata/-/reflect-metadata-0.1.2.tgz#ea23e5823dc830f292822bd3da9b89fd57bffb03"
-  integrity sha1-6iPlgj3IMPKSgivT2puJ/Ve/+wM=
-
 reflect-metadata@^0.1.2:
   version "0.1.13"
   resolved "https://registry.yarnpkg.com/reflect-metadata/-/reflect-metadata-0.1.13.tgz#67ae3ca57c972a2aa1642b10fe363fe32d49dc08"

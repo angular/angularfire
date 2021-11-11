@@ -1,5 +1,6 @@
 import Jasmine from 'jasmine';
 
+import 'reflect-metadata';
 import 'zone.js/dist/zone-node';
 import 'zone.js/dist/zone-testing';
 
