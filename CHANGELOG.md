@@ -1,3 +1,10 @@
+<a name="7.2.0"></a>
+# [7.2.0](https://github.com/angular/angularfire/compare/7.1.1...7.2.0) (2021-11-11)
+
+### Features
+
+* **core:** marking as compatible with Angular 13 peer ([#3057](https://github.com/angular/angularfire/pull/3057))
+
 <a name="7.1.1"></a>
 # [7.1.1](https://github.com/angular/angularfire/compare/7.1.0...7.1.1) (2021-10-18)
 
