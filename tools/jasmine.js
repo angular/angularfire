@@ -1,11 +1,11 @@
-Jasmine = require('jasmine');
+import Jasmine from 'jasmine';
 
-require('reflect-metadata');
-require('zone.js/dist/zone-node');
-require('zone.js/dist/zone-testing');
+import 'reflect-metadata';
+import 'zone.js/dist/zone-node';
+import 'zone.js/dist/zone-testing';
 
-const { getTestBed } = require('@angular/core/testing');
-const { platformServerTesting, ServerTestingModule } = require('@angular/platform-server/testing');
+import { getTestBed } from '@angular/core/testing';
+import { platformServerTesting, ServerTestingModule } from '@angular/platform-server/testing';
 
 global['globalThis'] = require('globalthis/polyfill')();
 
