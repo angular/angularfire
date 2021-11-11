@@ -97,7 +97,10 @@ export const persistenceEnabled = new Promise<boolean>(resolve => {
       return functions;
     }),
   ],
-  providers: [ ],
+  providers: [
+    ScreenTrackingService,
+    UserTrackingService
+  ],
   bootstrap: [ ],
 })
 export class AppModule { }

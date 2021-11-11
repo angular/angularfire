@@ -1,5 +1,4 @@
 const { initializeApp } = require("firebase/app");
-const { initializeMessaging, isSupported } = require('firebase/messaging');
 
 // Add the Firebase products that you want to use
 const { getFunctions, httpsCallable } = require("firebase/functions");
