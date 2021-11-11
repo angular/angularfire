@@ -3,7 +3,7 @@
 
 ### Features
 
-* **core:** marking as compatible with Angular 13 peer ([#3057](https://github.com/angular/angularfire/pull/3057))
+* **core:** marking as compatible with Angular 13 peer ([#3057](https://github.com/angular/angularfire/pull/3057)) ([390691b](https://github.com/angular/angularfire/commit/390691b))
 
 ### Bug Fixes
 
