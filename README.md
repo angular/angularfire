@@ -66,6 +66,7 @@ AngularFire doesn't follow Angular's versioning as Firebase also has breaking ch
 
 | Angular | Firebase | AngularFire  |
 | --------|----------|--------------|
+| 13      | 9        | ^7.2         |
 | 12      | 9        | ^7.0         |
 | 12      | 7,8      | ^6.1.5       |
 | 11      | 7,8      | ^6.1         |
@@ -73,8 +74,6 @@ AngularFire doesn't follow Angular's versioning as Firebase also has breaking ch
 | 10      | 7        | ^6.0.3       |
 | 9       | 8        | ^6.0.4       |
 | 9       | 7        | ^6.0         |
-| 8       | 7        | ^5.2.3       |
-| 8       | 6        | ^5.2.0       |
 
 <sub>Version combinations not documented here __may__ work but are untested and you will see NPM peer warnings.</sub>
 
