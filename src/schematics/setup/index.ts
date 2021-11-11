@@ -33,7 +33,7 @@ export const setupProject =
 
     const { project, projectName } = getProject(config, tree);
 
-    const sourcePath = [project.root, project.sourceRoot].filter(it => !!it).join('/');
+    const sourcePath = project.sourceRoot ?? project.root;
 
     addIgnoreFiles(tree);
 

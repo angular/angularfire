@@ -467,6 +467,20 @@ describe('ng-add', () => {
       expect(result.read('.firebaserc').toString()).toEqual(overwriteFirebaserc);
       expect(result.read('angular.json').toString()).toEqual(overwriteAngularJson);
     });
+    
+    it('runs if source root is relative to workspace root', async () => {
+      const angularJson = generateAngularJson();
+      const project: {root: string, sourceRoot?: string} = angularJson.projects[PROJECT_NAME];
+      project.sourceRoot = `${project.root}/src`;
+      tree.overwrite('angular.json', JSON.stringify(angularJson));
+      const promise = setupProject(tree, {} as any, [FEATURES.Hosting], {
+        firebaseProject: { projectId: FIREBASE_PROJECT } as any,
+        projectType: PROJECT_TYPE.Static,
+        project: undefined,
+        prerender: false,
+      });
+      await expectAsync(promise).toBeResolved();
+    });
 
     it('overrides existing files', async () => {
       const tempTree = await setupProject(tree, {} as any, [FEATURES.Hosting], {
