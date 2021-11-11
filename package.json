@@ -1,6 +1,6 @@
 {
   "name": "@angular/fire",
-  "version": "7.1.1",
+  "version": "7.2.0",
   "description": "The official Angular library for Firebase.",
   "private": true,
   "scripts": {
@@ -12,7 +12,7 @@
     "test:chrome-headless": "firebase emulators:exec --project=angularfire2-test \"ng test --watch=false --browsers=ChromeHeadless\"",
     "test:firefox-headless": "firebase emulators:exec --project=angularfire2-test \"ng test --watch=false --browsers=FirefoxHeadless\"",
     "lint": "ng lint",
-    "test:node": "node -r tsconfig-paths/register ./tools/jasmine.js",
+    "test:node": "node -r tsconfig-paths/register ./tools/load-jasmine.js",
     "test:typings": "node ./tools/run-typings-test.js",
     "test:build": "bash ./test/ng-build/build.sh",
     "test:all": "npm run test:node && npm run test:chrome-headless && npm run test:typings && npm run test:build",
@@ -53,7 +53,7 @@
     "@angular/platform-browser-dynamic": "^12.0.0",
     "@angular/router": "^12.0.0",
     "@schematics/angular": "^12.0.0",
-    "firebase": "^9.1.0",
+    "firebase": "^9.4.0",
     "firebase-admin": "^9.11.1",
     "firebase-functions": "^3.6.0",
     "firebase-tools": "^9.0.0",
@@ -110,7 +110,7 @@
     "ng-packagr": "^12.0.0",
     "pretty-size": "^2.0.0",
     "protractor": "~7.0.0",
-    "reflect-metadata": "0.1.2",
+    "reflect-metadata": "^0.1.2",
     "replace-in-file": "^5.0.2",
     "rimraf": "^2.5.4",
     "rollup": "^2.22.0",
@@ -127,8 +127,5 @@
     "typedoc": "^0.16.4",
     "typescript": ">=4.2.3 <4.3.0"
   },
-  "typings": "index.d.ts",
-  "resolutions": {
-    "webpack": "^5.35.0"
-  }
+  "typings": "index.d.ts"
 }
