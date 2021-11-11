@@ -127,8 +127,5 @@
     "typedoc": "^0.16.4",
     "typescript": ">=4.2.3 <4.3.0"
   },
-  "typings": "index.d.ts",
-  "resolutions": {
-    "webpack": "^5.35.0"
-  }
+  "typings": "index.d.ts"
 }
