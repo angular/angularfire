@@ -51,7 +51,7 @@ like app verification mode for phone authentication, which is useful for
 [testing](https://cloud.google.com/identity-platform/docs/test-phone-numbers).
 
 ```ts
-import { SETTINGS as AUTH_SETTINGS } from '@angular/fire/auth';
+import { SETTINGS as AUTH_SETTINGS } from '@angular/fire/compat/auth';
 
 @NgModule({
   // ... Existing configuration
@@ -73,7 +73,7 @@ preference. This allows to localize emails but be aware that this only applies
 if you use the standard template provided by Firebase. 
 
 ```ts
-import { USE_DEVICE_LANGUAGE } from '@angular/fire/auth';
+import { USE_DEVICE_LANGUAGE } from '@angular/fire/compat/auth';
 
 @NgModule({
   // ... Existing configuration
@@ -91,7 +91,7 @@ If you want to set a different language, you can use `LANGUAGE_CODE` DI Token
 More info at the [firebase auth docs](https://firebase.google.com/docs/reference/js/firebase.auth.Auth#languagecode).
 
 ```ts
-import { LANGUAGE_CODE } from '@angular/fire/auth';
+import { LANGUAGE_CODE } from '@angular/fire/compat/auth';
 
 @NgModule({
   // ... Existing configuration
@@ -115,7 +115,7 @@ The possible types are `'local'`, `'session'` or `'none'`. Read more at
 [authentication state persistence](https://firebase.google.com/docs/auth/web/auth-state-persistence),
 
 ```ts
-import { PERSISTENCE } from '@angular/fire/auth';
+import { PERSISTENCE } from '@angular/fire/compat/auth';
 
 @NgModule({
   // ... Existing configuration
@@ -135,7 +135,7 @@ ID using `TENANT_ID` DI Token (*default: null*).
 More tutorials regarding this topic are _coming soon_.
 
 ```ts
-import { TENANT_ID } from '@angular/fire/auth';
+import { TENANT_ID } from '@angular/fire/compat/auth';
 
 @NgModule({
   // ... Existing configuration
