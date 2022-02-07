@@ -1,6 +1,5 @@
 import { NgZone } from '@angular/core';
 import { Observable } from 'rxjs';
-import firebase from 'firebase/compat';
 
 type MyFunction = (...args: any[]) => any;
 type FunctionPropertyNames<T> = { [K in keyof T]: T[K] extends MyFunction ? K : never }[keyof T];
