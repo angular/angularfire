@@ -30,7 +30,7 @@
       "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
     },
     "ssr": {
-      "type": ["boolean", "string"],
+      "oneOf": [{ "type": "boolean" }, { "type": "string" }],
       "description": "Should we attempt to deploy the function to Cloud Functions (true or 'cloud-functions') / Cloud Run ('cloud-run') or just Hosting (false)"
     },
     "prerender": {
@@ -54,7 +54,7 @@
       "description": "The name of the Cloud Function or Cloud Run serviceId to deploy SSR to"
     },
     "functionsNodeVersion": {
-      "type": ["number", "string"],
+      "oneOf": [{ "type": "number" }, { "type": "string" }],
       "description": "Version of Node.js to run Cloud Functions / Run on"
     },
     "region": {
@@ -82,12 +82,12 @@
           "description": "Set a CPU limit in Kubernetes cpu units."
         },
         "maxConcurrency": {
-          "type": ["number", "string"],
+          "oneOf": [{ "type": "number" }, { "type": "string" }],
           "pattern": "^(\\d+|default)$",
           "description": "Set the maximum number of concurrent requests allowed per container instance. If concurrency is unspecified, any number of concurrent requests are allowed. To unset this field, provide the special value default."
         },
         "maxInstances": {
-          "type": ["number", "string"],
+          "oneOf": [{ "type": "number" }, { "type": "string" }],
           "pattern": "^(\\d+|default)$",
           "description": "The maximum number of container instances of the Service to run. Use 'default' to unset the limit and use the platform default."
         },
@@ -97,7 +97,7 @@
           "description": "Set a memory limit. Ex: 1Gi, 512Mi."
         },
         "minInstances": {
-          "type": ["number", "string"],
+          "oneOf": [{ "type": "number" }, { "type": "string" }],
           "pattern": "^(\\d+|default)$",
           "description": "The minimum number of container instances of the Service to run or 'default' to remove any minimum."
         },
