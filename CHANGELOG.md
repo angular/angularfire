@@ -1,3 +1,16 @@
+<a name="7.2.1"></a>
+# [7.2.1](https://github.com/angular/angularfire/compare/7.2.0...7.2.1) (2022-02-10)
+
+### Bug Fixes
+
+* **compat:** Typescript 4.5 inference breaks the PromiseProxy ([#3144](https://github.com/angular/angularfire/issues/3144)) ([f61bc7d](https://github.com/angular/angularfire/commit/f61bc7d)), closes [#3090](https://github.com/angular/angularfire/issues/3090) [#3088](https://github.com/angular/angularfire/issues/3088)
+* **core:** Address bad arguments being passed to zone wrapper ([#3127](https://github.com/angular/angularfire/issues/3127)) ([8b693e4](https://github.com/angular/angularfire/commit/8b693e4))
+* **core:** Defensively catch Firebase isSupported calls ([#3146](https://github.com/angular/angularfire/issues/3146)) ([520930b](https://github.com/angular/angularfire/commit/520930b))
+* **schematic:** use oneOf rather than array types in the deploy schematic ([#3092](https://github.com/angular/angularfire/issues/3092)) ([058d624](https://github.com/angular/angularfire/commit/058d624))
+* **schematics:** Address ng add console lock up ([#3151](https://github.com/angular/angularfire/issues/3151)) ([4852c35](https://github.com/angular/angularfire/commit/4852c35)), closes [#3145](https://github.com/angular/angularfire/issues/3145) [#3121](https://github.com/angular/angularfire/issues/3121)
+
+
+
 <a name="7.2.0"></a>
 # [7.2.0](https://github.com/angular/angularfire/compare/7.1.1...7.2.0) (2021-11-11)
 
