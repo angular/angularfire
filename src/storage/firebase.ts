@@ -4,9 +4,12 @@ import { ɵzoneWrap } from '@angular/fire';
 import {
   connectStorageEmulator as _connectStorageEmulator,
   deleteObject as _deleteObject,
+  getBlob as _getBlob,
+  getBytes as _getBytes,
   getDownloadURL as _getDownloadURL,
   getMetadata as _getMetadata,
   getStorage as _getStorage,
+  getStream as _getStream,
   list as _list,
   listAll as _listAll,
   ref as _ref,
@@ -18,9 +21,12 @@ import {
 
 export const connectStorageEmulator = ɵzoneWrap(_connectStorageEmulator, true);
 export const deleteObject = ɵzoneWrap(_deleteObject, true);
+export const getBlob = ɵzoneWrap(_getBlob, true);
+export const getBytes = ɵzoneWrap(_getBytes, true);
 export const getDownloadURL = ɵzoneWrap(_getDownloadURL, true);
 export const getMetadata = ɵzoneWrap(_getMetadata, true);
 export const getStorage = ɵzoneWrap(_getStorage, true);
+export const getStream = ɵzoneWrap(_getStream, true);
 export const list = ɵzoneWrap(_list, true);
 export const listAll = ɵzoneWrap(_listAll, true);
 export const ref = ɵzoneWrap(_ref, true);
