@@ -147,7 +147,7 @@ jobs:
         os: [ ubuntu-latest ]
         node: ["14"]
         firebase: ["9", "canary", "next"]
-        firebaseTools: ["9", "10"]
+        firebaseTools: ["10"]
         rxjs: ["7"]
         ng: ["12", "13", "next"]
         exclude:
