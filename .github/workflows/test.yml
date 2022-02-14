@@ -141,7 +141,8 @@ jobs:
   canary:
     runs-on: ${{ matrix.os }}
     # if: ${{ github.ref == 'refs/heads/master' }}
-    needs: [ 'build', 'test' ]
+    # needs: [ 'build', 'test' ]
+    needs: [ 'test' ]
     strategy:
       matrix:
         os: [ ubuntu-latest ]
