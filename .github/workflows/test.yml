@@ -142,7 +142,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     # if: ${{ github.ref == 'refs/heads/master' }}
     # needs: [ 'build', 'test' ]
-    needs: [ 'test' ]
+    needs: [ 'build' ]
     strategy:
       matrix:
         os: [ ubuntu-latest ]
