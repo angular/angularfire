@@ -467,7 +467,7 @@ describe('ng-add', () => {
       expect(result.read('.firebaserc').toString()).toEqual(overwriteFirebaserc);
       expect(result.read('angular.json').toString()).toEqual(overwriteAngularJson);
     });
-    
+
     it('runs if source root is relative to workspace root', async () => {
       const angularJson = generateAngularJson();
       const project: {root: string, sourceRoot?: string} = angularJson.projects[PROJECT_NAME];

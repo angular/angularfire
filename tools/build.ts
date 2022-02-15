@@ -124,17 +124,10 @@ ${zoneWrapped.map(([importName, exportName]) => `export const ${exportName} = ɵ
 }
 
 function webpackFirestoreProtos() {
-  // TODO fix on windows
-  return new Promise<void>((resolve, reject) => {
-    glob('./node_modules/@firebase/firestore/dist/src/protos/**/*.proto', {}, async (err, files) => {
-      if (err) { reject(err); }
-      const fileLoader = files.map(path =>
-        `require('file-loader?name=${path.replace('./node_modules/@firebase/firestore/dist/', '')}!${path.replace('./node_modules/', '../../')}');`
-      ).join('\n');
-      await writeFile(dest('firestore-protos.js'), fileLoader);
-      resolve();
-    });
-  });
+  return writeFile(dest('firestore-protos.js'), `/**
+ * @deprecated No longer needed since Firebase JS SDK 9.6.3
+ */
+export {};`);
 }
 
 function proxyPolyfillCompat() {
