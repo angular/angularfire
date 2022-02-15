@@ -204,8 +204,13 @@ jobs:
           yarn add firebase@${{ matrix.firebase }}
           yarn add firebase-tools@${{ matrix.firebaseTools }}
           yarn add rxjs@${{ matrix.rxjs }} --prefer-offline
-          if [ "${{ matrix.ng }}" = "next" ]; then; npx ng update @angular/core@$13 @angular/cli@$13 --allow-dirty --force; fi
-          npx ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty --force
+      # Can't update more than one major at a times, take the incremental step
+      - name: Ng update @13
+        run: npx ng update @angular/core@13 @angular/cli@13 --allow-dirty --force
+        if: matrix.ng == 'next'
+      - name: Ng update @${{ matrix.ng }}
+        run: npx ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty --force
+        if: matrix.ng != '12'
       - name: Firebase emulator cache
         uses: actions/cache@v2
         with:
@@ -219,17 +224,28 @@ jobs:
         run: |
           yarn build:jasmine
           yarn test:node
-      - name: Test prerender
+      - name: Test browser
+        if: matrix.os == 'ubuntu-latest' && matrix.node == '14' && matrix.firebaseTools == '9'
+        run: yarn test:chrome-headless
+      - name: ng-build yarn install
         run: |
           cd ./test/ng-build
           yarn --frozen-lockfile --prefer-offline
           yarn add firebase@${{ matrix.firebase }}
-          if [ "${{ matrix.ng }}" = "next" ]; then; npx ng update @angular/core@$13 @angular/cli@$13 @nguniversal/express-engine@$13 --allow-dirty --force; fi
+      - name: ng-build update @13
+        run: |
+          cd ./test/ng-build
+          npx ng update @angular/core@13 @angular/cli@13 @nguniversal/express-engine@13  --allow-dirty --force
+        if: matrix.ng == 'next'
+      - name: ng-build update @${{ matrix.ng }} & prerender
+        run: |
+          cd ./test/ng-build
           npx ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} @nguniversal/express-engine@${{ matrix.ng }} --allow-dirty --force
+        if: matrix.ng != '12'
+      - name: ng-build prerender
+        run: |
+          cd ./test/ng-build
           yarn prerender
-      - name: Test browser
-        if: matrix.os == 'ubuntu-latest' && matrix.node == '14' && matrix.firebaseTools == '9'
-        run: yarn test:chrome-headless
 
   contribute:
     runs-on: ${{ matrix.os }}
