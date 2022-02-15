@@ -178,6 +178,7 @@ export interface DeployBuilderSchema {
   functionsRuntimeOptions?: RuntimeOptions;
   cloudRunOptions?: Partial<CloudRunOptions>;
   outputPath?: string;
+  CF3v2?: boolean;
 }
 
 export interface CloudRunOptions {
