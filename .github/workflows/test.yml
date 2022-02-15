@@ -204,7 +204,8 @@ jobs:
           yarn add firebase@${{ matrix.firebase }}
           yarn add firebase-tools@${{ matrix.firebaseTools }}
           yarn add rxjs@${{ matrix.rxjs }} --prefer-offline
-          npx ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty --force || true
+          if [ "${{ matrix.ng }}" = "next" ]; then; npx ng update @angular/core@$13 @angular/cli@$13 --allow-dirty --force; fi
+          npx ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty --force
       - name: Firebase emulator cache
         uses: actions/cache@v2
         with:
@@ -223,7 +224,8 @@ jobs:
           cd ./test/ng-build
           yarn --frozen-lockfile --prefer-offline
           yarn add firebase@${{ matrix.firebase }}
-          ./node_modules/.bin/ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} @nguniversal/express-engine@${{ matrix.ng }} --allow-dirty
+          if [ "${{ matrix.ng }}" = "next" ]; then; npx ng update @angular/core@$13 @angular/cli@$13 @nguniversal/express-engine@$13 --allow-dirty --force; fi
+          npx ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} @nguniversal/express-engine@${{ matrix.ng }} --allow-dirty --force
           yarn prerender
       - name: Test browser
         if: matrix.os == 'ubuntu-latest' && matrix.node == '14' && matrix.firebaseTools == '9'
