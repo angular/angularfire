@@ -133,6 +133,13 @@ jobs:
         run: |
           yarn build:jasmine
           yarn test:node
+      - name: Test prerender
+        run: |
+          cd test/ng-build
+          yarn --frozen-lockfile --prefer-offline
+          yarn add firebase@${{ matrix.firebase }}
+          ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} @nguniversal/express-engine@${{ matrix.ng }} --allow-dirty
+          yarn prerender
       - name: Test browser
         if: matrix.os == 'ubuntu-latest' && matrix.node == '14' && matrix.firebaseTools == '9'
         run: yarn test:chrome-headless
@@ -211,6 +218,13 @@ jobs:
         run: |
           yarn build:jasmine
           yarn test:node
+      - name: Test prerender
+        run: |
+          cd test/ng-build
+          yarn --frozen-lockfile --prefer-offline
+          yarn add firebase@${{ matrix.firebase }}
+          ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} @nguniversal/express-engine@${{ matrix.ng }} --allow-dirty
+          yarn prerender
       - name: Test browser
         if: matrix.os == 'ubuntu-latest' && matrix.node == '14' && matrix.firebaseTools == '9'
         run: yarn test:chrome-headless
