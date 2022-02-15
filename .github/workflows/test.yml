@@ -220,7 +220,7 @@ jobs:
           yarn test:node
       - name: Test prerender
         run: |
-          cd test/ng-build
+          cd ./test/ng-build
           yarn --frozen-lockfile --prefer-offline
           yarn add firebase@${{ matrix.firebase }}
           ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} @nguniversal/express-engine@${{ matrix.ng }} --allow-dirty
