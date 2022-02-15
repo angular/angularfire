@@ -223,7 +223,7 @@ jobs:
           cd ./test/ng-build
           yarn --frozen-lockfile --prefer-offline
           yarn add firebase@${{ matrix.firebase }}
-          ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} @nguniversal/express-engine@${{ matrix.ng }} --allow-dirty
+          ./node_modules/.bin/ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} @nguniversal/express-engine@${{ matrix.ng }} --allow-dirty
           yarn prerender
       - name: Test browser
         if: matrix.os == 'ubuntu-latest' && matrix.node == '14' && matrix.firebaseTools == '9'
