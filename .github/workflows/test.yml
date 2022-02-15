@@ -133,16 +133,28 @@ jobs:
         run: |
           yarn build:jasmine
           yarn test:node
-      - name: Test prerender
-        run: |
-          cd test/ng-build
-          yarn --frozen-lockfile --prefer-offline
-          yarn add firebase@${{ matrix.firebase }}
-          ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} @nguniversal/express-engine@${{ matrix.ng }} --allow-dirty
-          yarn prerender
       - name: Test browser
         if: matrix.os == 'ubuntu-latest' && matrix.node == '14' && matrix.firebaseTools == '9'
         run: yarn test:chrome-headless
+      - name: ng-build yarn install
+        run: |
+          cd ./test/ng-build
+          yarn --frozen-lockfile --prefer-offline
+          yarn add firebase@${{ matrix.firebase }}
+      - name: Update ng-build to ng@13
+        run: |
+          cd ./test/ng-build
+          npx ng update @angular/core@13 @angular/cli@13 @nguniversal/express-engine@13  --allow-dirty --force
+        if: matrix.ng == '14' || matrix.ng == 'next'
+      - name: Update ng-build to ng@${{ matrix.ng }}
+        run: |
+          cd ./test/ng-build
+          npx ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} @nguniversal/express-engine@${{ matrix.ng }} --allow-dirty --force
+        if: matrix.ng != '12'
+      - name: ng-build prerender
+        run: |
+          cd ./test/ng-build
+          yarn prerender
 
   # TODO dry up
   canary:
@@ -205,10 +217,10 @@ jobs:
           yarn add firebase-tools@${{ matrix.firebaseTools }}
           yarn add rxjs@${{ matrix.rxjs }} --prefer-offline
       # Can't update more than one major at a times, take the incremental step
-      - name: Ng update @13
+      - name: Update to ng@13
         run: npx ng update @angular/core@13 @angular/cli@13 --allow-dirty --force
-        if: matrix.ng == 'next'
-      - name: Ng update @${{ matrix.ng }}
+        if: matrix.ng == '14' || matrix.ng == 'next'
+      - name: Update to ng@${{ matrix.ng }}
         run: npx ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty --force
         if: matrix.ng != '12'
       - name: Firebase emulator cache
@@ -232,12 +244,12 @@ jobs:
           cd ./test/ng-build
           yarn --frozen-lockfile --prefer-offline
           yarn add firebase@${{ matrix.firebase }}
-      - name: ng-build update @13
+      - name: Update ng-build to ng@13
         run: |
           cd ./test/ng-build
           npx ng update @angular/core@13 @angular/cli@13 @nguniversal/express-engine@13  --allow-dirty --force
         if: matrix.ng == 'next'
-      - name: ng-build update @${{ matrix.ng }} & prerender
+      - name: Update ng-build to ng@${{ matrix.ng }}
         run: |
           cd ./test/ng-build
           npx ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} @nguniversal/express-engine@${{ matrix.ng }} --allow-dirty --force
