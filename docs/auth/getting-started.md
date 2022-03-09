@@ -1,42 +1,265 @@
 # 5. Getting started with Firebase Authentication
 
-`AngularFireAuth.user` provides you an `Observable<User|null>` to monitor your application's authentication State.
+#### This documentation works for Modular Firebase V9+
 
-`AngularFireAuth` promise proxies an initialized
-`firebase.auth.Auth` instance, allowing you to log users in, out, etc. [See
-the Firebase docs for more information on what methods are available.](https://firebase.google.com/docs/reference/js/firebase.auth.Auth)
+First initialize firebase authentication in `app.module.ts`
 
-**Example app:**
+```typescript
+@NgModule({
+  declarations: [AppComponent],
+  imports: [provideAuth(() => getAuth())],
+  providers: [ScreenTrackingService, UserTrackingService],
+  bootstrap: [AppComponent],
+})
+export class AppModule {}
+```
 
-```ts
-import { Component } from '@angular/core';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import firebase from 'firebase/compat/app';
+#### A basic authentication demo code.
 
+```typescript
+import { Component } from "@angular/core";
+import {
+  Auth,
+  authState,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  UserCredential,
+} from "@angular/fire/auth";
+import { map } from "rxjs";
 @Component({
-  selector: 'app-root',
+  selector: "app-root",
   template: `
-    <div *ngIf="auth.user | async as user; else showLogin">
+    <div *ngIf="loggedIn">
       <h1>Hello {{ user.displayName }}!</h1>
       <button (click)="logout()">Logout</button>
     </div>
-    <ng-template #showLogin>
+
+    <div *ngIf="!loggedIn">
       <p>Please login.</p>
       <button (click)="login()">Login with Google</button>
-    </ng-template>
+    </div>
   `,
 })
 export class AppComponent {
-  constructor(public auth: AngularFireAuth) {
+  title = "AngularFireDevelopment";
+  user: any;
+  public loggedIn: boolean = false;
+  constructor(private auth: Auth) {
+    authState(this.auth)
+      .pipe(map((u) => u))
+      .subscribe((userData) => {
+        this.user = userData;
+        this.loggedIn = !!userData;
+      });
   }
   login() {
-    this.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    signInWithPopup(this.auth, new GoogleAuthProvider()).then(
+      async (credentials: UserCredential) => {
+        this.user = credentials.user;
+      }
+    );
   }
   logout() {
-    this.auth.signOut();
+    return signOut(this.auth);
   }
 }
 ```
+
+It is a good practice to keep your local code away from component code. So let's create a service file inside our
+
+`ng generate service services/authentication/authentication`
+
+It should create a file like this. This file is known as service.
+[More on services here.](https://angular.io/tutorial/toh-pt4)
+
+![Directory Strucutre](AuthServiceDireStructure.png)
+
+Now add these functions in your services
+
+This is for logging in with google.
+
+```typescript
+googleLogin(){
+    signInWithPopup(this.auth, new GoogleAuthProvider()).then(
+      async (credentials: UserCredential) => {
+        this.user = credentials.user;
+      }
+    );
+  }
+```
+
+This is for logging in with email and password it takes two arguments email and password.
+
+```typescript
+emailLogin(email:string,password:string){
+    return signInWithEmailAndPassword(this.auth,email,password)
+  }
+```
+
+This is for creating account with an email and password
+
+#### Please verify and check for all password requirements using form validation firebase does not qualifications for secure password and valid emails.
+
+```typescript
+emailSignup(email:string,password:string){
+    return createUserWithEmailAndPassword(this.auth,email,password)
+  }
+```
+
+This method logs you out of any or all account for current user instance
+
+```typescript
+logout() {
+    return signOut(this.auth);
+  }
+```
+
+This methods signs you in anonymously.
+
+```typescript
+anonymousSignIn(){
+    return signInAnonymously(this.auth);
+  }
+```
+
+#### The final service file
+
+`authentication.service.ts`
+
+```typescript
+import { Injectable } from "@angular/core";
+import {
+  Auth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  UserCredential,
+} from "@angular/fire/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInAnonymously,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+
+@Injectable({
+  providedIn: "root",
+})
+export class AuthenticationService {
+  user: any;
+  constructor(private auth: Auth) {}
+  googleLogin() {
+    signInWithPopup(this.auth, new GoogleAuthProvider()).then(
+      async (credentials: UserCredential) => {
+        this.user = credentials.user;
+      }
+    );
+  }
+  emailLogin(email: string, password: string) {
+    return signInWithEmailAndPassword(this.auth, email, password);
+  }
+  emailSignup(email: string, password: string) {
+    return createUserWithEmailAndPassword(this.auth, email, password);
+  }
+  logout() {
+    return signOut(this.auth);
+  }
+  anonymousSignIn() {
+    return signInAnonymously(this.auth);
+  }
+}
+```
+
+Now in your `app.component.ts` add this code to immport our `AuthenticationService` file we just created.
+
+`app.component.ts`
+
+```typescript
+import { Component } from '@angular/core';
+import { FormControl, FormControlName, FormGroup, Validators } from '@angular/forms';
+import { AuthenticationService } from './services/authentication/authentication.service';
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  title = 'AngularFireDevelopment';
+  constructor(public authService:AuthenticationService){}
+  signIn:FormGroup = new FormGroup({
+    email:new FormControl('',[Validators.required]),
+    password:new FormControl('',[Validators.required])
+  });
+  signUp:FormGroup = new FormGroup({
+    email:new FormControl('',[Validators.required]),
+    password:new FormControl('',[Validators.required])
+  });
+  login(){
+    if(this.signIn.valid){
+      this.authService.emailLogin(this.signIn.value.email,this.signIn.value.password)
+      .then(()=>alert('Signed In'))
+      .catch((error)=>alert('Invalid Sign In'+error.toString()));
+    } else {
+      alert('Invalid Login Form');
+    }
+  }
+  signup(){
+    if(this.signUp.valid){
+      this.authService.emailSignup(this.signUp.value.email,this.signUp.value.password)
+      .then(()=>alert('Signed up'))
+      .catch((error:any)=>alert('Invalid Sign Up'+error.toString()));
+    } else {
+      alert('Invalid Signup Form');
+    }
+  }
+}
+
+```
+
+Now add `FormsModule` and `ReactiveFormsModule` to your app module imports.
+
+```typescript
+imports:
+[
+  FormsModule,
+  ReactiveFormsModule,
+]
+```
+
+And your `app.component.html` file which will have only UI code but will be able to access the authentication service using Injection
+
+`app.component.html`
+
+```html
+<div *ngIf="authService.loggedIn">
+  <h1>Hello {{ authService.user.displayName }}!</h1>
+  <button (click)="authService.logout()">Logout</button>
+</div>
+
+<div *ngIf="!authService.loggedIn">
+  <p>Please login.</p>
+  <button (click)="authService.googleLogin()">Login with Google</button>
+  <div>
+    <form [formGroup]="signIn">
+      <input type="text" formControlName="email" placeholder="Email">
+      <input type="text" formControlName="password" placeholder="Password">
+      <button (click)="login()">Login with Email And Password</button>
+    </form>
+  </div>
+  <div>
+    <form [formGroup]="signUp">
+      <input type="text" formControlName="email" placeholder="Email">
+      <input type="text" formControlName="password" placeholder="Password">
+      <button (click)="signup()">Signup with Email And Password</button>
+    </form>
+  </div>
+</div>
+```
+
+### Now you just learned how to do authentication with firebase.
+
+---
+
 
 ## Configuration with Dependency Injection
 
