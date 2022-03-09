@@ -256,6 +256,8 @@ And your `app.component.html` file which will have only UI code but will be able
 </div>
 ```
 
+#### Full repo [link here](https://github.com/Sapython/AngularFireDevelopment)
+
 ### Now you just learned how to do authentication with firebase.
 
 ---
