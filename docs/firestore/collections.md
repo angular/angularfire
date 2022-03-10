@@ -1,321 +1,308 @@
 # 3. Collections in AngularFirestore
 
-> Cloud Firestore is a NoSQL, document-oriented database. Unlike a SQL database, there are no tables or rows. Instead, you store data in *documents*, which are organized into *collections*.
-Each *document* contains a set of key-value pairs. Cloud Firestore is optimized for storing large collections of small documents.
+#### <p style="color:#16ab45"> This documentation is updated for modular version 9 of angular fire package. For previous or missing features refer to older docs.</p>
+
+> Cloud Firestore is a NoSQL, document-oriented database. Unlike a SQL database, there are no tables or rows. Instead, you store data in _documents_, which are organized into _collections_.
+> Each _document_ contains a set of key-value pairs. Cloud Firestore is optimized for storing large collections of small documents.
 
 ## Using `AngularFirestoreCollection`
 
 The `AngularFirestoreCollection` service is a wrapper around the native Firestore SDK's [`CollectionReference`](https://firebase.google.com/docs/reference/js/firebase.firestore.CollectionReference) and [`Query`](https://firebase.google.com/docs/reference/js/firebase.firestore.Query) types. It is a generic service that provides you with a strongly typed set of methods for manipulating and streaming data. This service is designed for use as an `@Injectable()`.
 
 ```ts
-import { Component } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
-import { Observable } from 'rxjs';
-
-export interface Item { name: string; }
+import { Component } from "@angular/core";
+import { Subscription } from "rxjs";
+import { collection, getDocs, QuerySnapshot } from "firebase/firestore";
+import { Firestore } from "@angular/fire/firestore";
+export interface Item {
+  name: string;
+}
 
 @Component({
-  selector: 'app-root',
+  selector: "app-root",
   template: `
     <ul>
-      <li *ngFor="let item of items | async">
+      <li *ngFor="let item of items">
         {{ item.name }}
       </li>
     </ul>
-  `
+  `,
 })
-export class AppComponent {
-  private itemsCollection: AngularFirestoreCollection<Item>;
-  items: Observable<Item[]>;
-  constructor(private afs: AngularFirestore) {
-    this.itemsCollection = afs.collection<Item>('items');
-    this.items = this.itemsCollection.valueChanges();
-  }
-  addItem(item: Item) {
-    this.itemsCollection.add(item);
-  }
-}
-```
-
-The `AngularFirestoreCollection` is a service you use to create streams of the collection and perform data operations on the underyling collection.
-
-### The `DocumentChangeAction` type
-
-With the exception of the `valueChanges()`, each streaming method returns an Observable of `DocumentChangeAction[]`.
-
-A `DocumentChangeAction` gives you the `type` and `payload` properties. The `type` tells when what `DocumentChangeType` operation occured (`added`, `modified`, `removed`). The `payload` property is a `DocumentChange` which provides you important metadata about the change and a `doc` property which is the `DocumentSnapshot`.
-
-```ts
-interface DocumentChangeAction {
-  //'added' | 'modified' | 'removed';
-  type: DocumentChangeType;
-  payload: DocumentChange;
-}
-
-interface DocumentChange {
-  type: DocumentChangeType;
-  doc: DocumentSnapshot;
-  oldIndex: number;
-  newIndex: number;
-}
-
-interface DocumentSnapshot {
-  exists: boolean;
-  ref: DocumentReference;
-  id: string;
-  metadata: SnapshotMetadata;
-  data(): DocumentData;
-  get(fieldPath: string): any;
-}
-```
-
-## Streaming collection data
-
-There are multiple ways of streaming collection data from Firestore. 
-
-### `valueChanges({ idField?: string })`
-
-**What is it?** - The current state of your collection. Returns an Observable of data as a synchronized array of JSON objects. All Snapshot metadata is stripped and just the document data is included. Optionally, you can pass an options object with an `idField` key containing a string. If provided, the returned JSON objects will include their document ID mapped to a property with the name provided by `idField`.  
-
-**Why would you use it?** - When you just need a list of data. No document metadata is attached to the resulting array which makes it simple to render to a view.
-
-**When would you not use it?** - When you need a more complex data structure than an array.
-
-**Best practices** - Use this method to display data on a page. It's simple but effective. Use `.snapshotChanges()` once your needs become more complex.
-
-#### Example of persisting a Document Id
-
-```ts
-import { Component } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
-import { Observable } from 'rxjs';
-
-export interface Item { id: string; name: string; }
-
-@Component({
-  selector: 'app-root',
-  template: `
-    <ul>
-      <li *ngFor="let item of items | async">
-        {{ item.name }}
-      </li>
-    </ul>
-  `
-})
-export class AppComponent {
-  private itemsCollection: AngularFirestoreCollection<Item>;
-  items: Observable<Item[]>;
-  constructor(private readonly afs: AngularFirestore) {
-    this.itemsCollection = afs.collection<Item>('items');
-    this.items = this.itemsCollection.valueChanges({ idField: 'customID' });
-  }
-  addItem(name: string) {
-    // Persist a document id
-    const id = this.afs.createId();
-    const item: Item = { id, name };
-    this.itemsCollection.doc(id).set(item);
-  }
-}
-```
-
-### `snapshotChanges()`
-
-**What is it?** - The current state of your collection. Returns an Observable of data as a synchronized array of `DocumentChangeAction[]`. 
-
-**Why would you use it?** - When you need a list of data but also want to keep around metadata. Metadata provides you the underyling `DocumentReference`, document id, and array index of the single document. Having the document's id around makes it easier to use data manipulation methods. This method gives you more horsepower with other Angular integrations such as ngrx, forms, and animations due to the `type` property. The `type` property on each `DocumentChangeAction` is useful for ngrx reducers, form states, and animation states.
-
-**When would you not use it?** - When you need a more complex data structure than an array or if you need to process changes as they occur. This array is synchronized with the remote and local changes in Firestore.
-
-**Best practices** - Use an observable operator to transform your data from `.snapshotChanges()`. Don't return the `DocumentChangeAction[]` to the template. See the example below.
-
-#### Example
-
-```ts
-import { Component } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-
-export interface Shirt { name: string; price: number; }
-export interface ShirtId extends Shirt { id: string; }
-
-@Component({
-  selector: 'app-root',
-  template: `
-    <ul>
-      <li *ngFor="let shirt of shirts | async">
-        {{ shirt.name }} is {{ shirt.price }}
-      </li>
-    </ul>
-  `
-})
-export class AppComponent {
-  private shirtCollection: AngularFirestoreCollection<Shirt>;
-  shirts: Observable<ShirtId[]>;
-  constructor(private readonly afs: AngularFirestore) {
-    this.shirtCollection = afs.collection<Shirt>('shirts');
-    // .snapshotChanges() returns a DocumentChangeAction[], which contains
-    // a lot of information about "what happened" with each change. If you want to
-    // get the data and the id use the map operator.
-    this.shirts = this.shirtCollection.snapshotChanges().pipe(
-      map(actions => actions.map(a => {
-        const data = a.payload.doc.data() as Shirt;
-        const id = a.payload.doc.id;
-        return { id, ...data };
-      }))
+export class AppComponent implements OnInit {
+  items: Item[] = [];
+  constructor(private firestore: Firestore) {}
+  ngOnInit() {
+    getDocs(collection(this.firestore, "data")).then(
+      (querySnapshot: QuerySnapshot) => {
+        this.items = [];
+        querySnapshot.forEach((doc: any) => {
+          this.items.push(doc.data());
+        });
+      }
     );
   }
 }
 ```
 
-### `stateChanges()`
+## Streaming collection data or get realtime data
 
-**What is it?** - Returns an Observable of the most recent changes as a `DocumentChangeAction[]`. 
+There are multiple ways of streaming collection data from Firestore.
 
-**Why would you use it?** - The above methods return a synchronized array sorted in query order. `stateChanges()` emits changes as they occur rather than syncing the query order. This works well for ngrx integrations as you can build your own data structure in your reducer methods.
+1. `collectionSnapshots()` It is a method which returns a subscription with latest and complete list of documents in a collection.
+2. `collectionChanges()` It is a method which returns a subscription with only the changed data in a collection.
 
-**When would you not use it?** - When you just need a list of data. This is a more advanced usage of AngularFirestore.
+## `collectionSnapshots()` Implementation example
 
-#### Example
-
-```ts
-import { Component } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-
-export interface AccountDeposit { description: string; amount: number; }
-export interface AccountDepositId extends AccountDeposit { id: string; }
-
-@Component({
-  selector: 'app-root',
-  template: `
-    <ul>
-      <li *ngFor="let deposit of deposits | async">
-        {{ deposit.description }} for {{ deposit.amount }}
-      </li>
-    </ul>
-  `
-})
-export class AppComponent {
-  private depositCollection: AngularFirestoreCollection<AccountDeposit>;
-  deposits: Observable<AccountDepositId[]>;
-  constructor(private readonly afs: AngularFirestore) {
-    this.depositCollection = afs.collection<AccountDeposit>('deposits');
-    this.deposits = this.depositCollection.stateChanges(['added']).pipe(
-      map(actions => actions.map(a => {
-        const data = a.payload.doc.data() as AccountDeposit;
-        const id = a.payload.doc.id;
-        return { id, ...data };
-      }))
-    );
-  }
+```typescript
+import { Component } from "@angular/core";
+import { Subscription } from "rxjs";
+import { collection } from "firebase/firestore";
+import { collectionSnapshots, Firestore } from "@angular/fire/firestore";
+export interface Item {
+  name: string;
 }
-```
-
-### `auditTrail()`
-
-**What is it?** - Returns an Observable of `DocumentChangeAction[]` as they occur. Similar to `stateChanges()`, but instead it keeps around the trail of events as an array.
-
-**Why would you use it?** - This method is like `stateChanges()` except it is not ephemeral. It collects each change in an array as they occur. This is useful for ngrx integrations where you need to replay the entire state of an application. This also works as a great debugging tool for all applications. You can simply write `afs.collection('items').auditTrail().subscribe(console.log)` and check the events in the console as they occur.
-
-**When would you not use it?** - When you just need a list of data. This is a more advanced usage of AngularFirestore. 
-
-#### Example
-
-```ts
-import { Component } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-
-export interface AccountLogItem { description: string; amount: number; }
-export interface AccountLogItemId extends AccountLogItem { id: string; }
 
 @Component({
-  selector: 'app-root',
+  selector: "app-root",
   template: `
     <ul>
-      <li *ngFor="let log of accountLogs | async">
-        {{ log.description }} for {{ log.amount }}
-      </li>
-    </ul>
-  `
-})
-export class AppComponent {
-  private accountLogCollection: AngularFirestoreCollection<AccountLogItem>;
-  accountLogs: Observable<AccountLogItemId[]>;
-  constructor(private readonly afs: AngularFirestore) {
-    this.accountLogCollection = afs.collection<AccountLogItem>('accountLog');
-    this.accountLogs = this.accountLogCollection.auditTrail().pipe(
-      map(actions => actions.map(a => {
-        const data = a.payload.doc.data() as AccountLogItem;
-        const id = a.payload.doc.id;
-        return { id, ...data };
-      }))
-    );
-  }
-}
-```
-
-### Limiting events
-
-There are three `DocumentChangeType`s in Firestore: `added`, `removed`, and `modified`. Each streaming method listens to all three by default. However, you may only be interested in one of these events. You can specify which events you'd like to use through the first parameter of each method:
-
-#### Basic example
-
-```ts
-  constructor(private afs: AngularFirestore): {
-    this.itemsCollection = afs.collection<Item>('items');
-    this.items = this.itemsCollection.snapshotChanges(['added', 'removed']);
-  }
-```
-
-#### Component example
-
-```ts
-import { Component } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
-import { Observable } from 'rxjs';
-
-@Component({
-  selector: 'app-root',
-  template: `
-    <ul>
-      <li *ngFor="let item of items | async">
+      <li *ngFor="let item of items">
         {{ item.name }}
       </li>
     </ul>
-  `
+  `,
 })
-export class AppComponent {
-  private itemsCollection: AngularFirestoreCollection<Item>;
-  items: Observable<Item[]>;
-  constructor(private afs: AngularFirestore) {
-    this.itemsCollection = afs.collection<Item>('items');
-    this.items = this.itemsCollection.valueChanges(['added', 'removed']);
+export class AppComponent implements OnInit, OnDestroy {
+  itemListSubscription: Subscription = Subscription.EMPTY;
+  items: Item[] = [];
+  constructor(private firestore: Firestore) {}
+  ngOnInit() {
+    this.dataListSubscription = collectionSnapshots(
+      collection(this.firestore, "data")
+    ).subscribe((data) => {
+      this.items = [];
+      data.forEach((doc: any) => {
+        this.items.push(doc.data());
+      });
+    });
+  }
+  ngOnDestroy(): void {
+    this.itemListSubscription.unsubscribe();
   }
 }
 ```
 
-## State based vs. action based
+## `collectionChanges()` Implementation example
 
-Each one of these methods falls into two categories: state based and action based. State based methods return the state of your collection "as-is". Whereas action based methods return "what happened" in your collection.
+This method only returns data of a changed document so it can be used for keeping an eye on edits on any dataset. This is good method because you don't have to compare all data on the fly to know which one is new.
 
-For example, a user updates the third item in a list. In a state based method like `.valueChanges()` will update the third item in the collection and return an array of JSON data. This is how your state looks.
+> Cool tip: It has the best use case when showing notifications. But remember
 
-## Adding documents to a collection
+> <p style="color:#ff4f67;"> <strong>WARNING:</strong> It outputs every document last change present in the collection when it is first invoked or executed. </p>
 
-To add a new document to a collection with a generated id use the `add()` method. This method uses the type provided by the generic class to validate it's type structure.
+```typescript
+import { Component } from "@angular/core";
+import { Subscription } from "rxjs";
+import { collection } from "firebase/firestore";
+import { collectionChanges, Firestore } from "@angular/fire/firestore";
+export interface Item {
+  name: string;
+}
 
-#### Basic example
-
-```ts
-  constructor(private afs: AngularFirestore): {
-    const shirtsCollection = afs.collection<Item>('tshirts');
-    shirtsCollection.add({ name: 'item', price: 10 });
+@Component({
+  selector: "app-root",
+  template: `
+    <ul>
+      <li *ngFor="let item of items">
+        {{ item.doc.data().name }}
+        <strong>Type: </strong>{{ item.type }} <strong>New Index: </strong
+        >{{ item.newIndex }} <strong>Old Index: </strong>{{ item.oldIndex }}
+      </li>
+    </ul>
+  `,
+})
+export class AppComponent implements OnInit, OnDestroy {
+  itemListSubscription: Subscription = Subscription.EMPTY;
+  items: Item[] = [];
+  constructor(private firestore: Firestore) {}
+  ngOnInit() {
+    this.dataListSubscription = collectionChanges(
+      collection(this.firestore, "data")
+    ).subscribe((dataChange) => {
+      this.items = [];
+      dataChange.forEach((doc: any) => {
+        this.items.push(doc.data());
+      });
+    });
   }
+  ngOnDestroy(): void {
+    this.itemListSubscription.unsubscribe();
+  }
+}
 ```
+
+## Conditional collection querying
+
+Cloud Firestore provides powerful query functionality for specifying which documents you want to retrieve from a collection or collection group. These queries can also be used with either `getDocs()` or `collectionSnapshots()`, as described in Get Data and Get Realtime Updates.
+
+[More on queries refer here](https://firebase.google.com/docs/firestore/query-data/queries)
+
+#### Simple example demonstrating functioning of queries.
+
+```typescript
+import { Component } from "@angular/core";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { Firestore } from "@angular/fire/firestore";
+export interface Item {
+  name: string;
+  salary:number;
+}
+
+@Component({
+  selector: "app-root",
+  template: `
+    <ul>
+      <li *ngFor="let item of items">
+        {{ item.name }}
+      </li>
+    </ul>
+  `,
+})
+export class AppComponent implements OnInit {
+  items: Item[] = [];
+  constructor(private firestore: Firestore) {}
+  ngOnInit() {
+    getDocs(
+      query(
+        collection(this.firestore,'data'),
+        where('salary', '>=', 400))).then(collections:any)=>{
+        collections.forEach((doc:any)=>{
+         this.items.push(doc.data())
+        })
+    })
+  }
+}
+```
+The where() method takes three parameters: a field to filter on, a comparison operator, and a value. Cloud Firestore supports the following comparison operators:
+
+* `<` less than
+* `<=` less than or equal to
+* `==` equal to
+* `\>` greater than
+* `\>=` greater than or equal to
+* `!=` not equal to
+* `array-contains`
+* `array-contains-any`
+* `in`
+* `not-in`
+
+
+[Looking for more advanced queries](https://firebase.google.com/docs/firestore/query-data/queries#query_operators)
+
+---
+## Order and limit data with Cloud Firestore
+
+Cloud Firestore provides powerful query functionality for specifying which documents you want to retrieve from a collection. These queries can also be used with either `getDocs()` or `collectionChanges()`, as described in Get Data.
+
+### Order and limit data
+By default, a query retrieves all documents that satisfy the query in ascending order by document ID. You can specify the sort order for your data using orderBy(), and you can limit the number of documents retrieved using limit().
+
+For example, you could query for the first 3 cities alphabetically with:
+
+```typescript
+import { Component } from "@angular/core";
+import { collection, getDocs, query, limit, where } from "firebase/firestore";
+import { Firestore } from "@angular/fire/firestore";
+export interface City {
+  name: string;
+}
+
+@Component({
+  selector: "app-root",
+  template: `
+    <ul>
+      <li *ngFor="let city of cities">
+        {{ city.name }}
+      </li>
+    </ul>
+  `,
+})
+export class AppComponent implements OnInit {
+  cities: City[] = [];
+  constructor(private firestore: Firestore) {}
+  ngOnInit() {
+    getDocs(
+      query(
+        collection(this.firestore,'cities'),
+        orderBy('name'),
+        limit(10))).then((collections:any)=>{
+          collections.forEach((doc:any)=>{
+            console.log('Conditional',doc.data())
+            this.cities.push(doc.data())
+          })
+    })
+  }
+}
+```
+
+[For more references and extra options visit full docs](https://firebase.google.com/docs/firestore/query-data/order-limit-data)
+
+## Paginate data with query cursors
+With query cursors in Cloud Firestore, you can split data returned by a query into batches according to the parameters you define in your query.
+
+Query cursors define the start and end points for a query, allowing you to:
+
+* Return a subset of the data.
+* Paginate query results.
+
+However, to define a specific range for a query, you should use the `where()` method described in Simple Queries.
+
+### Add a simple cursor to a query
+
+Use the `startAt()` or `startAfter()` methods to define the start point for a query. The `startAt()` method includes the start point, while the `startAfter()` method excludes it.
+
+For example, if you use `startAt(A)` in a query, it returns the entire alphabet. If you use `startAfter(A)` instead, it returns `B-Z`.
+
+```typescript
+import { Component } from "@angular/core";
+import { collection, getDocs, query, limit, where } from "firebase/firestore";
+import { Firestore } from "@angular/fire/firestore";
+export interface City {
+  name: string;
+  population:number;
+}
+
+@Component({
+  selector: "app-root",
+  template: `
+    <ul>
+      <li *ngFor="let city of cities">
+        {{ city.name }}
+      </li>
+    </ul>
+  `,
+})
+export class AppComponent implements OnInit {
+  cities: City[] = [];
+  constructor(private firestore: Firestore) {}
+  ngOnInit() {
+    getDocs(
+      query(
+        collection(this.firestore,'population'),
+        orderBy("population"),
+        startAt(1000000))).then((collections:any)=>{
+          collections.forEach((doc:any)=>{
+            this.cities.push(doc.data())
+        })
+    })
+  }
+}
+```
+
+> Now to paginate this query. You just need to get the length of current cities length(-1) and then use it inside `startAfter` function so that all the results will be after the last document
+
+[Full example on pagination](https://firebase.google.com/docs/firestore/query-data/query-cursors#paginate_a_query)
+
 
 ## Manipulating individual documents
 
