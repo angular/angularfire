@@ -6,7 +6,7 @@ import { AppComponent } from './app.component';
 
 import * as firebaseAdmin from 'firebase-admin';
 
-console.log(firebaseAdmin);
+console.log(Object.keys({firebaseAdmin}));
 
 @NgModule({
   imports: [
