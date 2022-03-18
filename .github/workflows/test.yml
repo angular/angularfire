@@ -134,7 +134,7 @@ jobs:
           yarn build:jasmine
           yarn test:node
       - name: Test browser
-        if: matrix.os == 'ubuntu-latest' && matrix.node == '14' && matrix.firebaseTools == '9'
+        if: matrix.os == 'ubuntu-latest' && matrix.node == '14' && matrix.firebaseTools == '10'
         run: yarn test:chrome-headless
       - name: ng-build yarn install
         run: |
@@ -237,7 +237,6 @@ jobs:
           yarn build:jasmine
           yarn test:node
       - name: Test browser
-        if: matrix.os == 'ubuntu-latest' && matrix.node == '14' && matrix.firebaseTools == '9'
         run: yarn test:chrome-headless
       - name: ng-build yarn install
         run: |

@@ -15,7 +15,7 @@ import * as remoteConfig from 'firebase/remote-config';
 import * as storage from 'firebase/storage';
 
 import * as firebaseCompat from 'firebase/compat/app';
-// import * as appCheckCompat from 'firebase/compat/app-check';
+import * as appCheckCompat from 'firebase/compat/app-check';
 import * as analyticsCompat from 'firebase/compat/analytics';
 import * as authCompat from 'firebase/compat/auth';
 import * as databaseCompat from 'firebase/compat/database';
@@ -28,7 +28,7 @@ import * as storageCompat from 'firebase/compat/storage';
 console.log(Object.keys({
   firebase, appCheck, analytics, auth, database,
   firestore, functions, performance, remoteConfig, storage,
-  firebaseCompat, /* appCheckCompat, */ analyticsCompat, authCompat,
+  firebaseCompat, appCheckCompat, analyticsCompat, authCompat,
   databaseCompat, firestoreCompat, functionsCompat, performanceCompat,
   remoteConfigCompat, storageCompat,
 }));
