@@ -141,7 +141,7 @@ jobs:
       - name: ng-build yarn install
         run: |
           cd ./test/ng-build
-          yarn --frozen-lockfile --prefer-offline
+          yarn --prefer-offline
           yarn add firebase@${{ matrix.firebase }}
       - name: Update ng-build to ng@13
         run: |
@@ -247,7 +247,7 @@ jobs:
           yarn --prefer-offline
           yarn add firebase@${{ matrix.firebase }}
           export DATABASE_TYPES_VERSION=`cat node_modules/@firebase/database-compat/package.json | npx json dependencies.@firebase/database-types`
-          npx json -I -f package.json -e 'this.resolutions={"@firebase/database-types": "$DATABASE_TYPES_VERSION"}'
+          npx json -I -f package.json -e 'this.resolutions={"@firebase/database-types": "$(echo $DATABASE_TYPES_VERSION)"}'
           yarn --prefer-offline
       - name: Update ng-build to ng@13
         run: |
