@@ -49,7 +49,7 @@ describe('AngularFirestoreCollectionGroup', () => {
   });
 
   afterEach(() => {
-    app.delete().catch(() => undefined);
+     try { app.delete().catch(() => undefined); } catch (e) { }
   });
 
   describe('valueChanges()', () => {

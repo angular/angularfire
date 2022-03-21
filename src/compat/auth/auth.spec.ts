@@ -41,7 +41,7 @@ describe('AngularFireAuth', () => {
   });
 
   afterEach(() => {
-    app.delete().catch(() => undefined);
+     try { app.delete().catch(() => undefined); } catch (e) { }
   });
 
   describe('Zones', () => {
@@ -150,7 +150,7 @@ describe('AngularFireAuth with different app', () => {
   });
 
   afterEach(() => {
-    app.delete().catch(() => undefined);
+     try { app.delete().catch(() => undefined); } catch (e) { }
   });
 
   describe('<constructor>', () => {

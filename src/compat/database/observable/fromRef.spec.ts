@@ -38,7 +38,7 @@ describe('fromRef', () => {
   });
 
   afterEach(() => {
-    app.delete().catch(() => undefined);
+     try { app.delete().catch(() => undefined); } catch (e) { }
   });
 
   it('it should be async by default', (done) => {

@@ -43,7 +43,7 @@ describe('AuthGuard', () => {
   });
 
   afterEach(() => {
-    deleteApp(app).catch(() => undefined);
+    try { deleteApp(app).catch(() => undefined); } catch (e) { }
   });
 
   it('should be injectable', () => {
