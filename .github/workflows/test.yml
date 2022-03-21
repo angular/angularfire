@@ -49,6 +49,7 @@ jobs:
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
+          yarn config set network-timeout 300000
           yarn config set yarn-offline-mirror-pruning true
           yarn install --frozen-lockfile --prefer-offline
       - name: Build
@@ -110,6 +111,7 @@ jobs:
       - name: Configure yarn
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
+          yarn config set network-timeout 300000
           yarn config set ignore-engines true
       - name: Yarn install
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
@@ -207,12 +209,14 @@ jobs:
       - name: Configure yarn
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
+          yarn config set network-timeout 300000
           yarn config set ignore-engines true
       - name: Yarn install
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile --prefer-offline
       - name: Bump deps
         run: |
+          json -I -f package.json -e 'this.resolutions={"@firebase/database-types": "${ matrix.firebase }"}'
           yarn add firebase@${{ matrix.firebase }}
           yarn add firebase-tools@${{ matrix.firebaseTools }}
           yarn add rxjs@${{ matrix.rxjs }} --prefer-offline
@@ -301,6 +305,7 @@ jobs:
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
+          yarn config set network-timeout 300000
           yarn config set ignore-engines true
           yarn install --frozen-lockfile --prefer-offline
       - name: Build
