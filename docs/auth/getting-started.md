@@ -112,7 +112,7 @@ of persistence for future sign-in requests, including sign-in with redirect
 requests, you can use the `PERSISTENCE` DI Token (*default: null*).
 
 The possible types are `'local'`, `'session'` or `'none'`. Read more at 
-[authentication state persistence](https://firebase.google.com/docs/auth/web/auth-state-persistence),
+[authentication state persistence](https://firebase.google.com/docs/auth/web/auth-state-persistence).
 
 ```ts
 import { PERSISTENCE } from '@angular/fire/compat/auth';
