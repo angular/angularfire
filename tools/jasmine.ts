@@ -7,9 +7,6 @@ import 'zone.js';
 import { getTestBed } from '@angular/core/testing';
 import { platformServerTesting, ServerTestingModule } from '@angular/platform-server/testing';
 
-// @ts-ignore
-global.globalThis = require('globalthis/polyfill')();
-
 // First, initialize the Angular testing environment.
 getTestBed().initTestEnvironment(
     ServerTestingModule,

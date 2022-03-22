@@ -140,7 +140,7 @@ jobs:
         run: |
           yarn build:jasmine
           yarn test:node-esm
-        if: matrix.ng != '12'
+        if: matrix.ng != '12' && matrix.rxjs == '7'
       - name: Test browser
         if: matrix.os == 'ubuntu-latest' && matrix.node == '14' && matrix.firebaseTools == '10'
         run: yarn test:chrome-headless
