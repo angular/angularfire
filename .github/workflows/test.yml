@@ -246,9 +246,12 @@ jobs:
           cd ./test/ng-build
           yarn --prefer-offline
           yarn add firebase@${{ matrix.firebase }}
-          export DATABASE_TYPES_VERSION=`cat node_modules/@firebase/database-compat/package.json | npx json dependencies.@firebase/database-types`
-          npx json -I -f package.json -e 'this.resolutions={"@firebase/database-types": "$(echo $DATABASE_TYPES_VERSION)"}'
-          yarn --prefer-offline
+      # on @canary firebase-admin and firebase database-types conflict, skip the lib check for now
+      - name: ng-build skipLibCheck
+        run: |
+          cd ./test/ng-build
+          npx json -I -f tsconfig.json -e 'this.compilerOptions.skipLibCheck=true'
+        if: matrix.firebase == 'canary'
       - name: Update ng-build to ng@13
         run: |
           cd ./test/ng-build
