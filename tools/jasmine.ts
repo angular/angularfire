@@ -1,9 +1,9 @@
 // @ts-ignore
 import Jasmine from 'jasmine';
 
-import('reflect-metadata');
-import('zone.js/dist/zone-node');
-import('zone.js/dist/zone-testing');
+import 'reflect-metadata';
+import 'zone.js/dist/zone-node';
+import 'zone.js/dist/zone-testing';
 
 import { getTestBed } from '@angular/core/testing';
 import { platformServerTesting, ServerTestingModule } from '@angular/platform-server/testing';
