@@ -1,11 +1,11 @@
-import Jasmine from 'jasmine';
+Jasmine = require('jasmine');
 
-import 'reflect-metadata';
-import 'zone.js/dist/zone-node';
-import 'zone.js/dist/zone-testing';
+require('reflect-metadata');
+require('zone.js/dist/zone-node');
+require('zone.js/dist/zone-testing');
 
-import { getTestBed } from '@angular/core/testing';
-import { platformServerTesting, ServerTestingModule } from '@angular/platform-server/testing';
+const { getTestBed } = require('@angular/core/testing');
+const { platformServerTesting, ServerTestingModule } = require('@angular/platform-server/testing');
 
 global['globalThis'] = require('globalthis/polyfill')();
 
@@ -20,7 +20,7 @@ jasmine.loadConfig({
     spec_dir: '.',
     spec_files: [
         'dist/out-tsc/jasmine/**/*.jasmine.js',
-        'dist/out-tsc/jasmine/**/*.spec.js'
+        'dist/out-tsc/jasmine/**/*.spec.js',
     ]
 });
 
