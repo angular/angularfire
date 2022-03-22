@@ -2,8 +2,7 @@
 import Jasmine from 'jasmine';
 
 import 'reflect-metadata';
-import 'zone.js/dist/zone-node';
-import 'zone.js/dist/zone-testing';
+import 'zone.js';
 
 import { getTestBed } from '@angular/core/testing';
 import { platformServerTesting, ServerTestingModule } from '@angular/platform-server/testing';
