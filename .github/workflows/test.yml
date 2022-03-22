@@ -373,3 +373,11 @@ jobs:
           ./publish.sh
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  notify:
+    runs-only: ubuntu-latest
+    name: Notify
+    needs: ['build', 'test', 'contribute', 'canary']
+    if: always()
+    steps:
+      - run: echo ${{ github.run_id }}
