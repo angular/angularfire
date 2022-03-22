@@ -131,10 +131,16 @@ jobs:
         uses: actions/download-artifact@v2
       - name: Relocate Artifacts
         run: mv angularfire-${{ github.run_id }} dist
-      - name: Test node
+      - name: Test Node (CJS)
         run: |
           yarn build:jasmine
           yarn test:node
+        if: matrix.ng == '12'
+      - name: Test Node (ESM)
+        run: |
+          yarn build:jasmine
+          yarn test:node-esm
+        if: matrix.ng != '12'
       - name: Test browser
         if: matrix.os == 'ubuntu-latest' && matrix.node == '14' && matrix.firebaseTools == '10'
         run: yarn test:chrome-headless
@@ -235,10 +241,16 @@ jobs:
         uses: actions/download-artifact@v2
       - name: Relocate Artifacts
         run: mv angularfire-${{ github.run_id }} dist
-      - name: Test node
+      - name: Test Node (CJS)
         run: |
           yarn build:jasmine
           yarn test:node
+        if: matrix.ng == '12'
+      - name: Test Node (ESM)
+        run: |
+          yarn build:jasmine
+          yarn test:node-esm
+        if: matrix.ng != '12'
       - name: Test browser
         run: yarn test:chrome-headless
       - name: ng-build yarn install
