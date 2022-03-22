@@ -333,9 +333,14 @@ jobs:
           yarn install --frozen-lockfile --prefer-offline
       - name: Build
         run: yarn build
+      - name: Test (node-only)
+        run: |
+          npm run build:jasmine
+          npm run test:node
+        if: matrix.os == 'windows-latest'
       - name: Test
-        # TODO figure out why tests are flaking
-        continue-on-error: true
+        # TODO figure out why tests are flaking, potentially an emulator issue
+        if: matrix.os != 'windows-latest'
         run: yarn test
 
   # Break the branch protection test into a seperate step, so we can manage the matrix more easily
