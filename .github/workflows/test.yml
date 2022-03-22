@@ -162,11 +162,13 @@ jobs:
           cd ./test/ng-build
           npx @angular/cli@13 update @angular/core@13 @angular/cli@13 @nguniversal/express-engine@13  --allow-dirty --force
         if: matrix.ng == '14' || matrix.ng == 'next'
+        continue-on-error: ${{ matrix.os == 'windows-latest' }}
       - name: Update ng-build to ng@${{ matrix.ng }}
         run: |
           cd ./test/ng-build
           npx @angular/cli@${{ matrix.ng }} update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} @nguniversal/express-engine@${{ matrix.ng }} --allow-dirty --force
         if: matrix.ng != '12'
+        continue-on-error: ${{ matrix.os == 'windows-latest' }}
       - name: ng-build prerender
         run: |
           cd ./test/ng-build
