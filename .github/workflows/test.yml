@@ -340,6 +340,10 @@ jobs:
           npm run build:jasmine
           npm run test:node
         if: matrix.os == 'windows-latest'
+      - name: Test headless (allowing failure)
+        if: matrix.os == 'windows-latest'
+        run: yarn test:chrome-headless
+        continue-on-error: true
       - name: Test
         # TODO figure out why tests are flaking, potentially an emulator issue
         if: matrix.os != 'windows-latest'
