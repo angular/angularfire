@@ -125,10 +125,11 @@ jobs:
       - name: Update to ng@13
         run: npx @angular/cli@13 update @angular/core@13 @angular/cli@13 --allow-dirty --force
         if: matrix.ng == '14' || matrix.ng == 'next'
-        continue-on-error: true
+        continue-on-error: ${{ matrix.os == 'windows-latest' }}
       - name: Update to ng@${{ matrix.ng }}
         run: npx @angular/cli@${{ matrix.ng }} update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty --force
         if: matrix.ng != '12'
+        continue-on-error: ${{ matrix.os == 'windows-latest' }}
       - name: Firebase emulator cache
         uses: actions/cache@v2
         with:
@@ -236,7 +237,6 @@ jobs:
       - name: Update to ng@13
         run: npx @angular/cli@13 update @angular/core@13 @angular/cli@13 --allow-dirty --force
         if: matrix.ng == '14' || matrix.ng == 'next'
-        continue-on-error: true
       - name: Update to ng@${{ matrix.ng }}
         run: npx @angular/cli@${{ matrix.ng }} update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty --force
         if: matrix.ng != '12'
