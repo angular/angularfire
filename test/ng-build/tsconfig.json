@@ -12,6 +12,7 @@
     "declaration": false,
     "downlevelIteration": true,
     "experimentalDecorators": true,
+    "skipLibCheck": false,
     "moduleResolution": "node",
     "importHelpers": true,
     "target": "es2017",
