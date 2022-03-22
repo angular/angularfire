@@ -37,6 +37,10 @@ describe('fromRef', () => {
     ref = (path: string) => db.database.ref(path);
   });
 
+  afterEach(() => {
+    db.database.goOffline();
+  });
+
   it('it should be async by default', (done) => {
     const itemRef = ref(rando());
     itemRef.set(batch);

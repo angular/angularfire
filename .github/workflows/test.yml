@@ -123,7 +123,7 @@ jobs:
           yarn add rxjs@${{ matrix.rxjs }} --prefer-offline
       # Can't update more than one major at a times, take the incremental step
       - name: Update to ng@13
-        run: npx @angular/cli@13 update @angular/core@13 @angular/cli@13 --allow-dirty --force
+        run: npx @angular/cli@13 update @angular/core@13 @angular/cli@13 --allow-dirty --force || true
         if: matrix.ng == '14' || matrix.ng == 'next'
       - name: Update to ng@${{ matrix.ng }}
         run: npx @angular/cli@${{ matrix.ng }} update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty --force

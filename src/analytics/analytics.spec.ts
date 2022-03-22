@@ -1,15 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 import { FirebaseApp, provideFirebaseApp, getApp, initializeApp, deleteApp } from '@angular/fire/app';
 import { Analytics, provideAnalytics, getAnalytics, isSupported } from '@angular/fire/analytics';
-import { COMMON_CONFIG } from '../test-config';
+import { COMMON_CONFIG_TOO } from '../test-config';
 import { rando } from '../utils';
-
-// TODO file a bug, seems like we got an issue with getAnalytics here.
-let providedAnalytics: Analytics;
 
 describe('Analytics', () => {
   let app: FirebaseApp;
   let analytics: Analytics;
+  let providedAnalytics: Analytics;
   let appName: string;
 
   beforeAll(done => {
@@ -26,9 +24,9 @@ describe('Analytics', () => {
         appName = rando();
         TestBed.configureTestingModule({
             imports: [
-                provideFirebaseApp(() => initializeApp(COMMON_CONFIG, appName)),
+                provideFirebaseApp(() => initializeApp(COMMON_CONFIG_TOO, appName)),
                 provideAnalytics(() => {
-                    providedAnalytics ||= getAnalytics(getApp(appName));
+                    providedAnalytics = getAnalytics(getApp(appName));
                     return providedAnalytics;
                 }),
             ],

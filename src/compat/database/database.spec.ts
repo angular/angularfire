@@ -86,6 +86,10 @@ describe('AngularFireDatabase w/options', () => {
     db = TestBed.inject(AngularFireDatabase);
   });
 
+  afterEach(() => {
+    db.database.goOffline();
+  });
+
   describe('<constructor>', () => {
 
     it('should be an AngularFireDatabase type', () => {
