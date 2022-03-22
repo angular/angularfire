@@ -30,10 +30,6 @@ describe('AngularFireAuthGuard', () => {
     router = TestBed.inject(Router);
   });
 
-  afterEach(() => {
-     try { app.delete().catch(() => undefined); } catch (e) { }
-  });
-
   it('should be injectable', () => {
     expect(router).toBeTruthy();
   });

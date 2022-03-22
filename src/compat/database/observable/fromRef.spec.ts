@@ -37,10 +37,6 @@ describe('fromRef', () => {
     ref = (path: string) => db.database.ref(path);
   });
 
-  afterEach(() => {
-     try { app.delete().catch(() => undefined); } catch (e) { }
-  });
-
   it('it should be async by default', (done) => {
     const itemRef = ref(rando());
     itemRef.set(batch);

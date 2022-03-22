@@ -33,11 +33,6 @@ describe('angularfire', () => {
     listOfQuestionsRef = rootRef.child('list-of-questions');
   });
 
-  afterEach(() => {
-    rootRef.remove();
-    try { app.delete().catch(() => undefined); } catch (e) { }
-  });
-
   describe('ZoneScheduler', () => {
     it('should execute the scheduled work inside the specified zone', done => {
       const ngZone = Zone.current.fork({

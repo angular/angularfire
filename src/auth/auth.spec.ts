@@ -28,10 +28,6 @@ describe('Auth', () => {
         auth = TestBed.inject(Auth);
     });
 
-    afterEach(() => {
-        try { deleteApp(app).catch(() => undefined); } catch (e) { }
-    });
-
     it('should be injectable', () => {
         expect(providedAuth).toBeTruthy();
         expect(auth).toEqual(providedAuth);

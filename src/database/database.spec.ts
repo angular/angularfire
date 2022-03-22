@@ -28,10 +28,6 @@ describe('Database', () => {
         database = TestBed.inject(Database);
     });
 
-    afterEach(() => {
-        try { deleteApp(app).catch(() => undefined); } catch (e) { }
-    });
-
     it('should be injectable', () => {
         expect(providedDatabase).toBeTruthy();
         expect(database).toEqual(providedDatabase);

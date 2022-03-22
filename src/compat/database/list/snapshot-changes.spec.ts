@@ -36,10 +36,6 @@ describe('snapshotChanges', () => {
     createRef = (path: string) => db.database.ref(path);
   });
 
-  afterEach(() => {
-     try { app.delete().catch(() => undefined); } catch (e) { }
-  });
-
   function prepareSnapshotChanges(opts: { events?: ChildEvent[], skipnumber: number } = { skipnumber: 0 }) {
     const { events, skipnumber } = opts;
     const aref = createRef(rando());

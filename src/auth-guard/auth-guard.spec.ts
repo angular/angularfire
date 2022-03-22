@@ -42,10 +42,6 @@ describe('AuthGuard', () => {
     router = TestBed.inject(Router);
   });
 
-  afterEach(() => {
-    try { deleteApp(app).catch(() => undefined); } catch (e) { }
-  });
-
   it('should be injectable', () => {
     expect(AuthGuard).toBeTruthy();
   });

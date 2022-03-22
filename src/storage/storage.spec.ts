@@ -28,10 +28,6 @@ describe('Storage', () => {
         storage = TestBed.inject(Storage);
     });
 
-    afterEach(() => {
-        try { deleteApp(app).catch(() => undefined); } catch (e) { }
-    });
-
     it('should be injectable', () => {
         expect(providedStorage).toBeTruthy();
         expect(storage).toEqual(providedStorage);

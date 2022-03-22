@@ -50,7 +50,7 @@ describe('AngularFirestoreCollection', () => {
   });
 
   afterEach(() => {
-     try { app.delete().catch(() => undefined); } catch (e) { }
+    afs.firestore.disableNetwork();
   });
 
   describe('valueChanges()', () => {

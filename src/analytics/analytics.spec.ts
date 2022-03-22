@@ -4,10 +4,12 @@ import { Analytics, provideAnalytics, getAnalytics, isSupported } from '@angular
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../utils';
 
+// TODO file a bug, seems like we got an issue with getAnalytics here.
+let providedAnalytics: Analytics;
+
 describe('Analytics', () => {
   let app: FirebaseApp;
   let analytics: Analytics;
-  let providedAnalytics: Analytics;
   let appName: string;
 
   beforeAll(done => {
@@ -26,17 +28,13 @@ describe('Analytics', () => {
             imports: [
                 provideFirebaseApp(() => initializeApp(COMMON_CONFIG, appName)),
                 provideAnalytics(() => {
-                    providedAnalytics = getAnalytics(getApp(appName));
+                    providedAnalytics ||= getAnalytics(getApp(appName));
                     return providedAnalytics;
                 }),
             ],
         });
         app = TestBed.inject(FirebaseApp);
         analytics = TestBed.inject(Analytics);
-    });
-
-    afterEach(() => {
-        try { deleteApp(app).catch(() => undefined); } catch (e) { }
     });
 
     it('should be injectable', () => {

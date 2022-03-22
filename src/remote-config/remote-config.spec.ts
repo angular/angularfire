@@ -35,10 +35,6 @@ describe('RemoteConfig', () => {
         remoteConfig = TestBed.inject(RemoteConfig);
     });
 
-    afterEach(() => {
-        try { deleteApp(app).catch(() => undefined); } catch (e) { }
-    });
-
     it('should be injectable', () => {
         expect(providedRemoteConfig).toBeTruthy();
         expect(remoteConfig).toEqual(providedRemoteConfig);

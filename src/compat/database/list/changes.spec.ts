@@ -35,10 +35,6 @@ describe('listChanges', () => {
     ref = (path: string) => db.database.ref(path);
   });
 
-  afterEach(() => {
-     try { app.delete().catch(() => undefined); } catch (e) { }
-  });
-
   describe('events', () => {
 
     it('should stream value at first', (done) => {

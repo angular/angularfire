@@ -20,10 +20,6 @@ describe('AngularFirePerformance', () => {
     afp = TestBed.inject(AngularFirePerformance);
   });
 
-  afterEach(() => {
-     try { app.delete().catch(() => undefined); } catch (e) { }
-  });
-
   it('should exist', () => {
     expect(afp instanceof AngularFirePerformance).toBe(true);
   });
