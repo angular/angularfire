@@ -1,7 +1,5 @@
 {
     "peerDependencies": {
-        "firebase": { "dev": false, "version": "0.0.0" },
-        "rxfire": { "dev": false, "version": "0.0.0" }
     },
     "firebaseFunctionsDependencies": {
         "firebase-admin": { "dev": false, "version": "0.0.0" },

@@ -40,10 +40,6 @@ describe('AngularFireAuth', () => {
     (afAuth as any).idToken = mockAuthState as Observable<firebase.User>;
   });
 
-  afterEach(() => {
-    app.delete().catch(() => undefined);
-  });
-
   describe('Zones', () => {
     it('should call operators and subscriber in the same zone as when service was initialized', (done) => {
       // Initialize the app outside of the zone, to mimick real life behavior.
@@ -147,10 +143,6 @@ describe('AngularFireAuth with different app', () => {
 
     app = TestBed.inject(FirebaseApp);
     afAuth = TestBed.inject(AngularFireAuth);
-  });
-
-  afterEach(() => {
-    app.delete().catch(() => undefined);
   });
 
   describe('<constructor>', () => {

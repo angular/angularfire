@@ -37,7 +37,7 @@ describe('snapshotChanges', () => {
   });
 
   afterEach(() => {
-    app.delete().catch(() => undefined);
+    db.database.goOffline();
   });
 
   function prepareSnapshotChanges(opts: { events?: ChildEvent[], skipnumber: number } = { skipnumber: 0 }) {

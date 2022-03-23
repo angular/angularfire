@@ -28,10 +28,6 @@ describe('Functions', () => {
         functions = TestBed.inject(Functions);
     });
 
-    afterEach(() => {
-        deleteApp(app).catch(() => undefined);
-    });
-
     it('should be injectable', () => {
         expect(providedFunctions).toBeTruthy();
         expect(functions).toEqual(providedFunctions);

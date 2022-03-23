@@ -48,6 +48,23 @@ exports.${functionName || DEFAULT_FUNCTION_NAME} = functions
   .onRequest(expressApp);
 `;
 
+export const functionGen2 = (
+  path: string,
+  options: DeployBuilderOptions,
+  functionName: string|undefined,
+) => `const { onRequest } = require('firebase-functions/v2/https');
+
+// Increase readability in Cloud Logging
+require("firebase-functions/lib/logger/compat");
+
+const expressApp = require('./${path}/main').app();
+
+exports.${functionName || DEFAULT_FUNCTION_NAME} = onRequest(${JSON.stringify({
+  region: options.region || DEFAULT_FUNCTION_REGION,
+  ...(options.functionsRuntimeOptions || DEFAULT_RUNTIME_OPTIONS)
+})}, expressApp);
+`;
+
 export const dockerfile = (
   options: DeployBuilderOptions,
 ) => `FROM node:${options.functionsNodeVersion || DEFAULT_NODE_VERSION}-slim

@@ -23,10 +23,6 @@ describe('FirebaseApp', () => {
         app = TestBed.inject(FirebaseApp);
     });
 
-    afterEach(() => {
-        deleteApp(app).catch(() => undefined);
-    });
-
     it('should be injectable', () => {
         expect(app).toBeTruthy();
         expect(app).toEqual(providedApp);

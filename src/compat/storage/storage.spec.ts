@@ -43,10 +43,6 @@ describe('AngularFireStorage', () => {
     cdr = TestBed.inject(ChangeDetectorRef);
   });
 
-  afterEach(() => {
-    app.delete().catch(() => undefined);
-  });
-
   it('should exist', () => {
     expect(afStorage instanceof AngularFireStorage).toBe(true);
   });
@@ -249,7 +245,7 @@ describe('AngularFireStorage w/options', () => {
   });
 
   afterEach(() => {
-    app.delete().catch(() => undefined);
+     try { app.delete().catch(() => undefined); } catch (e) { }
   });
 
   describe('<constructor>', () => {

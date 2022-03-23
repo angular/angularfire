@@ -26,7 +26,7 @@ describe('AngularFirestore', () => {
   });
 
   afterEach(() => {
-    app.delete().catch(() => undefined);
+    afs.firestore.disableNetwork();
   });
 
   it('should be the properly initialized type', () => {
@@ -117,10 +117,6 @@ describe('AngularFirestore with different app', () => {
     afs = TestBed.inject(AngularFirestore);
   });
 
-  afterEach(() => {
-    app.delete().catch(() => undefined);
-  });
-
   describe('<constructor>', () => {
 
     it('should be an AngularFirestore type', () => {
@@ -156,10 +152,6 @@ describe('AngularFirestore without persistance', () => {
 
     app = TestBed.inject(FirebaseApp);
     afs = TestBed.inject(AngularFirestore);
-  });
-
-  afterEach(() => {
-    app.delete().catch(() => undefined);
   });
 
   it('should not enable persistence', (done) => {
