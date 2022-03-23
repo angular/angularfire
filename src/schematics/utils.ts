@@ -165,13 +165,10 @@ export function addFixesToServer(host: Tree, options: { sourcePath: string, feat
   }
   const sourceText = text.toString('utf-8');
   const addZonePatch = !sourceText.includes('import \'zone.js/dist/zone-patch-rxjs\';');
-  const addFirestorePatch = options.features.includes(FEATURES.Firestore) &&
-    !sourceText.includes('import \'@angular/fire/firestore-protos\';');
 
-  if (addZonePatch || addFirestorePatch) {
+  if (addZonePatch) {
     overwriteIfExists(host, serverPath, sourceText.replace('import \'zone.js/dist/zone-node\';', `import 'zone.js/dist/zone-node';
-${addZonePatch ? 'import \'zone.js/dist/zone-patch-rxjs\';' : ''}
-${addFirestorePatch ? 'import \'@angular/fire/firestore-protos\';' : ''}`));
+${addZonePatch ? 'import \'zone.js/dist/zone-patch-rxjs\';' : ''}`));
   }
 
   return host;

@@ -36,7 +36,7 @@ describe('auditTrail', () => {
   });
 
   afterEach(() => {
-    app.delete().catch(() => undefined);
+    db.database.goOffline();
   });
 
   function prepareAuditTrail(opts: { events?: ChildEvent[], skipnumber: number } = { skipnumber: 0 }) {

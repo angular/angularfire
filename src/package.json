@@ -27,15 +27,15 @@
     "@angular/core": "^12.0.0 || ^13.0.0",
     "@angular/platform-browser": "^12.0.0 || ^13.0.0",
     "@angular/platform-browser-dynamic": "^12.0.0 || ^13.0.0",
-    "firebase": "^9.4.0",
-    "rxfire": "^6.0.0",
     "rxjs": "~6.6.0 || ^7.0.0",
-    "firebase-tools": "^9.9.0"
+    "firebase-tools": "^9.9.0 || ^10.0.0"
   },
   "peerDependenciesMeta": {
     "firebase-tools": { "optional": true }
   },
   "dependencies": {
+    "firebase": "^9.5.0",
+    "rxfire": "^6.0.0",
     "@angular-devkit/schematics": "^12.0.0 || ^13.0.0",
     "@schematics/angular": "^12.0.0 || ^13.0.0",
     "tslib": "^2.0.0",
@@ -69,7 +69,8 @@
       "fuzzy", "inquirer-autocomplete-prompt",
       "open", "jsonc-parser", "ora", "winston",
       "triple-beam", "@schematics/angular", "node-fetch",
-      "semver", "inquirer", "fs-extra", "file-loader"
+      "semver", "inquirer", "fs-extra", "file-loader",
+      "firebase", "rxfire"
     ]
   },
   "ng-update": {

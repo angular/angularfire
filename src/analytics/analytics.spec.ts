@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { FirebaseApp, provideFirebaseApp, getApp, initializeApp, deleteApp } from '@angular/fire/app';
 import { Analytics, provideAnalytics, getAnalytics, isSupported } from '@angular/fire/analytics';
-import { COMMON_CONFIG } from '../test-config';
+import { COMMON_CONFIG_TOO } from '../test-config';
 import { rando } from '../utils';
 
 describe('Analytics', () => {
@@ -24,7 +24,7 @@ describe('Analytics', () => {
         appName = rando();
         TestBed.configureTestingModule({
             imports: [
-                provideFirebaseApp(() => initializeApp(COMMON_CONFIG, appName)),
+                provideFirebaseApp(() => initializeApp(COMMON_CONFIG_TOO, appName)),
                 provideAnalytics(() => {
                     providedAnalytics = getAnalytics(getApp(appName));
                     return providedAnalytics;
@@ -33,10 +33,6 @@ describe('Analytics', () => {
         });
         app = TestBed.inject(FirebaseApp);
         analytics = TestBed.inject(Analytics);
-    });
-
-    afterEach(() => {
-        deleteApp(app).catch(() => undefined);
     });
 
     it('should be injectable', () => {

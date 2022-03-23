@@ -21,10 +21,6 @@ describe('AngularFireFunctions', () => {
     afFns = TestBed.inject(AngularFireFunctions);
   });
 
-  afterEach(() => {
-    app.delete().catch(() => undefined);
-  });
-
   it('should exist', () => {
     expect(afFns instanceof AngularFireFunctions).toBe(true);
   });
@@ -57,10 +53,6 @@ describe('AngularFireFunctions with different app', () => {
 
     app = TestBed.inject(FirebaseApp);
     afFns = TestBed.inject(AngularFireFunctions);
-  });
-
-  afterEach(() => {
-    app.delete().catch(() => undefined);
   });
 
   describe('<constructor>', () => {

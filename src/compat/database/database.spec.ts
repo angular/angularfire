@@ -30,10 +30,6 @@ describe('AngularFireDatabase', () => {
     zone = TestBed.inject(NgZone);
   });
 
-  afterEach(() => {
-    app.delete().catch(() => undefined);
-  });
-
   describe('<constructor>', () => {
 
     it('should be an AngularFireDatabase type', () => {
@@ -91,7 +87,7 @@ describe('AngularFireDatabase w/options', () => {
   });
 
   afterEach(() => {
-    app.delete().catch(() => undefined);
+    db.database.goOffline();
   });
 
   describe('<constructor>', () => {

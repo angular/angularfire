@@ -28,10 +28,6 @@ describe('Firestore-lite', () => {
         firestore = TestBed.inject(Firestore);
     });
 
-    afterEach(() => {
-        deleteApp(app).catch(() => undefined);
-    });
-
     it('should be injectable', () => {
         expect(providedFirestore).toBeTruthy();
         expect(firestore).toEqual(providedFirestore);

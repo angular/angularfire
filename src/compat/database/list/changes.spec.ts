@@ -36,7 +36,7 @@ describe('listChanges', () => {
   });
 
   afterEach(() => {
-    app.delete().catch(() => undefined);
+    db.database.goOffline();
   });
 
   describe('events', () => {

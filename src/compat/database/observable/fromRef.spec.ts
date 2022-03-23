@@ -38,7 +38,7 @@ describe('fromRef', () => {
   });
 
   afterEach(() => {
-    app.delete().catch(() => undefined);
+    db.database.goOffline();
   });
 
   it('it should be async by default', (done) => {

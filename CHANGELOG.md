@@ -1,3 +1,16 @@
+<a name="7.3.0"></a>
+# [7.3.0](https://github.com/angular/angularfire/compare/7.2.1...7.3.0) (2022-03-23)
+
+### Features
+
+* **storage:** adding wrappers for getBlob, getBytes, and getStream ([#3159](https://github.com/angular/angularfire/pull/3159))
+
+### Misc.
+
+* **core:** update firebase dependency  ([#3159](https://github.com/angular/angularfire/pull/3159))
+* **core:** mark firebase-tools 10 as compatible ([#3159](https://github.com/angular/angularfire/pull/3159))
+* **firestore-protos:** no longer needed ([#3159](https://github.com/angular/angularfire/pull/3159))
+
 <a name="7.2.1"></a>
 # [7.2.1](https://github.com/angular/angularfire/compare/7.2.0...7.2.1) (2022-02-10)
 

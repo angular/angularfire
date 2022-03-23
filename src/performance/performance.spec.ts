@@ -25,9 +25,6 @@ describe('Performance', () => {
         performance = TestBed.inject(Performance);
     });
 
-    afterEach(() => {
-    });
-
     it('should be injectable', () => {
         expect(providedPerformance).toBeTruthy();
         expect(performance).toEqual(providedPerformance);

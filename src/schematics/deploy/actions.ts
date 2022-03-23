@@ -4,7 +4,7 @@ import { existsSync, readFileSync, renameSync, writeFileSync } from 'fs';
 import { copySync, removeSync } from 'fs-extra';
 import { dirname, join } from 'path';
 import { execSync, spawn, SpawnOptionsWithoutStdio } from 'child_process';
-import { defaultFunction, defaultPackage, DEFAULT_FUNCTION_NAME, dockerfile } from './functions-templates';
+import { defaultFunction, functionGen2, defaultPackage, DEFAULT_FUNCTION_NAME, dockerfile } from './functions-templates';
 import { satisfies } from 'semver';
 import open from 'open';
 import { SchematicsException } from '@angular-devkit/schematics';
@@ -211,10 +211,17 @@ export const deployToFunction = async (
     JSON.stringify(packageJson, null, 2)
   );
 
-  fsHost.writeFileSync(
-    join(functionsOut, 'index.js'),
-    defaultFunction(serverBuildOptions.outputPath, options, functionName)
-  );
+  if (options.CF3v2) {
+    fsHost.writeFileSync(
+      join(functionsOut, 'index.js'),
+      functionGen2(serverBuildOptions.outputPath, options, functionName)
+    );
+  } else {
+    fsHost.writeFileSync(
+      join(functionsOut, 'index.js'),
+      defaultFunction(serverBuildOptions.outputPath, options, functionName)
+    );
+  }
 
   if (!options.prerender) {
     try {

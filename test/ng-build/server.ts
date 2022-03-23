@@ -1,5 +1,4 @@
 import 'zone.js/dist/zone-node';
-import 'zone.js/dist/zone-patch-rxjs';
 
 import { ngExpressEngine } from '@nguniversal/express-engine';
 import * as express from 'express';
@@ -9,15 +8,10 @@ import { AppServerModule } from './src/main.server';
 import { APP_BASE_HREF } from '@angular/common';
 import { existsSync } from 'fs';
 
-// These polyfills are for app-check Node.js
-// @ts-ignore
-globalThis.self = globalThis;
-globalThis.fetch = require('node-fetch').default;
-
 // The Express app is exported so that it can be used by serverless Functions.
 export function app(): express.Express {
   const server = express();
-  const distFolder = join(process.cwd(), 'dist/sample/browser');
+  const distFolder = join(process.cwd(), 'dist/ng-build/browser');
   const indexHtml = existsSync(join(distFolder, 'index.original.html')) ? 'index.original.html' : 'index';
 
   // Our Universal express-engine (found @ https://github.com/angular/universal/tree/master/modules/express-engine)

@@ -57,6 +57,10 @@
       "oneOf": [{ "type": "number" }, { "type": "string" }],
       "description": "Version of Node.js to run Cloud Functions / Run on"
     },
+    "CF3v2": {
+      "type": "boolean",
+      "description": "Generation of the Functions product to run on"
+    },
     "region": {
       "type": "string",
       "description": "The region to deploy Cloud Functions or Cloud Run to"
