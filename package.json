@@ -116,7 +116,7 @@
     "rimraf": "^2.5.4",
     "rollup": "^2.22.0",
     "schematics-utilities": "^2.0.1",
-    "shelljs": "^0.8.0",
+    "shelljs": "^0.8.5",
     "systemjs": "^0.19.16",
     "systemjs-builder": "^0.15.7",
     "traceur": "0.0.96",
