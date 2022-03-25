@@ -49,7 +49,7 @@ export class FunctionsModule {
   }
 }
 
-export function provideFunctions(fn: () => FirebaseFunctions, ...deps: any[]): ModuleWithProviders<FunctionsModule> {
+export function provideFunctions(fn: (injector: Injector) => FirebaseFunctions, ...deps: any[]): ModuleWithProviders<FunctionsModule> {
   return {
     ngModule: FunctionsModule,
     providers: [{

@@ -48,7 +48,7 @@ export class AuthModule {
   }
 }
 
-export function provideAuth(fn: () => FirebaseAuth, ...deps: any[]): ModuleWithProviders<AuthModule> {
+export function provideAuth(fn: (injector: Injector) => FirebaseAuth, ...deps: any[]): ModuleWithProviders<AuthModule> {
   return {
     ngModule: AuthModule,
     providers: [{

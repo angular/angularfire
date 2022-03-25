@@ -49,7 +49,7 @@ export class DatabaseModule {
   }
 }
 
-export function provideDatabase(fn: () => FirebaseDatabase, ...deps: any[]): ModuleWithProviders<DatabaseModule> {
+export function provideDatabase(fn: (injector: Injector) => FirebaseDatabase, ...deps: any[]): ModuleWithProviders<DatabaseModule> {
   return {
     ngModule: DatabaseModule,
     providers: [{

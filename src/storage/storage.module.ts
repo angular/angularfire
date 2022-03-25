@@ -49,7 +49,7 @@ export class StorageModule {
   }
 }
 
-export function provideStorage(fn: () => FirebaseStorage, ...deps: any[]): ModuleWithProviders<StorageModule> {
+export function provideStorage(fn: (injector: Injector) => FirebaseStorage, ...deps: any[]): ModuleWithProviders<StorageModule> {
   return {
     ngModule: StorageModule,
     providers: [{
