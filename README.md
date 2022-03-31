@@ -16,19 +16,53 @@ AngularFire smooths over the rough edges an Angular developer might encounter wh
 
 ## Example use
 
+`app.module.ts`
+
 ```ts
-import { provideFirebaseApp, getApp, initializeApp } from '@angular/fire/app';
-import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+
+import { AppComponent } from './app.component';
+
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
+import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+import { environment } from '../environments/environment';
 
 @NgModule({
-  imports: [
-    provideFirebaseApp(() => initializeApp({ ... })),
-    provideFirestore(() => getFirestore()),
+  declarations: [
+    AppComponent
   ],
-  ...
+  imports: [
+    BrowserModule,
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFireAnalyticsModule,
+    AngularFirestoreModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
 })
 export class AppModule { }
 ```
+
+`environment.ts`
+
+```ts
+export const environment = {
+  production: false,
+  firebase: {
+    apiKey: "...",
+    authDomain: "...firebaseapp.com",
+    projectId: "...",
+    storageBucket: "...appspot.com",
+    messagingSenderId: "...",
+    appId: "1:...:web:...",
+    measurementId: "G-..."
+  }
+};
+```
+
+`app.component.ts`
 
 ```ts
 import { Firestore, collectionData, collection } from '@angular/fire/firestore';
@@ -57,6 +91,8 @@ export class AppComponent {
   }
 }
 ```
+
+Make a Firestore database with a collection 'items` and some documents with a property `name`. You should see the names display in your browser when you run `ng serve`.
 
 ## Compatibility
 
