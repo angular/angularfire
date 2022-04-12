@@ -68,7 +68,7 @@ export class FirebaseAppModule {
 // Calling initializeApp({ ... }, 'name') multiple times will add more FirebaseApps into the FIREBASE_APPS
 // injection scope. This allows developers to more easily work with multiple Firebase Applications. Downside
 // is that DI for app name and options doesn't really make sense anymore.
-export function provideFirebaseApp(fn: () => IFirebaseApp, ...deps: any[]): ModuleWithProviders<FirebaseAppModule> {
+export function provideFirebaseApp(fn: (injector: Injector) => IFirebaseApp, ...deps: any[]): ModuleWithProviders<FirebaseAppModule> {
   return {
     ngModule: FirebaseAppModule,
     providers: [{
