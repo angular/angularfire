@@ -70,7 +70,7 @@ jobs:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
         node: [ "14", "16"]
         firebase: ["9"]
-        firebaseTools: ["10"]
+        firebaseTools: ["11"]
         rxjs: ["7"]
         ng: ["12", "13", "14"]
         exclude:
@@ -150,7 +150,7 @@ jobs:
           yarn test:node-esm
         if: matrix.ng != '12' && matrix.rxjs == '7'
       - name: Test browser
-        if: matrix.os == 'ubuntu-latest' && matrix.node == '14' && matrix.firebaseTools == '10'
+        if: matrix.os == 'ubuntu-latest' && matrix.node == '14' && matrix.firebaseTools == '11'
         run: yarn test:chrome-headless
       - name: ng-build yarn install
         run: |
@@ -185,7 +185,7 @@ jobs:
         os: [ ubuntu-latest ]
         node: ["14"]
         firebase: ["9", "canary", "next"]
-        firebaseTools: ["10"]
+        firebaseTools: ["11"]
         rxjs: ["7"]
         ng: ["12", "13", "14", "next"]
         exclude:
