@@ -278,7 +278,7 @@ jobs:
         run: |
           cd ./test/ng-build
           npx @angular/cli@13 update @angular/core@13 @angular/cli@13 @nguniversal/express-engine@13  --allow-dirty --force
-        if: matrix.ng == 'next'
+        if: matrix.ng == '14' || matrix.ng == 'next'
       - name: Update ng-build to ng@${{ matrix.ng }}
         run: |
           cd ./test/ng-build
