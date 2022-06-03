@@ -71,8 +71,8 @@ jobs:
         node: [ "14", "16"]
         firebase: ["9"]
         firebaseTools: ["10"]
-        rxjs: ["6", "7"]
-        ng: ["12", "13"]
+        rxjs: ["7"]
+        ng: ["12", "13", "14"]
         exclude:
           # TODO investigate failures
           # https://github.com/angular/angularfire/runs/4174069788
@@ -187,7 +187,7 @@ jobs:
         firebase: ["9", "canary", "next"]
         firebaseTools: ["10"]
         rxjs: ["7"]
-        ng: ["12", "13", "next"]
+        ng: ["12", "13", "14", "next"]
         exclude:
           # standard configurations
           - firebase: 9
