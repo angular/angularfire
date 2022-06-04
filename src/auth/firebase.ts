@@ -3,6 +3,7 @@ export * from 'firebase/auth';
 import { ɵzoneWrap } from '@angular/fire';
 import {
   applyActionCode as _applyActionCode,
+  beforeAuthStateChanged as _beforeAuthStateChanged,
   checkActionCode as _checkActionCode,
   confirmPasswordReset as _confirmPasswordReset,
   connectAuthEmulator as _connectAuthEmulator,
@@ -55,6 +56,7 @@ import {
 } from 'firebase/auth';
 
 export const applyActionCode = ɵzoneWrap(_applyActionCode, true);
+export const beforeAuthStateChanged = ɵzoneWrap(_beforeAuthStateChanged, true);
 export const checkActionCode = ɵzoneWrap(_checkActionCode, true);
 export const confirmPasswordReset = ɵzoneWrap(_confirmPasswordReset, true);
 export const connectAuthEmulator = ɵzoneWrap(_connectAuthEmulator, true);

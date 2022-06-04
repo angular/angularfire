@@ -34,7 +34,7 @@
     "firebase-tools": { "optional": true }
   },
   "dependencies": {
-    "firebase": "^9.5.0",
+    "firebase": "^9.8.0",
     "rxfire": "^6.0.0",
     "@angular-devkit/schematics": "^12.0.0 || ^13.0.0 || ^14.0.0",
     "@schematics/angular": "^12.0.0 || ^13.0.0 || ^14.0.0",

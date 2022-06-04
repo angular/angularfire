@@ -8,6 +8,8 @@ import {
   endAt as _endAt,
   endBefore as _endBefore,
   equalTo as _equalTo,
+  forceLongPolling as _forceLongPolling,
+  forceWebSockets as _forceWebSockets,
   get as _get,
   getDatabase as _getDatabase,
   goOffline as _goOffline,
@@ -47,6 +49,8 @@ export const enableLogging = ɵzoneWrap(_enableLogging, true);
 export const endAt = ɵzoneWrap(_endAt, true);
 export const endBefore = ɵzoneWrap(_endBefore, true);
 export const equalTo = ɵzoneWrap(_equalTo, true);
+export const forceLongPolling = ɵzoneWrap(_forceLongPolling, true);
+export const forceWebSockets = ɵzoneWrap(_forceWebSockets, true);
 export const get = ɵzoneWrap(_get, true);
 export const getDatabase = ɵzoneWrap(_getDatabase, true);
 export const goOffline = ɵzoneWrap(_goOffline, true);
