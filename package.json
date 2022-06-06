@@ -1,23 +1,24 @@
 {
   "name": "@angular/fire",
-  "version": "7.1.0",
+  "version": "7.4.0",
   "description": "The official Angular library for Firebase.",
   "private": true,
   "scripts": {
     "test": "npm run build:jasmine && npm run test:node && npm run test:chrome-headless",
-    "test:watch": "firebase emulators:exec --project=angularfire2-test \"ng test --watch=true --browsers=Chrome\"",
-    "test:chrome": "firebase emulators:exec --project=angularfire2-test \"ng test --watch=false --browsers=Chrome\"",
-    "test:firefox": "firebase emulators:exec --project=angularfire2-test \"ng test --watch=false --browsers=Firefox\"",
-    "test:safari": "firebase emulators:exec --project=angularfire2-test \"ng test --watch=false --browsers=SafariNative\"",
-    "test:chrome-headless": "firebase emulators:exec --project=angularfire2-test \"ng test --watch=false --browsers=ChromeHeadless\"",
-    "test:firefox-headless": "firebase emulators:exec --project=angularfire2-test \"ng test --watch=false --browsers=FirefoxHeadless\"",
+    "test:watch": "npx firebase-tools@latest emulators:exec --project=angularfire2-test \"ng test --watch=true --browsers=Chrome\"",
+    "test:chrome": "npx firebase-tools@latest emulators:exec --project=angularfire2-test \"ng test --watch=false --browsers=Chrome\"",
+    "test:firefox": "npx firebase-tools@latest emulators:exec --project=angularfire2-test \"ng test --watch=false --browsers=Firefox\"",
+    "test:safari": "npx firebase-tools@latest emulators:exec --project=angularfire2-test \"ng test --watch=false --browsers=SafariNative\"",
+    "test:chrome-headless": "npx firebase-tools@latest emulators:exec --project=angularfire2-test \"ng test --watch=false --browsers=ChromeHeadless\"",
+    "test:firefox-headless": "npx firebase-tools@latest emulators:exec --project=angularfire2-test \"ng test --watch=false --browsers=FirefoxHeadless\"",
     "lint": "ng lint",
-    "test:node": "node -r tsconfig-paths/register ./tools/jasmine.js",
+    "test:node": "node -r tsconfig-paths/register ./dist/out-tsc/jasmine/tools/jasmine.js --input-type=commonjs",
+    "test:node-esm": "node -r tsconfig-paths/register ./dist/out-tsc/jasmine/tools/jasmine.mjs --input-type=commonjs",
     "test:typings": "node ./tools/run-typings-test.js",
     "test:build": "bash ./test/ng-build/build.sh",
     "test:all": "npm run test:node && npm run test:chrome-headless && npm run test:typings && npm run test:build",
     "build": "rimraf dist && ttsc -p tsconfig.build.json && node --trace-warnings ./tools/build.js && npm pack ./dist/packages-dist",
-    "build:jasmine": "tsc -p tsconfig.jasmine.json && cp ./dist/packages-dist/schematics/versions.json ./dist/out-tsc/jasmine/schematics",
+    "build:jasmine": "npx tsc -p tsconfig.jasmine.json --module es2015 && cp ./dist/out-tsc/jasmine/tools/jasmine.js ./dist/out-tsc/jasmine/tools/jasmine.mjs && npx tsc -p tsconfig.jasmine.json && cp ./dist/packages-dist/schematics/versions.json ./dist/out-tsc/jasmine/schematics",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 1"
   },
   "husky": {
@@ -53,7 +54,7 @@
     "@angular/platform-browser-dynamic": "^12.0.0",
     "@angular/router": "^12.0.0",
     "@schematics/angular": "^12.0.0",
-    "firebase": "^9.1.0",
+    "firebase": "^9.8.2",
     "firebase-admin": "^9.11.1",
     "firebase-functions": "^3.6.0",
     "firebase-tools": "^9.0.0",
@@ -110,7 +111,7 @@
     "ng-packagr": "^12.0.0",
     "pretty-size": "^2.0.0",
     "protractor": "~7.0.0",
-    "reflect-metadata": "0.1.2",
+    "reflect-metadata": "^0.1.2",
     "replace-in-file": "^5.0.2",
     "rimraf": "^2.5.4",
     "rollup": "^2.22.0",
@@ -127,8 +128,5 @@
     "typedoc": "^0.16.4",
     "typescript": ">=4.2.3 <4.3.0"
   },
-  "typings": "index.d.ts",
-  "resolutions": {
-    "webpack": "^5.35.0"
-  }
+  "typings": "index.d.ts"
 }

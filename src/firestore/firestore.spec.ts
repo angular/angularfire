@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { FirebaseApp, provideFirebaseApp, getApp, initializeApp, deleteApp } from '@angular/fire/app';
-import { Firestore, provideFirestore, getFirestore, connectFirestoreEmulator } from '@angular/fire/firestore';
+import { Firestore, provideFirestore, getFirestore, connectFirestoreEmulator, disableNetwork } from '@angular/fire/firestore';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../utils';
 
@@ -29,7 +29,7 @@ describe('Firestore', () => {
     });
 
     afterEach(() => {
-        deleteApp(app).catch(() => undefined);
+        disableNetwork(firestore);
     });
 
     it('should be injectable', () => {

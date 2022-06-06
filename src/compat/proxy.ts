@@ -1,21 +1,21 @@
 import { NgZone } from '@angular/core';
 import { Observable } from 'rxjs';
 
-// tslint:disable:ban-types
-type FunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? K : never }[keyof T];
+type MyFunction = (...args: any[]) => any;
+type FunctionPropertyNames<T> = { [K in keyof T]: T[K] extends MyFunction ? K : never }[keyof T];
+type ReturnTypeOrNever<T> = T extends MyFunction ? ReturnType<T> : never;
+type ParametersOrNever<T> = T extends MyFunction ? Parameters<T> : never;
 type PromiseReturningFunctionPropertyNames<T> = {
-  [K in FunctionPropertyNames<T>]: ReturnType<T[K]> extends Promise<any> ? K : never
+  [K in FunctionPropertyNames<T>]: ReturnTypeOrNever<T[K]> extends Promise<any> ? K : never
 }[FunctionPropertyNames<T>];
 type NonPromiseReturningFunctionPropertyNames<T> = {
-  [K in FunctionPropertyNames<T>]: ReturnType<T[K]> extends Promise<any> ? never : K
+  [K in FunctionPropertyNames<T>]: ReturnTypeOrNever<T[K]> extends Promise<any> ? never : K
 }[FunctionPropertyNames<T>];
-type NonFunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof T];
-// tslint:enable:ban-types
+type NonFunctionPropertyNames<T> = { [K in keyof T]: T[K] extends MyFunction ? never : K }[keyof T];
 
 export type ɵPromiseProxy<T> = { [K in NonFunctionPropertyNames<T>]: Promise<T[K]> } &
-  { [K in NonPromiseReturningFunctionPropertyNames<T>]: (...args: Parameters<T[K]>) => Promise<ReturnType<T[K]>> } &
-  { [K in PromiseReturningFunctionPropertyNames<T>]: (...args: Parameters<T[K]>) => ReturnType<T[K]> };
-
+  { [K in NonPromiseReturningFunctionPropertyNames<T>]: (...args: ParametersOrNever<T[K]>) => Promise<ReturnTypeOrNever<T[K]>> } &
+  { [K in PromiseReturningFunctionPropertyNames<T>]: T[K] };
 
 // DEBUG quick debugger function for inline logging that typescript doesn't complain about
 //       wrote it for debugging the ɵlazySDKProxy, commenting out for now; should consider exposing a

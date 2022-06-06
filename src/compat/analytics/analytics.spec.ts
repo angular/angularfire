@@ -21,10 +21,6 @@ describe('AngularFireAnalytics', () => {
     analytics = TestBed.inject(AngularFireAnalytics);
   });
 
-  afterEach(() => {
-    app.delete().catch(() => undefined);
-  });
-
   it('should be exist', () => {
     expect(analytics instanceof AngularFireAnalytics).toBe(true);
   });

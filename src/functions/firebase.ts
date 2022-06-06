@@ -4,9 +4,11 @@ import { ɵzoneWrap } from '@angular/fire';
 import {
   connectFunctionsEmulator as _connectFunctionsEmulator,
   getFunctions as _getFunctions,
-  httpsCallable as _httpsCallable
+  httpsCallable as _httpsCallable,
+  httpsCallableFromURL as _httpsCallableFromURL
 } from 'firebase/functions';
 
 export const connectFunctionsEmulator = ɵzoneWrap(_connectFunctionsEmulator, true);
 export const getFunctions = ɵzoneWrap(_getFunctions, true);
 export const httpsCallable = ɵzoneWrap(_httpsCallable, true);
+export const httpsCallableFromURL = ɵzoneWrap(_httpsCallableFromURL, true);

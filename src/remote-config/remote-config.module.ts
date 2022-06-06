@@ -57,7 +57,9 @@ export class RemoteConfigModule {
   }
 }
 
-export function provideRemoteConfig(fn: () => FirebaseRemoteConfig, ...deps: any[]): ModuleWithProviders<RemoteConfigModule> {
+export function provideRemoteConfig(
+  fn: (injector: Injector) => FirebaseRemoteConfig, ...deps: any[]
+): ModuleWithProviders<RemoteConfigModule> {
   return {
     ngModule: RemoteConfigModule,
     providers: [{

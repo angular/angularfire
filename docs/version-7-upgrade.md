@@ -47,7 +47,7 @@ In order to better support the tree-shakability introduced in Firebase v9 & to r
         provideFirebaseApp(() => initializeApp(config)),
         provideFirestore(() => {
             const firestore = getFirestore();
-            connectEmulator(firestore, 'localhost', 8080);
+            connectFirestoreEmulator(firestore, 'localhost', 8080);
             enableIndexedDbPersistence(firestore);
             return firestore;
         }),

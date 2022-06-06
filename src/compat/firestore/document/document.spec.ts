@@ -30,7 +30,7 @@ describe('AngularFirestoreDocument', () => {
   });
 
   afterEach(() => {
-    app.delete().catch(() => undefined);
+    afs.firestore.disableNetwork();
   });
 
   describe('valueChanges()', () => {

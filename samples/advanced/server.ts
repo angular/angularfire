@@ -9,8 +9,6 @@ import { AppServerModule } from './src/main.server';
 import { APP_BASE_HREF } from '@angular/common';
 import { existsSync } from 'fs';
 
-import '@angular/fire/firestore-protos';
-
 // These polyfills are for app-check Node.js
 // @ts-ignore
 globalThis.self = globalThis;

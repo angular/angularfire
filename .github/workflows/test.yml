@@ -31,7 +31,7 @@ jobs:
         id: node_modules_cache
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-14-9-9-6-node_modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-14-12-9-9-6-node_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-14-12-9-9-6-node_modules-
             ${{ runner.os }}-14-12-9-9-
@@ -49,6 +49,7 @@ jobs:
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
+          yarn config set network-timeout 300000
           yarn config set yarn-offline-mirror-pruning true
           yarn install --frozen-lockfile --prefer-offline
       - name: Build
@@ -67,11 +68,18 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
-        node: ["12", "14", "16"]
+        node: [ "14", "16"]
         firebase: ["9"]
-        firebaseTools: ["9"]
-        rxjs: ["6", "7"]
-        ng: ["12"]
+        firebaseTools: ["11"]
+        rxjs: ["7"]
+        ng: ["12", "13", "14"]
+        exclude:
+          # TODO investigate failures
+          # https://github.com/angular/angularfire/runs/4174069788
+          # Can't resolve 'core-js/proposals/reflect-metadata'
+          - os: ubuntu-latest
+            node: 14
+            ng: 13
       fail-fast: false
     name: Test firebase@${{ matrix.firebase }} firebase-tools@${{ matrix.firebaseTools }} ng@${{ matrix.ng }} rxjs@${{ matrix.rxjs}} on ${{ matrix.os }} Node.js ${{ matrix.node }}
     steps:
@@ -103,6 +111,7 @@ jobs:
       - name: Configure yarn
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
+          yarn config set network-timeout 300000
           yarn config set ignore-engines true
       - name: Yarn install
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
@@ -112,7 +121,15 @@ jobs:
           yarn add firebase@${{ matrix.firebase }}
           yarn add firebase-tools@${{ matrix.firebaseTools }}
           yarn add rxjs@${{ matrix.rxjs }} --prefer-offline
-          npx ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty --force || true
+      # Can't update more than one major at a times, take the incremental step
+      - name: Update to ng@13
+        run: npx @angular/cli@13 update @angular/core@13 @angular/cli@13 --allow-dirty --force
+        if: matrix.ng == '14' || matrix.ng == 'next'
+        continue-on-error: ${{ matrix.os == 'windows-latest' }}
+      - name: Update to ng@${{ matrix.ng }}
+        run: npx @angular/cli@${{ matrix.ng }} update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty --force
+        if: matrix.ng != '12'
+        continue-on-error: ${{ matrix.os == 'windows-latest' }}
       - name: Firebase emulator cache
         uses: actions/cache@v2
         with:
@@ -122,31 +139,61 @@ jobs:
         uses: actions/download-artifact@v2
       - name: Relocate Artifacts
         run: mv angularfire-${{ github.run_id }} dist
-      - name: Test node
+      - name: Test Node (CJS)
         run: |
           yarn build:jasmine
           yarn test:node
+        if: matrix.ng == '12'
+      - name: Test Node (ESM)
+        run: |
+          yarn build:jasmine
+          yarn test:node-esm
+        if: matrix.ng != '12' && matrix.rxjs == '7'
       - name: Test browser
-        if: matrix.os == 'ubuntu-latest' && matrix.node == '14' && matrix.firebaseTools == '9'
+        if: matrix.os == 'ubuntu-latest' && matrix.node == '14' && matrix.firebaseTools == '11'
         run: yarn test:chrome-headless
+      - name: ng-build yarn install
+        run: |
+          cd ./test/ng-build
+          yarn --prefer-offline
+          yarn add firebase@${{ matrix.firebase }}
+      - name: Update ng-build to ng@13
+        run: |
+          cd ./test/ng-build
+          npx @angular/cli@13 update @angular/core@13 @angular/cli@13 @nguniversal/express-engine@13  --allow-dirty --force
+        if: matrix.ng == '14' || matrix.ng == 'next'
+        continue-on-error: ${{ matrix.os == 'windows-latest' }}
+      - name: Update ng-build to ng@${{ matrix.ng }}
+        run: |
+          cd ./test/ng-build
+          npx @angular/cli@${{ matrix.ng }} update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} @nguniversal/express-engine@${{ matrix.ng }} --allow-dirty --force
+        if: matrix.ng != '12'
+        continue-on-error: ${{ matrix.os == 'windows-latest' }}
+      - name: ng-build prerender
+        run: |
+          cd ./test/ng-build
+          yarn prerender
 
   # TODO dry up
   canary:
     runs-on: ${{ matrix.os }}
-    if: ${{ github.ref == 'refs/heads/master' }}
-    needs: [ 'build', 'test' ]
+    # if: ${{ github.ref == 'refs/heads/master' }}
+    # needs: [ 'build', 'test' ]
+    needs: [ 'build' ]
     strategy:
       matrix:
         os: [ ubuntu-latest ]
         node: ["14"]
-        firebase: ["9", "canary"]
-        firebaseTools: ["9"]
+        firebase: ["9", "canary", "next"]
+        firebaseTools: ["11"]
         rxjs: ["7"]
-        ng: ["12", "next"]
+        ng: ["12", "13", "14", "next"]
         exclude:
-          # standard configuration
+          # standard configurations
           - firebase: 9
             ng: 12
+          - firebase: 9
+            ng: 13
       fail-fast: false
     name: Canary firebase@${{ matrix.firebase }} firebase-tools@${{ matrix.firebaseTools }} ng@${{ matrix.ng }} rxjs@${{ matrix.rxjs}} on ${{ matrix.os }} Node.js ${{ matrix.node }}
     steps:
@@ -178,6 +225,7 @@ jobs:
       - name: Configure yarn
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
+          yarn config set network-timeout 300000
           yarn config set ignore-engines true
       - name: Yarn install
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
@@ -187,7 +235,13 @@ jobs:
           yarn add firebase@${{ matrix.firebase }}
           yarn add firebase-tools@${{ matrix.firebaseTools }}
           yarn add rxjs@${{ matrix.rxjs }} --prefer-offline
-          npx ng update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty --force || true
+      # Can't update more than one major at a times, take the incremental step
+      - name: Update to ng@13
+        run: npx @angular/cli@13 update @angular/core@13 @angular/cli@13 --allow-dirty --force
+        if: matrix.ng == '14' || matrix.ng == 'next'
+      - name: Update to ng@${{ matrix.ng }}
+        run: npx @angular/cli@${{ matrix.ng }} update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty --force
+        if: matrix.ng != '12'
       - name: Firebase emulator cache
         uses: actions/cache@v2
         with:
@@ -197,13 +251,43 @@ jobs:
         uses: actions/download-artifact@v2
       - name: Relocate Artifacts
         run: mv angularfire-${{ github.run_id }} dist
-      - name: Test node
+      - name: Test Node (CJS)
         run: |
           yarn build:jasmine
           yarn test:node
+        if: matrix.ng == '12'
+      - name: Test Node (ESM)
+        run: |
+          yarn build:jasmine
+          yarn test:node-esm
+        if: matrix.ng != '12'
       - name: Test browser
-        if: matrix.os == 'ubuntu-latest' && matrix.node == '14' && matrix.firebaseTools == '9'
         run: yarn test:chrome-headless
+      - name: ng-build yarn install
+        run: |
+          cd ./test/ng-build
+          yarn --prefer-offline
+          yarn add firebase@${{ matrix.firebase }}
+      # on @canary firebase-admin and firebase database-types conflict, skip the lib check for now
+      - name: ng-build skipLibCheck
+        run: |
+          cd ./test/ng-build
+          sed -i 's/"skipLibCheck": false,/"skipLibCheck": true,/g' tsconfig.json
+        if: matrix.firebase == 'canary'
+      - name: Update ng-build to ng@13
+        run: |
+          cd ./test/ng-build
+          npx @angular/cli@13 update @angular/core@13 @angular/cli@13 @nguniversal/express-engine@13  --allow-dirty --force
+        if: matrix.ng == '14' || matrix.ng == 'next'
+      - name: Update ng-build to ng@${{ matrix.ng }}
+        run: |
+          cd ./test/ng-build
+          npx @angular/cli@${{ matrix.ng }} update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} @nguniversal/express-engine@${{ matrix.ng }} --allow-dirty --force
+        if: matrix.ng != '12'
+      - name: ng-build prerender
+        run: |
+          cd ./test/ng-build
+          yarn prerender
 
   contribute:
     runs-on: ${{ matrix.os }}
@@ -211,7 +295,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
-        node: ["12", "14", "16"]
+        node: ["14", "16"]
         exclude:
           # we build with this combination, safely skip
           - os: ubuntu-latest
@@ -225,6 +309,13 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           check-latest: true
+      # node 14 image doesn't have new enough java for the emulators
+      - name: Setup java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+        if: matrix.node == '14'
       - name: node_modules cache
         uses: actions/cache@v2
         id: node_modules_cache
@@ -248,14 +339,18 @@ jobs:
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
+          yarn config set network-timeout 300000
           yarn config set ignore-engines true
           yarn install --frozen-lockfile --prefer-offline
       - name: Build
         run: yarn build
-      - name: Test
-        # TODO figure out why tests are flaking
-        continue-on-error: true
-        run: yarn test
+      - name: Test Node
+        run: |
+          npm run build:jasmine
+          npm run test:node
+      - name: Test headless
+        run: yarn test:chrome-headless
+        continue-on-error: ${{ matrix.os == 'windows-latest' }}
 
   # Break the branch protection test into a seperate step, so we can manage the matrix more easily
   test_and_contribute:
@@ -285,3 +380,11 @@ jobs:
           ./publish.sh
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  notify:
+    runs-on: ubuntu-latest
+    name: Notify
+    needs: ['build', 'test', 'contribute', 'canary']
+    if: always()
+    steps:
+      - run: echo ${{ github.run_id }}

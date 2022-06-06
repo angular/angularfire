@@ -16,14 +16,20 @@ const isMessagingSupportedPromiseSymbol = '__angularfire_symbol__messagingIsSupp
 
 globalThis[isAnalyticsSupportedPromiseSymbol] ||= isAnalyticsSupported().then(it =>
   globalThis[isAnalyticsSupportedValueSymbol] = it
+).catch(() =>
+  globalThis[isAnalyticsSupportedValueSymbol] = false
 );
 
 globalThis[isMessagingSupportedPromiseSymbol] ||= isMessagingSupported().then(it =>
   globalThis[isMessagingSupportedValueSymbol] = it
+).catch(() =>
+  globalThis[isMessagingSupportedValueSymbol] = false
 );
 
 globalThis[isRemoteConfigSupportedPromiseSymbol] ||= isRemoteConfigSupported().then(it =>
   globalThis[isRemoteConfigSupportedValueSymbol] = it
+).catch(() =>
+  globalThis[isRemoteConfigSupportedValueSymbol] = false
 );
 
 const isSupportedError = (module: string) =>

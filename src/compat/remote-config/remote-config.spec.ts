@@ -20,10 +20,6 @@ describe('AngularFireRemoteConfig', () => {
     rc = TestBed.inject(AngularFireRemoteConfig);
   });
 
-  afterEach(() => {
-    app.delete().catch(() => undefined);
-  });
-
   it('should be exist', () => {
     expect(rc instanceof AngularFireRemoteConfig).toBe(true);
   });
@@ -56,10 +52,6 @@ describe('AngularFireRemoteConfig with different app', () => {
 
     app = TestBed.inject(FirebaseApp);
     rc = TestBed.inject(AngularFireRemoteConfig);
-  });
-
-  afterEach(() => {
-    app.delete().catch(() => undefined);
   });
 
   describe('<constructor>', () => {

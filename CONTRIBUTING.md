@@ -148,7 +148,7 @@ changes to be accepted, the CLA must be signed. It's a quick process, we promise
 [slack]: https://firebase-community.appspot.com/
 [coc]: https://github.com/angular/code-of-conduct/blob/master/CODE_OF_CONDUCT.md
 [commit-message-format]: https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit#
-[corporate-cla]: http://code.google.com/legal/corporate-cla-v1.0.html
+[corporate-cla]: https://code.google.com/legal/corporate-cla-v1.0.html
 [individual-cla]: http://code.google.com/legal/individual-cla-v1.0.html
 [js-style-guide]: https://google.github.io/styleguide/javascriptguide.xml
 [jsfiddle]: http://jsfiddle.net

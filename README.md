@@ -66,6 +66,8 @@ AngularFire doesn't follow Angular's versioning as Firebase also has breaking ch
 
 | Angular | Firebase | AngularFire  |
 | --------|----------|--------------|
+| 14      | 9        | ^7.4         |
+| 13      | 9        | ^7.2         |
 | 12      | 9        | ^7.0         |
 | 12      | 7,8      | ^6.1.5       |
 | 11      | 7,8      | ^6.1         |
@@ -73,8 +75,6 @@ AngularFire doesn't follow Angular's versioning as Firebase also has breaking ch
 | 10      | 7        | ^6.0.3       |
 | 9       | 8        | ^6.0.4       |
 | 9       | 7        | ^6.0         |
-| 8       | 7        | ^5.2.3       |
-| 8       | 6        | ^5.2.0       |
 
 <sub>Version combinations not documented here __may__ work but are untested and you will see NPM peer warnings.</sub>
 
@@ -84,10 +84,10 @@ Neither AngularFire or Firebase ship with polyfills. To have compatability acros
 
 | API | Environments | Suggested Polyfill | License |
 |-----|--------------|--------------------|---------|
-| Various ES5+ features  | IE 11<br>Safari &lt; 10 | [`core-js/stable`](https://github.com/zloirock/core-js#readme) | MIT |
-| `globalThis` | [IE 11<br>Chrome &lt; 71<br>Safari &lt; 12.1<br>iOS &lt; 12.2<br>Node &lt; 12](https://caniuse.com/mdn-javascript_builtins_globalthis) | [`globalThis`](https://github.com/es-shims/globalThis#readme) | MIT |
-| `Proxy` | [IE 11<br>Safari &lt; 10](https://caniuse.com/proxy) | [`proxy-polyfill`](https://github.com/GoogleChrome/proxy-polyfill#readme) | Apache 2.0 |
-| `fetch` | [IE 11<br>Safari &lt; 10.1<br>iOS &lt; 10.3](https://caniuse.com/fetch) | [`cross-fetch`](https://github.com/lquixada/cross-fetch#readme) | MIT |
+| Various ES5+ features  | Safari &lt; 10 | [`core-js/stable`](https://github.com/zloirock/core-js#readme) | MIT |
+| `globalThis` | [Chrome &lt; 71<br>Safari &lt; 12.1<br>iOS &lt; 12.2<br>Node &lt; 12](https://caniuse.com/mdn-javascript_builtins_globalthis) | [`globalThis`](https://github.com/es-shims/globalThis#readme) | MIT |
+| `Proxy` | [Safari &lt; 10](https://caniuse.com/proxy) | [`proxy-polyfill`](https://github.com/GoogleChrome/proxy-polyfill#readme) | Apache 2.0 |
+| `fetch` | [Safari &lt; 10.1<br>iOS &lt; 10.3](https://caniuse.com/fetch) | [`cross-fetch`](https://github.com/lquixada/cross-fetch#readme) | MIT |
 
 ## Resources
 

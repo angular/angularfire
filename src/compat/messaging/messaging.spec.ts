@@ -20,10 +20,6 @@ describe('AngularFireMessaging', () => {
     afm = TestBed.inject(AngularFireMessaging);
   });
 
-  afterEach(() => {
-    app.delete().catch(() => undefined);
-  });
-
   it('should be exist', () => {
     expect(afm instanceof AngularFireMessaging).toBe(true);
   });
@@ -54,10 +50,6 @@ describe('AngularFireMessaging with different app', () => {
 
     app = TestBed.inject(FirebaseApp);
     afm = TestBed.inject(AngularFireMessaging);
-  });
-
-  afterEach(() => {
-    app.delete().catch(() => undefined);
   });
 
   describe('<constructor>', () => {

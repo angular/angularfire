@@ -24,8 +24,8 @@ const isSite = (elem: FirebaseHostingSite | fuzzy.FilterResult<FirebaseHostingSi
     return (elem as { original: FirebaseHostingSite }).original === undefined;
 };
 
-export const searchProjects = (promise: Promise<FirebaseProject[]>) =>
-    (_: any, input: string) => promise.then(projects => {
+export const searchProjects = (projects: FirebaseProject[]) =>
+    async (_: any, input: string) => {
         projects.unshift({
             projectId: NEW_OPTION,
             displayName: '[CREATE NEW PROJECT]'
@@ -47,10 +47,10 @@ export const searchProjects = (promise: Promise<FirebaseProject[]>) =>
                 value: original.projectId
             };
         });
-    });
+    };
 
-export const searchApps = (promise: Promise<FirebaseApp[]>) =>
-  (_: any, input: string) => promise.then(apps => {
+export const searchApps = (apps: FirebaseApp[]) =>
+  async (_: any, input: string) => {
     apps.unshift({
       appId: NEW_OPTION,
       displayName: '[CREATE NEW APP]',
@@ -72,10 +72,10 @@ export const searchApps = (promise: Promise<FirebaseApp[]>) =>
         value: shortAppId(original),
       };
     });
-  });
+  };
 
-export const searchSites = (promise: Promise<FirebaseHostingSite[]>) =>
-  (_: any, input: string) => promise.then(sites => {
+export const searchSites = (sites: FirebaseHostingSite[]) =>
+  async (_: any, input: string) => {
     sites.unshift({
       name: NEW_OPTION,
       defaultUrl: '[CREATE NEW SITE]',
@@ -97,7 +97,7 @@ export const searchSites = (promise: Promise<FirebaseHostingSite[]>) =>
         value: shortSiteName(original),
       };
     });
-  });
+  };
 
 
 type Prompt = <K extends string, U= unknown>(questions: { name: K, source: (...args) =>
@@ -146,7 +146,7 @@ export const userPrompt = async (options: {}): Promise<Record<string, any>> => {
 
 export const projectPrompt = async (defaultProject: string|undefined, options: {}) => {
   const firebaseTools = await getFirebaseTools();
-  const projects = firebaseTools.projects.list(options);
+  const projects = await firebaseTools.projects.list(options);
   const { projectId } = await autocomplete({
     type: 'autocomplete',
     name: 'projectId',
@@ -174,7 +174,7 @@ export const projectPrompt = async (defaultProject: string|undefined, options: {
 
 export const appPrompt = async ({ projectId: project }: FirebaseProject, defaultAppId: string|undefined, options: {}) => {
   const firebaseTools = await getFirebaseTools();
-  const apps = firebaseTools.apps.list('web', { ...options, project });
+  const apps = await firebaseTools.apps.list('web', { ...options, project });
   const { appId } = await autocomplete({
     type: 'autocomplete',
     name: 'appId',
@@ -196,7 +196,7 @@ export const appPrompt = async ({ projectId: project }: FirebaseProject, default
 
 export const sitePrompt = async ({ projectId: project }: FirebaseProject, options: {}) => {
   const firebaseTools = await getFirebaseTools();
-  const sites = firebaseTools.hosting.sites.list({ ...options, project }).then(it => {
+  const sites = await firebaseTools.hosting.sites.list({ ...options, project }).then(it => {
     if (it.sites.length === 0) {
       // newly created projects don't return their default site, stub one
       return [{
@@ -214,7 +214,7 @@ export const sitePrompt = async ({ projectId: project }: FirebaseProject, option
     name: 'siteName',
     source: searchSites(sites),
     message: 'Please select a hosting site:',
-    default: _ => sites.then(it => shortSiteName(it.find(it => it.type === DEFAULT_SITE_TYPE))),
+    default: _ => shortSiteName(sites.find(site => site.type === DEFAULT_SITE_TYPE)),
   });
   if (siteName === NEW_OPTION) {
     const { subdomain } = await inquirer.prompt({

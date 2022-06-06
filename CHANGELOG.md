@@ -1,3 +1,60 @@
+<a name="7.4.0"></a>
+# [7.4.0](https://github.com/angular/angularfire/compare/7.3.0...7.4.0) (2022-06-04)
+
+### Misc.
+
+* **core:** [**Internet Explorer support has been dropped**](https://firebase.blog/posts/2022/05/firebase-js-sdk-drops-support-for-internet-explorer)
+* **core:** Bumped the Firebase dependency to ^9.8, wrapping new APIs
+* **core:** mark Angular 14 as an compatable peer ([#3230](https://github.com/angular/angularfire/issues/3230)) ([3c3a343](https://github.com/angular/angularfire/commit/3c3a343))
+
+### Bug Fixes
+
+* **core:** added missing injector input signatures ([#3191](https://github.com/angular/angularfire/issues/3191)) ([88796bc](https://github.com/angular/angularfire/commit/88796bc))
+
+<a name="7.3.0"></a>
+# [7.3.0](https://github.com/angular/angularfire/compare/7.2.1...7.3.0) (2022-03-23)
+
+### Features
+
+* **storage:** adding wrappers for getBlob, getBytes, and getStream ([#3159](https://github.com/angular/angularfire/pull/3159))
+
+### Misc.
+
+* **core:** update firebase dependency  ([#3159](https://github.com/angular/angularfire/pull/3159))
+* **core:** mark firebase-tools 10 as compatible ([#3159](https://github.com/angular/angularfire/pull/3159))
+* **firestore-protos:** no longer needed ([#3159](https://github.com/angular/angularfire/pull/3159))
+
+<a name="7.2.1"></a>
+# [7.2.1](https://github.com/angular/angularfire/compare/7.2.0...7.2.1) (2022-02-10)
+
+### Bug Fixes
+
+* **compat:** Typescript 4.5 inference breaks the PromiseProxy ([#3144](https://github.com/angular/angularfire/issues/3144)) ([f61bc7d](https://github.com/angular/angularfire/commit/f61bc7d)), closes [#3090](https://github.com/angular/angularfire/issues/3090) [#3088](https://github.com/angular/angularfire/issues/3088)
+* **core:** Address bad arguments being passed to zone wrapper ([#3127](https://github.com/angular/angularfire/issues/3127)) ([8b693e4](https://github.com/angular/angularfire/commit/8b693e4))
+* **core:** Defensively catch Firebase isSupported calls ([#3146](https://github.com/angular/angularfire/issues/3146)) ([520930b](https://github.com/angular/angularfire/commit/520930b))
+* **schematic:** use oneOf rather than array types in the deploy schematic ([#3092](https://github.com/angular/angularfire/issues/3092)) ([058d624](https://github.com/angular/angularfire/commit/058d624))
+* **schematics:** Address ng add console lock up ([#3151](https://github.com/angular/angularfire/issues/3151)) ([4852c35](https://github.com/angular/angularfire/commit/4852c35)), closes [#3145](https://github.com/angular/angularfire/issues/3145) [#3121](https://github.com/angular/angularfire/issues/3121)
+
+
+
+<a name="7.2.0"></a>
+# [7.2.0](https://github.com/angular/angularfire/compare/7.1.1...7.2.0) (2021-11-11)
+
+### Features
+
+* **core:** marking as compatible with Angular 13 peer ([#3057](https://github.com/angular/angularfire/pull/3057)) ([390691b](https://github.com/angular/angularfire/commit/390691b))
+
+### Bug Fixes
+
+* **schematics:** ng-add should pass if sourceRoot is relative to workspace root ([#3052](https://github.com/angular/angularfire/issues/3052)) ([7e931cb](https://github.com/angular/angularfire/commit/7e931cb))
+
+<a name="7.1.1"></a>
+# [7.1.1](https://github.com/angular/angularfire/compare/7.1.0...7.1.1) (2021-10-18)
+
+### Bug Fixes
+
+* **schematics:** Fix ng add on Windows ([#3022](https://github.com/angular/angularfire/issues/3022)) ([6ed7aef](https://github.com/angular/angularfire/commit/6ed7aef)), closes [#3016](https://github.com/angular/angularfire/issues/3016)
+
 <a name="7.1.0"></a>
 # [7.1.0](https://github.com/angular/angularfire/compare/7.0.4...7.1.0) (2021-10-08)
 

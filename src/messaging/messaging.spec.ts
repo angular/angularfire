@@ -35,10 +35,6 @@ describe('Messaging', () => {
         messaging = TestBed.inject(Messaging);
     });
 
-    afterEach(() => {
-        deleteApp(app).catch(() => undefined);
-    });
-
     it('should be injectable', () => {
         expect(providedMessaging).toBeTruthy();
         expect(messaging).toEqual(providedMessaging);
