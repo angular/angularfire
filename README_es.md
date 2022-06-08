@@ -20,7 +20,7 @@ ng add @angular/fire
 
 ## Inicio Rápido
 
-Levanta y ejecuta tu primera aplicacion solo siguiendo nuestra [guía de inicio rápido](docs/install-and-setup_es.md). (en proceso de traducción)
+Levanta y ejecuta tu primera aplicación solo siguiendo nuestra [guía de inicio rápido](docs/install-and-setup_es.md). (en proceso de traducción)
 
 ## Ejemplo de uso:
 
@@ -49,11 +49,11 @@ export class MyApp {
 
 ## Recursos
 
-[Contribuyedo](CONTRIBUTING.md) (en proceso de traducción).
+[Contribuyendo](CONTRIBUTING.md) (en proceso de traducción).
 
 [Plantilla Stackblitz](https://stackblitz.com/edit/angular-fire-start) - Recuerda colocar tu configuración de Firebase en `app/app.module.ts`.
 
-[¿Actualizando a v6.0? Mira nuestra guia.](docs/version-6-upgrade.md). (en proceso de traducción)
+[¿Actualizando a v6.0? Mira nuestra guía.](docs/version-6-upgrade.md). (en proceso de traducción)
 
 **¿Tienes problemas?** Obtén ayuda en el [Firebase Mailing List](https://groups.google.com/forum/#!forum/firebase-talk) (apoyado oficialmente), la [Comunidad Firebase en Slack](https://firebase.community/) (busca en el canal `#angularfire2`), [Gitter](https://gitter.im/angular/angularfire2), o [Stack Overflow](https://stackoverflow.com/questions/tagged/angularfire2).
 
