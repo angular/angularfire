@@ -3,7 +3,7 @@
 `AngularFireAuthGuard` provides a prebuilt [`canActivate` Router Guard](https://angular.io/api/router/CanActivate) using `AngularFireAuth`. By default unauthenticated users are not permitted to navigate to protected routes:
 
 ```ts
-import { AngularFireAuthGuard } from '@angular/fire/auth-guard';
+import { AngularFireAuthGuard } from '@angular/fire/compat/auth-guard';
 
 export const routes: Routes = [
     { path: '',      component: AppComponent },
@@ -29,7 +29,7 @@ The `auth-guard` module provides the following pre-built pipes:
 Example use:
 
 ```ts
-import { AngularFireAuthGuard, hasCustomClaim, redirectUnauthorizedTo, redirectLoggedInTo } from '@angular/fire/auth-guard';
+import { AngularFireAuthGuard, hasCustomClaim, redirectUnauthorizedTo, redirectLoggedInTo } from '@angular/fire/compat/auth-guard';
 
 const adminOnly = () => hasCustomClaim('admin');
 const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['login']);
@@ -48,7 +48,7 @@ export const routes: Routes = [
 Use the provided `canActivate` helper and spread syntax to make your routes more readable:
 
 ```ts
-import { canActivate } from '@angular/fire/auth-guard';
+import { canActivate } from '@angular/fire/compat/auth-guard';
 
 export const routes: Routes = [
     { path: '',             component: AppComponent },
@@ -76,11 +76,11 @@ The `auth-guard` modules provides a `customClaims` operator to reduce boiler pla
 ```ts
 import { pipe } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { customClaims } from '@angular/fire/auth-guard';
+import { customClaims } from '@angular/fire/compat/auth-guard';
 
 // This pipe will only allow users with the editor role to access the route
 // { path: 'articles/:id/edit', component: ArticleEditComponent, ...canActivate(editorOnly) }
-const editorOnly = () => pipe(customClaims, map(claims => claims.role === "editor"));
+const editorOnly = () => pipe(customClaims, map(claims => claims.role === 'editor'));
 ```
 
 ### Using router state
@@ -90,7 +90,7 @@ const editorOnly = () => pipe(customClaims, map(claims => claims.role === "edito
 ```ts
 import { pipe } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { customClaims } from '@angular/fire/auth-guard';
+import { customClaims } from '@angular/fire/compat/auth-guard';
 
 // Only allow navigation to the route if :userId matches the authenticated user's uid
 // { path: 'user/:userId/edit', component: ProfileEditComponent, ...canActivate(onlyAllowSelf) }
@@ -98,5 +98,5 @@ const onlyAllowSelf = (next) => map(user => !!user && next.params.userId === use
 
 // Only allow navigation to the route if the user has a custom claim matching  :accountId
 // { path: 'accounts/:accountId/billing', component: BillingDetailsComponent, ...canActivate(accountAdmin) }
-const accountAdmin = (next) => pipe(customClaims, map(claims => claims[`account-${next.params.accountId}-role`] === "admin"));
+const accountAdmin = (next) => pipe(customClaims, map(claims => claims[`account-${next.params.accountId}-role`] === 'admin'));
 ```

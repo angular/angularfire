@@ -1,3 +1,355 @@
+<a name="7.4.0"></a>
+# [7.4.0](https://github.com/angular/angularfire/compare/7.3.0...7.4.0) (2022-06-04)
+
+### Misc.
+
+* **core:** [**Internet Explorer support has been dropped**](https://firebase.blog/posts/2022/05/firebase-js-sdk-drops-support-for-internet-explorer)
+* **core:** Bumped the Firebase dependency to ^9.8, wrapping new APIs
+* **core:** mark Angular 14 as an compatable peer ([#3230](https://github.com/angular/angularfire/issues/3230)) ([3c3a343](https://github.com/angular/angularfire/commit/3c3a343))
+
+### Bug Fixes
+
+* **core:** added missing injector input signatures ([#3191](https://github.com/angular/angularfire/issues/3191)) ([88796bc](https://github.com/angular/angularfire/commit/88796bc))
+
+<a name="7.3.0"></a>
+# [7.3.0](https://github.com/angular/angularfire/compare/7.2.1...7.3.0) (2022-03-23)
+
+### Features
+
+* **storage:** adding wrappers for getBlob, getBytes, and getStream ([#3159](https://github.com/angular/angularfire/pull/3159))
+
+### Misc.
+
+* **core:** update firebase dependency  ([#3159](https://github.com/angular/angularfire/pull/3159))
+* **core:** mark firebase-tools 10 as compatible ([#3159](https://github.com/angular/angularfire/pull/3159))
+* **firestore-protos:** no longer needed ([#3159](https://github.com/angular/angularfire/pull/3159))
+
+<a name="7.2.1"></a>
+# [7.2.1](https://github.com/angular/angularfire/compare/7.2.0...7.2.1) (2022-02-10)
+
+### Bug Fixes
+
+* **compat:** Typescript 4.5 inference breaks the PromiseProxy ([#3144](https://github.com/angular/angularfire/issues/3144)) ([f61bc7d](https://github.com/angular/angularfire/commit/f61bc7d)), closes [#3090](https://github.com/angular/angularfire/issues/3090) [#3088](https://github.com/angular/angularfire/issues/3088)
+* **core:** Address bad arguments being passed to zone wrapper ([#3127](https://github.com/angular/angularfire/issues/3127)) ([8b693e4](https://github.com/angular/angularfire/commit/8b693e4))
+* **core:** Defensively catch Firebase isSupported calls ([#3146](https://github.com/angular/angularfire/issues/3146)) ([520930b](https://github.com/angular/angularfire/commit/520930b))
+* **schematic:** use oneOf rather than array types in the deploy schematic ([#3092](https://github.com/angular/angularfire/issues/3092)) ([058d624](https://github.com/angular/angularfire/commit/058d624))
+* **schematics:** Address ng add console lock up ([#3151](https://github.com/angular/angularfire/issues/3151)) ([4852c35](https://github.com/angular/angularfire/commit/4852c35)), closes [#3145](https://github.com/angular/angularfire/issues/3145) [#3121](https://github.com/angular/angularfire/issues/3121)
+
+
+
+<a name="7.2.0"></a>
+# [7.2.0](https://github.com/angular/angularfire/compare/7.1.1...7.2.0) (2021-11-11)
+
+### Features
+
+* **core:** marking as compatible with Angular 13 peer ([#3057](https://github.com/angular/angularfire/pull/3057)) ([390691b](https://github.com/angular/angularfire/commit/390691b))
+
+### Bug Fixes
+
+* **schematics:** ng-add should pass if sourceRoot is relative to workspace root ([#3052](https://github.com/angular/angularfire/issues/3052)) ([7e931cb](https://github.com/angular/angularfire/commit/7e931cb))
+
+<a name="7.1.1"></a>
+# [7.1.1](https://github.com/angular/angularfire/compare/7.1.0...7.1.1) (2021-10-18)
+
+### Bug Fixes
+
+* **schematics:** Fix ng add on Windows ([#3022](https://github.com/angular/angularfire/issues/3022)) ([6ed7aef](https://github.com/angular/angularfire/commit/6ed7aef)), closes [#3016](https://github.com/angular/angularfire/issues/3016)
+
+<a name="7.1.0"></a>
+# [7.1.0](https://github.com/angular/angularfire/compare/7.0.4...7.1.0) (2021-10-08)
+
+### Features
+
+* **auth-guard:** modular auth guards now available ([#3001](https://github.com/angular/angularfire/issues/3001)) ([3ae6ce5](https://github.com/angular/angularfire/commit/3ae6ce5))
+* **schematics:** setup wizard on `ng add`, allow deployment to Cloud Run, and add more configuration options to `ng deploy` ([#2836](https://github.com/angular/angularfire/issues/2836)) ([72d3c2e](https://github.com/angular/angularfire/commit/72d3c2e))
+* **compat/storage**: Adding list function ([#2960](https://github.com/angular/angularfire/issues/2960)) ([ea544b](https://github.com/angular/angularfire/commit/8ea544b))
+* **app-check**: Add AppCheck ([#2940](https://github.com/angular/angularfire/issues/2940)) ([337116f](https://github.com/angular/angularfire/commit/337116f))
+* **compat/storage**: Transfer state support for the `getDownloadURL` pipe ([#2921](https://github.com/angular/angularfire/issues/2921)) ([d6cfe16](https://github.com/angular/angularfire/commit/d6cfe16))
+* **analytics**: modular versions of `ScreenTrackingService` and `UserTrackingService` now available ([#2963](https://github.com/angular/angularfire/issues/2963)) ([d724d81](https://github.com/angular/angularfire/commit/d724d81))
+* **core**: `provide*` methods can pass dependencies & the factory can use the injector for more advanced configuration ([#2963](https://github.com/angular/angularfire/issues/2963)) ([d724d81](https://github.com/angular/angularfire/commit/d724d81))
+
+### Bug Fixes
+
+* **compat/storage**: Type fixes for `.child` ([#2921](https://github.com/angular/angularfire/issues/2921)) ([d6cfe16](https://github.com/angular/angularfire/commit/d6cfe16))
+
+### Misc.
+
+* `Analytics`, `RemoteConfig`, and `Messaging` can be `null` if `isSupported()` returns false, this guards against runtime failures in unsupported environments at the cost of null checking
+* Require Firebase 9.1 peer
+* `ng add` installs firebase-tools globally, this also addressed the race condition
+* Requires firebase-tools 9.9+ peer (optional)
+* Moved peer dependencies for the schematics to proper dependencies
+* Mark compatibility with rxjs 7
+* Increase the accuracy of performance marks
+* `ng deploy` echos out the firebase-tools version and the user
+* Error message improvements
+
+<a name="7.0.4"></a>
+# [7.0.4](https://github.com/angular/angularfire/compare/7.0.3...7.0.4) (2021-09-07)
+
+
+### Bug Fixes
+
+* **compat/database:** Zone should be destabilized on get ([#2923](https://github.com/angular/angularfire/issues/2923)) ([c006da8](https://github.com/angular/angularfire/commit/c006da8))
+* **compat/perf:** AFP should not error in Jest ([#2920](https://github.com/angular/angularfire/issues/2920)) ([b0e147e](https://github.com/angular/angularfire/commit/b0e147e))
+* **schematics:** ng upgrade when e2e is present ([#2927](https://github.com/angular/angularfire/issues/2927)) ([9071faa](https://github.com/angular/angularfire/commit/9071faa))
+
+
+
+<a name="7.0.3"></a>
+# [7.0.3](https://github.com/angular/angularfire/compare/7.0.2...7.0.3) (2021-09-02)
+
+
+### Bug fixes
+
+* **auth:** `@angular/fire/auth` was Zone wrapping some `firebase/auth` exports it shouldn't have been
+* **messaging:** `onMessage`'s callback should fire inside the Angular Zone
+* **schematics:** `ng deploy` SSR should assume `bundleDependencies` defaults to true
+* **schematics:** `ng deploy` SSR should not fail if an `index.html` does not exist ([#2765](https://github.com/angular/angularfire/issues/2765))
+
+
+<a name="7.0.2"></a>
+# [7.0.2](https://github.com/angular/angularfire2/compare/7.0.1...7.0.2) (2021-08-30)
+
+### Bug fixes
+
+* **types:** `firebase/*` types were not being reexported from the `@angular/fire/*` modules (modular)
+
+<a name="7.0.1"></a>
+# [7.0.1](https://github.com/angular/angularfire2/compare/7.0.0...7.0.1) (2021-08-30)
+
+### Bug fixes
+
+* **messaging:** `onMessage` will no longer destablize the Angular Zone
+* **core:** Injected Classes now have a better fallback pattern for finding defaults, [#2909](https://github.com/angular/angularfire/issues/2909) allowing use of emulators and other config options as expected
+* **schematic:** upgrade schematic will no longer rewrite `.ts` files outside of your project root, [#2907](https://github.com/angular/angularfire/issues/2907)
+
+<a name="7.0.0"></a>
+# [7.0.0](https://github.com/angular/angularfire2/compare/6.1.5...7.0.0) (2021-08-25)
+
+### Breaking changes
+
+* Angular 12 is required
+* AngularFire now only works in Ivy applications
+* Firebase JS SDK v9 is required
+* The existing AngularFire v6 API surface has moved from `@angular/fire/*` to `@angular/fire/compat/*` (see compatibility mode)
+* **compat/auth:** `USE_EMULATOR` DI token is now in the form of `['http://localhost:9099']`
+
+### Features
+
+* New modular API surface available at `@angular/fire/*`
+* **compat/storage:** `USE_EMULATOR` DI token
+
+[See the v7 upgrade guide for more information.](https://github.com/angular/angularfire/blob/master/docs/version-7-upgrade.md)
+
+<a name="6.1.5"></a>
+# [6.1.5](https://github.com/angular/angularfire/compare/6.1.4...6.1.5) (2021-05-17)
+
+Support Angular 12 peer
+
+### Bug Fixes
+
+* **auth:** set the passed settings individually ([#2826](https://github.com/angular/angularfire/issues/2826)) ([984803d](https://github.com/angular/angularfire/commit/984803d))
+
+<a name="6.1.4"></a>
+# [6.1.4](https://github.com/angular/angularfire/compare/6.1.3...6.1.4) (2020-12-03)
+
+
+### Bug Fixes
+
+* **storage:** `firebase.default` typing issue with Firebase v7 ([#2703](https://github.com/angular/angularfire/issues/2703)) ([984006d](https://github.com/angular/angularfire/commit/984006d))
+* **storage:** snapshotChanges should return a success snapshot ([#2704](https://github.com/angular/angularfire/issues/2704)) ([972aa85](https://github.com/angular/angularfire/commit/972aa85))
+* **analytics:** no longer error when included in SSR or when using Firebase v7 ([#2701](https://github.com/angular/angularfire/issues/2704)) ([da8c660](https://github.com/angular/angularfire/commit/da8c660))
+
+
+<a name="6.1.3"></a>
+# [6.1.3](https://github.com/angular/angularfire/compare/6.1.2...6.1.3) (2020-11-30)
+
+
+### Bug Fixes
+
+* **afs:** allow stateChanges and auditLog to emit blank arrays at first ([21442f0](https://github.com/angular/angularfire/commit/21442f0))
+
+
+
+<a name="6.1.2"></a>
+# [6.1.2](https://github.com/angular/angularfire/compare/6.1.1...6.1.2) (2020-11-24)
+
+
+### Bug Fixes
+
+* **afs:** document's actions should have appropriate types ([#2683](https://github.com/angular/angularfire/issues/2683)) ([d36544f](https://github.com/angular/angularfire/commit/d36544f))
+* **afs:** fixing the metadata in `snapshotChanges` and more ([#2670](https://github.com/angular/angularfire/issues/2670)) ([d5dbe99](https://github.com/angular/angularfire/commit/d5dbe99))
+* **afs:** `stateChanges` and `auditLog` correctly emit metadata changes ([#2684](https://github.com/angular/angularfire/issues/2684)) ([fce594b](https://github.com/angular/angularfire/commit/fce594b))
+* **analytics:** screen tracking will no longer fail on broken routes ([#2678](https://github.com/angular/angularfire/issues/2678)) ([ae26b35](https://github.com/angular/angularfire/commit/ae26b35)), closes [#2677](https://github.com/angular/angularfire/issues/2677)
+* **auth:** removed the `shareReplay` from auth and addressed Zone.js issues ([#2682](https://github.com/angular/angularfire/issues/2682)) ([059547b](https://github.com/angular/angularfire/commit/059547b)), closes [#2681](https://github.com/angular/angularfire/issues/2681)
+* **core:** ensure the UMDs are importing things correctly for the lazy modules ([#2676](https://github.com/angular/angularfire/issues/2676)) ([6817bcc](https://github.com/angular/angularfire/commit/6817bcc))
+* **core:** try/catch the HMR/DI warning ([#2687](https://github.com/angular/angularfire/issues/2687)) ([1530112](https://github.com/angular/angularfire/commit/1530112))
+* **storage:** unsubscribing from the upload progress will not cancel and added replay ([#2688](https://github.com/angular/angularfire/issues/2688)) ([d845cdd](https://github.com/angular/angularfire/commit/d845cdd)), closes [#2685](https://github.com/angular/angularfire/issues/2685)
+
+
+
+<a name="6.1.1"></a>
+# [6.1.1](https://github.com/angular/angularfire/compare/6.1.0...6.1.1) (2020-11-19)
+
+### Bug Fixes
+
+* **afs:** fix regression keeping one from overriding collection.doc type ([#2668](https://github.com/angular/angularfire/issues/2668)) ([22e2883](https://github.com/angular/angularfire/commit/22e2883))
+* **core:** fix the instance cache logic ([#2667](https://github.com/angular/angularfire/issues/2667)) ([7f89643](https://github.com/angular/angularfire/commit/7f89643))
+* **storage:** error state not represent in UploadTaskSnapshot ([#2665](https://github.com/angular/angularfire/issues/2665)) ([2ce41aa](https://github.com/angular/angularfire/commit/2ce41aa))
+
+
+<a name="6.1.0"></a>
+# [6.1.0](https://github.com/angular/angularfire/compare/6.0.4...6.1.0) (2020-11-18)
+
+### Bug Fixes
+
+* **database:** fix Zone.js issues by running ref-gen outside angular ([5186389](https://github.com/angular/angularfire/commit/5186389))
+* **auth:** `ScreenTrackingService` will now wait for `UserTrackingService` to report an initial result, if `UserTrackingService` has been provided ([#2661](https://github.com/angular/angularfire/issues/2661)) ([b666a80](https://github.com/angular/angularfire/commit/b666a80))
+* **analytics:** Bunch of analytics & screen tracking improvements ([#2654](https://github.com/angular/angularfire/pull/2654)) ([5bc159a](https://github.com/angular/angularfire/commit/5bc159a))
+* **fcm:** `tokenChanges` now listen for notification permission changes and trip token detection as expected ([#2652](https://github.com/angular/angularfire/issues/2652)) ([8d3093f](https://github.com/angular/angularfire/commit/8d3093f))
+* **firestore:** doc and collection methods generic ([#2649](https://github.com/angular/angularfire/issues/2649)) ([796b7c1](https://github.com/angular/angularfire/commit/796b7c1))
+* **deploy:** remove direct workspace access ([#2643](https://github.com/angular/angularfire/issues/2643)) ([7e1918a](https://github.com/angular/angularfire/commit/7e1918a))
+* **schematics:** remove experimental workspace API type usage ([#2644](https://github.com/angular/angularfire/issues/2644)) ([b976c58](https://github.com/angular/angularfire/commit/b976c58))
+
+### Features
+
+* **core:** Support Angular 11
+* **core:** Adding global caches that survive/warn on HMR ([#2661](https://github.com/angular/angularfire/issues/2661)) ([b666a80](https://github.com/angular/angularfire/commit/b666a80)), closes [#2655](https://github.com/angular/angularfire/issues/2655)
+* **auth:** Warn when using Auth emulator in conjunction with database or firestore, ([#2661](https://github.com/angular/angularfire/issues/2661)) ([b666a80](https://github.com/angular/angularfire/commit/b666a80)), closes [#2656](https://github.com/angular/angularfire/issues/2656)
+* **auth:** Adding `AngularFireAuth.credential` an observer for `firebase.auth.UserCredential` ([#2661](https://github.com/angular/angularfire/issues/2661)) ([b666a80](https://github.com/angular/angularfire/commit/b666a80))
+* **auth:** `ScreenTrackingService` now logs `sign_up` and `login` events ([#2661](https://github.com/angular/angularfire/issues/2661)) ([b666a80](https://github.com/angular/angularfire/commit/b666a80))
+* **database:** Added `USE_EMULATOR` DI token ([#2652](https://github.com/angular/angularfire/issues/2652)) ([8d3093f](https://github.com/angular/angularfire/commit/8d3093f))
+* **fcm:** Added `VAPID_KEY`, `SERVICE_WORKER`, and `USE_EMULATOR` DI tokens ([#2652](https://github.com/angular/angularfire/issues/2652)) ([8d3093f](https://github.com/angular/angularfire/commit/8d3093f))
+* **fcm:** `deleteToken`'s token argument is now optional, reflecting Firebase v8 changes ([#2652](https://github.com/angular/angularfire/issues/2652)) ([8d3093f](https://github.com/angular/angularfire/commit/8d3093f))
+* **auth:** Added `SETTINGS`, `TENANT_ID`, `LANGUAGE_CODE`, `USE_DEVICE_LANGUAGE`, `USE_EMULATOR` and `PERSISTENCE` DI tokens ([#2652](https://github.com/angular/angularfire/issues/2652)) ([8d3093f](https://github.com/angular/angularfire/commit/8d3093f))
+* **functions:** Added `USE_EMULATOR` and `NEW_ORIGIN_BEHAVIOR` DI token to opt-into the new way of setting `ORIGIN` ([#2652](https://github.com/angular/angularfire/issues/2652)) ([8d3093f](https://github.com/angular/angularfire/commit/8d3093f))
+* **functions:** `httpsCallable` function now takes in `HttpsCallableOptions` ([#2652](https://github.com/angular/angularfire/issues/2652)) ([8d3093f](https://github.com/angular/angularfire/commit/8d3093f))
+* **storage:** Added `MAX_UPLOAD_RETRY_TIME` and `MAX_OPERATION_RETRY_TIME` DI tokens ([#2652](https://github.com/angular/angularfire/issues/2652)) ([8d3093f](https://github.com/angular/angularfire/commit/8d3093f))
+* **firestore:** Inherit doc return type from class ([#2640](https://github.com/angular/angularfire/issues/2640)) ([f7bbd09](https://github.com/angular/angularfire/commit/f7bbd09))
+* **firestore:** map document ID to the provided `idField` in a collection group query ([#2580](https://github.com/angular/angularfire/issues/2580)) ([dbf31d9](https://github.com/angular/angularfire/commit/dbf31d9))
+* **auth-guard:** add support for specifying a `string` to redirect to ([#2448](https://github.com/angular/angularfire/issues/2448)) ([fe31191](https://github.com/angular/angularfire/commit/fe31191)), closes [#2287](https://github.com/angular/angularfire/issues/2287) [#2144](https://github.com/angular/angularfire/issues/2144)
+* **database:** add option to include key on `valueChanges()` ([#2126](https://github.com/angular/angularfire/issues/2126)) ([5cdb8ce](https://github.com/angular/angularfire/commit/5cdb8ce))
+* **deploy:** More deploy options ([#2647](https://github.com/angular/angularfire/issues/2647)) ([1bbd3e4](https://github.com/angular/angularfire/commit/1bbd3e4))
+* **firestore:** options to include document ID on `valueChanges()` ([#2113](https://github.com/angular/angularfire/issues/2113)) ([09ed22a](https://github.com/angular/angularfire/commit/09ed22a))
+* **functions:** Add options param to callable functions ([#2434](https://github.com/angular/angularfire/issues/2434)) ([f8d5a50](https://github.com/angular/angularfire/commit/f8d5a50)), closes [#2433](https://github.com/angular/angularfire/issues/2433)
+* **schematics:** support `FIREBASE_TOKEN` for `ng deploy` ([#2327](https://github.com/angular/angularfire/issues/2327)) ([dd92869](https://github.com/angular/angularfire/commit/dd92869))
+* **storage:** `getDownloadURL` pipe ([#2648](https://github.com/angular/angularfire/issues/2648)) ([0d799da](https://github.com/angular/angularfire/commit/0d799da))
+
+<a name="6.1.0-rc.4"></a>
+# [6.1.0-rc.4](https://github.com/angular/angularfire/compare/6.1.0-rc.3...6.1.0-rc.4) (2020-11-17)
+
+### Bug Fixes
+
+* **auth:** `ScreenTrackingService` will now wait for `UserTrackingService` to report an initial result, if `UserTrackingService` has been provided ([#2661](https://github.com/angular/angularfire/issues/2661)) ([b666a80](https://github.com/angular/angularfire/commit/b666a80))
+
+### Features
+
+* **core:** Adding global caches that survive/warn on HMR ([#2661](https://github.com/angular/angularfire/issues/2661)) ([b666a80](https://github.com/angular/angularfire/commit/b666a80)), closes [#2655](https://github.com/angular/angularfire/issues/2655)
+* **auth:** Warn when using Auth emulator in conjunction with database or firestore, ([#2661](https://github.com/angular/angularfire/issues/2661)) ([b666a80](https://github.com/angular/angularfire/commit/b666a80)), closes [#2656](https://github.com/angular/angularfire/issues/2656)
+* **auth:** Adding `AngularFireAuth.credential` an observer for `firebase.auth.UserCredential` ([#2661](https://github.com/angular/angularfire/issues/2661)) ([b666a80](https://github.com/angular/angularfire/commit/b666a80))
+* **auth:** `ScreenTrackingService` now logs `sign_up` and `login` events ([#2661](https://github.com/angular/angularfire/issues/2661)) ([b666a80](https://github.com/angular/angularfire/commit/b666a80))
+
+<a name="6.1.0-rc.3"></a>
+# [6.1.0-rc.3](https://github.com/angular/angularfire/compare/6.1.0-rc.2...6.1.0-rc.3) (2020-11-14)
+
+### Bug Fixes
+
+* **analytics:** Bunch of analytics & screen tracking improvements ([#2654](https://github.com/angular/angularfire/pull/2654)) ([5bc159a](https://github.com/angular/angularfire/commit/5bc159a))
+
+<a name="6.1.0-rc.2"></a>
+# [6.1.0-rc.2](https://github.com/angular/angularfire/compare/6.1.0-rc.1...6.1.0-rc.2) (2020-11-13)
+
+
+### Bug Fixes
+
+* **fcm:** `tokenChanges` now listen for notification permission changes and trip token detection as expected ([#2652](https://github.com/angular/angularfire/issues/2652)) ([8d3093f](https://github.com/angular/angularfire/commit/8d3093f))
+
+### Features
+
+* **database:** Added `USE_EMULATOR` DI token ([#2652](https://github.com/angular/angularfire/issues/2652)) ([8d3093f](https://github.com/angular/angularfire/commit/8d3093f))
+* **fcm:** Added `VAPID_KEY`, `SERVICE_WORKER`, and `USE_EMULATOR` DI tokens ([#2652](https://github.com/angular/angularfire/issues/2652)) ([8d3093f](https://github.com/angular/angularfire/commit/8d3093f))
+* **fcm:** `deleteToken`'s token argument is now optional, reflecting Firebase v8 changes ([#2652](https://github.com/angular/angularfire/issues/2652)) ([8d3093f](https://github.com/angular/angularfire/commit/8d3093f))
+* **auth:** Added `SETTINGS`, `TENANT_ID`, `LANGUAGE_CODE`, `USE_DEVICE_LANGUAGE`, `USE_EMULATOR` and `PERSISTENCE` DI tokens ([#2652](https://github.com/angular/angularfire/issues/2652)) ([8d3093f](https://github.com/angular/angularfire/commit/8d3093f))
+* **functions:** Added `USE_EMULATOR` and `NEW_ORIGIN_BEHAVIOR` DI token to opt-into the new way of setting `ORIGIN` ([#2652](https://github.com/angular/angularfire/issues/2652)) ([8d3093f](https://github.com/angular/angularfire/commit/8d3093f))
+* **functions:** `httpsCallable` function now takes in `HttpsCallableOptions` ([#2652](https://github.com/angular/angularfire/issues/2652)) ([8d3093f](https://github.com/angular/angularfire/commit/8d3093f))
+* **storage:** Added `MAX_UPLOAD_RETRY_TIME` and `MAX_OPERATION_RETRY_TIME` DI tokens ([#2652](https://github.com/angular/angularfire/issues/2652)) ([8d3093f](https://github.com/angular/angularfire/commit/8d3093f))
+
+
+<a name="6.1.0-rc.1"></a>
+# [6.1.0-rc.1](https://github.com/angular/angularfire/compare/6.1.0-rc.0...6.1.0-rc.1) (2020-11-12)
+
+### Bug Fixes
+
+* **firestore:** doc and collection methods generic ([#2649](https://github.com/angular/angularfire/issues/2649)) ([796b7c1](https://github.com/angular/angularfire/commit/796b7c1))
+
+
+### Features
+
+* **firestore:** Inherit doc return type from class ([#2640](https://github.com/angular/angularfire/issues/2640)) ([f7bbd09](https://github.com/angular/angularfire/commit/f7bbd09))
+* **firestore:** map document ID to the provided idField in a collection group query ([#2580](https://github.com/angular/angularfire/issues/2580)) ([dbf31d9](https://github.com/angular/angularfire/commit/dbf31d9))
+* **auth-guard:** add support for specifying a `string` to redirect to ([#2448](https://github.com/angular/angularfire/issues/2448)) ([fe31191](https://github.com/angular/angularfire/commit/fe31191)), closes [#2287](https://github.com/angular/angularfire/issues/2287) [#2144](https://github.com/angular/angularfire/issues/2144)
+* **database:** add option to include key on `valueChanges()` ([#2126](https://github.com/angular/angularfire/issues/2126)) ([5cdb8ce](https://github.com/angular/angularfire/commit/5cdb8ce))
+* **deploy:** More deploy options ([#2647](https://github.com/angular/angularfire/issues/2647)) ([1bbd3e4](https://github.com/angular/angularfire/commit/1bbd3e4))
+* **firestore:** options to include document ID on valueChanges() ([#2113](https://github.com/angular/angularfire/issues/2113)) ([09ed22a](https://github.com/angular/angularfire/commit/09ed22a))
+* **functions:** Add options param to httpsCallable functions ([#2434](https://github.com/angular/angularfire/issues/2434)) ([f8d5a50](https://github.com/angular/angularfire/commit/f8d5a50)), closes [#2433](https://github.com/angular/angularfire/issues/2433)
+* **schematics:** support FIREBASE_TOKEN for `ng deploy` ([#2327](https://github.com/angular/angularfire/issues/2327)) ([dd92869](https://github.com/angular/angularfire/commit/dd92869))
+* **storage:** getDownloadURL pipe ([#2648](https://github.com/angular/angularfire/issues/2648)) ([0d799da](https://github.com/angular/angularfire/commit/0d799da))
+
+
+
+<a name="6.1.0-rc.0"></a>
+# [6.1.0-rc.0](https://github.com/angular/angularfire/compare/6.0.5...6.1.0-rc.0) (2020-11-11)
+
+
+### Bug Fixes
+
+* **deploy:** remove direct workspace access ([#2643](https://github.com/angular/angularfire/issues/2643)) ([7e1918a](https://github.com/angular/angularfire/commit/7e1918a))
+* **schematics:** remove experimental workspace API type usage ([#2644](https://github.com/angular/angularfire/issues/2644)) ([b976c58](https://github.com/angular/angularfire/commit/b976c58))
+
+
+### Features
+
+* **core:** Support Angular 11
+
+
+<a name="6.0.5"></a>
+# [6.0.5](https://github.com/angular/angularfire/compare/6.0.4...6.0.5) (2020-11-10)
+
+
+### Bug Fixes
+
+* **core:** proxy-polyfill support and various other small fixes ([#2633](https://github.com/angular/angularfire/issues/2633)) ([af238cd](https://github.com/angular/angularfire/commit/af238cd))
+
+
+<a name="6.0.4"></a>
+# [6.0.4](https://github.com/angular/angularfire2/compare/6.0.3...6.0.4) (2020-10-30)
+
+
+### Bug Fixes
+
+* **analytics:** `UserTrackingService` and `ScreenTrackingService` should be opt-in, rather than opt-out ([#2605](https://github.com/angular/angularfire2/issues/2605)) ([92f7aaf](https://github.com/angular/angularfire2/commit/92f7aaf))
+* **auth:** addressing observable errors in non-browser environments ([#2626](https://github.com/angular/angularfire2/issues/2626)) ([120c854](https://github.com/angular/angularfire2/commit/120c854))
+
+
+### Features
+
+* **core:** Support Firebase v8 ([#2624](https://github.com/angular/angularfire2/issues/2624)) ([082c0de](https://github.com/angular/angularfire2/commit/082c0de))
+
+
+
+<a name="6.0.3"></a>
+# [6.0.3](https://github.com/angular/angularfire2/compare/6.0.2...6.0.3) (2020-09-25)
+
+
+### Bug Fixes
+
+* **perf:** Fixing configuration regression with performance monitoring ([#2597](https://github.com/angular/angularfire2/issues/2597)) ([1608676](https://github.com/angular/angularfire2/commit/1608676))
+* **fcm:** Fixing Zone.js and other various regressions ([#2597](https://github.com/angular/angularfire2/issues/2597)) ([1608676](https://github.com/angular/angularfire2/commit/1608676))
+* **analytics:** Fix custom data layer function keeping Analytics from functioning ([#2594](https://github.com/angular/angularfire2/issues/2594)) ([77a9a15](https://github.com/angular/angularfire2/commit/77a9a15)), closes [#2505](https://github.com/angular/angularfire2/issues/2505)
+* **core:** NG10-style ModuleWithProviders ([#2527](https://github.com/angular/angularfire2/issues/2527)) ([93912bc](https://github.com/angular/angularfire2/commit/93912bc))
+* **core:** NG 10 support and various fixes ([#2522](https://github.com/angular/angularfire2/issues/2522)) ([7cb6c03](https://github.com/angular/angularfire2/commit/7cb6c03))
+
 <a name="6.0.2"></a>
 # [6.0.2](https://github.com/angular/angularfire2/compare/6.0.1...6.0.2) (2020-06-24)
 

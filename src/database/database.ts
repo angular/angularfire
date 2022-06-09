@@ -1,83 +1,30 @@
-import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
-import { AngularFireList, AngularFireObject, DatabaseQuery, PathReference, QueryFn } from './interfaces';
-import { getRef } from './utils';
-import { createListReference } from './list/create-reference';
-import { createObjectReference } from './object/create-reference';
-import {
-  FIREBASE_APP_NAME,
-  FIREBASE_OPTIONS,
-  FirebaseAppConfig,
-  FirebaseOptions,
-  ɵAngularFireSchedulers,
-  ɵfirebaseAppFactory,
-  ɵkeepUnstableUntilFirstFactory
-} from '@angular/fire';
-import { Observable } from 'rxjs';
-import { database } from 'firebase/app';
-import 'firebase/database';
-import { registerDatabase } from '@firebase/database';
-import firebase from 'firebase/app';
+import { Database as FirebaseDatabase } from 'firebase/database';
+import { ɵgetAllInstancesOf } from '@angular/fire';
+import { from, timer } from 'rxjs';
+import { concatMap, distinct } from 'rxjs/operators';
 
-export const URL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
+// see notes in core/firebase.app.module.ts for why we're building the class like this
+// tslint:disable-next-line:no-empty-interface
+export interface Database extends FirebaseDatabase {}
 
-@Injectable({
-  providedIn: 'any'
-})
-export class AngularFireDatabase {
-  public readonly database: database.Database;
-
-  public readonly schedulers: ɵAngularFireSchedulers;
-  public readonly keepUnstableUntilFirst: <T>(obs$: Observable<T>) => Observable<T>;
-
-  constructor(
-    @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
-    @Optional() @Inject(FIREBASE_APP_NAME) nameOrConfig: string | FirebaseAppConfig | null | undefined,
-    @Optional() @Inject(URL) databaseURL: string | null,
-    // tslint:disable-next-line:ban-types
-    @Inject(PLATFORM_ID) platformId: Object,
-    zone: NgZone
-  ) {
-    this.schedulers = new ɵAngularFireSchedulers(zone);
-    this.keepUnstableUntilFirst = ɵkeepUnstableUntilFirstFactory(this.schedulers);
-
-    this.database = zone.runOutsideAngular(() => {
-      const app = ɵfirebaseAppFactory(options, zone, nameOrConfig);
-      if (registerDatabase) {
-        registerDatabase(firebase as any);
-      }
-      return app.database(databaseURL || undefined);
-    });
+export class Database {
+  constructor(database: FirebaseDatabase) {
+    return database;
   }
-
-  list<T>(pathOrRef: PathReference, queryFn?: QueryFn): AngularFireList<T> {
-    const ref = getRef(this.database, pathOrRef);
-    let query: DatabaseQuery = ref;
-    if (queryFn) {
-      query = queryFn(ref);
-    }
-    return createListReference<T>(query, this);
-  }
-
-  object<T>(pathOrRef: PathReference): AngularFireObject<T> {
-    const ref = getRef(this.database, pathOrRef);
-    return createObjectReference<T>(ref, this);
-  }
-
-  createPushId() {
-    return this.database.ref().push().key;
-  }
-
 }
 
-export {
-  PathReference,
-  DatabaseSnapshot,
-  ChildEvent,
-  ListenEvent,
-  QueryFn,
-  AngularFireList,
-  AngularFireObject,
-  AngularFireAction,
-  Action,
-  SnapshotAction
-} from './interfaces';
+export const DATABASE_PROVIDER_NAME = 'database';
+
+// tslint:disable-next-line:no-empty-interface
+export interface DatabaseInstances extends Array<FirebaseDatabase> {}
+
+export class DatabaseInstances {
+  constructor() {
+    return ɵgetAllInstancesOf<FirebaseDatabase>(DATABASE_PROVIDER_NAME);
+  }
+}
+
+export const databaseInstance$ = timer(0, 300).pipe(
+  concatMap(() => from(ɵgetAllInstancesOf<FirebaseDatabase>(DATABASE_PROVIDER_NAME))),
+  distinct(),
+);

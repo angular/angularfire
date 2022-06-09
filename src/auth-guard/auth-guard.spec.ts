@@ -1,22 +1,34 @@
 import { TestBed } from '@angular/core/testing';
-import { AngularFireModule, FirebaseApp } from '@angular/fire';
+import { FirebaseApp, provideFirebaseApp, getApp, initializeApp, deleteApp } from '@angular/fire/app';
+import { Auth, provideAuth, getAuth, connectAuthEmulator } from '@angular/fire/auth';
 import { COMMON_CONFIG } from '../test-config';
-import { AngularFireAuthGuard, AngularFireAuthGuardModule } from './public_api';
+import { AuthGuard, AuthGuardModule } from '@angular/fire/auth-guard';
 import { Router, RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
-import { rando } from '../firestore/utils.spec';
+import { rando } from '../utils';
 
-describe('AngularFireAuthGuard', () => {
+class TestComponent { }
+
+describe('AuthGuard', () => {
   let app: FirebaseApp;
+  let auth: Auth;
+  let authGuard: AuthGuard;
   let router: Router;
+  let appName: string;
 
   beforeEach(() => {
+    appName = rando();
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
-        AngularFireAuthGuardModule,
+        provideFirebaseApp(() => initializeApp(COMMON_CONFIG, appName)),
+        provideAuth(() => {
+          const auth = getAuth(getApp(appName));
+          connectAuthEmulator(auth, 'http://localhost:9099');
+          return auth;
+        }),
+        AuthGuardModule,
         RouterModule.forRoot([
-          { path: 'a', redirectTo: '/', canActivate: [AngularFireAuthGuard] }
+          { path: 'a', component: TestComponent, canActivate: [AuthGuard] }
         ])
       ],
       providers: [
@@ -25,14 +37,17 @@ describe('AngularFireAuthGuard', () => {
     });
 
     app = TestBed.inject(FirebaseApp);
+    auth = TestBed.inject(Auth);
+    authGuard = TestBed.inject(AuthGuard);
     router = TestBed.inject(Router);
   });
 
-  afterEach(done => {
-    app.delete().then(done, done);
+  it('should be injectable', () => {
+    expect(AuthGuard).toBeTruthy();
   });
 
-  it('should be injectable', () => {
+  it('router should be valid', () => {
     expect(router).toBeTruthy();
   });
+
 });

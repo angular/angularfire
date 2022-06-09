@@ -1,14 +1,60 @@
 import { BuilderContext, targetFromTargetString } from '@angular-devkit/architect';
-import { BuildTarget, FirebaseTools, FSHost } from '../interfaces';
+import { BuildTarget, CloudRunOptions, DeployBuilderSchema, FirebaseTools, FSHost } from '../interfaces';
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'fs';
 import { copySync, removeSync } from 'fs-extra';
 import { dirname, join } from 'path';
-import { execSync } from 'child_process';
-import { defaultFunction, defaultPackage, NODE_VERSION } from './functions-templates';
-import { experimental } from '@angular-devkit/core';
-import { SchematicsException } from '@angular-devkit/schematics';
+import { execSync, spawn, SpawnOptionsWithoutStdio } from 'child_process';
+import { defaultFunction, functionGen2, defaultPackage, DEFAULT_FUNCTION_NAME, dockerfile } from './functions-templates';
 import { satisfies } from 'semver';
-import * as open from 'open';
+import open from 'open';
+import { SchematicsException } from '@angular-devkit/schematics';
+import { firebaseFunctionsDependencies } from '../versions.json';
+import * as winston from 'winston';
+import tripleBeam from 'triple-beam';
+import * as inquirer from 'inquirer';
+
+const DEFAULT_EMULATOR_PORT = 5000;
+const DEFAULT_EMULATOR_HOST = 'localhost';
+
+const DEFAULT_CLOUD_RUN_OPTIONS: Partial<CloudRunOptions> = {
+  memory: '1Gi',
+  timeout: 60,
+  maxInstances: 'default',
+  maxConcurrency: 'default', // TODO tune concurrency for cloud run + angular
+  minInstances: 'default',
+  cpus: 1,
+};
+
+const spawnAsync = async (
+  command: string,
+  options?: SpawnOptionsWithoutStdio
+) =>
+  new Promise<Buffer>((resolve, reject) => {
+    const [spawnCommand, ...args] = command.split(/\s+/);
+    const spawnProcess = spawn(spawnCommand, args, options);
+    const chunks: Buffer[] = [];
+    const errorChunks: Buffer[] = [];
+    spawnProcess.stdout.on('data', (data) => {
+      process.stdout.write(data.toString());
+      chunks.push(data);
+    });
+    spawnProcess.stderr.on('data', (data) => {
+      process.stderr.write(data.toString());
+      errorChunks.push(data);
+    });
+    spawnProcess.on('error', (error) => {
+      reject(error);
+    });
+    spawnProcess.on('close', (code) => {
+      if (code === 1) {
+        reject(Buffer.concat(errorChunks).toString());
+        return;
+      }
+      resolve(Buffer.concat(chunks));
+    });
+  });
+
+export type DeployBuilderOptions = DeployBuilderSchema & Record<string, any>;
 
 const escapeRegExp = (str: string) => str.replace(/[\-\[\]\/{}()*+?.\\^$|]/g, '\\$&');
 
@@ -17,262 +63,430 @@ const moveSync = (src: string, dest: string) => {
   removeSync(src);
 };
 
-const deployToHosting = (
+const deployToHosting = async (
   firebaseTools: FirebaseTools,
   context: BuilderContext,
   workspaceRoot: string,
-  preview: boolean
+  options: DeployBuilderOptions,
+  firebaseToken?: string,
 ) => {
 
-  if (preview) {
-    const port = 5000; // TODO make this configurable
+  // tslint:disable-next-line:no-non-null-assertion
+  const siteTarget = options.target ?? context.target!.project;
 
-    setTimeout(() => {
-      open(`http://localhost:${port}`);
-    }, 1500);
+  if (options.preview) {
 
-    return firebaseTools.serve({ port, targets: ['hosting'], host: 'localhost' }).then(() =>
-      require('inquirer').prompt({
-        type: 'confirm',
-        name: 'deployProject',
-        message: 'Would you like to deploy your application to Firebase Hosting?'
-      })
-    ).then(({ deployProject }: { deployProject: boolean }) => {
-      if (deployProject) {
-        return firebaseTools.deploy({
-          // tslint:disable-next-line:no-non-null-assertion
-          only: 'hosting:' + context.target!.project,
-          cwd: workspaceRoot
-        });
-      } else {
-        return Promise.resolve();
-      }
+    await firebaseTools.serve({
+      port: DEFAULT_EMULATOR_PORT,
+      host: DEFAULT_EMULATOR_HOST,
+      targets: [`hosting:${siteTarget}`],
+      nonInteractive: true,
+      projectRoot: workspaceRoot,
     });
 
-  } else {
-
-    return firebaseTools.deploy({
-      // tslint:disable-next-line:no-non-null-assertion
-      only: 'hosting:' + context.target!.project,
-      cwd: workspaceRoot
+    const { deployProject } = await inquirer.prompt({
+      type: 'confirm',
+      name: 'deployProject',
+      message: 'Would you like to deploy your application to Firebase Hosting?'
     });
+
+    if (!deployProject) { return; }
 
   }
+
+  return await firebaseTools.deploy({
+    only: `hosting:${siteTarget}`,
+    cwd: workspaceRoot,
+    token: firebaseToken,
+    nonInteractive: true,
+    projectRoot: workspaceRoot,
+  });
+
 };
 
 const defaultFsHost: FSHost = {
   moveSync,
   writeFileSync,
-  renameSync
+  renameSync,
+  copySync,
+  removeSync,
+  existsSync,
 };
 
-const getVersionRange = (v: number) => `^${v}.0.0`;
-
-const findPackageVersion = (name: string) => {
-  const match = execSync(`npm list ${name}`).toString().match(` ${escapeRegExp(name)}@.+\\w`);
-  return match ? match[0].split(`${name}@`)[1] : null;
+const findPackageVersion = (packageManager: string, name: string) => {
+  const match = execSync(`${packageManager} list ${name}`).toString().match(`[^|\s]${escapeRegExp(name)}[@| ][^\s]+(\s.+)?$`);
+  return match ? match[0].split(new RegExp(`${escapeRegExp(name)}[@| ]`))[1].split(/\s/)[0] : null;
 };
 
-const getPackageJson = (context: BuilderContext, workspaceRoot: string) => {
-  const dependencies = {
-    'firebase-admin': 'latest',
-    'firebase-functions': 'latest'
-  };
-  const devDependencies = {
-    'firebase-functions-test': 'latest'
-  };
-  Object.keys(dependencies).forEach((dependency: string) => {
-    const packageVersion = findPackageVersion(dependency);
-    if (packageVersion) { dependencies[dependency] = packageVersion; }
-  });
-  Object.keys(devDependencies).forEach((devDependency: string) => {
-    const packageVersion = findPackageVersion(devDependency);
-    if (packageVersion) { devDependencies[devDependency] = packageVersion; }
-  });
+const getPackageJson = (context: BuilderContext, workspaceRoot: string, options: DeployBuilderOptions, main?: string) => {
+  const dependencies: Record<string, string> = {};
+  const devDependencies: Record<string, string> = {};
+  if (options.ssr !== 'cloud-run') {
+    Object.keys(firebaseFunctionsDependencies).forEach(name => {
+      const { version, dev } = firebaseFunctionsDependencies[name];
+      (dev ? devDependencies : dependencies)[name] = version;
+    });
+  }
   if (existsSync(join(workspaceRoot, 'angular.json'))) {
     const angularJson = JSON.parse(readFileSync(join(workspaceRoot, 'angular.json')).toString());
+    const packageManager = angularJson.cli?.packageManager ?? 'npm';
     // tslint:disable-next-line:no-non-null-assertion
     const server = angularJson.projects[context.target!.project].architect.server;
-    const serverOptions = server && server.options;
-    const externalDependencies = serverOptions && serverOptions.externalDependencies || [];
-    const bundleDependencies = serverOptions && serverOptions.bundleDependencies;
-    if (bundleDependencies !== true) {
+    const externalDependencies = server?.options?.externalDependencies || [];
+    const bundleDependencies = server?.options?.bundleDependencies ?? true;
+    if (bundleDependencies) {
+      externalDependencies.forEach(externalDependency => {
+        const packageVersion = findPackageVersion(packageManager, externalDependency);
+        if (packageVersion) { dependencies[externalDependency] = packageVersion; }
+      });
+    } else {
       if (existsSync(join(workspaceRoot, 'package.json'))) {
         const packageJson = JSON.parse(readFileSync(join(workspaceRoot, 'package.json')).toString());
         Object.keys(packageJson.dependencies).forEach((dependency: string) => {
           dependencies[dependency] = packageJson.dependencies[dependency];
         });
       } // TODO should we throw?
-    } else {
-      externalDependencies.forEach(externalDependency => {
-        const packageVersion = findPackageVersion(externalDependency);
-        if (packageVersion) { dependencies[externalDependency] = packageVersion; }
-      });
     }
-  } // TODO should we throw?
-  return defaultPackage(dependencies, devDependencies);
+  }
+  // TODO should we throw?
+  return defaultPackage(dependencies, devDependencies, options, main);
 };
 
 export const deployToFunction = async (
   firebaseTools: FirebaseTools,
   context: BuilderContext,
   workspaceRoot: string,
-  project: experimental.workspace.WorkspaceTool,
-  preview: boolean,
+  staticBuildTarget: BuildTarget,
+  serverBuildTarget: BuildTarget,
+  options: DeployBuilderOptions,
+  firebaseToken?: string,
   fsHost: FSHost = defaultFsHost
 ) => {
-  if (!satisfies(process.versions.node, getVersionRange(NODE_VERSION))) {
+
+  const staticBuildOptions = await context.getTargetOptions(targetFromTargetString(staticBuildTarget.name));
+  if (!staticBuildOptions.outputPath || typeof staticBuildOptions.outputPath !== 'string') {
+    throw new Error(
+      `Cannot read the output path option of the Angular project '${staticBuildTarget.name}' in angular.json`
+    );
+  }
+
+  const serverBuildOptions = await context.getTargetOptions(targetFromTargetString(serverBuildTarget.name));
+  if (!serverBuildOptions.outputPath || typeof serverBuildOptions.outputPath !== 'string') {
+    throw new Error(
+      `Cannot read the output path option of the Angular project '${serverBuildTarget.name}' in angular.json`
+    );
+  }
+
+  const staticOut = join(workspaceRoot, staticBuildOptions.outputPath);
+  const serverOut = join(workspaceRoot, serverBuildOptions.outputPath);
+
+  const functionsOut = options.outputPath ? join(workspaceRoot, options.outputPath) : dirname(serverOut);
+  const functionName = options.functionName || DEFAULT_FUNCTION_NAME;
+
+  const newStaticOut = join(functionsOut, staticBuildOptions.outputPath);
+  const newServerOut = join(functionsOut, serverBuildOptions.outputPath);
+
+  // New behavior vs. old
+  if (options.outputPath) {
+    fsHost.removeSync(functionsOut);
+    fsHost.copySync(staticOut, newStaticOut);
+    fsHost.copySync(serverOut, newServerOut);
+  } else {
+    fsHost.moveSync(staticOut, newStaticOut);
+    fsHost.moveSync(serverOut, newServerOut);
+  }
+
+  const packageJson = getPackageJson(context, workspaceRoot, options);
+  const nodeVersion = packageJson.engines.node;
+
+  if (!satisfies(process.versions.node, nodeVersion.toString())) {
     context.logger.warn(
-      `⚠️ Your Node.js version (${process.versions.node}) does not match the Firebase Functions runtime (${NODE_VERSION}).`
+      `⚠️ Your Node.js version (${process.versions.node}) does not match the Firebase Functions runtime (${nodeVersion}).`
     );
   }
 
-  if (
-    !project ||
-    !project.build ||
-    !project.build.options ||
-    !project.build.options.outputPath
-  ) {
-    throw new SchematicsException(
-      `Cannot read the output path (architect.build.options.outputPath) of the Angular project in angular.json`
+  const functionsPackageJsonPath = join(functionsOut, 'package.json');
+  fsHost.writeFileSync(
+    functionsPackageJsonPath,
+    JSON.stringify(packageJson, null, 2)
+  );
+
+  if (options.CF3v2) {
+    fsHost.writeFileSync(
+      join(functionsOut, 'index.js'),
+      functionGen2(serverBuildOptions.outputPath, options, functionName)
+    );
+  } else {
+    fsHost.writeFileSync(
+      join(functionsOut, 'index.js'),
+      defaultFunction(serverBuildOptions.outputPath, options, functionName)
     );
   }
 
-  if (
-    !project ||
-    !project.server ||
-    !project.server.options ||
-    !project.server.options.outputPath
-  ) {
-    throw new SchematicsException(
-      `Cannot read the output path (architect.server.options.outputPath) of the Angular project in angular.json`
+  if (!options.prerender) {
+    try {
+      fsHost.renameSync(
+        join(newStaticOut, 'index.html'),
+        join(newStaticOut, 'index.original.html')
+      );
+    } catch (e) { }
+  }
+
+  // tslint:disable-next-line:no-non-null-assertion
+  const siteTarget = options.target ?? context.target!.project;
+
+  if (fsHost.existsSync(functionsPackageJsonPath)) {
+    execSync(`npm --prefix ${functionsOut} install`);
+  } else {
+    console.error(`No package.json exists at ${functionsOut}`);
+  }
+
+  if (options.preview) {
+
+    await firebaseTools.serve({
+      port: DEFAULT_EMULATOR_PORT,
+      host: DEFAULT_EMULATOR_HOST,
+      targets: [`hosting:${siteTarget}`, `functions:${functionName}`],
+      nonInteractive: true,
+      projectRoot: workspaceRoot,
+    });
+
+    const { deployProject} = await inquirer.prompt({
+      type: 'confirm',
+      name: 'deployProject',
+      message: 'Would you like to deploy your application to Firebase Hosting & Cloud Functions?'
+    });
+
+    if (!deployProject) { return; }
+  }
+
+  return await firebaseTools.deploy({
+    only: `hosting:${siteTarget},functions:${functionName}`,
+    cwd: workspaceRoot,
+    token: firebaseToken,
+    nonInteractive: true,
+    projectRoot: workspaceRoot,
+  });
+
+};
+
+
+export const deployToCloudRun = async (
+  firebaseTools: FirebaseTools,
+  context: BuilderContext,
+  workspaceRoot: string,
+  staticBuildTarget: BuildTarget,
+  serverBuildTarget: BuildTarget,
+  options: DeployBuilderOptions,
+  firebaseToken?: string,
+  fsHost: FSHost = defaultFsHost
+) => {
+
+  const staticBuildOptions = await context.getTargetOptions(targetFromTargetString(staticBuildTarget.name));
+  if (!staticBuildOptions.outputPath || typeof staticBuildOptions.outputPath !== 'string') {
+    throw new Error(
+      `Cannot read the output path option of the Angular project '${staticBuildTarget.name}' in angular.json`
     );
   }
 
-  const staticOut = project.build.options.outputPath;
-  const serverOut = project.server.options.outputPath;
-  const newClientPath = join(dirname(staticOut), staticOut);
-  const newServerPath = join(dirname(serverOut), serverOut);
+  const serverBuildOptions = await context.getTargetOptions(targetFromTargetString(serverBuildTarget.name));
+  if (!serverBuildOptions.outputPath || typeof serverBuildOptions.outputPath !== 'string') {
+    throw new Error(
+      `Cannot read the output path option of the Angular project '${serverBuildTarget.name}' in angular.json`
+    );
+  }
+
+  const staticOut = join(workspaceRoot, staticBuildOptions.outputPath);
+  const serverOut = join(workspaceRoot, serverBuildOptions.outputPath);
+
+  const cloudRunOut = options.outputPath ? join(workspaceRoot, options.outputPath) : join(dirname(serverOut), 'run');
+  const serviceId = options.functionName || DEFAULT_FUNCTION_NAME;
+
+  const newStaticOut = join(cloudRunOut, staticBuildOptions.outputPath);
+  const newServerOut = join(cloudRunOut, serverBuildOptions.outputPath);
 
   // This is needed because in the server output there's a hardcoded dependency on $cwd/dist/browser,
   // This assumes that we've deployed our application dist directory and we're running the server
   // in the parent directory. To have this precondition, we move dist/browser to dist/dist/browser
   // since the firebase function runs the server from dist.
-  fsHost.moveSync(staticOut, newClientPath);
-  fsHost.moveSync(serverOut, newServerPath);
+  fsHost.removeSync(cloudRunOut);
+  fsHost.copySync(staticOut, newStaticOut);
+  fsHost.copySync(serverOut, newServerOut);
 
-  fsHost.writeFileSync(
-    join(dirname(serverOut), 'package.json'),
-    getPackageJson(context, workspaceRoot)
-  );
+  const packageJson = getPackageJson(context, workspaceRoot, options, join(serverBuildOptions.outputPath, 'main.js'));
+  const nodeVersion = packageJson.engines.node;
 
-  fsHost.writeFileSync(
-    join(dirname(serverOut), 'index.js'),
-    defaultFunction(serverOut)
-  );
-
-  fsHost.renameSync(
-    join(newClientPath, 'index.html'),
-    join(newClientPath, 'index.original.html')
-  );
-
-  if (preview) {
-    const port = 5000; // TODO make this configurable
-
-    setTimeout(() => {
-      open(`http://localhost:${port}`);
-    }, 1500);
-
-    return firebaseTools.serve({ port, targets: ['hosting', 'functions'], host: 'localhost'}).then(() =>
-      require('inquirer').prompt({
-        type: 'confirm',
-        name: 'deployProject',
-        message: 'Would you like to deploy your application to Firebase Hosting & Cloud Functions?'
-      })
-    ).then(({ deployProject }: { deployProject: boolean }) => {
-      if (deployProject) {
-        return firebaseTools.deploy({
-          // tslint:disable-next-line:no-non-null-assertion
-          only: `hosting:${context.target!.project},functions:ssr`,
-          cwd: workspaceRoot
-        });
-      } else {
-        return Promise.resolve();
-      }
-    });
-  } else {
-    return firebaseTools.deploy({
-      // tslint:disable-next-line:no-non-null-assertion
-      only: `hosting:${context.target!.project},functions:ssr`,
-      cwd: workspaceRoot
-    });
+  if (!satisfies(process.versions.node, nodeVersion.toString())) {
+    context.logger.warn(
+      `⚠️ Your Node.js version (${process.versions.node}) does not match the Cloud Run runtime (${nodeVersion}).`
+    );
   }
+
+  fsHost.writeFileSync(
+    join(cloudRunOut, 'package.json'),
+    JSON.stringify(packageJson, null, 2),
+  );
+
+  fsHost.writeFileSync(
+    join(cloudRunOut, 'Dockerfile'),
+    dockerfile(options)
+  );
+
+  if (!options.prerender) {
+    try {
+      fsHost.renameSync(
+        join(newStaticOut, 'index.html'),
+        join(newStaticOut, 'index.original.html')
+      );
+    } catch (e) { }
+  }
+
+  if (options.preview) {
+    throw new SchematicsException('Cloud Run preview not supported.');
+  }
+
+  const deployArguments: Array<any> = [];
+  const cloudRunOptions = options.cloudRunOptions || {};
+  Object.entries(DEFAULT_CLOUD_RUN_OPTIONS).forEach(([k, v]) => {
+    cloudRunOptions[k] ||= v;
+  });
+  // lean on the schema for validation (rather than sanitize)
+  if (cloudRunOptions.cpus) { deployArguments.push('--cpu', cloudRunOptions.cpus); }
+  if (cloudRunOptions.maxConcurrency) { deployArguments.push('--concurrency', cloudRunOptions.maxConcurrency); }
+  if (cloudRunOptions.maxInstances) { deployArguments.push('--max-instances', cloudRunOptions.maxInstances); }
+  if (cloudRunOptions.memory) { deployArguments.push('--memory', cloudRunOptions.memory); }
+  if (cloudRunOptions.minInstances) { deployArguments.push('--min-instances', cloudRunOptions.minInstances); }
+  if (cloudRunOptions.timeout) { deployArguments.push('--timeout', cloudRunOptions.timeout); }
+  if (cloudRunOptions.vpcConnector) { deployArguments.push('--vpc-connector', cloudRunOptions.vpcConnector); }
+
+  // TODO validate serviceId, firebaseProject, and vpcConnector both to limit errors and opp for injection
+
+  context.logger.info(`📦 Deploying to Cloud Run`);
+  await spawnAsync(`gcloud builds submit ${cloudRunOut} --tag gcr.io/${options.firebaseProject}/${serviceId} --project ${options.firebaseProject} --quiet`);
+  await spawnAsync(`gcloud run deploy ${serviceId} --image gcr.io/${options.firebaseProject}/${serviceId} --project ${options.firebaseProject} ${deployArguments.join(' ')} --platform managed --allow-unauthenticated --region=${options.region} --quiet`);
+
+  // tslint:disable-next-line:no-non-null-assertion
+  const siteTarget = options.target ?? context.target!.project;
+
+  // TODO deploy cloud run
+  return await firebaseTools.deploy({
+    only: `hosting:${siteTarget}`,
+    cwd: workspaceRoot,
+    token: firebaseToken,
+    nonInteractive: true,
+    projectRoot: workspaceRoot,
+  });
 };
 
 export default async function deploy(
   firebaseTools: FirebaseTools,
   context: BuilderContext,
-  projectTargets: experimental.workspace.WorkspaceTool,
-  buildTargets: BuildTarget[],
+  staticBuildTarget: BuildTarget,
+  serverBuildTarget: BuildTarget | undefined,
+  prerenderBuildTarget: BuildTarget | undefined,
   firebaseProject: string,
-  ssr: boolean,
-  preview: boolean
+  options: DeployBuilderOptions,
+  firebaseToken?: string,
 ) {
-  await firebaseTools.login();
-
-  if (!context.target) {
-    throw new Error('Cannot execute the build target');
+  if (!firebaseToken) {
+    await firebaseTools.login();
+    const user = await firebaseTools.login({ projectRoot: context.workspaceRoot });
+    console.log(`Logged into Firebase as ${user.email}.`);
   }
 
-  context.logger.info(`📦 Building "${context.target.project}"`);
+  if (prerenderBuildTarget) {
 
-  for (const target of buildTargets) {
     const run = await context.scheduleTarget(
-      targetFromTargetString(target.name),
-      target.options
+      targetFromTargetString(prerenderBuildTarget.name),
+      prerenderBuildTarget.options
     );
     await run.result;
+
+  } else {
+
+    if (!context.target) {
+      throw new Error('Cannot execute the build target');
+    }
+
+    context.logger.info(`📦 Building "${context.target.project}"`);
+
+    const builders = [
+      context.scheduleTarget(
+        targetFromTargetString(staticBuildTarget.name),
+        staticBuildTarget.options
+      ).then(run => run.result)
+    ];
+
+    if (serverBuildTarget) {
+      builders.push(context.scheduleTarget(
+        targetFromTargetString(serverBuildTarget.name),
+        serverBuildTarget.options
+      ).then(run => run.result));
+    }
+
+    await Promise.all(builders);
   }
 
   try {
-    await firebaseTools.use(firebaseProject, { project: firebaseProject });
+    await firebaseTools.use(firebaseProject, {
+      project: firebaseProject,
+      projectRoot: context.workspaceRoot,
+    });
   } catch (e) {
     throw new Error(`Cannot select firebase project '${firebaseProject}'`);
   }
 
-  try {
-    const winston = require('winston');
-    const tripleBeam = require('triple-beam');
+  options.firebaseProject = firebaseProject;
 
-    firebaseTools.logger.add(
-      new winston.transports.Console({
-        level: 'info',
-        format: winston.format.printf((info) =>
-          [info.message, ...(info[tripleBeam.SPLAT] || [])]
-            .filter((chunk) => typeof chunk === 'string')
-            .join(' ')
-        )
-      })
-    );
+  const logger = new winston.transports.Console({
+    level: 'info',
+    format: winston.format.printf((info) => {
+      const emulator = info[tripleBeam.SPLAT as any]?.[1]?.metadata?.emulator;
+      const text = info[tripleBeam.SPLAT as any]?.[0];
+      if (text?.replace) {
+        const plainText = text.replace(/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]/g, '');
+        if (emulator?.name === 'hosting' && plainText.startsWith('Local server: ')) {
+          open(plainText.split(': ')[1]);
+        }
+      }
+      return [info.message, ...(info[tripleBeam.SPLAT as any] || [])]
+        .filter((chunk) => typeof chunk === 'string')
+        .join(' ');
+    })
+  });
 
-    if (ssr) {
+  firebaseTools.logger.logger.add(logger);
+
+  if (serverBuildTarget) {
+    if (options.ssr === 'cloud-run') {
+      await deployToCloudRun(
+        firebaseTools,
+        context,
+        context.workspaceRoot,
+        staticBuildTarget,
+        serverBuildTarget,
+        options,
+        firebaseToken,
+      );
+    } else {
       await deployToFunction(
         firebaseTools,
         context,
         context.workspaceRoot,
-        projectTargets,
-        preview
-      );
-    } else {
-      await deployToHosting(
-        firebaseTools,
-        context,
-        context.workspaceRoot,
-        preview
+        staticBuildTarget,
+        serverBuildTarget,
+        options,
+        firebaseToken,
       );
     }
-
-  } catch (e) {
-    context.logger.error(e.message || e);
+  } else {
+    await deployToHosting(
+      firebaseTools,
+      context,
+      context.workspaceRoot,
+      options,
+      firebaseToken,
+    );
   }
+
 }

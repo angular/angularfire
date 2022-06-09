@@ -19,3 +19,9 @@ tools/build.js
 coverage
 *.log
 api-*.json
+angularfire.tgz
+unpack.sh
+publish.sh
+.firebase
+.angular
+.vscode

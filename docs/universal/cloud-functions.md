@@ -72,4 +72,4 @@ To test, spin up the emulator with `firebase serve`. Once you've confirmed it's 
 ## Additional Resources
 
 - [Universal Starter Template](https://github.com/angular/universal-starter)
-- [AngularFirebase SSR Videos](https://angularfirebase.com/tag/ssr/)
+- [FireShip: Angular Universal SSR with Firebase](https://fireship.io/lessons/angular-universal-firebase/)

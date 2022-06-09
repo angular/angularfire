@@ -1,7 +1,13 @@
 import { NgModule } from '@angular/core';
-import { AngularFireAuthGuard } from './auth-guard';
+import { AuthGuard } from './auth-guard';
+import { registerVersion } from 'firebase/app';
+import { VERSION } from '@angular/fire';
 
 @NgModule({
-  providers: [ AngularFireAuthGuard ]
+  providers: [ AuthGuard ]
 })
-export class AngularFireAuthGuardModule { }
+export class AuthGuardModule {
+  constructor() {
+    registerVersion('angularfire', VERSION.full, 'auth-guard');
+  }
+}

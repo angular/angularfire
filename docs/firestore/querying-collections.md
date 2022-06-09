@@ -83,7 +83,7 @@ size$.next('small');
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
@@ -193,7 +193,7 @@ ngOnInit() {
   ...
   // Get all the user's comments, no matter how deeply nested
   this.comments$ = afs.collectionGroup('Comments', ref => ref.where('user', '==', userId))
-                      .valueChanges({ idField });
+                      .valueChanges({ idField: 'docId' });
 }
 ```
 

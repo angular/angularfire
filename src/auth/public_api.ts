@@ -1,2 +1,4 @@
-export * from './auth';
-export * from './auth.module';
+export { Auth, AuthInstances, authInstance$ } from './auth';
+export { provideAuth, AuthModule } from './auth.module';
+export * from './rxfire';
+export * from './firebase';

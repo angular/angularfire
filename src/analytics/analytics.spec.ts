@@ -1,36 +1,46 @@
 import { TestBed } from '@angular/core/testing';
-import { AngularFireModule, FirebaseApp } from '@angular/fire';
-import { AngularFireAnalytics, AngularFireAnalyticsModule } from './public_api';
-import { COMMON_CONFIG } from '../test-config';
-import { rando } from '../firestore/utils.spec';
+import { FirebaseApp, provideFirebaseApp, getApp, initializeApp, deleteApp } from '@angular/fire/app';
+import { Analytics, provideAnalytics, getAnalytics, isSupported } from '@angular/fire/analytics';
+import { COMMON_CONFIG_TOO } from '../test-config';
+import { rando } from '../utils';
 
-
-describe('AngularFireAnalytics', () => {
+describe('Analytics', () => {
   let app: FirebaseApp;
-  let analytics: AngularFireAnalytics;
+  let analytics: Analytics;
+  let providedAnalytics: Analytics;
+  let appName: string;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
-        AngularFireAnalyticsModule
-      ]
+  beforeAll(done => {
+    // The APP_INITIALIZER that is making isSupported() sync for DI may not
+    // be done evaulating by the time we inject from the TestBed. We can
+    // ensure correct behavior by waiting for the (global) isSuppported() promise
+    // to resolve.
+    isSupported().then(() => done());
+  });
+
+  describe('single injection', () => {
+
+    beforeEach(() => {
+        appName = rando();
+        TestBed.configureTestingModule({
+            imports: [
+                provideFirebaseApp(() => initializeApp(COMMON_CONFIG_TOO, appName)),
+                provideAnalytics(() => {
+                    providedAnalytics = getAnalytics(getApp(appName));
+                    return providedAnalytics;
+                }),
+            ],
+        });
+        app = TestBed.inject(FirebaseApp);
+        analytics = TestBed.inject(Analytics);
     });
 
-    app = TestBed.inject(FirebaseApp);
-    analytics = TestBed.inject(AngularFireAnalytics);
-  });
+    it('should be injectable', () => {
+        expect(providedAnalytics).toBeTruthy();
+        expect(analytics).toEqual(providedAnalytics);
+        expect(analytics.app).toEqual(app);
+    });
 
-  afterEach(() => {
-    app.delete();
-  });
-
-  it('should be exist', () => {
-    expect(analytics instanceof AngularFireAnalytics).toBe(true);
-  });
-
-  it('should have the Firebase Functions instance', () => {
-    expect(analytics.app).toBeDefined();
   });
 
 });

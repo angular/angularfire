@@ -9,7 +9,7 @@ The `AngularFirestoreDocument` service is a wrapper around the native Firestore 
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
 import { Observable } from 'rxjs';
 
 export interface Item { name: string; }
@@ -45,7 +45,7 @@ A `DocumentChangeAction` gives you the `type` and `payload` properties. The `typ
 interface DocumentChangeAction {
   //'added' | 'modified' | 'removed';
   type: DocumentChangeType;
-  payload: DocumentChange;
+  payload: DocumentSnapshot;
 }
 
 interface DocumentChange {
@@ -69,13 +69,13 @@ interface DocumentSnapshot {
 
 There are multiple ways of streaming collection data from Firestore.
 
-### `valueChanges()`
+### `valueChanges({ idField?: string })`
 
-**What is it?** - Returns an Observable of document data. All Snapshot metadata is stripped. This method provides only the data.
+**What is it?** - Returns an Observable of document data. All Snapshot metadata is stripped. This method provides only the data. Optionally, you can pass an options object with an `idField` key containing a string. If provided, the returned object will include its document ID mapped to a property with the name provided by `idField`.
 
 **Why would you use it?** - When you just need the object data. No document metadata is attached which makes it simple to render to a view.
 
-**When would you not use it?** - When you need the `id` of the document to use data manipulation methods. This method assumes you either are saving the `id` to the document data or using a "readonly" approach.
+**When would you not use it?** - When you need document metadata.
 
 ### `snapshotChanges()`
 

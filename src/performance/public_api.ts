@@ -1,3 +1,4 @@
-export * from './performance';
-export * from './performance.module';
-export * from './performance.service';
+export { Performance, PerformanceInstances, performanceInstance$ } from './performance';
+export { providePerformance, PerformanceModule } from './performance.module';
+export * from './rxfire';
+export * from './firebase';

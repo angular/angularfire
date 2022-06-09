@@ -5,8 +5,8 @@
 Understand your Angular application's real-world performance with [Firebase Performance Monitoring](https://firebase.google.com/docs/perf-mon). Performance Monitoring automatically provides a trace for **page load** when you add `AngularFirePerformanceModule` into your App Module's imports.
 
 ```ts
-import { AngularFireModule } from '@angular/fire';
-import { AngularFirePerformanceModule, PerformanceMonitoringService } from '@angular/fire/performance';
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFirePerformanceModule, PerformanceMonitoringService } from '@angular/fire/compat/performance';
 import { environment } from '../environments/environment';
 
 @NgModule({
@@ -62,10 +62,10 @@ trace.stop();
 
 ## RXJS operators
 
-AngularFire provides a number of RXJS operaters which wrap the User Timing API. These are picked up by performance monitoring tools such as Chrome Inspector and Firebase Performance Monitoring.
+AngularFire provides a number of RXJS operators which wrap the User Timing API. These are picked up by performance monitoring tools such as Chrome Inspector and Firebase Performance Monitoring.
 
 ```ts
-import { trace } from '@angular/fire/performance';
+import { trace } from '@angular/fire/compat/performance';
 
 ...
 

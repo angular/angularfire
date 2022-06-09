@@ -1,5 +1,4 @@
-export * from './ref';
-export * from './storage';
-export * from './task';
-export * from './observable/fromTask';
-export * from './storage.module';
+export { Storage, StorageInstances, storageInstance$ } from './storage';
+export { provideStorage, StorageModule } from './storage.module';
+export * from './rxfire';
+export * from './firebase';

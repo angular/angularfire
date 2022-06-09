@@ -2,13 +2,14 @@
 
 > The FCM JavaScript API lets you receive notification messages in web apps running in browsers that support the Push API.
 
-### AngularFireMessaging is not compatible with the Angular Service Worker
+### AngularFireMessaging is not out-of-the-box compatible with the Angular Service Worker
 
-If you are using the Angular Service Worker, you are not currently able to use AngularFireMessaging.
+If you are using the Angular Service Worker, you are not currently able to use AngularFireMessaging out-of-the-box.
 If you'd like this feature please add your 👍 to [this issue](https://github.com/angular/angular/issues/34352).
 
 Your alternatives are to use
 - [WorkboxJS](https://developers.google.com/web/tools/workbox/)
+- Follow the discussion in [this issue](https://github.com/angular/angular/issues/34352) and [here](https://github.com/angular/angularfire/discussions/1923), manually registering the Angular Service Worker
 - The Firebase Messaging Service Worker, which is detailed below
 
 ### Import the `NgModule`
@@ -19,8 +20,8 @@ Push Notifications for AngularFire are contained in the `@angular/fire/messaging
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
-import { AngularFireModule } from '@angular/fire';
-import { AngularFireMessagingModule } from '@angular/fire/messaging';
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFireMessagingModule } from '@angular/fire/compat/messaging';
 import { environment } from '../environments/environment';
 
 @NgModule({
@@ -50,13 +51,41 @@ You can either use the `firebase-messaging-sw.js` file provided in the docs or y
   ],
 ```
 
+[Warning] Remember update the `firebase-messaging-sw.js` everytime you update the `firebase` in package.json. The missmatch version could lead to unable to receive notification in `foreground`, you can create your `firebase-messaging-sw.js` like this:
+
+```js
+// Give the service worker access to Firebase Messaging.
+// Note that you can only use Firebase Messaging here, other Firebase libraries
+// are not available in the service worker.
+importScripts('https://www.gstatic.com/firebasejs/[the number of version matching with firebase in package.json]/firebase-app.js');
+importScripts('https://www.gstatic.com/firebasejs/[for example: 7.16.1]/firebase-messaging.js');
+
+// Initialize the Firebase app in the service worker by passing in the
+// messagingSenderId.
+
+firebase.initializeApp({
+    apiKey: '<your-key>',
+    authDomain: '<your-project-authdomain>',
+    databaseURL: '<your-database-URL>',
+    projectId: '<your-project-id>',
+    storageBucket: '<your-storage-bucket>',
+    messagingSenderId: '<your-messaging-sender-id>'
+});
+
+// Retrieve an instance of Firebase Messaging so that it can handle background
+// messages.
+const messaging = firebase.messaging();
+
+
+```
+
 ### Requesting permission
 
 Once you have the Firebase Messaging Service Worker set up and installed, you need to request permission to send a user notifications. While the browser will popup a UI for you, it is highly recommend to ask the user for permission with a custom UI and only ask when it makes sense. If you blindly ask for permission, you have an extremely high chance of getting denied or blocked.
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireMessaging } from '@angular/fire/messaging';
+import { AngularFireMessaging } from '@angular/fire/compat/messaging';
 
 @Component({
   selector: 'app-root',
@@ -82,7 +111,7 @@ Once you have the permission of the user, you need their token. You can do this 
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireMessaging } from '@angular/fire/messaging';
+import { AngularFireMessaging } from '@angular/fire/compat/messaging';
 import { mergeMapTo } from 'rxjs/operators';
 
 @Component({
@@ -114,7 +143,7 @@ An easier way of requesting permission and getting tokens is with the `requestTo
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireMessaging } from '@angular/fire/messaging';
+import { AngularFireMessaging } from '@angular/fire/compat/messaging';
 
 @Component({
   selector: 'app-root',
@@ -144,13 +173,13 @@ Need to delete a user's token? Not a problem.
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireMessaging } from '@angular/fire/messaging';
+import { AngularFireMessaging } from '@angular/fire/compat/messaging';
 import { mergeMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
   template: `
-  <button (click)="deleteMyToken()">
+  <button (click)="deleteToken()">
     Delete my token
   </button>
   `
@@ -175,7 +204,7 @@ Once you have a user's token and they are subscribed, you can listen to messages
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFireMessaging } from '@angular/fire/messaging';
+import { AngularFireMessaging } from '@angular/fire/compat/messaging';
 
 @Component({
   selector: 'app-root',

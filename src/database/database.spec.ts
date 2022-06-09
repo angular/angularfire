@@ -1,121 +1,43 @@
-import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire';
-import { AngularFireDatabase, AngularFireDatabaseModule, URL } from './public_api';
 import { TestBed } from '@angular/core/testing';
+import { FirebaseApp, provideFirebaseApp, getApp, initializeApp, deleteApp } from '@angular/fire/app';
+import { Database, provideDatabase, getDatabase, connectDatabaseEmulator, goOffline } from '@angular/fire/database';
 import { COMMON_CONFIG } from '../test-config';
-import { NgZone } from '@angular/core';
-import 'firebase/database';
-import { rando } from '../firestore/utils.spec';
+import { rando } from '../utils';
 
-describe('AngularFireDatabase', () => {
+describe('Database', () => {
   let app: FirebaseApp;
-  let db: AngularFireDatabase;
-  let zone: NgZone;
-  let firebaseAppName: string;
+  let database: Database;
+  let providedDatabase: Database;
+  let appName: string;
 
-  beforeEach(() => {
-    firebaseAppName = rando();
-    TestBed.configureTestingModule({
-      imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG, firebaseAppName),
-        AngularFireDatabaseModule
-      ],
-      providers: [
-        { provide: URL, useValue: 'http://localhost:9000' }
-      ]
-    });
+  describe('single injection', () => {
 
-    app = TestBed.inject(FirebaseApp);
-    db = TestBed.inject(AngularFireDatabase);
-    zone = TestBed.inject(NgZone);
-  });
-
-  afterEach(() => {
-    app.delete();
-  });
-
-  describe('<constructor>', () => {
-
-    it('should be an AngularFireDatabase type', () => {
-      expect(db instanceof AngularFireDatabase).toEqual(true);
-    });
-
-    it('should have an initialized Firebase app', () => {
-      expect(db.database.app).toBeDefined();
-    });
-
-    it('should accept a Firebase App in the constructor', (done) => {
-      const database = new AngularFireDatabase(app.options, rando(), undefined, {}, zone);
-      expect(database instanceof AngularFireDatabase).toEqual(true);
-      database.database.app.delete().then(done, done);
-    });
-
-    it('should have an initialized Firebase app instance member', () => {
-      expect(db.database.app.name).toEqual(firebaseAppName);
-    });
-
-  });
-
-});
-
-describe('AngularFireDatabase w/options', () => {
-  let app: FirebaseApp;
-  let db: AngularFireDatabase;
-  let firebaseAppName: string;
-  let url: string;
-  let query: string;
-
-  beforeEach(() => {
-    query = rando();
-    firebaseAppName = rando();
-    url = `http://localhost:${Math.floor(Math.random() * 9999)}`;
-    TestBed.configureTestingModule({
-      imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
-        AngularFireDatabaseModule
-      ],
-      providers: [
-        { provide: FIREBASE_APP_NAME, useValue: firebaseAppName },
-        { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG },
-        { provide: URL, useValue: url }
-      ]
-    });
-
-    app = TestBed.inject(FirebaseApp);
-    db = TestBed.inject(AngularFireDatabase);
-  });
-
-  afterEach(() => {
-    app.delete();
-  });
-
-  describe('<constructor>', () => {
-
-    it('should be an AngularFireDatabase type', () => {
-      expect(db instanceof AngularFireDatabase).toEqual(true);
-    });
-
-    it('should have an initialized Firebase app', () => {
-      expect(db.database.app).toBeDefined();
-    });
-
-    it('should have an initialized Firebase app instance member', () => {
-      expect(db.database.app.name).toEqual(firebaseAppName);
-    });
-
-    /* INVESTIGATE database(url) does not seem to be working
-
-        it('database be pointing to the provided DB instance', () => {
-          expect(db.database.ref().toString()).toEqual(url);
+    beforeEach(() => {
+        appName = rando();
+        TestBed.configureTestingModule({
+            imports: [
+                provideFirebaseApp(() => initializeApp(COMMON_CONFIG, appName)),
+                provideDatabase(() => {
+                    providedDatabase = getDatabase(getApp(appName));
+                    connectDatabaseEmulator(providedDatabase, 'localhost', 9000);
+                    return providedDatabase;
+                }),
+            ],
         });
+        app = TestBed.inject(FirebaseApp);
+        database = TestBed.inject(Database);
+    });
 
-        it('list should be using the provided DB instance', () => {
-          expect(db.list(query).query.toString()).toEqual(`${url}/${query}`);
-        });
+    afterEach(() => {
+        goOffline(database);
+    });
 
-        it('object should be using the provided DB instance', () => {
-          expect(db.object(query).query.toString()).toEqual(`${url}/${query}`);
-        });
-    */
+    it('should be injectable', () => {
+        expect(providedDatabase).toBeTruthy();
+        expect(database).toEqual(providedDatabase);
+        expect(database.app).toEqual(app);
+    });
+
   });
 
 });

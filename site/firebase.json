@@ -1,0 +1,73 @@
+{
+  "hosting": {
+    "public": "public",
+    "cleanUrls": true,
+    "redirects": [
+      {
+        "source": "/get-started",
+        "destination": "/get-started/quick-start",
+        "type": 301
+      },
+      {
+        "source": "/analytics",
+        "destination": "/analytics/getting-started",
+        "type": 301
+      },
+      {
+        "source": "/auth",
+        "destination": "/auth/getting-started",
+        "type": 301
+      },
+      {
+        "source": "/firestore",
+        "destination": "/firestore/documents",
+        "type": 301
+      },
+      {
+        "source": "/functions",
+        "destination": "/functions/getting-started",
+        "type": 301
+      },
+      {
+        "source": "/ionic",
+        "destination": "/ionic/getting-started",
+        "type": 301
+      },
+      {
+        "source": "/messaging",
+        "destination": "/messaging/getting-started",
+        "type": 301
+      },
+      {
+        "source": "/performance",
+        "destination": "/performance/getting-started",
+        "type": 301
+      },
+      {
+        "source": "/remote-config",
+        "destination": "/remote-config/getting-started",
+        "type": 301
+      },
+      {
+        "source": "/rtdb",
+        "destination": "/rtdb/getting-started",
+        "type": 301
+      },
+      {
+        "source": "/storage",
+        "destination": "/storage/getting-started",
+        "type": 301
+      },
+      {
+        "source": "/universal",
+        "destination": "/universal/getting-started",
+        "type": 301
+      }
+    ],
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}

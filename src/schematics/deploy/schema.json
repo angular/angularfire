@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "id": "FirebaseDeploySchema",
+  "$id": "FirebaseDeploySchema",
   "title": "Firebase Deploy",
   "description": "Ng Deploy target options for Firebase.",
   "properties": {
@@ -9,9 +9,111 @@
       "description": "Target to build.",
       "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
     },
+    "browserTarget": {
+      "type": "string",
+      "description": "Target to build.",
+      "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
+    },
+    "prerenderTarget": {
+      "type": "string",
+      "description": "Target to build.",
+      "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
+    },
+    "serverTarget": {
+      "type": "string",
+      "description": "Target to build.",
+      "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
+    },
+    "universalBuildTarget": {
+      "type": "string",
+      "description": "Target to build.",
+      "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
+    },
+    "ssr": {
+      "oneOf": [{ "type": "boolean" }, { "type": "string" }],
+      "description": "Should we attempt to deploy the function to Cloud Functions (true or 'cloud-functions') / Cloud Run ('cloud-run') or just Hosting (false)"
+    },
+    "prerender": {
+      "type": "boolean",
+      "description": "Prerender before deploy?"
+    },
+    "firebaseProject": {
+      "type": "string",
+      "description": "The Firebase project name or project alias to use when deploying"
+    },
+    "target": {
+      "type": "string",
+      "description": "The Firebase hosting target in firebase.json for multi-site"
+    },
+    "firebaseHostingSite": {
+      "type": "string",
+      "description": "The Firebase Hosting site to deploy to"
+    },
+    "functionName": {
+      "type": "string",
+      "description": "The name of the Cloud Function or Cloud Run serviceId to deploy SSR to"
+    },
+    "functionsNodeVersion": {
+      "oneOf": [{ "type": "number" }, { "type": "string" }],
+      "description": "Version of Node.js to run Cloud Functions / Run on"
+    },
+    "CF3v2": {
+      "type": "boolean",
+      "description": "Generation of the Functions product to run on"
+    },
+    "region": {
+      "type": "string",
+      "description": "The region to deploy Cloud Functions or Cloud Run to"
+    },
+    "outputPath": {
+      "type": "string",
+      "description": "Where to output the deploy artifacts"
+    },
+    "functionsRuntimeOptions": {
+      "type": "object",
+      "description": "Runtime options for Cloud Functions, if deploying to Cloud Functions"
+    },
     "preview": {
       "type": "boolean",
       "description": "Do not deploy the application, just set up the Firebase Function in the project output directory. Can be used for testing the Firebase Function with `firebase serve`."
+    },
+    "cloudRunOptions": {
+      "type": "object",
+      "description": "Options passed to Cloud Run, if deploying to Cloud Run.",
+      "properties": {
+        "cpus": {
+          "type": "number",
+          "description": "Set a CPU limit in Kubernetes cpu units."
+        },
+        "maxConcurrency": {
+          "oneOf": [{ "type": "number" }, { "type": "string" }],
+          "pattern": "^(\\d+|default)$",
+          "description": "Set the maximum number of concurrent requests allowed per container instance. If concurrency is unspecified, any number of concurrent requests are allowed. To unset this field, provide the special value default."
+        },
+        "maxInstances": {
+          "oneOf": [{ "type": "number" }, { "type": "string" }],
+          "pattern": "^(\\d+|default)$",
+          "description": "The maximum number of container instances of the Service to run. Use 'default' to unset the limit and use the platform default."
+        },
+        "memory": {
+          "type": "string",
+          "pattern": "^\\d+(G|M)i$",
+          "description": "Set a memory limit. Ex: 1Gi, 512Mi."
+        },
+        "minInstances": {
+          "oneOf": [{ "type": "number" }, { "type": "string" }],
+          "pattern": "^(\\d+|default)$",
+          "description": "The minimum number of container instances of the Service to run or 'default' to remove any minimum."
+        },
+        "timeout": {
+          "type": "number",
+          "description": "Set the maximum request execution time (timeout) in seconds."
+        },
+        "vpcConnector": {
+          "type": "string",
+          "description": "Set a VPC connector for this resource."
+        }
+      }
     }
   }
 }

@@ -1,0 +1,9 @@
+<p>lazy works!</p>
+
+<ul>
+    <li *ngFor="let item of snapshot | async">
+        <pre>data(): {{ item.payload.doc.data() | json }},
+id: {{ item.payload.doc.id }},
+metadata: {{ item.payload.doc.metadata | json }}</pre>
+    </li>
+</ul>
