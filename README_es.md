@@ -83,7 +83,7 @@ AngularFire no sigue el control de versiones de Angular, ya que Firebase tambié
 
 ### Polyfills
 
-Ni AngularFire ni Firebase contienen con polyfills. Para tener compatibilidad en una amplia gama de entornos, sugerimos que se agreguen los siguientes polyfills a su aplicación:
+Ni AngularFire ni Firebase contienen polyfills. Para tener compatibilidad en una amplia gama de entornos, sugerimos que se agreguen los siguientes polyfills a su aplicación:
 
 | API                         | Entornos | Polyfill Sugerido  | Licencia   |
 |-----------------------------|--------------------|--------------------|------------|
@@ -94,7 +94,7 @@ Ni AngularFire ni Firebase contienen con polyfills. Para tener compatibilidad en
 
 ## Recursos
 
-[Inicio](docs/install-and-setup.md) - Ten tu primera aplicación levantada y corriendo siguiendo nuestra guía de inicio rápido. (en proceso de traducción).
+[Inicio Rápido](docs/install-and-setup_es.md) - Ten tu primera aplicación levantada y corriendo siguiendo nuestra guía de inicio rápido. (en proceso de traducción).
 
 [Contribuyendo](CONTRIBUTING.md).
 
