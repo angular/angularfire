@@ -94,13 +94,13 @@ Ni AngularFire ni Firebase contienen polyfills. Para tener compatibilidad en una
 
 ## Recursos
 
-[Inicio Rápido](docs/install-and-setup_es.md) - Ten tu primera aplicación levantada y corriendo siguiendo nuestra guía de inicio rápido. (en proceso de traducción).
+[Inicio Rápido](docs/install-and-setup_es.md) - Ten tu primera aplicación levantada y corriendo siguiendo nuestra guía de inicio rápido.
 
 [Contribuyendo](CONTRIBUTING.md).
 
 [Plantilla Stackblitz](https://stackblitz.com/edit/angular-fire-start) - Recuerda colocar tu configuración de Firebase en `app/app.module.ts`.
 
-[¿Actualizando a v7.0? Mira nuestra guía.](docs/version-7-upgrade.md). (en proceso de traducción)
+[¿Actualizando a v7.0? Mira nuestra guía.](docs/version-7-upgrade_es.md).
 
 ### Aplicaciones de muestra
 
