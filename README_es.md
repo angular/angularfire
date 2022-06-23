@@ -127,7 +127,7 @@ Esta guía para desarrolladores asume que estás usando la API de compatibilidad
 
 > `AngularFireAnalytics` provee un método conviente para interactuar con Google Analytics en tu aplicación Angular. `ScreenTrackingService` y `UserTrackingService` registran eventos automáticamente cuando estás usando el Router de Angular o Firebase Authentication respectivamente. [Conoce más sonre Google Analytics](https://firebase.google.com/docs/analytics).
 
-- [Comenzando con Google Analytics](docs/analytics/getting-started.md). (en proceso de traducción)
+- [Comenzando con Google Analytics](docs/analytics/getting-started_es.md). (en proceso de traducción)
 
 ### Interactúa con tu(s) base(s) de datos
 
