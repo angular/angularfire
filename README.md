@@ -25,6 +25,9 @@ import { getFirestore, provideFirestore } from '@angular/fire/firestore';
     provideFirebaseApp(() => initializeApp({ ... })),
     provideFirestore(() => getFirestore()),
   ],
+  providers: [
+    { provide: FIREBASE_OPTIONS, useValue: environment.firebase }
+  ],
   ...
 })
 export class AppModule { }
