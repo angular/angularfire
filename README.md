@@ -20,21 +20,6 @@ AngularFire smooths over the rough edges an Angular developer might encounter wh
 
 Update the 'environment.ts' file with your firebase config information
 
-```ts
-export const environment = {
-  production: false,
-  firebase: {
-    apiKey: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    authDomain: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    projectId: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    storageBucket: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    messagingSenderId: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    appId: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    measurementId: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-  },
-};
-```
-
 Add the following to your 'app.modules.ts' file
 
 ```ts
