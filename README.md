@@ -79,8 +79,8 @@ interface Item {
 export class AppComponent {
   item$: Observable<Item[]>;
   constructor(firestore: Firestore) {
-    const collection = collection(firestore, 'items');
-    this.item$ = collectionData(collection);
+    const items = collection(firestore, 'items');
+    this.item$ = collectionData(items) as Observable<Item[]>;
   }
 }
 ```
