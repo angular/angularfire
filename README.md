@@ -80,7 +80,7 @@ AngularFire doesn't follow Angular's versioning as Firebase also has breaking ch
 
 ### Polyfills
 
-Neither AngularFire or Firebase ship with polyfills. To have compatability across as wide-range of environments we suggest the following polyfills be added to your application:
+Neither AngularFire or Firebase ship with polyfills. To have compatibility across as wide-range of environments we suggest the following polyfills be added to your application:
 
 | API | Environments | Suggested Polyfill | License |
 |-----|--------------|--------------------|---------|
