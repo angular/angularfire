@@ -388,10 +388,14 @@ export default async function deploy(
   options: DeployBuilderOptions,
   firebaseToken?: string,
 ) {
-  if (!firebaseToken) {
+  if (!firebaseToken && !process.env.GOOGLE_APPLICATION_CREDENTIALS) {
     await firebaseTools.login();
     const user = await firebaseTools.login({ projectRoot: context.workspaceRoot });
     console.log(`Logged into Firebase as ${user.email}.`);
+  }
+
+  if(process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+    console.log(`Using Google Application Credentials.`);
   }
 
   if (prerenderBuildTarget) {
