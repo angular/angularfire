@@ -394,7 +394,8 @@ export default async function deploy(
     console.log(`Logged into Firebase as ${user.email}.`);
   }
 
-  if(process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+  if(!firebaseToken && process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+    await spawnAsync(`gcloud auth activate-service-account --key-file ${process.env.GOOGLE_APPLICATION_CREDENTIALS}`);
     console.log(`Using Google Application Credentials.`);
   }
 
