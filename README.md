@@ -62,7 +62,7 @@ export class AppComponent {
 
 ### Angular and Firebase versions
 
-AngularFire doesn't follow Angular's versioning as Firebase also has breaking changes throughout the year. Instead we try to maintain compatibility with both Firebase and Angular majors for as long as possible, only breaking when we need to support a new major of one or the other.
+AngularFire doesn't follow Angular's versioning as Firebase also has breaking changes throughout the year. Instead, we try to maintain compatibility with both Firebase and Angular majors for as long as possible, only breaking when we need to support a new major of one or the other.
 
 | Angular | Firebase | AngularFire  |
 | --------|----------|--------------|
@@ -80,7 +80,7 @@ AngularFire doesn't follow Angular's versioning as Firebase also has breaking ch
 
 ### Polyfills
 
-Neither AngularFire or Firebase ship with polyfills. To have compatability across as wide-range of environments we suggest the following polyfills be added to your application:
+Neither AngularFire nor Firebase ship with polyfills. To have compatibility across a wide-range of environments we suggest the following polyfills be added to your application:
 
 | API | Environments | Suggested Polyfill | License |
 |-----|--------------|--------------------|---------|
@@ -103,7 +103,7 @@ Neither AngularFire or Firebase ship with polyfills. To have compatability acros
 
 We have three sample apps in this repository:
 
-1. [`samples/compat`](samples/compat) a kitchen sink application that demonstrates use of the "compatability" API
+1. [`samples/compat`](samples/compat) a kitchen sink application that demonstrates the use of the "compatibility" API
 1. [`samples/modular`](samples/modular) a kitchen sink application that demonstrates the new tree-shakable API
 1. [`samples/advanced`](samples/advanced) the same app as `samples/modular` but demonstrates more advanced concepts such as Angular Universal state-transfer, dynamically importing Firebase feature modules, and Firestore data bundling.
 
@@ -115,9 +115,9 @@ Get help on our [Q&A board](https://github.com/angular/angularfire/discussions?d
 
 ## Developer Guide
 
-AngularFire has a new tree-shakable API, however this is still under active development and documentation is in the works, so we suggest most developers stick with the Compatiability API for the time being. [See the v7 upgrade guide for more information.](docs/version-7-upgrade.md). 
+AngularFire has a new tree-shakable API, however, this is still under active development and documentation is in the works, so we suggest most developers stick with the Compatibility API for the time being. [See the v7 upgrade guide for more information.](docs/version-7-upgrade.md). 
 
-This developer guide assumes you're using the Compatiability API (`@angular/fire/compat/*`).
+This developer guide assumes you're using the Compatibility API (`@angular/fire/compat/*`).
 
 ### Monitor usage of your application in production
 
@@ -163,7 +163,7 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 
 - [Getting started with Firebase Messaging](docs/messaging/messaging.md)
 
-### **BETA:** Change behavior and appearance of your application without deploying
+### **BETA:** Change the behavior and appearance of your application without deploying
 
 > Firebase Remote Config is a cloud service that lets you change the behavior and appearance of your app without requiring users to download an app update. [Learn more about Remote Config](https://firebase.google.com/docs/remote-config).
 
