@@ -3,7 +3,13 @@ The official [Angular](https://angular.io/) library for [Firebase](https://fireb
 
 <strong><pre>ng add @angular/fire</pre></strong>
 
-AngularFire smooths over the rough edges an Angular developer might encounter when implementing the framework-agnostic [Firebase JS SDK](https://github.com/firebase/firebase-js-sdk) & aims to provide a more natural developer experience by conforming to Angular conventions.
+_Note: If you want to `ng add` AngularFire and will be using Hosting/Cloud Functions then you will want to configure the 
+Firebase CLI first so that you are logged in for the schematics that are run as part of `ng add @angular/fire`.
+Follow [this guide](docs/install-firebase-tools.md) to have the Firebase CLI walk you through the setup._
+
+AngularFire smooths over the rough edges an Angular developer might encounter when implementing the framework-agnostic 
+[Firebase JS SDK](https://github.com/firebase/firebase-js-sdk) & aims to provide a more natural developer experience 
+by conforming to Angular conventions.
 
 - **Dependency injection** - Provide and Inject Firebase services in your components
 - **Zone.js wrappers** - Stable zones allow proper functionality of service workers, forms, SSR, and pre-rendering
