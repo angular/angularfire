@@ -31,9 +31,15 @@ import { getDatabase, provideDatabase } from '@angular/fire/database';
 Next inject it into your component:
 
 ```ts
+import { Component, inject } from '@angular/core';
 import { Database } from '@angular/fire/database';
 
-constructor(database: Database) {
+@Component({...})
+extend class DepartmentComponent {
+  private database: Database = inject(Database);
+
+  constructor() {
+  }
 }
 ```
 
@@ -61,7 +67,13 @@ The `object()` function creates an observable that emits object changes.
 
 ### `objectVal`
 
-TBD
+The `objectVal` function creates an observable that emits an array of object values, optionally with a mapped key.
+
+|                 |                                                       |
+|-----------------|-------------------------------------------------------|
+| **function**    | `objectVal(query, options?)`                                              |
+| **params**      | query: `Reference\|Query`, options?: { keyField?: `string` } |
+| **return**      | `Observable<T>`                           |
 
 ### `list`
 
@@ -75,10 +87,15 @@ The `list()` function creates an observable that emits a sorted array for each c
 
 ### `listVal`
 
-TBD
+The `listVal()` function creates an observable that emits an object mapped to its value, and optionally its key.
+
+|                 |                                                       |
+|-----------------|-------------------------------------------------------|
+| **function**    | `listVal(query, options?)`                            |
+| **params**      | ref: `Reference\|Query`, options?: { keyField?: `string` } |
+| **return**      | `Observable<T \| null>`                                            |
 
 ### `stateChanges`
-
 
 The `stateChanges()` function creates an observable that emits each time a change occurs at the reference or query passed. This is useful for tracking the changes in your list. The optional `events` parameter will filter which child events populate the array.
 
