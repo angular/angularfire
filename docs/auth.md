@@ -17,7 +17,7 @@ Firebase Authentication integrates tightly with other Firebase services, and it 
 
 AngularFire allows you to work with Firebase Auth via Angular's Dependency Injection.
 
-First provide an auth instance to AngularFire:
+First provide an auth instance to AngularFire in the application's `NgModule` (`app.module.ts`):
 
 ```ts
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
@@ -34,17 +34,22 @@ import { getAuth, provideAuth } from '@angular/fire/auth';
 Next inject it into your component:
 
 ```ts
+import { Component, inject} from '@angular/core';
 import { Auth } from '@angular/fire/auth';
 
-constructor(database: Auth) {
+@Component({ ... })
+export class LoginComponent {
+  private auth: Auth = inject(Auth);
+  ...
 }
+
 ```
 
 ## Firebase API
 
 AngularFire wraps the Firebase JS SDK to ensure proper functionality in Angular, while providing the same API.
 
-Just change your imports from `import { ... } from 'firebase/auth'` to `import { ... } from '@angular/fire/auth'` and follow the offical documentation.
+Update the imports from `import { ... } from 'firebase/auth'` to `import { ... } from '@angular/fire/auth'` and follow the offical documentation.
 
 [Getting Started](https://firebase.google.com/docs/auth/web/start) | [API Reference](https://firebase.google.com/docs/reference/js/auth)
 
@@ -54,16 +59,92 @@ AngularFire provides observables to allow convenient use of the Firebase Authent
 
 ### user
 
-TBD
+The `user` observable streams events triggered by sign-in, sign-out, and token refresh events.
+
+Example code:
+
+```ts
+import { Auth, User, user } from '@angular/fire/auth';
+...
+
+export class UserComponent implements OnDestroy {
+  private auth: Auth = inject(auth);
+  user$ = user(auth);
+  userSubscription: Subscription;
+  ...
+
+  constructor() {
+    this.userSubscription = this.user$.subscribe(aUser: User | null => {
+        //handle user state changes here. Note, that user will be null if there is no currently logged in user.
+     console.log(aUser);
+    })
+  }
+
+  ngOnDestroy() {
+    // when manually subscribing to an observable remember to unsubscribe in ngOnDestroy
+    this.userSubscription.unsubscribe();
+  }
+}
+
+```
 
 ### authState
 
-TBD
+The `authState` observable streams events triggered by sign-in and sign-out events.
+
+Example code:
+```ts
+import { Auth, authState } from '@angular/fire/auth';
+...
+
+export class UserComponent implements OnDestroy {
+  private auth: Auth = inject(auth);
+  authState$ = authState(auth);
+  authStateSubscription: Subscription;
+  ...
+
+  constructor() {
+    this.authStateSubscription = this.authState$.subscribe(aUser: User | null => {
+        //handle auth state changes here. Note, that user will be null if there is no currently logged in user.
+     console.log(aUser);
+    })
+  }
+
+  ngOnDestroy() {
+    // when manually subscribing to an observable remember to unsubscribe in ngOnDestroy
+    this.authStateSubscription.unsubscribe();
+  }
+}
+```
 
 ### idToken
 
-TBD
+The `idToken` observable streams events triggered by sign-in, sign-out and token refresh events.
 
+Example code:
+```ts
+import { Auth, idToken } from '@angular/fire/auth';
+...
+
+export class UserComponent implements OnDestroy {
+  private auth: Auth = inject(auth);
+  idToken$ = idToken(auth);
+  idTokenSubscription: Subscription;
+  ...
+
+  constructor() {
+    this.idTokenSubscription = this.idToken$.subscribe(token: string | null => {
+        //handle idToken changes here. Note, that user will be null if there is no currently logged in user.
+     console.log(string);
+    })
+  }
+
+  ngOnDestroy() {
+    // when manually subscribing to an observable remember to unsubscribe in ngOnDestroy
+    this.idTokenSubscription.unsubscribe();
+  }
+}
+```
 
 ## Connecting the the emulator suite
 
