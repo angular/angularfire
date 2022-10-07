@@ -314,7 +314,8 @@ export const deployToCloudRun = async (
   fsHost.copySync(staticOut, newStaticOut);
   fsHost.copySync(serverOut, newServerOut);
 
-  const packageJson = getPackageJson(context, workspaceRoot, options, join(serverBuildOptions.outputPath, 'main.js'));
+  // Target runtime is Linux based.
+  const packageJson = getPackageJson(context, workspaceRoot, options, [serverBuildOptions.outputPath, 'main.js'].join('/'));
   const nodeVersion = packageJson.engines.node;
 
   if (!satisfies(process.versions.node, nodeVersion.toString())) {
