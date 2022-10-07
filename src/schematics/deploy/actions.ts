@@ -31,6 +31,7 @@ const spawnAsync = async (
 ) =>
   new Promise<Buffer>((resolve, reject) => {
     const [spawnCommand, ...args] = command.split(/\s+/);
+    options = { ...(options || {}), shell: true };
     const spawnProcess = spawn(spawnCommand, args, options);
     const chunks: Buffer[] = [];
     const errorChunks: Buffer[] = [];
