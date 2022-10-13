@@ -57,17 +57,37 @@ import { AngularFireFunctions } from '@angular/fire/compat/functions';
 
 @Component({
   selector: 'app-root',
-  template: `{ data$  | async }`
+  template: `{{ data$  | async }}`
 })
 export class AppComponent {
+  data$: any;
+
   constructor(private fns: AngularFireFunctions) { 
-    const callable = fns.httpsCallable('my-fn-name');
+    const callable = this.fns.httpsCallable('myFunctionName');
     this.data$ = callable({ name: 'some-data' });
   }
 }
 ```
 
 Notice that calling `httpsCallable()` does not initiate the request. It creates a function, which when called creates an Observable, subscribe or convert it to a Promise to initiate the request.
+
+### Creating a cloud function
+Create your cloud function in `index.js`:
+
+```js
+// The Cloud Functions for Firebase SDK to create Cloud Functions and set up triggers.
+const functions = require('firebase-functions');
+
+// The Firebase Admin SDK to access Firestore.
+const admin = require('firebase-admin');
+admin.initializeApp();
+
+exports.myFunctionName = functions.https.onCall((data, context) => {
+    console.log("Hello world!")
+    console.log(data);
+    console.log(context);
+});
+```
 
 ## Configuration via Dependency Injection
 
