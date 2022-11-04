@@ -95,13 +95,17 @@ export function getFirebaseProjectNameFromFs(
   }
 }
 
-const projectFromRc = (rc: FirebaseRc, target: string): [string|undefined, string|undefined] => {
-  const defaultProject = rc.projects?.default;
-  const project = Object.keys(rc.targets || {}).find(
-    project => !!rc.targets?.[project]?.hosting?.[target]
-  );
-  const site = project && rc.targets?.[project]?.hosting?.[target]?.[0];
-  return [project || defaultProject, site];
+export const projectFromRc = (rc: FirebaseRc, target: string): [string|undefined, string|undefined] => {
+  if (!rc.targets) {
+    return [undefined, undefined];
+  }
+
+  const project = rc.projects?.default || Object.keys(rc.targets)[0];
+  if (!project) {
+    return [undefined, undefined];
+  }
+
+  return [project, rc.targets[project].hosting[target][0]];
 };
 
 /**
