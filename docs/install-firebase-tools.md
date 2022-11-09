@@ -49,7 +49,7 @@ redirect to log you into Firebase.
 
 ### 3. Choose what Firebase features
 
-`firebase-tools` will ask you want Firebase features you want to configure.
+`firebase-tools` displays Firebase features you want to configure.
 
 ```bash
 ? Which Firebase features do you want to set up for this directory? Press Space 
