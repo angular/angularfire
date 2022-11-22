@@ -124,7 +124,11 @@ jobs:
       # Can't update more than one major at a times, take the incremental step
       - name: Update to ng@13
         run: npx @angular/cli@13 update @angular/core@13 @angular/cli@13 --allow-dirty --force
-        if: matrix.ng == '14' || matrix.ng == 'next'
+        if: matrix.ng == '14' || matrix.ng == '15' || matrix.ng == 'next'
+        continue-on-error: ${{ matrix.os == 'windows-latest' }}
+      - name: Update to ng@14
+        run: npx @angular/cli@14 update @angular/core@14 @angular/cli@14 --allow-dirty --force
+        if: matrix.ng == '15' || matrix.ng == 'next'
         continue-on-error: ${{ matrix.os == 'windows-latest' }}
       - name: Update to ng@${{ matrix.ng }}
         run: npx @angular/cli@${{ matrix.ng }} update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty --force
