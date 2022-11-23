@@ -24,7 +24,7 @@ export interface Item { name: string; }
 })
 export class AppComponent {
   private itemDoc: AngularFirestoreDocument<Item>;
-  item: Observable<Item>;
+  item: Observable<Item | undefined>;
   constructor(private afs: AngularFirestore) {
     this.itemDoc = afs.doc<Item>('items/1');
     this.item = this.itemDoc.valueChanges();
