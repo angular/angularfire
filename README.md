@@ -16,19 +16,31 @@ AngularFire smooths over the rough edges an Angular developer might encounter wh
 
 ## Example use
 
+### Environment Config
+
+Update the 'environment.ts' file with your firebase config information
+
+Add the following to your 'app.modules.ts' file
+
 ```ts
 import { provideFirebaseApp, getApp, initializeApp } from '@angular/fire/app';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { environment } from '../environments/environment';
 
 @NgModule({
   imports: [
-    provideFirebaseApp(() => initializeApp({ ... })),
+    provideFirebaseApp(() => initializeApp({ environment.firebase })),
     provideFirestore(() => getFirestore()),
+  ],
+  providers: [
+    { provide: FIREBASE_OPTIONS, useValue: environment.firebase }
   ],
   ...
 })
 export class AppModule { }
 ```
+
+Try it out in the component
 
 ```ts
 import { Firestore, collectionData, collection } from '@angular/fire/firestore';
@@ -52,8 +64,8 @@ interface Item {
 export class AppComponent {
   item$: Observable<Item[]>;
   constructor(firestore: Firestore) {
-    const collection = collection(firestore, 'items');
-    this.item$ = collectionData(collection);
+    const items = collection(firestore, 'items');
+    this.item$ = collectionData(items) as Observable<Item[]>;
   }
 }
 ```
