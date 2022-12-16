@@ -6,18 +6,48 @@
 
 # App Check
 
-What is app check?
+App Check helps protect your API resources from abuse by preventing unauthorized clients from accessing your backend resources. It works with both Firebase services, Google Cloud services, and your own APIs to keep your resources safe.
+
+[Learn More](https://firebase.google.com/docs/app-check)
 
 ## Dependency Injection
+As a prerequisite, ensure that `AngularFire` has been added to your project via
+```bash
+ng add @angular/fire
+```
 
-YADA YADA YADA
+Provide an App Check instance and configuration in the application's `NgModule` (`app.module.ts`):
+
+```ts
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { getAppCheck, provideAppCheck } from '@angular/fire/app-check';
+
+@NgModule({
+  imports: [
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideAppCheck(() => initializeAppCheck(getApp(), {
+        provider: new ReCaptchaV3Provider(/* configuration */),
+      })),
+  ]
+})
+```
+
+Next inject it into your component:
+
+```ts
+import { Component, inject} from '@angular/core';
+import { AppCheck } from '@angular/fire/app-check';
+
+@Component({ ... })
+export class AppCheckComponent {
+  private appCheck: AppCheck = inject(AppCheck);
+  ...
+}
+```
 
 ## Firebase API
 
-Something something look at the offical docs
+The [AppCheck documentation](https://firebase.google.com/docs/reference/js/app-check) is available on the Firebase website.
 
 ## Convenience observables
-
-### Foo
-
-bar baz
+Coming soon.

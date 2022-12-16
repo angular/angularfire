@@ -12,9 +12,12 @@ The Firebase Realtime Database is a cloud-hosted database. Data is stored as JSO
 
 ## Dependency Injection
 
-AngularFire allows you to work with the Realtime Database via Angular's Dependency Injection.
+As a prerequisite, ensure that `AngularFire` has been added to your project via
+```bash
+ng add @angular/fire
+```
 
-First provide a RTDB instance to AngularFire:
+Provide an RTBD instance in the application's `NgModule` (`app.module.ts`):
 
 ```ts
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';

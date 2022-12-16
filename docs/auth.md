@@ -15,9 +15,12 @@ Firebase Authentication integrates tightly with other Firebase services, and it 
 
 ## Dependency Injection
 
-AngularFire allows you to work with Firebase Auth via Angular's Dependency Injection.
+As a prerequisite, ensure that `AngularFire` has been added to your project via
+```bash
+ng add @angular/fire
+```
 
-First provide an auth instance to AngularFire in the application's `NgModule` (`app.module.ts`):
+Provide an auth instance in the application's `NgModule` (`app.module.ts`):
 
 ```ts
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
@@ -42,7 +45,6 @@ export class LoginComponent {
   private auth: Auth = inject(Auth);
   ...
 }
-
 ```
 
 ## Firebase API
@@ -104,7 +106,7 @@ export class UserComponent implements OnDestroy {
   ...
 
   constructor() {
-    this.authStateSubscription = this.authState$.subscribe(aUser: User | null => {
+    this.authStateSubscription = this.authState$.subscribe((aUser: User | null) => {
         //handle auth state changes here. Note, that user will be null if there is no currently logged in user.
      console.log(aUser);
     })
@@ -133,7 +135,7 @@ export class UserComponent implements OnDestroy {
   ...
 
   constructor() {
-    this.idTokenSubscription = this.idToken$.subscribe(token: string | null => {
+    this.idTokenSubscription = this.idToken$.subscribe((token: string | null) => {
         //handle idToken changes here. Note, that user will be null if there is no currently logged in user.
      console.log(string);
     })

@@ -6,24 +6,52 @@
 
 # Performance Monitoring
 
-What is perf mon?
+Firebase Performance Monitoring is a service that helps you to gain insight into the performance characteristics of your Apple, Android, and web apps.
+
+[Learn More](https://firebase.google.com/docs/perf-mon)
 
 ## Dependency Injection
 
-YADA YADA YADA
+As a prerequisite, ensure that `AngularFire` has been added to your project via
+```bash
+ng add @angular/fire
+```
+
+Provide a Performance instance and configuration in the application's `NgModule` (`app.module.ts`):
+
+```ts
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { getPerformance, providePerformance} from '@angular/fire/performance';
+
+@NgModule({
+  imports: [
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    providePerformance(() => getPerformance()),
+  ]
+})
+```
+
+Next inject it into your component:
+
+```ts
+import { Component, inject} from '@angular/core';
+import { Performance } from '@angular/fire/performance';
+
+@Component({ ... })
+export class PerformanceComponent {
+  private performance: Performance = inject(Performance);
+  ...
+}
+```
 
 ## Firebase API
 
-Something something look at the offical docs
+The [Performance documentation](https://firebase.google.com/docs/reference/js/performance.md#performance_package) is available on the Firebase website.
 
 ## Services
 
-### YADA
-
-asdfk
+Coming soon.
 
 ## Convenience observables
 
-### Foo
-
-bar baz
+Coming soon.

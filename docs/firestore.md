@@ -18,25 +18,7 @@ As a prerequisite, ensure that `AngularFire` has been added to your project via
 ```bash
 ng add @angular/fire
 ```
-In your component class, for example `user-profile.component.ts` import and inject `Firestore`:
-
-```typescript
-import { Component, inject } from '@angular/core';
-import { Firestore } from '@angular/fire/firestore';
-
-@Component({
-    standalone: true,
-    selector: 'app-user-profile',
-    ...
-})
-export class UserProfileComponent {
-    private firestore: Firestore = inject(Firestore);
-    ...
-}
-```
-At this point, the application is ready to leverage Cloud Firestore. The initialization for of the application was completed for you by the `AngularFire` schematic. 
-
-In `app.module.ts`, the `NgModule` has been configured updated to include the app initialization:
+Provide a Firestore instance in the application's `NgModule` (`app.module.ts`):
 
 ```typescript
 @NgModule({
@@ -54,6 +36,25 @@ In `app.module.ts`, the `NgModule` has been configured updated to include the ap
 })
 export class AppModule { }
 ```
+
+
+In your component class, for example `user-profile.component.ts` import and inject `Firestore`:
+
+```typescript
+import { Component, inject } from '@angular/core';
+import { Firestore } from '@angular/fire/firestore';
+
+@Component({
+    standalone: true,
+    selector: 'app-user-profile',
+    ...
+})
+export class UserProfileComponent {
+    private firestore: Firestore = inject(Firestore);
+    ...
+}
+```
+
 ## Firebase API
 With the reference to Cloud Firestore available in a component it is now possible to connect read from and write to the database.
 

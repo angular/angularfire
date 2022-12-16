@@ -6,22 +6,62 @@
 
 # Analytics
 
-What is Analytics?
+Google Analytics is an app measurement solution, available at no charge, that provides insight on app usage and user engagement.
 
+[Learn more](https://firebase.google.com/docs/analytics)
 ## Dependency Injection
 
-YADA YADA YADA
+As a prerequisite, ensure that `AngularFire` has been added to your project via
+```bash
+ng add @angular/fire
+```
+
+Provide a Google Analytics instance in the application's `NgModule` (`app.module.ts`):
+
+```ts
+@NgModule({
+  declarations: [
+    ...
+  ],
+  imports: [
+    ...
+    // App initialization
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideAnalytics(() => getAnalytics())
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+In your component class, for example `user-profile.component.ts` import and inject `Firestore`:
+
+```typescript
+import { Component, inject } from '@angular/core';
+import { Analytics } from '@angular/fire/analytics';
+
+@Component({
+    standalone: true,
+    selector: 'app-user-profile',
+    ...
+})
+export class UserProfileComponent {
+    private analytics: Analytics = inject(Analytics);
+    ...
+}
+```
 
 ## Firebase API
 
-Something something look at the offical docs
+The [Firebase API for Google Analytics documentation](https://firebase.google.com/docs/reference/js/analytics.md#analytics_package) is available on the Firebase website.
 
 ## Services
 
 ### ScreenTrackingService
 
-asdfij
+Coming soon, for now [please review the documentation](https://firebase.google.com/docs/analytics/screenviews)
 
 ### UserTrackingService
+Coming soon
 
-asdfsfadlkj

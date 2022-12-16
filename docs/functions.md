@@ -6,18 +6,47 @@
 
 # Cloud Functions
 
-What are Cloud Functions?
+The Cloud Functions for Firebase client SDKs let you call functions directly from a Firebase app. To call a function from your app in this way, write and deploy an HTTPS Callable function in Cloud Functions, and then add client logic to call the function from your app.
+
+[Learn More](https://firebase.google.com/docs/functions/get-started)
 
 ## Dependency Injection
 
-YADA YADA YADA
+As a prerequisite, ensure that `AngularFire` has been added to your project via
+```bash
+ng add @angular/fire
+```
+
+Provide a Cloud Functions instance in the application's `NgModule` (`app.module.ts`):
+
+```ts
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { getFunctions, provideFunctions } from '@angular/fire/functions';
+
+@NgModule({
+  imports: [
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideFunctions(() => getFunctions()),
+  ]
+})
+```
+
+Next inject it into your component:
+
+```ts
+import { Component, inject} from '@angular/core';
+import { Functions } from '@angular/fire/functions';
+
+@Component({ ... })
+export class AppComponent {
+  private functions: Functions = inject(Functions);
+  ...
+}
+```
 
 ## Firebase API
-
-Something something look at the offical docs
+The [Firebase API for Cloud Functions documentation](https://firebase.google.com/docs/reference/js/functions) is available on the Firebase website.
 
 ## Convenience observables
 
-### Foo
-
-bar baz
+More details coming soon.

@@ -72,7 +72,8 @@ jobs:
         firebase: ["9"]
         firebaseTools: ["11"]
         rxjs: ["7"]
-        ng: ["12", "13", "14"]
+        # TODO add ng 12 back in, we need to cut a major at this point and drop
+        ng: ["13", "14", "15"]
         exclude:
           # TODO investigate failures
           # https://github.com/angular/angularfire/runs/4174069788
@@ -124,7 +125,11 @@ jobs:
       # Can't update more than one major at a times, take the incremental step
       - name: Update to ng@13
         run: npx @angular/cli@13 update @angular/core@13 @angular/cli@13 --allow-dirty --force
-        if: matrix.ng == '14' || matrix.ng == 'next'
+        if: matrix.ng == '14' || matrix.ng == '15' || matrix.ng == 'next'
+        continue-on-error: ${{ matrix.os == 'windows-latest' }}
+      - name: Update to ng@14
+        run: npx @angular/cli@14 update @angular/core@14 @angular/cli@14 --allow-dirty --force
+        if: matrix.ng == '15' || matrix.ng == 'next'
         continue-on-error: ${{ matrix.os == 'windows-latest' }}
       - name: Update to ng@${{ matrix.ng }}
         run: npx @angular/cli@${{ matrix.ng }} update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty --force
@@ -161,7 +166,13 @@ jobs:
         run: |
           cd ./test/ng-build
           npx @angular/cli@13 update @angular/core@13 @angular/cli@13 @nguniversal/express-engine@13  --allow-dirty --force
-        if: matrix.ng == '14' || matrix.ng == 'next'
+        if: matrix.ng == '14' || matrix.ng == '15' || matrix.ng == 'next'
+        continue-on-error: ${{ matrix.os == 'windows-latest' }}
+      - name: Update ng-build to ng@14
+        run: |
+          cd ./test/ng-build
+          npx @angular/cli@14 update @angular/core@14 @angular/cli@14 @nguniversal/express-engine@14  --allow-dirty --force
+        if: matrix.ng == '15' || matrix.ng == 'next'
         continue-on-error: ${{ matrix.os == 'windows-latest' }}
       - name: Update ng-build to ng@${{ matrix.ng }}
         run: |
@@ -173,6 +184,8 @@ jobs:
         run: |
           cd ./test/ng-build
           yarn prerender
+        # ng 13 is flaking, skip for now
+        if: matrix.ng != '13'
 
   # TODO dry up
   canary:
@@ -187,7 +200,8 @@ jobs:
         firebase: ["9", "canary", "next"]
         firebaseTools: ["11"]
         rxjs: ["7"]
-        ng: ["12", "13", "14", "next"]
+        # TODO add 12 back in
+        ng: ["13", "14", "15", "next"]
         exclude:
           # standard configurations
           - firebase: 9
@@ -238,7 +252,10 @@ jobs:
       # Can't update more than one major at a times, take the incremental step
       - name: Update to ng@13
         run: npx @angular/cli@13 update @angular/core@13 @angular/cli@13 --allow-dirty --force
-        if: matrix.ng == '14' || matrix.ng == 'next'
+        if: matrix.ng == '14' || matrix.ng == '15' || matrix.ng == 'next'
+      - name: Update to ng@14
+        run: npx @angular/cli@14 update @angular/core@14 @angular/cli@14 --allow-dirty --force
+        if: matrix.ng == '15' || matrix.ng == 'next'
       - name: Update to ng@${{ matrix.ng }}
         run: npx @angular/cli@${{ matrix.ng }} update @angular/core@${{ matrix.ng }} @angular/cli@${{ matrix.ng }} --allow-dirty --force
         if: matrix.ng != '12'
@@ -278,7 +295,12 @@ jobs:
         run: |
           cd ./test/ng-build
           npx @angular/cli@13 update @angular/core@13 @angular/cli@13 @nguniversal/express-engine@13  --allow-dirty --force
-        if: matrix.ng == '14' || matrix.ng == 'next'
+        if: matrix.ng == '14' || matrix.ng == '15' || matrix.ng == 'next'
+      - name: Update ng-build to ng@14
+        run: |
+          cd ./test/ng-build
+          npx @angular/cli@14 update @angular/core@14 @angular/cli@14 @nguniversal/express-engine@14  --allow-dirty --force
+        if: matrix.ng == '15' || matrix.ng == 'next'
       - name: Update ng-build to ng@${{ matrix.ng }}
         run: |
           cd ./test/ng-build
@@ -288,6 +310,8 @@ jobs:
         run: |
           cd ./test/ng-build
           yarn prerender
+        # ng 13 is flaking, skip for now
+        if: matrix.ng != '13'
 
   contribute:
     runs-on: ${{ matrix.os }}

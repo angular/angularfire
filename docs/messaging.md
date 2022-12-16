@@ -6,7 +6,9 @@
 
 # Cloud Messaging
 
-What is messaging?
+The FCM JavaScript API lets you receive notification messages in web apps running in browsers that support the Push API.
+
+[Learn More](https://firebase.google.com/docs/cloud-messaging/)
 
 ## Dependency Injection
 

@@ -6,18 +6,48 @@
 
 # Remote Config
 
-What is remote config?
+Firebase Remote Config is a cloud service that lets you change the behavior and appearance of your app without requiring users to download an app update.
+
+[Learn More](https://firebase.google.com/docs/remote-config/)
 
 ## Dependency Injection
 
-YADA YADA YADA
+As a prerequisite, ensure that `AngularFire` has been added to your project via
+```bash
+ng add @angular/fire
+```
+
+Provide a Performance instance and configuration in the application's `NgModule` (`app.module.ts`):
+
+```ts
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { getRemoteConfig, provideRemoteConfig} from '@angular/fire/remote-config';
+
+@NgModule({
+  imports: [
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideRemoteConfig(() => getRemoteConfig()),
+  ]
+})
+```
+
+Next inject it into your component:
+
+```ts
+import { Component, inject} from '@angular/core';
+import { RemoteConfig } from '@angular/fire/remote-config';
+
+@Component({ ... })
+export class RemoteConfigComponent {
+  private remoteConfig: RemoteConfig = inject(RemoteConfig);
+  ...
+}
+```
 
 ## Firebase API
 
-Something something look at the offical docs
+The [Remote Config documentation](https://firebase.google.com/docs/reference/js/remote-config) is available on the Firebase website.
 
 ## Convenience observables
 
-### Foo
-
-bar baz
+Coming soon.
