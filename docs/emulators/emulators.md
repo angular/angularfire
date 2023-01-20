@@ -58,6 +58,21 @@ Follow the instructions to download whatever emulator you want to use then check
 }
 ```
 
+Then launch the emulators by running
+
+```shell
+firebase emulators:start
+```
+
+Then you can visit 
+
+```shell
+┌─────────────────────────────────────────────────────────────┐
+│ ✔  All emulators ready! It is now safe to connect your app. │
+│ i  View Emulator UI at http://127.0.0.1:4000/               │
+└─────────────────────────────────────────────────────────────┘
+```
+
 ## Import the DI Tokens at your AppModule
 
 Configuring your app to connect to local emulators is easily done by using dependency injection tokens provided by the library. However, there are slighty changes between 6.0.0 and 6.1.0 in the way it was done.
@@ -65,6 +80,17 @@ Configuring your app to connect to local emulators is easily done by using depen
 ### 6.1.0 Method
 
 Each module (database, firestore, auth, function) provides `USE_EMULATOR` token to configure the emulator `host` and `port` by passing a tuple of `[string, number]` values, which are set by default to `localhost` and the asigned port from your `firebase.json` file.
+
+Update your `environment.ts` file:
+
+```ts
+export const environment = {
+  production: false,
+  useEmulators: true,
+  ...
+}
+
+```
 
 Import these tokens at your `app.module.ts` as follow:
 
@@ -78,10 +104,10 @@ import { USE_EMULATOR as USE_FUNCTIONS_EMULATOR } from '@angular/fire/compat/fun
   // ... Existing configuration
   providers: [
     // ... Existing Providers
-    { provide: USE_AUTH_EMULATOR, useValue: environment.useEmulators ? ['localhost', 9099] : undefined },
-    { provide: USE_DATABASE_EMULATOR, useValue: environment.useEmulators ? ['localhost', 9000] : undefined },
-    { provide: USE_FIRESTORE_EMULATOR, useValue: environment.useEmulators ? ['localhost', 8080] : undefined },
-    { provide: USE_FUNCTIONS_EMULATOR, useValue: environment.useEmulators ? ['localhost', 5001] : undefined },
+    { provide: USE_AUTH_EMULATOR, useValue: environment.useEmulators ? ['http://localhost', 9099] : undefined },
+    { provide: USE_DATABASE_EMULATOR, useValue: environment.useEmulators ? ['http://localhost', 9000] : undefined },
+    { provide: USE_FIRESTORE_EMULATOR, useValue: environment.useEmulators ? ['http://localhost', 8080] : undefined },
+    { provide: USE_FUNCTIONS_EMULATOR, useValue: environment.useEmulators ? ['http://localhost', 5001] : undefined },
   ]
 })
 export class AppModule { }
