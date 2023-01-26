@@ -4,7 +4,7 @@
 
 `AngularFireAuth` promise proxies an initialized
 `firebase.auth.Auth` instance, allowing you to log users in, out, etc. [See
-the Firebase docs for more information on what methods are available.](https://firebase.google.com/docs/reference/js/firebase.auth.Auth)
+the Firebase docs for more information on what methods are available.](https://firebase.google.com/docs/reference/js/auth.auth)
 
 **Example app:**
 
@@ -63,7 +63,7 @@ import { SETTINGS as AUTH_SETTINGS } from '@angular/fire/compat/auth';
 export class AppModule { }
 ```
 
-Read more at [Firebase Auth Settings](https://firebase.google.com/docs/reference/js/firebase.auth.AuthSettings).
+Read more at [Firebase Auth Settings](https://firebase.google.com/docs/reference/js/auth.authsettings).
 
 ### Use Current Browser Language
 
@@ -88,7 +88,7 @@ export class AppModule { }
 If you want to set a different language, you can use `LANGUAGE_CODE` DI Token
 (*default: null*).
 
-More info at the [firebase auth docs](https://firebase.google.com/docs/reference/js/firebase.auth.Auth#languagecode).
+More info at the [firebase auth docs](https://firebase.google.com/docs/reference/js/auth.auth#authlanguagecode).
 
 ```ts
 import { LANGUAGE_CODE } from '@angular/fire/compat/auth';
@@ -148,7 +148,7 @@ export class AppModule { }
 ```
 
 - [Multi-Tenancy Authentication](https://cloud.google.com/identity-platform/docs/multi-tenancy-authentication)
-- [Firebase Auth Tenant](https://firebase.google.com/docs/reference/js/firebase.auth.Auth#tenantid)
+- [Firebase Auth Tenant](https://firebase.google.com/docs/reference/js/auth.auth#tenantid)
 
 ## UI Libraries
 
