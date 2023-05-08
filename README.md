@@ -67,18 +67,19 @@ export class AppComponent {
 
 AngularFire doesn't follow Angular's versioning as Firebase also has breaking changes throughout the year. Instead we try to maintain compatibility with both Firebase and Angular majors for as long as possible, only breaking when we need to support a new major of one or the other.
 
-| Angular | Firebase | AngularFire  |
-| --------|----------|--------------|
-| 15      | 9        | ^7.5         |
-| 14      | 9        | ^7.4         |
-| 13      | 9        | ^7.2         |
-| 12      | 9        | ^7.0         |
-| 12      | 7,8      | ^6.1.5       |
-| 11      | 7,8      | ^6.1         |
-| 10      | 8        | ^6.0.4       |
-| 10      | 7        | ^6.0.3       |
-| 9       | 8        | ^6.0.4       |
-| 9       | 7        | ^6.0         |
+| Angular | Firebase | AngularFire |
+|---------|----------|-------------|
+| 16      | 9        | ^7.6        |
+| 15      | 9        | ^7.5        |
+| 14      | 9        | ^7.4        |
+| 13      | 9        | ^7.2        |
+| 12      | 9        | ^7.0        |
+| 12      | 7,8      | ^6.1.5      |
+| 11      | 7,8      | ^6.1        |
+| 10      | 8        | ^6.0.4      |
+| 10      | 7        | ^6.0.3      |
+| 9       | 8        | ^6.0.4      |
+| 9       | 7        | ^6.0        |
 
 <sub>Version combinations not documented here __may__ work but are untested and you will see NPM peer warnings.</sub>
 
