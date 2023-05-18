@@ -13,7 +13,7 @@ export type Query<T = DocumentData> = firebase.firestore.Query<T>;
 export type SetOptions = firebase.firestore.SetOptions;
 export type DocumentData = firebase.firestore.DocumentData;
 
-export interface DocumentSnapshotExists<T> extends firebase.firestore.DocumentSnapshot {
+export interface DocumentSnapshotExists<T> extends firebase.firestore.DocumentSnapshot<T> {
   readonly exists: true;
   data(options?: SnapshotOptions): T;
 }
@@ -26,15 +26,15 @@ export interface DocumentSnapshotDoesNotExist extends firebase.firestore.Documen
 
 export type DocumentSnapshot<T> = DocumentSnapshotExists<T> | DocumentSnapshotDoesNotExist;
 
-export interface QueryDocumentSnapshot<T> extends firebase.firestore.QueryDocumentSnapshot {
+export interface QueryDocumentSnapshot<T> extends firebase.firestore.QueryDocumentSnapshot<T> {
   data(options?: SnapshotOptions): T;
 }
 
-export interface QuerySnapshot<T> extends firebase.firestore.QuerySnapshot {
+export interface QuerySnapshot<T> extends firebase.firestore.QuerySnapshot<T> {
   readonly docs: QueryDocumentSnapshot<T>[];
 }
 
-export interface DocumentChange<T> extends firebase.firestore.DocumentChange {
+export interface DocumentChange<T> extends firebase.firestore.DocumentChange<T> {
   readonly doc: QueryDocumentSnapshot<T>;
 }
 
