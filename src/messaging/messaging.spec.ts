@@ -35,9 +35,16 @@ describe('Messaging', () => {
         messaging = TestBed.inject(Messaging);
     });
 
-    it('should be injectable', () => {
-        expect(providedMessaging).toBeTruthy();
-        expect(messaging).toEqual(providedMessaging);
+    it('should be injectable', async (done) => {
+        const supported = await isSupported();
+        if (supported) {
+          expect(providedMessaging).toBeTruthy();
+          expect(messaging).toEqual(providedMessaging);
+        } else {
+          expect(providedMessaging).toBeUndefined();
+          expect(messaging).toBeUndefined();
+        }
+        done();
     });
 
   });
