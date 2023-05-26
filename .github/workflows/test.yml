@@ -111,11 +111,6 @@ jobs:
       - name: Yarn install
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile --prefer-offline
-      - name: Bump deps
-        run: |
-          yarn add firebase@${{ matrix.firebase }}
-          yarn add firebase-tools@${{ matrix.firebaseTools }}
-          yarn add rxjs@${{ matrix.rxjs }} --prefer-offline
       - name: Firebase emulator cache
         uses: actions/cache@v2
         with:
@@ -128,15 +123,15 @@ jobs:
       - name: Test Node
         run: |
           yarn build:jasmine
-          yarn test:node-esm
+          yarn test:node
       - name: Test browser
+        # only test on the default, maybe we should just make this a seperate test
         if: matrix.os == 'ubuntu-latest' && matrix.node == '16'
         run: yarn test:chrome-headless
       - name: ng-build yarn install
         run: |
           cd ./test/ng-build
           yarn --prefer-offline
-          yarn add firebase@${{ matrix.firebase }}
       - name: ng-build prerender
         run: |
           cd ./test/ng-build
@@ -213,7 +208,7 @@ jobs:
       - name: Test Node
         run: |
           yarn build:jasmine
-          yarn test:node-esm
+          yarn test:node
       - name: Test browser
         run: yarn test:chrome-headless
       - name: ng-build yarn install

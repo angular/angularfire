@@ -630,7 +630,9 @@ describe('ng-add', () => {
         project: PROJECT_NAME,
         prerender: false,
       })).toBeRejectedWith(
-        new SchematicsException('Error when parsing .firebaserc: Unexpected token I in JSON at position 0')
+        parseInt(process.versions.node, 10) >= 20 ?
+          new SchematicsException(`Error when parsing .firebaserc: Unexpected token 'I', "I'm broken 😔" is not valid JSON.`) :
+          new SchematicsException('Error when parsing .firebaserc: Unexpected token I in JSON at position 0')
       );
     });
 
