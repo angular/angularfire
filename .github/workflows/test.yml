@@ -49,6 +49,7 @@ jobs:
       - name: Install deps
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         run: |
+          yarn config set ignore-engines true
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
           yarn config set network-timeout 300000
           yarn config set yarn-offline-mirror-pruning true
