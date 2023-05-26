@@ -38,6 +38,7 @@ jobs:
             ${{ runner.os }}-16-12-9-9-
             ${{ runner.os }}-16-12-9-
             ${{ runner.os }}-16-12-
+            ${{ runner.os }}-16-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         uses: actions/cache@v2
