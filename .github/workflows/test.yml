@@ -253,7 +253,7 @@ jobs:
   test_and_contribute:
     runs-on: ubuntu-latest
     name: Branch protection
-    needs: ['test', 'contribute']
+    needs: ['test', 'contribute', 'browser']
     steps:
       - run: true
 
