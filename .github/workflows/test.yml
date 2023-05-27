@@ -153,7 +153,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
-        if: matrix.os == 'macos-latest'
       - name: node_modules cache
         id: node_modules_cache
         uses: actions/cache@v2
@@ -208,12 +207,6 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           check-latest: true
-      - name: Setup java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '11'
-        if: matrix.os == 'macos-latest'
       - name: node_modules cache
         uses: actions/cache@v2
         id: node_modules_cache
@@ -248,6 +241,11 @@ jobs:
         run: |
           yarn build:jasmine
           yarn test:node
+      - name: Setup java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
       - name: Test headless
         run: yarn test:chrome-headless
         continue-on-error: ${{ matrix.os == 'windows-latest' }}
