@@ -42,7 +42,7 @@ describe('Messaging', () => {
           expect(messaging).toEqual(providedMessaging);
         } else {
           expect(providedMessaging).toBeUndefined();
-          expect(messaging).toBeUndefined();
+          expect(messaging).toBeNull();
         }
         done();
     });
