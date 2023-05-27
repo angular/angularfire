@@ -108,7 +108,7 @@ jobs:
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile --prefer-offline
       - name: Download Artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
       - name: Relocate Artifacts
         run: mv angularfire-${{ github.run_id }} dist
       - name: Test Node
@@ -180,7 +180,7 @@ jobs:
           path: ~/.cache/firebase/emulators
           key: firebase_emulators
       - name: Download Artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
       - name: Relocate Artifacts
         run: mv angularfire-${{ github.run_id }} dist
       - name: Test browser
@@ -272,7 +272,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           check-latest: true
       - name: 'Download Artifacts'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
       - name: Publish
         run: |
           cd ./angularfire-${{ github.run_id }}/packages-dist

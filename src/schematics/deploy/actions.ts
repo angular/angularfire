@@ -397,7 +397,7 @@ export default async function deploy(
   }
 
   if (options.version && options.version >= 2) {
-    if (lt(firebaseTools.cli.version(), '12.2')) {
+    if (lt(firebaseTools.cli.version(), '12.2.0')) {
       throw new SchematicsException('firebase-tools version 12.2+ is required.');
     }
     process.env.FIREBASE_FRAMEWORK_BUILD_TARGET = (prerenderBuildTarget || serverBuildTarget || staticBuildTarget).name;
