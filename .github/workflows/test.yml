@@ -107,11 +107,6 @@ jobs:
       - name: Yarn install
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile --prefer-offline
-      - name: Firebase emulator cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/firebase/emulators
-          key: firebase_emulators
       - name: Download Artifacts
         uses: actions/download-artifact@v2
       - name: Relocate Artifacts
@@ -241,6 +236,11 @@ jobs:
         run: |
           yarn build:jasmine
           yarn test:node
+      - name: Firebase emulator cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/firebase/emulators
+          key: firebase_emulators
       - name: Setup java
         uses: actions/setup-java@v3
         with:
