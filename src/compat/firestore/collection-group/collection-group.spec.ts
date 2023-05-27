@@ -353,7 +353,7 @@ describe('AngularFirestoreCollectionGroup', () => {
 
     it('should be able to filter snapshotChanges() types - removed', done => {
       (async () => {
-        if (process.platform === 'win32') {
+        if (window.navigator.platform === 'Win32') {
           pending('Flakes on Windows');
         }
 
@@ -497,7 +497,7 @@ describe('AngularFirestoreCollectionGroup', () => {
 
     it('should be able to filter stateChanges() types - removed', done => {
       (async () => {
-        if (process.platform === 'win32') {
+        if (window.navigator.platform === 'Win32') {
           pending('Flakes on Windows');
         }
 
@@ -540,7 +540,7 @@ describe('AngularFirestoreCollectionGroup', () => {
 
     it('should be able to filter auditTrail() types - removed', done => {
       (async () => {
-        if (process.platform === 'win32') {
+        if (window.navigator.platform === 'Win32') {
           pending('Flakes on Windows');
         }
 
