@@ -21,14 +21,14 @@ jobs:
     name: Build
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup node
-        uses: actions/setup-node@v2-beta
+        uses: actions/setup-node@v3
         with:
           node-version: '16'
           check-latest: true
       - name: node_modules cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: node_modules_cache
         with:
           path: ./node_modules
@@ -41,7 +41,7 @@ jobs:
             ${{ runner.os }}-16-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.npm-packages-offline-cache
           key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
@@ -58,7 +58,7 @@ jobs:
         id: yarn-pack-dir
         run: ./tools/build.sh
       - name: 'Upload Artifact'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: angularfire-${{ github.run_id }}
           path: dist
@@ -75,15 +75,15 @@ jobs:
     name: Test Node ${{ matrix.node }} (${{ matrix.os }})
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup node
-        uses: actions/setup-node@v2-beta
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
           check-latest: true
       - name: node_modules cache
         id: node_modules_cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ./node_modules
           key: ${{ runner.os }}-${{ matrix.node }}-16-9-12-7-node_modules-${{ hashFiles('yarn.lock') }}
@@ -94,7 +94,7 @@ jobs:
             ${{ runner.os }}-${{ matrix.node }}-16-
             ${{ runner.os }}-${{ matrix.node }}-
       - name: Yarn offline cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.npm-packages-offline-cache
           key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
@@ -134,12 +134,11 @@ jobs:
         browser: [ chrome-headless, firefox-headless ]
         include:
         - os: macos-latest
-          browser: safari
-    steps:
+          browser: safari    steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup node
-        uses: actions/setup-node@v2-beta
+        uses: actions/setup-node@v3
         with:
           node-version: 16
           check-latest: true
@@ -150,7 +149,7 @@ jobs:
           java-version: '11'
       - name: node_modules cache
         id: node_modules_cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ./node_modules
           key: ${{ runner.os }}-${{ matrix.node }}-16-9-12-7-node_modules-${{ hashFiles('yarn.lock') }}
@@ -161,7 +160,7 @@ jobs:
             ${{ runner.os }}-${{ matrix.node }}-16-
             ${{ runner.os }}-${{ matrix.node }}-
       - name: Yarn offline cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.npm-packages-offline-cache
           key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
@@ -175,7 +174,7 @@ jobs:
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile --prefer-offline
       - name: Firebase emulator cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.cache/firebase/emulators
           key: firebase_emulators
@@ -196,14 +195,14 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup node
-        uses: actions/setup-node@v2-beta
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
           check-latest: true
       - name: node_modules cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: node_modules_cache
         with:
           path: ./node_modules
@@ -216,7 +215,7 @@ jobs:
             ${{ runner.os }}-${{ matrix.node }}-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.npm-packages-offline-cache
           key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
@@ -237,7 +236,7 @@ jobs:
           yarn build:jasmine
           yarn test:node
       - name: Firebase emulator cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.cache/firebase/emulators
           key: firebase_emulators
@@ -264,7 +263,7 @@ jobs:
     if: ${{ github.ref == 'refs/heads/master' || github.event_name == 'release' }}
     steps:
       - name: Setup node
-        uses: actions/setup-node@v2-beta
+        uses: actions/setup-node@v3
         with:
           node-version: '16'
           registry-url: 'https://registry.npmjs.org'
