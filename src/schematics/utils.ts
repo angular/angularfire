@@ -112,41 +112,43 @@ export function addEnvironmentEntry(
   filePath: string,
   data: string,
 ): Tree {
-  if (!host.exists(filePath)) {
-    throw new Error(`File ${filePath} does not exist`);
-  }
+  const fileExists = host.exists(filePath);
+  if (fileExists) {
+    const buffer = host.read(filePath);
+    if (!buffer) {
+      throw new SchematicsException(`Cannot read ${filePath}`);
+    }
+    const sourceFile = ts.createSourceFile(filePath, buffer.toString('utf-8'), ts.ScriptTarget.Latest, true);
 
-  const buffer = host.read(filePath);
-  if (!buffer) {
-    throw new SchematicsException(`Cannot read ${filePath}`);
-  }
-  const sourceFile = ts.createSourceFile(filePath, buffer.toString('utf-8'), ts.ScriptTarget.Latest, true);
+    const envIdentifier = findNode(sourceFile as any, ts.SyntaxKind.Identifier, 'environment');
+    if (!envIdentifier || !envIdentifier.parent) {
+      throw new SchematicsException(`Cannot find 'environment' identifier in ${filePath}`);
+    }
 
-  const envIdentifier = findNode(sourceFile as any, ts.SyntaxKind.Identifier, 'environment');
-  if (!envIdentifier || !envIdentifier.parent) {
-    throw new SchematicsException(`Cannot find 'environment' identifier in ${filePath}`);
-  }
-
-  const envObjectLiteral = envIdentifier.parent.getChildren().find(({ kind }) => kind === ts.SyntaxKind.ObjectLiteralExpression);
-  if (!envObjectLiteral) {
-    throw new SchematicsException(`${filePath} is not in the expected format`);
-  }
-  const firebaseIdentifier = findNode(envObjectLiteral, ts.SyntaxKind.Identifier, 'firebase');
-
-  const recorder = host.beginUpdate(filePath);
-  if (firebaseIdentifier && firebaseIdentifier.parent) {
-    const change = new ReplaceChange(filePath, firebaseIdentifier.parent.pos, firebaseIdentifier.parent.getFullText(), data);
-    applyToUpdateRecorder(recorder, [change]);
-  } else {
-    const openBracketToken = envObjectLiteral.getChildren().find(({ kind }) => kind === ts.SyntaxKind.OpenBraceToken);
-    if (openBracketToken) {
-      const change = new InsertChange(filePath, openBracketToken.end, `${data},`);
-      applyToUpdateRecorder(recorder, [change]);
-    } else {
+    const envObjectLiteral = envIdentifier.parent.getChildren().find(({ kind }) => kind === ts.SyntaxKind.ObjectLiteralExpression);
+    if (!envObjectLiteral) {
       throw new SchematicsException(`${filePath} is not in the expected format`);
     }
+    const firebaseIdentifier = findNode(envObjectLiteral, ts.SyntaxKind.Identifier, 'firebase');
+
+    const recorder = host.beginUpdate(filePath);
+    if (firebaseIdentifier && firebaseIdentifier.parent) {
+      const change = new ReplaceChange(filePath, firebaseIdentifier.parent.pos, firebaseIdentifier.parent.getFullText(), data);
+      applyToUpdateRecorder(recorder, [change]);
+    } else {
+      const openBracketToken = envObjectLiteral.getChildren().find(({ kind }) => kind === ts.SyntaxKind.OpenBraceToken);
+      if (openBracketToken) {
+        const change = new InsertChange(filePath, openBracketToken.end, `${data},`);
+        applyToUpdateRecorder(recorder, [change]);
+      } else {
+        throw new SchematicsException(`${filePath} is not in the expected format`);
+      }
+    }
+    host.commitUpdate(recorder);
+  } else {
+    host.create(filePath, `export const environment = {${data},
+};`);
   }
-  host.commitUpdate(recorder);
 
   return host;
 }
