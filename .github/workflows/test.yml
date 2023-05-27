@@ -134,7 +134,8 @@ jobs:
         browser: [ chrome-headless, firefox-headless ]
         include:
         - os: macos-latest
-          browser: safari    steps:
+          browser: safari
+    steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup node
