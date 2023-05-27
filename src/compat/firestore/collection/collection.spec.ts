@@ -329,7 +329,7 @@ describe('AngularFirestoreCollection', () => {
 
     it('should be able to filter snapshotChanges() types - removed', done => {
       (async () => {
-        if (window.navigator.platform === 'Win32') {
+        if (navigator.platform.toLowerCase().startsWith('win')) {
           pending('Flakes on Windows');
         }
 
@@ -449,7 +449,7 @@ describe('AngularFirestoreCollection', () => {
 
     it('should be able to filter stateChanges() types - added', done => {
       (async () => {
-        if (window.navigator.platform === 'Win32') {
+        if (navigator.platform.toLowerCase().startsWith('win')) {
           pending('Flakes on Windows');
         }
 
