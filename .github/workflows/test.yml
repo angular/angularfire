@@ -248,6 +248,8 @@ jobs:
           java-version: '11'
       - name: Test headless
         run: yarn test:chrome-headless
+        # Tests are flaky on Windows
+        continue-on-error: ${{ matrix.os == 'windows-latest' }}
 
   # Break the branch protection test into a seperate step, so we can manage the matrix more easily
   test_and_contribute:

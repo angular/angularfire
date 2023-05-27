@@ -351,27 +351,24 @@ describe('AngularFirestoreCollectionGroup', () => {
     });
     */
 
-    // TODO figure out why this is failing on windows
-    if (!navigator.platform.toLowerCase().startsWith('win')) {
-      it('should be able to filter snapshotChanges() types - removed', done => {
-        (async () => {
+    it('should be able to filter snapshotChanges() types - removed', done => {
+      (async () => {
 
-          const ITEMS = 10;
-          const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
+        const ITEMS = 10;
+        const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
 
-          const sub = stocks.snapshotChanges(['added', 'removed']).pipe(skip(1)).subscribe(data => {
-            sub.unsubscribe();
-            const change = data.filter(x => x.payload.doc.id === names[0]);
-            expect(data.length).toEqual(ITEMS - 1);
-            expect(change.length).toEqual(0);
-            deleteThemAll(names, ref).then(done).catch(done.fail);
-            done();
-          });
+        const sub = stocks.snapshotChanges(['added', 'removed']).pipe(skip(1)).subscribe(data => {
+          sub.unsubscribe();
+          const change = data.filter(x => x.payload.doc.id === names[0]);
+          expect(data.length).toEqual(ITEMS - 1);
+          expect(change.length).toEqual(0);
+          deleteThemAll(names, ref).then(done).catch(done.fail);
+          done();
+        });
 
-          delayDelete(ref, names[0], 400);
-        })();
-      });
-    }
+        delayDelete(ref, names[0], 400);
+      })();
+    });
 
   });
 
@@ -471,52 +468,46 @@ describe('AngularFirestoreCollectionGroup', () => {
       })();
     });
 
-    // TODO figure out why this is failing on windows
-    if (!navigator.platform.toLowerCase().startsWith('win')) {
-      it('should be able to filter stateChanges() types - added', done => {
-        (async () => {
-          const ITEMS = 10;
+    it('should be able to filter stateChanges() types - added', done => {
+      (async () => {
+        const ITEMS = 10;
 
-          const harness = await collectionHarness(afs, ITEMS);
-          const { ref, stocks } = harness;
-          let { names } = harness;
+        const harness = await collectionHarness(afs, ITEMS);
+        const { ref, stocks } = harness;
+        let { names } = harness;
 
 
-          const sub = stocks.stateChanges(['added']).pipe(skip(1)).subscribe(data => {
-            sub.unsubscribe();
-            expect(data.length).toEqual(1);
-            expect(data[0].payload.doc.data().price).toEqual(2);
-            expect(data[0].type).toEqual('added');
-            deleteThemAll(names, ref).then(done).catch(done.fail);
-            done();
-          });
+        const sub = stocks.stateChanges(['added']).pipe(skip(1)).subscribe(data => {
+          sub.unsubscribe();
+          expect(data.length).toEqual(1);
+          expect(data[0].payload.doc.data().price).toEqual(2);
+          expect(data[0].type).toEqual('added');
+          deleteThemAll(names, ref).then(done).catch(done.fail);
+          done();
+        });
 
-          const nextId = ref.doc('a').id;
-          names = names.concat([nextId]);
-          delayAdd(ref, nextId, { price: 2 });
-        })();
-      });
-    }
+        const nextId = ref.doc('a').id;
+        names = names.concat([nextId]);
+        delayAdd(ref, nextId, { price: 2 });
+      })();
+    });
 
-    // TODO figure out why this is failing on windows
-    if (!navigator.platform.toLowerCase().startsWith('win')) {
-      it('should be able to filter stateChanges() types - removed', done => {
-        (async () => {
-          const ITEMS = 10;
-          const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
+    it('should be able to filter stateChanges() types - removed', done => {
+      (async () => {
+        const ITEMS = 10;
+        const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
 
-          const sub = stocks.stateChanges(['removed']).subscribe(data => {
-            sub.unsubscribe();
-            expect(data.length).toEqual(1);
-            expect(data[0].type).toEqual('removed');
-            deleteThemAll(names, ref).then(done).catch(done.fail);
-            done();
-          });
+        const sub = stocks.stateChanges(['removed']).subscribe(data => {
+          sub.unsubscribe();
+          expect(data.length).toEqual(1);
+          expect(data[0].type).toEqual('removed');
+          deleteThemAll(names, ref).then(done).catch(done.fail);
+          done();
+        });
 
-          delayDelete(ref, names[0], 400);
-        })();
-      });
-    }
+        delayDelete(ref, names[0], 400);
+      })();
+    });
   });
 
   describe('auditTrail()', () => {
@@ -540,25 +531,22 @@ describe('AngularFirestoreCollectionGroup', () => {
       })();
     });
 
-    // TODO figure out why this is failing on windows
-    if (!navigator.platform.toLowerCase().startsWith('win')) {
-      it('should be able to filter auditTrail() types - removed', done => {
-        (async () => {
-          const ITEMS = 10;
-          const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
+    it('should be able to filter auditTrail() types - removed', done => {
+      (async () => {
+        const ITEMS = 10;
+        const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
 
-          const sub = stocks.auditTrail(['removed']).subscribe(data => {
-            sub.unsubscribe();
-            expect(data.length).toEqual(1);
-            expect(data[0].type).toEqual('removed');
-            deleteThemAll(names, ref).then(done).catch(done.fail);
-            done();
-          });
+        const sub = stocks.auditTrail(['removed']).subscribe(data => {
+          sub.unsubscribe();
+          expect(data.length).toEqual(1);
+          expect(data[0].type).toEqual('removed');
+          deleteThemAll(names, ref).then(done).catch(done.fail);
+          done();
+        });
 
-          delayDelete(ref, names[0], 400);
-        })();
-      });
-    }
+        delayDelete(ref, names[0], 400);
+      })();
+    });
   });
 
 });
