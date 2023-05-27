@@ -353,6 +353,7 @@ describe('AngularFirestoreCollectionGroup', () => {
 
     it('should be able to filter snapshotChanges() types - removed', done => {
       (async () => {
+        throw navigator.platform;
         if (navigator.platform.toLowerCase().startsWith('win')) {
           pending('Flakes on Windows');
         }
