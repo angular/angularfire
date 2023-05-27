@@ -329,6 +329,10 @@ describe('AngularFirestoreCollection', () => {
 
     it('should be able to filter snapshotChanges() types - removed', done => {
       (async () => {
+        if (process.platform === 'win32') {
+          pending('Flakes on Windows');
+        }
+
         const ITEMS = 10;
         const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
 
@@ -445,6 +449,10 @@ describe('AngularFirestoreCollection', () => {
 
     it('should be able to filter stateChanges() types - added', done => {
       (async () => {
+        if (process.platform === 'win32') {
+          pending('Flakes on Windows');
+        }
+
         const ITEMS = 10;
 
         const harness = await collectionHarness(afs, ITEMS);

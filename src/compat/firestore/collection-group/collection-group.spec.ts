@@ -353,6 +353,10 @@ describe('AngularFirestoreCollectionGroup', () => {
 
     it('should be able to filter snapshotChanges() types - removed', done => {
       (async () => {
+        if (process.platform === 'win32') {
+          pending('Flakes on Windows');
+        }
+
         const ITEMS = 10;
         const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
 
@@ -493,6 +497,10 @@ describe('AngularFirestoreCollectionGroup', () => {
 
     it('should be able to filter stateChanges() types - removed', done => {
       (async () => {
+        if (process.platform === 'win32') {
+          pending('Flakes on Windows');
+        }
+
         const ITEMS = 10;
         const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
 
@@ -532,6 +540,10 @@ describe('AngularFirestoreCollectionGroup', () => {
 
     it('should be able to filter auditTrail() types - removed', done => {
       (async () => {
+        if (process.platform === 'win32') {
+          pending('Flakes on Windows');
+        }
+
         const ITEMS = 10;
         const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
 

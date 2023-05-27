@@ -26,8 +26,6 @@ export const setupProject =
     firebaseApp?: FirebaseApp,
     firebaseHostingSite?: FirebaseHostingSite,
     sdkConfig?: Record<string, string>,
-    projectType: PROJECT_TYPE,
-    prerender: boolean,
     nodeVersion?: string,
     browserTarget?: string,
     serverTarget?: string,
@@ -79,7 +77,7 @@ ${Object.entries(config.sdkConfig).reduce(
       firebaseApp: config.firebaseApp,
       firebaseHostingSite: config.firebaseHostingSite,
       sdkConfig: config.sdkConfig,
-      prerender: config.prerender,
+      prerender: undefined,
       browserTarget: config.browserTarget,
       serverTarget: config.serverTarget,
       prerenderTarget: config.prerenderTarget,
@@ -126,7 +124,7 @@ export const ngAddSetupProject = (
 
     const firebaseProject = await projectPrompt(defaultProjectName, { projectRoot, account: user.email });
 
-    let hosting = { projectType: PROJECT_TYPE.Static, prerender: false };
+    let hosting = { };
     let firebaseHostingSite: FirebaseHostingSite|undefined;
 
     if (features.includes(FEATURES.Hosting)) {

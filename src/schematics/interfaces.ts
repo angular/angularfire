@@ -39,7 +39,7 @@ export interface NgAddNormalizedOptions {
   firebaseApp: FirebaseApp|undefined;
   firebaseHostingSite: FirebaseHostingSite|undefined;
   sdkConfig: Record<string, string>|undefined;
-  prerender: boolean;
+  prerender: boolean|undefined;
   browserTarget: string|undefined;
   serverTarget: string|undefined;
   prerenderTarget: string|undefined;
