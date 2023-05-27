@@ -26,7 +26,7 @@ export const featureOptions = [
   { name: 'Remote Config', value: FEATURES.RemoteConfig },
 ];
 
-export const enum PROJECT_TYPE { Static, CloudFunctions, CloudRun }
+export const enum PROJECT_TYPE { Static, CloudFunctions, CloudRun, WebFrameworks }
 
 export interface NgAddOptions {
   firebaseProject: string;
@@ -43,6 +43,7 @@ export interface NgAddNormalizedOptions {
   browserTarget: string|undefined;
   serverTarget: string|undefined;
   prerenderTarget: string|undefined;
+  ssrRegion: string|undefined;
 }
 
 export interface DeployOptions {
@@ -139,9 +140,9 @@ export interface FirebaseHostingRewrite {
 
 export interface FirebaseHostingConfig {
   public?: string;
-  ignore: string[];
-  target: string;
-  rewrites: FirebaseHostingRewrite[];
+  ignore?: string[];
+  target?: string;
+  rewrites?: FirebaseHostingRewrite[];
 }
 
 export interface FirebaseFunctionsConfig { [key: string]: any; }
@@ -179,6 +180,7 @@ export interface DeployBuilderSchema {
   cloudRunOptions?: Partial<CloudRunOptions>;
   outputPath?: string;
   CF3v2?: boolean;
+  version?: number;
 }
 
 export interface CloudRunOptions {

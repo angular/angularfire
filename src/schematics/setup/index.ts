@@ -5,8 +5,6 @@ import {
   addToNgModule, addIgnoreFiles, addFixesToServer
 } from '../utils';
 import { projectTypePrompt, appPrompt, sitePrompt, projectPrompt, featuresPrompt, userPrompt } from './prompts';
-import { setupUniversalDeployment } from './ssr';
-import { setupStaticDeployment } from './static';
 import {
   FirebaseApp, FirebaseHostingSite, FirebaseProject, DeployOptions, NgAddNormalizedOptions,
   FEATURES, PROJECT_TYPE
@@ -14,6 +12,13 @@ import {
 import { getFirebaseTools } from '../firebaseTools';
 import { writeFileSync } from 'fs';
 import { join } from 'path';
+import {
+  generateFirebaseRc,
+  overwriteIfExists,
+  safeReadJSON,
+  stringifyFormatted
+} from '../common';
+import { FirebaseJSON, Workspace, WorkspaceProject } from '../interfaces';
 
 export const setupProject =
   async (tree: Tree, context: SchematicContext, features: FEATURES[], config: DeployOptions & {
@@ -28,6 +33,7 @@ export const setupProject =
     serverTarget?: string,
     prerenderTarget?: string,
     project: string,
+    ssrRegion?: string,
   }) => {
     const { path: workspacePath, workspace } = getWorkspace(tree);
 
@@ -77,35 +83,18 @@ ${Object.entries(config.sdkConfig).reduce(
       browserTarget: config.browserTarget,
       serverTarget: config.serverTarget,
       prerenderTarget: config.prerenderTarget,
+      ssrRegion: config.ssrRegion,
     };
 
     if (features.includes(FEATURES.Hosting)) {
-      // TODO dry up by always doing the static work
-      switch (config.projectType) {
-        case PROJECT_TYPE.CloudFunctions:
-        case PROJECT_TYPE.CloudRun:
-          return setupUniversalDeployment({
-            workspace,
-            workspacePath,
-            options,
-            tree,
-            context,
-            project,
-            projectType: config.projectType,
-            // tslint:disable-next-line:no-non-null-assertion
-            nodeVersion: config.nodeVersion!,
-          });
-        case PROJECT_TYPE.Static:
-          return setupStaticDeployment({
-            workspace,
-            workspacePath,
-            options,
-            tree,
-            context,
-            project
-          });
-        default: throw(new SchematicsException(`Unimplemented PROJECT_TYPE ${config.projectType}`));
-      }
+      return setupFirebase({
+        workspace,
+        workspacePath,
+        options,
+        tree,
+        context,
+        project
+      });
     } else {
       return Promise.resolve();
     }
@@ -165,4 +154,76 @@ export const ngAddSetupProject = (
     });
 
   }
+};
+
+export function generateFirebaseJson(
+  tree: Tree,
+  path: string,
+  project: string,
+  region: string|undefined,
+) {
+  const firebaseJson: FirebaseJSON = tree.exists(path)
+    ? safeReadJSON(path, tree)
+    : {};
+
+  const newConfig = {
+    target: project,
+    source: '.',
+    frameworksBackend: {
+      region
+    }
+  };
+  if (firebaseJson.hosting === undefined) {
+    firebaseJson.hosting = [newConfig];
+  } else if (Array.isArray(firebaseJson.hosting)) {
+    const existingConfigIndex = firebaseJson.hosting.findIndex(config => config.target === newConfig.target);
+    if (existingConfigIndex > -1) {
+      firebaseJson.hosting.splice(existingConfigIndex, 1, newConfig);
+    } else {
+      firebaseJson.hosting.push(newConfig);
+    }
+  } else {
+    firebaseJson.hosting = [firebaseJson.hosting, newConfig];
+  }
+
+  overwriteIfExists(tree, path, stringifyFormatted(firebaseJson));
+}
+
+export const setupFirebase = (config: {
+  project: WorkspaceProject;
+  options: NgAddNormalizedOptions;
+  workspacePath: string;
+  workspace: Workspace;
+  tree: Tree;
+  context: SchematicContext;
+}) => {
+  const { tree, workspacePath, workspace, options } = config;
+  const project = workspace.projects[options.project];
+
+  if (!project.architect) {
+    throw new SchematicsException(`Angular project "${options.project}" has a malformed angular.json`);
+  }
+
+  project.architect.deploy = {
+    builder: '@angular/fire:deploy',
+    options: {
+      version: 2,
+      browserTarget: options.browserTarget,
+      ...(options.serverTarget ? {serverTarget: options.serverTarget} : {}),
+      ...(options.prerenderTarget ? {prerenderTarget: options.prerenderTarget} : {})
+    }
+  };
+
+  tree.overwrite(workspacePath, JSON.stringify(workspace, null, 2));
+
+  generateFirebaseJson(tree, 'firebase.json', options.project, options.ssrRegion);
+  generateFirebaseRc(
+    tree,
+    '.firebaserc',
+    options.firebaseProject.projectId,
+    options.firebaseHostingSite,
+    options.project
+  );
+
+  return tree;
 };

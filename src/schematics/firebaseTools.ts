@@ -10,11 +10,12 @@ declare global {
 export const getFirebaseTools = () => globalThis.firebaseTools ?
     Promise.resolve(globalThis.firebaseTools) :
     new Promise<FirebaseTools>((resolve, reject) => {
+        process.env.FIREBASE_CLI_EXPERIMENTS ||= 'webframeworks';
         try {
             resolve(require('firebase-tools'));
         } catch (e) {
             try {
-                const root = execSync('npm root -g').toString().trim();
+                const root = execSync('npm root --location=global').toString().trim();
                 resolve(require(`${root}/firebase-tools`));
             } catch (e) {
                 const spinner = ora({
@@ -22,7 +23,7 @@ export const getFirebaseTools = () => globalThis.firebaseTools ?
                     // Workaround for https://github.com/sindresorhus/ora/issues/136.
                     discardStdin: process.platform !== 'win32',
                 }).start();
-                spawn('npm', ['i', '-g', 'firebase-tools'], {
+                spawn('npm', ['i', '--location=global', 'firebase-tools'], {
                     stdio: 'pipe',
                     shell: true,
                 }).on('close', (code) => {
