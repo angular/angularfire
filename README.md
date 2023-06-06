@@ -1,6 +1,9 @@
 # AngularFire
 The official [Angular](https://angular.io/) library for [Firebase](https://firebase.google.com/).
 
+Please ensure that firebase-tools is installed prior. 
+<strong><pre>npm install firebase-tools</pre></strong>
+Then the following command can be run.
 <strong><pre>ng add @angular/fire</pre></strong>
 
 AngularFire smooths over the rough edges an Angular developer might encounter when implementing the framework-agnostic [Firebase JS SDK](https://github.com/firebase/firebase-js-sdk) & aims to provide a more natural developer experience by conforming to Angular conventions.
