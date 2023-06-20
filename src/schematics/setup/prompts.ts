@@ -228,58 +228,32 @@ export const sitePrompt = async ({ projectId: project }: FirebaseProject, option
   return (await sites).find(it => shortSiteName(it) === siteName)!;
 };
 
+const DEFAULT_REGION = 'us-central1';
+const ALLOWED_SSR_REGIONS = [
+  { name: 'us-central1 (Iowa)', value: 'us-central1' },
+  { name: 'us-west1 (Oregon)', value: 'us-west1' },
+  { name: 'us-east1 (South Carolina)', value: 'us-east1' },
+  { name: 'europe-west1 (Belgium)', value: 'europe-west1' },
+  { name: 'asia-east1 (Taiwan)', value: 'asia-east1' },
+];
+
 export const projectTypePrompt = async (project: WorkspaceProject, name: string) => {
-  let prerender = false;
-  let nodeVersion: string|undefined;
   let serverTarget: string|undefined;
   let browserTarget = `${name}:build:${project.architect?.build?.defaultConfiguration || 'production'}`;
   let prerenderTarget: string|undefined;
   if (isUniversalApp(project)) {
     serverTarget = `${name}:server:${project.architect?.server?.defaultConfiguration || 'production'}`;
     browserTarget = `${name}:build:${project.architect?.build?.defaultConfiguration || 'production'}`;
-    if (hasPrerenderOption(project)) {
-      prerenderTarget = `${name}:prerender:${project.architect?.prerender?.defaultConfiguration || 'production'}`;
-      const { shouldPrerender } = await inquirer.prompt({
-        type: 'confirm',
-        name: 'shouldPrerender',
-        message: 'Should we prerender before deployment?',
-        default: true
-      });
-      prerender = shouldPrerender;
-    }
-    const choices = [
-      { name: prerender ? 'Pre-render only' : 'Don\'t render universal content', value: PROJECT_TYPE.Static },
-      { name: 'Cloud Functions', value: PROJECT_TYPE.CloudFunctions },
-      { name: 'Cloud Run', value: PROJECT_TYPE.CloudRun },
-    ];
-    const { projectType } = await inquirer.prompt({
+    const prerender = hasPrerenderOption(project);
+    prerenderTarget = prerender && `${name}:prerender:${prerender.defaultConfiguration || 'production'}`;
+    const { ssrRegion } = await inquirer.prompt({
       type: 'list',
-      name: 'projectType',
-      choices,
-      message: 'How would you like to render server-side content?',
-      default: PROJECT_TYPE.CloudFunctions,
+      name: 'ssrRegion',
+      choices: ALLOWED_SSR_REGIONS,
+      message: 'In which region would you like to host server-side content?',
+      default: DEFAULT_REGION,
     });
-    if (projectType === PROJECT_TYPE.CloudFunctions) {
-      const { newNodeVersion } = await inquirer.prompt({
-        type: 'list',
-        name: 'newNodeVersion',
-        choices: ['12', '14', '16'],
-        message: 'What version of Node.js would you like to use?',
-        default: parseInt(process.versions.node, 10).toString(),
-      });
-      nodeVersion = newNodeVersion;
-    } else if (projectType === PROJECT_TYPE.CloudRun) {
-      const fetch = require('node-fetch');
-      const { newNodeVersion } = await inquirer.prompt({
-        type: 'input',
-        name: 'newNodeVersion',
-        message: 'What version of Node.js would you like to use?',
-        validate: it => fetch(`https://hub.docker.com/v2/repositories/library/node/tags/${it}-slim`).then(it => it.status === 200 || `Can't find node:${it}-slim docker image.`),
-        default: parseFloat(process.versions.node).toString(),
-      });
-      nodeVersion = newNodeVersion;
-    }
-    return { prerender, projectType, nodeVersion, browserTarget, serverTarget, prerenderTarget };
+    return { prerender, projectType: PROJECT_TYPE.WebFrameworks, ssrRegion, browserTarget, serverTarget, prerenderTarget };
   }
-  return { projectType: PROJECT_TYPE.Static, prerender, nodeVersion, browserTarget, serverTarget, prerenderTarget };
+  return { projectType: PROJECT_TYPE.WebFrameworks, browserTarget, serverTarget, prerenderTarget };
 };

@@ -91,36 +91,8 @@ const initialFirebaseJson = `{
   \"hosting\": [
     {
       \"target\": \"pie-ka-chu\",
-      \"public\": \"dist/ikachu\",
-      \"ignore\": [
-        \"**/.*\"
-      ],
-      \"headers\": [
-        {
-          \"source\": \"*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].+(css|js)\",
-          \"headers\": [
-            {
-              \"key\": \"Cache-Control\",
-              \"value\": \"public,max-age=31536000,immutable\"
-            }
-          ]
-        },
-        {
-          \"source\": \"/@(ngsw-worker.js|ngsw.json)\",
-          \"headers\": [
-            {
-              \"key\": \"Cache-Control\",
-              \"value\": \"no-cache\"
-            }
-          ]
-        }
-      ],
-      \"rewrites\": [
-        {
-          \"source\": \"**\",
-          \"destination\": \"/index.html\"
-        }
-      ]
+      \"source\": \".\",
+      \"frameworksBackend\": {}
     }
   ]
 }`;
@@ -155,9 +127,7 @@ const initialAngularJson = `{
         \"deploy\": {
           \"builder\": \"@angular/fire:deploy\",
           \"options\": {
-            \"prerender\": false,
-            \"ssr\": false,
-            \"firebaseProject\": \"pirojok-111e3\"
+            \"version\": 2
           }
         }
       }
@@ -180,36 +150,8 @@ const overwriteFirebaseJson = `{
   \"hosting\": [
     {
       \"target\": \"pie-ka-chu\",
-      \"public\": \"dist/ikachu\",
-      \"ignore\": [
-        \"**/.*\"
-      ],
-      \"headers\": [
-        {
-          \"source\": \"*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].+(css|js)\",
-          \"headers\": [
-            {
-              \"key\": \"Cache-Control\",
-              \"value\": \"public,max-age=31536000,immutable\"
-            }
-          ]
-        },
-        {
-          \"source\": \"/@(ngsw-worker.js|ngsw.json)\",
-          \"headers\": [
-            {
-              \"key\": \"Cache-Control\",
-              \"value\": \"no-cache\"
-            }
-          ]
-        }
-      ],
-      \"rewrites\": [
-        {
-          \"source\": \"**\",
-          \"destination\": \"/index.html\"
-        }
-      ]
+      \"source\": \".\",
+      \"frameworksBackend\": {}
     }
   ]
 }`;
@@ -244,9 +186,7 @@ const overwriteAngularJson = `{
         \"deploy\": {
           \"builder\": \"@angular/fire:deploy\",
           \"options\": {
-            \"prerender\": false,
-            \"ssr\": false,
-            \"firebaseProject\": \"pirojok-111e3\"
+            \"version\": 2
           }
         }
       }
@@ -269,69 +209,13 @@ const projectFirebaseJson = `{
   \"hosting\": [
     {
       \"target\": \"pie-ka-chu\",
-      \"public\": \"dist/ikachu\",
-      \"ignore\": [
-        \"**/.*\"
-      ],
-      \"headers\": [
-        {
-          \"source\": \"*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].+(css|js)\",
-          \"headers\": [
-            {
-              \"key\": \"Cache-Control\",
-              \"value\": \"public,max-age=31536000,immutable\"
-            }
-          ]
-        },
-        {
-          \"source\": \"/@(ngsw-worker.js|ngsw.json)\",
-          \"headers\": [
-            {
-              \"key\": \"Cache-Control\",
-              \"value\": \"no-cache\"
-            }
-          ]
-        }
-      ],
-      \"rewrites\": [
-        {
-          \"source\": \"**\",
-          \"destination\": \"/index.html\"
-        }
-      ]
+      \"source\": \".\",
+      \"frameworksBackend\": {}
     },
     {
       \"target\": \"pi-catch-you\",
-      \"public\": \"dist/ikachu\",
-      \"ignore\": [
-        \"**/.*\"
-      ],
-      \"headers\": [
-        {
-          \"source\": \"*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].+(css|js)\",
-          \"headers\": [
-            {
-              \"key\": \"Cache-Control\",
-              \"value\": \"public,max-age=31536000,immutable\"
-            }
-          ]
-        },
-        {
-          \"source\": \"/@(ngsw-worker.js|ngsw.json)\",
-          \"headers\": [
-            {
-              \"key\": \"Cache-Control\",
-              \"value\": \"no-cache\"
-            }
-          ]
-        }
-      ],
-      \"rewrites\": [
-        {
-          \"source\": \"**\",
-          \"destination\": \"/index.html\"
-        }
-      ]
+      \"source\": \".\",
+      \"frameworksBackend\": {}
     }
   ]
 }`;
@@ -373,9 +257,7 @@ const projectAngularJson = `{
         \"deploy\": {
           \"builder\": \"@angular/fire:deploy\",
           \"options\": {
-            \"prerender": false,
-            \"ssr\": false,
-            \"firebaseProject\": \"pirojok-111e3\"
+            \"version": 2
           }
         }
       }
@@ -392,9 +274,7 @@ const projectAngularJson = `{
         \"deploy\": {
           \"builder\": \"@angular/fire:deploy\",
           \"options\": {
-            \"prerender\": false,
-            \"ssr\": false,
-            \"firebaseProject\": \"bi-catch-you-77e7e\"
+            \"version\": 2
           }
         }
       }
@@ -405,33 +285,9 @@ const projectAngularJson = `{
 const universalFirebaseJson = {
   hosting: [{
     target: 'pie-ka-chu',
-    public: 'dist/ikachu',
-    ignore: [
-      '**/.*'
-    ],
-    headers: [{
-      source: '*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].+(css|js)',
-      headers: [{
-        key: 'Cache-Control',
-        value: 'public,max-age=31536000,immutable'
-      }]
-    }, {
-      source: '/@(ngsw-worker.js|ngsw.json)',
-      headers: [{
-        key: 'Cache-Control',
-        value: 'no-cache',
-      }],
-    }],
-    rewrites: [
-      {
-        source: '**',
-        function: 'ssr_pie-ka-chu'
-      }
-    ]
+    source: '.',
+    frameworksBackend: {},
   }],
-  functions: {
-    source: 'dist/pie-ka-chu/functions'
-  }
 };
 
 describe('ng-add', () => {
@@ -583,7 +439,7 @@ describe('ng-add', () => {
         project: PROJECT_NAME,
         prerender: false,
       })).toBeRejectedWith(
-        new SchematicsException('Cannot read the output path (architect.build.options.outputPath) of the Angular project "pie-ka-chu" in angular.json')
+        new SchematicsException('Angular project "pie-ka-chu" has a malformed angular.json')
       );
     });
 
@@ -630,7 +486,9 @@ describe('ng-add', () => {
         project: PROJECT_NAME,
         prerender: false,
       })).toBeRejectedWith(
-        new SchematicsException('Error when parsing .firebaserc: Unexpected token I in JSON at position 0')
+        parseInt(process.versions.node, 10) >= 20 ?
+          new SchematicsException(`Error when parsing .firebaserc: Unexpected token 'I', "I'm broken 😔" is not valid JSON`) :
+          new SchematicsException('Error when parsing .firebaserc: Unexpected token I in JSON at position 0')
       );
     });
 
@@ -674,20 +532,6 @@ describe('ng-add', () => {
     }); */
 
     describe('universal app', () => {
-      it('should fail without a server project', async () => {
-        const tree = Tree.empty();
-        tree.create('angular.json', JSON.stringify(generateAngularJson()));
-        tree.create('package.json', JSON.stringify(generatePackageJson()));
-
-        await expectAsync(setupProject(tree, {} as any, [FEATURES.Hosting], {
-          firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-          projectType: PROJECT_TYPE.CloudFunctions,
-          project: PROJECT_NAME,
-          prerender: false,
-        })).toBeRejectedWith(
-          new SchematicsException('Cannot read the output path (architect.server.options.outputPath) of the Angular project "pie-ka-chu" in angular.json')
-        );
-      });
 
       it('should add a @angular/fire builder', async () => {
         const tree = Tree.empty();
@@ -703,7 +547,7 @@ describe('ng-add', () => {
         });
 
         const workspace = JSON.parse((await result.read('angular.json')).toString());
-        expect(workspace.projects['pie-ka-chu'].architect.deploy.options.ssr).toEqual('cloud-functions');
+        expect(workspace.projects['pie-ka-chu'].architect.deploy).toBeTruthy();
       });
 
       it('should configure firebase.json', async () => {
