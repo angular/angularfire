@@ -1,5 +1,5 @@
 import { ɵisSupportedError } from '@angular/fire';
-import { isSupported } from '@firebase/messaging';
+import { isSupported } from 'firebase/messaging';
 
 const isMessagingSupportedPromiseSymbol = '__angularfire_symbol__messagingIsSupported';
 const isMessagingSupportedValueSymbol = '__angularfire_symbol__messagingIsSupportedValue';
