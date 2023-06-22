@@ -1,5 +1,5 @@
 import { ɵisSupportedError } from '@angular/fire';
-import { isSupported } from '@firebase/analytics';
+import { isSupported } from 'firebase/analytics';
 
 const isAnalyticsSupportedValueSymbol = '__angularfire_symbol__analyticsIsSupportedValue';
 const isAnalyticsSupportedPromiseSymbol = '__angularfire_symbol__analyticsIsSupported';
