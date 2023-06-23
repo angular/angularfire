@@ -25,7 +25,7 @@ Now that you have a new project setup, install AngularFire and Firebase from npm
 
 ## Add Firebase config to environments variable
 
-Open `/src/environments/environment.ts` and add your Firebase configuration. You can find your project configuration in [the Firebase Console](https://console.firebase.google.com). Click the Gear icon next to Project Overview, in the Your Apps section, create a new app and choose the type Web. Give the app a name and copy the config values provided.
+Open `/src/environments/environment.ts`, create it if it doesn't exist, and add your Firebase configuration. You can find your project configuration in [the Firebase Console](https://console.firebase.google.com). Click the Gear icon next to Project Overview, in the Your Apps section, create a new app and choose the type Web. Give the app a name and copy the config values provided.
 
 ```ts
 export const environment = {
@@ -43,47 +43,78 @@ export const environment = {
 };
 ```
 
-## Setup `@NgModule` for the `AngularFireModule`
+## Configuring Firebase in your Angular Application
 
-Open `/src/app/app.module.ts`, inject the Firebase providers, and specify your Firebase configuration.
+### Set up Firebase for `@NgModule` based apps
+For applications bootstrapped using `@NgModule`, add the Firebase providers to the imports array of the `@NgModule` decorator metadata.
+
+In `/src/app/app.module.ts` update the code to:.
 
 ```ts
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
-import { AngularFireModule } from '@angular/fire';
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { environment } from '../environments/environment';
 
 @NgModule({
   imports: [
     BrowserModule,
-    AngularFireModule.initializeApp(environment.firebase)
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
   ],
   declarations: [ AppComponent ],
   bootstrap: [ AppComponent ]
 })
 export class AppModule {}
 ```
+### Set up Firebase for Standalone API based apps
+Beginning in [Angular v14](https://blog.angular.io/angular-v14-is-now-available-391a6db736af) applications can be built and bootstrapped using the set of [Standalone APIs](https://angular.io/guide/standalone-components).
 
-## Setup individual `@NgModule`s
-
-After adding the AngularFireModule you also need to add modules for the individual @NgModules that your application needs.
-
-For example if your application was using both Google Analytics and the Firestore you would add `AngularFireAnalyticsModule` and `AngularFirestoreModule`:
+The provider configuration for these applications should be added to the `bootstrapApplication` function in `main.ts`:
 
 ```ts
+import { importProvidersFrom } from '@angular/core';
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { getAuth, provideAuth } from '@angular/fire/auth';
+import { bootstrapApplication } from '@angular/platform-browser';
+import { AppComponent } from './app/app.component';
+import { environment } from './environments/environment';
+
+
+bootstrapApplication(AppComponent, {
+  providers: [
+    importProvidersFrom(
+      provideFirebaseApp(()=> initializeApp(environment.firebase))
+    ),
+  ],
+}).catch(err => console.error(err));
+```
+
+Note that you are required to wrap the `provideFirebaseApp` function call in the `importProvidersFrom` function.
+
+### Configuring Firebase features
+
+After adding the Firbase app providers, you also need to add providers for the each of  Firebase features your application needs.
+
+For example if your application uses both Google Analytics and the Firestore database you would add `provideAnalytics` and `provideFirestore`:
+
+```ts
+// Module based configuration app.module.ts
+
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
-import { AngularFireModule } from '@angular/fire';
-import { AngularFireAnalyticsModule } from '@angular/fire/analytics';
-import { AngularFirestoreModule } from '@angular/fire/firestore';
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { provideAnalytics, getAnalytics } from '@angular/fire/analytics';
+import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { environment } from '../environments/environment';
 
 @NgModule({
   imports: [
     BrowserModule,
-    AngularFireModule.initializeApp(environment.firebase),
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideAnalytics(()=> getAnalytics()),
+    provideFirestore(() => getFirestore()),
     AngularFireAnalyticsModule,
     AngularFirestoreModule
   ],
@@ -93,13 +124,34 @@ import { environment } from '../environments/environment';
 export class AppModule {}
 ```
 
+```ts
+// Standalone API based config (main.ts)
+import { importProvidersFrom } from '@angular/core';
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { provideFirestore, getFirestore } from '@angular/fire/firestore'
+import { getAuth, provideAuth } from '@angular/fire/auth';
+import { bootstrapApplication } from '@angular/platform-browser';
+import { AppComponent } from './app/app.component';
+import { environment } from './environments/environment';
+
+
+bootstrapApplication(AppComponent, {
+  providers: [
+    importProvidersFrom(
+      provideFirebaseApp(() => initializeApp(environment.firebase)),
+      provideAuth(() => getAuth()),
+      provideFirestore(() => getFirestore())
+    ),
+  ],
+}).catch(err => console.error(err));
+```
 ## Inject `AngularFirestore`
 
 Open `/src/app/app.component.ts`, and make sure to modify/delete any tests to get the sample working (tests are still important, you know):
 
 ```ts
-import { Component } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { Component, inject } from '@angular/core';
+import { Firestore } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-root',
@@ -107,9 +159,8 @@ import { AngularFirestore } from '@angular/fire/firestore';
   styleUrls: ['app.component.css']
 })
 export class AppComponent {
-  constructor(firestore: AngularFirestore) {
-
-  }
+  private firestore: AngularFirestore = inject(Firestore)
+  ...
 }
 ```
 
@@ -119,7 +170,7 @@ In `/src/app/app.component.ts`:
 
 ```ts
 import { Component } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { Firestore, collection } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -128,9 +179,12 @@ import { Observable } from 'rxjs';
   styleUrls: ['app.component.css']
 })
 export class AppComponent {
-  items: Observable<any[]>;
-  constructor(firestore: AngularFirestore) {
-    this.items = firestore.collection('items').valueChanges();
+  private firestore: Firestore = inject(Firestore);
+  items$: Observable<any[]>;
+
+  constructor() {
+    const itemsCollectionRef = collection(this.firestore, 'items');
+    this.items = collectionData(itemsCollectionRef) as Observable<any[]>;
   }
 }
 ```
@@ -139,7 +193,7 @@ Open `/src/app/app.component.html`:
 
 ```html
 <ul>
-  <li class="text" *ngFor="let item of items | async">
+  <li class="text" *ngFor="let item of items$ | async">
     {{item.name}}
   </li>
 </ul>
