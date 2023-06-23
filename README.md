@@ -31,6 +31,7 @@ export class AppModule { }
 ```
 
 ```ts
+import { inject } from '@angular/core';
 import { Firestore, collectionData, collection } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 
@@ -51,9 +52,11 @@ interface Item {
 })
 export class AppComponent {
   item$: Observable<Item[]>;
-  constructor(firestore: Firestore) {
-    const collection = collection(firestore, 'items');
-    this.item$ = collectionData(collection);
+  firestore: Firestore = inject(Firestore);
+
+  constructor() {
+    const itemCollection = collection(this.firestore, 'items');
+    this.item$ = collectionData(itemCollection);
   }
 }
 ```
@@ -66,6 +69,7 @@ AngularFire doesn't follow Angular's versioning as Firebase also has breaking ch
 
 | Angular | Firebase | AngularFire  |
 | --------|----------|--------------|
+| 16      | 9        | ^7.6         |
 | 15      | 9        | ^7.5         |
 | 14      | 9        | ^7.4         |
 | 13      | 9        | ^7.2         |
@@ -116,86 +120,97 @@ Get help on our [Q&A board](https://github.com/angular/angularfire/discussions?d
 
 ## Developer Guide
 
-AngularFire has a new tree-shakable API, however this is still under active development and documentation is in the works, so we suggest most developers stick with the Compatiability API for the time being. [See the v7 upgrade guide for more information.](docs/version-7-upgrade.md). 
+This developer guide assimes you're using the new tree-shakable AngularFire API, [if you're looking for the compatability API you can find the documentation here](docs/compat.md).
 
-This developer guide assumes you're using the Compatiability API (`@angular/fire/compat/*`).
+[See the v7 upgrade guide for more information on this change.](docs/version-7-upgrade.md).
 
-### Monitor usage of your application in production
+### Firebase product integrations
 
-> `AngularFireAnalytics` provides a convenient method of interacting with Google Analytics in your Angular application. The provided `ScreenTrackingService` and `UserTrackingService` automatically log events when you're using the Angular Router or Firebase Authentication respectively. [Learn more about Google Analytics](https://firebase.google.com/docs/analytics).
+<table>
+  <tr>
+    <td>
 
-- [Getting started with Google Analytics](docs/analytics/getting-started.md)
+#### [Analytics](docs/analytics.md#analytics)
+```ts
+import { } from '@angular/fire/analytics';
+```
+</td>
+    <td>
 
-### Interacting with your database(s)
+#### [Authentication](docs/auth.md#authentication)
+```ts
+import { } from '@angular/fire/auth';
+```
+</td>
+  </tr>
+  <tr>
+    <td>
 
-Firebase offers two cloud-based, client-accessible database solutions that support realtime data syncing. [Learn about the differences between them in the Firebase Documentation](https://firebase.google.com/docs/firestore/rtdb-vs-firestore).
+#### [Cloud Firestore](docs/firestore.md#cloud-firestore)
+```ts
+import { } from '@angular/fire/firestore';
+```
+</td>
+    <td>
 
-#### Cloud Firestore
+#### [Cloud Functions](docs/functions.md#cloud-functions)
+```ts
+import { } from '@angular/fire/functions';
+```
+</td>
+  </tr>
+  <tr>
+    <td>
 
-> `AngularFirestore` allows you to work with Cloud Firestore, the new flagship database for mobile app development. It improves on the successes of Realtime Database with a new, more intuitive data model. Cloud Firestore also features richer, faster queries and scales better than Realtime Database.
+#### [Cloud Messaging](docs/messaging.md#cloud-messaging)
+```ts
+import { } from '@angular/fire/messaging';
+```
+</td>
+    <td>
 
-- [Documents](docs/firestore/documents.md)
-- [Collections](docs/firestore/collections.md)
-- [Querying Collections](docs/firestore/querying-collections.md)
-- [Offline data](docs/firestore/offline-data.md)
+#### [Cloud Storage](docs/storage.md#cloud-storage)
+```ts
+import { } from '@angular/fire/storage';
+```
+</td>
+  </tr>
+  <tr>
+    <td>
 
-#### Realtime Database
+#### [Performance Monitoring](docs/performance.md#performance-monitoring)
+```ts
+import { } from '@angular/fire/performance';
+```
+</td>
+    <td>
 
-> `AngularFireDatabase` allows you to work with the Realtime Database, Firebase's original database. It's an efficient, low-latency solution for mobile apps that require synced states across clients in realtime.
+#### [Realtime Database](docs/database.md#realtime-database)
+```ts
+import { } from '@angular/fire/database';
+```
+</td>
+  </tr>
+  <tr>
+    <td>
 
-- [Objects](docs/rtdb/objects.md)
-- [Lists](docs/rtdb/lists.md)
-- [Querying lists](docs/rtdb/querying-lists.md)
+#### [Remote Config](docs/remote-config.md#remote-config)
+```ts
+import { } from '@angular/fire/remote-config';
+```
+</td>
+    <td>
 
-### Authenticate users
+#### [App Check](docs/app-check.md#app-check)
+```ts
+import { } from '@angular/fire/app-check';
+```
+</td>
+  </tr>
+</table>
 
-- [Getting started with Firebase Authentication](docs/auth/getting-started.md)
-- [Route users with AngularFire guards](docs/auth/router-guards.md)
+### Deploying your site
 
-### Local Emulator Suite
-
-- [Getting started with Firebase Emulator Suite](docs/emulators/emulators.md)
-
-### Upload files
-
-- [Getting started with Cloud Storage](docs/storage/storage.md)
-
-### Receive push notifications
-
-- [Getting started with Firebase Messaging](docs/messaging/messaging.md)
-
-### **BETA:** Change behavior and appearance of your application without deploying
-
-> Firebase Remote Config is a cloud service that lets you change the behavior and appearance of your app without requiring users to download an app update. [Learn more about Remote Config](https://firebase.google.com/docs/remote-config).
-
-- [Getting started with Remote Config](docs/remote-config/getting-started.md)
-
-### Monitor your application performance in production
-
-> Firebase Performance Monitoring is a service that helps you to gain insight into the performance characteristics of your iOS, Android, and web apps. [Learn more about Performance Monitoring](https://firebase.google.com/docs/perf-mon).
-
-- [Getting started with Performance Monitoring](docs/performance/getting-started.md)
-
-### Directly call Cloud Functions
-
-- [Getting started with Callable Functions](docs/functions/functions.md)
-
-### Deploying your application
-
-> Firebase Hosting is production-grade web content hosting for developers. With Hosting, you can quickly and easily deploy web apps and static content to a global content delivery network (CDN) with a single command.
-
-- [Deploy your application on Firebase Hosting](docs/deploy/getting-started.md)
-
-#### Server-side rendering
-
-> Angular Universal is a technology that allows you to run your Angular application on a server. This allows you to generate your HTML in a process called server-side rendering (SSR). AngularFire is compatible with server-side rendering; allowing you to take advantage of the Search Engine Optimization, link previews, the performance gains granted by the technology, and more. [Learn more about Angular Universal](https://angular.io/guide/universal).
-
-- [Getting started with Angular Universal](docs/universal/getting-started.md)
-- [Deploying your Universal application on Cloud Functions for Firebase](docs/universal/cloud-functions.md)
-- [Prerendering your Universal application](docs/universal/prerendering.md)
-
-### Ionic
-
-- [Installation and Setup with Ionic CLI](docs/ionic/cli.md)
-- [Using AngularFire with Ionic 2](docs/ionic/v2.md)
-- [Using AngularFire with Ionic 3](docs/ionic/v3.md)
+* Deploy to Firebase Hosting
+* Angular Universal: Deploy to Cloud Functions
+* Angular Universal: Deploy to Cloud Run
