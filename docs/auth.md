@@ -70,7 +70,7 @@ import { Auth, User, user } from '@angular/fire/auth';
 ...
 
 export class UserComponent implements OnDestroy {
-  private auth: Auth = inject(auth);
+  private auth: Auth = inject(Auth);
   user$ = user(auth);
   userSubscription: Subscription;
   ...
@@ -100,7 +100,7 @@ import { Auth, authState } from '@angular/fire/auth';
 ...
 
 export class UserComponent implements OnDestroy {
-  private auth: Auth = inject(auth);
+  private auth: Auth = inject(Auth);
   authState$ = authState(auth);
   authStateSubscription: Subscription;
   ...
@@ -129,7 +129,7 @@ import { Auth, idToken } from '@angular/fire/auth';
 ...
 
 export class UserComponent implements OnDestroy {
-  private auth: Auth = inject(auth);
+  private auth: Auth = inject(Auth);
   idToken$ = idToken(auth);
   idTokenSubscription: Subscription;
   ...
@@ -148,7 +148,7 @@ export class UserComponent implements OnDestroy {
 }
 ```
 
-## Connecting the the emulator suite
+## Connecting the emulator suite
 
 ```ts
 import { connectAuthEmulator, getAuth, provideAuth } from '@angular/fire/auth';
