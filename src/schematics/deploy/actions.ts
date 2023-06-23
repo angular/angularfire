@@ -5,7 +5,7 @@ import { copySync, removeSync } from 'fs-extra';
 import { dirname, join } from 'path';
 import { execSync, spawn, SpawnOptionsWithoutStdio } from 'child_process';
 import { defaultFunction, functionGen2, defaultPackage, DEFAULT_FUNCTION_NAME, dockerfile } from './functions-templates';
-import { satisfies } from 'semver';
+import { satisfies, lt } from 'semver';
 import open from 'open';
 import { SchematicsException } from '@angular-devkit/schematics';
 import { firebaseFunctionsDependencies } from '../versions.json';
@@ -79,7 +79,7 @@ const deployToHosting = async (
     await firebaseTools.serve({
       port: DEFAULT_EMULATOR_PORT,
       host: DEFAULT_EMULATOR_HOST,
-      targets: [`hosting:${siteTarget}`],
+      only: `hosting:${siteTarget}`,
       nonInteractive: true,
       projectRoot: workspaceRoot,
     });
@@ -91,6 +91,8 @@ const deployToHosting = async (
     });
 
     if (!deployProject) { return; }
+
+    process.env.FIREBASE_FRAMEWORKS_SKIP_BUILD = 'true';
 
   }
 
@@ -400,36 +402,36 @@ export default async function deploy(
   }
 
   if (prerenderBuildTarget) {
+      const run = await context.scheduleTarget(
+        targetFromTargetString(prerenderBuildTarget.name),
+        prerenderBuildTarget.options
+      );
+      await run.result;
 
-    const run = await context.scheduleTarget(
-      targetFromTargetString(prerenderBuildTarget.name),
-      prerenderBuildTarget.options
-    );
-    await run.result;
+    } else {
 
-  } else {
+      if (!context.target) {
+        throw new Error('Cannot execute the build target');
+      }
 
-    if (!context.target) {
-      throw new Error('Cannot execute the build target');
+      context.logger.info(`📦 Building "${context.target.project}"`);
+
+      const builders = [
+        context.scheduleTarget(
+          targetFromTargetString(staticBuildTarget.name),
+          staticBuildTarget.options
+        ).then(run => run.result)
+      ];
+
+      if (serverBuildTarget) {
+        builders.push(context.scheduleTarget(
+          targetFromTargetString(serverBuildTarget.name),
+          serverBuildTarget.options
+        ).then(run => run.result));
+      }
+
+      await Promise.all(builders);
     }
-
-    context.logger.info(`📦 Building "${context.target.project}"`);
-
-    const builders = [
-      context.scheduleTarget(
-        targetFromTargetString(staticBuildTarget.name),
-        staticBuildTarget.options
-      ).then(run => run.result)
-    ];
-
-    if (serverBuildTarget) {
-      builders.push(context.scheduleTarget(
-        targetFromTargetString(serverBuildTarget.name),
-        serverBuildTarget.options
-      ).then(run => run.result));
-    }
-
-    await Promise.all(builders);
   }
 
   try {
@@ -462,7 +464,7 @@ export default async function deploy(
 
   firebaseTools.logger.logger.add(logger);
 
-  if (serverBuildTarget) {
+  if ((!options.version || options.version < 2) && serverBuildTarget) {
     if (options.ssr === 'cloud-run') {
       await deployToCloudRun(
         firebaseTools,

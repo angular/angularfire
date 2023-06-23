@@ -87,7 +87,7 @@ Open `/src/app/app.component.html`:
 
 ```html
 <ul>
-  <li class="text" *ngFor="let item of items | async">
+  <li class="text" *ngFor="let item of items$ | async">
     {{item.name}}
   </li>
 </ul>

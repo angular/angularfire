@@ -20,7 +20,7 @@ Provide an App Check instance and configuration in the application's `NgModule` 
 
 ```ts
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { getAppCheck, provideAppCheck } from '@angular/fire/app-check';
+import { provideAppCheck } from '@angular/fire/app-check';
 
 @NgModule({
   imports: [
