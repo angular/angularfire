@@ -17,7 +17,8 @@ import { environment } from '../environments/environment';
 // AngularFire 7
 // import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 // import { provideFirestore, getFirestore } from '@angular/fire/firestore';
-// import { provideFunctions, getFunctions, connectFunctionsEmulator } from '@angular/fire/functions'; // https://firebase.google.com/docs/emulator-suite/connect_functions#instrument_your_app_to_talk_to_the_emulators
+// import { provideFunctions, getFunctions, connectFunctionsEmulator } from '@angular/fire/functions'; 
+// https://firebase.google.com/docs/emulator-suite/connect_functions#instrument_your_app_to_talk_to_the_emulators
 
 // AngularFire 6
 import { AngularFireModule } from '@angular/fire/compat';
