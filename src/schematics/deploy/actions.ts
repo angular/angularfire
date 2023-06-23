@@ -88,7 +88,7 @@ const deployToHosting = async (
       type: 'confirm',
       name: 'deployProject',
       message: 'Would you like to deploy your application to Firebase Hosting?'
-    });
+    }) as { deployProject: boolean };
 
     if (!deployProject) { return; }
 
@@ -253,11 +253,11 @@ export const deployToFunction = async (
       projectRoot: workspaceRoot,
     });
 
-    const { deployProject} = await inquirer.prompt({
+    const { deployProject } = await inquirer.prompt({
       type: 'confirm',
       name: 'deployProject',
       message: 'Would you like to deploy your application to Firebase Hosting & Cloud Functions?'
-    });
+    }) as { deployProject: boolean };
 
     if (!deployProject) { return; }
   }
@@ -396,43 +396,43 @@ export default async function deploy(
     console.log(`Logged into Firebase as ${user.email}.`);
   }
 
-  if(!firebaseToken && process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+  if (!firebaseToken && process.env.GOOGLE_APPLICATION_CREDENTIALS) {
     await spawnAsync(`gcloud auth activate-service-account --key-file ${process.env.GOOGLE_APPLICATION_CREDENTIALS}`);
     console.log(`Using Google Application Credentials.`);
   }
 
   if (prerenderBuildTarget) {
-      const run = await context.scheduleTarget(
-        targetFromTargetString(prerenderBuildTarget.name),
-        prerenderBuildTarget.options
-      );
-      await run.result;
+    const run = await context.scheduleTarget(
+      targetFromTargetString(prerenderBuildTarget.name),
+      prerenderBuildTarget.options
+    );
+    await run.result;
 
-    } else {
+  } else {
 
-      if (!context.target) {
-        throw new Error('Cannot execute the build target');
-      }
-
-      context.logger.info(`📦 Building "${context.target.project}"`);
-
-      const builders = [
-        context.scheduleTarget(
-          targetFromTargetString(staticBuildTarget.name),
-          staticBuildTarget.options
-        ).then(run => run.result)
-      ];
-
-      if (serverBuildTarget) {
-        builders.push(context.scheduleTarget(
-          targetFromTargetString(serverBuildTarget.name),
-          serverBuildTarget.options
-        ).then(run => run.result));
-      }
-
-      await Promise.all(builders);
+    if (!context.target) {
+      throw new Error('Cannot execute the build target');
     }
+
+    context.logger.info(`📦 Building "${context.target.project}"`);
+
+    const builders = [
+      context.scheduleTarget(
+        targetFromTargetString(staticBuildTarget.name),
+        staticBuildTarget.options
+      ).then(run => run.result)
+    ];
+
+    if (serverBuildTarget) {
+      builders.push(context.scheduleTarget(
+        targetFromTargetString(serverBuildTarget.name),
+        serverBuildTarget.options
+      ).then(run => run.result));
+    }
+
+    await Promise.all(builders);
   }
+
 
   try {
     await firebaseTools.use(firebaseProject, {
