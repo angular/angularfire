@@ -91,7 +91,7 @@ AngularFire doesn't follow Angular's versioning as Firebase also has breaking ch
 
 ### Polyfills
 
-Neither AngularFire or Firebase ship with polyfills. To have compatability across as wide-range of environments we suggest the following polyfills be added to your application:
+Neither AngularFire or Firebase ship with polyfills. To have compatibility across as wide-range of environments we suggest the following polyfills be added to your application:
 
 | API | Environments | Suggested Polyfill | License |
 |-----|--------------|--------------------|---------|
@@ -114,7 +114,7 @@ Neither AngularFire or Firebase ship with polyfills. To have compatability acros
 
 We have three sample apps in this repository:
 
-1. [`samples/compat`](samples/compat) a kitchen sink application that demonstrates use of the "compatability" API
+1. [`samples/compat`](samples/compat) a kitchen sink application that demonstrates use of the "compatibility" API
 1. [`samples/modular`](samples/modular) a kitchen sink application that demonstrates the new tree-shakable API
 1. [`samples/advanced`](samples/advanced) the same app as `samples/modular` but demonstrates more advanced concepts such as Angular Universal state-transfer, dynamically importing Firebase feature modules, and Firestore data bundling.
 
