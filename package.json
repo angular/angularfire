@@ -17,7 +17,7 @@
     "test:typings": "node ./tools/run-typings-test.js",
     "test:build": "bash ./test/ng-build/build.sh",
     "test:all": "npm run test:node && npm run test:chrome-headless && npm run test:typings && npm run test:build",
-    "build": "rimraf dist && ttsc -p tsconfig.build.json && node --trace-warnings ./tools/build.js && npm pack ./dist/packages-dist",
+    "build": "rimraf dist && tsc -p tsconfig.build.json && node --trace-warnings ./tools/build.js && npm pack ./dist/packages-dist",
     "buildd": "tsc -p tsconfig.build.json && node --trace-warnings ./tools/build.js",
     "build:jasmine": "npx tsc -p tsconfig.jasmine.json --module es2015 && cp ./dist/out-tsc/jasmine/tools/jasmine.js ./dist/out-tsc/jasmine/tools/jasmine.mjs && npx tsc -p tsconfig.jasmine.json && cp ./dist/packages-dist/schematics/versions.json ./dist/out-tsc/jasmine/schematics",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 1"
