@@ -3,7 +3,13 @@ The official [Angular](https://angular.io/) library for [Firebase](https://fireb
 
 <strong><pre>ng add @angular/fire</pre></strong>
 
-AngularFire smooths over the rough edges an Angular developer might encounter when implementing the framework-agnostic [Firebase JS SDK](https://github.com/firebase/firebase-js-sdk) & aims to provide a more natural developer experience by conforming to Angular conventions.
+_Note: If you want to ng add AngularFire and will be using Hosting/Cloud Functions, you need to configure the 
+Firebase CLI first so that you are logged in for the schematics that are run as part of `ng add @angular/fire`.
+Follow [this guide](docs/install-firebase-tools.md) to have the Firebase CLI walk you through the setup._
+
+AngularFire smooths over the rough edges an Angular developer might encounter when implementing the framework-agnostic 
+[Firebase JS SDK](https://github.com/firebase/firebase-js-sdk) & aims to provide a more natural developer experience 
+by conforming to Angular conventions.
 
 - **Dependency injection** - Provide and Inject Firebase services in your components
 - **Zone.js wrappers** - Stable zones allow proper functionality of service workers, forms, SSR, and pre-rendering
@@ -85,7 +91,7 @@ AngularFire doesn't follow Angular's versioning as Firebase also has breaking ch
 
 ### Polyfills
 
-Neither AngularFire or Firebase ship with polyfills. To have compatability across as wide-range of environments we suggest the following polyfills be added to your application:
+Neither AngularFire or Firebase ship with polyfills. To have compatibility across as wide-range of environments we suggest the following polyfills be added to your application:
 
 | API | Environments | Suggested Polyfill | License |
 |-----|--------------|--------------------|---------|
@@ -108,7 +114,7 @@ Neither AngularFire or Firebase ship with polyfills. To have compatability acros
 
 We have three sample apps in this repository:
 
-1. [`samples/compat`](samples/compat) a kitchen sink application that demonstrates use of the "compatability" API
+1. [`samples/compat`](samples/compat) a kitchen sink application that demonstrates use of the "compatibility" API
 1. [`samples/modular`](samples/modular) a kitchen sink application that demonstrates the new tree-shakable API
 1. [`samples/advanced`](samples/advanced) the same app as `samples/modular` but demonstrates more advanced concepts such as Angular Universal state-transfer, dynamically importing Firebase feature modules, and Firestore data bundling.
 
