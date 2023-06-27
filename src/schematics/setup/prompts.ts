@@ -114,7 +114,7 @@ export const featuresPrompt = async (): Promise<FEATURES[]> => {
     choices: featureOptions,
     message: 'What features would you like to setup?',
     default: [FEATURES.Hosting],
-  });
+  }) as any; // { features: FEATURES[] };
   return features;
 };
 
@@ -135,7 +135,7 @@ export const userPrompt = async (options: {}): Promise<Record<string, any>> => {
       choices: [newChoice].concat(choices as any), // TODO types
       message: 'Which Firebase account would you like to use?',
       default: choices.find(it => it.value.email === defaultUser.email)?.value,
-    });
+    }) as any;
     if (user === NEW_OPTION) {
       const { user } = await firebaseTools.login.add();
       return user;
@@ -159,13 +159,13 @@ export const projectPrompt = async (defaultProject: string|undefined, options: {
       type: 'input',
       name: 'projectId',
       message: `Please specify a unique project id (cannot be modified afterward) [6-30 characters]:`,
-    });
+    }) as { projectId: string };
     const { displayName } = await inquirer.prompt({
       type: 'input',
       name: 'displayName',
       message: 'What would you like to call your project?',
       default: projectId,
-    });
+    }) as { displayName: string };
     return await firebaseTools.projects.create(projectId, { account: (options as any).account, displayName, nonInteractive: true });
   }
   // tslint:disable-next-line:no-non-null-assertion
@@ -187,7 +187,7 @@ export const appPrompt = async ({ projectId: project }: FirebaseProject, default
       type: 'input',
       name: 'displayName',
       message: 'What would you like to call your app?',
-    });
+    }) as { displayName: string };;
     return await firebaseTools.apps.create('web', displayName, { ...options, nonInteractive: true, project });
   }
   // tslint:disable-next-line:no-non-null-assertion
@@ -221,7 +221,7 @@ export const sitePrompt = async ({ projectId: project }: FirebaseProject, option
       type: 'input',
       name: 'subdomain',
       message: 'Please provide an unique, URL-friendly id for the site (<id>.web.app):',
-    });
+    }) as { subdomain: string };
     return await firebaseTools.hosting.sites.create(subdomain, { ...options, nonInteractive: true, project });
   }
   // tslint:disable-next-line:no-non-null-assertion
@@ -252,7 +252,7 @@ export const projectTypePrompt = async (project: WorkspaceProject, name: string)
       choices: ALLOWED_SSR_REGIONS,
       message: 'In which region would you like to host server-side content?',
       default: DEFAULT_REGION,
-    });
+    }) as { ssrRegion: string };
     return { prerender, projectType: PROJECT_TYPE.WebFrameworks, ssrRegion, browserTarget, serverTarget, prerenderTarget };
   }
   return { projectType: PROJECT_TYPE.WebFrameworks, browserTarget, serverTarget, prerenderTarget };

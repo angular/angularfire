@@ -2,10 +2,7 @@ import { spawn } from 'cross-spawn';
 import { copy, readFile, writeFile } from 'fs-extra';
 import { prettySize } from 'pretty-size';
 import { file as gzipSizeFile } from 'gzip-size';
-import { dirname, join } from 'path';
-import { keys as tsKeys } from 'ts-transformer-keys';
-import firebase from 'firebase/compat/app';
-import * as glob from 'glob';
+import { join } from 'path';
 
 // TODO infer these from the package.json
 const MODULES = [
@@ -78,13 +75,13 @@ ${exportedZoneWrappedFns}
     await writeFile(filePath, fileOutput);
   };
   return Promise.all([
-    reexport('analytics', 'firebase', 'firebase/analytics', tsKeys<typeof import('firebase/analytics')>(), {
+    reexport('analytics', 'firebase', 'firebase/analytics', ["getAnalytics", "initializeAnalytics", "isSupported", "logEvent", "setAnalyticsCollectionEnabled", "setCurrentScreen", "settings", "setUserId", "setUserProperties"], {
       isSupported: { override: true },
     }),
-    reexport('app', 'firebase', 'firebase/app', tsKeys<typeof import('firebase/app')>()),
-    reexport('app-check', 'firebase', 'firebase/app-check', tsKeys<typeof import('firebase/app-check')>()),
-    reexport('auth', 'rxfire', 'rxfire/auth', tsKeys<typeof import('rxfire/auth')>()),
-    reexport('auth', 'firebase', 'firebase/auth', tsKeys<typeof import('firebase/auth')>(), {
+    reexport('app', 'firebase', 'firebase/app', ["deleteApp", "getApp", "getApps", "initializeApp", "onLog", "registerVersion", "setLogLevel", "FirebaseError", "SDK_VERSION"]),
+    reexport('app-check', 'firebase', 'firebase/app-check', ["getToken", "initializeAppCheck", "onTokenChanged", "setTokenAutoRefreshEnabled", "CustomProvider", "ReCaptchaEnterpriseProvider", "ReCaptchaV3Provider"]),
+    reexport('auth', 'rxfire', 'rxfire/auth', ["authState", "user", "idToken"]),
+    reexport('auth', 'firebase', 'firebase/auth', ["applyActionCode", "beforeAuthStateChanged", "checkActionCode", "confirmPasswordReset", "connectAuthEmulator", "createUserWithEmailAndPassword", "deleteUser", "fetchSignInMethodsForEmail", "getAdditionalUserInfo", "getAuth", "getIdToken", "getIdTokenResult", "getMultiFactorResolver", "getRedirectResult", "initializeAuth", "isSignInWithEmailLink", "linkWithCredential", "linkWithPhoneNumber", "linkWithPopup", "linkWithRedirect", "multiFactor", "onAuthStateChanged", "onIdTokenChanged", "parseActionCodeURL", "reauthenticateWithCredential", "reauthenticateWithPhoneNumber", "reauthenticateWithPopup", "reauthenticateWithRedirect", "reload", "sendEmailVerification", "sendPasswordResetEmail", "sendSignInLinkToEmail", "setPersistence", "signInAnonymously", "signInWithCredential", "signInWithCustomToken", "signInWithEmailAndPassword", "signInWithEmailLink", "signInWithPhoneNumber", "signInWithPopup", "signInWithRedirect", "signOut", "unlink", "updateCurrentUser", "updateEmail", "updatePassword", "updatePhoneNumber", "updateProfile", "useDeviceLanguage", "verifyBeforeUpdateEmail", "verifyPasswordResetCode", "ActionCodeOperation", "ActionCodeURL", "AuthCredential", "AuthErrorCodes", "browserLocalPersistence", "browserPopupRedirectResolver", "browserSessionPersistence", "debugErrorMap", "EmailAuthCredential", "EmailAuthProvider", "FacebookAuthProvider", "FactorId", "GithubAuthProvider", "GoogleAuthProvider", "indexedDBLocalPersistence", "inMemoryPersistence", "OAuthCredential", "OAuthProvider", "OperationType", "PhoneAuthCredential", "PhoneAuthProvider", "PhoneMultiFactorGenerator", "prodErrorMap", "ProviderId", "RecaptchaVerifier", "SAMLAuthProvider", "SignInMethod", "TwitterAuthProvider"], {
       debugErrorMap: null,
       inMemoryPersistence: null,
       browserLocalPersistence: null,
@@ -92,48 +89,48 @@ ${exportedZoneWrappedFns}
       indexedDBLocalPersistence: null,
       prodErrorMap: null,
     }),
-    reexport('database', 'rxfire', 'rxfire/database', tsKeys<typeof import('rxfire/database')>()),
-    reexport('database', 'firebase', 'firebase/database', tsKeys<typeof import('firebase/database')>()),
-    reexport('firestore', 'rxfire', 'rxfire/firestore', tsKeys<typeof import('rxfire/firestore')>(), {
+    reexport('database', 'rxfire', 'rxfire/database', ["fromRef", "ListenEvent", "ListenerMethods", "stateChanges", "list", "listVal", "auditTrail", "object", "objectVal", "changeToData"]),
+    reexport('database', 'firebase', 'firebase/database', ["child", "connectDatabaseEmulator", "enableLogging", "endAt", "endBefore", "equalTo", "forceLongPolling", "forceWebSockets", "get", "getDatabase", "goOffline", "goOnline", "increment", "limitToFirst", "limitToLast", "off", "onChildAdded", "onChildChanged", "onChildMoved", "onChildRemoved", "onDisconnect", "onValue", "orderByChild", "orderByKey", "orderByPriority", "orderByValue", "push", "query", "ref", "refFromURL", "remove", "runTransaction", "serverTimestamp", "set", "setPriority", "setWithPriority", "startAfter", "startAt", "update", "Database", "DataSnapshot", "OnDisconnect", "QueryConstraint", "TransactionResult"]),
+    reexport('firestore', 'rxfire', 'rxfire/firestore', ["collectionChanges", "collection", "sortedChanges", "auditTrail", "collectionData", "doc", "docData", "snapToData", "fromRef"], {
       doc: { exportName: 'docSnapshots' },
       collection: { exportName: 'collectionSnapshots' },
     }),
-    reexport('firestore', 'firebase', 'firebase/firestore', tsKeys<typeof import('firebase/firestore')>()),
-    reexport('functions', 'rxfire', 'rxfire/functions', tsKeys<typeof import('rxfire/functions')>(), {
+    reexport('firestore', 'firebase', 'firebase/firestore', ["addDoc", "arrayRemove", "arrayUnion", "clearIndexedDbPersistence", "collection", "collectionGroup", "connectFirestoreEmulator", "deleteDoc", "deleteField", "disableNetwork", "doc", "documentId", "enableIndexedDbPersistence", "enableMultiTabIndexedDbPersistence", "enableNetwork", "endAt", "endBefore", "getDoc", "getDocFromCache", "getDocFromServer", "getDocs", "getDocsFromCache", "getDocsFromServer", "getFirestore", "increment", "initializeFirestore", "limit", "limitToLast", "loadBundle", "namedQuery", "onSnapshot", "onSnapshotsInSync", "orderBy", "query", "queryEqual", "refEqual", "runTransaction", "serverTimestamp", "setDoc", "setLogLevel", "snapshotEqual", "startAfter", "startAt", "terminate", "updateDoc", "waitForPendingWrites", "where", "writeBatch", "Bytes", "CACHE_SIZE_UNLIMITED", "CollectionReference", "DocumentReference", "DocumentSnapshot", "FieldPath", "FieldValue", "Firestore", "FirestoreError", "GeoPoint", "LoadBundleTask", "Query", "QueryConstraint", "QueryDocumentSnapshot", "QuerySnapshot", "SnapshotMetadata", "Timestamp", "Transaction", "WriteBatch"]),
+    reexport('functions', 'rxfire', 'rxfire/functions', ["httpsCallable"], {
       httpsCallable: { exportName: 'httpsCallableData' },
     }),
-    reexport('functions', 'firebase', 'firebase/functions', tsKeys<typeof import('firebase/functions')>()),
-    reexport('messaging', 'firebase', 'firebase/messaging', tsKeys<typeof import('firebase/messaging')>(), {
+    reexport('functions', 'firebase', 'firebase/functions', ["connectFunctionsEmulator", "getFunctions", "httpsCallable", "httpsCallableFromURL"]),
+    reexport('messaging', 'firebase', 'firebase/messaging', ["deleteToken", "getMessaging", "getToken", "isSupported", "onMessage"], {
       onMessage: { blockUntilFirst: false },
       isSupported: { override: true },
     }),
-    reexport('remote-config', 'rxfire', 'rxfire/remote-config', tsKeys<typeof import('rxfire/remote-config')>(), {
+    reexport('remote-config', 'rxfire', 'rxfire/remote-config', ["getValue", "getString", "getNumber", "getBoolean", "getAll"], {
       getValue: { exportName: 'getValueChanges' },
       getString: { exportName: 'getStringChanges' },
       getNumber: { exportName: 'getNumberChanges' },
       getBoolean: { exportName: 'getBooleanChanges' },
       getAll: { exportName: 'getAllChanges' },
     }),
-    reexport('remote-config', 'firebase', 'firebase/remote-config', tsKeys<typeof import('firebase/remote-config')>(), {
+    reexport('remote-config', 'firebase', 'firebase/remote-config', ["activate", "ensureInitialized", "fetchAndActivate", "fetchConfig", "getAll", "getBoolean", "getNumber", "getRemoteConfig", "getString", "getValue", "isSupported", "setLogLevel"], {
       isSupported: { override: true },
     }),
-    reexport('storage', 'rxfire', 'rxfire/storage', tsKeys<typeof import('rxfire/storage')>(), {
+    reexport('storage', 'rxfire', 'rxfire/storage', ["fromTask", "getDownloadURL", "getMetadata", "uploadBytesResumable", "uploadString", "percentage"], {
       getDownloadURL: null,
       getMetadata: null,
       uploadBytesResumable: null,
       uploadString: null,
     }),
-    reexport('storage', 'firebase', 'firebase/storage', tsKeys<typeof import('firebase/storage')>()),
-    reexport('performance', 'rxfire', 'rxfire/performance', tsKeys<typeof import('rxfire/performance')>(), {
+    reexport('storage', 'firebase', 'firebase/storage', ["connectStorageEmulator", "deleteObject", "getBlob", "getBytes", "getDownloadURL", "getMetadata", "getStorage", "getStream", "list", "listAll", "ref", "updateMetadata", "uploadBytes", "uploadBytesResumable", "uploadString", "StringFormat"]),
+    reexport('performance', 'rxfire', 'rxfire/performance', ["getPerformance$", "trace", "traceUntil", "traceWhile", "traceUntilComplete", "traceUntilFirst"], {
       getPerformance$: null,
       trace: null,
     }),
-    reexport('performance', 'firebase', 'firebase/performance', tsKeys<typeof import('firebase/performance')>()),
-    reexport('firestore/lite', 'rxfire', 'rxfire/firestore/lite', tsKeys<typeof import('rxfire/firestore/lite')>(), {
+    reexport('performance', 'firebase', 'firebase/performance', ["getPerformance", "initializePerformance", "trace"]),
+    reexport('firestore/lite', 'rxfire', 'rxfire/firestore/lite', ["collection", "collectionData", "doc", "docData", "snapToData", "fromRef"], {
       doc: { exportName: 'docSnapshots' },
       collection: { exportName: 'collectionSnapshots' },
     }),
-    reexport('firestore/lite', 'firebase', 'firebase/firestore/lite', tsKeys<typeof import('firebase/firestore/lite')>()),
+    reexport('firestore/lite', 'firebase', 'firebase/firestore/lite', ["addDoc", "arrayRemove", "arrayUnion", "collection", "collectionGroup", "connectFirestoreEmulator", "deleteDoc", "deleteField", "doc", "documentId", "endAt", "endBefore", "getDoc", "getDocs", "getFirestore", "increment", "initializeFirestore", "limit", "limitToLast", "orderBy", "query", "queryEqual", "refEqual", "runTransaction", "serverTimestamp", "setDoc", "setLogLevel", "snapshotEqual", "startAfter", "startAt", "terminate", "updateDoc", "where", "writeBatch", "Bytes", "CollectionReference", "DocumentReference", "DocumentSnapshot", "FieldPath", "FieldValue", "Firestore", "FirestoreError", "GeoPoint", "Query", "QueryConstraint", "QueryDocumentSnapshot", "QuerySnapshot", "Timestamp", "Transaction", "WriteBatch"]),
   ]);
 }
 
@@ -146,14 +143,13 @@ export {};`);
 
 function proxyPolyfillCompat() {
   const defaultObject = {
-    'compat/analytics': tsKeys<firebase.analytics.Analytics>(),
-    'compat/auth': tsKeys<firebase.auth.Auth>(),
-    'compat/functions': tsKeys<firebase.functions.Functions>(),
-    'compat/messaging': tsKeys<firebase.messaging.Messaging>(),
-    'compat/performance': tsKeys<firebase.performance.Performance>(),
-    'compat/remote-config': tsKeys<firebase.remoteConfig.RemoteConfig>(),
-  };
-
+    'compat/analytics': ["app", "logEvent", "setCurrentScreen", "setUserId", "setUserProperties", "setAnalyticsCollectionEnabled"],
+    'compat/auth': ["name", "config", "emulatorConfig", "app", "applyActionCode", "checkActionCode", "confirmPasswordReset", "createUserWithEmailAndPassword", "currentUser", "fetchSignInMethodsForEmail", "isSignInWithEmailLink", "getRedirectResult", "languageCode", "settings", "onAuthStateChanged", "onIdTokenChanged", "sendSignInLinkToEmail", "sendPasswordResetEmail", "setPersistence", "signInAndRetrieveDataWithCredential", "signInAnonymously", "signInWithCredential", "signInWithCustomToken", "signInWithEmailAndPassword", "signInWithPhoneNumber", "signInWithEmailLink", "signInWithPopup", "signInWithRedirect", "signOut", "tenantId", "updateCurrentUser", "useDeviceLanguage", "useEmulator", "verifyPasswordResetCode"],
+    'compat/functions': ["useEmulator", "useFunctionsEmulator", "httpsCallable"],
+    'compat/messaging': ["deleteToken", "getToken", "onMessage", "onBackgroundMessage"],
+    'compat/performance': ["app", "trace", "instrumentationEnabled", "dataCollectionEnabled"],
+    'compat/remote-config': ["app", "settings", "defaultConfig", "fetchTimeMillis", "lastFetchStatus", "activate", "ensureInitialized", "fetch", "fetchAndActivate", "getAll", "getBoolean", "getNumber", "getString", "getValue", "setLogLevel"],
+};
   return Promise.all(Object.keys(defaultObject).map(module =>
     writeFile(join(process.cwd(), 'src', `${module}/base.ts`), `// DO NOT MODIFY, this file is autogenerated by tools/build.ts
 // Export a null object with the same keys as firebase/${module}, so Proxy can work with proxy-polyfill in Internet Explorer
@@ -243,26 +239,26 @@ async function buildLibrary() {
   await proxyPolyfillCompat();
   await zoneWrapExports();
   await spawnPromise('npx', ['ng', 'build']);
-  await Promise.all([
-    copy(join(process.cwd(), '.npmignore'), dest('.npmignore')),
-    copy(join(process.cwd(), 'README.md'), dest('README.md')),
-    copy(join(process.cwd(), 'docs'), dest('docs')),
-    compileSchematics(),
-    replacePackageCoreVersion(),
-    fixImportForLazyModules(),
-    webpackFirestoreProtos(),
-  ]);
+  // await Promise.all([
+  //   copy(join(process.cwd(), '.npmignore'), dest('.npmignore')),
+  //   copy(join(process.cwd(), 'README.md'), dest('README.md')),
+  //   copy(join(process.cwd(), 'docs'), dest('docs')),
+  //   compileSchematics(),
+  //   replacePackageCoreVersion(),
+  //   fixImportForLazyModules(),
+  //   webpackFirestoreProtos(),
+  // ]);
 }
 
 function measureLibrary() {
-  return Promise.all(UMD_NAMES.map(measure));
+  // return Promise.all(UMD_NAMES.map(measure));
 }
 
 
-buildLibrary().then(measureLibrary).then(stats =>
-  console.log(`
-Package              Size    Gzipped
-------------------------------------
-${stats.map((s, i) => [MODULES[i].padEnd(21), s.size.padEnd(8), s.gzip].join('')).join('\n')}`
-  )
-);
+buildLibrary().then(measureLibrary).then(stats => {
+// console.log(`
+// Package              Size    Gzipped
+// ------------------------------------
+// ${stats.map((s, i) => [MODULES[i].padEnd(21), s.size.padEnd(8), s.gzip].join('')).join('\n')}`
+//   )
+});
