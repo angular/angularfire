@@ -6,7 +6,7 @@ import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInsta
 import { UploadMetadata } from './interfaces';
 import 'firebase/compat/storage';
 import firebase from 'firebase/compat/app';
-import { AppCheckInstances } from '@angular/fire/app-check';
+import { AppCheckInstances } from '@angular/fire';
 
 export const BUCKET = new InjectionToken<string>('angularfire2.storageBucket');
 export const MAX_UPLOAD_RETRY_TIME = new InjectionToken<number>('angularfire2.storage.maxUploadRetryTime');

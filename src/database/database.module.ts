@@ -5,7 +5,7 @@ import { ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, VERSION } from '@angul
 import { Database, DatabaseInstances, DATABASE_PROVIDER_NAME } from './database';
 import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
 import { registerVersion } from 'firebase/app';
-import { AppCheckInstances } from '@angular/fire/app-check';
+import { AppCheckInstances } from '@angular/fire';
 
 export const PROVIDED_DATABASE_INSTANCES = new InjectionToken<Database[]>('angularfire2.database-instances');
 

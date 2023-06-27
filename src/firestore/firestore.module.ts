@@ -5,7 +5,7 @@ import { ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, VERSION } from '@angul
 import { Firestore, FirestoreInstances, FIRESTORE_PROVIDER_NAME } from './firestore';
 import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
 import { registerVersion } from 'firebase/app';
-import { AppCheckInstances } from '@angular/fire/app-check';
+import { AppCheckInstances } from '@angular/fire';
 
 export const PROVIDED_FIRESTORE_INSTANCES = new InjectionToken<Firestore[]>('angularfire2.firestore-instances');
 

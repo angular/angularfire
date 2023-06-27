@@ -1,11 +1,10 @@
 import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, Injector } from '@angular/core';
 import { Firestore as FirebaseFirestore } from 'firebase/firestore/lite';
 import { AuthInstances  } from '@angular/fire/auth';
-import { ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
+import { ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, AppCheckInstances, VERSION } from '@angular/fire';
 import { Firestore, FirestoreInstances, FIRESTORE_PROVIDER_NAME } from './lite';
 import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
 import { registerVersion } from 'firebase/app';
-import { AppCheckInstances } from '@angular/fire/app-check';
 
 export const PROVIDED_FIRESTORE_INSTANCES = new InjectionToken<Firestore[]>('angularfire2.firestore-lite-instances');
 

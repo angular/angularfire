@@ -30,7 +30,7 @@ import {
   PERSISTENCE,
   ɵauthFactory,
 } from '@angular/fire/compat/auth';
-import { AppCheckInstances } from '@angular/fire/app-check';
+import { AppCheckInstances } from '@angular/fire';
 
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled

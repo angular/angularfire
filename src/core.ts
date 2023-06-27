@@ -1,6 +1,7 @@
 import { Version } from '@angular/core';
 import { FirebaseApp, getApps } from 'firebase/app';
 import { ComponentContainer } from '@firebase/component';
+import type { AppCheck } from 'firebase/app-check';
 
 export const VERSION = new Version('ANGULARFIRE2_VERSION');
 
@@ -41,3 +42,16 @@ export const ɵgetAllInstancesOf = <T= unknown>(identifier: string, app?: Fireba
   });
   return instances;
 };
+
+// tslint:disable-next-line:no-empty-interface
+export interface AppCheckInstances extends Array<AppCheck> {}
+
+// tslint:disable-next-line:class-name
+export class AppCheckInstances {
+  constructor() {
+    return ɵgetAllInstancesOf<AppCheck>(ɵAPP_CHECK_PROVIDER_NAME);
+  }
+}
+
+// tslint:disable-next-line:variable-name
+export const ɵAPP_CHECK_PROVIDER_NAME = 'app-check';

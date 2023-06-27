@@ -5,7 +5,7 @@ import { Storage, StorageInstances, STORAGE_PROVIDER_NAME } from './storage';
 import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
 import { AuthInstances } from '@angular/fire/auth';
 import { registerVersion } from 'firebase/app';
-import { AppCheckInstances } from '@angular/fire/app-check';
+import { AppCheckInstances } from '@angular/fire';
 
 export const PROVIDED_STORAGE_INSTANCES = new InjectionToken<Storage[]>('angularfire2.storage-instances');
 

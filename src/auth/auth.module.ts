@@ -4,7 +4,7 @@ import { ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, VERSION } from '@angul
 import { Auth, AuthInstances, AUTH_PROVIDER_NAME } from './auth';
 import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
 import { registerVersion } from 'firebase/app';
-import { AppCheckInstances } from '@angular/fire/app-check';
+import { AppCheckInstances } from '@angular/fire';
 
 export const PROVIDED_AUTH_INSTANCES = new InjectionToken<Auth[]>('angularfire2.auth-instances');
 

@@ -19,7 +19,7 @@ import {
   ɵauthFactory,
 } from '@angular/fire/compat/auth';
 import firebase from 'firebase/compat/app';
-import { AppCheckInstances } from '@angular/fire/app-check';
+import { AppCheckInstances } from '@angular/fire';
 
 export const URL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
 
