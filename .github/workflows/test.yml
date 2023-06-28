@@ -47,7 +47,7 @@ jobs:
           key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
           restore-keys: yarn-offline
       - name: Install deps
-          run: yarn
+        run: yarn
         # if: steps.node_modules_cache.outputs.cache-hit != 'true'
         # run: |
         #   yarn config set ignore-engines true
