@@ -239,26 +239,22 @@ async function buildLibrary() {
   await proxyPolyfillCompat();
   await zoneWrapExports();
   await spawnPromise('npx', ['ng', 'build']);
-  // await Promise.all([
-  //   copy(join(process.cwd(), '.npmignore'), dest('.npmignore')),
-  //   copy(join(process.cwd(), 'README.md'), dest('README.md')),
-  //   copy(join(process.cwd(), 'docs'), dest('docs')),
-  //   compileSchematics(),
-  //   replacePackageCoreVersion(),
-  //   fixImportForLazyModules(),
-  //   webpackFirestoreProtos(),
-  // ]);
+  await Promise.all([
+    copy(join(process.cwd(), '.npmignore'), dest('.npmignore')),
+    copy(join(process.cwd(), 'README.md'), dest('README.md')),
+    copy(join(process.cwd(), 'docs'), dest('docs')),
+    compileSchematics(),
+    replacePackageCoreVersion(),
+    // fixImportForLazyModules(),
+    webpackFirestoreProtos(),
+  ]);
 }
 
 function measureLibrary() {
-  // return Promise.all(UMD_NAMES.map(measure));
+  return Promise.all(UMD_NAMES.map(measure));
 }
 
-
-buildLibrary().then(measureLibrary).then(stats => {
-// console.log(`
-// Package              Size    Gzipped
-// ------------------------------------
-// ${stats.map((s, i) => [MODULES[i].padEnd(21), s.size.padEnd(8), s.gzip].join('')).join('\n')}`
-//   )
-});
+buildLibrary().catch(err => {
+  console.error(err);
+  process.exit(1);
+})
