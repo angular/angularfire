@@ -1,6 +1,6 @@
 import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, PLATFORM_ID, isDevMode, Injector } from '@angular/core';
 import { AppCheck as FirebaseAppCheck } from 'firebase/app-check';
-import { ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, AppCheckInstances, ɵAPP_CHECK_PROVIDER_NAME, VERSION } from '@angular/fire';
+import { ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, ɵAppCheckInstances, ɵAPP_CHECK_PROVIDER_NAME, VERSION } from '@angular/fire';
 import { AppCheck } from './app-check';
 import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
 import { registerVersion } from 'firebase/app';
@@ -29,7 +29,7 @@ export function appCheckInstanceFactory(fn: (injector: Injector) => FirebaseAppC
 }
 
 const APP_CHECK_INSTANCES_PROVIDER = {
-  provide: AppCheckInstances,
+  provide: ɵAppCheckInstances,
   deps: [
     [new Optional(), PROVIDED_APP_CHECK_INSTANCES ],
   ]

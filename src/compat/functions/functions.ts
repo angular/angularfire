@@ -8,7 +8,7 @@ import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInsta
 import firebase from 'firebase/compat/app';
 import { proxyPolyfillCompat } from './base';
 import { HttpsCallableOptions } from '@firebase/functions-types';
-import { AppCheckInstances } from '@angular/fire';
+import { AppCheckInstances } from '@angular/fire/app-check';
 
 export const ORIGIN = new InjectionToken<string>('angularfire2.functions.origin');
 export const REGION = new InjectionToken<string>('angularfire2.functions.region');

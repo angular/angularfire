@@ -43,11 +43,11 @@ export const ɵgetAllInstancesOf = <T= unknown>(identifier: string, app?: Fireba
   return instances;
 };
 
-// tslint:disable-next-line:no-empty-interface
-export interface AppCheckInstances extends Array<AppCheck> {}
+// tslint:disable-next-line:no-empty-interface class-name
+export interface ɵAppCheckInstances extends Array<AppCheck> {}
 
 // tslint:disable-next-line:class-name
-export class AppCheckInstances {
+export class ɵAppCheckInstances {
   constructor() {
     return ɵgetAllInstancesOf<AppCheck>(ɵAPP_CHECK_PROVIDER_NAME);
   }
