@@ -48,10 +48,10 @@ function zoneWrapExports() {
     const hasRawExportedFns = rawExport.length > 0;
     const hasOverridedFns = overridden.length > 0;
     const zoneWrappedImports = zoneWrapped.map(([importName]) => `${importName} as _${importName}`).join(',\n  ');
-    const rawExportedFns = rawExport.map(([importName, exportName]) => 
+    const rawExportedFns = rawExport.map(([importName, exportName]) =>
       `${importName}${exportName === importName ? '' : `as ${exportName}`}`).join(',\n  ');
     const overriddenFns = overridden.join(',\n  ');
-    const exportedZoneWrappedFns = zoneWrapped.map(([importName, exportName]) => 
+    const exportedZoneWrappedFns = zoneWrapped.map(([importName, exportName]) =>
       `export const ${exportName} = ɵzoneWrap(_${importName}, ${overrides[importName]?.blockUntilFirst ?? true});`)
         .join('\n');
     const filePath = join(process.cwd(), 'src', `${module}/${name}.ts`);
@@ -160,7 +160,7 @@ ${defaultObject[module].map(it => `  ${it}: null,`).join('\n')}
 }
 
 const src = (...args: string[]) => join(process.cwd(), 'src', ...args);
-const dest = (...args: string[]) => join(process.cwd(), 'dist', 'packages-dist', ...args);
+const dest = (...args: string[]) => join(process.cwd(), 'dist', '@angular/fire', ...args);
 
 const rootPackage = import(join(process.cwd(), 'package.json'));
 
@@ -188,7 +188,14 @@ async function replaceSchematicVersions() {
 }
 
 function spawnPromise(command: string, args: string[]) {
-  return new Promise(resolve => spawn(command, args, { stdio: 'inherit' }).on('close', resolve));
+  return new Promise<void>((resolve, reject) => spawn(command, args, { stdio: 'inherit' }).on('close', code => {
+    if (code === 0) {
+      resolve()
+    } else {
+      reject('Build failed.');
+    }
+  })
+  .on('error', reject));
 }
 
 async function compileSchematics() {
