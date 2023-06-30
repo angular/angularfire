@@ -2,7 +2,6 @@ import { TestBed } from '@angular/core/testing';
 import { AngularFireModule, FirebaseApp } from '@angular/fire/compat';
 import { AngularFirePerformance, AngularFirePerformanceModule } from '@angular/fire/compat/performance';
 import { COMMON_CONFIG } from '../../../src/test-config';
-import { rando } from '../../../src/utils';
 
 describe('AngularFirePerformance', () => {
   let app: FirebaseApp;
@@ -11,11 +10,12 @@ describe('AngularFirePerformance', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
+        // NOTE: You must use the [DEFAULT] app instance 
+        // for these tests to work.
+        AngularFireModule.initializeApp(COMMON_CONFIG),
         AngularFirePerformanceModule
       ]
     });
-
     app = TestBed.inject(FirebaseApp);
     afp = TestBed.inject(AngularFirePerformance);
   });
