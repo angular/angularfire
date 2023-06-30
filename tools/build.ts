@@ -207,7 +207,7 @@ async function compileSchematics() {
     copy(src('schematics', 'deploy', 'schema.json'), dest('schematics', 'deploy', 'schema.json')),
     copy(src('schematics', 'add', 'schema.json'), dest('schematics', 'add', 'schema.json')),
     copy(src('schematics', 'setup', 'schema.json'), dest('schematics', 'setup', 'schema.json')),
-    replaceSchematicVersions()
+    // replaceSchematicVersions()
   ]);
 }
 
@@ -251,9 +251,9 @@ async function buildLibrary() {
     copy(join(process.cwd(), 'README.md'), dest('README.md')),
     copy(join(process.cwd(), 'docs'), dest('docs')),
     compileSchematics(),
-    replacePackageCoreVersion(),
+    // replacePackageCoreVersion(),
     // fixImportForLazyModules(),
-    webpackFirestoreProtos(),
+    // webpackFirestoreProtos(),
   ]);
 }
 

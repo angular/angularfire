@@ -149,7 +149,7 @@ export class AngularFireRemoteConfig {
       }, [settings, defaultConfig])),
       startWith<firebase.remoteConfig.RemoteConfig, undefined>(undefined),
       shareReplay({ bufferSize: 1, refCount: false })
-    );
+    ) as Observable<any>;
 
     const loadedRemoteConfig$ = remoteConfig$.pipe(
       filter<firebase.remoteConfig.RemoteConfig>(rc => !!rc)
