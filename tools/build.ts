@@ -135,6 +135,8 @@ ${exportedZoneWrappedFns}
 }
 
 function webpackFirestoreProtos() {
+  const path = dest('firestore-protos.js');
+  console.log({ path })
   return writeFile(dest('firestore-protos.js'), `/**
  * @deprecated No longer needed since Firebase JS SDK 9.6.3
  */
@@ -161,14 +163,16 @@ ${defaultObject[module].map(it => `  ${it}: null,`).join('\n')}
 
 const src = (...args: string[]) => join(process.cwd(), 'src', ...args);
 const dest = (...args: string[]) => join(process.cwd(), 'dist', '@angular/fire', ...args);
+const destPacakges = (...args: string[]) => join(process.cwd(), 'dist/packages-dist', ...args);
 
 const rootPackage = import(join(process.cwd(), 'package.json'));
 
 async function replacePackageCoreVersion() {
   const root = await rootPackage;
   const replace = require('replace-in-file');
+  const files = destPacakges('package.json');
   return replace({
-    files: dest('**', '*'),
+    files,
     from: 'ANGULARFIRE2_VERSION',
     to: root.version
   });
@@ -176,15 +180,15 @@ async function replacePackageCoreVersion() {
 
 async function replaceSchematicVersions() {
   const root = await rootPackage;
-  const path = dest('schematics', 'versions.json');
-  const dependencies = await import(path);
+  const packagesPath = destPacakges('schematics', 'versions.json');
+  const dependencies = await import(packagesPath);
   Object.keys(dependencies.peerDependencies).forEach(name => {
     dependencies.peerDependencies[name].version = root.dependencies[name] || root.devDependencies[name];
   });
   Object.keys(dependencies.firebaseFunctionsDependencies).forEach(name => {
     dependencies.firebaseFunctionsDependencies[name].version = root.dependencies[name] || root.devDependencies[name];
   });
-  return writeFile(path, JSON.stringify(dependencies, null, 2));
+  return writeFile(packagesPath, JSON.stringify(dependencies, null, 2));
 }
 
 function spawnPromise(command: string, args: string[]) {
@@ -207,7 +211,7 @@ async function compileSchematics() {
     copy(src('schematics', 'deploy', 'schema.json'), dest('schematics', 'deploy', 'schema.json')),
     copy(src('schematics', 'add', 'schema.json'), dest('schematics', 'add', 'schema.json')),
     copy(src('schematics', 'setup', 'schema.json'), dest('schematics', 'setup', 'schema.json')),
-    // replaceSchematicVersions()
+    replaceSchematicVersions()
   ]);
 }
 
@@ -243,7 +247,7 @@ async function fixImportForLazyModules() {
 }
 
 async function buildLibrary() {
-  await proxyPolyfillCompat();
+  // await proxyPolyfillCompat();
   await zoneWrapExports();
   await spawnPromise('npx', ['ng', 'build']);
   await Promise.all([
@@ -251,7 +255,7 @@ async function buildLibrary() {
     copy(join(process.cwd(), 'README.md'), dest('README.md')),
     copy(join(process.cwd(), 'docs'), dest('docs')),
     compileSchematics(),
-    // replacePackageCoreVersion(),
+    replacePackageCoreVersion(),
     // fixImportForLazyModules(),
     // webpackFirestoreProtos(),
   ]);

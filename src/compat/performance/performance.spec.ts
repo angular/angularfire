@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { AngularFireModule, FirebaseApp } from '@angular/fire/compat';
 import { AngularFirePerformance, AngularFirePerformanceModule } from '@angular/fire/compat/performance';
-import { COMMON_CONFIG } from '../../test-config';
-import { rando } from '../../utils';
+import { COMMON_CONFIG } from '../../../src/test-config';
+import { rando } from '../../../src/utils';
 
 describe('AngularFirePerformance', () => {
   let app: FirebaseApp;

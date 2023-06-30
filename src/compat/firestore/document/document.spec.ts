@@ -3,10 +3,10 @@ import { AngularFirestore, USE_EMULATOR, AngularFirestoreModule, AngularFirestor
 import { take } from 'rxjs/operators';
 
 import { TestBed } from '@angular/core/testing';
-import { COMMON_CONFIG } from '../../../test-config';
+import { COMMON_CONFIG } from '../../../../src/test-config';
 
 import { FAKE_STOCK_DATA, randomName, Stock } from '../utils.spec';
-import { rando } from '../../../utils';
+import { rando } from '../../../../src/utils';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 
@@ -21,7 +21,7 @@ describe('AngularFirestoreDocument', () => {
         AngularFirestoreModule
       ],
       providers: [
-        { provide: USE_EMULATOR, useValue: ['localhost', 8080] }
+        { provide: USE_EMULATOR, useValue: ['localhost', 8089] }
       ]
     });
 

@@ -5,7 +5,7 @@ import { skip, switchMap, take } from 'rxjs/operators';
 import 'firebase/compat/firestore';
 
 import { async, TestBed } from '@angular/core/testing';
-import { COMMON_CONFIG } from '../../../test-config';
+import { COMMON_CONFIG } from '../../../../src/test-config';
 
 import {
   createRandomStocks,
@@ -17,7 +17,7 @@ import {
   randomName,
   Stock
 } from '../utils.spec';
-import { rando } from '../../../utils';
+import { rando } from '../../../../src/utils';
 
 async function collectionHarness(afs: AngularFirestore, items: number, queryFn?: QueryFn<Stock>) {
   const randomCollectionName = randomName(afs.firestore);
@@ -41,7 +41,7 @@ describe('AngularFirestoreCollection', () => {
         AngularFirestoreModule
       ],
       providers: [
-        { provide: USE_EMULATOR, useValue: ['localhost', 8080] }
+        { provide: USE_EMULATOR, useValue: ['localhost', 8089] }
       ]
     });
 
@@ -75,7 +75,13 @@ describe('AngularFirestoreCollection', () => {
           });
           // Delete them all
           const promises = names.map(name => ref.doc(name).delete());
-          Promise.all(promises).then(done).catch(fail);
+          Promise.all(promises)
+            .then(() => {
+              done()
+            })
+            .catch(() => {
+              done.fail()
+            });
         });
       })();
     });
@@ -185,22 +191,32 @@ describe('AngularFirestoreCollection', () => {
       })();
     });
 
+    it('test log', done => {
+      console.log('Done!')
+      done()
+    })
+
     it('should handle multiple subscriptions (hot)', done => {
-      (async () => {
+      async function setup() {
         const ITEMS = 4;
         const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
-        const changes = stocks.snapshotChanges();
-        const sub = changes.subscribe(() => {
-        });
+        const changes$ = stocks.snapshotChanges();
+        const sub = changes$.subscribe(changes => { });
         sub.add(
-          changes.pipe(take(1)).subscribe(data => {
+          changes$.pipe(take(1)).subscribe(data => {
             expect(data.length).toEqual(ITEMS);
             sub.unsubscribe();
-          }).add(() => {
-            deleteThemAll(names, ref).then(done).catch(done.fail);
+            deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           })
         );
-      })();
+      }
+      setup()
     });
 
     it('should handle multiple subscriptions (warm)', done => {

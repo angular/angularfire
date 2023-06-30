@@ -3,7 +3,7 @@ import { QueryGroupFn, Query , AngularFirestore, AngularFirestoreCollectionGroup
 import { BehaviorSubject } from 'rxjs';
 import { skip, switchMap, take } from 'rxjs/operators';
 import { TestBed } from '@angular/core/testing';
-import { COMMON_CONFIG } from '../../../test-config';
+import { COMMON_CONFIG } from '../../../../src/test-config';
 import 'firebase/compat/firestore';
 
 import {
@@ -16,7 +16,7 @@ import {
   randomName,
   Stock
 } from '../utils.spec';
-import { rando } from '../../../utils';
+import { rando } from '../../../../src/utils';
 
 async function collectionHarness(afs: AngularFirestore, items: number, queryGroupFn?: QueryGroupFn<Stock>) {
   const randomCollectionName = randomName(afs.firestore);
@@ -40,7 +40,7 @@ describe('AngularFirestoreCollectionGroup', () => {
         AngularFirestoreModule
       ],
       providers: [
-        { provide: USE_EMULATOR, useValue: ['localhost', 8080] }
+        { provide: USE_EMULATOR, useValue: ['localhost', 8089] }
       ]
     });
 

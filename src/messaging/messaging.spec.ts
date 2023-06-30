@@ -35,7 +35,8 @@ describe('Messaging', () => {
         messaging = TestBed.inject(Messaging);
     });
 
-    it('should be injectable', async (done) => {
+    it('should be injectable', done => {
+      (async () => {
         const supported = await isSupported();
         if (supported) {
           expect(providedMessaging).toBeTruthy();
@@ -45,6 +46,7 @@ describe('Messaging', () => {
           expect(messaging).toBeNull();
         }
         done();
+      })();
     });
 
   });
