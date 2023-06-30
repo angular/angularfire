@@ -112,7 +112,13 @@ describe('AngularFirestoreCollection', () => {
             expect(data.length).toEqual(ITEMS);
             sub.unsubscribe();
           }).add(() => {
-            deleteThemAll(names, ref).then(done).catch(done.fail);
+            deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           })
         );
       })();
@@ -128,7 +134,13 @@ describe('AngularFirestoreCollection', () => {
           changes.pipe(take(1)).subscribe(data => {
             expect(data.length).toEqual(ITEMS);
           }).add(() => {
-            deleteThemAll(names, ref).then(done).catch(done.fail);
+            deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           });
         });
       })();
@@ -156,7 +168,13 @@ describe('AngularFirestoreCollection', () => {
           if (count === 2) {
             expect(data.length).toEqual(0);
             sub.unsubscribe();
-            deleteThemAll(names, ref).then(done).catch(done.fail);
+            deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           }
         });
       })();
@@ -185,16 +203,17 @@ describe('AngularFirestoreCollection', () => {
             const change = data.filter(x => x.payload.doc.id === names[0])[0];
             expect(change.type).toEqual('modified');
             sub.unsubscribe();
-            deleteThemAll(names, ref).then(done).catch(done.fail);
+            deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           }
         });
       })();
     });
-
-    it('test log', done => {
-      console.log('Done!')
-      done()
-    })
 
     it('should handle multiple subscriptions (hot)', done => {
       async function setup() {
@@ -229,7 +248,13 @@ describe('AngularFirestoreCollection', () => {
           changes.pipe(take(1)).subscribe(data => {
             expect(data.length).toEqual(ITEMS);
           }).add(() => {
-            deleteThemAll(names, ref).then(done).catch(done.fail);
+            deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           });
         });
       })();
@@ -258,7 +283,13 @@ describe('AngularFirestoreCollection', () => {
             expect(change.type).toEqual('modified');
             expect(change.payload.oldIndex).toEqual(firstIndex);
             sub.unsubscribe();
-            deleteThemAll(names, ref).then(done).catch(done.fail);
+            deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           }
         });
       })();
@@ -275,7 +306,13 @@ describe('AngularFirestoreCollection', () => {
           expect(data.length).toEqual(1);
           expect(change.payload.doc.data().price).toEqual(2);
           expect(change.type).toEqual('modified');
-          deleteThemAll(names, ref).then(done).catch(done.fail);
+          deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
         });
 
         delayUpdate(stocks, names[0], { price: 2 });
@@ -297,7 +334,13 @@ describe('AngularFirestoreCollection', () => {
           expect(data.length).toEqual(ITEMS + 1);
           expect(change.payload.doc.data().price).toEqual(2);
           expect(change.type).toEqual('added');
-          deleteThemAll(names, ref).then(done).catch(done.fail);
+          deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           done();
         });
 
@@ -334,7 +377,13 @@ describe('AngularFirestoreCollection', () => {
             expect(change.type).toEqual('modified');
           }
         }).add(() => {
-          deleteThemAll(names, ref).then(done).catch(done.fail);
+          deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
         });
 
         names = names.concat([nextId]);
@@ -353,7 +402,13 @@ describe('AngularFirestoreCollection', () => {
           const change = data.filter(x => x.payload.doc.id === names[0]);
           expect(data.length).toEqual(ITEMS - 1);
           expect(change.length).toEqual(0);
-          deleteThemAll(names, ref).then(done).catch(done.fail);
+          deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           done();
         });
 
@@ -383,7 +438,9 @@ describe('AngularFirestoreCollection', () => {
             // We used the same piece of data so they should all equal
             expect(action.payload.doc.data()).toEqual(FAKE_STOCK_DATA);
           });
-          deleteThemAll(names, ref).then(done).catch(done.fail);
+          deleteThemAll(names, ref)
+            .then(() => { done() })
+            .catch(() => { done.fail() });
         });
       })();
     });
@@ -401,7 +458,13 @@ describe('AngularFirestoreCollection', () => {
           if (count === 2) {
             expect(data.length).toEqual(1);
             expect(data[0].type).toEqual('modified');
-            deleteThemAll(names, ref).then(done).catch(done.fail);
+            deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           }
         });
       })();
@@ -419,7 +482,13 @@ describe('AngularFirestoreCollection', () => {
             expect(data.length).toEqual(ITEMS);
             sub.unsubscribe();
           }).add(() => {
-            deleteThemAll(names, ref).then(done).catch(done.fail);
+            deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           })
         );
       })();
@@ -435,7 +504,13 @@ describe('AngularFirestoreCollection', () => {
           changes.pipe(take(1)).subscribe(data => {
             expect(data.length).toEqual(ITEMS);
           }).add(() => {
-            deleteThemAll(names, ref).then(done).catch(done.fail);
+            deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           });
         });
       })();
@@ -451,7 +526,13 @@ describe('AngularFirestoreCollection', () => {
           expect(data.length).toEqual(1);
           expect(data[0].payload.doc.data().price).toEqual(2);
           expect(data[0].type).toEqual('modified');
-          deleteThemAll(names, ref).then(done).catch(done.fail);
+          deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           done();
         });
 
@@ -472,7 +553,13 @@ describe('AngularFirestoreCollection', () => {
           expect(data.length).toEqual(1);
           expect(data[0].payload.doc.data().price).toEqual(2);
           expect(data[0].type).toEqual('added');
-          deleteThemAll(names, ref).then(done).catch(done.fail);
+          deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           done();
         });
 
@@ -491,7 +578,13 @@ describe('AngularFirestoreCollection', () => {
           sub.unsubscribe();
           expect(data.length).toEqual(1);
           expect(data[0].type).toEqual('removed');
-          deleteThemAll(names, ref).then(done).catch(done.fail);
+          deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           done();
         });
 
@@ -530,7 +623,13 @@ describe('AngularFirestoreCollection', () => {
             sub.unsubscribe();
             expect(data.length).toEqual(ITEMS + 1);
             expect(data[data.length - 1].type).toEqual('modified');
-            deleteThemAll(names, ref).then(done).catch(done.fail);
+            deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           }
         });
       })();
@@ -545,7 +644,13 @@ describe('AngularFirestoreCollection', () => {
           sub.unsubscribe();
           expect(data.length).toEqual(1);
           expect(data[0].type).toEqual('removed');
-          deleteThemAll(names, ref).then(done).catch(done.fail);
+          deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           done();
         });
 

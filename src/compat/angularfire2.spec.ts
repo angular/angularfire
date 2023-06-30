@@ -148,6 +148,7 @@ describe('angularfire', () => {
 
     });
 
+    // TODO(davideast): This sometimes fails. Why?
     it('should block until first emission', done => {
       const testScheduler = new TestScheduler(null);
       testScheduler.run(helpers => {
