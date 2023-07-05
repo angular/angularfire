@@ -128,7 +128,7 @@ The `fromRef()` function creates an observable that emits reference changes.
 | **params**      | ref: `Reference\|Query`, event: `ListenEvent` |
 | **return**      | `Observable<QueryChange>`                |
 
-## Connecting the the emulator suite
+## Connecting to the emulator suite
 
 ```ts
 import { connectDatabaseEmulator, getDatabase, provideDatabase } from '@angular/fire/database';
