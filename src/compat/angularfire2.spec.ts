@@ -148,7 +148,7 @@ describe('angularfire', () => {
 
     });
 
-    // TODO(davideast): This sometimes fails. Why?
+    // TODO(davideast): new Zone['TaskTrackingZoneSpec'](); no longer works
     xit('should block until first emission', done => {
       const testScheduler = new TestScheduler(null);
       testScheduler.run(helpers => {

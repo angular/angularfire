@@ -11,7 +11,7 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 
 // TODO(davideast): Investage this flake on Safari.
-xdescribe('AngularFirestoreDocument', () => {
+describe('AngularFirestoreDocument', () => {
   let app: FirebaseApp;
   let afs: AngularFirestore;
 
