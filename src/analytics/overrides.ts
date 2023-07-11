@@ -1,3 +1,4 @@
-import { ɵisAnalyticsSupportedFactory } from '@angular/fire';
+import { isAnalyticsSupportedFactory } from './is-analytics-supported-factory';
 
-export const isSupported = ɵisAnalyticsSupportedFactory.async;
+export const isSupported = isAnalyticsSupportedFactory.async;
+
