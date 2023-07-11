@@ -114,7 +114,7 @@ export const featuresPrompt = async (): Promise<FEATURES[]> => {
     choices: featureOptions,
     message: 'What features would you like to setup?',
     default: [FEATURES.Hosting],
-  }) as any; // { features: FEATURES[] };
+  }) as { features: FEATURES[] };
   return features;
 };
 
