@@ -1,7 +1,7 @@
 # 4. Querying Collections in AngularFirestore
 
 > Firestore has [powerful querying syntax](https://firebase.google.com/docs/firestore/query-data/queries) and the `AngularFirestoreCollection` provides a thin wrapper around it. This keeps you from having to learn two query syntax systems.
-If you know the [Firestore query API](https://firebase.google.com/docs/reference/js/firebase.firestore.Query) then you know how to query in AngularFirestore.
+If you know the [Firestore query API](https://firebase.google.com/docs/reference/js/v8/firebase.firestore.Query) then you know how to query in AngularFirestore.
 
 > **NOTE**: [AngularFire has a new tree-shakable API](../../../README.md#developer-guide), you're looking at the documentation for the compatability version of the library. [See the v7 upgrade guide for more information on this change.](../../version-7-upgrade.md).
 
