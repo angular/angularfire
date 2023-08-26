@@ -11,7 +11,7 @@
   },
   "emulators": {
     "auth": {
-      "port": 9099
+      "port": 9098
     },
     "functions": {
       "port": 5001
@@ -20,7 +20,7 @@
       "port": 8089
     },
     "database": {
-      "port": 9001
+      "port": 9002
     },
     "storage": {
       "port": 9199

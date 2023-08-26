@@ -91,7 +91,7 @@ ${exportedZoneWrappedFns}
     }),
     reexport('database', 'rxfire', 'rxfire/database', ["fromRef", "ListenEvent", "ListenerMethods", "stateChanges", "list", "listVal", "auditTrail", "object", "objectVal", "changeToData"]),
     reexport('database', 'firebase', 'firebase/database', ["child", "connectDatabaseEmulator", "enableLogging", "endAt", "endBefore", "equalTo", "forceLongPolling", "forceWebSockets", "get", "getDatabase", "goOffline", "goOnline", "increment", "limitToFirst", "limitToLast", "off", "onChildAdded", "onChildChanged", "onChildMoved", "onChildRemoved", "onDisconnect", "onValue", "orderByChild", "orderByKey", "orderByPriority", "orderByValue", "push", "query", "ref", "refFromURL", "remove", "runTransaction", "serverTimestamp", "set", "setPriority", "setWithPriority", "startAfter", "startAt", "update", "Database", "DataSnapshot", "OnDisconnect", "QueryConstraint", "TransactionResult"]),
-    reexport('firestore', 'rxfire', 'rxfire/firestore', ["collectionChanges", "collection", "sortedChanges", "auditTrail", "collectionData", "doc", "docData", "snapToData", "fromRef"], {
+    reexport('firestore', 'rxfire', 'rxfire/firestore', ["collectionChanges", "collection", "sortedChanges", "auditTrail", "collectionData", "doc", "docData", "snapToData", "fromRef", "collectionCount", "collectionCountSnap"], {
       doc: { exportName: 'docSnapshots' },
       collection: { exportName: 'collectionSnapshots' },
     }),

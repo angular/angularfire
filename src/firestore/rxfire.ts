@@ -9,7 +9,9 @@ import {
   doc as _doc,
   docData as _docData,
   snapToData as _snapToData,
-  fromRef as _fromRef
+  fromRef as _fromRef,
+  collectionCount as _collectionCount,
+  collectionCountSnap as _collectionCountSnap
 } from 'rxfire/firestore';
 
 export const collectionChanges = ɵzoneWrap(_collectionChanges, true);
@@ -21,3 +23,5 @@ export const docSnapshots = ɵzoneWrap(_doc, true);
 export const docData = ɵzoneWrap(_docData, true);
 export const snapToData = ɵzoneWrap(_snapToData, true);
 export const fromRef = ɵzoneWrap(_fromRef, true);
+export const collectionCount = ɵzoneWrap(_collectionCount, true);
+export const collectionCountSnap = ɵzoneWrap(_collectionCountSnap, true);
