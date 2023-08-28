@@ -45,6 +45,7 @@ export class ɵZoneScheduler implements SchedulerLike {
 }
 
 class BlockUntilFirstOperator<T> implements Operator<T, T> {
+  // @ts-ignore
   private task: MacroTask | null = null;
 
   constructor(private zone: any) {
@@ -52,6 +53,7 @@ class BlockUntilFirstOperator<T> implements Operator<T, T> {
 
   call(subscriber: Subscriber<T>, source: Observable<T>): TeardownLogic {
     const unscheduleTask = this.unscheduleTask.bind(this);
+    // @ts-ignore
     this.task = this.zone.run(() => Zone.current.scheduleMacroTask('firebaseZoneBlock', noop, {}, noop, noop));
 
     return source.pipe(
@@ -80,7 +82,9 @@ export class ɵAngularFireSchedulers {
   public readonly insideAngular: ɵZoneScheduler;
 
   constructor(public ngZone: NgZone) {
+    // @ts-ignore
     this.outsideAngular = ngZone.runOutsideAngular(() => new ɵZoneScheduler(Zone.current));
+    // @ts-ignore
     this.insideAngular = ngZone.run(() => new ɵZoneScheduler(Zone.current, asyncScheduler));
     globalThis.ɵAngularFireScheduler ||= this;
   }
@@ -140,6 +144,7 @@ export function ɵkeepUnstableUntilFirstFactory(schedulers: ɵAngularFireSchedul
   };
 }
 
+// @ts-ignore
 const zoneWrapFn = (it: (...args: any[]) => any, macrotask: MacroTask|undefined) => {
   const _this = this;
   // function() is needed for the arguments object
@@ -161,6 +166,7 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
   // function() is needed for the arguments object
   // tslint:disable-next-line:only-arrow-functions
   return function() {
+    // @ts-ignore
     let macrotask: MacroTask | undefined;
     const _arguments = arguments;
     // if this is a callback function, e.g, onSnapshot, we should create a microtask and invoke it
@@ -168,6 +174,7 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
     for (let i = 0; i < arguments.length; i++) {
       if (typeof _arguments[i] === 'function') {
         if (blockUntilFirst) {
+          // @ts-ignore
           macrotask ||= run(() => Zone.current.scheduleMacroTask('firebaseZoneBlock', noop, {}, noop, noop));
         }
         // TODO create a microtask to track callback functions
@@ -178,7 +185,7 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
     if (!blockUntilFirst) {
       if (ret instanceof Observable) {
         const schedulers = getSchedulers();
-        return ret.pipe(
+        return ret.pipe( 
           subscribeOn(schedulers.outsideAngular),
           observeOn(schedulers.insideAngular),
         );

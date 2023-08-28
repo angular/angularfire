@@ -19,7 +19,7 @@ describe('Firestore-lite', () => {
                 provideFirebaseApp(() => initializeApp(COMMON_CONFIG, appName)),
                 provideFirestore(() => {
                     providedFirestore = getFirestore(getApp(appName));
-                    connectFirestoreEmulator(providedFirestore, 'localhost', 8080);
+                    connectFirestoreEmulator(providedFirestore, 'localhost', 8089);
                     return providedFirestore;
                 }),
             ],

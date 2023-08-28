@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { AngularFireModule, FirebaseApp } from '@angular/fire/compat';
-import { COMMON_CONFIG } from '../../test-config';
+import { COMMON_CONFIG } from '../../../src/test-config';
 import { AngularFireAuthGuard, AngularFireAuthGuardModule } from '@angular/fire/compat/auth-guard';
 import { Router, RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
-import { rando } from '../../utils';
+import { rando } from '../../../src/utils';
 
 class TestComponent { }
 

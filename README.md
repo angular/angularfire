@@ -1,3 +1,4 @@
+
 # AngularFire
 The official [Angular](https://angular.io/) library for [Firebase](https://firebase.google.com/).
 

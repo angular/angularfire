@@ -19,7 +19,7 @@ describe('Functions', () => {
                 provideFirebaseApp(() => initializeApp(COMMON_CONFIG, appName)),
                 provideFunctions(() => {
                     providedFunctions = getFunctions(getApp(appName));
-                    connectFunctionsEmulator(providedFunctions, 'localhost', 9099);
+                    connectFunctionsEmulator(providedFunctions, 'localhost', 5001);
                     return providedFunctions;
                 }),
             ],

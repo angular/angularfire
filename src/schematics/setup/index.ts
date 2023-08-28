@@ -20,19 +20,23 @@ import {
 } from '../common';
 import { FirebaseJSON, Workspace, WorkspaceProject } from '../interfaces';
 
+export interface SetupConfig extends DeployOptions {
+  firebaseProject: FirebaseProject,
+  firebaseApp?: FirebaseApp,
+  firebaseHostingSite?: FirebaseHostingSite,
+  sdkConfig?: Record<string, string>,
+  nodeVersion?: string,
+  browserTarget?: string,
+  serverTarget?: string,
+  prerenderTarget?: string,
+  project: string,
+  ssrRegion?: string,
+  projectType?: PROJECT_TYPE,
+  prerender?: boolean,
+}; 
+
 export const setupProject =
-  async (tree: Tree, context: SchematicContext, features: FEATURES[], config: DeployOptions & {
-    firebaseProject: FirebaseProject,
-    firebaseApp?: FirebaseApp,
-    firebaseHostingSite?: FirebaseHostingSite,
-    sdkConfig?: Record<string, string>,
-    nodeVersion?: string,
-    browserTarget?: string,
-    serverTarget?: string,
-    prerenderTarget?: string,
-    project: string,
-    ssrRegion?: string,
-  }) => {
+  async (tree: Tree, context: SchematicContext, features: FEATURES[], config: SetupConfig) => {
     const { path: workspacePath, workspace } = getWorkspace(tree);
 
     const { project, projectName } = getProject(config, tree);

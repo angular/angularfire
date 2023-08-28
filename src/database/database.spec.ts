@@ -19,7 +19,7 @@ describe('Database', () => {
                 provideFirebaseApp(() => initializeApp(COMMON_CONFIG, appName)),
                 provideDatabase(() => {
                     providedDatabase = getDatabase(getApp(appName));
-                    connectDatabaseEmulator(providedDatabase, 'localhost', 9000);
+                    connectDatabaseEmulator(providedDatabase, 'localhost', 9002);
                     return providedDatabase;
                 }),
             ],

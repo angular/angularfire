@@ -47,7 +47,8 @@ ncp(pathToTestSrcFolder, pathToTestFolder, () => {
           }
         });
       }))
-      .catch(_ => {
+      .catch(error => {
+        console.log(error)
         // resolve with exit code 1
         return Promise.resolve(1)
       })
@@ -67,6 +68,9 @@ function spawnIt(program, args) {
       .on('close', (code) => {
         if (code) return rej(code);
         res();
+      })
+      .on('error', error => {
+        rej(error)
       })
   });
 }

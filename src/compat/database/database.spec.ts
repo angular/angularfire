@@ -1,10 +1,10 @@
 import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire/compat';
 import { AngularFireDatabase, AngularFireDatabaseModule, URL } from '@angular/fire/compat/database';
 import { TestBed } from '@angular/core/testing';
-import { COMMON_CONFIG } from '../../test-config';
+import { COMMON_CONFIG } from '../../../src/test-config';
 import { NgZone } from '@angular/core';
 import 'firebase/compat/database';
-import { rando } from '../../utils';
+import { rando } from '../../../src/utils';
 import { ɵAngularFireSchedulers } from '@angular/fire';
 
 describe('AngularFireDatabase', () => {

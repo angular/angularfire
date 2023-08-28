@@ -2,10 +2,10 @@ import { ɵZoneScheduler } from '@angular/fire';
 import { AngularFireModule, FirebaseApp } from '@angular/fire/compat';
 import { AngularFireDatabase, AngularFireDatabaseModule, fromRef } from '@angular/fire/compat/database';
 import { TestBed } from '@angular/core/testing';
-import { COMMON_CONFIG } from '../../../test-config';
+import { COMMON_CONFIG } from '../../../../src/test-config';
 import { take } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
-import { rando } from '../../../utils';
+import { rando } from '../../../../src/utils';
 import firebase from 'firebase/compat/app';
 
 describe('fromRef', () => {
@@ -70,11 +70,11 @@ describe('fromRef', () => {
 
     obs.subscribe(() => {
       expect(testScheduler.schedule).toHaveBeenCalled();
-      done();
+      // done();
     }, err => {
       console.error(err);
       expect(false).withContext('Shouldnt error').toEqual(true);
-      done();
+      // done();
     }, () => {
       expect(testScheduler.schedule).toHaveBeenCalled();
       done();

@@ -23,7 +23,7 @@ describe('AuthGuard', () => {
         provideFirebaseApp(() => initializeApp(COMMON_CONFIG, appName)),
         provideAuth(() => {
           const auth = getAuth(getApp(appName));
-          connectAuthEmulator(auth, 'http://localhost:9099');
+          connectAuthEmulator(auth, 'http://localhost:9098');
           return auth;
         }),
         AuthGuardModule,
