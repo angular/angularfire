@@ -1,7 +1,7 @@
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
-import { setupProject } from '@angular/fire/schematics/setup';
+// import { setupProject } from '@angular/fire/schematics/setup';
+import { setupProject } from  './setup';
 import 'jasmine';
-import { join as pathJoin } from 'path';
 import { FEATURES, PROJECT_TYPE } from './interfaces';
 
 const PROJECT_NAME = 'pie-ka-chu';
@@ -306,7 +306,7 @@ describe('ng-add', () => {
         projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
         prerender: false,
-      });
+      }) as Tree;
       expect(result.read('firebase.json').toString()).toEqual(initialFirebaseJson);
       expect(result.read('.firebaserc').toString()).toEqual(initialFirebaserc);
       expect(result.read('angular.json').toString()).toEqual(initialAngularJson);
@@ -318,7 +318,7 @@ describe('ng-add', () => {
         projectType: PROJECT_TYPE.Static,
         project: undefined,
         prerender: false,
-      });
+      }) as Tree;
       expect(result.read('firebase.json').toString()).toEqual(overwriteFirebaseJson);
       expect(result.read('.firebaserc').toString()).toEqual(overwriteFirebaserc);
       expect(result.read('angular.json').toString()).toEqual(overwriteAngularJson);
@@ -350,7 +350,7 @@ describe('ng-add', () => {
         projectType: PROJECT_TYPE.Static,
         project: OTHER_PROJECT_NAME,
         prerender: false,
-      });
+      }) as Tree;
       expect(result.read('firebase.json').toString()).toEqual(projectFirebaseJson);
       expect(result.read('.firebaserc').toString()).toEqual(projectFirebaserc);
       expect(result.read('angular.json').toString()).toEqual(projectAngularJson);
@@ -544,7 +544,7 @@ describe('ng-add', () => {
           projectType: PROJECT_TYPE.CloudFunctions,
           project: PROJECT_NAME,
           prerender: false,
-        });
+        }) as Tree;
 
         const workspace = JSON.parse((await result.read('angular.json')).toString());
         expect(workspace.projects['pie-ka-chu'].architect.deploy).toBeTruthy();
@@ -561,7 +561,7 @@ describe('ng-add', () => {
           projectType: PROJECT_TYPE.CloudFunctions,
           project: PROJECT_NAME,
           prerender: false,
-        });
+        }) as Tree;
 
         const firebaseJson = JSON.parse((await result.read('firebase.json')).toString());
         expect(firebaseJson).toEqual(universalFirebaseJson);

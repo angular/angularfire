@@ -9,6 +9,8 @@ import { AngularFirestoreDocument } from '../document/document';
 import { fromCollectionRef } from '../observable/fromRef';
 import { AngularFirestore } from '../firestore';
 
+type DocumentChangeTuple<T> = [DocumentChangeAction<T>[], DocumentChangeAction<T>[]];
+
 export function validateEventsArray(events?: DocumentChangeType[]) {
   if (!events || events.length === 0) {
     events = ['added', 'removed', 'modified'];
@@ -71,7 +73,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
       // that the collection has been resolve; even if it's empty
       startWith<DocumentChangeAction<T>[], undefined>(undefined),
       pairwise(),
-      filter(([prior, current]) => current.length > 0 || !prior),
+      filter(([prior, current]: DocumentChangeTuple<T>) => current.length > 0 || !prior),
       map(([prior, current]) => current),
       keepUnstableUntilFirst
     );

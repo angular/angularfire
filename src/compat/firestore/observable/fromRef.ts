@@ -30,7 +30,8 @@ export function fromDocRef<T>(ref: DocumentReference<T>, scheduler?: SchedulerLi
     .pipe(
       startWith<DocumentSnapshot<T>, undefined>(undefined),
       pairwise(),
-      map(([priorPayload, payload]) => {
+      map((snapshots: [DocumentSnapshot<T>, DocumentSnapshot<T>]) => {
+        const [priorPayload, payload] = snapshots;
         if (!payload.exists) {
           return { payload, type: 'removed' };
         }

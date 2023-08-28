@@ -2,9 +2,9 @@ import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } f
 import { AngularFirestore, USE_EMULATOR, AngularFirestoreModule, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
 
 import { TestBed } from '@angular/core/testing';
-import { COMMON_CONFIG } from '../../test-config';
+import { COMMON_CONFIG } from '../../../src/test-config';
 import 'firebase/compat/firestore';
-import { rando } from '../../utils';
+import { rando } from '../../../src/utils';
 
 describe('AngularFirestore', () => {
   let app: FirebaseApp;
@@ -17,7 +17,7 @@ describe('AngularFirestore', () => {
         AngularFirestoreModule.enablePersistence()
       ],
       providers: [
-        { provide: USE_EMULATOR, useValue: ['localhost', 8080] }
+        { provide: USE_EMULATOR, useValue: ['localhost', 8089] }
       ]
     });
 
@@ -108,7 +108,7 @@ describe('AngularFirestore with different app', () => {
       providers: [
         { provide: FIREBASE_APP_NAME, useValue: firebaseAppName },
         { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG },
-        { provide: USE_EMULATOR, useValue: ['localhost', 8080] }
+        { provide: USE_EMULATOR, useValue: ['localhost', 8089] }
       ]
     });
 
@@ -146,7 +146,7 @@ describe('AngularFirestore without persistance', () => {
         AngularFirestoreModule
       ],
       providers: [
-        { provide: USE_EMULATOR, useValue: ['localhost', 8080] }
+        { provide: USE_EMULATOR, useValue: ['localhost', 8089] }
       ]
     });
 

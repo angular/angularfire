@@ -1,11 +1,11 @@
 import { AngularFireModule, FirebaseApp } from '@angular/fire/compat';
 import { AngularFireDatabase, AngularFireDatabaseModule, auditTrail, ChildEvent, URL } from '@angular/fire/compat/database';
 import { TestBed } from '@angular/core/testing';
-import { COMMON_CONFIG } from '../../../test-config';
+import { COMMON_CONFIG } from '../../../../src/test-config';
 import { skip } from 'rxjs/operators';
 import 'firebase/compat/database';
 import firebase from 'firebase/compat/app';
-import { rando } from '../../../utils';
+import { rando } from '../../../../src/utils';
 
 describe('auditTrail', () => {
   let app: FirebaseApp;

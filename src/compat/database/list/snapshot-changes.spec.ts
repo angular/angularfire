@@ -2,11 +2,11 @@ import firebase from 'firebase/compat/app';
 import { AngularFireModule, FirebaseApp } from '@angular/fire/compat';
 import { AngularFireDatabase, AngularFireDatabaseModule, ChildEvent, snapshotChanges, URL } from '@angular/fire/compat/database';
 import { TestBed } from '@angular/core/testing';
-import { COMMON_CONFIG } from '../../../test-config';
+import { COMMON_CONFIG } from '../../../../src/test-config';
 import { BehaviorSubject } from 'rxjs';
 import { skip, switchMap, take } from 'rxjs/operators';
 import 'firebase/compat/database';
-import { rando } from '../../../utils';
+import { rando } from '../../../../src/utils';
 
 describe('snapshotChanges', () => {
   let app: FirebaseApp;

@@ -5,6 +5,7 @@ import { auditTrail } from './audit-trail';
 import { createDataOperationMethod } from './data-operation';
 import { createRemoveMethod } from './remove';
 import { AngularFireDatabase } from '../database';
+import type { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { keepUnstableUntilFirst } from '@angular/fire';
 
@@ -26,7 +27,7 @@ export function createListReference<T= any>(query: DatabaseQuery, afDatabase: An
     auditTrail(events?: ChildEvent[]) {
       return auditTrail<T>(query, events, outsideAngularScheduler).pipe(keepUnstableUntilFirst);
     },
-    valueChanges<K extends string>(events?: ChildEvent[], options?: {idField?: K}) {
+    valueChanges<K extends string>(events?: ChildEvent[], options?: {idField?: K}): Observable<(T & { [x: string]: string; })[]> {
       const snapshotChanges$ = snapshotChanges<T>(query, events, outsideAngularScheduler);
       return snapshotChanges$.pipe(
         map(actions => actions.map(a => {
@@ -38,7 +39,7 @@ export function createListReference<T= any>(query: DatabaseQuery, afDatabase: An
               }
             };
           } else {
-            return a.payload.val() as T;
+            return a.payload.val() as T & { [x: string]: string; }
           }
         })),
         keepUnstableUntilFirst

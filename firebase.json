@@ -11,16 +11,16 @@
   },
   "emulators": {
     "auth": {
-      "port": 9099
+      "port": 9098
     },
     "functions": {
       "port": 5001
     },
     "firestore": {
-      "port": 8080
+      "port": 8089
     },
     "database": {
-      "port": 9000
+      "port": 9002
     },
     "storage": {
       "port": 9199
