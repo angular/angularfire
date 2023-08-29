@@ -83,7 +83,7 @@ export class AngularFirestoreCollectionGroup<T = DocumentData> {
    */
   valueChanges(): Observable<T[]>;
   // tslint:disable-next-line:unified-signatures
-  valueChanges({}): Observable<T[]>;
+  valueChanges(): Observable<T[]>;
   valueChanges<K extends string>(options: {idField: K}): Observable<(T & { [T in K]: string })[]>;
   valueChanges<K extends string>(options: {idField?: K} = {}): Observable<T[]> {
     const fromCollectionRefScheduled$ = fromCollectionRef<T>(this.query, this.afs.schedulers.outsideAngular);
