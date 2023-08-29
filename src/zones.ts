@@ -1,24 +1,25 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Injectable, NgZone } from '@angular/core';
 import {
-  asyncScheduler,
   Observable,
   Operator,
-  queueScheduler,
   SchedulerAction,
   SchedulerLike,
   Subscriber,
   Subscription,
-  TeardownLogic
+  TeardownLogic,
+  asyncScheduler,
+  queueScheduler
 } from 'rxjs';
 import { observeOn, subscribeOn, tap } from 'rxjs/operators';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 function noop() {
 }
 
 /**
  * Schedules tasks so that they are invoked inside the Zone that is passed in the constructor.
  */
-// tslint:disable-next-line:class-name
 export class ɵZoneScheduler implements SchedulerLike {
   constructor(private zone: any, private delegate: any = queueScheduler) {
   }
@@ -76,7 +77,6 @@ class BlockUntilFirstOperator<T> implements Operator<T, T> {
 @Injectable({
   providedIn: 'root',
 })
-// tslint:disable-next-line:class-name
 export class ɵAngularFireSchedulers {
   public readonly outsideAngular: ɵZoneScheduler;
   public readonly insideAngular: ɵZoneScheduler;
@@ -117,7 +117,6 @@ export function observeInsideAngular<T>(obs$: Observable<T>): Observable<T> {
 }
 
 export function keepUnstableUntilFirst<T>(obs$: Observable<T>): Observable<T> {
-  const scheduler = getSchedulers();
   return ɵkeepUnstableUntilFirstFactory(getSchedulers())(obs$);
 }
 
@@ -146,9 +145,9 @@ export function ɵkeepUnstableUntilFirstFactory(schedulers: ɵAngularFireSchedul
 
 // @ts-ignore
 const zoneWrapFn = (it: (...args: any[]) => any, macrotask: MacroTask|undefined) => {
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
   const _this = this;
   // function() is needed for the arguments object
-  // tslint:disable-next-line:only-arrow-functions
   return function() {
     const _arguments = arguments;
     if (macrotask) {
@@ -164,7 +163,6 @@ const zoneWrapFn = (it: (...args: any[]) => any, macrotask: MacroTask|undefined)
 
 export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
   // function() is needed for the arguments object
-  // tslint:disable-next-line:only-arrow-functions
   return function() {
     // @ts-ignore
     let macrotask: MacroTask | undefined;
@@ -185,7 +183,7 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
     if (!blockUntilFirst) {
       if (ret instanceof Observable) {
         const schedulers = getSchedulers();
-        return ret.pipe( 
+        return ret.pipe(
           subscribeOn(schedulers.outsideAngular),
           observeOn(schedulers.insideAngular),
         );
@@ -196,11 +194,11 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
     if (ret instanceof Observable) {
       return ret.pipe(keepUnstableUntilFirst) as any;
     } else if (ret instanceof Promise) {
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       return run(() => new Promise((resolve, reject) => ret.then(it => run(() => resolve(it)), reason => run(() => reject(reason)))));
     } else if (typeof ret === 'function' && macrotask) {
       // Handle unsubscribe
       // function() is needed for the arguments object
-      // tslint:disable-next-line:only-arrow-functions
       return function() {
         setTimeout(() => {
           if (macrotask && macrotask.state === 'scheduled') {

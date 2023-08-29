@@ -1,8 +1,7 @@
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
-// import { setupProject } from '@angular/fire/schematics/setup';
+import { FEATURES, PROJECT_TYPE } from './interfaces';
 import { setupProject } from  './setup';
 import 'jasmine';
-import { FEATURES, PROJECT_TYPE } from './interfaces';
 
 const PROJECT_NAME = 'pie-ka-chu';
 const PROJECT_ROOT = 'pirojok';
@@ -88,57 +87,57 @@ function generateAngularJsonWithServer() {
 }
 
 const initialFirebaseJson = `{
-  \"hosting\": [
+  "hosting": [
     {
-      \"target\": \"pie-ka-chu\",
-      \"source\": \".\",
-      \"frameworksBackend\": {}
+      "target": "pie-ka-chu",
+      "source": ".",
+      "frameworksBackend": {}
     }
   ]
 }`;
 
 const initialFirebaserc = `{
-  \"targets\": {
-    \"pirojok-111e3\": {
-      \"hosting\": {
-        \"pie-ka-chu\": [
-          \"pirojok-111e3\"
+  "targets": {
+    "pirojok-111e3": {
+      "hosting": {
+        "pie-ka-chu": [
+          "pirojok-111e3"
         ]
       }
     }
   },
-  \"projects\": {
-    \"default\": \"pirojok-111e3\"
+  "projects": {
+    "default": "pirojok-111e3"
   }
 }`;
 
 const initialAngularJson = `{
-  \"defaultProject\": \"pie-ka-chu\",
-  \"projects\": {
-    \"pie-ka-chu\": {
-      \"projectType\": \"application\",
-      \"root\": \"pirojok\",
-      \"architect\": {
-        \"build\": {
-          \"options\": {
-            \"outputPath\": \"dist/ikachu\"
+  "defaultProject": "pie-ka-chu",
+  "projects": {
+    "pie-ka-chu": {
+      "projectType": "application",
+      "root": "pirojok",
+      "architect": {
+        "build": {
+          "options": {
+            "outputPath": "dist/ikachu"
           }
         },
-        \"deploy\": {
-          \"builder\": \"@angular/fire:deploy\",
-          \"options\": {
-            \"version\": 2
+        "deploy": {
+          "builder": "@angular/fire:deploy",
+          "options": {
+            "version": 2
           }
         }
       }
     },
-    \"pi-catch-you\": {
-      \"projectType\": \"application\",
-      \"root\": \"pirojok\",
-      \"architect\": {
-        \"build\": {
-          \"options\": {
-            \"outputPath\": \"dist/ikachu\"
+    "pi-catch-you": {
+      "projectType": "application",
+      "root": "pirojok",
+      "architect": {
+        "build": {
+          "options": {
+            "outputPath": "dist/ikachu"
           }
         }
       }
@@ -147,57 +146,57 @@ const initialAngularJson = `{
 }`;
 
 const overwriteFirebaseJson = `{
-  \"hosting\": [
+  "hosting": [
     {
-      \"target\": \"pie-ka-chu\",
-      \"source\": \".\",
-      \"frameworksBackend\": {}
+      "target": "pie-ka-chu",
+      "source": ".",
+      "frameworksBackend": {}
     }
   ]
 }`;
 
 const overwriteFirebaserc = `{
-  \"targets\": {
-    \"pirojok-111e3\": {
-      \"hosting\": {
-        \"pie-ka-chu\": [
-          \"pirojok-111e3\"
+  "targets": {
+    "pirojok-111e3": {
+      "hosting": {
+        "pie-ka-chu": [
+          "pirojok-111e3"
         ]
       }
     }
   },
-  \"projects\": {
-    \"default\": \"pirojok-111e3\"
+  "projects": {
+    "default": "pirojok-111e3"
   }
 }`;
 
 const overwriteAngularJson = `{
-  \"defaultProject\": \"pie-ka-chu\",
-  \"projects\": {
-    \"pie-ka-chu\": {
-      \"projectType\": \"application\",
-      \"root\": \"pirojok\",
-      \"architect\": {
-        \"build\": {
-          \"options\": {
-            \"outputPath\": \"dist/ikachu\"
+  "defaultProject": "pie-ka-chu",
+  "projects": {
+    "pie-ka-chu": {
+      "projectType": "application",
+      "root": "pirojok",
+      "architect": {
+        "build": {
+          "options": {
+            "outputPath": "dist/ikachu"
           }
         },
-        \"deploy\": {
-          \"builder\": \"@angular/fire:deploy\",
-          \"options\": {
-            \"version\": 2
+        "deploy": {
+          "builder": "@angular/fire:deploy",
+          "options": {
+            "version": 2
           }
         }
       }
     },
-    \"pi-catch-you\": {
-      \"projectType\": \"application\",
-      \"root\": \"pirojok\",
-      \"architect\": {
-        \"build\": {
-          \"options\": {
-            \"outputPath\": \"dist/ikachu\"
+    "pi-catch-you": {
+      "projectType": "application",
+      "root": "pirojok",
+      "architect": {
+        "build": {
+          "options": {
+            "outputPath": "dist/ikachu"
           }
         }
       }
@@ -206,75 +205,75 @@ const overwriteAngularJson = `{
 }`;
 
 const projectFirebaseJson = `{
-  \"hosting\": [
+  "hosting": [
     {
-      \"target\": \"pie-ka-chu\",
-      \"source\": \".\",
-      \"frameworksBackend\": {}
+      "target": "pie-ka-chu",
+      "source": ".",
+      "frameworksBackend": {}
     },
     {
-      \"target\": \"pi-catch-you\",
-      \"source\": \".\",
-      \"frameworksBackend\": {}
+      "target": "pi-catch-you",
+      "source": ".",
+      "frameworksBackend": {}
     }
   ]
 }`;
 
 const projectFirebaserc = `{
-  \"targets\": {
-    \"pirojok-111e3\": {
-      \"hosting\": {
-        \"pie-ka-chu\": [
-          \"pirojok-111e3\"
+  "targets": {
+    "pirojok-111e3": {
+      "hosting": {
+        "pie-ka-chu": [
+          "pirojok-111e3"
         ]
       }
     },
-    \"bi-catch-you-77e7e\": {
-      \"hosting\": {
-        \"pi-catch-you\": [
-          \"bi-catch-you-77e7e\"
+    "bi-catch-you-77e7e": {
+      "hosting": {
+        "pi-catch-you": [
+          "bi-catch-you-77e7e"
         ]
       }
     }
   },
-  \"projects\": {
-    \"default\": \"bi-catch-you-77e7e\"
+  "projects": {
+    "default": "bi-catch-you-77e7e"
   }
 }`;
 
 const projectAngularJson = `{
-  \"defaultProject\": \"pie-ka-chu\",
-  \"projects\": {
-    \"pie-ka-chu\": {
-      \"projectType\": \"application\",
-      \"root\": \"pirojok\",
-      \"architect\": {
-        \"build\": {
-          \"options\": {
-            \"outputPath\": \"dist/ikachu\"
+  "defaultProject": "pie-ka-chu",
+  "projects": {
+    "pie-ka-chu": {
+      "projectType": "application",
+      "root": "pirojok",
+      "architect": {
+        "build": {
+          "options": {
+            "outputPath": "dist/ikachu"
           }
         },
-        \"deploy\": {
-          \"builder\": \"@angular/fire:deploy\",
-          \"options\": {
-            \"version": 2
+        "deploy": {
+          "builder": "@angular/fire:deploy",
+          "options": {
+            "version": 2
           }
         }
       }
     },
-    \"pi-catch-you\": {
-      \"projectType\": \"application\",
-      \"root\": \"pirojok\",
-      \"architect\": {
-        \"build\": {
-          \"options\": {
-            \"outputPath\": \"dist/ikachu\"
+    "pi-catch-you": {
+      "projectType": "application",
+      "root": "pirojok",
+      "architect": {
+        "build": {
+          "options": {
+            "outputPath": "dist/ikachu"
           }
         },
-        \"deploy\": {
-          \"builder\": \"@angular/fire:deploy\",
-          \"options\": {
-            \"version\": 2
+        "deploy": {
+          "builder": "@angular/fire:deploy",
+          "options": {
+            "version": 2
           }
         }
       }
@@ -339,7 +338,7 @@ describe('ng-add', () => {
     });
 
     it('overrides existing files', async () => {
-      const tempTree = await setupProject(tree, {} as any, [FEATURES.Hosting], {
+      await setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
         projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
@@ -539,14 +538,14 @@ describe('ng-add', () => {
         tree.create('package.json', JSON.stringify(generatePackageJson()));
 
         // TODO mock addTask
-        const result = await setupProject(tree, {addTask: () => {}} as any, [FEATURES.Hosting], {
+        const result = await setupProject(tree, {addTask: () => undefined} as any, [FEATURES.Hosting], {
           firebaseProject: { projectId: FIREBASE_PROJECT } as any,
           projectType: PROJECT_TYPE.CloudFunctions,
           project: PROJECT_NAME,
           prerender: false,
         }) as Tree;
 
-        const workspace = JSON.parse((await result.read('angular.json')).toString());
+        const workspace = JSON.parse((result.read('angular.json')).toString());
         expect(workspace.projects['pie-ka-chu'].architect.deploy).toBeTruthy();
       });
 
@@ -556,14 +555,14 @@ describe('ng-add', () => {
         tree.create('package.json', JSON.stringify(generatePackageJson()));
 
         // TODO mock addTask
-        const result = await setupProject(tree, {addTask: () => {}} as any, [FEATURES.Hosting], {
+        const result = await setupProject(tree, {addTask: () => undefined} as any, [FEATURES.Hosting], {
           firebaseProject: { projectId: FIREBASE_PROJECT } as any,
           projectType: PROJECT_TYPE.CloudFunctions,
           project: PROJECT_NAME,
           prerender: false,
         }) as Tree;
 
-        const firebaseJson = JSON.parse((await result.read('firebase.json')).toString());
+        const firebaseJson = JSON.parse((result.read('firebase.json')).toString());
         expect(firebaseJson).toEqual(universalFirebaseJson);
       });
     });

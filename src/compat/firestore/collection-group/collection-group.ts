@@ -1,13 +1,12 @@
-import { from, Observable } from 'rxjs';
-import { fromCollectionRef } from '../observable/fromRef';
-import { filter, map, scan } from 'rxjs/operators';
-import firebase from 'firebase/compat/app';
 import { keepUnstableUntilFirst } from '@angular/fire';
-
-import { DocumentChangeAction, DocumentChangeType, DocumentData, Query } from '../interfaces';
-import { validateEventsArray } from '../collection/collection';
+import firebase from 'firebase/compat/app';
+import { Observable, from } from 'rxjs';
+import { filter, map, scan } from 'rxjs/operators';
 import { docChanges, sortedChanges } from '../collection/changes';
+import { validateEventsArray } from '../collection/collection';
 import { AngularFirestore } from '../firestore';
+import { DocumentChangeAction, DocumentChangeType, DocumentData, Query } from '../interfaces';
+import { fromCollectionRef } from '../observable/fromRef';
 
 /**
  * AngularFirestoreCollectionGroup service
@@ -82,7 +81,7 @@ export class AngularFirestoreCollectionGroup<T = DocumentData> {
    * provided `idField` property name.
    */
   valueChanges(): Observable<T[]>;
-  // tslint:disable-next-line:unified-signatures
+  // eslint-disable-next-line no-empty-pattern
   valueChanges({}): Observable<T[]>;
   valueChanges<K extends string>(options: {idField: K}): Observable<(T & { [T in K]: string })[]>;
   valueChanges<K extends string>(options: {idField?: K} = {}): Observable<T[]> {

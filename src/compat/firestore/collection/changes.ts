@@ -1,8 +1,8 @@
-import { fromCollectionRef } from '../observable/fromRef';
+import firebase from 'firebase/compat/app';
 import { Observable, SchedulerLike } from 'rxjs';
 import { distinctUntilChanged, map, pairwise, scan, startWith } from 'rxjs/operators';
-import { Action, QuerySnapshot, DocumentChange, DocumentChangeAction, DocumentChangeType, Query } from '../interfaces';
-import firebase from 'firebase/compat/app';
+import { Action, DocumentChange, DocumentChangeAction, DocumentChangeType, Query, QuerySnapshot } from '../interfaces';
+import { fromCollectionRef } from '../observable/fromRef';
 
 
 type ActionTupe = [Action<QuerySnapshot<firebase.firestore.DocumentData>>, Action<QuerySnapshot<firebase.firestore.DocumentData>>]

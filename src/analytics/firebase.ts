@@ -7,9 +7,9 @@ import {
   logEvent as _logEvent,
   setAnalyticsCollectionEnabled as _setAnalyticsCollectionEnabled,
   setCurrentScreen as _setCurrentScreen,
-  settings as _settings,
   setUserId as _setUserId,
-  setUserProperties as _setUserProperties
+  setUserProperties as _setUserProperties,
+  settings as _settings
 } from 'firebase/analytics';
 
 export {

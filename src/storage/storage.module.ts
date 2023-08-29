@@ -1,11 +1,11 @@
-import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, Injector } from '@angular/core';
-import { FirebaseStorage } from 'firebase/storage';
-import { ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
-import { Storage, StorageInstances, STORAGE_PROVIDER_NAME } from './storage';
-import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
+import { InjectionToken, Injector, ModuleWithProviders, NgModule, NgZone, Optional } from '@angular/core';
+import { VERSION, ɵAngularFireSchedulers, ɵgetDefaultInstanceOf } from '@angular/fire';
+import { ɵAppCheckInstances } from '@angular/fire';
+import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
 import { AuthInstances } from '@angular/fire/auth';
 import { registerVersion } from 'firebase/app';
-import { ɵAppCheckInstances } from '@angular/fire';
+import { FirebaseStorage } from 'firebase/storage';
+import { STORAGE_PROVIDER_NAME, Storage, StorageInstances } from './storage';
 
 export const PROVIDED_STORAGE_INSTANCES = new InjectionToken<Storage[]>('angularfire2.storage-instances');
 

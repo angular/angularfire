@@ -1,11 +1,10 @@
 import { TestBed } from '@angular/core/testing';
-import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire/compat';
+import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire/compat';
 import { AngularFireRemoteConfig, AngularFireRemoteConfigModule, DEFAULTS, SETTINGS } from '@angular/fire/compat/remote-config';
 import { COMMON_CONFIG } from '../../../src/test-config';
 import { rando } from '../../../src/utils';
 
 describe('AngularFireRemoteConfig', () => {
-  let app: FirebaseApp;
   let rc: AngularFireRemoteConfig;
 
   beforeEach(() => {
@@ -16,7 +15,6 @@ describe('AngularFireRemoteConfig', () => {
       ]
     });
 
-    app = TestBed.inject(FirebaseApp);
     rc = TestBed.inject(AngularFireRemoteConfig);
   });
 
@@ -33,7 +31,6 @@ describe('AngularFireRemoteConfig', () => {
 const FIREBASE_APP_NAME_TOO = (Math.random() + 1).toString(36).substring(7);
 
 describe('AngularFireRemoteConfig with different app', () => {
-  let app: FirebaseApp;
   let rc: AngularFireRemoteConfig;
 
   beforeEach(() => {
@@ -50,7 +47,6 @@ describe('AngularFireRemoteConfig with different app', () => {
       ]
     });
 
-    app = TestBed.inject(FirebaseApp);
     rc = TestBed.inject(AngularFireRemoteConfig);
   });
 

@@ -1,15 +1,14 @@
-import firebase from 'firebase/compat/app';
-import { AngularFireModule, FirebaseApp } from '@angular/fire/compat';
-import { AngularFireDatabase, AngularFireDatabaseModule, ChildEvent, snapshotChanges, URL } from '@angular/fire/compat/database';
 import { TestBed } from '@angular/core/testing';
-import { COMMON_CONFIG } from '../../../../src/test-config';
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFireDatabase, AngularFireDatabaseModule, ChildEvent, URL, snapshotChanges } from '@angular/fire/compat/database';
+import firebase from 'firebase/compat/app';
 import { BehaviorSubject } from 'rxjs';
 import { skip, switchMap, take } from 'rxjs/operators';
+import { COMMON_CONFIG } from '../../../../src/test-config';
 import 'firebase/compat/database';
 import { rando } from '../../../../src/utils';
 
 describe('snapshotChanges', () => {
-  let app: FirebaseApp;
   let db: AngularFireDatabase;
   let createRef: (path: string) => firebase.database.Reference;
   let batch = {};
@@ -31,7 +30,6 @@ describe('snapshotChanges', () => {
       ]
     });
 
-    app = TestBed.inject(FirebaseApp);
     db = TestBed.inject(AngularFireDatabase);
     createRef = (path: string) => db.database.ref(path);
   });
@@ -61,8 +59,7 @@ describe('snapshotChanges', () => {
 
   it('should handle multiple subscriptions (hot)', (done) => {
     const { snapChanges, ref } = prepareSnapshotChanges();
-    const sub = snapChanges.subscribe(() => {
-    });
+    const sub = snapChanges.subscribe(() => undefined);
     sub.add(done);
     snapChanges.pipe(take(1)).subscribe(actions => {
       const data = actions.map(a => a.payload.val());
@@ -73,8 +70,7 @@ describe('snapshotChanges', () => {
 
   it('should handle multiple subscriptions (warm)', done => {
     const { snapChanges, ref } = prepareSnapshotChanges();
-    snapChanges.pipe(take(1)).subscribe(() => {
-    }).add(() => {
+    snapChanges.pipe(take(1)).subscribe(() => undefined).add(() => {
       snapChanges.pipe(take(1)).subscribe(actions => {
         const data = actions.map(a => a.payload.val());
         expect(data).toEqual(items);

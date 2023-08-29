@@ -1,12 +1,12 @@
-import { Auth as FirebaseAuth } from 'firebase/auth';
 import { ɵgetAllInstancesOf } from '@angular/fire';
+import { Auth as FirebaseAuth } from 'firebase/auth';
 import { from, timer } from 'rxjs';
 import { concatMap, distinct } from 'rxjs/operators';
 
 export const AUTH_PROVIDER_NAME = 'auth';
 
 // see notes in core/firebase.app.module.ts for why we're building the class like this
-// tslint:disable-next-line:no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Auth extends FirebaseAuth {}
 
 export class Auth {
@@ -15,7 +15,7 @@ export class Auth {
   }
 }
 
-// tslint:disable-next-line:no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface AuthInstances extends Array<FirebaseAuth> {}
 
 export class AuthInstances {

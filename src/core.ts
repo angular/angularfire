@@ -1,6 +1,6 @@
 import { Version } from '@angular/core';
-import { FirebaseApp, getApps } from 'firebase/app';
 import { ComponentContainer } from '@firebase/component';
+import { FirebaseApp, getApps } from 'firebase/app';
 import type { AppCheck } from 'firebase/app-check';
 
 export const VERSION = new Version('ANGULARFIRE2_VERSION');
@@ -29,9 +29,9 @@ export function ɵgetDefaultInstanceOf<T= unknown>(identifier: string, provided:
   return provider.getImmediate({ optional: true });
 }
 
-export const ɵgetAllInstancesOf = <T= unknown>(identifier: string, app?: FirebaseApp): Array<T> => {
+export const ɵgetAllInstancesOf = <T= unknown>(identifier: string, app?: FirebaseApp): T[] => {
   const apps = app ? [app] : getApps();
-  const instances: Array<any> = [];
+  const instances: any[] = [];
   apps.forEach((app: FirebaseAppWithContainer) => {
     const provider: any = app.container.getProvider(identifier as never);
     provider.instances.forEach((instance: any) => {
@@ -43,15 +43,13 @@ export const ɵgetAllInstancesOf = <T= unknown>(identifier: string, app?: Fireba
   return instances;
 };
 
-// tslint:disable-next-line:no-empty-interface class-name
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ɵAppCheckInstances extends Array<AppCheck> {}
 
-// tslint:disable-next-line:class-name
 export class ɵAppCheckInstances {
   constructor() {
     return ɵgetAllInstancesOf<AppCheck>(ɵAPP_CHECK_PROVIDER_NAME);
   }
 }
 
-// tslint:disable-next-line:variable-name
 export const ɵAPP_CHECK_PROVIDER_NAME = 'app-check';

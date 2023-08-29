@@ -1,12 +1,12 @@
 import { readFileSync } from 'fs';
-import { FirebaseRc, Workspace, WorkspaceProject, FirebaseApp, DeployOptions, FEATURES } from './interfaces';
 import { join } from 'path';
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
 import ts from '@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript';
-import { findNode, addImportToModule, addProviderToModule, insertImport } from '@schematics/angular/utility/ast-utils';
-import { InsertChange, ReplaceChange, applyToUpdateRecorder, Change } from '@schematics/angular/utility/change';
+import { addImportToModule, addProviderToModule, findNode, insertImport } from '@schematics/angular/utility/ast-utils';
+import { Change, InsertChange, ReplaceChange, applyToUpdateRecorder } from '@schematics/angular/utility/change';
 import { buildRelativePath } from '@schematics/angular/utility/find-module';
 import { overwriteIfExists } from './common';
+import { DeployOptions, FEATURES, FirebaseApp, FirebaseRc, Workspace, WorkspaceProject } from './interfaces';
 
 // We consider a project to be a universal project if it has a `server` architect
 // target. If it does, it knows how to build the application's server.
@@ -18,7 +18,7 @@ export const hasPrerenderOption = (
   project: WorkspaceProject
 ) => project.architect?.prerender;
 
-export const shortAppId = (app?: FirebaseApp) => app?.appId && app.appId.split('/').pop();
+export const shortAppId = (app?: FirebaseApp) => app?.appId?.split('/').pop();
 
 export function getWorkspace(
   host: Tree
@@ -30,6 +30,7 @@ export function getWorkspace(
     throw new SchematicsException(`Could not find angular.json`);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { parse } = require('jsonc-parser');
 
   const workspace = parse(configBuffer.toString()) as Workspace|undefined;
@@ -121,7 +122,7 @@ export function addEnvironmentEntry(
     const sourceFile = ts.createSourceFile(filePath, buffer.toString('utf-8'), ts.ScriptTarget.Latest, true);
 
     const envIdentifier = findNode(sourceFile as any, ts.SyntaxKind.Identifier, 'environment');
-    if (!envIdentifier || !envIdentifier.parent) {
+    if (!envIdentifier?.parent) {
       throw new SchematicsException(`Cannot find 'environment' identifier in ${filePath}`);
     }
 
@@ -132,7 +133,7 @@ export function addEnvironmentEntry(
     const firebaseIdentifier = findNode(envObjectLiteral, ts.SyntaxKind.Identifier, 'firebase');
 
     const recorder = host.beginUpdate(filePath);
-    if (firebaseIdentifier && firebaseIdentifier.parent) {
+    if (firebaseIdentifier?.parent) {
       const change = new ReplaceChange(filePath, firebaseIdentifier.parent.pos, firebaseIdentifier.parent.getFullText(), data);
       applyToUpdateRecorder(recorder, [change]);
     } else {
@@ -154,7 +155,7 @@ export function addEnvironmentEntry(
 }
 
 // TODO rewrite using typescript
-export function addFixesToServer(host: Tree, options: { sourcePath: string, features: FEATURES[]}) {
+export function addFixesToServer(host: Tree) {
   const serverPath = `/server.ts`;
 
   if (!host.exists(serverPath)) {
@@ -202,7 +203,7 @@ export function addToNgModule(host: Tree, options: { sourcePath: string, feature
     `/${options.sourcePath}/environments/environment`
   );
 
-  const changes: Array<Change> = [];
+  const changes: Change[] = [];
 
   if (!findNode(source, ts.SyntaxKind.Identifier, 'provideFirebaseApp')) {
     changes.push(

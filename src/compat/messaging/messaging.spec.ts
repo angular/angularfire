@@ -1,11 +1,10 @@
 import { TestBed } from '@angular/core/testing';
-import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire/compat';
+import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire/compat';
 import { AngularFireMessaging, AngularFireMessagingModule } from '@angular/fire/compat/messaging';
 import { COMMON_CONFIG } from '../../../src/test-config';
 import { rando } from '../../../src/utils';
 
 describe('AngularFireMessaging', () => {
-  let app: FirebaseApp;
   let afm: AngularFireMessaging;
 
   beforeEach(() => {
@@ -16,7 +15,6 @@ describe('AngularFireMessaging', () => {
       ]
     });
 
-    app = TestBed.inject(FirebaseApp);
     afm = TestBed.inject(AngularFireMessaging);
   });
 
@@ -33,7 +31,6 @@ describe('AngularFireMessaging', () => {
 const FIREBASE_APP_NAME_TOO = (Math.random() + 1).toString(36).substring(7);
 
 describe('AngularFireMessaging with different app', () => {
-  let app: FirebaseApp;
   let afm: AngularFireMessaging;
 
   beforeEach(() => {
@@ -48,7 +45,6 @@ describe('AngularFireMessaging with different app', () => {
       ]
     });
 
-    app = TestBed.inject(FirebaseApp);
     afm = TestBed.inject(AngularFireMessaging);
   });
 

@@ -44,26 +44,25 @@ export const ɵlazySDKProxy = (klass: any, observable: Observable<any>, zone: Ng
         return klass[name];
       }
       if (noopFunctions.indexOf(name) > -1) {
-        return () => {
-        };
+        return () => undefined;
       }
       const promise = observable.toPromise().then(mod => {
-        const ret = mod && mod[name];
+        const ret = mod?.[name];
         // TODO move to proper type guards
         if (typeof ret === 'function') {
           return ret.bind(mod);
-        } else if (ret && ret.then) {
+        } else if (ret?.then) {
           return ret.then((res: any) => zone.run(() => res));
         } else {
           return zone.run(() => ret);
         }
       });
       // recurse the proxy
-      return new Proxy(() => {}, {
+      return new Proxy(() => undefined, {
           get: (_, name) => promise[name],
           // TODO handle callbacks as transparently as I can
           apply: (self, _, args) => promise.then(it => {
-            const res = it && it(...args);
+            const res = it?.(...args);
             if (options?.spy?.apply) {
               options.spy.apply(name, args, res);
             }

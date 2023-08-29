@@ -1,12 +1,11 @@
 import { TestBed } from '@angular/core/testing';
-import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire/compat';
-import { AngularFireFunctions, AngularFireFunctionsModule, USE_EMULATOR, REGION } from '@angular/fire/compat/functions';
+import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire/compat';
+import { AngularFireFunctions, AngularFireFunctionsModule, REGION, USE_EMULATOR } from '@angular/fire/compat/functions';
 import { COMMON_CONFIG } from '../../../src/test-config';
 import 'firebase/compat/functions';
 import { rando } from '../../../src/utils';
 
 describe('AngularFireFunctions', () => {
-  let app: FirebaseApp;
   let afFns: AngularFireFunctions;
 
   beforeEach(() => {
@@ -17,7 +16,6 @@ describe('AngularFireFunctions', () => {
       ]
     });
 
-    app = TestBed.inject(FirebaseApp);
     afFns = TestBed.inject(AngularFireFunctions);
   });
 
@@ -32,7 +30,6 @@ describe('AngularFireFunctions', () => {
 });
 
 describe('AngularFireFunctions with different app', () => {
-  let app: FirebaseApp;
   let afFns: AngularFireFunctions;
   let firebaseAppName: string;
 
@@ -51,7 +48,6 @@ describe('AngularFireFunctions with different app', () => {
       ]
     });
 
-    app = TestBed.inject(FirebaseApp);
     afFns = TestBed.inject(AngularFireFunctions);
   });
 

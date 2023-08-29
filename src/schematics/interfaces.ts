@@ -55,7 +55,7 @@ export interface FirebaseProject {
   projectNumber: string;
   displayName: string;
   name: string;
-  resources: { [key: string]: string };
+  resources: Record<string, string>;
   state: string;
 }
 
@@ -84,7 +84,7 @@ export interface FirebaseHostingSite {
 export interface FirebaseSDKConfig {
   fileName: string;
   fileContents: string;
-  sdkConfig: { [key: string]: string };
+  sdkConfig: Record<string, string>;
 }
 
 export interface FirebaseTools {
@@ -122,8 +122,8 @@ export interface FirebaseTools {
   login: {
     list(): Promise<{user: Record<string, any>}[]>;
     add(): Promise<Record<string, any>>;
-    use(email: string, options?: {}): Promise<string>;
-  } & ((options?: {}) => Promise<Record<string, any>>);
+    use(email: string, options?: unknown): Promise<string>;
+  } & ((options?: unknown) => Promise<Record<string, any>>);
 
   deploy(config: FirebaseDeployConfig): Promise<any>;
 
@@ -145,7 +145,7 @@ export interface FirebaseHostingConfig {
   rewrites?: FirebaseHostingRewrite[];
 }
 
-export interface FirebaseFunctionsConfig { [key: string]: any; }
+export type FirebaseFunctionsConfig = Record<string, any>;
 
 export interface FirebaseJSON {
   hosting?: FirebaseHostingConfig[] | FirebaseHostingConfig;
@@ -195,7 +195,7 @@ export interface CloudRunOptions {
 
 export interface BuildTarget {
   name: string;
-  options?: {[name: string]: any};
+  options?: Record<string, any>;
 }
 
 export interface FSHost {
