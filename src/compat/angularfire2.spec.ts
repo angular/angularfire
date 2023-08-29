@@ -1,20 +1,16 @@
+import { CompilerFactory, DoBootstrap, NgModule, NgZone, PlatformRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { CompilerFactory, NgModule, NgZone, PlatformRef } from '@angular/core';
+import { ɵAngularFireSchedulers, ɵZoneScheduler, ɵkeepUnstableUntilFirstFactory } from '@angular/fire';
 import { AngularFireModule, FirebaseApp } from '@angular/fire/compat';
-import { Observable, of, Subject } from 'rxjs';
-import { COMMON_CONFIG } from '../../src/test-config';
-import { rando } from '../../src/utils';
 import { BrowserModule } from '@angular/platform-browser';
-import firebase from 'firebase/compat/app';
+import { Observable, Subject, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
-import { ɵAngularFireSchedulers, ɵkeepUnstableUntilFirstFactory, ɵZoneScheduler } from '@angular/fire';
+import { COMMON_CONFIG } from '../../src/test-config';
+import { rando } from '../../src/utils';
 
 describe('angularfire', () => {
   let app: FirebaseApp;
-  let rootRef: firebase.database.Reference;
-  let questionsRef: firebase.database.Reference;
-  let listOfQuestionsRef: firebase.database.Reference;
   let defaultPlatform: PlatformRef;
   let appName: string;
 
@@ -28,9 +24,6 @@ describe('angularfire', () => {
 
     app = TestBed.inject(FirebaseApp);
     defaultPlatform = TestBed.inject(PlatformRef);
-    rootRef = app.database().ref();
-    questionsRef = rootRef.child('questions');
-    listOfQuestionsRef = rootRef.child('list-of-questions');
   });
 
   describe('ZoneScheduler', () => {
@@ -153,7 +146,7 @@ describe('angularfire', () => {
       const testScheduler = new TestScheduler(null);
       testScheduler.run(helpers => {
         const outsideZone = Zone.current;
-        // tslint:disable-next-line:no-string-literal
+        // eslint-disable-next-line @typescript-eslint/dot-notation
         const taskTrack = new Zone['TaskTrackingZoneSpec']();
         const insideZone = Zone.current.fork(taskTrack);
         const trackingSchedulers: ɵAngularFireSchedulers = {
@@ -171,11 +164,9 @@ describe('angularfire', () => {
         const s = new Subject();
         s.pipe(
           keepUnstableOp
-        ).subscribe(() => {
-        }, err => {
+        ).subscribe(() => undefined, err => {
           fail(err);
-        }, () => {
-        });
+        }, () => undefined);
 
         // Flush to ensure all async scheduled functions are run
         helpers.flush();
@@ -218,7 +209,8 @@ describe('angularfire', () => {
             BrowserModule
           ]
         })
-        class MyModule {
+        class MyModule implements DoBootstrap {
+          // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method,@typescript-eslint/no-empty-function
           ngDoBootstrap() {
           }
         }

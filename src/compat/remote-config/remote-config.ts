@@ -1,5 +1,11 @@
 import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
-import { concat, EMPTY, MonoTypeOperatorFunction, Observable, of, OperatorFunction, pipe } from 'rxjs';
+import { keepUnstableUntilFirst, ɵAngularFireSchedulers } from '@angular/fire';
+import { ɵPromiseProxy, ɵapplyMixins, ɵlazySDKProxy } from '@angular/fire/compat';
+import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance, ɵfirebaseAppFactory } from '@angular/fire/compat';
+import { FirebaseOptions } from 'firebase/app';
+import firebase from 'firebase/compat/app';
+import { isSupported } from 'firebase/remote-config';
+import { EMPTY, MonoTypeOperatorFunction, Observable, OperatorFunction, concat, of, pipe } from 'rxjs';
 import {
   debounceTime,
   distinctUntilChanged,
@@ -14,22 +20,15 @@ import {
   switchMap,
   withLatestFrom
 } from 'rxjs/operators';
-import { ɵAngularFireSchedulers, keepUnstableUntilFirst } from '@angular/fire';
-import { ɵlazySDKProxy, ɵPromiseProxy, ɵapplyMixins } from '@angular/fire/compat';
-import { FirebaseOptions } from 'firebase/app';
-import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance } from '@angular/fire/compat';
-import firebase from 'firebase/compat/app';
-import { Settings } from './interfaces';
 import { proxyPolyfillCompat } from './base';
-import { isSupported } from 'firebase/remote-config';
+import { Settings } from './interfaces';
 
-export interface ConfigTemplate {
-  [key: string]: string | number | boolean;
-}
+export type ConfigTemplate = Record<string, string | number | boolean>;
 
 export const SETTINGS = new InjectionToken<Settings>('angularfire2.remoteConfig.settings');
 export const DEFAULTS = new InjectionToken<ConfigTemplate>('angularfire2.remoteConfig.defaultConfig');
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface AngularFireRemoteConfig extends ɵPromiseProxy<firebase.remoteConfig.RemoteConfig> {
 }
 
@@ -65,7 +64,6 @@ export class Value implements firebase.remoteConfig.Value {
     return this._source;
   }
 
-  // tslint:disable-next-line:variable-name
   constructor(public _source: firebase.remoteConfig.ValueSource, public _value: string) {
   }
 }
@@ -94,7 +92,7 @@ export const filterFresh = (howRecentInMillis: number) => filterTest(p => p.fetc
 // which we can simplify to === rather than deep comparison
 const scanToParametersArray = (
   remoteConfig: Observable<firebase.remoteConfig.RemoteConfig | undefined>
-): OperatorFunction<{ [key: string]: firebase.remoteConfig.Value }, Parameter[]> => pipe(
+): OperatorFunction<Record<string, firebase.remoteConfig.Value>, Parameter[]> => pipe(
   withLatestFrom(remoteConfig),
   scan((existing, [all, rc]) => {
     // SEMVER use "new Set" to unique once we're only targeting es6
@@ -107,7 +105,7 @@ const scanToParametersArray = (
       return updatedValue ? new Parameter(key, rc ? rc.fetchTimeMillis : -1, updatedValue.getSource(), updatedValue.asString())
         : existing.find(p => p.key === key);
     });
-  }, [] as Array<Parameter>)
+  }, [] as Parameter[])
 );
 
 
@@ -118,9 +116,9 @@ export class AngularFireRemoteConfig {
 
   readonly changes: Observable<Parameter>;
   readonly parameters: Observable<Parameter[]>;
-  readonly numbers: Observable<{ [key: string]: number | undefined }> & { [key: string]: Observable<number> };
-  readonly booleans: Observable<{ [key: string]: boolean | undefined }> & { [key: string]: Observable<boolean> };
-  readonly strings: Observable<{ [key: string]: string | undefined }> & { [key: string]: Observable<string | undefined> };
+  readonly numbers: Observable<Record<string, number | undefined>> & Record<string, Observable<number>>;
+  readonly booleans: Observable<Record<string, boolean | undefined>> & Record<string, Observable<boolean>>;
+  readonly strings: Observable<Record<string, string | undefined>> & Record<string, Observable<string | undefined>>;
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
@@ -129,7 +127,7 @@ export class AngularFireRemoteConfig {
     @Optional() @Inject(DEFAULTS) defaultConfig: ConfigTemplate | null,
     private zone: NgZone,
     schedulers: ɵAngularFireSchedulers,
-    // tslint:disable-next-line:ban-types
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-types
     @Inject(PLATFORM_ID) platformId: Object
   ) {
     const remoteConfig$ = of(undefined).pipe(
@@ -155,13 +153,13 @@ export class AngularFireRemoteConfig {
       filter<firebase.remoteConfig.RemoteConfig>(rc => !!rc)
     );
 
-    const default$: Observable<{ [key: string]: firebase.remoteConfig.Value }> = of(Object.keys(defaultConfig || {}).reduce(
+    const default$: Observable<Record<string, firebase.remoteConfig.Value>> = of(Object.keys(defaultConfig || {}).reduce(
       (c, k) => ({ ...c, [k]: new Value('default', defaultConfig[k].toString()) }), {}
     ));
 
     // we should filter out the defaults we provided to RC, since we have our own implementation
     // that gives us a -1 for fetchTimeMillis (so filterFresh can filter them out)
-    const filterOutDefaults = map<{ [key: string]: firebase.remoteConfig.Value }, { [key: string]: firebase.remoteConfig.Value }>(all =>
+    const filterOutDefaults = map<Record<string, firebase.remoteConfig.Value>, Record<string, firebase.remoteConfig.Value>>(all =>
       Object.keys(all)
         .filter(key => all[key].getSource() !== 'default')
         .reduce((acc, key) => ({ ...acc, [key]: all[key] }), {})
@@ -251,12 +249,12 @@ const typedMethod = (it: any) => {
 };
 
 
-export function scanToObject(): OperatorFunction<Parameter, { [key: string]: string | undefined }>;
-export function scanToObject(to: 'numbers'): OperatorFunction<Parameter, { [key: string]: number | undefined }>;
-export function scanToObject(to: 'booleans'): OperatorFunction<Parameter, { [key: string]: boolean | undefined }>;
-// tslint:disable-next-line:unified-signatures
-export function scanToObject(to: 'strings'): OperatorFunction<Parameter, { [key: string]: string | undefined }>;
-export function scanToObject<T extends ConfigTemplate>(template: T): OperatorFunction<Parameter, T & { [key: string]: string | undefined }>;
+export function scanToObject(): OperatorFunction<Parameter, Record<string, string | undefined>>;
+export function scanToObject(to: 'numbers'): OperatorFunction<Parameter, Record<string, number | undefined>>;
+export function scanToObject(to: 'booleans'): OperatorFunction<Parameter, Record<string, boolean | undefined>>;
+// eslint-disable-next-line @typescript-eslint/unified-signatures
+export function scanToObject(to: 'strings'): OperatorFunction<Parameter, Record<string, string | undefined>>;
+export function scanToObject<T extends ConfigTemplate>(template: T): OperatorFunction<Parameter, T & Record<string, string | undefined>>;
 export function scanToObject<T extends ConfigTemplate>(to: 'numbers' | 'booleans' | 'strings' | T = 'strings') {
   return pipe(
     // TODO cleanup
@@ -267,8 +265,8 @@ export function scanToObject<T extends ConfigTemplate>(to: 'numbers' | 'booleans
           p[AS_TO_FN[to]]()
       }),
       typeof to === 'object' ?
-        to as T & { [key: string]: string | undefined } :
-        {} as { [key: string]: number | boolean | string }
+        to as T & Record<string, string | undefined> :
+        {} as Record<string, number | boolean | string>
     ),
     debounceTime(1),
     budget(10),
@@ -276,13 +274,13 @@ export function scanToObject<T extends ConfigTemplate>(to: 'numbers' | 'booleans
   );
 }
 
-export function mapToObject(): OperatorFunction<Parameter[], { [key: string]: string | undefined }>;
-export function mapToObject(to: 'numbers'): OperatorFunction<Parameter[], { [key: string]: number | undefined }>;
-export function mapToObject(to: 'booleans'): OperatorFunction<Parameter[], { [key: string]: boolean | undefined }>;
-// tslint:disable-next-line:unified-signatures
-export function mapToObject(to: 'strings'): OperatorFunction<Parameter[], { [key: string]: string | undefined }>;
+export function mapToObject(): OperatorFunction<Parameter[], Record<string, string | undefined>>;
+export function mapToObject(to: 'numbers'): OperatorFunction<Parameter[], Record<string, number | undefined>>;
+export function mapToObject(to: 'booleans'): OperatorFunction<Parameter[], Record<string, boolean | undefined>>;
+// eslint-disable-next-line @typescript-eslint/unified-signatures
+export function mapToObject(to: 'strings'): OperatorFunction<Parameter[], Record<string, string | undefined>>;
 export function mapToObject<T extends ConfigTemplate>(template: T):
-  OperatorFunction<Parameter[], T & { [key: string]: string | undefined }>;
+  OperatorFunction<Parameter[], T & Record<string, string | undefined>>;
 export function mapToObject<T extends ConfigTemplate>(to: 'numbers' | 'booleans' | 'strings' | T = 'strings') {
   return pipe(
     // TODO this is getting a little long, cleanup
@@ -293,8 +291,8 @@ export function mapToObject<T extends ConfigTemplate>(to: 'numbers' | 'booleans'
           p[AS_TO_FN[to]]()
       }),
       typeof to === 'object' ?
-        to as T & { [key: string]: string | undefined } :
-        {} as { [key: string]: number | boolean | string }
+        to as T & Record<string, string | undefined> :
+        {} as Record<string, number | boolean | string>
     )),
     distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
   );

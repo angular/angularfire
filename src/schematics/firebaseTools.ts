@@ -1,7 +1,8 @@
-import { FirebaseTools } from './interfaces';
-import { spawn, execSync } from 'child_process';
+/* eslint-disable @typescript-eslint/no-var-requires */
+import { execSync, spawn } from 'child_process';
 import ora from 'ora';
 import * as semver from 'semver';
+import { FirebaseTools } from './interfaces';
 
 declare global {
     var firebaseTools: FirebaseTools|undefined;

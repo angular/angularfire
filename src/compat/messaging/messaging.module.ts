@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
-import { AngularFireMessaging } from './messaging';
-import firebase from 'firebase/compat/app';
 import { VERSION } from '@angular/fire';
+import firebase from 'firebase/compat/app';
+import { AngularFireMessaging } from './messaging';
 
 @NgModule({
   providers: [ AngularFireMessaging ]

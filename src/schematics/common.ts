@@ -1,8 +1,8 @@
-import { SchematicsException, Tree, SchematicContext } from '@angular-devkit/schematics';
-import { FirebaseHostingSite, FirebaseRc } from './interfaces';
+import { SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
 import * as semver from 'semver';
+import { FirebaseHostingSite, FirebaseRc } from './interfaces';
 
-export const shortSiteName = (site?: FirebaseHostingSite) => site?.name && site.name.split('/').pop();
+export const shortSiteName = (site?: FirebaseHostingSite) => site?.name?.split('/').pop();
 
 export const stringifyFormatted = (obj: any) => JSON.stringify(obj, null, 2);
 
@@ -58,7 +58,7 @@ export function generateFirebaseRc(
 
 export function safeReadJSON(path: string, tree: Tree) {
   try {
-    // tslint:disable-next-line:no-non-null-assertion
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return JSON.parse(tree.read(path)!.toString());
   } catch (e) {
     throw new SchematicsException(`Error when parsing ${path}: ${e.message}`);
@@ -67,7 +67,7 @@ export function safeReadJSON(path: string, tree: Tree) {
 
 export const addDependencies = (
   host: Tree,
-  deps: { [name: string]: { dev?: boolean, version: string } },
+  deps: Record<string, { dev?: boolean, version: string }>,
   context: SchematicContext
 ) => {
   const packageJson =

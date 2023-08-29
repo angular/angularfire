@@ -1,19 +1,19 @@
-import { forkJoin } from 'rxjs';
-import { mergeMap, tap } from 'rxjs/operators';
+import { ChangeDetectorRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire/compat';
-import { AngularFireStorage, AngularFireStorageModule, AngularFireUploadTask, BUCKET, fromTask, USE_EMULATOR } from '@angular/fire/compat/storage';
+import { AngularFireStorage, AngularFireStorageModule, AngularFireUploadTask, BUCKET, USE_EMULATOR, fromTask } from '@angular/fire/compat/storage';
+import firebase from 'firebase/compat/app';
+import { forkJoin } from 'rxjs';
+import { mergeMap, tap } from 'rxjs/operators';
 import { COMMON_CONFIG } from '../../../src/test-config';
 import { rando } from '../../../src/utils';
-import { ChangeDetectorRef } from '@angular/core';
 import 'firebase/compat/storage';
-import firebase from 'firebase/compat/app';
 
 if (typeof XMLHttpRequest === 'undefined') {
   globalThis.XMLHttpRequest = require('xhr2');
 }
 
-const blobOrBuffer = (data: string, options: {}) => {
+const blobOrBuffer = (data: string, options: unknown) => {
   if (typeof Blob === 'undefined') {
     return Buffer.from(data, 'utf8');
   } else {
@@ -22,9 +22,7 @@ const blobOrBuffer = (data: string, options: {}) => {
 };
 
 describe('AngularFireStorage', () => {
-  let app: FirebaseApp;
   let afStorage: AngularFireStorage;
-  let cdr: ChangeDetectorRef;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -38,9 +36,7 @@ describe('AngularFireStorage', () => {
       ]
     });
 
-    app = TestBed.inject(FirebaseApp);
     afStorage = TestBed.inject(AngularFireStorage);
-    cdr = TestBed.inject(ChangeDetectorRef);
   });
 
   it('should exist', () => {
@@ -80,8 +76,8 @@ describe('AngularFireStorage', () => {
     });
 
     it('should upload a file and observe the download url', (done) => {
-      const data = { angular: 'fire' };
-      const blob = blobOrBuffer(JSON.stringify(data), { type: 'application/json' });
+      const data = {angular: 'fire'};
+      const blob = blobOrBuffer(JSON.stringify(data), {type: 'application/json'});
       const ref = afStorage.ref(rando());
       ref.put(blob).then(() => {
         const url$ = ref.getDownloadURL();
@@ -150,25 +146,25 @@ describe('AngularFireStorage', () => {
     });
 
     it('should work with an already finished task', (done) => {
-      const data = { angular: 'promise' };
-      const blob = blobOrBuffer(JSON.stringify(data), { type: 'application/json' });
+      const data = {angular: 'promise'};
+      const blob = blobOrBuffer(JSON.stringify(data), {type: 'application/json'});
       const ref = afStorage.storage.ref(rando());
       const task = ref.put(blob);
       let emissionCount = 0;
       let lastSnap: firebase.storage.UploadTaskSnapshot;
       task.then(_snap => {
         fromTask(task).subscribe(
-            snap => {
-              lastSnap = snap;
-              emissionCount++;
-              expect(snap).toBeDefined();
-            },
-            done.fail,
-            () => {
-              expect(lastSnap.state).toBe('success');
-              expect(emissionCount).toBe(1);
-              ref.delete().then(done, done.fail);
-            });
+          snap => {
+            lastSnap = snap;
+            emissionCount++;
+            expect(snap).toBeDefined();
+          },
+          done.fail,
+          () => {
+            expect(lastSnap.state).toBe('success');
+            expect(emissionCount).toBe(1);
+            ref.delete().then(done, done.fail);
+          });
       });
     });
 
@@ -245,7 +241,7 @@ describe('AngularFireStorage w/options', () => {
   });
 
   afterEach(() => {
-     try { app.delete().catch(() => undefined); } catch (e) { }
+     try { app.delete().catch(() => undefined); } catch (e) { /* empty */ }
   });
 
   describe('<constructor>', () => {

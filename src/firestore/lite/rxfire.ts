@@ -5,8 +5,8 @@ import {
   collectionData as _collectionData,
   doc as _doc,
   docData as _docData,
-  snapToData as _snapToData,
-  fromRef as _fromRef
+  fromRef as _fromRef,
+  snapToData as _snapToData
 } from 'rxfire/firestore/lite';
 
 export const collectionSnapshots = ɵzoneWrap(_collection, true);

@@ -1,10 +1,11 @@
 import * as fuzzy from 'fuzzy';
 import * as inquirer from 'inquirer';
-import { featureOptions, FEATURES, FirebaseApp, FirebaseHostingSite, FirebaseProject, PROJECT_TYPE, WorkspaceProject } from '../interfaces';
-import { hasPrerenderOption, isUniversalApp, shortAppId } from '../utils';
-import { getFirebaseTools } from '../firebaseTools';
 import { shortSiteName } from '../common';
+import { getFirebaseTools } from '../firebaseTools';
+import { FEATURES, FirebaseApp, FirebaseHostingSite, FirebaseProject, PROJECT_TYPE, WorkspaceProject, featureOptions } from '../interfaces';
+import { hasPrerenderOption, isUniversalApp, shortAppId } from '../utils';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
 
 const NEW_OPTION = '~~angularfire-new~~';
@@ -25,6 +26,7 @@ const isSite = (elem: FirebaseHostingSite | fuzzy.FilterResult<FirebaseHostingSi
 };
 
 export const searchProjects = (projects: FirebaseProject[]) =>
+  // eslint-disable-next-line @typescript-eslint/require-await
     async (_: any, input: string) => {
         projects.unshift({
             projectId: NEW_OPTION,
@@ -50,6 +52,7 @@ export const searchProjects = (projects: FirebaseProject[]) =>
     };
 
 export const searchApps = (apps: FirebaseApp[]) =>
+  // eslint-disable-next-line @typescript-eslint/require-await
   async (_: any, input: string) => {
     apps.unshift({
       appId: NEW_OPTION,
@@ -75,6 +78,7 @@ export const searchApps = (apps: FirebaseApp[]) =>
   };
 
 export const searchSites = (sites: FirebaseHostingSite[]) =>
+  // eslint-disable-next-line @typescript-eslint/require-await
   async (_: any, input: string) => {
     sites.unshift({
       name: NEW_OPTION,
@@ -118,7 +122,7 @@ export const featuresPrompt = async (): Promise<FEATURES[]> => {
   return features;
 };
 
-export const userPrompt = async (options: {}): Promise<Record<string, any>> => {
+export const userPrompt = async (options: unknown): Promise<Record<string, any>> => {
   const firebaseTools = await getFirebaseTools();
   const users = await firebaseTools.login.list();
   if (!users || users.length === 0) {
@@ -144,7 +148,7 @@ export const userPrompt = async (options: {}): Promise<Record<string, any>> => {
   }
 };
 
-export const projectPrompt = async (defaultProject: string|undefined, options: {}) => {
+export const projectPrompt = async (defaultProject: string|undefined, options: unknown) => {
   const firebaseTools = await getFirebaseTools();
   const projects = await firebaseTools.projects.list(options);
   const { projectId } = await autocomplete({
@@ -168,11 +172,11 @@ export const projectPrompt = async (defaultProject: string|undefined, options: {
     }) as { displayName: string };
     return await firebaseTools.projects.create(projectId, { account: (options as any).account, displayName, nonInteractive: true });
   }
-  // tslint:disable-next-line:no-non-null-assertion
-  return (await projects).find(it => it.projectId === projectId)!;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return (projects).find(it => it.projectId === projectId)!;
 };
 
-export const appPrompt = async ({ projectId: project }: FirebaseProject, defaultAppId: string|undefined, options: {}) => {
+export const appPrompt = async ({ projectId: project }: FirebaseProject, defaultAppId: string|undefined, options: any) => {
   const firebaseTools = await getFirebaseTools();
   const apps = await firebaseTools.apps.list('web', { ...options, project });
   const { appId } = await autocomplete({
@@ -187,14 +191,14 @@ export const appPrompt = async ({ projectId: project }: FirebaseProject, default
       type: 'input',
       name: 'displayName',
       message: 'What would you like to call your app?',
-    }) as { displayName: string };;
+    }) as { displayName: string };
     return await firebaseTools.apps.create('web', displayName, { ...options, nonInteractive: true, project });
   }
-  // tslint:disable-next-line:no-non-null-assertion
-  return (await apps).find(it => shortAppId(it) === appId)!;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return (apps).find(it => shortAppId(it) === appId)!;
 };
 
-export const sitePrompt = async ({ projectId: project }: FirebaseProject, options: {}) => {
+export const sitePrompt = async ({ projectId: project }: FirebaseProject, options: any) => {
   const firebaseTools = await getFirebaseTools();
   const sites = await firebaseTools.hosting.sites.list({ ...options, project }).then(it => {
     if (it.sites.length === 0) {
@@ -224,8 +228,8 @@ export const sitePrompt = async ({ projectId: project }: FirebaseProject, option
     }) as { subdomain: string };
     return await firebaseTools.hosting.sites.create(subdomain, { ...options, nonInteractive: true, project });
   }
-  // tslint:disable-next-line:no-non-null-assertion
-  return (await sites).find(it => shortSiteName(it) === siteName)!;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return (sites).find(it => shortSiteName(it) === siteName)!;
 };
 
 const DEFAULT_REGION = 'us-central1';

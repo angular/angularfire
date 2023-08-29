@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { FirebaseApp, provideFirebaseApp, getApp, initializeApp, deleteApp } from '@angular/fire/app';
-import { Firestore, provideFirestore, getFirestore, connectFirestoreEmulator } from '@angular/fire/firestore/lite';
+import { FirebaseApp, getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { Firestore, connectFirestoreEmulator, getFirestore, provideFirestore } from '@angular/fire/firestore/lite';
 import { COMMON_CONFIG } from '../../test-config';
 import { rando } from '../../utils';
 

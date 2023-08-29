@@ -1,5 +1,5 @@
-import { isSupported } from 'firebase/remote-config';
 import { ɵisSupportedError } from '@angular/fire';
+import { isSupported } from 'firebase/remote-config';
 
 const isRemoteConfigSupportedValueSymbol = '__angularfire_symbol__remoteConfigIsSupportedValue';
 const isRemoteConfigSupportedPromiseSymbol = '__angularfire_symbol__remoteConfigIsSupported';

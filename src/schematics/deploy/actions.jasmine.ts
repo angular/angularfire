@@ -1,8 +1,9 @@
-import { JsonObject, logging } from '@angular-devkit/core';
-import { BuilderContext, BuilderRun, ScheduleOptions, Target } from '@angular-devkit/architect';
-import { BuildTarget, FirebaseDeployConfig, FirebaseTools, FSHost } from '../interfaces';
-import deploy, { deployToFunction } from './actions'
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { join } from 'path';
+import { BuilderContext, BuilderRun, ScheduleOptions, Target } from '@angular-devkit/architect';
+import { JsonObject, logging } from '@angular-devkit/core';
+import { BuildTarget, FSHost, FirebaseDeployConfig, FirebaseTools } from '../interfaces';
+import deploy, { deployToFunction } from './actions'
 import 'jasmine';
 
 let context: BuilderContext;
@@ -89,7 +90,7 @@ const initMocks = () => {
     id: 1,
     logger: new logging.NullLogger() as any,
     workspaceRoot: 'cwd',
-    getTargetOptions: async (target: Target) => {
+    getTargetOptions: (target: Target) => {
       if (target.target === 'build') {
         return { outputPath: 'dist/browser' };
       } else if (target.target === 'server') {

@@ -1,5 +1,5 @@
-import { Subscriber } from 'rxjs';
 import firebase from 'firebase/compat/app';
+import { Subscriber } from 'rxjs';
 
 export type Settings =  firebase.firestore.Settings;
 export type CollectionReference<T = DocumentData> = firebase.firestore.CollectionReference<T>;
@@ -48,7 +48,7 @@ export interface Action<T> {
   payload: T;
 }
 
-export interface Reference<T> {
+export interface Reference {
   onSnapshot: (options: firebase.firestore.SnapshotListenOptions, sub: Subscriber<any>) => any;
 }
 

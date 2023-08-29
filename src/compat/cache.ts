@@ -27,6 +27,7 @@ const IS_HMR = typeof module !== 'undefined' && !!(module as any).hot;
 
 const log = (level: 'log'|'error'|'info'|'warn', ...args: any) => {
   if (isDevMode() && typeof console !== 'undefined') {
+    // eslint-disable-next-line no-console
     console[level](...args);
   }
 };

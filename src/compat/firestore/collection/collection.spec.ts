@@ -1,23 +1,22 @@
-import { AngularFireModule, FirebaseApp } from '@angular/fire/compat';
-import { AngularFirestore, USE_EMULATOR, AngularFirestoreModule, AngularFirestoreCollection, QueryFn, CollectionReference } from '@angular/fire/compat/firestore';
+import { TestBed } from '@angular/core/testing';
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreModule, CollectionReference, QueryFn, USE_EMULATOR } from '@angular/fire/compat/firestore';
 import { BehaviorSubject } from 'rxjs';
 import { skip, switchMap, take } from 'rxjs/operators';
-import 'firebase/compat/firestore';
-
-import { async, TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../../../src/test-config';
-
+import { rando } from '../../../../src/utils';
 import {
+  FAKE_STOCK_DATA,
+  Stock,
   createRandomStocks,
   delayAdd,
   delayDelete,
   delayUpdate,
   deleteThemAll,
-  FAKE_STOCK_DATA,
-  randomName,
-  Stock
+  randomName
 } from '../utils.spec';
-import { rando } from '../../../../src/utils';
+
+import 'firebase/compat/firestore';
 
 async function collectionHarness(afs: AngularFirestore, items: number, queryFn?: QueryFn<Stock>) {
   const randomCollectionName = randomName(afs.firestore);
@@ -31,7 +30,6 @@ async function collectionHarness(afs: AngularFirestore, items: number, queryFn?:
 }
 
 describe('AngularFirestoreCollection', () => {
-  let app: FirebaseApp;
   let afs: AngularFirestore;
 
   beforeEach(() => {
@@ -45,7 +43,6 @@ describe('AngularFirestoreCollection', () => {
       ]
     });
 
-    app = TestBed.inject(FirebaseApp);
     afs = TestBed.inject(AngularFirestore);
   });
 
@@ -105,8 +102,7 @@ describe('AngularFirestoreCollection', () => {
         const ITEMS = 4;
         const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
         const changes = stocks.valueChanges();
-        const sub = changes.subscribe(() => {
-        });
+        const sub = changes.subscribe(() => undefined);
         sub.add(
           changes.pipe(take(1)).subscribe(data => {
             expect(data.length).toEqual(ITEMS);
@@ -129,8 +125,7 @@ describe('AngularFirestoreCollection', () => {
         const ITEMS = 4;
         const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
         const changes = stocks.valueChanges();
-        changes.pipe(take(1)).subscribe(() => {
-        }).add(() => {
+        changes.pipe(take(1)).subscribe(() => undefined).add(() => {
           changes.pipe(take(1)).subscribe(data => {
             expect(data.length).toEqual(ITEMS);
           }).add(() => {
@@ -220,7 +215,7 @@ describe('AngularFirestoreCollection', () => {
         const ITEMS = 4;
         const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
         const changes$ = stocks.snapshotChanges();
-        const sub = changes$.subscribe(changes => { });
+        const sub = changes$.subscribe(() => undefined);
         sub.add(
           changes$.pipe(take(1)).subscribe(data => {
             expect(data.length).toEqual(ITEMS);
@@ -243,8 +238,7 @@ describe('AngularFirestoreCollection', () => {
         const ITEMS = 4;
         const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
         const changes = stocks.snapshotChanges();
-        changes.pipe(take(1)).subscribe(() => {
-        }).add(() => {
+        changes.pipe(take(1)).subscribe(() => undefined).add(() => {
           changes.pipe(take(1)).subscribe(data => {
             expect(data.length).toEqual(ITEMS);
           }).add(() => {
@@ -475,8 +469,7 @@ describe('AngularFirestoreCollection', () => {
         const ITEMS = 4;
         const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
         const changes = stocks.stateChanges();
-        const sub = changes.subscribe(() => {
-        });
+        const sub = changes.subscribe(() => undefined);
         sub.add(
           changes.pipe(take(1)).subscribe(data => {
             expect(data.length).toEqual(ITEMS);
@@ -499,8 +492,7 @@ describe('AngularFirestoreCollection', () => {
         const ITEMS = 4;
         const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
         const changes = stocks.stateChanges();
-        changes.pipe(take(1)).subscribe(() => {
-        }).add(() => {
+        changes.pipe(take(1)).subscribe(() => undefined).add(() => {
           changes.pipe(take(1)).subscribe(data => {
             expect(data.length).toEqual(ITEMS);
           }).add(() => {

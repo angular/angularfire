@@ -1,24 +1,24 @@
-import { asWindowsPath, normalize } from '@angular-devkit/core';
-import { SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
-import {
-  getWorkspace, getProject, getFirebaseProjectNameFromHost, addEnvironmentEntry,
-  addToNgModule, addIgnoreFiles, addFixesToServer
-} from '../utils';
-import { projectTypePrompt, appPrompt, sitePrompt, projectPrompt, featuresPrompt, userPrompt } from './prompts';
-import {
-  FirebaseApp, FirebaseHostingSite, FirebaseProject, DeployOptions, NgAddNormalizedOptions,
-  FEATURES, PROJECT_TYPE
-} from '../interfaces';
-import { getFirebaseTools } from '../firebaseTools';
 import { writeFileSync } from 'fs';
 import { join } from 'path';
+import { asWindowsPath, normalize } from '@angular-devkit/core';
+import { SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
 import {
   generateFirebaseRc,
   overwriteIfExists,
   safeReadJSON,
   stringifyFormatted
 } from '../common';
+import { getFirebaseTools } from '../firebaseTools';
+import {
+  DeployOptions, FEATURES, FirebaseApp, FirebaseHostingSite, FirebaseProject,
+  NgAddNormalizedOptions, PROJECT_TYPE
+} from '../interfaces';
 import { FirebaseJSON, Workspace, WorkspaceProject } from '../interfaces';
+import {
+  addEnvironmentEntry, addFixesToServer, addIgnoreFiles, addToNgModule,
+  getFirebaseProjectNameFromHost, getProject, getWorkspace
+} from '../utils';
+import { appPrompt, featuresPrompt, projectPrompt, projectTypePrompt, sitePrompt, userPrompt } from './prompts';
 
 export interface SetupConfig extends DeployOptions {
   firebaseProject: FirebaseProject,
@@ -33,7 +33,7 @@ export interface SetupConfig extends DeployOptions {
   ssrRegion?: string,
   projectType?: PROJECT_TYPE,
   prerender?: boolean,
-}; 
+}
 
 export const setupProject =
   async (tree: Tree, context: SchematicContext, features: FEATURES[], config: SetupConfig) => {
@@ -48,7 +48,7 @@ export const setupProject =
     const featuresToImport = features.filter(it => it !== FEATURES.Hosting);
     if (featuresToImport.length > 0) {
       addToNgModule(tree, { features: featuresToImport, sourcePath });
-      addFixesToServer(tree, { features: featuresToImport, sourcePath });
+      addFixesToServer(tree);
     }
 
     if (config.sdkConfig) {

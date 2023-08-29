@@ -1,11 +1,11 @@
+import { NgZone } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { ɵAngularFireSchedulers } from '@angular/fire';
 import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire/compat';
 import { AngularFireDatabase, AngularFireDatabaseModule, URL } from '@angular/fire/compat/database';
-import { TestBed } from '@angular/core/testing';
 import { COMMON_CONFIG } from '../../../src/test-config';
-import { NgZone } from '@angular/core';
-import 'firebase/compat/database';
 import { rando } from '../../../src/utils';
-import { ɵAngularFireSchedulers } from '@angular/fire';
+import 'firebase/compat/database';
 
 describe('AngularFireDatabase', () => {
   let app: FirebaseApp;
@@ -60,14 +60,11 @@ describe('AngularFireDatabase', () => {
 });
 
 describe('AngularFireDatabase w/options', () => {
-  let app: FirebaseApp;
   let db: AngularFireDatabase;
   let firebaseAppName: string;
   let url: string;
-  let query: string;
 
   beforeEach(() => {
-    query = rando();
     firebaseAppName = rando();
     url = `http://localhost:${Math.floor(Math.random() * 9999)}`;
     TestBed.configureTestingModule({
@@ -82,7 +79,6 @@ describe('AngularFireDatabase w/options', () => {
       ]
     });
 
-    app = TestBed.inject(FirebaseApp);
     db = TestBed.inject(AngularFireDatabase);
   });
 

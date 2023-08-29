@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { FirebaseApp, provideFirebaseApp, getApp, initializeApp, deleteApp } from '@angular/fire/app';
-import { Firestore, provideFirestore, getFirestore, connectFirestoreEmulator, disableNetwork } from '@angular/fire/firestore';
+import { FirebaseApp, getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { Firestore, connectFirestoreEmulator, disableNetwork, getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../utils';
 
@@ -28,8 +28,8 @@ describe('Firestore', () => {
         firestore = TestBed.inject(Firestore);
     });
 
-    afterEach(() => {
-        disableNetwork(firestore);
+    afterEach(async () => {
+      await disableNetwork(firestore);
     });
 
     it('should be injectable', () => {

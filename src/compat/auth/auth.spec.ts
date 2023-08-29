@@ -1,8 +1,9 @@
-import firebase from 'firebase/compat/app';
-import { Observable, Subject, forkJoin, merge, tap } from 'rxjs';
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { TestBed } from '@angular/core/testing';
 import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire/compat';
 import { AngularFireAuth, AngularFireAuthModule, SETTINGS } from '@angular/fire/compat/auth';
+import firebase from 'firebase/compat/app';
+import { Observable, Subject } from 'rxjs';
 import { COMMON_CONFIG } from '../../../src/test-config';
 import 'firebase/compat/auth';
 import { rando } from '../../../src/utils';
@@ -13,7 +14,6 @@ const firebaseUser = {
 } as firebase.User;
 
 describe('AngularFireAuth', () => {
-  let app: FirebaseApp;
   let afAuth: AngularFireAuth;
   let mockAuthState: Subject<firebase.User>;
 
@@ -28,7 +28,6 @@ describe('AngularFireAuth', () => {
       ]
     });
 
-    app = TestBed.inject(FirebaseApp);
     afAuth = TestBed.inject(AngularFireAuth);
 
     mockAuthState = new Subject<firebase.User>();

@@ -1,9 +1,9 @@
 import {
-  InjectionToken, Inject, isDevMode, ModuleWithProviders, NgModule, NgZone, Optional, PLATFORM_ID, VERSION as NG_VERSION, Version
+  Inject, InjectionToken, ModuleWithProviders, VERSION as NG_VERSION, NgModule, NgZone, Optional, PLATFORM_ID, isDevMode
 } from '@angular/core';
-import firebase from 'firebase/compat/app';
-import { FirebaseOptions, FirebaseAppSettings } from 'firebase/app';
 import { VERSION } from '@angular/fire';
+import { FirebaseAppSettings, FirebaseOptions } from 'firebase/app';
+import firebase from 'firebase/compat/app';
 import { FirebaseApp } from './firebase.app';
 
 export const FIREBASE_OPTIONS = new InjectionToken<FirebaseOptions>('angularfire2.app.options');
@@ -24,12 +24,13 @@ export function ɵfirebaseAppFactory(options: FirebaseOptions, zone: NgZone, nam
       const hmr = !!(module as any).hot;
       log('error', `${app.name} Firebase App already initialized with different options${hmr ? ', you may need to reload as Firebase is not HMR aware.' : '.'}`);
     }
-  } catch (e) { }
+  } catch (e) { /* empty */ }
   return new FirebaseApp(app);
 }
 
 const log = (level: 'log'|'error'|'info'|'warn', ...args: any) => {
   if (isDevMode() && typeof console !== 'undefined') {
+    // eslint-disable-next-line no-console
     console[level](...args);
   }
 };
@@ -58,10 +59,11 @@ export class AngularFireModule {
     };
   }
 
-  // tslint:disable-next-line:ban-types
+  // eslint-disable-next-line @typescript-eslint/ban-types
   constructor(@Inject(PLATFORM_ID) platformId: Object) {
     firebase.registerVersion('angularfire', VERSION.full, 'core');
     firebase.registerVersion('angularfire', VERSION.full, 'app-compat');
+    // eslint-disable-next-line @typescript-eslint/no-base-to-string
     firebase.registerVersion('angular', NG_VERSION.full, platformId.toString());
   }
 }

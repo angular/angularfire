@@ -1,13 +1,12 @@
-import { from, Observable } from 'rxjs';
-import { filter, map, pairwise, scan, startWith } from 'rxjs/operators';
-import firebase from 'firebase/compat/app';
 import { keepUnstableUntilFirst } from '@angular/fire';
-
-import { CollectionReference, DocumentChangeAction, DocumentChangeType, DocumentData, DocumentReference, Query } from '../interfaces';
-import { docChanges, sortedChanges } from './changes';
+import firebase from 'firebase/compat/app';
+import { Observable, from } from 'rxjs';
+import { filter, map, pairwise, scan, startWith } from 'rxjs/operators';
 import { AngularFirestoreDocument } from '../document/document';
-import { fromCollectionRef } from '../observable/fromRef';
 import { AngularFirestore } from '../firestore';
+import { CollectionReference, DocumentChangeAction, DocumentChangeType, DocumentData, DocumentReference, Query } from '../interfaces';
+import { fromCollectionRef } from '../observable/fromRef';
+import { docChanges, sortedChanges } from './changes';
 
 type DocumentChangeTuple<T> = [DocumentChangeAction<T>[], DocumentChangeAction<T>[]];
 
@@ -74,7 +73,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
       startWith<DocumentChangeAction<T>[], undefined>(undefined),
       pairwise(),
       filter(([prior, current]: DocumentChangeTuple<T>) => current.length > 0 || !prior),
-      map(([prior, current]) => current),
+      map(([, current]) => current),
       keepUnstableUntilFirst
     );
   }
@@ -106,7 +105,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
    * provided `idField` property name.
    */
   valueChanges(): Observable<T[]>;
-  // tslint:disable-next-line:unified-signatures
+  // eslint-disable-next-line no-empty-pattern
   valueChanges({}): Observable<T[]>;
   valueChanges<K extends string>(options: {idField: K}): Observable<(T & { [T in K]: string })[]>;
   valueChanges<K extends string>(options: {idField?: K} = {}): Observable<T[]> {
@@ -115,7 +114,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
         map(actions => actions.payload.docs.map(a => {
           if (options.idField) {
             return {
-              ...a.data() as {},
+              ...a.data() as any,
               ...{ [options.idField]: a.id }
             } as T & { [T in K]: string };
           } else {
