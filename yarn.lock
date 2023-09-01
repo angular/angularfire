@@ -11891,10 +11891,10 @@ rx@2.3.24:
   resolved "https://registry.yarnpkg.com/rx/-/rx-2.3.24.tgz#14f950a4217d7e35daa71bbcbe58eff68ea4b2b7"
   integrity sha512-Ue4ZB7Dzbn2I9sIj8ws536nOP2S53uypyCkCz9q0vlYD5Kn6/pu4dE+wt2ZfFzd9m73hiYKnnCb1OyKqc+MRkg==
 
-rxfire@^6.0.4-canary.343c520:
-  version "6.0.4-canary.343c520"
-  resolved "https://registry.yarnpkg.com/rxfire/-/rxfire-6.0.4-canary.343c520.tgz#76dd272c81f6755c0956de1bcd4481bef0a97c93"
-  integrity sha512-lGWv7RmYPuU5QepdoRKz0MYTX5ZuFMlrLcOavsWHpdf4EuJ9mIDqyBuSWAL8tZfRCndvPwoQybl8RJD2ibNFvg==
+rxfire@^6.0.5:
+  version "6.0.5"
+  resolved "https://registry.yarnpkg.com/rxfire/-/rxfire-6.0.5.tgz#02035400b150dd730353c786ffa15283f0389dd4"
+  integrity sha512-ycBsANGbya3GNtOBKzZVATLEV+0S9gUrlTfwnN15TCXtgG8OgIMAuv2k9+kMeVaevp/DRp1KT+vYf6Wkop6gvw==
 
 rxjs@6.4.0:
   version "6.4.0"
