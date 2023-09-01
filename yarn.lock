@@ -6780,7 +6780,7 @@ firebase-tools@^12.2.1:
     winston-transport "^4.4.0"
     ws "^7.2.3"
 
-firebase@^10.0.0:
+"firebase@^9.0.0 || ^10.0.0":
   version "10.3.0"
   resolved "https://registry.yarnpkg.com/firebase/-/firebase-10.3.0.tgz#17695cf0f97f636fe31daf4e7d1e0c3df223a202"
   integrity sha512-1dy6KqAvGlnFUEFE+IaHQNygG/4v1OwB5KVIC/G1/qwbHEFws0FVHe3n/aRZ+Oo0tINO9s2Lim496p9wprMbNQ==
@@ -11891,10 +11891,10 @@ rx@2.3.24:
   resolved "https://registry.yarnpkg.com/rx/-/rx-2.3.24.tgz#14f950a4217d7e35daa71bbcbe58eff68ea4b2b7"
   integrity sha512-Ue4ZB7Dzbn2I9sIj8ws536nOP2S53uypyCkCz9q0vlYD5Kn6/pu4dE+wt2ZfFzd9m73hiYKnnCb1OyKqc+MRkg==
 
-rxfire@^6.0.4:
-  version "6.0.4"
-  resolved "https://registry.yarnpkg.com/rxfire/-/rxfire-6.0.4.tgz#871e81e1ac29d0333c0fa6692bfa0a8c174eb2bc"
-  integrity sha512-s/1SkWLA1SIKqQl3DFKkKRYHda4z8YeGBY/v2IWsN3EqHEParKV1+WXDkxhOhra2NDlv5GB0WAbeO3QE8kPkmg==
+rxfire@^6.0.5:
+  version "6.0.5"
+  resolved "https://registry.yarnpkg.com/rxfire/-/rxfire-6.0.5.tgz#02035400b150dd730353c786ffa15283f0389dd4"
+  integrity sha512-ycBsANGbya3GNtOBKzZVATLEV+0S9gUrlTfwnN15TCXtgG8OgIMAuv2k9+kMeVaevp/DRp1KT+vYf6Wkop6gvw==
 
 rxjs@6.4.0:
   version "6.4.0"
