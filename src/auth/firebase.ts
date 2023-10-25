@@ -17,6 +17,7 @@ import {
   getMultiFactorResolver as _getMultiFactorResolver,
   getRedirectResult as _getRedirectResult,
   initializeAuth as _initializeAuth,
+  initializeRecaptchaConfig as _initializeRecaptchaConfig,
   isSignInWithEmailLink as _isSignInWithEmailLink,
   linkWithCredential as _linkWithCredential,
   linkWithPhoneNumber as _linkWithPhoneNumber,
@@ -51,6 +52,7 @@ import {
   updatePhoneNumber as _updatePhoneNumber,
   updateProfile as _updateProfile,
   useDeviceLanguage as _useDeviceLanguage,
+  validatePassword as _validatePassword,
   verifyBeforeUpdateEmail as _verifyBeforeUpdateEmail,
   verifyPasswordResetCode as _verifyPasswordResetCode
 } from 'firebase/auth';
@@ -70,6 +72,7 @@ export const getIdTokenResult = ɵzoneWrap(_getIdTokenResult, true);
 export const getMultiFactorResolver = ɵzoneWrap(_getMultiFactorResolver, true);
 export const getRedirectResult = ɵzoneWrap(_getRedirectResult, true);
 export const initializeAuth = ɵzoneWrap(_initializeAuth, true);
+export const initializeRecaptchaConfig = ɵzoneWrap(_initializeRecaptchaConfig, true);
 export const isSignInWithEmailLink = ɵzoneWrap(_isSignInWithEmailLink, true);
 export const linkWithCredential = ɵzoneWrap(_linkWithCredential, true);
 export const linkWithPhoneNumber = ɵzoneWrap(_linkWithPhoneNumber, true);
@@ -104,5 +107,6 @@ export const updatePassword = ɵzoneWrap(_updatePassword, true);
 export const updatePhoneNumber = ɵzoneWrap(_updatePhoneNumber, true);
 export const updateProfile = ɵzoneWrap(_updateProfile, true);
 export const useDeviceLanguage = ɵzoneWrap(_useDeviceLanguage, true);
+export const validatePassword = ɵzoneWrap(_validatePassword, true);
 export const verifyBeforeUpdateEmail = ɵzoneWrap(_verifyBeforeUpdateEmail, true);
 export const verifyPasswordResetCode = ɵzoneWrap(_verifyPasswordResetCode, true);
