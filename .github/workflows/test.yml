@@ -106,6 +106,7 @@ jobs:
         # include:
         # - os: macos-latest
         #   browser: safari
+      fail-fast: false
     steps:
       - name: Checkout
         uses: actions/checkout@v3
