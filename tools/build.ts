@@ -122,8 +122,7 @@ ${exportedZoneWrappedFns}
 }
 
 const src = (...args: string[]) => join(process.cwd(), 'src', ...args);
-const dest = (...args: string[]) => join(process.cwd(), 'dist', '@angular/fire', ...args);
-const destPacakges = (...args: string[]) => join(process.cwd(), 'dist/packages-dist', ...args);
+const dest = (...args: string[]) => join(process.cwd(), 'dist', 'packages-dist', ...args);
 
 const rootPackage = import(join(process.cwd(), 'package.json'));
 
@@ -131,7 +130,7 @@ async function replacePackageCoreVersion() {
   const root = await rootPackage;
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const replace = require('replace-in-file');
-  const files = destPacakges('package.json');
+  const files = dest('package.json');
   return replace({
     files,
     from: 'ANGULARFIRE2_VERSION',
@@ -141,7 +140,7 @@ async function replacePackageCoreVersion() {
 
 async function replaceSchematicVersions() {
   const root = await rootPackage;
-  const packagesPath = destPacakges('schematics', 'versions.json');
+  const packagesPath = dest('schematics', 'versions.json');
   const dependencies = await import(packagesPath);
   Object.keys(dependencies.peerDependencies).forEach(name => {
     dependencies.peerDependencies[name].version = root.dependencies[name] || root.devDependencies[name];

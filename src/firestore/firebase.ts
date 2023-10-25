@@ -19,6 +19,7 @@ import {
   enableNetwork as _enableNetwork,
   endAt as _endAt,
   endBefore as _endBefore,
+  getCountFromServer as _getCountFromServer,
   getDoc as _getDoc,
   getDocFromCache as _getDocFromCache,
   getDocFromServer as _getDocFromServer,
@@ -100,3 +101,4 @@ export const updateDoc = ɵzoneWrap(_updateDoc, true);
 export const waitForPendingWrites = ɵzoneWrap(_waitForPendingWrites, true);
 export const where = ɵzoneWrap(_where, true);
 export const writeBatch = ɵzoneWrap(_writeBatch, true);
+export const getCountFromServer = ɵzoneWrap(_getCountFromServer, true);
