@@ -2,13 +2,13 @@
 import { ɵzoneWrap } from '@angular/fire';
 import {
   collection as _collection,
-  collectionCount as _collectionCount,
-  collectionCountSnap as _collectionCountSnap,
   collectionData as _collectionData,
+  collectionCountSnap as _collectionCountSnap,
+  collectionCount as _collectionCount,
   doc as _doc,
   docData as _docData,
-  fromRef as _fromRef,
-  snapToData as _snapToData
+  snapToData as _snapToData,
+  fromRef as _fromRef
 } from 'rxfire/firestore/lite';
 
 export const collectionSnapshots = ɵzoneWrap(_collection, true);
