@@ -1,7 +1,7 @@
 {
   "name": "@angular/fire",
   "version": "16.0.0",
-  "description": "The official Angular library for Firebase.",
+  "description": "Angular + Firebase = ❤️",
   "private": true,
   "scripts": {
     "test": "npm run build:jasmine && npm run test:node-esm && npm run test:chrome-headless",

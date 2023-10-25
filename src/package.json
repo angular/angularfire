@@ -2,7 +2,7 @@
   "$schema": "../node_modules/ng-packagr/package.schema.json",
   "name": "@angular/fire",
   "version": "ANGULARFIRE2_VERSION",
-  "description": "The official Angular library for Firebase.",
+  "description": "Angular + Firebase = ❤️",
   "schematics": "./schematics/collection.json",
   "builders": "./schematics/builders.json",
   "keywords": [
