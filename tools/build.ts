@@ -1,6 +1,7 @@
 import { join } from 'path';
 import { spawn } from 'cross-spawn';
 import { copy, writeFile } from 'fs-extra';
+import { keys as tsKeys } from 'ts-transformer-keys';
 
 interface OverrideOptions {
   exportName?: string;
@@ -62,13 +63,13 @@ ${exportedZoneWrappedFns}
     await writeFile(filePath, fileOutput);
   };
   return Promise.all([
-    reexport('analytics', 'firebase', 'firebase/analytics', ["getAnalytics", "initializeAnalytics", "isSupported", "logEvent", "setAnalyticsCollectionEnabled", "setCurrentScreen", "settings", "setUserId", "setUserProperties"], {
+    reexport('analytics', 'firebase', 'firebase/analytics', tsKeys<typeof import('firebase/analytics')>(), {
       isSupported: { override: true },
     }),
-    reexport('app', 'firebase', 'firebase/app', ["deleteApp", "getApp", "getApps", "initializeApp", "onLog", "registerVersion", "setLogLevel", "FirebaseError", "SDK_VERSION"]),
-    reexport('app-check', 'firebase', 'firebase/app-check', ["getToken", "initializeAppCheck", "onTokenChanged", "setTokenAutoRefreshEnabled", "CustomProvider", "ReCaptchaEnterpriseProvider", "ReCaptchaV3Provider"]),
-    reexport('auth', 'rxfire', 'rxfire/auth', ["authState", "user", "idToken"]),
-    reexport('auth', 'firebase', 'firebase/auth', ["applyActionCode", "beforeAuthStateChanged", "checkActionCode", "confirmPasswordReset", "connectAuthEmulator", "createUserWithEmailAndPassword", "deleteUser", "fetchSignInMethodsForEmail", "getAdditionalUserInfo", "getAuth", "getIdToken", "getIdTokenResult", "getMultiFactorResolver", "getRedirectResult", "initializeAuth", "isSignInWithEmailLink", "linkWithCredential", "linkWithPhoneNumber", "linkWithPopup", "linkWithRedirect", "multiFactor", "onAuthStateChanged", "onIdTokenChanged", "parseActionCodeURL", "reauthenticateWithCredential", "reauthenticateWithPhoneNumber", "reauthenticateWithPopup", "reauthenticateWithRedirect", "reload", "sendEmailVerification", "sendPasswordResetEmail", "sendSignInLinkToEmail", "setPersistence", "signInAnonymously", "signInWithCredential", "signInWithCustomToken", "signInWithEmailAndPassword", "signInWithEmailLink", "signInWithPhoneNumber", "signInWithPopup", "signInWithRedirect", "signOut", "unlink", "updateCurrentUser", "updateEmail", "updatePassword", "updatePhoneNumber", "updateProfile", "useDeviceLanguage", "verifyBeforeUpdateEmail", "verifyPasswordResetCode", "ActionCodeOperation", "ActionCodeURL", "AuthCredential", "AuthErrorCodes", "browserLocalPersistence", "browserPopupRedirectResolver", "browserSessionPersistence", "debugErrorMap", "EmailAuthCredential", "EmailAuthProvider", "FacebookAuthProvider", "FactorId", "GithubAuthProvider", "GoogleAuthProvider", "indexedDBLocalPersistence", "inMemoryPersistence", "OAuthCredential", "OAuthProvider", "OperationType", "PhoneAuthCredential", "PhoneAuthProvider", "PhoneMultiFactorGenerator", "prodErrorMap", "ProviderId", "RecaptchaVerifier", "SAMLAuthProvider", "SignInMethod", "TwitterAuthProvider"], {
+    reexport('app', 'firebase', 'firebase/app', tsKeys<typeof import('firebase/app')>()),
+    reexport('app-check', 'firebase', 'firebase/app-check', tsKeys<typeof import('firebase/app-check')>()),
+    reexport('auth', 'rxfire', 'rxfire/auth', tsKeys<typeof import('rxfire/auth')>()),
+    reexport('auth', 'firebase', 'firebase/auth', tsKeys<typeof import('firebase/auth')>(), {
       debugErrorMap: null,
       inMemoryPersistence: null,
       browserLocalPersistence: null,
@@ -76,48 +77,48 @@ ${exportedZoneWrappedFns}
       indexedDBLocalPersistence: null,
       prodErrorMap: null,
     }),
-    reexport('database', 'rxfire', 'rxfire/database', ["fromRef", "ListenEvent", "ListenerMethods", "stateChanges", "list", "listVal", "auditTrail", "object", "objectVal", "changeToData"]),
-    reexport('database', 'firebase', 'firebase/database', ["child", "connectDatabaseEmulator", "enableLogging", "endAt", "endBefore", "equalTo", "forceLongPolling", "forceWebSockets", "get", "getDatabase", "goOffline", "goOnline", "increment", "limitToFirst", "limitToLast", "off", "onChildAdded", "onChildChanged", "onChildMoved", "onChildRemoved", "onDisconnect", "onValue", "orderByChild", "orderByKey", "orderByPriority", "orderByValue", "push", "query", "ref", "refFromURL", "remove", "runTransaction", "serverTimestamp", "set", "setPriority", "setWithPriority", "startAfter", "startAt", "update", "Database", "DataSnapshot", "OnDisconnect", "QueryConstraint", "TransactionResult"]),
-    reexport('firestore', 'rxfire', 'rxfire/firestore', ["collectionChanges", "collection", "sortedChanges", "auditTrail", "collectionData", "doc", "docData", "snapToData", "fromRef", "collectionCount", "collectionCountSnap"], {
+    reexport('database', 'rxfire', 'rxfire/database', tsKeys<typeof import('rxfire/database')>()),
+    reexport('database', 'firebase', 'firebase/database', tsKeys<typeof import('firebase/database')>()),
+    reexport('firestore', 'rxfire', 'rxfire/firestore', tsKeys<typeof import('rxfire/firestore')>(), {
       doc: { exportName: 'docSnapshots' },
       collection: { exportName: 'collectionSnapshots' },
     }),
-    reexport('firestore', 'firebase', 'firebase/firestore', ["addDoc", "arrayRemove", "arrayUnion", "clearIndexedDbPersistence", "collection", "collectionGroup", "connectFirestoreEmulator", "deleteDoc", "deleteField", "disableNetwork", "doc", "documentId", "enableIndexedDbPersistence", "enableMultiTabIndexedDbPersistence", "enableNetwork", "endAt", "endBefore", "getDoc", "getDocFromCache", "getDocFromServer", "getDocs", "getDocsFromCache", "getDocsFromServer", "getFirestore", "increment", "initializeFirestore", "limit", "limitToLast", "loadBundle", "namedQuery", "onSnapshot", "onSnapshotsInSync", "orderBy", "query", "queryEqual", "refEqual", "runTransaction", "serverTimestamp", "setDoc", "setLogLevel", "snapshotEqual", "startAfter", "startAt", "terminate", "updateDoc", "waitForPendingWrites", "where", "writeBatch", "Bytes", "CACHE_SIZE_UNLIMITED", "CollectionReference", "DocumentReference", "DocumentSnapshot", "FieldPath", "FieldValue", "Firestore", "FirestoreError", "GeoPoint", "LoadBundleTask", "Query", "QueryConstraint", "QueryDocumentSnapshot", "QuerySnapshot", "SnapshotMetadata", "Timestamp", "Transaction", "WriteBatch", "getCountFromServer"]),
+    reexport('firestore', 'firebase', 'firebase/firestore', tsKeys<typeof import('firebase/firestore')>()),
     reexport('functions', 'rxfire', 'rxfire/functions', ["httpsCallable"], {
       httpsCallable: { exportName: 'httpsCallableData' },
     }),
-    reexport('functions', 'firebase', 'firebase/functions', ["connectFunctionsEmulator", "getFunctions", "httpsCallable", "httpsCallableFromURL"]),
-    reexport('messaging', 'firebase', 'firebase/messaging', ["deleteToken", "getMessaging", "getToken", "isSupported", "onMessage"], {
+    reexport('functions', 'firebase', 'firebase/functions', tsKeys<typeof import('firebase/functions')>()),
+    reexport('messaging', 'firebase', 'firebase/messaging', tsKeys<typeof import('firebase/messaging')>(), {
       onMessage: { blockUntilFirst: false },
       isSupported: { override: true },
     }),
-    reexport('remote-config', 'rxfire', 'rxfire/remote-config', ["getValue", "getString", "getNumber", "getBoolean", "getAll"], {
+    reexport('remote-config', 'rxfire', 'rxfire/remote-config', tsKeys<typeof import('rxfire/remote-config')>(), {
       getValue: { exportName: 'getValueChanges' },
       getString: { exportName: 'getStringChanges' },
       getNumber: { exportName: 'getNumberChanges' },
       getBoolean: { exportName: 'getBooleanChanges' },
       getAll: { exportName: 'getAllChanges' },
     }),
-    reexport('remote-config', 'firebase', 'firebase/remote-config', ["activate", "ensureInitialized", "fetchAndActivate", "fetchConfig", "getAll", "getBoolean", "getNumber", "getRemoteConfig", "getString", "getValue", "isSupported", "setLogLevel"], {
+    reexport('remote-config', 'firebase', 'firebase/remote-config', tsKeys<typeof import('firebase/remote-config')>(), {
       isSupported: { override: true },
     }),
-    reexport('storage', 'rxfire', 'rxfire/storage', ["fromTask", "getDownloadURL", "getMetadata", "uploadBytesResumable", "uploadString", "percentage"], {
+    reexport('storage', 'rxfire', 'rxfire/storage', tsKeys<typeof import('rxfire/storage')>(), {
       getDownloadURL: null,
       getMetadata: null,
       uploadBytesResumable: null,
       uploadString: null,
     }),
-    reexport('storage', 'firebase', 'firebase/storage', ["connectStorageEmulator", "deleteObject", "getBlob", "getBytes", "getDownloadURL", "getMetadata", "getStorage", "getStream", "list", "listAll", "ref", "updateMetadata", "uploadBytes", "uploadBytesResumable", "uploadString", "StringFormat"]),
-    reexport('performance', 'rxfire', 'rxfire/performance', ["getPerformance$", "trace", "traceUntil", "traceWhile", "traceUntilComplete", "traceUntilFirst"], {
+    reexport('storage', 'firebase', 'firebase/storage', tsKeys<typeof import('firebase/storage')>()),
+    reexport('performance', 'rxfire', 'rxfire/performance', tsKeys<typeof import('rxfire/performance')>(), {
       getPerformance$: null,
       trace: null,
     }),
-    reexport('performance', 'firebase', 'firebase/performance', ["getPerformance", "initializePerformance", "trace"]),
-    reexport('firestore/lite', 'rxfire', 'rxfire/firestore/lite', ["collection", "collectionData", "doc", "docData", "snapToData", "fromRef"], {
+    reexport('performance', 'firebase', 'firebase/performance', tsKeys<typeof import('firebase/performance')>()),
+    reexport('firestore/lite', 'rxfire', 'rxfire/firestore/lite', tsKeys<typeof import('rxfire/firestore/lite')>(), {
       doc: { exportName: 'docSnapshots' },
       collection: { exportName: 'collectionSnapshots' },
     }),
-    reexport('firestore/lite', 'firebase', 'firebase/firestore/lite', ["addDoc", "arrayRemove", "arrayUnion", "collection", "collectionGroup", "connectFirestoreEmulator", "deleteDoc", "deleteField", "doc", "documentId", "endAt", "endBefore", "getDoc", "getDocs", "getFirestore", "increment", "initializeFirestore", "limit", "limitToLast", "orderBy", "query", "queryEqual", "refEqual", "runTransaction", "serverTimestamp", "setDoc", "setLogLevel", "snapshotEqual", "startAfter", "startAt", "terminate", "updateDoc", "where", "writeBatch", "Bytes", "CollectionReference", "DocumentReference", "DocumentSnapshot", "FieldPath", "FieldValue", "Firestore", "FirestoreError", "GeoPoint", "Query", "QueryConstraint", "QueryDocumentSnapshot", "QuerySnapshot", "Timestamp", "Transaction", "WriteBatch"]),
+    reexport('firestore/lite', 'firebase', 'firebase/firestore/lite', tsKeys<typeof import('firebase/firestore/lite')>()),
   ]);
 }
 

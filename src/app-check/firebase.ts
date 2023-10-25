@@ -2,12 +2,14 @@
 export * from 'firebase/app-check';
 import { ɵzoneWrap } from '@angular/fire';
 import {
+  getLimitedUseToken as _getLimitedUseToken,
   getToken as _getToken,
   initializeAppCheck as _initializeAppCheck,
   onTokenChanged as _onTokenChanged,
   setTokenAutoRefreshEnabled as _setTokenAutoRefreshEnabled
 } from 'firebase/app-check';
 
+export const getLimitedUseToken = ɵzoneWrap(_getLimitedUseToken, true);
 export const getToken = ɵzoneWrap(_getToken, true);
 export const initializeAppCheck = ɵzoneWrap(_initializeAppCheck, true);
 export const onTokenChanged = ɵzoneWrap(_onTokenChanged, true);
