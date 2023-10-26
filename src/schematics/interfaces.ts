@@ -49,7 +49,7 @@ export interface NgAddNormalizedOptions {
 }
 
 export interface DeployOptions {
-  project: string;
+  project?: string;
 }
 
 export interface FirebaseProject {

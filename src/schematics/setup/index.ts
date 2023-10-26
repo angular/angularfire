@@ -1,7 +1,7 @@
 import { writeFileSync } from 'fs';
 import { join } from 'path';
 import { asWindowsPath, normalize } from '@angular-devkit/core';
-import { SchematicContext, SchematicsException, Tree, chain, noop } from '@angular-devkit/schematics';
+import { SchematicContext, SchematicsException, Tree, chain } from '@angular-devkit/schematics';
 import { addRootImport } from '@schematics/angular/utility';
 import {
   generateFirebaseRc,
@@ -18,7 +18,7 @@ import { FirebaseJSON, Workspace, WorkspaceProject } from '../interfaces';
 import {
   addIgnoreFiles,
   featureToRules,
-  getFirebaseProjectNameFromHost, getProject
+  getFirebaseProjectNameFromHost, getProject, getWorkspace
 } from '../utils';
 import { appPrompt, featuresPrompt, projectPrompt, projectTypePrompt, sitePrompt, userPrompt } from './prompts';
 
@@ -31,7 +31,7 @@ export interface SetupConfig extends DeployOptions {
   browserTarget?: string,
   serverTarget?: string,
   prerenderTarget?: string,
-  project: string,
+  project?: string,
   ssrRegion?: string,
   projectType?: PROJECT_TYPE,
   prerender?: boolean,
@@ -43,6 +43,30 @@ export const setupProject =
 
     addIgnoreFiles(tree);
 
+    if (features.includes(FEATURES.Hosting)) {
+      const { path: workspacePath, workspace } = getWorkspace(tree);
+      const { project, projectName } = getProject(config, tree);
+      setupFirebase({
+        workspace,
+        workspacePath,
+        options: {
+          project: projectName,
+          firebaseProject: config.firebaseProject,
+          firebaseApp: config.firebaseApp,
+          firebaseHostingSite: config.firebaseHostingSite,
+          sdkConfig: config.sdkConfig,
+          prerender: undefined,
+          browserTarget: config.browserTarget,
+          serverTarget: config.serverTarget,
+          prerenderTarget: config.prerenderTarget,
+          ssrRegion: config.ssrRegion,
+        },
+        tree,
+        context,
+        project
+      });
+    }
+
     const featuresToImport = features.filter(it => it !== FEATURES.Hosting);
     if (featuresToImport.length > 0) {
       return chain([
@@ -52,8 +76,6 @@ export const setupProject =
         }),
         ...featureToRules(features, projectName),
       ]);
-    } else {
-      return Promise.resolve(noop);
     }
 };
 
@@ -106,7 +128,7 @@ export const ngAddSetupProject = (
 
     }
 
-    return await setupProject(host, context, features, {
+    return setupProject(host, context, features, {
       ...options, ...hosting, firebaseProject, firebaseApp, firebaseHostingSite, sdkConfig,
     });
 
