@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { Rule, SchematicsException, Tree, chain, noop } from '@angular-devkit/schematics';
+import { Rule, SchematicsException, Tree, chain } from '@angular-devkit/schematics';
 import ts from '@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { addRootImport, addRootProvider } from '@schematics/angular/utility';
 import { findNode } from '@schematics/angular/utility/ast-utils';
@@ -177,48 +177,82 @@ ${addZonePatch ? 'import \'zone.js/dist/zone-patch-rxjs\';' : ''}`));
   return host;
 }
 
-function featureToRules(features: FEATURES[], projectName: string) {
+export function featureToRules(features: FEATURES[], projectName: string) {
   return features.map(feature => {
     switch (feature) {
+        case FEATURES.AppCheck:
+          // TODO make this smarter in Angular Universal
+          return addRootImport(projectName, ({code, external}) => {
+            external('initializeAppCheck', '@angular/fire/app-check');
+            external('ReCaptchaEnterpriseProvider', '@angular/fire/app-check');
+            return code`${external('provideAppCheck', '@angular/fire/app-check')}(() => {
+  // TODO get a reCAPTCHA Enterprise here https://console.cloud.google.com/security/recaptcha?project=_
+  const provider = new ReCaptchaEnterpriseProvider(/* reCAPTCHA Enterprise site key */);
+  return initializeAppCheck(undefined, { provider, isTokenAutoRefreshEnabled: true });
+})`;
+          });
         case FEATURES.Analytics:
           return chain([
             addRootImport(projectName, ({code, external}) => {
               external('getAnalytics', '@angular/fire/analytics');
               return code`${external('provideAnalytics', '@angular/fire/analytics')}(() => getAnalytics())`;
             }),
+            // TODO if using Angular router
             addRootProvider(projectName, ({code, external}) => {
               return code`${external('ScreenTrackingService', '@angular/fire/analytics')}`;
             }),
-            addRootProvider(projectName, ({code, external}) => {
-              return code`${external('UserTrackingService', '@angular/fire/analytics')}`;
-            }),
+            ...(features.includes(FEATURES.Authentication) ? [
+              addRootProvider(projectName, ({code, external}) => {
+                return code`${external('UserTrackingService', '@angular/fire/analytics')}`;
+              })
+            ] : []),
           ])
         case FEATURES.Authentication:
           return addRootImport(projectName, ({code, external}) => {
             external('getAuth', '@angular/fire/auth');
             return code`${external('provideAuth', '@angular/fire/auth')}(() => getAuth())`;
           });
+        case FEATURES.Database:
+          return addRootImport(projectName, ({code, external}) => {
+            external('getDatabase', '@angular/fire/database');
+            return code`${external('provideDatabase', '@angular/fire/database')}(() => getDatabase())`;
+          });
+        case FEATURES.Firestore:
+          return addRootImport(projectName, ({code, external}) => {
+            external('getFirestore', '@angular/fire/firestore');
+            return code`${external('provideFirestore', '@angular/fire/firestore')}(() => getFirestore())`;
+          });
+        case FEATURES.Functions:
+          return addRootImport(projectName, ({code, external}) => {
+            external('getFunctions', '@angular/fire/functions');
+            return code`${external('provideFunctions', '@angular/fire/functions')}(() => getFunctions())`;
+          });
+        case FEATURES.Messaging:
+          // TODO add the service worker
+          return addRootImport(projectName, ({code, external}) => {
+            external('getMessaging', '@angular/fire/messaging');
+            return code`${external('provideMessaging', '@angular/fire/messaging')}(() => getMessaging())`;
+          });
+        case FEATURES.Performance:
+          return addRootImport(projectName, ({code, external}) => {
+            external('getPerformance', '@angular/fire/performance');
+            return code`${external('providePerformance', '@angular/fire/performance')}(() => getPerformance())`;
+          });
+        case FEATURES.Storage:
+          return addRootImport(projectName, ({code, external}) => {
+            external('getStorage', '@angular/fire/storage');
+            return code`${external('provideStorage', '@angular/fire/storage')}(() => getStorage())`;
+          });
+        case FEATURES.RemoteConfig:
+          // TODO consider downloading the defaults
+          return addRootImport(projectName, ({code, external}) => {
+            external('getRemoteConfig', '@angular/fire/remote-config');
+            return code`${external('provideRemoteConfig', '@angular/fire/remote-config')}(() => getRemoteConfig())`;
+          });
         default:
           return undefined;
       }
   }).filter((it): it is Rule => !!it);
-}
-
-export function addToNgModule(host: Tree, options: { sourcePath: string, features: FEATURES[], projectName: string }): Rule {
-
-  const featuresToImport = options.features.filter(it => it !== FEATURES.Hosting);
-  if (featuresToImport.length > 0) {
-    return chain([
-      addRootImport(options.projectName, ({code, external}) => {
-        external('initializeApp', '@angular/fire/app');
-        return code`${external('provideFirebaseApp', '@angular/fire/app')}(() => initializeApp(environment.firebase))`;
-      }),
-      ...featureToRules(options.features, options.projectName),
-    ]);
-  } else {
-    return noop;
-  }
-
 }
 
 export const addIgnoreFiles = (host: Tree) => {

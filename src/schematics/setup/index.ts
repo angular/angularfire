@@ -1,7 +1,8 @@
 import { writeFileSync } from 'fs';
 import { join } from 'path';
 import { asWindowsPath, normalize } from '@angular-devkit/core';
-import { SchematicContext, SchematicsException, Tree, noop } from '@angular-devkit/schematics';
+import { SchematicContext, SchematicsException, Tree, chain, noop } from '@angular-devkit/schematics';
+import { addRootImport } from '@schematics/angular/utility';
 import {
   generateFirebaseRc,
   overwriteIfExists,
@@ -16,7 +17,7 @@ import {
 import { FirebaseJSON, Workspace, WorkspaceProject } from '../interfaces';
 import {
   addIgnoreFiles,
-  addToNgModule,
+  featureToRules,
   getFirebaseProjectNameFromHost, getProject
 } from '../utils';
 import { appPrompt, featuresPrompt, projectPrompt, projectTypePrompt, sitePrompt, userPrompt } from './prompts';
@@ -38,15 +39,19 @@ export interface SetupConfig extends DeployOptions {
 
 export const setupProject =
   (tree: Tree, context: SchematicContext, features: FEATURES[], config: SetupConfig) => {
-    const { project, projectName } = getProject(config, tree);
-
-    const sourcePath = project.sourceRoot ?? project.root;
+    const { projectName } = getProject(config, tree);
 
     addIgnoreFiles(tree);
 
     const featuresToImport = features.filter(it => it !== FEATURES.Hosting);
     if (featuresToImport.length > 0) {
-      return Promise.resolve(addToNgModule(tree, { features: featuresToImport, sourcePath, projectName }));
+      return chain([
+        addRootImport(projectName, ({code, external}) => {
+          external('initializeApp', '@angular/fire/app');
+          return code`${external('provideFirebaseApp', '@angular/fire/app')}(() => initializeApp(${JSON.stringify(config.sdkConfig)}))`;
+        }),
+        ...featureToRules(features, projectName),
+      ]);
     } else {
       return Promise.resolve(noop);
     }
