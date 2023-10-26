@@ -4,6 +4,7 @@ export const enum FEATURES {
   Hosting,
   Authentication,
   Analytics,
+  AppCheck,
   Database,
   Functions,
   Messaging,
@@ -16,9 +17,10 @@ export const enum FEATURES {
 export const featureOptions = [
   { name: 'ng deploy -- hosting', value: FEATURES.Hosting },
   { name: 'Authentication', value: FEATURES.Authentication },
+  { name: 'Google Analytics', value: FEATURES.Analytics },
+  { name: 'App Check', value: FEATURES.AppCheck },
   { name: 'Firestore', value: FEATURES.Firestore },
   { name: 'Realtime Database', value: FEATURES.Database },
-  { name: 'Analytics', value: FEATURES.Analytics },
   { name: 'Cloud Functions (callable)', value: FEATURES.Functions },
   { name: 'Cloud Messaging', value: FEATURES.Messaging },
   { name: 'Performance Monitoring', value: FEATURES.Performance },
@@ -47,7 +49,7 @@ export interface NgAddNormalizedOptions {
 }
 
 export interface DeployOptions {
-  project: string;
+  project?: string;
 }
 
 export interface FirebaseProject {

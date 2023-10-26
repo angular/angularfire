@@ -299,114 +299,113 @@ describe('ng-add', () => {
       tree.create('package.json', JSON.stringify(generatePackageJson()));
     });
 
-    it('generates new files if starting from scratch', async () => {
-      const result = await setupProject(tree, {} as any, [FEATURES.Hosting], {
+    it('generates new files if starting from scratch', () => {
+      setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
         projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
         prerender: false,
-      }) as Tree;
-      expect(result.read('firebase.json').toString()).toEqual(initialFirebaseJson);
-      expect(result.read('.firebaserc').toString()).toEqual(initialFirebaserc);
-      expect(result.read('angular.json').toString()).toEqual(initialAngularJson);
+      });
+      expect(tree.read('firebase.json')?.toString()).toEqual(initialFirebaseJson);
+      expect(tree.read('.firebaserc')?.toString()).toEqual(initialFirebaserc);
+      expect(tree.read('angular.json')?.toString()).toEqual(initialAngularJson);
     });
 
-    it('uses default project', async () => {
-      const result = await setupProject(tree, {} as any, [FEATURES.Hosting], {
+    it('uses default project', () => {
+      setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
         projectType: PROJECT_TYPE.Static,
         project: undefined,
         prerender: false,
-      }) as Tree;
-      expect(result.read('firebase.json').toString()).toEqual(overwriteFirebaseJson);
-      expect(result.read('.firebaserc').toString()).toEqual(overwriteFirebaserc);
-      expect(result.read('angular.json').toString()).toEqual(overwriteAngularJson);
+      });
+      expect(tree.read('firebase.json')?.toString()).toEqual(overwriteFirebaseJson);
+      expect(tree.read('.firebaserc')?.toString()).toEqual(overwriteFirebaserc);
+      expect(tree.read('angular.json')?.toString()).toEqual(overwriteAngularJson);
     });
 
-    it('runs if source root is relative to workspace root', async () => {
+    it('runs if source root is relative to workspace root', () => {
       const angularJson = generateAngularJson();
       const project: {root: string, sourceRoot?: string} = angularJson.projects[PROJECT_NAME];
       project.sourceRoot = `${project.root}/src`;
       tree.overwrite('angular.json', JSON.stringify(angularJson));
-      const promise = setupProject(tree, {} as any, [FEATURES.Hosting], {
+      setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
         projectType: PROJECT_TYPE.Static,
         project: undefined,
         prerender: false,
       });
-      await expectAsync(promise).toBeResolved();
     });
 
-    it('overrides existing files', async () => {
-      await setupProject(tree, {} as any, [FEATURES.Hosting], {
+    it('overrides existing files', () => {
+      setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
         projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
         prerender: false,
       });
-      const result = await setupProject(tree, {} as any, [FEATURES.Hosting], {
+      setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: OTHER_FIREBASE_PROJECT_NAME } as any,
         projectType: PROJECT_TYPE.Static,
         project: OTHER_PROJECT_NAME,
         prerender: false,
-      }) as Tree;
-      expect(result.read('firebase.json').toString()).toEqual(projectFirebaseJson);
-      expect(result.read('.firebaserc').toString()).toEqual(projectFirebaserc);
-      expect(result.read('angular.json').toString()).toEqual(projectAngularJson);
+      });
+      expect(tree.read('firebase.json')?.toString()).toEqual(projectFirebaseJson);
+      expect(tree.read('.firebaserc')?.toString()).toEqual(projectFirebaserc);
+      expect(tree.read('angular.json')?.toString()).toEqual(projectAngularJson);
     });
   });
 
   describe('error handling', () => {
-    it('fails if project not defined', async () => {
+    it('fails if project not defined', () => {
       const tree = Tree.empty();
       const angularJSON = generateAngularJson();
       delete angularJSON.defaultProject;
       tree.create('angular.json', JSON.stringify(angularJSON));
       tree.create('package.json', JSON.stringify(generatePackageJson()));
-      await expectAsync(setupProject(tree, {} as any, [FEATURES.Hosting], {
+      expect(() => setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
         projectType: PROJECT_TYPE.Static,
         project: undefined,
         prerender: false,
-      })).toBeRejectedWith(
+      })).toThrow(
         new SchematicsException('No Angular project selected and no default project in the workspace')
       );
     });
 
-    it('Should throw if angular.json not found', async () => {
-      await expectAsync(setupProject(Tree.empty(), {} as any, [FEATURES.Hosting], {
+    it('Should throw if angular.json not found', () => {
+      expect(() => setupProject(Tree.empty(), {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
         projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
         prerender: false,
-      })).toBeRejectedWith(new SchematicsException('Could not find angular.json'));
+      })).toThrow(new SchematicsException('Could not find angular.json'));
     });
 
-    it('Should throw if angular.json  can not be parsed', async () => {
+    it('Should throw if angular.json  can not be parsed', () => {
       const tree = Tree.empty();
       tree.create('angular.json', 'hi');
       tree.create('package.json', JSON.stringify(generatePackageJson()));
-      await expectAsync(setupProject(tree, {} as any, [FEATURES.Hosting], {
+      expect(() => setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
         projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
         prerender: false,
-      })).toBeRejectedWith(new SchematicsException('Could not parse angular.json'));
+      })).toThrow(new SchematicsException('Could not parse angular.json'));
     });
 
-    it('Should throw if specified project does not exist ', async () => {
+    it('Should throw if specified project does not exist ', () => {
       const tree = Tree.empty();
       tree.create('angular.json', JSON.stringify({ projects: {} }));
       tree.create('package.json', JSON.stringify(generatePackageJson()));
-      await expectAsync(setupProject(tree, {} as any, [FEATURES.Hosting], {
+      expect(() => setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
         projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
         prerender: false,
-      })).toBeRejectedWith(new SchematicsException('The specified Angular project is not defined in this workspace'));
+      })).toThrow(new SchematicsException('The specified Angular project is not defined in this workspace'));
     });
 
-    it('Should throw if specified project is not application', async () => {
+    it('Should throw if specified project is not application', () => {
       const tree = Tree.empty();
       tree.create(
         'angular.json',
@@ -415,15 +414,15 @@ describe('ng-add', () => {
         })
       );
       tree.create('package.json', JSON.stringify(generatePackageJson()));
-      await expectAsync(setupProject(tree, {} as any, [FEATURES.Hosting], {
+      expect(() => setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
         projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
         prerender: false,
-      })).toBeRejectedWith(new SchematicsException('Deploy requires an Angular project type of "application" in angular.json'));
+      })).toThrow(new SchematicsException('Deploy requires an Angular project type of "application" in angular.json'));
     });
 
-    it('Should throw if app does not have architect configured', async () => {
+    it('Should throw if app does not have architect configured', () => {
       const tree = Tree.empty();
       tree.create(
         'angular.json',
@@ -432,12 +431,12 @@ describe('ng-add', () => {
         })
       );
       tree.create('package.json', JSON.stringify(generatePackageJson()));
-      await expectAsync(setupProject(tree, {} as any, [FEATURES.Hosting], {
+      expect(() => setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
         projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
         prerender: false,
-      })).toBeRejectedWith(
+      })).toThrow(
         new SchematicsException('Angular project "pie-ka-chu" has a malformed angular.json')
       );
     });
@@ -474,17 +473,17 @@ describe('ng-add', () => {
       ).toThrowError(/firebase.json: Unexpected token/);
     });*/
 
-    it('Should throw if .firebaserc is broken', async () => {
+    it('Should throw if .firebaserc is broken', () => {
       const tree = Tree.empty();
       tree.create('angular.json', JSON.stringify(generateAngularJson()));
       tree.create('package.json', JSON.stringify(generatePackageJson()));
       tree.create('.firebaserc', `I'm broken 😔`);
-      await expectAsync(setupProject(tree, {} as any, [FEATURES.Hosting], {
+      expect(() => setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
         projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
         prerender: false,
-      })).toBeRejectedWith(
+      })).toThrow(
         parseInt(process.versions.node, 10) >= 20 ?
           new SchematicsException(`Error when parsing .firebaserc: Unexpected token 'I', "I'm broken 😔" is not valid JSON`) :
           new SchematicsException('Error when parsing .firebaserc: Unexpected token I in JSON at position 0')
@@ -532,37 +531,39 @@ describe('ng-add', () => {
 
     describe('universal app', () => {
 
-      it('should add a @angular/fire builder', async () => {
+      it('should add a @angular/fire builder', () => {
         const tree = Tree.empty();
         tree.create('angular.json', JSON.stringify(generateAngularJsonWithServer()));
         tree.create('package.json', JSON.stringify(generatePackageJson()));
 
         // TODO mock addTask
-        const result = await setupProject(tree, {addTask: () => undefined} as any, [FEATURES.Hosting], {
+        setupProject(tree, {addTask: () => undefined} as any, [FEATURES.Hosting], {
           firebaseProject: { projectId: FIREBASE_PROJECT } as any,
           projectType: PROJECT_TYPE.CloudFunctions,
           project: PROJECT_NAME,
           prerender: false,
-        }) as Tree;
+        });
 
-        const workspace = JSON.parse((result.read('angular.json')).toString());
-        expect(workspace.projects['pie-ka-chu'].architect.deploy).toBeTruthy();
+        const angularJSON = tree.read('angular.json')?.toString();
+        const workspace = angularJSON && JSON.parse(angularJSON);
+        expect(workspace?.projects['pie-ka-chu']?.architect?.deploy).toBeTruthy();
       });
 
-      it('should configure firebase.json', async () => {
+      it('should configure firebase.json', () => {
         const tree = Tree.empty();
         tree.create('angular.json', JSON.stringify(generateAngularJsonWithServer()));
         tree.create('package.json', JSON.stringify(generatePackageJson()));
 
         // TODO mock addTask
-        const result = await setupProject(tree, {addTask: () => undefined} as any, [FEATURES.Hosting], {
+        setupProject(tree, {addTask: () => undefined} as any, [FEATURES.Hosting], {
           firebaseProject: { projectId: FIREBASE_PROJECT } as any,
           projectType: PROJECT_TYPE.CloudFunctions,
           project: PROJECT_NAME,
           prerender: false,
-        }) as Tree;
+        });
 
-        const firebaseJson = JSON.parse((result.read('firebase.json')).toString());
+        const firebaseJsonData= tree.read('firebase.json')?.toString();
+        const firebaseJson = firebaseJsonData && JSON.parse(firebaseJsonData);
         expect(firebaseJson).toEqual(universalFirebaseJson);
       });
     });
