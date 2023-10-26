@@ -1,7 +1,7 @@
 import { writeFileSync } from 'fs';
 import { join } from 'path';
 import { asWindowsPath, normalize } from '@angular-devkit/core';
-import { SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
+import { SchematicContext, SchematicsException, Tree, noop } from '@angular-devkit/schematics';
 import {
   generateFirebaseRc,
   overwriteIfExists,
@@ -15,8 +15,9 @@ import {
 } from '../interfaces';
 import { FirebaseJSON, Workspace, WorkspaceProject } from '../interfaces';
 import {
-  addEnvironmentEntry, addFixesToServer, addIgnoreFiles, addToNgModule,
-  getFirebaseProjectNameFromHost, getProject, getWorkspace
+  addIgnoreFiles,
+  addToNgModule,
+  getFirebaseProjectNameFromHost, getProject
 } from '../utils';
 import { appPrompt, featuresPrompt, projectPrompt, projectTypePrompt, sitePrompt, userPrompt } from './prompts';
 
@@ -36,9 +37,7 @@ export interface SetupConfig extends DeployOptions {
 }
 
 export const setupProject =
-  async (tree: Tree, context: SchematicContext, features: FEATURES[], config: SetupConfig) => {
-    const { path: workspacePath, workspace } = getWorkspace(tree);
-
+  (tree: Tree, context: SchematicContext, features: FEATURES[], config: SetupConfig) => {
     const { project, projectName } = getProject(config, tree);
 
     const sourcePath = project.sourceRoot ?? project.root;
@@ -47,58 +46,9 @@ export const setupProject =
 
     const featuresToImport = features.filter(it => it !== FEATURES.Hosting);
     if (featuresToImport.length > 0) {
-      addToNgModule(tree, { features: featuresToImport, sourcePath });
-      addFixesToServer(tree);
-    }
-
-    if (config.sdkConfig) {
-      const source = `
-  firebase: {
-${Object.entries(config.sdkConfig).reduce(
-    (c, [k, v]) => c.concat(`    ${k}: '${v}'`),
-    [] as string[]
-).join(',\n')},
-  }`;
-
-      const environmentPath = `${sourcePath}/environments/environment.ts`;
-      addEnvironmentEntry(tree, `/${environmentPath}`, source);
-
-      // Iterate over the replacements for the environment file and add the config
-      Object.values(project.architect || {}).forEach(builder => {
-        Object.values(builder.configurations || {}).forEach(configuration => {
-          (configuration.fileReplacements || []).forEach((replacement: any) => {
-            if (replacement.replace === environmentPath) {
-              addEnvironmentEntry(tree, `/${replacement.with}`, source);
-            }
-          });
-        });
-      });
-    }
-
-    const options: NgAddNormalizedOptions = {
-      project: projectName,
-      firebaseProject: config.firebaseProject,
-      firebaseApp: config.firebaseApp,
-      firebaseHostingSite: config.firebaseHostingSite,
-      sdkConfig: config.sdkConfig,
-      prerender: undefined,
-      browserTarget: config.browserTarget,
-      serverTarget: config.serverTarget,
-      prerenderTarget: config.prerenderTarget,
-      ssrRegion: config.ssrRegion,
-    };
-
-    if (features.includes(FEATURES.Hosting)) {
-      return setupFirebase({
-        workspace,
-        workspacePath,
-        options,
-        tree,
-        context,
-        project
-      });
+      return Promise.resolve(addToNgModule(tree, { features: featuresToImport, sourcePath, projectName }));
     } else {
-      return Promise.resolve();
+      return Promise.resolve(noop);
     }
 };
 
@@ -151,7 +101,7 @@ export const ngAddSetupProject = (
 
     }
 
-    await setupProject(host, context, features, {
+    return await setupProject(host, context, features, {
       ...options, ...hosting, firebaseProject, firebaseApp, firebaseHostingSite, sdkConfig,
     });
 

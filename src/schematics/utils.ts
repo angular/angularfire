@@ -1,10 +1,10 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { SchematicsException, Tree } from '@angular-devkit/schematics';
+import { Rule, SchematicsException, Tree, chain, noop } from '@angular-devkit/schematics';
 import ts from '@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript';
-import { addImportToModule, addProviderToModule, findNode, insertImport } from '@schematics/angular/utility/ast-utils';
-import { Change, InsertChange, ReplaceChange, applyToUpdateRecorder } from '@schematics/angular/utility/change';
-import { buildRelativePath } from '@schematics/angular/utility/find-module';
+import { addRootImport, addRootProvider } from '@schematics/angular/utility';
+import { findNode } from '@schematics/angular/utility/ast-utils';
+import { InsertChange, ReplaceChange, applyToUpdateRecorder } from '@schematics/angular/utility/change';
 import { overwriteIfExists } from './common';
 import { DeployOptions, FEATURES, FirebaseApp, FirebaseRc, Workspace, WorkspaceProject } from './interfaces';
 
@@ -177,140 +177,48 @@ ${addZonePatch ? 'import \'zone.js/dist/zone-patch-rxjs\';' : ''}`));
   return host;
 }
 
-export function addToNgModule(host: Tree, options: { sourcePath: string, features: FEATURES[]}) {
+function featureToRules(features: FEATURES[], projectName: string) {
+  return features.map(feature => {
+    switch (feature) {
+        case FEATURES.Analytics:
+          return chain([
+            addRootImport(projectName, ({code, external}) => {
+              external('getAnalytics', '@angular/fire/analytics');
+              return code`${external('provideAnalytics', '@angular/fire/analytics')}(() => getAnalytics())`;
+            }),
+            addRootProvider(projectName, ({code, external}) => {
+              return code`${external('ScreenTrackingService', '@angular/fire/analytics')}`;
+            }),
+            addRootProvider(projectName, ({code, external}) => {
+              return code`${external('UserTrackingService', '@angular/fire/analytics')}`;
+            }),
+          ])
+        case FEATURES.Authentication:
+          return addRootImport(projectName, ({code, external}) => {
+            external('getAuth', '@angular/fire/auth');
+            return code`${external('provideAuth', '@angular/fire/auth')}(() => getAuth())`;
+          });
+        default:
+          return undefined;
+      }
+  }).filter((it): it is Rule => !!it);
+}
 
-  const modulePath = `/${options.sourcePath}/app/app.module.ts`;
+export function addToNgModule(host: Tree, options: { sourcePath: string, features: FEATURES[], projectName: string }): Rule {
 
-  if (!host.exists(modulePath)) {
-    throw new Error(`Specified module path ${modulePath} does not exist`);
+  const featuresToImport = options.features.filter(it => it !== FEATURES.Hosting);
+  if (featuresToImport.length > 0) {
+    return chain([
+      addRootImport(options.projectName, ({code, external}) => {
+        external('initializeApp', '@angular/fire/app');
+        return code`${external('provideFirebaseApp', '@angular/fire/app')}(() => initializeApp(environment.firebase))`;
+      }),
+      ...featureToRules(options.features, options.projectName),
+    ]);
+  } else {
+    return noop;
   }
 
-  const text = host.read(modulePath);
-  if (text === null) {
-    throw new SchematicsException(`File ${modulePath} does not exist.`);
-  }
-  const sourceText = text.toString('utf-8');
-
-  const source = ts.createSourceFile(
-    modulePath,
-    sourceText,
-    ts.ScriptTarget.Latest,
-    true
-  );
-
-  const environmentsPath = buildRelativePath(
-    modulePath,
-    `/${options.sourcePath}/environments/environment`
-  );
-
-  const changes: Change[] = [];
-
-  if (!findNode(source, ts.SyntaxKind.Identifier, 'provideFirebaseApp')) {
-    changes.push(
-      insertImport(source, modulePath, ['initializeApp', 'provideFirebaseApp'] as any, '@angular/fire/app'),
-      insertImport(source, modulePath, 'environment', environmentsPath),
-      ...addImportToModule(source, modulePath, `provideFirebaseApp(() => initializeApp(environment.firebase))`, null as any),
-    );
-  }
-
-  if (
-    options.features.includes(FEATURES.Analytics) &&
-    !findNode(source, ts.SyntaxKind.Identifier, 'provideAnalytics')
-  ) {
-    changes.push(
-      insertImport(source, modulePath, ['provideAnalytics', 'getAnalytics', 'ScreenTrackingService', 'UserTrackingService'] as any, '@angular/fire/analytics'),
-      ...addImportToModule(source, modulePath, `provideAnalytics(() => getAnalytics())`, null as any),
-      ...addProviderToModule(source, modulePath, ['ScreenTrackingService', 'UserTrackingService'] as any, null as any),
-    );
-  }
-
-  if (
-    options.features.includes(FEATURES.Authentication) &&
-    !findNode(source, ts.SyntaxKind.Identifier, 'provideAuth')
-  ) {
-    changes.push(
-      insertImport(source, modulePath, ['provideAuth', 'getAuth'] as any, '@angular/fire/auth'),
-      ...addImportToModule(source, modulePath, `provideAuth(() => getAuth())`, null as any),
-    );
-  }
-
-  if (
-    options.features.includes(FEATURES.Database) &&
-    !findNode(source, ts.SyntaxKind.Identifier, 'provideDatabase')
-  ) {
-    changes.push(
-      insertImport(source, modulePath, ['provideDatabase', 'getDatabase'] as any, '@angular/fire/database'),
-      ...addImportToModule(source, modulePath, `provideDatabase(() => getDatabase())`, null as any),
-    );
-  }
-
-  if (
-    options.features.includes(FEATURES.Firestore) &&
-    !findNode(source, ts.SyntaxKind.Identifier, 'provideFirestore')
-  ) {
-    changes.push(
-      insertImport(source, modulePath, ['provideFirestore', 'getFirestore'] as any, '@angular/fire/firestore'),
-      ...addImportToModule(source, modulePath, `provideFirestore(() => getFirestore())`, null as any),
-    );
-  }
-
-  if (
-    options.features.includes(FEATURES.Functions) &&
-    !findNode(source, ts.SyntaxKind.Identifier, 'provideFunctions')
-  ) {
-    changes.push(
-      insertImport(source, modulePath, ['provideFunctions', 'getFunctions'] as any, '@angular/fire/functions'),
-      ...addImportToModule(source, modulePath, `provideFunctions(() => getFunctions())`, null as any),
-    );
-  }
-
-  if (
-    options.features.includes(FEATURES.Messaging) &&
-    !findNode(source, ts.SyntaxKind.Identifier, 'provideMessaging')
-  ) {
-    // TODO add the service worker
-    changes.push(
-      insertImport(source, modulePath, ['provideMessaging', 'getMessaging'] as any, '@angular/fire/messaging'),
-      ...addImportToModule(source, modulePath, `provideMessaging(() => getMessaging())`, null as any),
-    );
-  }
-
-  if (
-    options.features.includes(FEATURES.Performance) &&
-    !findNode(source, ts.SyntaxKind.Identifier, 'providePerformance')
-  ) {
-    // TODO performance monitor service
-    changes.push(
-      insertImport(source, modulePath, ['providePerformance', 'getPerformance'] as any, '@angular/fire/performance'),
-      ...addImportToModule(source, modulePath, `providePerformance(() => getPerformance())`, null as any),
-    );
-  }
-
-  if (
-    options.features.includes(FEATURES.RemoteConfig) &&
-    !findNode(source, ts.SyntaxKind.Identifier, 'provideRemoteConfig')
-  ) {
-    changes.push(
-      insertImport(source, modulePath, ['provideRemoteConfig', 'getRemoteConfig'] as any, '@angular/fire/remote-config'),
-      ...addImportToModule(source, modulePath, `provideRemoteConfig(() => getRemoteConfig())`, null as any),
-    );
-  }
-
-  if (
-    options.features.includes(FEATURES.Storage) &&
-    !findNode(source, ts.SyntaxKind.Identifier, 'provideStorage')
-  ) {
-    changes.push(
-      insertImport(source, modulePath, ['provideStorage', 'getStorage'] as any, '@angular/fire/storage'),
-      ...addImportToModule(source, modulePath, `provideStorage(() => getStorage())`, null as any),
-    );
-  }
-
-  const recorder = host.beginUpdate(modulePath);
-  applyToUpdateRecorder(recorder, changes);
-  host.commitUpdate(recorder);
-
-  return host;
 }
 
 export const addIgnoreFiles = (host: Tree) => {
