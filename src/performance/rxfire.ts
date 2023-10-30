@@ -2,9 +2,9 @@
 import { ɵzoneWrap } from '@angular/fire';
 import {
   traceUntil as _traceUntil,
+  traceWhile as _traceWhile,
   traceUntilComplete as _traceUntilComplete,
-  traceUntilFirst as _traceUntilFirst,
-  traceWhile as _traceWhile
+  traceUntilFirst as _traceUntilFirst
 } from 'rxfire/performance';
 
 export const traceUntil = ɵzoneWrap(_traceUntil, true);

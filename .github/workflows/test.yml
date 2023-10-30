@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - v17
     paths-ignore:
       - "**/*.md"
   pull_request:
@@ -201,7 +202,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Publish (NPM)
     needs: ['build', 'test', 'browser']
-    if: ${{ github.ref == 'refs/heads/master' || github.event_name == 'release' }}
+    if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/v17' || github.event_name == 'release' }}
     steps:
       - name: Setup node
         uses: actions/setup-node@v3
