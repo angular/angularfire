@@ -38,6 +38,7 @@
 	},
 	"cli": {
 		"packageManager": "npm",
-		"analytics": "86795b8f-9036-4a53-929c-a7303453d677"
-	}
+		"analytics": "86795b8f-9036-4a53-929c-a7303453d677",
+    "schematicCollections": ["@angular-eslint/schematics"]
+  }
 }

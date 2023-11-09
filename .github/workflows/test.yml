@@ -167,8 +167,8 @@ jobs:
       - name: Install deps
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         run: npm ci
-      # - name: Lint
-      #   run: npm run lint
+      - name: Lint
+        run: npm run lint
       - name: Build
         run: npm run build
       - name: Test Node
