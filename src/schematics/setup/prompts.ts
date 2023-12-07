@@ -1,10 +1,10 @@
+import { spawnSync } from 'child_process';
 import * as fuzzy from 'fuzzy';
 import * as inquirer from 'inquirer';
 import { shortSiteName } from '../common';
 import { getFirebaseTools } from '../firebaseTools';
 import { FEATURES, FirebaseApp, FirebaseHostingSite, FirebaseProject, PROJECT_TYPE, WorkspaceProject, featureOptions } from '../interfaces';
-import { isUniversalApp, shortAppId } from '../utils';
-import { spawnSync } from 'child_process';
+import { shortAppId } from '../utils';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
@@ -143,10 +143,14 @@ export const userPrompt = async (options: { projectRoot: string }): Promise<Reco
     if (user === NEW_OPTION) {
       spawnSync('firebase login:add', { shell: true, cwd: options.projectRoot, stdio: 'inherit' });
       loginList = await firebaseTools.login.list();
-      if (!Array.isArray(loginList)) throw new Error("firebase login:list did not respond as expected");
+      if (!Array.isArray(loginList)) {
+        throw new Error("firebase login:list did not respond as expected");
+      }
       const priorEmails = choices.map(it => it.name);
       const newLogin = loginList.find(it => !priorEmails.includes(it.user.email));
-      if (!newLogin) throw new Error("Did not find a new user.");
+      if (!newLogin) {
+        throw new Error("Did not find a new user.");
+      }
       return newLogin.user;
     }
     return user;

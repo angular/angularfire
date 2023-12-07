@@ -1,5 +1,5 @@
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
-import { FEATURES, PROJECT_TYPE } from './interfaces';
+import { FEATURES } from './interfaces';
 import { setupProject } from  './setup';
 import 'jasmine';
 
