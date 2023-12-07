@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - v17
     paths-ignore:
       - "**/*.md"
   pull_request:
