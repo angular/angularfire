@@ -41,7 +41,8 @@ export interface NgAddNormalizedOptions {
   firebaseApp: FirebaseApp|undefined;
   firebaseHostingSite: FirebaseHostingSite|undefined;
   sdkConfig: Record<string, string>|undefined;
-  buildTarget: string|undefined;
+  buildTarget: [string,string]|undefined;
+  serveTarget: [string,string]|undefined;
   ssrRegion: string|undefined;
 }
 
