@@ -197,7 +197,7 @@ export const setupFirebase = (config: {
         serveTarget: options.serveTarget?.[1],
       }
     },
-    defaultConfiguration: 'development',
+    defaultConfiguration: 'production',
   };
 
   tree.overwrite(workspacePath, JSON.stringify(workspace, null, 2));

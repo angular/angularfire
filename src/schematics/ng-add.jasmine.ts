@@ -132,7 +132,7 @@ const initialAngularJson = `{
             "production": {},
             "development": {}
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "production"
         }
       }
     },
@@ -196,7 +196,7 @@ const overwriteAngularJson = `{
             "production": {},
             "development": {}
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "production"
         }
       }
     },
@@ -272,7 +272,7 @@ const projectAngularJson = `{
             "production": {},
             "development": {}
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "production"
         }
       }
     },
@@ -294,7 +294,7 @@ const projectAngularJson = `{
             "production": {},
             "development": {}
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "production"
         }
       }
     }
