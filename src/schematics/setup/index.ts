@@ -110,6 +110,8 @@ export const ngAddSetupProject = (
       firebaseHostingSite = await sitePrompt(firebaseProject, { projectRoot });
     }
 
+    
+
     let firebaseApp: FirebaseApp|undefined;
     let sdkConfig: Record<string, string>|undefined;
 

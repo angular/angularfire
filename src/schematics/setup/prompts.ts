@@ -125,7 +125,7 @@ export const featuresPrompt = async (): Promise<FEATURES[]> => {
 
 export const userPrompt = async (options: { projectRoot: string }): Promise<Record<string, any>> => {
   const firebaseTools = await getFirebaseTools();
-  const loginList = await firebaseTools.login.list();
+  let loginList = await firebaseTools.login.list();
   if (!Array.isArray(loginList) || loginList.length === 0) {
     spawnSync('firebase login', { shell: true, cwd: options.projectRoot, stdio: 'inherit' });
     return await firebaseTools.login(options);
@@ -141,8 +141,13 @@ export const userPrompt = async (options: { projectRoot: string }): Promise<Reco
       default: choices.find(it => it.value.email === defaultUser.email)?.value,
     }) as any;
     if (user === NEW_OPTION) {
-      const { user } = await firebaseTools.login.add();
-      return user;
+      spawnSync('firebase login:add', { shell: true, cwd: options.projectRoot, stdio: 'inherit' });
+      loginList = await firebaseTools.login.list();
+      if (!Array.isArray(loginList)) throw new Error("firebase login:list did not respond as expected");
+      const priorEmails = choices.map(it => it.name);
+      const newLogin = loginList.find(it => !priorEmails.includes(it.user.email));
+      if (!newLogin) throw new Error("Did not find a new user.");
+      return newLogin.user;
     }
     return user;
   }
@@ -243,15 +248,12 @@ const ALLOWED_SSR_REGIONS = [
 
 export const projectTypePrompt = async (project: WorkspaceProject, name: string) => {
   const buildTarget = `${name}:build:${project.architect?.build?.defaultConfiguration || 'production'}`;
-  if (isUniversalApp(project)) {
-    const { ssrRegion } = await inquirer.prompt({
-      type: 'list',
-      name: 'ssrRegion',
-      choices: ALLOWED_SSR_REGIONS,
-      message: 'In which region would you like to host server-side content?',
-      default: DEFAULT_REGION,
-    }) as { ssrRegion: string };
-    return { projectType: PROJECT_TYPE.WebFrameworks, ssrRegion, buildTarget };
-  }
-  return { projectType: PROJECT_TYPE.WebFrameworks, buildTarget };
+  const { ssrRegion } = await inquirer.prompt({
+    type: 'list',
+    name: 'ssrRegion',
+    choices: ALLOWED_SSR_REGIONS,
+    message: 'In which region would you like to host server-side content?',
+    default: DEFAULT_REGION,
+  }) as { ssrRegion: string };
+  return { projectType: PROJECT_TYPE.WebFrameworks, ssrRegion, buildTarget };
 };
