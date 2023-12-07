@@ -4,7 +4,7 @@ import * as inquirer from 'inquirer';
 import { shortSiteName } from '../common';
 import { getFirebaseTools } from '../firebaseTools';
 import { FEATURES, FirebaseApp, FirebaseHostingSite, FirebaseProject, PROJECT_TYPE, WorkspaceProject, featureOptions } from '../interfaces';
-import { shortAppId } from '../utils';
+import { isSSRApp, isUniversalApp, shortAppId } from '../utils';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
@@ -251,13 +251,19 @@ const ALLOWED_SSR_REGIONS = [
 ];
 
 export const projectTypePrompt = async (project: WorkspaceProject, name: string) => {
-  const buildTarget = `${name}:build:${project.architect?.build?.defaultConfiguration || 'production'}`;
-  const { ssrRegion } = await inquirer.prompt({
-    type: 'list',
-    name: 'ssrRegion',
-    choices: ALLOWED_SSR_REGIONS,
-    message: 'In which region would you like to host server-side content?',
-    default: DEFAULT_REGION,
-  }) as { ssrRegion: string };
-  return { projectType: PROJECT_TYPE.WebFrameworks, ssrRegion, buildTarget };
+  const buildTarget = [`${name}:build:production`, `${name}:build:development`];
+  const serveTarget = isUniversalApp(project) ?
+    [`${name}:serve-ssr:production`, `${name}:serve-ssr:development`] :
+    [`${name}:serve:production`, `${name}:serve:development`];
+  if (isUniversalApp(project) || isSSRApp(project)) {
+    const { ssrRegion } = await inquirer.prompt({
+      type: 'list',
+      name: 'ssrRegion',
+      choices: ALLOWED_SSR_REGIONS,
+      message: 'In which region would you like to host server-side content?',
+      default: DEFAULT_REGION,
+    }) as { ssrRegion: string };
+    return { projectType: PROJECT_TYPE.WebFrameworks, ssrRegion, buildTarget, serveTarget };
+  }
+  return { projectType: PROJECT_TYPE.WebFrameworks, buildTarget, serveTarget };
 };

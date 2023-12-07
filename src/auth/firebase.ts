@@ -32,6 +32,7 @@ import {
   reauthenticateWithPopup as _reauthenticateWithPopup,
   reauthenticateWithRedirect as _reauthenticateWithRedirect,
   reload as _reload,
+  revokeAccessToken as _revokeAccessToken,
   sendEmailVerification as _sendEmailVerification,
   sendPasswordResetEmail as _sendPasswordResetEmail,
   sendSignInLinkToEmail as _sendSignInLinkToEmail,
@@ -87,6 +88,7 @@ export const reauthenticateWithPhoneNumber = ɵzoneWrap(_reauthenticateWithPhone
 export const reauthenticateWithPopup = ɵzoneWrap(_reauthenticateWithPopup, true);
 export const reauthenticateWithRedirect = ɵzoneWrap(_reauthenticateWithRedirect, true);
 export const reload = ɵzoneWrap(_reload, true);
+export const revokeAccessToken = ɵzoneWrap(_revokeAccessToken, true);
 export const sendEmailVerification = ɵzoneWrap(_sendEmailVerification, true);
 export const sendPasswordResetEmail = ɵzoneWrap(_sendPasswordResetEmail, true);
 export const sendSignInLinkToEmail = ɵzoneWrap(_sendSignInLinkToEmail, true);

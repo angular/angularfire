@@ -27,7 +27,8 @@ export interface SetupConfig extends DeployOptions {
   firebaseApp?: FirebaseApp,
   firebaseHostingSite?: FirebaseHostingSite,
   sdkConfig?: Record<string, string>,
-  buildTarget?: string,
+  buildTarget?: [string, string],
+  serveTarget?: [string, string],
   project?: string,
   ssrRegion?: string,
 }
@@ -51,6 +52,7 @@ export const setupProject =
           firebaseHostingSite: config.firebaseHostingSite,
           sdkConfig: config.sdkConfig,
           buildTarget: config.buildTarget,
+          serveTarget: config.serveTarget,
           ssrRegion: config.ssrRegion,
         },
         tree,
@@ -187,10 +189,15 @@ export const setupFirebase = (config: {
     },
     configurations: {
       production: {
-        buildTarget: options.buildTarget,
+        buildTarget: options.buildTarget?.[0],
+        serveTarget: options.serveTarget?.[0],
       },
+      development: {
+        buildTarget: options.buildTarget?.[1],
+        serveTarget: options.serveTarget?.[1],
+      }
     },
-    defaultConfiguration: 'production',
+    defaultConfiguration: 'development',
   };
 
   tree.overwrite(workspacePath, JSON.stringify(workspace, null, 2));

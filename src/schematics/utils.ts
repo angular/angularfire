@@ -14,6 +14,10 @@ export const isUniversalApp = (
   project: WorkspaceProject
 ) => project.architect?.server;
 
+export const isSSRApp = (
+  project: WorkspaceProject
+) => !!project.architect?.build.options?.ssr;
+
 export const hasPrerenderOption = (
   project: WorkspaceProject
 ) => project.architect?.prerender;
