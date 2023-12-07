@@ -3,7 +3,8 @@ import * as inquirer from 'inquirer';
 import { shortSiteName } from '../common';
 import { getFirebaseTools } from '../firebaseTools';
 import { FEATURES, FirebaseApp, FirebaseHostingSite, FirebaseProject, PROJECT_TYPE, WorkspaceProject, featureOptions } from '../interfaces';
-import { hasPrerenderOption, isUniversalApp, shortAppId } from '../utils';
+import { isUniversalApp, shortAppId } from '../utils';
+import { spawnSync } from 'child_process';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
@@ -122,16 +123,15 @@ export const featuresPrompt = async (): Promise<FEATURES[]> => {
   return features;
 };
 
-export const userPrompt = async (options: unknown): Promise<Record<string, any>> => {
+export const userPrompt = async (options: { projectRoot: string }): Promise<Record<string, any>> => {
   const firebaseTools = await getFirebaseTools();
-  const users = await firebaseTools.login.list();
-  if (!users || users.length === 0) {
-    await firebaseTools.login(); // first login isn't returning anything of value
-    const user = await firebaseTools.login(options);
-    return user;
+  const loginList = await firebaseTools.login.list();
+  if (!Array.isArray(loginList) || loginList.length === 0) {
+    spawnSync('firebase login', { shell: true, cwd: options.projectRoot, stdio: 'inherit' });
+    return await firebaseTools.login(options);
   } else {
     const defaultUser = await firebaseTools.login(options);
-    const choices = users.map(({user}) => ({ name: user.email, value: user }));
+    const choices = loginList.map(({user}) => ({ name: user.email, value: user }));
     const newChoice = { name: '[Login in with another account]', value: NEW_OPTION };
     const { user } = await inquirer.prompt({
       type: 'list',
@@ -242,14 +242,8 @@ const ALLOWED_SSR_REGIONS = [
 ];
 
 export const projectTypePrompt = async (project: WorkspaceProject, name: string) => {
-  let serverTarget: string|undefined;
-  let browserTarget = `${name}:build:${project.architect?.build?.defaultConfiguration || 'production'}`;
-  let prerenderTarget: string|undefined;
+  const buildTarget = `${name}:build:${project.architect?.build?.defaultConfiguration || 'production'}`;
   if (isUniversalApp(project)) {
-    serverTarget = `${name}:server:${project.architect?.server?.defaultConfiguration || 'production'}`;
-    browserTarget = `${name}:build:${project.architect?.build?.defaultConfiguration || 'production'}`;
-    const prerender = hasPrerenderOption(project);
-    prerenderTarget = prerender && `${name}:prerender:${prerender.defaultConfiguration || 'production'}`;
     const { ssrRegion } = await inquirer.prompt({
       type: 'list',
       name: 'ssrRegion',
@@ -257,7 +251,7 @@ export const projectTypePrompt = async (project: WorkspaceProject, name: string)
       message: 'In which region would you like to host server-side content?',
       default: DEFAULT_REGION,
     }) as { ssrRegion: string };
-    return { prerender, projectType: PROJECT_TYPE.WebFrameworks, ssrRegion, browserTarget, serverTarget, prerenderTarget };
+    return { projectType: PROJECT_TYPE.WebFrameworks, ssrRegion, buildTarget };
   }
-  return { projectType: PROJECT_TYPE.WebFrameworks, browserTarget, serverTarget, prerenderTarget };
+  return { projectType: PROJECT_TYPE.WebFrameworks, buildTarget };
 };

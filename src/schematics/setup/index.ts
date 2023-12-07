@@ -12,7 +12,7 @@ import {
 import { getFirebaseTools } from '../firebaseTools';
 import {
   DeployOptions, FEATURES, FirebaseApp, FirebaseHostingSite, FirebaseProject,
-  NgAddNormalizedOptions, PROJECT_TYPE
+  NgAddNormalizedOptions
 } from '../interfaces';
 import { FirebaseJSON, Workspace, WorkspaceProject } from '../interfaces';
 import {
@@ -27,14 +27,9 @@ export interface SetupConfig extends DeployOptions {
   firebaseApp?: FirebaseApp,
   firebaseHostingSite?: FirebaseHostingSite,
   sdkConfig?: Record<string, string>,
-  nodeVersion?: string,
-  browserTarget?: string,
-  serverTarget?: string,
-  prerenderTarget?: string,
+  buildTarget?: string,
   project?: string,
   ssrRegion?: string,
-  projectType?: PROJECT_TYPE,
-  prerender?: boolean,
 }
 
 export const setupProject =
@@ -55,10 +50,7 @@ export const setupProject =
           firebaseApp: config.firebaseApp,
           firebaseHostingSite: config.firebaseHostingSite,
           sdkConfig: config.sdkConfig,
-          prerender: undefined,
-          browserTarget: config.browserTarget,
-          serverTarget: config.serverTarget,
-          prerenderTarget: config.prerenderTarget,
+          buildTarget: config.buildTarget,
           ssrRegion: config.ssrRegion,
         },
         tree,
@@ -97,7 +89,10 @@ export const ngAddSetupProject = (
     if (!host.exists('/firebase.json')) { writeFileSync(join(projectRoot, 'firebase.json'), '{}'); }
 
     const user = await userPrompt({ projectRoot });
-    await firebaseTools.login.use(user.email, { projectRoot });
+    const defaultUser = await firebaseTools.login(options);
+    if (user.email !== defaultUser?.email) {
+      await firebaseTools.login.use(user.email, { projectRoot });
+    }
 
     const { project: ngProject, projectName: ngProjectName } = getProject(options, host);
 
@@ -187,10 +182,13 @@ export const setupFirebase = (config: {
     builder: '@angular/fire:deploy',
     options: {
       version: 2,
-      browserTarget: options.browserTarget,
-      ...(options.serverTarget ? {serverTarget: options.serverTarget} : {}),
-      ...(options.prerenderTarget ? {prerenderTarget: options.prerenderTarget} : {})
-    }
+    },
+    configurations: {
+      production: {
+        buildTarget: options.buildTarget,
+      },
+    },
+    defaultConfiguration: 'production',
   };
 
   tree.overwrite(workspacePath, JSON.stringify(workspace, null, 2));

@@ -7,10 +7,6 @@ by conforming to Angular conventions.
 
 <strong><pre>ng add @angular/fire</pre></strong>
 
-_Note: If you want to ng add AngularFire and will be using Hosting/Cloud Functions, you need to configure the 
-Firebase CLI first so that you are logged in for the schematics that are run as part of `ng add @angular/fire`.
-Follow [this guide](docs/install-firebase-tools.md) to have the Firebase CLI walk you through the setup._
-
 - **Dependency injection** - Provide and Inject Firebase services in your components
 - **Zone.js wrappers** - Stable zones allow proper functionality of service workers, forms, SSR, and pre-rendering
 - **Observable based** - Utilize RxJS rather than callbacks for realtime streams
