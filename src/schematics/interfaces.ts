@@ -41,10 +41,7 @@ export interface NgAddNormalizedOptions {
   firebaseApp: FirebaseApp|undefined;
   firebaseHostingSite: FirebaseHostingSite|undefined;
   sdkConfig: Record<string, string>|undefined;
-  prerender: boolean|undefined;
-  browserTarget: string|undefined;
-  serverTarget: string|undefined;
-  prerenderTarget: string|undefined;
+  buildTarget: string|undefined;
   ssrRegion: string|undefined;
 }
 
@@ -122,7 +119,7 @@ export interface FirebaseTools {
   };
 
   login: {
-    list(): Promise<{user: Record<string, any>}[]>;
+    list(): Promise<{user: Record<string, any>}[] | { users: undefined }>;
     add(): Promise<Record<string, any>>;
     use(email: string, options?: unknown): Promise<string>;
   } & ((options?: unknown) => Promise<Record<string, any>>);

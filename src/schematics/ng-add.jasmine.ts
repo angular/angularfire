@@ -1,5 +1,5 @@
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
-import { FEATURES, PROJECT_TYPE } from './interfaces';
+import { FEATURES } from './interfaces';
 import { setupProject } from  './setup';
 import 'jasmine';
 
@@ -127,7 +127,11 @@ const initialAngularJson = `{
           "builder": "@angular/fire:deploy",
           "options": {
             "version": 2
-          }
+          },
+          "configurations": {
+            "production": {}
+          },
+          "defaultConfiguration": "production"
         }
       }
     },
@@ -186,7 +190,11 @@ const overwriteAngularJson = `{
           "builder": "@angular/fire:deploy",
           "options": {
             "version": 2
-          }
+          },
+          "configurations": {
+            "production": {}
+          },
+          "defaultConfiguration": "production"
         }
       }
     },
@@ -257,7 +265,11 @@ const projectAngularJson = `{
           "builder": "@angular/fire:deploy",
           "options": {
             "version": 2
-          }
+          },
+          "configurations": {
+            "production": {}
+          },
+          "defaultConfiguration": "production"
         }
       }
     },
@@ -274,7 +286,11 @@ const projectAngularJson = `{
           "builder": "@angular/fire:deploy",
           "options": {
             "version": 2
-          }
+          },
+          "configurations": {
+            "production": {}
+          },
+          "defaultConfiguration": "production"
         }
       }
     }
@@ -302,9 +318,7 @@ describe('ng-add', () => {
     it('generates new files if starting from scratch', () => {
       setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-        projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
-        prerender: false,
       });
       expect(tree.read('firebase.json')?.toString()).toEqual(initialFirebaseJson);
       expect(tree.read('.firebaserc')?.toString()).toEqual(initialFirebaserc);
@@ -314,9 +328,7 @@ describe('ng-add', () => {
     it('uses default project', () => {
       setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-        projectType: PROJECT_TYPE.Static,
         project: undefined,
-        prerender: false,
       });
       expect(tree.read('firebase.json')?.toString()).toEqual(overwriteFirebaseJson);
       expect(tree.read('.firebaserc')?.toString()).toEqual(overwriteFirebaserc);
@@ -330,24 +342,18 @@ describe('ng-add', () => {
       tree.overwrite('angular.json', JSON.stringify(angularJson));
       setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-        projectType: PROJECT_TYPE.Static,
         project: undefined,
-        prerender: false,
       });
     });
 
     it('overrides existing files', () => {
       setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-        projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
-        prerender: false,
       });
       setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: OTHER_FIREBASE_PROJECT_NAME } as any,
-        projectType: PROJECT_TYPE.Static,
         project: OTHER_PROJECT_NAME,
-        prerender: false,
       });
       expect(tree.read('firebase.json')?.toString()).toEqual(projectFirebaseJson);
       expect(tree.read('.firebaserc')?.toString()).toEqual(projectFirebaserc);
@@ -364,9 +370,7 @@ describe('ng-add', () => {
       tree.create('package.json', JSON.stringify(generatePackageJson()));
       expect(() => setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-        projectType: PROJECT_TYPE.Static,
         project: undefined,
-        prerender: false,
       })).toThrow(
         new SchematicsException('No Angular project selected and no default project in the workspace')
       );
@@ -375,9 +379,7 @@ describe('ng-add', () => {
     it('Should throw if angular.json not found', () => {
       expect(() => setupProject(Tree.empty(), {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-        projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
-        prerender: false,
       })).toThrow(new SchematicsException('Could not find angular.json'));
     });
 
@@ -387,9 +389,7 @@ describe('ng-add', () => {
       tree.create('package.json', JSON.stringify(generatePackageJson()));
       expect(() => setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-        projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
-        prerender: false,
       })).toThrow(new SchematicsException('Could not parse angular.json'));
     });
 
@@ -399,9 +399,7 @@ describe('ng-add', () => {
       tree.create('package.json', JSON.stringify(generatePackageJson()));
       expect(() => setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-        projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
-        prerender: false,
       })).toThrow(new SchematicsException('The specified Angular project is not defined in this workspace'));
     });
 
@@ -416,9 +414,7 @@ describe('ng-add', () => {
       tree.create('package.json', JSON.stringify(generatePackageJson()));
       expect(() => setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-        projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
-        prerender: false,
       })).toThrow(new SchematicsException('Deploy requires an Angular project type of "application" in angular.json'));
     });
 
@@ -433,9 +429,7 @@ describe('ng-add', () => {
       tree.create('package.json', JSON.stringify(generatePackageJson()));
       expect(() => setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-        projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
-        prerender: false,
       })).toThrow(
         new SchematicsException('Angular project "pie-ka-chu" has a malformed angular.json')
       );
@@ -480,9 +474,7 @@ describe('ng-add', () => {
       tree.create('.firebaserc', `I'm broken 😔`);
       expect(() => setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-        projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
-        prerender: false,
       })).toThrow(
         parseInt(process.versions.node, 10) >= 20 ?
           new SchematicsException(`Error when parsing .firebaserc: Unexpected token 'I', "I'm broken 😔" is not valid JSON`) :
@@ -539,9 +531,7 @@ describe('ng-add', () => {
         // TODO mock addTask
         setupProject(tree, {addTask: () => undefined} as any, [FEATURES.Hosting], {
           firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-          projectType: PROJECT_TYPE.CloudFunctions,
           project: PROJECT_NAME,
-          prerender: false,
         });
 
         const angularJSON = tree.read('angular.json')?.toString();
@@ -557,9 +547,7 @@ describe('ng-add', () => {
         // TODO mock addTask
         setupProject(tree, {addTask: () => undefined} as any, [FEATURES.Hosting], {
           firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-          projectType: PROJECT_TYPE.CloudFunctions,
           project: PROJECT_NAME,
-          prerender: false,
         });
 
         const firebaseJsonData= tree.read('firebase.json')?.toString();
