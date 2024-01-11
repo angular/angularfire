@@ -12,7 +12,7 @@ Each *document* contains a set of key-value pairs. Cloud Firestore is optimized 
 
 ## Using `AngularFirestoreCollection`
 
-The `AngularFirestoreCollection` service is a wrapper around the native Firestore SDK's [`CollectionReference`](https://firebase.google.com/docs/reference/js/firebase.firestore.CollectionReference) and [`Query`](https://firebase.google.com/docs/reference/js/firebase.firestore.Query) types. It is a generic service that provides you with a strongly typed set of methods for manipulating and streaming data. This service is designed for use as an `@Injectable()`.
+The `AngularFirestoreCollection` service is a wrapper around the native Firestore SDK's [`CollectionReference`](https://firebase.google.com/docs/reference/js/v8/firebase.firestore.CollectionReference) and [`Query`](hhttps://firebase.google.com/docs/reference/js/v8/firebase.firestore.Query) types. It is a generic service that provides you with a strongly typed set of methods for manipulating and streaming data. This service is designed for use as an `@Injectable()`.
 
 ```ts
 import { Component } from '@angular/core';
