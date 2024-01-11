@@ -16,7 +16,7 @@ YADA YADA YADA
 
 ## Firebase API
 
-Something something look at the offical docs
+Something something look at the official docs
 
 ## Convenience observables
 
