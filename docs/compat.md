@@ -38,7 +38,7 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 
 ### Authenticate users
 
-- [Getting started with Firebase Authentication](acompat/uth/getting-started.md)
+- [Getting started with Firebase Authentication](compat/auth/getting-started.md)
 - [Route users with AngularFire guards](compat/auth/router-guards.md)
 
 ### Local Emulator Suite
