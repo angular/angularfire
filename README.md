@@ -58,7 +58,7 @@ export class AppComponent {
 
   constructor() {
     const itemCollection = collection(this.firestore, 'items');
-    this.item$ = collectionData(itemCollection);
+    this.item$ = collectionData(itemCollection) as Observable<Item[]>;
   }
 }
 ```
