@@ -5,6 +5,9 @@ AngularFire smooths over the rough edges an Angular developer might encounter wh
 [Firebase JS SDK](https://github.com/firebase/firebase-js-sdk) & aims to provide a more natural developer experience
 by conforming to Angular conventions.
 
+Please ensure that firebase-tools is installed prior. 
+<strong><pre>npm install firebase-tools</pre></strong>
+Then the following command can be run.
 <strong><pre>ng add @angular/fire</pre></strong>
 
 - **Dependency injection** - Provide and Inject Firebase services in your components
