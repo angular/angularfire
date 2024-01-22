@@ -100,7 +100,7 @@ Get help on our [Q&A board](https://github.com/angular/angularfire/discussions?d
 
 ## Developer Guide
 
-This developer guide assimes you're using the new tree-shakable AngularFire API, [if you're looking for the compatability API you can find the documentation here](docs/compat.md).
+This developer guide assumes you're using the new tree-shakable AngularFire API, [if you're looking for the compatability API you can find the documentation here](docs/compat.md).
 
 [See the v7 upgrade guide for more information on this change.](docs/version-7-upgrade.md).
 
