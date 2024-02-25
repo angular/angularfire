@@ -1,4 +1,13 @@
-import { APP_INITIALIZER, InjectionToken, Injector, ModuleWithProviders, NgModule, NgZone, Optional } from '@angular/core';
+import {
+  APP_INITIALIZER,
+  EnvironmentProviders,
+  InjectionToken,
+  Injector,
+  NgModule,
+  NgZone,
+  Optional,
+  makeEnvironmentProviders,
+} from '@angular/core';
 import { VERSION, ɵAngularFireSchedulers, ɵgetDefaultInstanceOf } from '@angular/fire';
 import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
 import { registerVersion } from 'firebase/app';
@@ -60,10 +69,18 @@ export class RemoteConfigModule {
 
 export function provideRemoteConfig(
   fn: (injector: Injector) => FirebaseRemoteConfig, ...deps: any[]
-): ModuleWithProviders<RemoteConfigModule> {
-  return {
-    ngModule: RemoteConfigModule,
-    providers: [{
+): EnvironmentProviders {
+  registerVersion('angularfire', VERSION.full, 'rc');
+
+  return makeEnvironmentProviders([
+    DEFAULT_REMOTE_CONFIG_INSTANCE_PROVIDER,
+    REMOTE_CONFIG_INSTANCES_PROVIDER,
+    {
+      provide: APP_INITIALIZER,
+      useValue: isRemoteConfigSupportedFactory.async,
+      multi: true,
+    },
+    {
       provide: PROVIDED_REMOTE_CONFIG_INSTANCES,
       useFactory: remoteConfigInstanceFactory(fn),
       multi: true,
@@ -74,6 +91,6 @@ export function provideRemoteConfig(
         FirebaseApps,
         ...deps,
       ]
-    }]
-  };
+    }
+  ]);
 }

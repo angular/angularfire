@@ -1,13 +1,14 @@
 import {
+  EnvironmentProviders,
   Inject,
   InjectionToken,
   Injector,
-  ModuleWithProviders,
   VERSION as NG_VERSION,
   NgModule,
   NgZone,
   Optional,
   PLATFORM_ID,
+  makeEnvironmentProviders,
 } from '@angular/core';
 import { VERSION, ɵAngularFireSchedulers } from '@angular/fire';
 import { FirebaseApp as IFirebaseApp, getApp, registerVersion } from 'firebase/app';
@@ -44,6 +45,12 @@ const FIREBASE_APPS_PROVIDER = {
 
 export function firebaseAppFactory(fn: (injector: Injector) => IFirebaseApp) {
   return (zone: NgZone, injector: Injector) => {
+    const platformId = injector.get(PLATFORM_ID);
+    registerVersion('angularfire', VERSION.full, 'core');
+    registerVersion('angularfire', VERSION.full, 'app');
+    // eslint-disable-next-line @typescript-eslint/no-base-to-string
+    registerVersion('angular', NG_VERSION.full, platformId.toString());
+
     const app = zone.runOutsideAngular(() => fn(injector));
     return new FirebaseApp(app);
   };
@@ -68,10 +75,11 @@ export class FirebaseAppModule {
 // Calling initializeApp({ ... }, 'name') multiple times will add more FirebaseApps into the FIREBASE_APPS
 // injection scope. This allows developers to more easily work with multiple Firebase Applications. Downside
 // is that DI for app name and options doesn't really make sense anymore.
-export function provideFirebaseApp(fn: (injector: Injector) => IFirebaseApp, ...deps: any[]): ModuleWithProviders<FirebaseAppModule> {
-  return {
-    ngModule: FirebaseAppModule,
-    providers: [{
+export function provideFirebaseApp(fn: (injector: Injector) => IFirebaseApp, ...deps: any[]): EnvironmentProviders {
+  return makeEnvironmentProviders([
+    DEFAULT_FIREBASE_APP_PROVIDER,
+    FIREBASE_APPS_PROVIDER,
+    {
       provide: PROVIDED_FIREBASE_APPS,
       useFactory: firebaseAppFactory(fn),
       multi: true,
@@ -81,6 +89,6 @@ export function provideFirebaseApp(fn: (injector: Injector) => IFirebaseApp, ...
         ɵAngularFireSchedulers,
         ...deps,
       ],
-    }],
-  };
+    }
+  ])
 }

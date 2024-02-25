@@ -1,4 +1,12 @@
-import { InjectionToken, Injector, ModuleWithProviders, NgModule, NgZone, Optional } from '@angular/core';
+import {
+  EnvironmentProviders,
+  InjectionToken,
+  Injector,
+  NgModule,
+  NgZone,
+  Optional,
+  makeEnvironmentProviders,
+} from '@angular/core';
 import { VERSION, ɵAngularFireSchedulers, ɵgetDefaultInstanceOf } from '@angular/fire';
 import { ɵAppCheckInstances } from '@angular/fire';
 import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
@@ -49,10 +57,12 @@ export class DatabaseModule {
   }
 }
 
-export function provideDatabase(fn: (injector: Injector) => FirebaseDatabase, ...deps: any[]): ModuleWithProviders<DatabaseModule> {
-  return {
-    ngModule: DatabaseModule,
-    providers: [{
+export function provideDatabase(fn: (injector: Injector) => FirebaseDatabase, ...deps: any[]): EnvironmentProviders {
+  registerVersion('angularfire', VERSION.full, 'rtdb');
+  return makeEnvironmentProviders([
+    DEFAULT_DATABASE_INSTANCE_PROVIDER,
+    DATABASE_INSTANCES_PROVIDER,
+    {
       provide: PROVIDED_DATABASE_INSTANCES,
       useFactory: databaseInstanceFactory(fn),
       multi: true,
@@ -66,6 +76,6 @@ export function provideDatabase(fn: (injector: Injector) => FirebaseDatabase, ..
         [new Optional(), ɵAppCheckInstances ],
         ...deps,
       ]
-    }]
-  };
+    }
+  ]);
 }
