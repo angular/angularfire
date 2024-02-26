@@ -15,7 +15,7 @@ describe('Database', () => {
     beforeEach(() => {
         appName = rando();
         TestBed.configureTestingModule({
-            imports: [
+            providers: [
                 provideFirebaseApp(() => initializeApp(COMMON_CONFIG, appName)),
                 provideDatabase(() => {
                     providedDatabase = getDatabase(getApp(appName));
