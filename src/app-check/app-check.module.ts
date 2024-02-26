@@ -1,5 +1,15 @@
 import { isPlatformServer } from '@angular/common';
-import { InjectionToken, Injector, ModuleWithProviders, NgModule, NgZone, Optional, PLATFORM_ID, isDevMode } from '@angular/core';
+import {
+  EnvironmentProviders,
+  InjectionToken,
+  Injector,
+  NgModule,
+  NgZone,
+  Optional,
+  PLATFORM_ID,
+  isDevMode,
+  makeEnvironmentProviders,
+} from '@angular/core';
 import { VERSION, ɵAPP_CHECK_PROVIDER_NAME, ɵAngularFireSchedulers, ɵAppCheckInstances, ɵgetDefaultInstanceOf } from '@angular/fire';
 import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
 import { registerVersion } from 'firebase/app';
@@ -56,10 +66,12 @@ export class AppCheckModule {
   }
 }
 
-export function provideAppCheck(fn: (injector: Injector) => FirebaseAppCheck, ...deps: any[]): ModuleWithProviders<AppCheckModule> {
-  return {
-    ngModule: AppCheckModule,
-    providers: [{
+export function provideAppCheck(fn: (injector: Injector) => FirebaseAppCheck, ...deps: any[]): EnvironmentProviders {
+  registerVersion('angularfire', VERSION.full, 'app-check');
+  return makeEnvironmentProviders([
+    DEFAULT_APP_CHECK_INSTANCE_PROVIDER,
+    APP_CHECK_INSTANCES_PROVIDER,
+    {
       provide: PROVIDED_APP_CHECK_INSTANCES,
       useFactory: appCheckInstanceFactory(fn),
       multi: true,
@@ -71,6 +83,6 @@ export function provideAppCheck(fn: (injector: Injector) => FirebaseAppCheck, ..
         FirebaseApps,
         ...deps,
       ]
-    }]
-  };
+    }
+  ]);
 }

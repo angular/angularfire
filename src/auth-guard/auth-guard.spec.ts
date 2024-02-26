@@ -17,18 +17,18 @@ describe('AuthGuard', () => {
     appName = rando();
     TestBed.configureTestingModule({
       imports: [
-        provideFirebaseApp(() => initializeApp(COMMON_CONFIG, appName)),
-        provideAuth(() => {
-          const auth = getAuth(getApp(appName));
-          connectAuthEmulator(auth, 'http://localhost:9098');
-          return auth;
-        }),
         AuthGuardModule,
         RouterModule.forRoot([
           { path: 'a', component: TestComponent, canActivate: [AuthGuard] }
         ])
       ],
       providers: [
+        provideFirebaseApp(() => initializeApp(COMMON_CONFIG, appName)),
+        provideAuth(() => {
+          const auth = getAuth(getApp(appName));
+          connectAuthEmulator(auth, 'http://localhost:9098');
+          return auth;
+        }),
         { provide: APP_BASE_HREF, useValue: 'http://localhost:4200/' }
       ]
     });

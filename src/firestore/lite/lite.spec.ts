@@ -15,7 +15,7 @@ describe('Firestore-lite', () => {
     beforeEach(() => {
         appName = rando();
         TestBed.configureTestingModule({
-            imports: [
+            providers: [
                 provideFirebaseApp(() => initializeApp(COMMON_CONFIG, appName)),
                 provideFirestore(() => {
                     providedFirestore = getFirestore(getApp(appName));

@@ -13,7 +13,7 @@ describe('FirebaseApp', () => {
     beforeEach(() => {
         appName = rando();
         TestBed.configureTestingModule({
-            imports: [
+            providers: [
                 provideFirebaseApp(() => {
                     providedApp = initializeApp(COMMON_CONFIG, appName);
                     return providedApp;

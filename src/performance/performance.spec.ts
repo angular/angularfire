@@ -12,7 +12,7 @@ describe('Performance', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [
+            providers: [
                 provideFirebaseApp(() => initializeApp(COMMON_CONFIG)),
                 providePerformance(() => {
                     providedPerformance = getPerformance();

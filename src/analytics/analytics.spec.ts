@@ -23,7 +23,7 @@ describe('Analytics', () => {
     beforeEach(() => {
         appName = rando();
         TestBed.configureTestingModule({
-            imports: [
+            providers: [
                 provideFirebaseApp(() => initializeApp(COMMON_CONFIG_TOO, appName)),
                 provideAnalytics(() => {
                     providedAnalytics = getAnalytics(getApp(appName));

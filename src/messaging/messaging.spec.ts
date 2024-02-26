@@ -22,7 +22,7 @@ describe('Messaging', () => {
     beforeEach(() => {
         appName = rando();
         TestBed.configureTestingModule({
-            imports: [
+            providers: [
                 provideFirebaseApp(() => initializeApp(COMMON_CONFIG, appName)),
                 provideMessaging(() => {
                     providedMessaging = getMessaging(getApp(appName));

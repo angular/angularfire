@@ -15,7 +15,7 @@ describe('Functions', () => {
     beforeEach(() => {
         appName = rando();
         TestBed.configureTestingModule({
-            imports: [
+            providers: [
                 provideFirebaseApp(() => initializeApp(COMMON_CONFIG, appName)),
                 provideFunctions(() => {
                     providedFunctions = getFunctions(getApp(appName));
