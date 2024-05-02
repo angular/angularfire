@@ -6,7 +6,9 @@
 
 # Cloud Messaging
 
-### Provide Messaging to your existing application
+Firebase FCM allows you to register devices with unique FCM tokens, that you can later programtically send notifications to using Firebase Cloud Functions. It is up to the application to update these tokens in Firebase if you want to use them in other layers of your application, i.e send a notification to all administrators, etc. In that case, you would likely want to store your fcm tokens on your user collection, or a sub collection or another collection with different permissions.
+
+# Provide Messaging to your existing application
 
 ```
 import { getMessaging, provideMessaging } from "@angular/fire/messaging";
@@ -22,7 +24,7 @@ bootstrapApplication(AppComponent, {
 
 # Create a Firebase Messaging Service Worker 
 
-There are two parts to Firebase Messaging, a Service Worker and the DOM API. AngularFireMessaging allows you to request permission, get tokens, delete tokens, and subscribe to messages on the DOM side. To register to receive notifications you need to set up the Service Worker. [The official Firebase documentation for setting up the details exactly how to do that](https://firebase.google.com/docs/cloud-messaging/js/client).
+There are two parts to Firebase Messaging, a Service Worker and the DOM API. Angular Fire Messaging allows you to request permission, get tokens, delete tokens, and subscribe to messages on the DOM side. To register to receive notifications you need to set up the Service Worker. [The official Firebase documentation for setting up the details exactly how to do that](https://firebase.google.com/docs/cloud-messaging/js/client).
 
 #### Create your firebase-messaging-sw.js file in your src/assets folder
 
@@ -31,6 +33,8 @@ There are two parts to Firebase Messaging, a Service Worker and the DOM API. Ang
 It may be wise to use file replacements or environments here for different environments
 
 ```
+// This sample application is using 9.22, make sure you are importing the same version
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
 import { getMessaging } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging-sw.js";
 
@@ -50,7 +54,7 @@ const messaging = getMessaging(firebaseApp);
 
 ```
 import { Injectable } from "@angular/core";
-import { Messaging, getToken, onMessage } from "@angular/fire/messaging";
+import { Messaging, getToken, onMessage, deleteToken } from "@angular/fire/messaging";
 import { Observable, tap } from "rxjs";
 
 @Injectable({
@@ -81,26 +85,24 @@ export class FcmService {
         });
 	});  
     }
-    this.message$ = new Observable((sub) => onMessage(this.msg, (token) =>     
-      sub.next(token))).pipe(
-	    tap((token) => {
-	      console.log("My fcm token", token);
+    this.message$ = new Observable((sub) => onMessage(this.msg, (msg) =>     
+      sub.next(msg))).pipe(
+	    tap((msg) => {
+	      console.log("My Firebase Cloud Message", msg);
 	    })
     );
     }
   deleteToken(){
-    // We can also delete fcm tokens, make sure to also update this on
-    // Your firestore db if you are storing them as well
-    
-	await deleteToken(this.msg);
+    // We can also delete fcm tokens, make sure to also update this on your firestore db if you are storing them as well
+    await deleteToken(this.msg);
   }
 ```
 
 # Testing and Sending Notifications
 
-Firebase will allow you to send a test notification under Engage > Messaging > New Campaign > Notifications. Here you can click send test message. Additionally, you can send them programmatically through Firebase cloud functions. 
+Firebase will allow you to send a test notification under Engage > Messaging > New Campaign > Notifications. Here you can click send a test message. Additionally, you can send them programmatically through Firebase cloud functions. 
 
-Here is a barebones Node example
+Here is a barebones Node example:
 
 ```
 export const sendTestMessage = onRequest(async (_, res) => {
@@ -121,7 +123,7 @@ export const sendTestMessage = onRequest(async (_, res) => {
 });
 ```
 
-Here is a Node example that listens for a new comment, then sends a notification, and also adds it to a cache on Firebase so users can click through them.
+Here is a Node example that listens for a new comment on a collection, then sends a notification, and also adds it to a cache on Firebase so users can click through them.
 
 ```
 exports.onPostReply =
