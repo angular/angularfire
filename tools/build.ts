@@ -119,6 +119,7 @@ ${exportedZoneWrappedFns}
       collection: { exportName: 'collectionSnapshots' },
     }),
     reexport('firestore/lite', 'firebase', 'firebase/firestore/lite', tsKeys<typeof import('firebase/firestore/lite')>()),
+    reexport('vertexai-preview', 'firebase', 'firebase/vertexai-preview', tsKeys<typeof import('firebase/vertexai-preview')>()),
   ]);
 }
 

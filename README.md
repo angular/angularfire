@@ -19,17 +19,17 @@ by conforming to Angular conventions.
 ## Example use
 
 ```ts
-import { provideFirebaseApp, getApp, initializeApp } from '@angular/fire/app';
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 
-@NgModule({
-  imports: [
+export const appConfig: ApplicationConfig = {
+  providers: [
     provideFirebaseApp(() => initializeApp({ ... })),
     provideFirestore(() => getFirestore()),
+    ...
   ],
   ...
 })
-export class AppModule { }
 ```
 
 ```ts
@@ -44,11 +44,14 @@ interface Item {
 
 @Component({
   selector: 'app-root',
+  standalone: true,
   template: `
   <ul>
-    <li *ngFor="let item of item$ | async">
-      {{ item.name }}
-    </li>
+    @for (item of (item$ | async); track item) {
+      <li>
+        {{ item.name }}
+      </li>
+    }
   </ul>
   `
 })
@@ -96,11 +99,11 @@ We have three sample apps in this repository:
 
 Get help on our [Q&A board](https://github.com/angular/angularfire/discussions?discussions_q=category%3AQ%26A), the official [Firebase Mailing List](https://groups.google.com/forum/#!forum/firebase-talk), the [Firebase Community Slack](https://firebase.community/) (`#angularfire2`), the [Angular Community Discord](http://discord.gg/angular) (`#firebase`), [Gitter](https://gitter.im/angular/angularfire2), the [Firebase subreddit](https://www.reddit.com/r/firebase), or [Stack Overflow](https://stackoverflow.com/questions/tagged/angularfire2).
 
-> **NOTE:** AngularFire is maintained by Googlers but is not a supported Firebase product. Questions on the mailing list and issues filed here are answered on a <strong>best-effort basis</strong> by maintainers and other community members. If you are able to reproduce a problem with Firebase <em>outside of AngularFire's implementation</em>, please [file an issue on the Firebase JS SDK](https://github.com/firebase/firebase-js-sdk/issues) or reach out to the personalized [Firebase support channel](https://firebase.google.com/support/).
+> **NOTE:** While relatively stable, AngularFire is a [developer preview](https://angular.io/guide/releases#developer-preview) and is subject to change before general availability. Questions on the mailing list and issues filed here are answered on a <strong>best-effort basis</strong> by maintainers and other community members. If you are able to reproduce a problem with Firebase <em>outside of AngularFire's implementation</em>, please [file an issue on the Firebase JS SDK](https://github.com/firebase/firebase-js-sdk/issues) or reach out to the personalized [Firebase support channel](https://firebase.google.com/support/).
 
 ## Developer Guide
 
-This developer guide assumes you're using the new tree-shakable AngularFire API, [if you're looking for the compatability API you can find the documentation here](docs/compat.md).
+This developer guide assumes you're using the new tree-shakable AngularFire API, [if you're looking for the compatibility API you can find the documentation here](docs/compat.md).
 
 [See the v7 upgrade guide for more information on this change.](docs/version-7-upgrade.md).
 
@@ -188,9 +191,3 @@ import { } from '@angular/fire/app-check';
 </td>
   </tr>
 </table>
-
-### Deploying your site
-
-* Deploy to Firebase Hosting
-* Angular Universal: Deploy to Cloud Functions
-* Angular Universal: Deploy to Cloud Run

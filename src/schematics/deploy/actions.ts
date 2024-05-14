@@ -390,6 +390,8 @@ export default async function deploy(
   options: DeployBuilderOptions,
   firebaseToken?: string,
 ) {
+  const legacyNgDeploy = !options.version || options.version < 2;
+
   if (!firebaseToken && !process.env.GOOGLE_APPLICATION_CREDENTIALS) {
     await firebaseTools.login();
     const user = await firebaseTools.login({ projectRoot: context.workspaceRoot });
@@ -399,6 +401,12 @@ export default async function deploy(
   if (!firebaseToken && process.env.GOOGLE_APPLICATION_CREDENTIALS) {
     await spawnAsync(`gcloud auth activate-service-account --key-file ${process.env.GOOGLE_APPLICATION_CREDENTIALS}`);
     console.log(`Using Google Application Credentials.`);
+  }
+
+  if (legacyNgDeploy) {
+    console.error(`Legacy ng-deploy Firebase is deprecated.
+Please migrate to Firebase Hosting's integration with Angular https://firebase.google.com/docs/hosting/frameworks/angular
+or the new Firebase App Hosting product https://firebase.google.com/docs/app-hosting`);
   }
 
   if (prerenderBuildTarget) {
@@ -465,7 +473,7 @@ export default async function deploy(
 
   firebaseTools.logger.logger.add(logger);
 
-  if ((!options.version || options.version < 2) && serverBuildTarget) {
+  if (legacyNgDeploy && serverBuildTarget) {
     if (options.ssr === 'cloud-run') {
       await deployToCloudRun(
         firebaseTools,

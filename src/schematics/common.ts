@@ -1,6 +1,6 @@
 import { SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
 import * as semver from 'semver';
-import { FirebaseHostingSite, FirebaseRc } from './interfaces';
+import { FirebaseHostingSite } from './interfaces';
 
 export const shortSiteName = (site?: FirebaseHostingSite) => site?.name?.split('/').pop();
 
@@ -17,44 +17,6 @@ export const overwriteIfExists = (
     tree.create(path, content);
   }
 };
-
-function emptyFirebaseRc() {
-  return {
-    targets: {}
-  };
-}
-
-function generateFirebaseRcTarget(firebaseProject: string, firebaseHostingSite: FirebaseHostingSite|undefined, project: string) {
-  return {
-    hosting: {
-      [project]: [
-        shortSiteName(firebaseHostingSite) ?? firebaseProject
-      ]
-    }
-  };
-}
-
-export function generateFirebaseRc(
-  tree: Tree,
-  path: string,
-  firebaseProject: string,
-  firebaseHostingSite: FirebaseHostingSite|undefined,
-  project: string
-) {
-  const firebaseRc: FirebaseRc = tree.exists(path)
-    ? safeReadJSON(path, tree)
-    : emptyFirebaseRc();
-
-  firebaseRc.targets = firebaseRc.targets || {};
-  firebaseRc.targets[firebaseProject] = generateFirebaseRcTarget(
-    firebaseProject,
-    firebaseHostingSite,
-    project
-  );
-  firebaseRc.projects = { default: firebaseProject };
-
-  overwriteIfExists(tree, path, stringifyFormatted(firebaseRc));
-}
 
 export function safeReadJSON(path: string, tree: Tree) {
   try {

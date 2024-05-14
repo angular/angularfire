@@ -1,16 +1,14 @@
 import { spawnSync } from 'child_process';
 import * as fuzzy from 'fuzzy';
 import * as inquirer from 'inquirer';
-import { shortSiteName } from '../common';
 import { getFirebaseTools } from '../firebaseTools';
-import { FEATURES, FirebaseApp, FirebaseHostingSite, FirebaseProject, PROJECT_TYPE, WorkspaceProject, featureOptions } from '../interfaces';
-import { isSSRApp, isUniversalApp, shortAppId } from '../utils';
+import { FEATURES, FirebaseApp, FirebaseProject, featureOptions } from '../interfaces';
+import { shortAppId } from '../utils';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
 
 const NEW_OPTION = '~~angularfire-new~~';
-const DEFAULT_SITE_TYPE = 'DEFAULT_SITE';
 
 // `fuzzy` passes either the original list of projects or an internal object
 // which contains the project as a property.
@@ -20,10 +18,6 @@ const isProject = (elem: FirebaseProject | fuzzy.FilterResult<FirebaseProject>):
 
 const isApp = (elem: FirebaseApp | fuzzy.FilterResult<FirebaseApp>): elem is FirebaseApp => {
     return (elem as { original: FirebaseApp }).original === undefined;
-};
-
-const isSite = (elem: FirebaseHostingSite | fuzzy.FilterResult<FirebaseHostingSite>): elem is FirebaseHostingSite => {
-    return (elem as { original: FirebaseHostingSite }).original === undefined;
 };
 
 export const searchProjects = (projects: FirebaseProject[]) =>
@@ -78,33 +72,6 @@ export const searchApps = (apps: FirebaseApp[]) =>
     });
   };
 
-export const searchSites = (sites: FirebaseHostingSite[]) =>
-  // eslint-disable-next-line @typescript-eslint/require-await
-  async (_: any, input: string) => {
-    sites.unshift({
-      name: NEW_OPTION,
-      defaultUrl: '[CREATE NEW SITE]',
-    } as any);
-    return fuzzy.filter(input, sites, {
-      extract(el) {
-        return el.defaultUrl;
-      }
-    }).map((result) => {
-      let original: FirebaseHostingSite;
-      if (isSite(result)) {
-        original = result;
-      } else {
-        original = result.original;
-      }
-      return {
-        name: original.defaultUrl,
-        title: original.defaultUrl,
-        value: shortSiteName(original),
-      };
-    });
-  };
-
-
 type Prompt = <K extends string, U= unknown>(questions: { name: K, source: (...args) =>
   Promise<{ value: U }[]>, default?: U | ((o: U[]) => U | Promise<U>), [key: string]: any }) =>
     Promise<{[T in K]: U }>;
@@ -118,7 +85,7 @@ export const featuresPrompt = async (): Promise<FEATURES[]> => {
     name: 'features',
     choices: featureOptions,
     message: 'What features would you like to setup?',
-    default: [FEATURES.Hosting],
+    default: [],
   }) as { features: FEATURES[] };
   return features;
 };
@@ -205,65 +172,4 @@ export const appPrompt = async ({ projectId: project }: FirebaseProject, default
   }
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return (apps).find(it => shortAppId(it) === appId)!;
-};
-
-export const sitePrompt = async ({ projectId: project }: FirebaseProject, options: any) => {
-  const firebaseTools = await getFirebaseTools();
-  const sites = await firebaseTools.hosting.sites.list({ ...options, project }).then(it => {
-    if (it.sites.length === 0) {
-      // newly created projects don't return their default site, stub one
-      return [{
-        name: project,
-        defaultUrl: `https://${project}.web.app`,
-        type: DEFAULT_SITE_TYPE,
-        appId: undefined,
-      } as FirebaseHostingSite];
-    } else {
-      return it.sites;
-    }
-  });
-  const { siteName } = await autocomplete({
-    type: 'autocomplete',
-    name: 'siteName',
-    source: searchSites(sites),
-    message: 'Please select a hosting site:',
-    default: _ => shortSiteName(sites.find(site => site.type === DEFAULT_SITE_TYPE)),
-  });
-  if (siteName === NEW_OPTION) {
-    const { subdomain } = await inquirer.prompt({
-      type: 'input',
-      name: 'subdomain',
-      message: 'Please provide an unique, URL-friendly id for the site (<id>.web.app):',
-    }) as { subdomain: string };
-    return await firebaseTools.hosting.sites.create(subdomain, { ...options, nonInteractive: true, project });
-  }
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return (sites).find(it => shortSiteName(it) === siteName)!;
-};
-
-const DEFAULT_REGION = 'us-central1';
-const ALLOWED_SSR_REGIONS = [
-  { name: 'us-central1 (Iowa)', value: 'us-central1' },
-  { name: 'us-west1 (Oregon)', value: 'us-west1' },
-  { name: 'us-east1 (South Carolina)', value: 'us-east1' },
-  { name: 'europe-west1 (Belgium)', value: 'europe-west1' },
-  { name: 'asia-east1 (Taiwan)', value: 'asia-east1' },
-];
-
-export const projectTypePrompt = async (project: WorkspaceProject, name: string) => {
-  const buildTarget = [`${name}:build:production`, `${name}:build:development`];
-  const serveTarget = isUniversalApp(project) ?
-    [`${name}:serve-ssr:production`, `${name}:serve-ssr:development`] :
-    [`${name}:serve:production`, `${name}:serve:development`];
-  if (isUniversalApp(project) || isSSRApp(project)) {
-    const { ssrRegion } = await inquirer.prompt({
-      type: 'list',
-      name: 'ssrRegion',
-      choices: ALLOWED_SSR_REGIONS,
-      message: 'In which region would you like to host server-side content?',
-      default: DEFAULT_REGION,
-    }) as { ssrRegion: string };
-    return { projectType: PROJECT_TYPE.WebFrameworks, ssrRegion, buildTarget, serveTarget };
-  }
-  return { projectType: PROJECT_TYPE.WebFrameworks, buildTarget, serveTarget };
 };
