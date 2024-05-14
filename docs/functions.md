@@ -45,8 +45,9 @@ export class AppComponent {
 ```
 
 ## Firebase API
-The [Firebase API for Cloud Functions documentation](https://firebase.google.com/docs/reference/js/functions) is available on the Firebase website.
 
-## Convenience observables
+AngularFire wraps the Firebase JS SDK to ensure proper functionality in Angular, while providing the same API.
 
-More details coming soon.
+Update the imports from `import { ... } from 'firebase/functions'` to `import { ... } from '@angular/fire/functions'` and follow the official documentation.
+
+[Call functions from your app](https://firebase.google.com/docs/functions/callable?gen=2nd#web-modular-api) | [API Reference](https://firebase.google.com/docs/reference/js/functions)

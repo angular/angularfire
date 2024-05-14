@@ -1,5 +1,5 @@
 <small>
-<a href="https://github.com/angular/angularfire">AngularFire</a> &#10097; <a href="../README.md#developer-guide">Developer Guide</a> &#10097; Realtime App Check
+<a href="https://github.com/angular/angularfire">AngularFire</a> &#10097; <a href="../README.md#developer-guide">Developer Guide</a> &#10097; App Check
 </small>
 
 <img align="right" width="30%" src="images/reCAPTCHA-logo@1x.png">
@@ -47,7 +47,8 @@ export class AppCheckComponent {
 
 ## Firebase API
 
-The [AppCheck documentation](https://firebase.google.com/docs/reference/js/app-check) is available on the Firebase website.
+AngularFire wraps the Firebase JS SDK to ensure proper functionality in Angular, while providing the same API.
 
-## Convenience observables
-Coming soon.
+Update the imports from `import { ... } from 'firebase/app-check'` to `import { ... } from '@angular/fire/app-check'` and follow the official documentation.
+
+[Getting Started](https://firebase.google.com/docs/app-check/web/recaptcha-enterprise-provider) | [API Reference](https://firebase.google.com/docs/reference/js/app-check)

@@ -56,9 +56,15 @@ export class UserProfileComponent {
 ```
 
 ## Firebase API
-With the reference to Cloud Firestore available in a component it is now possible to connect read from and write to the database.
+
+AngularFire wraps the Firebase JS SDK to ensure proper functionality in Angular, while providing the same API.
+
+Update the imports from `import { ... } from 'firebase/firestore'` to `import { ... } from '@angular/fire/firestore'` and follow the official documentation.
+
+[Getting Started](https://firebase.google.com/docs/firestore/quickstart#web-modular-api) | [API Reference](https://firebase.google.com/docs/reference/js/firestore)
 
 ### Reading data
+
 In Cloud Firestore data is stored in `documents` and `documents` are stored in `collections`. The path to data follows `<collection_name>/<document_id>` and continues if there are subcollections. For example, `"users/ABC12345/posts/XYZ6789"` represents:
 * `users` collection
 * document id `ABC12345`
@@ -111,6 +117,7 @@ export Interface UserProfile {
 The `async` pipe handles unsubscribing from observables.
 
 ### Writing data
+
 To write to Cloud Firestore use the `addDoc` function. It will create a new document at the path specified by the collection. In `user-profile.component.ts`, we'll update the code to add a new document on a `<button>` click.
 
 

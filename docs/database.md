@@ -50,7 +50,7 @@ extend class DepartmentComponent {
 
 AngularFire wraps the Firebase JS SDK to ensure proper functionality in Angular, while providing the same API.
 
-Just change your imports from `import { ... } from 'firebase/database'` to `import { ... } from '@angular/fire/database'` and follow the offical documentation.
+Just change your imports from `import { ... } from 'firebase/database'` to `import { ... } from '@angular/fire/database'` and follow the official documentation.
 
 [Getting Started](https://firebase.google.com/docs/database/web/start) | [API Reference](https://firebase.google.com/docs/reference/js/database)
 

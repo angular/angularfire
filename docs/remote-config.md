@@ -46,8 +46,8 @@ export class RemoteConfigComponent {
 
 ## Firebase API
 
-The [Remote Config documentation](https://firebase.google.com/docs/reference/js/remote-config) is available on the Firebase website.
+AngularFire wraps the Firebase JS SDK to ensure proper functionality in Angular, while providing the same API.
 
-## Convenience observables
+Update the imports from `import { ... } from 'firebase/remote-config'` to `import { ... } from '@angular/fire/remote-config'` and follow the official documentation.
 
-Coming soon.
+[Getting Started](https://firebase.google.com/docs/remote-config/get-started?platform=web) | [API Reference](https://firebase.google.com/docs/reference/js/remote-config)
