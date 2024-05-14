@@ -4,6 +4,7 @@ export const enum FEATURES {
   Hosting,
   Authentication,
   Analytics,
+  AppCheck,
   Database,
   Functions,
   Messaging,
@@ -16,9 +17,10 @@ export const enum FEATURES {
 export const featureOptions = [
   { name: 'ng deploy -- hosting', value: FEATURES.Hosting },
   { name: 'Authentication', value: FEATURES.Authentication },
+  { name: 'Google Analytics', value: FEATURES.Analytics },
+  { name: 'App Check', value: FEATURES.AppCheck },
   { name: 'Firestore', value: FEATURES.Firestore },
   { name: 'Realtime Database', value: FEATURES.Database },
-  { name: 'Analytics', value: FEATURES.Analytics },
   { name: 'Cloud Functions (callable)', value: FEATURES.Functions },
   { name: 'Cloud Messaging', value: FEATURES.Messaging },
   { name: 'Performance Monitoring', value: FEATURES.Performance },
@@ -39,15 +41,13 @@ export interface NgAddNormalizedOptions {
   firebaseApp: FirebaseApp|undefined;
   firebaseHostingSite: FirebaseHostingSite|undefined;
   sdkConfig: Record<string, string>|undefined;
-  prerender: boolean|undefined;
-  browserTarget: string|undefined;
-  serverTarget: string|undefined;
-  prerenderTarget: string|undefined;
+  buildTarget: [string,string]|undefined;
+  serveTarget: [string,string]|undefined;
   ssrRegion: string|undefined;
 }
 
 export interface DeployOptions {
-  project: string;
+  project?: string;
 }
 
 export interface FirebaseProject {
@@ -120,7 +120,7 @@ export interface FirebaseTools {
   };
 
   login: {
-    list(): Promise<{user: Record<string, any>}[]>;
+    list(): Promise<{user: Record<string, any>}[] | { users: undefined }>;
     add(): Promise<Record<string, any>>;
     use(email: string, options?: unknown): Promise<string>;
   } & ((options?: unknown) => Promise<Record<string, any>>);

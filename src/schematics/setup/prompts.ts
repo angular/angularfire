@@ -1,9 +1,10 @@
+import { spawnSync } from 'child_process';
 import * as fuzzy from 'fuzzy';
 import * as inquirer from 'inquirer';
 import { shortSiteName } from '../common';
 import { getFirebaseTools } from '../firebaseTools';
 import { FEATURES, FirebaseApp, FirebaseHostingSite, FirebaseProject, PROJECT_TYPE, WorkspaceProject, featureOptions } from '../interfaces';
-import { hasPrerenderOption, isUniversalApp, shortAppId } from '../utils';
+import { isSSRApp, isUniversalApp, shortAppId } from '../utils';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
@@ -122,16 +123,15 @@ export const featuresPrompt = async (): Promise<FEATURES[]> => {
   return features;
 };
 
-export const userPrompt = async (options: unknown): Promise<Record<string, any>> => {
+export const userPrompt = async (options: { projectRoot: string }): Promise<Record<string, any>> => {
   const firebaseTools = await getFirebaseTools();
-  const users = await firebaseTools.login.list();
-  if (!users || users.length === 0) {
-    await firebaseTools.login(); // first login isn't returning anything of value
-    const user = await firebaseTools.login(options);
-    return user;
+  let loginList = await firebaseTools.login.list();
+  if (!Array.isArray(loginList) || loginList.length === 0) {
+    spawnSync('firebase login', { shell: true, cwd: options.projectRoot, stdio: 'inherit' });
+    return await firebaseTools.login(options);
   } else {
     const defaultUser = await firebaseTools.login(options);
-    const choices = users.map(({user}) => ({ name: user.email, value: user }));
+    const choices = loginList.map(({user}) => ({ name: user.email, value: user }));
     const newChoice = { name: '[Login in with another account]', value: NEW_OPTION };
     const { user } = await inquirer.prompt({
       type: 'list',
@@ -141,8 +141,17 @@ export const userPrompt = async (options: unknown): Promise<Record<string, any>>
       default: choices.find(it => it.value.email === defaultUser.email)?.value,
     }) as any;
     if (user === NEW_OPTION) {
-      const { user } = await firebaseTools.login.add();
-      return user;
+      spawnSync('firebase login:add', { shell: true, cwd: options.projectRoot, stdio: 'inherit' });
+      loginList = await firebaseTools.login.list();
+      if (!Array.isArray(loginList)) {
+        throw new Error("firebase login:list did not respond as expected");
+      }
+      const priorEmails = choices.map(it => it.name);
+      const newLogin = loginList.find(it => !priorEmails.includes(it.user.email));
+      if (!newLogin) {
+        throw new Error("Did not find a new user.");
+      }
+      return newLogin.user;
     }
     return user;
   }
@@ -242,14 +251,11 @@ const ALLOWED_SSR_REGIONS = [
 ];
 
 export const projectTypePrompt = async (project: WorkspaceProject, name: string) => {
-  let serverTarget: string|undefined;
-  let browserTarget = `${name}:build:${project.architect?.build?.defaultConfiguration || 'production'}`;
-  let prerenderTarget: string|undefined;
-  if (isUniversalApp(project)) {
-    serverTarget = `${name}:server:${project.architect?.server?.defaultConfiguration || 'production'}`;
-    browserTarget = `${name}:build:${project.architect?.build?.defaultConfiguration || 'production'}`;
-    const prerender = hasPrerenderOption(project);
-    prerenderTarget = prerender && `${name}:prerender:${prerender.defaultConfiguration || 'production'}`;
+  const buildTarget = [`${name}:build:production`, `${name}:build:development`];
+  const serveTarget = isUniversalApp(project) ?
+    [`${name}:serve-ssr:production`, `${name}:serve-ssr:development`] :
+    [`${name}:serve:production`, `${name}:serve:development`];
+  if (isUniversalApp(project) || isSSRApp(project)) {
     const { ssrRegion } = await inquirer.prompt({
       type: 'list',
       name: 'ssrRegion',
@@ -257,7 +263,7 @@ export const projectTypePrompt = async (project: WorkspaceProject, name: string)
       message: 'In which region would you like to host server-side content?',
       default: DEFAULT_REGION,
     }) as { ssrRegion: string };
-    return { prerender, projectType: PROJECT_TYPE.WebFrameworks, ssrRegion, browserTarget, serverTarget, prerenderTarget };
+    return { projectType: PROJECT_TYPE.WebFrameworks, ssrRegion, buildTarget, serveTarget };
   }
-  return { projectType: PROJECT_TYPE.WebFrameworks, browserTarget, serverTarget, prerenderTarget };
+  return { projectType: PROJECT_TYPE.WebFrameworks, buildTarget, serveTarget };
 };

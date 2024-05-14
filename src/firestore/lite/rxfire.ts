@@ -2,6 +2,8 @@
 import { ɵzoneWrap } from '@angular/fire';
 import {
   collection as _collection,
+  collectionCount as _collectionCount,
+  collectionCountSnap as _collectionCountSnap,
   collectionData as _collectionData,
   doc as _doc,
   docData as _docData,
@@ -11,6 +13,8 @@ import {
 
 export const collectionSnapshots = ɵzoneWrap(_collection, true);
 export const collectionData = ɵzoneWrap(_collectionData, true);
+export const collectionCountSnap = ɵzoneWrap(_collectionCountSnap, true);
+export const collectionCount = ɵzoneWrap(_collectionCount, true);
 export const docSnapshots = ɵzoneWrap(_doc, true);
 export const docData = ɵzoneWrap(_docData, true);
 export const snapToData = ɵzoneWrap(_snapToData, true);

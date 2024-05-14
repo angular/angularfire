@@ -1,7 +1,8 @@
 import { writeFileSync } from 'fs';
 import { join } from 'path';
 import { asWindowsPath, normalize } from '@angular-devkit/core';
-import { SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
+import { SchematicContext, SchematicsException, Tree, chain } from '@angular-devkit/schematics';
+import { addRootImport } from '@schematics/angular/utility';
 import {
   generateFirebaseRc,
   overwriteIfExists,
@@ -11,11 +12,12 @@ import {
 import { getFirebaseTools } from '../firebaseTools';
 import {
   DeployOptions, FEATURES, FirebaseApp, FirebaseHostingSite, FirebaseProject,
-  NgAddNormalizedOptions, PROJECT_TYPE
+  NgAddNormalizedOptions
 } from '../interfaces';
 import { FirebaseJSON, Workspace, WorkspaceProject } from '../interfaces';
 import {
-  addEnvironmentEntry, addFixesToServer, addIgnoreFiles, addToNgModule,
+  addIgnoreFiles,
+  featureToRules,
   getFirebaseProjectNameFromHost, getProject, getWorkspace
 } from '../utils';
 import { appPrompt, featuresPrompt, projectPrompt, projectTypePrompt, sitePrompt, userPrompt } from './prompts';
@@ -25,80 +27,49 @@ export interface SetupConfig extends DeployOptions {
   firebaseApp?: FirebaseApp,
   firebaseHostingSite?: FirebaseHostingSite,
   sdkConfig?: Record<string, string>,
-  nodeVersion?: string,
-  browserTarget?: string,
-  serverTarget?: string,
-  prerenderTarget?: string,
-  project: string,
+  buildTarget?: [string, string],
+  serveTarget?: [string, string],
+  project?: string,
   ssrRegion?: string,
-  projectType?: PROJECT_TYPE,
-  prerender?: boolean,
 }
 
 export const setupProject =
-  async (tree: Tree, context: SchematicContext, features: FEATURES[], config: SetupConfig) => {
-    const { path: workspacePath, workspace } = getWorkspace(tree);
-
-    const { project, projectName } = getProject(config, tree);
-
-    const sourcePath = project.sourceRoot ?? project.root;
+  (tree: Tree, context: SchematicContext, features: FEATURES[], config: SetupConfig) => {
+    const { projectName } = getProject(config, tree);
 
     addIgnoreFiles(tree);
 
-    const featuresToImport = features.filter(it => it !== FEATURES.Hosting);
-    if (featuresToImport.length > 0) {
-      addToNgModule(tree, { features: featuresToImport, sourcePath });
-      addFixesToServer(tree);
-    }
-
-    if (config.sdkConfig) {
-      const source = `
-  firebase: {
-${Object.entries(config.sdkConfig).reduce(
-    (c, [k, v]) => c.concat(`    ${k}: '${v}'`),
-    [] as string[]
-).join(',\n')},
-  }`;
-
-      const environmentPath = `${sourcePath}/environments/environment.ts`;
-      addEnvironmentEntry(tree, `/${environmentPath}`, source);
-
-      // Iterate over the replacements for the environment file and add the config
-      Object.values(project.architect || {}).forEach(builder => {
-        Object.values(builder.configurations || {}).forEach(configuration => {
-          (configuration.fileReplacements || []).forEach((replacement: any) => {
-            if (replacement.replace === environmentPath) {
-              addEnvironmentEntry(tree, `/${replacement.with}`, source);
-            }
-          });
-        });
-      });
-    }
-
-    const options: NgAddNormalizedOptions = {
-      project: projectName,
-      firebaseProject: config.firebaseProject,
-      firebaseApp: config.firebaseApp,
-      firebaseHostingSite: config.firebaseHostingSite,
-      sdkConfig: config.sdkConfig,
-      prerender: undefined,
-      browserTarget: config.browserTarget,
-      serverTarget: config.serverTarget,
-      prerenderTarget: config.prerenderTarget,
-      ssrRegion: config.ssrRegion,
-    };
-
     if (features.includes(FEATURES.Hosting)) {
-      return setupFirebase({
+      const { path: workspacePath, workspace } = getWorkspace(tree);
+      const { project, projectName } = getProject(config, tree);
+      setupFirebase({
         workspace,
         workspacePath,
-        options,
+        options: {
+          project: projectName,
+          firebaseProject: config.firebaseProject,
+          firebaseApp: config.firebaseApp,
+          firebaseHostingSite: config.firebaseHostingSite,
+          sdkConfig: config.sdkConfig,
+          buildTarget: config.buildTarget,
+          serveTarget: config.serveTarget,
+          ssrRegion: config.ssrRegion,
+        },
         tree,
         context,
         project
       });
-    } else {
-      return Promise.resolve();
+    }
+
+    const featuresToImport = features.filter(it => it !== FEATURES.Hosting);
+    if (featuresToImport.length > 0) {
+      return chain([
+        addRootImport(projectName, ({code, external}) => {
+          external('initializeApp', '@angular/fire/app');
+          return code`${external('provideFirebaseApp', '@angular/fire/app')}(() => initializeApp(${JSON.stringify(config.sdkConfig)}))`;
+        }),
+        ...featureToRules(features, projectName),
+      ]);
     }
 };
 
@@ -120,7 +91,10 @@ export const ngAddSetupProject = (
     if (!host.exists('/firebase.json')) { writeFileSync(join(projectRoot, 'firebase.json'), '{}'); }
 
     const user = await userPrompt({ projectRoot });
-    await firebaseTools.login.use(user.email, { projectRoot });
+    const defaultUser = await firebaseTools.login(options);
+    if (user.email !== defaultUser?.email) {
+      await firebaseTools.login.use(user.email, { projectRoot });
+    }
 
     const { project: ngProject, projectName: ngProjectName } = getProject(options, host);
 
@@ -138,6 +112,8 @@ export const ngAddSetupProject = (
       firebaseHostingSite = await sitePrompt(firebaseProject, { projectRoot });
     }
 
+    
+
     let firebaseApp: FirebaseApp|undefined;
     let sdkConfig: Record<string, string>|undefined;
 
@@ -151,7 +127,7 @@ export const ngAddSetupProject = (
 
     }
 
-    await setupProject(host, context, features, {
+    return setupProject(host, context, features, {
       ...options, ...hosting, firebaseProject, firebaseApp, firebaseHostingSite, sdkConfig,
     });
 
@@ -210,10 +186,18 @@ export const setupFirebase = (config: {
     builder: '@angular/fire:deploy',
     options: {
       version: 2,
-      browserTarget: options.browserTarget,
-      ...(options.serverTarget ? {serverTarget: options.serverTarget} : {}),
-      ...(options.prerenderTarget ? {prerenderTarget: options.prerenderTarget} : {})
-    }
+    },
+    configurations: {
+      production: {
+        buildTarget: options.buildTarget?.[0],
+        serveTarget: options.serveTarget?.[0],
+      },
+      development: {
+        buildTarget: options.buildTarget?.[1],
+        serveTarget: options.serveTarget?.[1],
+      }
+    },
+    defaultConfiguration: 'production',
   };
 
   tree.overwrite(workspacePath, JSON.stringify(workspace, null, 2));

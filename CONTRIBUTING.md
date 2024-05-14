@@ -57,9 +57,9 @@ and help you to craft the change so that it is successfully accepted into the pr
 ```shell
 $ git clone <your fork SSH/HTTPS from GitHub>
 $ cd angularfire
-$ yarn
-$ yarn build
-$ yarn test:all
+$ npm i
+$ npm run build
+$ npm run test:all
 ```
 
 3) Make your changes in a new git branch:

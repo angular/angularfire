@@ -13,7 +13,7 @@ angularfire2-*.tgz
 .DS_Store
 yarn-error.log
 *.bak
-package-lock.json
+yarn.lock
 test/ng-build/**/yarn.lock
 tools/build.js
 coverage
