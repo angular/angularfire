@@ -70,13 +70,13 @@ import { Auth, User, user } from '@angular/fire/auth';
 ...
 
 export class UserComponent implements OnDestroy {
-  private auth: Auth = inject(auth);
+  private auth: Auth = inject(Auth);
   user$ = user(auth);
   userSubscription: Subscription;
   ...
 
   constructor() {
-    this.userSubscription = this.user$.subscribe(aUser: User | null => {
+    this.userSubscription = this.user$.subscribe((aUser: User | null) => {
         //handle user state changes here. Note, that user will be null if there is no currently logged in user.
      console.log(aUser);
     })
@@ -100,7 +100,7 @@ import { Auth, authState } from '@angular/fire/auth';
 ...
 
 export class UserComponent implements OnDestroy {
-  private auth: Auth = inject(auth);
+  private auth: Auth = inject(Auth);
   authState$ = authState(auth);
   authStateSubscription: Subscription;
   ...
@@ -129,7 +129,7 @@ import { Auth, idToken } from '@angular/fire/auth';
 ...
 
 export class UserComponent implements OnDestroy {
-  private auth: Auth = inject(auth);
+  private auth: Auth = inject(Auth);
   idToken$ = idToken(auth);
   idTokenSubscription: Subscription;
   ...
@@ -148,7 +148,7 @@ export class UserComponent implements OnDestroy {
 }
 ```
 
-## Connecting the the emulator suite
+## Connecting the emulator suite
 
 ```ts
 import { connectAuthEmulator, getAuth, provideAuth } from '@angular/fire/auth';

@@ -1,13 +1,12 @@
-import { ComponentFactoryResolver, Injectable, NgZone, OnDestroy, Optional, Injector } from '@angular/core';
-import { of, Subscription, Observable } from 'rxjs';
-import { distinctUntilChanged, filter, groupBy, map, mergeMap, pairwise, startWith, switchMap } from 'rxjs/operators';
-import { ActivationEnd, Router, ɵEmptyOutletComponent } from '@angular/router';
-import { Title } from '@angular/platform-browser';
+import { ComponentFactoryResolver, Injectable, Injector, NgZone, OnDestroy, Optional } from '@angular/core';
 import { VERSION } from '@angular/fire';
+import { Title } from '@angular/platform-browser';
+import { ActivationEnd, Router, ɵEmptyOutletComponent } from '@angular/router';
 import { registerVersion } from 'firebase/app';
-
+import { Observable, Subscription, of } from 'rxjs';
+import { distinctUntilChanged, filter, groupBy, map, mergeMap, pairwise, startWith, switchMap } from 'rxjs/operators';
 import { Analytics } from './analytics';
-import { logEvent, isSupported } from './firebase';
+import { isSupported, logEvent } from './firebase';
 import { UserTrackingService } from './user-tracking.service';
 
 const FIREBASE_EVENT_ORIGIN_KEY = 'firebase_event_origin';
@@ -29,14 +28,15 @@ const SCREEN_INSTANCE_DELIMITER = '#';
 // this is an INT64 in iOS/Android but use INT32 cause javascript
 let nextScreenInstanceID = Math.floor(Math.random() * (2 ** 32 - 1)) - 2 ** 31;
 
-const knownScreenInstanceIDs: { [key: string]: number } = {};
+const knownScreenInstanceIDs: Record<string, number> = {};
 
-const getScreenInstanceID = (params: { [key: string]: any }) => {
+const getScreenInstanceID = (params: Record<string, any>) => {
   // unique the screen class against the outlet name
   const screenInstanceKey = [
     params[SCREEN_CLASS_KEY],
     params[OUTLET_KEY]
   ].join(SCREEN_INSTANCE_DELIMITER);
+  // eslint-disable-next-line no-prototype-builtins
   if (knownScreenInstanceIDs.hasOwnProperty(screenInstanceKey)) {
     return knownScreenInstanceIDs[screenInstanceKey];
   } else {

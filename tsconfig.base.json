@@ -12,7 +12,7 @@
       "module": "esnext",
       "moduleResolution": "node",
       "importHelpers": true,
-      "target": "es2015",
+      "target": "es2020",
       "skipLibCheck": true,
       "typeRoots": [
         "node_modules/@types"

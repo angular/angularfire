@@ -1,11 +1,11 @@
-import { from, Observable } from 'rxjs';
 import { keepUnstableUntilFirst } from '@angular/fire';
+import firebase from 'firebase/compat/app';
+import { Observable, from } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { AngularFirestoreCollection } from '../collection/collection';
+import { AngularFirestore, associateQuery } from '../firestore';
 import { Action, DocumentData, DocumentReference, DocumentSnapshot, QueryFn, SetOptions } from '../interfaces';
 import { fromDocRef } from '../observable/fromRef';
-import { map } from 'rxjs/operators';
-import { AngularFirestore, associateQuery } from '../firestore';
-import { AngularFirestoreCollection } from '../collection/collection';
-import firebase from 'firebase/compat/app';
 
 /**
  * AngularFirestoreDocument service
@@ -84,7 +84,7 @@ export class AngularFirestoreDocument<T = DocumentData> {
    * If the `idField` option is provided, document IDs are included and mapped to the
    * provided `idField` property name.
    */
-  valueChanges(options?: { }): Observable<T | undefined>;
+  valueChanges(options?: unknown): Observable<T | undefined>;
   valueChanges<K extends string>(options: { idField: K }): Observable<(T & { [T in K]: string }) | undefined>;
   valueChanges<K extends string>(options: { idField?: K } = {}): Observable<T | undefined> {
     return this.snapshotChanges().pipe(

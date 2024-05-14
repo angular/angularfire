@@ -17,6 +17,7 @@ import {
   getMultiFactorResolver as _getMultiFactorResolver,
   getRedirectResult as _getRedirectResult,
   initializeAuth as _initializeAuth,
+  initializeRecaptchaConfig as _initializeRecaptchaConfig,
   isSignInWithEmailLink as _isSignInWithEmailLink,
   linkWithCredential as _linkWithCredential,
   linkWithPhoneNumber as _linkWithPhoneNumber,
@@ -31,6 +32,7 @@ import {
   reauthenticateWithPopup as _reauthenticateWithPopup,
   reauthenticateWithRedirect as _reauthenticateWithRedirect,
   reload as _reload,
+  revokeAccessToken as _revokeAccessToken,
   sendEmailVerification as _sendEmailVerification,
   sendPasswordResetEmail as _sendPasswordResetEmail,
   sendSignInLinkToEmail as _sendSignInLinkToEmail,
@@ -51,6 +53,7 @@ import {
   updatePhoneNumber as _updatePhoneNumber,
   updateProfile as _updateProfile,
   useDeviceLanguage as _useDeviceLanguage,
+  validatePassword as _validatePassword,
   verifyBeforeUpdateEmail as _verifyBeforeUpdateEmail,
   verifyPasswordResetCode as _verifyPasswordResetCode
 } from 'firebase/auth';
@@ -70,6 +73,7 @@ export const getIdTokenResult = ɵzoneWrap(_getIdTokenResult, true);
 export const getMultiFactorResolver = ɵzoneWrap(_getMultiFactorResolver, true);
 export const getRedirectResult = ɵzoneWrap(_getRedirectResult, true);
 export const initializeAuth = ɵzoneWrap(_initializeAuth, true);
+export const initializeRecaptchaConfig = ɵzoneWrap(_initializeRecaptchaConfig, true);
 export const isSignInWithEmailLink = ɵzoneWrap(_isSignInWithEmailLink, true);
 export const linkWithCredential = ɵzoneWrap(_linkWithCredential, true);
 export const linkWithPhoneNumber = ɵzoneWrap(_linkWithPhoneNumber, true);
@@ -84,6 +88,7 @@ export const reauthenticateWithPhoneNumber = ɵzoneWrap(_reauthenticateWithPhone
 export const reauthenticateWithPopup = ɵzoneWrap(_reauthenticateWithPopup, true);
 export const reauthenticateWithRedirect = ɵzoneWrap(_reauthenticateWithRedirect, true);
 export const reload = ɵzoneWrap(_reload, true);
+export const revokeAccessToken = ɵzoneWrap(_revokeAccessToken, true);
 export const sendEmailVerification = ɵzoneWrap(_sendEmailVerification, true);
 export const sendPasswordResetEmail = ɵzoneWrap(_sendPasswordResetEmail, true);
 export const sendSignInLinkToEmail = ɵzoneWrap(_sendSignInLinkToEmail, true);
@@ -104,5 +109,6 @@ export const updatePassword = ɵzoneWrap(_updatePassword, true);
 export const updatePhoneNumber = ɵzoneWrap(_updatePhoneNumber, true);
 export const updateProfile = ɵzoneWrap(_updateProfile, true);
 export const useDeviceLanguage = ɵzoneWrap(_useDeviceLanguage, true);
+export const validatePassword = ɵzoneWrap(_validatePassword, true);
 export const verifyBeforeUpdateEmail = ɵzoneWrap(_verifyBeforeUpdateEmail, true);
 export const verifyPasswordResetCode = ɵzoneWrap(_verifyPasswordResetCode, true);

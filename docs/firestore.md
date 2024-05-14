@@ -59,7 +59,7 @@ export class UserProfileComponent {
 With the reference to Cloud Firestore available in a component it is now possible to connect read from and write to the database.
 
 ### Reading data
-In Cloud Firestore data is stored in `documents` and `documents` are stored in `collections`. The path to data follows `<collection_name>/<document_id>` and continues if there are subcollections. For example, `"users/ABC1245/posts/XYZ6789"` represents:
+In Cloud Firestore data is stored in `documents` and `documents` are stored in `collections`. The path to data follows `<collection_name>/<document_id>` and continues if there are subcollections. For example, `"users/ABC12345/posts/XYZ6789"` represents:
 * `users` collection
 * document id `ABC12345`
 * `posts` collection

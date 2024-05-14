@@ -1,10 +1,10 @@
-import { RemoteConfig as FirebaseRemoteConfig } from 'firebase/remote-config';
 import { ɵgetAllInstancesOf } from '@angular/fire';
+import { RemoteConfig as FirebaseRemoteConfig } from 'firebase/remote-config';
 import { from, timer } from 'rxjs';
 import { concatMap, distinct } from 'rxjs/operators';
 
 // see notes in core/firebase.app.module.ts for why we're building the class like this
-// tslint:disable-next-line:no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface RemoteConfig extends FirebaseRemoteConfig {}
 
 export class RemoteConfig {
@@ -15,7 +15,7 @@ export class RemoteConfig {
 
 export const REMOTE_CONFIG_PROVIDER_NAME = 'remote-config';
 
-// tslint:disable-next-line:no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface RemoteConfigInstances extends Array<FirebaseRemoteConfig> {}
 
 export class RemoteConfigInstances {

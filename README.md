@@ -1,18 +1,20 @@
+
 # AngularFire
-The official [Angular](https://angular.io/) library for [Firebase](https://firebase.google.com/).
+
+AngularFire smooths over the rough edges an Angular developer might encounter when implementing the framework-agnostic
+[Firebase JS SDK](https://github.com/firebase/firebase-js-sdk) & aims to provide a more natural developer experience
+by conforming to Angular conventions.
 
 <strong><pre>ng add @angular/fire</pre></strong>
 
-AngularFire smooths over the rough edges an Angular developer might encounter when implementing the framework-agnostic [Firebase JS SDK](https://github.com/firebase/firebase-js-sdk) & aims to provide a more natural developer experience by conforming to Angular conventions.
-
-- **Dependency injection** - Provide and Inject Firebase services in your components
-- **Zone.js wrappers** - Stable zones allow proper functionality of service workers, forms, SSR, and pre-rendering
-- **Observable based** - Utilize RxJS rather than callbacks for realtime streams
+- **Dependency injection** - Provide and Inject Firebase services in your components.
+- **Zone.js wrappers** - Stable zones allow proper functionality of service workers, forms, SSR, and pre-rendering.
+- **Observable based** - Utilize RxJS rather than callbacks for real-time streams.
 - **NgRx friendly API** - Integrate with NgRx using AngularFire's action based APIs.
-- **Lazy-loading** - AngularFire dynamically imports much of Firebase, reducing time to load your app
-- **Deploy schematics** - Get your Angular application deployed on Firebase Hosting with a single command
-- **Google Analytics** - Zero-effort Angular Router awareness in Google Analytics
-- **Router Guards** - Guard your Angular routes with built-in Firebase Authentication checks
+- **Lazy-loading** - AngularFire dynamically imports much of Firebase, reducing the time to load your app.
+- **Deploy schematics** - Get your Angular application deployed on Firebase Hosting with a single command.
+- **Google Analytics** - Zero-effort Angular Router awareness in Google Analytics.
+- **Router Guards** - Guard your Angular routes with built-in Firebase Authentication checks.
 
 ## Example use
 
@@ -56,35 +58,14 @@ export class AppComponent {
 
   constructor() {
     const itemCollection = collection(this.firestore, 'items');
-    this.item$ = collectionData(itemCollection);
+    this.item$ = collectionData<Item>(itemCollection);
   }
 }
 ```
 
-## Compatibility
-
-### Angular and Firebase versions
-
-AngularFire doesn't follow Angular's versioning as Firebase also has breaking changes throughout the year. Instead we try to maintain compatibility with both Firebase and Angular majors for as long as possible, only breaking when we need to support a new major of one or the other.
-
-| Angular | Firebase | AngularFire  |
-| --------|----------|--------------|
-| 15      | 9        | ^7.5         |
-| 14      | 9        | ^7.4         |
-| 13      | 9        | ^7.2         |
-| 12      | 9        | ^7.0         |
-| 12      | 7,8      | ^6.1.5       |
-| 11      | 7,8      | ^6.1         |
-| 10      | 8        | ^6.0.4       |
-| 10      | 7        | ^6.0.3       |
-| 9       | 8        | ^6.0.4       |
-| 9       | 7        | ^6.0         |
-
-<sub>Version combinations not documented here __may__ work but are untested and you will see NPM peer warnings.</sub>
-
 ### Polyfills
 
-Neither AngularFire or Firebase ship with polyfills. To have compatability across as wide-range of environments we suggest the following polyfills be added to your application:
+Neither AngularFire nor Firebase ship with polyfills. To have compatibility across a wide-range of environments, we suggest the following polyfills be added to your application:
 
 | API | Environments | Suggested Polyfill | License |
 |-----|--------------|--------------------|---------|
@@ -107,7 +88,7 @@ Neither AngularFire or Firebase ship with polyfills. To have compatability acros
 
 We have three sample apps in this repository:
 
-1. [`samples/compat`](samples/compat) a kitchen sink application that demonstrates use of the "compatability" API
+1. [`samples/compat`](samples/compat) a kitchen sink application that demonstrates use of the "compatibility" API
 1. [`samples/modular`](samples/modular) a kitchen sink application that demonstrates the new tree-shakable API
 1. [`samples/advanced`](samples/advanced) the same app as `samples/modular` but demonstrates more advanced concepts such as Angular Universal state-transfer, dynamically importing Firebase feature modules, and Firestore data bundling.
 

@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { FirebaseApp, provideFirebaseApp, initializeApp, deleteApp } from '@angular/fire/app';
+import { FirebaseApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../utils';
 

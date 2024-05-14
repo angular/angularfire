@@ -1,14 +1,14 @@
 import { Inject, Injectable, InjectionToken, NgZone, Optional } from '@angular/core';
-import { from, Observable, of } from 'rxjs';
-import { map, observeOn, shareReplay, switchMap } from 'rxjs/operators';
 import { ɵAngularFireSchedulers } from '@angular/fire';
-import { ɵlazySDKProxy, ɵPromiseProxy, ɵapplyMixins } from '@angular/fire/compat';
-import { FirebaseOptions } from 'firebase/app';
-import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance } from '@angular/fire/compat';
-import firebase from 'firebase/compat/app';
-import { proxyPolyfillCompat } from './base';
-import { HttpsCallableOptions } from '@firebase/functions-types';
 import { AppCheckInstances } from '@angular/fire/app-check';
+import { ɵPromiseProxy, ɵapplyMixins, ɵlazySDKProxy } from '@angular/fire/compat';
+import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance, ɵfirebaseAppFactory } from '@angular/fire/compat';
+import { HttpsCallableOptions } from '@firebase/functions-types';
+import { FirebaseOptions } from 'firebase/app';
+import firebase from 'firebase/compat/app';
+import { Observable, from, of } from 'rxjs';
+import { map, observeOn, shareReplay, switchMap } from 'rxjs/operators';
+import { proxyPolyfillCompat } from './base';
 
 export const ORIGIN = new InjectionToken<string>('angularfire2.functions.origin');
 export const REGION = new InjectionToken<string>('angularfire2.functions.region');
@@ -17,6 +17,7 @@ type UseEmulatorArguments = Parameters<firebase.functions.Functions['useEmulator
 export const USE_EMULATOR = new InjectionToken<UseEmulatorArguments>('angularfire2.functions.use-emulator');
 
 // override httpsCallable for compatibility with 5.x
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface AngularFireFunctions extends Omit<ɵPromiseProxy<firebase.functions.Functions>, 'httpsCallable'> {
 }
 

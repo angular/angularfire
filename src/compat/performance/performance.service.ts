@@ -11,6 +11,7 @@ export class PerformanceMonitoringService implements OnDestroy {
     private disposable: Subscription|undefined;
 
     constructor(appRef: ApplicationRef) {
+        // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
         if (typeof window !== 'undefined' && window.performance?.mark) {
             this.disposable = appRef.isStable.pipe(
                 first(it => it),

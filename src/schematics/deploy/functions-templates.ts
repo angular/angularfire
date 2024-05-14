@@ -11,8 +11,8 @@ const DEFAULT_RUNTIME_OPTIONS = {
 };
 
 export const defaultPackage = (
-  dependencies: {[key: string]: string},
-  devDependencies: {[key: string]: string},
+  dependencies: Record<string, string>,
+  devDependencies: Record<string, string>,
   options: DeployBuilderOptions,
   main?: string,
 ) => ({

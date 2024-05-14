@@ -1,9 +1,11 @@
-import { fromCollectionRef } from '../observable/fromRef';
+import firebase from 'firebase/compat/app';
 import { Observable, SchedulerLike } from 'rxjs';
 import { distinctUntilChanged, map, pairwise, scan, startWith } from 'rxjs/operators';
-import { Action, QuerySnapshot, DocumentChange, DocumentChangeAction, DocumentChangeType, Query } from '../interfaces';
-import firebase from 'firebase/compat/app';
+import { Action, DocumentChange, DocumentChangeAction, DocumentChangeType, Query, QuerySnapshot } from '../interfaces';
+import { fromCollectionRef } from '../observable/fromRef';
 
+
+type ActionTupe = [Action<QuerySnapshot<firebase.firestore.DocumentData>>, Action<QuerySnapshot<firebase.firestore.DocumentData>>]
 /**
  * Return a stream of document changes on a query. These results are not in sort order but in
  * order of occurence.
@@ -13,7 +15,8 @@ export function docChanges<T>(query: Query, scheduler?: SchedulerLike): Observab
     .pipe(
       startWith<Action<QuerySnapshot<firebase.firestore.DocumentData>>, undefined>(undefined),
       pairwise(),
-      map(([priorAction, action]) => {
+      map((actionTuple: ActionTupe) => {
+        const [priorAction, action] = actionTuple;
         const docChanges = action.payload.docChanges();
         const actions = docChanges.map(change => ({ type: change.type, payload: change }));
         // the metadata has changed from the prior emission

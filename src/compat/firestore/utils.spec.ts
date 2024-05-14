@@ -1,5 +1,5 @@
-import firebase from 'firebase/compat/app';
 import { AngularFirestoreCollection } from '@angular/fire/compat/firestore';
+import firebase from 'firebase/compat/app';
 
 export interface Stock {
   name: string;
@@ -18,9 +18,8 @@ export const createRandomStocks = async (
   // Create a batch to update everything at once
   const batch = firestore.batch();
   // Store the random names to delete them later
-  const count = 0;
   let names: string[] = [];
-  Array.from(Array(numberOfItems)).forEach((a, i) => {
+  Array.from(Array(numberOfItems)).forEach(() => {
     const name = randomName(firestore);
     batch.set(collectionRef.doc(name), FAKE_STOCK_DATA);
     names = [...names, name];

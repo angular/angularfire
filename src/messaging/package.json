@@ -1,12 +1,3 @@
 {
-  "$schema": "../../node_modules/ng-packagr/package.schema.json",
-  "ngPackage": {
-    "lib": {
-      "umdModuleIds": {
-        "rxfire/messaging": "rxfire-messaging",
-        "firebase/messaging": "firebase-messaging"
-      },
-      "entryFile": "public_api.ts"
-    }
-  }
+  "$schema": "../../node_modules/ng-packagr/package.schema.json"
 }

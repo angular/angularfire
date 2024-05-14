@@ -1,6 +1,6 @@
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectorRef, NgModule, OnDestroy, Optional, Pipe, PipeTransform } from '@angular/core';
-import { makeStateKey, TransferState } from '@angular/platform-browser';
+import { TransferState, makeStateKey } from '@angular/platform-browser';
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { AngularFireStorage } from '../storage';
