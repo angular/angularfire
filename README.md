@@ -7,14 +7,14 @@ by conforming to Angular conventions.
 
 <strong><pre>ng add @angular/fire</pre></strong>
 
-- **Dependency injection** - Provide and Inject Firebase services in your components
-- **Zone.js wrappers** - Stable zones allow proper functionality of service workers, forms, SSR, and pre-rendering
-- **Observable based** - Utilize RxJS rather than callbacks for realtime streams
+- **Dependency injection** - Provide and Inject Firebase services in your components.
+- **Zone.js wrappers** - Stable zones allow proper functionality of service workers, forms, SSR, and pre-rendering.
+- **Observable based** - Utilize RxJS rather than callbacks for real-time streams.
 - **NgRx friendly API** - Integrate with NgRx using AngularFire's action based APIs.
-- **Lazy-loading** - AngularFire dynamically imports much of Firebase, reducing time to load your app
-- **Deploy schematics** - Get your Angular application deployed on Firebase Hosting with a single command
-- **Google Analytics** - Zero-effort Angular Router awareness in Google Analytics
-- **Router Guards** - Guard your Angular routes with built-in Firebase Authentication checks
+- **Lazy-loading** - AngularFire dynamically imports much of Firebase, reducing the time to load your app.
+- **Deploy schematics** - Get your Angular application deployed on Firebase Hosting with a single command.
+- **Google Analytics** - Zero-effort Angular Router awareness in Google Analytics.
+- **Router Guards** - Guard your Angular routes with built-in Firebase Authentication checks.
 
 ## Example use
 
@@ -65,7 +65,7 @@ export class AppComponent {
 
 ### Polyfills
 
-Neither AngularFire or Firebase ship with polyfills. To have compatibility across as wide-range of environments we suggest the following polyfills be added to your application:
+Neither AngularFire nor Firebase ship with polyfills. To have compatibility across a wide-range of environments, we suggest the following polyfills be added to your application:
 
 | API | Environments | Suggested Polyfill | License |
 |-----|--------------|--------------------|---------|
@@ -100,7 +100,7 @@ Get help on our [Q&A board](https://github.com/angular/angularfire/discussions?d
 
 ## Developer Guide
 
-This developer guide assimes you're using the new tree-shakable AngularFire API, [if you're looking for the compatability API you can find the documentation here](docs/compat.md).
+This developer guide assumes you're using the new tree-shakable AngularFire API, [if you're looking for the compatability API you can find the documentation here](docs/compat.md).
 
 [See the v7 upgrade guide for more information on this change.](docs/version-7-upgrade.md).
 
