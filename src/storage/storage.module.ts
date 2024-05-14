@@ -1,4 +1,12 @@
-import { InjectionToken, Injector, ModuleWithProviders, NgModule, NgZone, Optional } from '@angular/core';
+import {
+  EnvironmentProviders,
+  InjectionToken,
+  Injector,
+  NgModule,
+  NgZone,
+  Optional,
+  makeEnvironmentProviders,
+} from '@angular/core';
 import { VERSION, ɵAngularFireSchedulers, ɵgetDefaultInstanceOf } from '@angular/fire';
 import { ɵAppCheckInstances } from '@angular/fire';
 import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
@@ -49,10 +57,13 @@ export class StorageModule {
   }
 }
 
-export function provideStorage(fn: (injector: Injector) => FirebaseStorage, ...deps: any[]): ModuleWithProviders<StorageModule> {
-  return {
-    ngModule: StorageModule,
-    providers: [{
+export function provideStorage(fn: (injector: Injector) => FirebaseStorage, ...deps: any[]): EnvironmentProviders {
+  registerVersion('angularfire', VERSION.full, 'gcs');
+
+  return makeEnvironmentProviders([
+    DEFAULT_STORAGE_INSTANCE_PROVIDER,
+    STORAGE_INSTANCES_PROVIDER,
+    {
       provide: PROVIDED_STORAGE_INSTANCES,
       useFactory: storageInstanceFactory(fn),
       multi: true,
@@ -66,6 +77,6 @@ export function provideStorage(fn: (injector: Injector) => FirebaseStorage, ...d
         [new Optional(), ɵAppCheckInstances ],
         ...deps,
       ]
-    }]
-  };
+    }
+  ]);
 }

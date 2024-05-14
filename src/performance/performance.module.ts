@@ -1,5 +1,14 @@
 import { isPlatformBrowser } from '@angular/common';
-import { InjectionToken, Injector, ModuleWithProviders, NgModule, NgZone, Optional, PLATFORM_ID } from '@angular/core';
+import {
+  EnvironmentProviders,
+  InjectionToken,
+  Injector,
+  NgModule,
+  NgZone,
+  Optional,
+  PLATFORM_ID,
+  makeEnvironmentProviders,
+} from '@angular/core';
 import { VERSION, ɵAngularFireSchedulers, ɵgetDefaultInstanceOf } from '@angular/fire';
 import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
 import { registerVersion } from 'firebase/app';
@@ -59,10 +68,13 @@ export class PerformanceModule {
 
 export function providePerformance(
   fn: (injector: Injector) => FirebasePerformance, ...deps: any[]
-): ModuleWithProviders<PerformanceModule> {
-  return {
-    ngModule: PerformanceModule,
-    providers: [{
+): EnvironmentProviders {
+  registerVersion('angularfire', VERSION.full, 'perf');
+
+  return makeEnvironmentProviders([
+    DEFAULT_PERFORMANCE_INSTANCE_PROVIDER,
+    PERFORMANCE_INSTANCES_PROVIDER,
+    {
       provide: PROVIDED_PERFORMANCE_INSTANCES,
       useFactory: performanceInstanceFactory(fn),
       multi: true,
@@ -74,6 +86,6 @@ export function providePerformance(
         FirebaseApps,
         ...deps,
       ]
-    }]
-  };
+    }
+  ]);
 }

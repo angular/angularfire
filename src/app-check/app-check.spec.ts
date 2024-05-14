@@ -15,7 +15,7 @@ describe('Auth', () => {
     beforeEach(() => {
         appName = rando();
         TestBed.configureTestingModule({
-            imports: [
+          providers: [
                 provideFirebaseApp(() => initializeApp(COMMON_CONFIG, appName)),
                 provideAuth(() => {
                     providedAuth = getAuth(getApp(appName));

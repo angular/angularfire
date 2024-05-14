@@ -15,7 +15,7 @@ describe('Storage', () => {
     beforeEach(() => {
         appName = rando();
         TestBed.configureTestingModule({
-            imports: [
+            providers: [
                 provideFirebaseApp(() => initializeApp(COMMON_CONFIG, appName)),
                 provideStorage(() => {
                     providedStorage = getStorage(getApp(appName));

@@ -1,4 +1,12 @@
-import { InjectionToken, Injector, ModuleWithProviders, NgModule, NgZone, Optional } from '@angular/core';
+import {
+  EnvironmentProviders,
+  InjectionToken,
+  Injector,
+  NgModule,
+  NgZone,
+  Optional,
+  makeEnvironmentProviders,
+} from '@angular/core';
 import { VERSION, ɵAngularFireSchedulers, ɵAppCheckInstances, ɵgetDefaultInstanceOf } from '@angular/fire';
 import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
 import { AuthInstances  } from '@angular/fire/auth';
@@ -48,10 +56,13 @@ export class FirestoreModule {
   }
 }
 
-export function provideFirestore(fn: (injector: Injector) => FirebaseFirestore, ...deps: any[]): ModuleWithProviders<FirestoreModule> {
-  return {
-    ngModule: FirestoreModule,
-    providers: [{
+export function provideFirestore(fn: (injector: Injector) => FirebaseFirestore, ...deps: any[]): EnvironmentProviders {
+  registerVersion('angularfire', VERSION.full, 'lite');
+
+  return makeEnvironmentProviders([
+    DEFAULT_FIRESTORE_INSTANCE_PROVIDER,
+    FIRESTORE_INSTANCES_PROVIDER,
+    {
       provide: PROVIDED_FIRESTORE_INSTANCES,
       useFactory: firestoreInstanceFactory(fn),
       multi: true,
@@ -65,6 +76,6 @@ export function provideFirestore(fn: (injector: Injector) => FirebaseFirestore, 
         [new Optional(), ɵAppCheckInstances ],
         ...deps,
       ]
-    }]
-  };
+    }
+  ]);
 }

@@ -23,7 +23,7 @@ describe('RemoteConfig', () => {
     beforeEach(() => {
         appName = rando();
         TestBed.configureTestingModule({
-            imports: [
+            providers: [
                 provideFirebaseApp(() => initializeApp(COMMON_CONFIG, appName)),
                 provideRemoteConfig(() => {
                     providedRemoteConfig = getRemoteConfig(getApp(appName));

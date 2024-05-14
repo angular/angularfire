@@ -1,4 +1,13 @@
-import { APP_INITIALIZER, InjectionToken, Injector, ModuleWithProviders, NgModule, NgZone, Optional } from '@angular/core';
+import {
+  APP_INITIALIZER,
+  EnvironmentProviders,
+  InjectionToken,
+  Injector,
+  NgModule,
+  NgZone,
+  Optional,
+  makeEnvironmentProviders,
+} from '@angular/core';
 import { VERSION, ɵAngularFireSchedulers, ɵgetDefaultInstanceOf } from '@angular/fire';
 import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
 import { Analytics as FirebaseAnalytics } from 'firebase/analytics';
@@ -60,10 +69,18 @@ export class AnalyticsModule {
   }
 }
 
-export function provideAnalytics(fn: (injector: Injector) => FirebaseAnalytics, ...deps: any[]): ModuleWithProviders<AnalyticsModule> {
-  return {
-    ngModule: AnalyticsModule,
-    providers: [{
+export function provideAnalytics(fn: (injector: Injector) => FirebaseAnalytics, ...deps: any[]): EnvironmentProviders {
+  registerVersion('angularfire', VERSION.full, 'analytics');
+
+  return makeEnvironmentProviders([
+    DEFAULT_ANALYTICS_INSTANCE_PROVIDER,
+    ANALYTICS_INSTANCES_PROVIDER,
+    {
+      provide: APP_INITIALIZER,
+      useValue: isAnalyticsSupportedFactory.async,
+      multi: true,
+    },
+    {
       provide: PROVIDED_ANALYTICS_INSTANCES,
       useFactory: analyticsInstanceFactory(fn),
       multi: true,
@@ -73,7 +90,7 @@ export function provideAnalytics(fn: (injector: Injector) => FirebaseAnalytics, 
         ɵAngularFireSchedulers,
         FirebaseApps,
         ...deps,
-      ]
-    }]
-  };
+      ],
+    },
+  ]);
 }

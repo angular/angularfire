@@ -1,4 +1,12 @@
-import { APP_INITIALIZER, InjectionToken, Injector, ModuleWithProviders, NgModule, NgZone, Optional } from '@angular/core';
+import {
+  APP_INITIALIZER, EnvironmentProviders,
+  InjectionToken,
+  Injector,
+  NgModule,
+  NgZone,
+  Optional,
+  makeEnvironmentProviders,
+} from '@angular/core';
 import { VERSION, ɵAngularFireSchedulers, ɵgetDefaultInstanceOf } from '@angular/fire';
 import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
 import { registerVersion } from 'firebase/app';
@@ -55,10 +63,18 @@ export class MessagingModule {
   }
 }
 
-export function provideMessaging(fn: (injector: Injector) => FirebaseMessaging, ...deps: any[]): ModuleWithProviders<MessagingModule> {
-  return {
-    ngModule: MessagingModule,
-    providers: [{
+export function provideMessaging(fn: (injector: Injector) => FirebaseMessaging, ...deps: any[]): EnvironmentProviders {
+  registerVersion('angularfire', VERSION.full, 'fcm');
+
+  return makeEnvironmentProviders([
+    DEFAULT_MESSAGING_INSTANCE_PROVIDER,
+    MESSAGING_INSTANCES_PROVIDER,
+    {
+      provide: APP_INITIALIZER,
+      useValue: isMessagingSupportedFactory.async,
+      multi: true,
+    },
+    {
       provide: PROVIDED_MESSAGING_INSTANCES,
       useFactory: messagingInstanceFactory(fn),
       multi: true,
@@ -69,6 +85,6 @@ export function provideMessaging(fn: (injector: Injector) => FirebaseMessaging, 
         FirebaseApps,
         ...deps,
       ],
-    }]
-  };
+    }
+  ]);
 }
