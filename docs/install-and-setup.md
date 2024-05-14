@@ -73,7 +73,7 @@ import { Observable } from 'rxjs';
   styleUrls: ['app.component.css']
 })
 export class AppComponent {
-  firestore: Firestore = inject(Firestore)
+  firestore: Firestore = inject(Firestore);
   items$: Observable<any[]>;
 
   constructor() {
