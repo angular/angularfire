@@ -1,7 +1,6 @@
 import { RuntimeOptions } from 'firebase-functions';
 
 export const enum FEATURES {
-  Hosting,
   Authentication,
   Analytics,
   AppCheck,
@@ -16,7 +15,6 @@ export const enum FEATURES {
 }
 
 export const featureOptions = [
-  { name: 'ng deploy -- Hosting', value: FEATURES.Hosting },
   { name: 'Authentication', value: FEATURES.Authentication },
   { name: 'Google Analytics', value: FEATURES.Analytics },
   { name: 'App Check', value: FEATURES.AppCheck },
@@ -152,15 +150,6 @@ export type FirebaseFunctionsConfig = Record<string, any>;
 export interface FirebaseJSON {
   hosting?: FirebaseHostingConfig[] | FirebaseHostingConfig;
   functions?: FirebaseFunctionsConfig;
-}
-
-export interface FirebaseRcTarget {
-  hosting: Record<string, string[]>;
-}
-
-export interface FirebaseRc {
-  targets?: Record<string, FirebaseRcTarget>;
-  projects?: Record<string, string>;
 }
 
 export interface DeployBuilderSchema {

@@ -1,26 +1,9 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { Rule, SchematicsException, Tree, chain } from '@angular-devkit/schematics';
-import ts from '@schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { addRootProvider } from '@schematics/angular/utility';
-import { findNode } from '@schematics/angular/utility/ast-utils';
-import { InsertChange, ReplaceChange, applyToUpdateRecorder } from '@schematics/angular/utility/change';
 import { overwriteIfExists } from './common';
-import { DeployOptions, FEATURES, FirebaseApp, FirebaseRc, Workspace, WorkspaceProject } from './interfaces';
-
-// We consider a project to be a universal project if it has a `server` architect
-// target. If it does, it knows how to build the application's server.
-export const isUniversalApp = (
-  project: WorkspaceProject
-) => project.architect?.server;
-
-export const isSSRApp = (
-  project: WorkspaceProject
-) => !!project.architect?.build.options?.ssr;
-
-export const hasPrerenderOption = (
-  project: WorkspaceProject
-) => project.architect?.prerender;
+import { DeployOptions, FEATURES, FirebaseApp, FirebaseRc, Workspace } from './interfaces';
 
 export const shortAppId = (app?: FirebaseApp) => app?.appId?.split('/').pop();
 
@@ -108,55 +91,6 @@ const projectFromRc = (rc: FirebaseRc, target: string): [string|undefined, strin
   const site = project && rc.targets?.[project]?.hosting?.[target]?.[0];
   return [project || defaultProject, site];
 };
-
-/**
- * Adds a package to the package.json
- */
-export function addEnvironmentEntry(
-  host: Tree,
-  filePath: string,
-  data: string,
-): Tree {
-  const fileExists = host.exists(filePath);
-  if (fileExists) {
-    const buffer = host.read(filePath);
-    if (!buffer) {
-      throw new SchematicsException(`Cannot read ${filePath}`);
-    }
-    const sourceFile = ts.createSourceFile(filePath, buffer.toString('utf-8'), ts.ScriptTarget.Latest, true);
-
-    const envIdentifier = findNode(sourceFile as any, ts.SyntaxKind.Identifier, 'environment');
-    if (!envIdentifier?.parent) {
-      throw new SchematicsException(`Cannot find 'environment' identifier in ${filePath}`);
-    }
-
-    const envObjectLiteral = envIdentifier.parent.getChildren().find(({ kind }) => kind === ts.SyntaxKind.ObjectLiteralExpression);
-    if (!envObjectLiteral) {
-      throw new SchematicsException(`${filePath} is not in the expected format`);
-    }
-    const firebaseIdentifier = findNode(envObjectLiteral, ts.SyntaxKind.Identifier, 'firebase');
-
-    const recorder = host.beginUpdate(filePath);
-    if (firebaseIdentifier?.parent) {
-      const change = new ReplaceChange(filePath, firebaseIdentifier.parent.pos, firebaseIdentifier.parent.getFullText(), data);
-      applyToUpdateRecorder(recorder, [change]);
-    } else {
-      const openBracketToken = envObjectLiteral.getChildren().find(({ kind }) => kind === ts.SyntaxKind.OpenBraceToken);
-      if (openBracketToken) {
-        const change = new InsertChange(filePath, openBracketToken.end, `${data},`);
-        applyToUpdateRecorder(recorder, [change]);
-      } else {
-        throw new SchematicsException(`${filePath} is not in the expected format`);
-      }
-    }
-    host.commitUpdate(recorder);
-  } else {
-    host.create(filePath, `export const environment = {${data},
-};`);
-  }
-
-  return host;
-}
 
 // TODO rewrite using typescript
 export function addFixesToServer(host: Tree) {
