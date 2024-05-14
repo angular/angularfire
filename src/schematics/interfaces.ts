@@ -152,6 +152,15 @@ export interface FirebaseJSON {
   functions?: FirebaseFunctionsConfig;
 }
 
+export interface FirebaseRcTarget {
+  hosting: Record<string, string[]>;
+}
+
+export interface FirebaseRc {
+  targets?: Record<string, FirebaseRcTarget>;
+  projects?: Record<string, string>;
+}
+
 export interface DeployBuilderSchema {
   buildTarget?: string;
   browserTarget?: string;
