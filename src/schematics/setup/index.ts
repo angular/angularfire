@@ -1,113 +1,75 @@
-import { asWindowsPath, normalize } from '@angular-devkit/core';
-import { SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
-import {
-  getWorkspace, getProject, getFirebaseProjectNameFromHost, addEnvironmentEntry,
-  addToNgModule, addIgnoreFiles, addFixesToServer
-} from '../utils';
-import { projectTypePrompt, appPrompt, sitePrompt, projectPrompt, featuresPrompt, userPrompt } from './prompts';
-import { setupUniversalDeployment } from './ssr';
-import { setupStaticDeployment } from './static';
-import {
-  FirebaseApp, FirebaseHostingSite, FirebaseProject, DeployOptions, NgAddNormalizedOptions,
-  FEATURES, PROJECT_TYPE
-} from '../interfaces';
-import { getFirebaseTools } from '../firebaseTools';
 import { writeFileSync } from 'fs';
 import { join } from 'path';
+import { asWindowsPath, normalize } from '@angular-devkit/core';
+import { SchematicContext, SchematicsException, Tree, chain } from '@angular-devkit/schematics';
+import { addRootImport } from '@schematics/angular/utility';
+import {
+  generateFirebaseRc,
+  overwriteIfExists,
+  safeReadJSON,
+  stringifyFormatted
+} from '../common';
+import { getFirebaseTools } from '../firebaseTools';
+import {
+  DeployOptions, FEATURES, FirebaseApp, FirebaseHostingSite, FirebaseProject,
+  NgAddNormalizedOptions
+} from '../interfaces';
+import { FirebaseJSON, Workspace, WorkspaceProject } from '../interfaces';
+import {
+  addIgnoreFiles,
+  featureToRules,
+  getFirebaseProjectNameFromHost, getProject, getWorkspace
+} from '../utils';
+import { appPrompt, featuresPrompt, projectPrompt, projectTypePrompt, sitePrompt, userPrompt } from './prompts';
+
+export interface SetupConfig extends DeployOptions {
+  firebaseProject: FirebaseProject,
+  firebaseApp?: FirebaseApp,
+  firebaseHostingSite?: FirebaseHostingSite,
+  sdkConfig?: Record<string, string>,
+  buildTarget?: [string, string],
+  serveTarget?: [string, string],
+  project?: string,
+  ssrRegion?: string,
+}
 
 export const setupProject =
-  async (tree: Tree, context: SchematicContext, features: FEATURES[], config: DeployOptions & {
-    firebaseProject: FirebaseProject,
-    firebaseApp?: FirebaseApp,
-    firebaseHostingSite?: FirebaseHostingSite,
-    sdkConfig?: Record<string, string>,
-    projectType: PROJECT_TYPE,
-    prerender: boolean,
-    nodeVersion?: string,
-    browserTarget?: string,
-    serverTarget?: string,
-    prerenderTarget?: string,
-    project: string,
-  }) => {
-    const { path: workspacePath, workspace } = getWorkspace(tree);
-
-    const { project, projectName } = getProject(config, tree);
-
-    const sourcePath = project.sourceRoot ?? project.root;
+  (tree: Tree, context: SchematicContext, features: FEATURES[], config: SetupConfig) => {
+    const { projectName } = getProject(config, tree);
 
     addIgnoreFiles(tree);
 
-    const featuresToImport = features.filter(it => it !== FEATURES.Hosting);
-    if (featuresToImport.length > 0) {
-      addToNgModule(tree, { features: featuresToImport, sourcePath });
-      addFixesToServer(tree, { features: featuresToImport, sourcePath });
-    }
-
-    if (config.sdkConfig) {
-      const source = `
-  firebase: {
-${Object.entries(config.sdkConfig).reduce(
-    (c, [k, v]) => c.concat(`    ${k}: '${v}'`),
-    [] as string[]
-).join(',\n')},
-  }`;
-
-      const environmentPath = `${sourcePath}/environments/environment.ts`;
-      addEnvironmentEntry(tree, `/${environmentPath}`, source);
-
-      // Iterate over the replacements for the environment file and add the config
-      Object.values(project.architect || {}).forEach(builder => {
-        Object.values(builder.configurations || {}).forEach(configuration => {
-          (configuration.fileReplacements || []).forEach((replacement: any) => {
-            if (replacement.replace === environmentPath) {
-              addEnvironmentEntry(tree, `/${replacement.with}`, source);
-            }
-          });
-        });
+    if (features.includes(FEATURES.Hosting)) {
+      const { path: workspacePath, workspace } = getWorkspace(tree);
+      const { project, projectName } = getProject(config, tree);
+      setupFirebase({
+        workspace,
+        workspacePath,
+        options: {
+          project: projectName,
+          firebaseProject: config.firebaseProject,
+          firebaseApp: config.firebaseApp,
+          firebaseHostingSite: config.firebaseHostingSite,
+          sdkConfig: config.sdkConfig,
+          buildTarget: config.buildTarget,
+          serveTarget: config.serveTarget,
+          ssrRegion: config.ssrRegion,
+        },
+        tree,
+        context,
+        project
       });
     }
 
-    const options: NgAddNormalizedOptions = {
-      project: projectName,
-      firebaseProject: config.firebaseProject,
-      firebaseApp: config.firebaseApp,
-      firebaseHostingSite: config.firebaseHostingSite,
-      sdkConfig: config.sdkConfig,
-      prerender: config.prerender,
-      browserTarget: config.browserTarget,
-      serverTarget: config.serverTarget,
-      prerenderTarget: config.prerenderTarget,
-    };
-
-    if (features.includes(FEATURES.Hosting)) {
-      // TODO dry up by always doing the static work
-      switch (config.projectType) {
-        case PROJECT_TYPE.CloudFunctions:
-        case PROJECT_TYPE.CloudRun:
-          return setupUniversalDeployment({
-            workspace,
-            workspacePath,
-            options,
-            tree,
-            context,
-            project,
-            projectType: config.projectType,
-            // tslint:disable-next-line:no-non-null-assertion
-            nodeVersion: config.nodeVersion!,
-          });
-        case PROJECT_TYPE.Static:
-          return setupStaticDeployment({
-            workspace,
-            workspacePath,
-            options,
-            tree,
-            context,
-            project
-          });
-        default: throw(new SchematicsException(`Unimplemented PROJECT_TYPE ${config.projectType}`));
-      }
-    } else {
-      return Promise.resolve();
+    const featuresToImport = features.filter(it => it !== FEATURES.Hosting);
+    if (featuresToImport.length > 0) {
+      return chain([
+        addRootImport(projectName, ({code, external}) => {
+          external('initializeApp', '@angular/fire/app');
+          return code`${external('provideFirebaseApp', '@angular/fire/app')}(() => initializeApp(${JSON.stringify(config.sdkConfig)}))`;
+        }),
+        ...featureToRules(features, projectName),
+      ]);
     }
 };
 
@@ -129,7 +91,10 @@ export const ngAddSetupProject = (
     if (!host.exists('/firebase.json')) { writeFileSync(join(projectRoot, 'firebase.json'), '{}'); }
 
     const user = await userPrompt({ projectRoot });
-    await firebaseTools.login.use(user.email, { projectRoot });
+    const defaultUser = await firebaseTools.login(options);
+    if (user.email !== defaultUser?.email) {
+      await firebaseTools.login.use(user.email, { projectRoot });
+    }
 
     const { project: ngProject, projectName: ngProjectName } = getProject(options, host);
 
@@ -137,7 +102,7 @@ export const ngAddSetupProject = (
 
     const firebaseProject = await projectPrompt(defaultProjectName, { projectRoot, account: user.email });
 
-    let hosting = { projectType: PROJECT_TYPE.Static, prerender: false };
+    let hosting = { };
     let firebaseHostingSite: FirebaseHostingSite|undefined;
 
     if (features.includes(FEATURES.Hosting)) {
@@ -146,6 +111,8 @@ export const ngAddSetupProject = (
       hosting = { ...hosting, ...results };
       firebaseHostingSite = await sitePrompt(firebaseProject, { projectRoot });
     }
+
+    
 
     let firebaseApp: FirebaseApp|undefined;
     let sdkConfig: Record<string, string>|undefined;
@@ -160,9 +127,89 @@ export const ngAddSetupProject = (
 
     }
 
-    await setupProject(host, context, features, {
+    return setupProject(host, context, features, {
       ...options, ...hosting, firebaseProject, firebaseApp, firebaseHostingSite, sdkConfig,
     });
 
   }
+};
+
+export function generateFirebaseJson(
+  tree: Tree,
+  path: string,
+  project: string,
+  region: string|undefined,
+) {
+  const firebaseJson: FirebaseJSON = tree.exists(path)
+    ? safeReadJSON(path, tree)
+    : {};
+
+  const newConfig = {
+    target: project,
+    source: '.',
+    frameworksBackend: {
+      region
+    }
+  };
+  if (firebaseJson.hosting === undefined) {
+    firebaseJson.hosting = [newConfig];
+  } else if (Array.isArray(firebaseJson.hosting)) {
+    const existingConfigIndex = firebaseJson.hosting.findIndex(config => config.target === newConfig.target);
+    if (existingConfigIndex > -1) {
+      firebaseJson.hosting.splice(existingConfigIndex, 1, newConfig);
+    } else {
+      firebaseJson.hosting.push(newConfig);
+    }
+  } else {
+    firebaseJson.hosting = [firebaseJson.hosting, newConfig];
+  }
+
+  overwriteIfExists(tree, path, stringifyFormatted(firebaseJson));
+}
+
+export const setupFirebase = (config: {
+  project: WorkspaceProject;
+  options: NgAddNormalizedOptions;
+  workspacePath: string;
+  workspace: Workspace;
+  tree: Tree;
+  context: SchematicContext;
+}) => {
+  const { tree, workspacePath, workspace, options } = config;
+  const project = workspace.projects[options.project];
+
+  if (!project.architect) {
+    throw new SchematicsException(`Angular project "${options.project}" has a malformed angular.json`);
+  }
+
+  project.architect.deploy = {
+    builder: '@angular/fire:deploy',
+    options: {
+      version: 2,
+    },
+    configurations: {
+      production: {
+        buildTarget: options.buildTarget?.[0],
+        serveTarget: options.serveTarget?.[0],
+      },
+      development: {
+        buildTarget: options.buildTarget?.[1],
+        serveTarget: options.serveTarget?.[1],
+      }
+    },
+    defaultConfiguration: 'production',
+  };
+
+  tree.overwrite(workspacePath, JSON.stringify(workspace, null, 2));
+
+  generateFirebaseJson(tree, 'firebase.json', options.project, options.ssrRegion);
+  generateFirebaseRc(
+    tree,
+    '.firebaserc',
+    options.firebaseProject.projectId,
+    options.firebaseHostingSite,
+    options.project
+  );
+
+  return tree;
 };

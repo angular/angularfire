@@ -1,17 +1,17 @@
-import { BuilderContext, targetFromTargetString } from '@angular-devkit/architect';
-import { BuildTarget, CloudRunOptions, DeployBuilderSchema, FirebaseTools, FSHost } from '../interfaces';
+import { SpawnOptionsWithoutStdio, execSync, spawn } from 'child_process';
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'fs';
-import { copySync, removeSync } from 'fs-extra';
 import { dirname, join } from 'path';
-import { execSync, spawn, SpawnOptionsWithoutStdio } from 'child_process';
-import { defaultFunction, functionGen2, defaultPackage, DEFAULT_FUNCTION_NAME, dockerfile } from './functions-templates';
-import { satisfies } from 'semver';
-import open from 'open';
+import { BuilderContext, targetFromTargetString } from '@angular-devkit/architect';
 import { SchematicsException } from '@angular-devkit/schematics';
-import { firebaseFunctionsDependencies } from '../versions.json';
-import * as winston from 'winston';
-import tripleBeam from 'triple-beam';
+import { copySync, removeSync } from 'fs-extra';
 import * as inquirer from 'inquirer';
+import open from 'open';
+import { satisfies } from 'semver';
+import tripleBeam from 'triple-beam';
+import * as winston from 'winston';
+import { BuildTarget, CloudRunOptions, DeployBuilderSchema, FSHost, FirebaseTools } from '../interfaces';
+import { firebaseFunctionsDependencies } from '../versions.json';
+import { DEFAULT_FUNCTION_NAME, defaultFunction, defaultPackage, dockerfile, functionGen2 } from './functions-templates';
 
 const DEFAULT_EMULATOR_PORT = 5000;
 const DEFAULT_EMULATOR_HOST = 'localhost';
@@ -56,7 +56,7 @@ const spawnAsync = async (
 
 export type DeployBuilderOptions = DeployBuilderSchema & Record<string, any>;
 
-const escapeRegExp = (str: string) => str.replace(/[\-\[\]\/{}()*+?.\\^$|]/g, '\\$&');
+const escapeRegExp = (str: string) => str.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&');
 
 const moveSync = (src: string, dest: string) => {
   copySync(src, dest);
@@ -71,7 +71,7 @@ const deployToHosting = async (
   firebaseToken?: string,
 ) => {
 
-  // tslint:disable-next-line:no-non-null-assertion
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const siteTarget = options.target ?? context.target!.project;
 
   if (options.preview) {
@@ -79,7 +79,7 @@ const deployToHosting = async (
     await firebaseTools.serve({
       port: DEFAULT_EMULATOR_PORT,
       host: DEFAULT_EMULATOR_HOST,
-      targets: [`hosting:${siteTarget}`],
+      only: `hosting:${siteTarget}`,
       nonInteractive: true,
       projectRoot: workspaceRoot,
     });
@@ -88,9 +88,11 @@ const deployToHosting = async (
       type: 'confirm',
       name: 'deployProject',
       message: 'Would you like to deploy your application to Firebase Hosting?'
-    });
+    }) as { deployProject: boolean };
 
     if (!deployProject) { return; }
+
+    process.env.FIREBASE_FRAMEWORKS_SKIP_BUILD = 'true';
 
   }
 
@@ -114,7 +116,7 @@ const defaultFsHost: FSHost = {
 };
 
 const findPackageVersion = (packageManager: string, name: string) => {
-  const match = execSync(`${packageManager} list ${name}`).toString().match(`[^|\s]${escapeRegExp(name)}[@| ][^\s]+(\s.+)?$`);
+  const match = execSync(`${packageManager} list ${name}`).toString().match(`[^|s]${escapeRegExp(name)}[@| ][^s]+(s.+)?$`);
   return match ? match[0].split(new RegExp(`${escapeRegExp(name)}[@| ]`))[1].split(/\s/)[0] : null;
 };
 
@@ -130,7 +132,7 @@ const getPackageJson = (context: BuilderContext, workspaceRoot: string, options:
   if (existsSync(join(workspaceRoot, 'angular.json'))) {
     const angularJson = JSON.parse(readFileSync(join(workspaceRoot, 'angular.json')).toString());
     const packageManager = angularJson.cli?.packageManager ?? 'npm';
-    // tslint:disable-next-line:no-non-null-assertion
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const server = angularJson.projects[context.target!.project].architect.server;
     const externalDependencies = server?.options?.externalDependencies || [];
     const bundleDependencies = server?.options?.bundleDependencies ?? true;
@@ -229,10 +231,10 @@ export const deployToFunction = async (
         join(newStaticOut, 'index.html'),
         join(newStaticOut, 'index.original.html')
       );
-    } catch (e) { }
+    } catch (e) { /* empty */ }
   }
 
-  // tslint:disable-next-line:no-non-null-assertion
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const siteTarget = options.target ?? context.target!.project;
 
   if (fsHost.existsSync(functionsPackageJsonPath)) {
@@ -251,11 +253,11 @@ export const deployToFunction = async (
       projectRoot: workspaceRoot,
     });
 
-    const { deployProject} = await inquirer.prompt({
+    const { deployProject } = await inquirer.prompt({
       type: 'confirm',
       name: 'deployProject',
       message: 'Would you like to deploy your application to Firebase Hosting & Cloud Functions?'
-    });
+    }) as { deployProject: boolean };
 
     if (!deployProject) { return; }
   }
@@ -338,14 +340,14 @@ export const deployToCloudRun = async (
         join(newStaticOut, 'index.html'),
         join(newStaticOut, 'index.original.html')
       );
-    } catch (e) { }
+    } catch (e) { /* empty */ }
   }
 
   if (options.preview) {
     throw new SchematicsException('Cloud Run preview not supported.');
   }
 
-  const deployArguments: Array<any> = [];
+  const deployArguments: any[] = [];
   const cloudRunOptions = options.cloudRunOptions || {};
   Object.entries(DEFAULT_CLOUD_RUN_OPTIONS).forEach(([k, v]) => {
     cloudRunOptions[k] ||= v;
@@ -365,7 +367,7 @@ export const deployToCloudRun = async (
   await spawnAsync(`gcloud builds submit ${cloudRunOut} --tag gcr.io/${options.firebaseProject}/${serviceId} --project ${options.firebaseProject} --quiet`);
   await spawnAsync(`gcloud run deploy ${serviceId} --image gcr.io/${options.firebaseProject}/${serviceId} --project ${options.firebaseProject} ${deployArguments.join(' ')} --platform managed --allow-unauthenticated --region=${options.region} --quiet`);
 
-  // tslint:disable-next-line:no-non-null-assertion
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const siteTarget = options.target ?? context.target!.project;
 
   // TODO deploy cloud run
@@ -388,14 +390,18 @@ export default async function deploy(
   options: DeployBuilderOptions,
   firebaseToken?: string,
 ) {
-  if (!firebaseToken) {
+  if (!firebaseToken && !process.env.GOOGLE_APPLICATION_CREDENTIALS) {
     await firebaseTools.login();
     const user = await firebaseTools.login({ projectRoot: context.workspaceRoot });
     console.log(`Logged into Firebase as ${user.email}.`);
   }
 
-  if (prerenderBuildTarget) {
+  if (!firebaseToken && process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+    await spawnAsync(`gcloud auth activate-service-account --key-file ${process.env.GOOGLE_APPLICATION_CREDENTIALS}`);
+    console.log(`Using Google Application Credentials.`);
+  }
 
+  if (prerenderBuildTarget) {
     const run = await context.scheduleTarget(
       targetFromTargetString(prerenderBuildTarget.name),
       prerenderBuildTarget.options
@@ -427,6 +433,7 @@ export default async function deploy(
     await Promise.all(builders);
   }
 
+
   try {
     await firebaseTools.use(firebaseProject, {
       project: firebaseProject,
@@ -444,6 +451,7 @@ export default async function deploy(
       const emulator = info[tripleBeam.SPLAT as any]?.[1]?.metadata?.emulator;
       const text = info[tripleBeam.SPLAT as any]?.[0];
       if (text?.replace) {
+        // eslint-disable-next-line no-control-regex
         const plainText = text.replace(/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]/g, '');
         if (emulator?.name === 'hosting' && plainText.startsWith('Local server: ')) {
           open(plainText.split(': ')[1]);
@@ -457,7 +465,7 @@ export default async function deploy(
 
   firebaseTools.logger.logger.add(logger);
 
-  if (serverBuildTarget) {
+  if ((!options.version || options.version < 2) && serverBuildTarget) {
     if (options.ssr === 'cloud-run') {
       await deployToCloudRun(
         firebaseTools,

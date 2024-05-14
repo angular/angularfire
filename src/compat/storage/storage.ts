@@ -1,12 +1,12 @@
 import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
-import { createStorageRef } from './ref';
 import { ɵAngularFireSchedulers } from '@angular/fire';
-import { FirebaseOptions } from 'firebase/app';
-import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance } from '@angular/fire/compat';
-import { UploadMetadata } from './interfaces';
-import 'firebase/compat/storage';
-import firebase from 'firebase/compat/app';
 import { AppCheckInstances } from '@angular/fire/app-check';
+import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance, ɵfirebaseAppFactory } from '@angular/fire/compat';
+import { FirebaseOptions } from 'firebase/app';
+import firebase from 'firebase/compat/app';
+import { UploadMetadata } from './interfaces';
+import { createStorageRef } from './ref';
+import 'firebase/compat/storage';
 
 export const BUCKET = new InjectionToken<string>('angularfire2.storageBucket');
 export const MAX_UPLOAD_RETRY_TIME = new InjectionToken<number>('angularfire2.storage.maxUploadRetryTime');
@@ -32,12 +32,12 @@ export class AngularFireStorage {
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) name: string | null | undefined,
     @Optional() @Inject(BUCKET) storageBucket: string | null,
-    // tslint:disable-next-line:ban-types
+    // eslint-disable-next-line @typescript-eslint/ban-types
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
     schedulers: ɵAngularFireSchedulers,
-    @Optional() @Inject(MAX_UPLOAD_RETRY_TIME) maxUploadRetryTime: number | any,
-    @Optional() @Inject(MAX_OPERATION_RETRY_TIME) maxOperationRetryTime: number | any,
+    @Optional() @Inject(MAX_UPLOAD_RETRY_TIME) maxUploadRetryTime: any,
+    @Optional() @Inject(MAX_OPERATION_RETRY_TIME) maxOperationRetryTime: any,
     @Optional() @Inject(USE_EMULATOR) _useEmulator: any,
     @Optional() _appCheckInstances: AppCheckInstances,
   ) {

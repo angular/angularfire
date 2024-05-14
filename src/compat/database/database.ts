@@ -1,25 +1,25 @@
 import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
-import { AngularFireList, AngularFireObject, DatabaseQuery, PathReference, QueryFn } from './interfaces';
-import { getRef } from './utils';
-import { createListReference } from './list/create-reference';
-import { createObjectReference } from './object/create-reference';
 import { ɵAngularFireSchedulers } from '@angular/fire';
-import { FirebaseOptions } from 'firebase/app';
-import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance } from '@angular/fire/compat';
-import 'firebase/compat/auth';
-import 'firebase/compat/database';
+import { AppCheckInstances } from '@angular/fire/app-check';
+import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance, ɵfirebaseAppFactory } from '@angular/fire/compat';
 import {
-  AngularFireAuth,
-  USE_EMULATOR as USE_AUTH_EMULATOR,
   SETTINGS as AUTH_SETTINGS,
-  TENANT_ID,
+  AngularFireAuth,
   LANGUAGE_CODE,
-  USE_DEVICE_LANGUAGE,
   PERSISTENCE,
+  TENANT_ID,
+  USE_EMULATOR as USE_AUTH_EMULATOR,
+  USE_DEVICE_LANGUAGE,
   ɵauthFactory,
 } from '@angular/fire/compat/auth';
+import { FirebaseOptions } from 'firebase/app';
 import firebase from 'firebase/compat/app';
-import { AppCheckInstances } from '@angular/fire/app-check';
+import { AngularFireList, AngularFireObject, DatabaseQuery, PathReference, QueryFn } from './interfaces';
+import { createListReference } from './list/create-reference';
+import { createObjectReference } from './object/create-reference';
+import { getRef } from './utils';
+import 'firebase/compat/auth';
+import 'firebase/compat/database';
 
 export const URL = new InjectionToken<string>('angularfire2.realtimeDatabaseURL');
 
@@ -36,7 +36,7 @@ export class AngularFireDatabase {
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) name: string | null | undefined,
     @Optional() @Inject(URL) databaseURL: string | null,
-    // tslint:disable-next-line:ban-types
+    // eslint-disable-next-line @typescript-eslint/ban-types
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
     public schedulers: ɵAngularFireSchedulers,

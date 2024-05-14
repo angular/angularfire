@@ -10,7 +10,7 @@ describe('utils', () => {
       const bool = true;
       const nul = null;
       const obj = {};
-      const fn = () => { };
+      const fn = () => undefined;
       const undef = undefined;
       expect(utils.isString(str)).toBe(true);
       expect(utils.isString(notStr)).toBe(false);

@@ -1,11 +1,11 @@
-import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, Injector } from '@angular/core';
-import { Database as FirebaseDatabase } from 'firebase/database';
+import { InjectionToken, Injector, ModuleWithProviders, NgModule, NgZone, Optional } from '@angular/core';
+import { VERSION, ɵAngularFireSchedulers, ɵgetDefaultInstanceOf } from '@angular/fire';
+import { ɵAppCheckInstances } from '@angular/fire';
+import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
 import { AuthInstances } from '@angular/fire/auth';
-import { ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
-import { Database, DatabaseInstances, DATABASE_PROVIDER_NAME } from './database';
-import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
 import { registerVersion } from 'firebase/app';
-import { AppCheckInstances } from '@angular/fire/app-check';
+import { Database as FirebaseDatabase } from 'firebase/database';
+import { DATABASE_PROVIDER_NAME, Database, DatabaseInstances } from './database';
 
 export const PROVIDED_DATABASE_INSTANCES = new InjectionToken<Database[]>('angularfire2.database-instances');
 
@@ -63,7 +63,7 @@ export function provideDatabase(fn: (injector: Injector) => FirebaseDatabase, ..
         FirebaseApps,
         // Database+Auth work better if Auth is loaded first
         [new Optional(), AuthInstances ],
-        [new Optional(), AppCheckInstances ],
+        [new Optional(), ɵAppCheckInstances ],
         ...deps,
       ]
     }]

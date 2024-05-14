@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { FirebaseApp, provideFirebaseApp, getApp, initializeApp, deleteApp } from '@angular/fire/app';
-import { Storage, provideStorage, getStorage, connectStorageEmulator } from '@angular/fire/storage';
+import { FirebaseApp, getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { Storage, connectStorageEmulator, getStorage, provideStorage } from '@angular/fire/storage';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../utils';
 

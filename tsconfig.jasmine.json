@@ -18,6 +18,6 @@
         // Not sure what is wrong here, but since upgrading karma it's fallen apart
         // "src/**/*.spec.ts",
         "src/**/*.d.ts",
-        "node_modules/zone.js/dist/zone.js.d.ts"
+        "node_modules/zone.js/zone.d.ts"
     ]
   }

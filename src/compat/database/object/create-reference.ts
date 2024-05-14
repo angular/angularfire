@@ -1,8 +1,8 @@
+import { keepUnstableUntilFirst } from '@angular/fire';
 import { map } from 'rxjs/operators';
+import { AngularFireDatabase } from '../database';
 import { AngularFireObject, DatabaseQuery } from '../interfaces';
 import { createObjectSnapshotChanges } from './snapshot-changes';
-import { AngularFireDatabase } from '../database';
-import { keepUnstableUntilFirst } from '@angular/fire';
 
 export function createObjectReference<T= any>(query: DatabaseQuery, afDatabase: AngularFireDatabase): AngularFireObject<T> {
   return {

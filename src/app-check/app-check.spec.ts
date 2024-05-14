@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { FirebaseApp, provideFirebaseApp, getApp, initializeApp, deleteApp } from '@angular/fire/app';
-import { Auth, provideAuth, getAuth, connectAuthEmulator } from '@angular/fire/auth';
+import { FirebaseApp, getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { Auth, connectAuthEmulator, getAuth, provideAuth } from '@angular/fire/auth';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../utils';
 
@@ -19,7 +19,7 @@ describe('Auth', () => {
                 provideFirebaseApp(() => initializeApp(COMMON_CONFIG, appName)),
                 provideAuth(() => {
                     providedAuth = getAuth(getApp(appName));
-                    connectAuthEmulator(providedAuth, 'http://localhost:9099');
+                    connectAuthEmulator(providedAuth, 'http://localhost:9098');
                     return providedAuth;
                 }),
             ],

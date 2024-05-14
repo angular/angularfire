@@ -1,5 +1,24 @@
+import { isPlatformServer } from '@angular/common';
 import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
-import { from, Observable, of } from 'rxjs';
+import { ɵAngularFireSchedulers } from '@angular/fire';
+import { AppCheckInstances } from '@angular/fire/app-check';
+import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance, ɵfirebaseAppFactory } from '@angular/fire/compat';
+import {
+  SETTINGS as AUTH_SETTINGS,
+  AngularFireAuth,
+  LANGUAGE_CODE,
+  PERSISTENCE,
+  TENANT_ID,
+  USE_EMULATOR as USE_AUTH_EMULATOR,
+  USE_DEVICE_LANGUAGE,
+  ɵauthFactory,
+} from '@angular/fire/compat/auth';
+import { FirebaseOptions } from 'firebase/app';
+import firebase from 'firebase/compat/app';
+import { Observable, from, of } from 'rxjs';
+import { AngularFirestoreCollection } from './collection/collection';
+import { AngularFirestoreCollectionGroup } from './collection-group/collection-group';
+import { AngularFirestoreDocument } from './document/document';
 import {
   AssociatedReference,
   CollectionReference,
@@ -10,27 +29,8 @@ import {
   QueryGroupFn,
   Settings
 } from './interfaces';
-import { AngularFirestoreDocument } from './document/document';
-import { AngularFirestoreCollection } from './collection/collection';
-import { AngularFirestoreCollectionGroup } from './collection-group/collection-group';
-import { ɵAngularFireSchedulers } from '@angular/fire';
-import { FirebaseApp, ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance } from '@angular/fire/compat';
-import { FirebaseOptions } from 'firebase/app';
-import { isPlatformServer } from '@angular/common';
-import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
-import {
-  AngularFireAuth,
-  USE_EMULATOR as USE_AUTH_EMULATOR,
-  SETTINGS as AUTH_SETTINGS,
-  TENANT_ID,
-  LANGUAGE_CODE,
-  USE_DEVICE_LANGUAGE,
-  PERSISTENCE,
-  ɵauthFactory,
-} from '@angular/fire/compat/auth';
-import { AppCheckInstances } from '@angular/fire/app-check';
 
 /**
  * The value of this token determines whether or not the firestore will have persistance enabled
@@ -59,13 +59,6 @@ export function associateQuery<T>(collectionRef: CollectionReference<T>, queryFn
   const ref = collectionRef;
   return { query, ref };
 }
-
-type InstanceCache = Map<FirebaseApp, [
-  firebase.firestore.Firestore,
-  firebase.firestore.Settings | null,
-  UseEmulatorArguments | null,
-  boolean | null]
->;
 
 /**
  * AngularFirestore Service
@@ -139,7 +132,7 @@ export class AngularFirestore {
     @Optional() @Inject(FIREBASE_APP_NAME) name: string | null | undefined,
     @Optional() @Inject(ENABLE_PERSISTENCE) shouldEnablePersistence: boolean | null,
     @Optional() @Inject(SETTINGS) settings: Settings | null,
-    // tslint:disable-next-line:ban-types
+    // eslint-disable-next-line @typescript-eslint/ban-types
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
     public schedulers: ɵAngularFireSchedulers,
@@ -195,7 +188,6 @@ export class AngularFirestore {
    * set.
    */
   collection<T>(path: string, queryFn?: QueryFn): AngularFirestoreCollection<T>;
-  // tslint:disable-next-line:unified-signatures
   collection<T>(ref: CollectionReference, queryFn?: QueryFn): AngularFirestoreCollection<T>;
   collection<T>(pathOrRef: string | CollectionReference<T>, queryFn?: QueryFn): AngularFirestoreCollection<T> {
     let collectionRef: CollectionReference<T>;
@@ -227,7 +219,6 @@ export class AngularFirestore {
    * Collection reference and can be queried.
    */
   doc<T>(path: string): AngularFirestoreDocument<T>;
-  // tslint:disable-next-line:unified-signatures
   doc<T>(ref: DocumentReference): AngularFirestoreDocument<T>;
   doc<T>(pathOrRef: string | DocumentReference<T>): AngularFirestoreDocument<T> {
     let ref: DocumentReference<T>;

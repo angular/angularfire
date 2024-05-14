@@ -1,13 +1,11 @@
-import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire/compat';
-import { AngularFirestore, USE_EMULATOR, AngularFirestoreModule, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
-
 import { TestBed } from '@angular/core/testing';
-import { COMMON_CONFIG } from '../../test-config';
+import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire/compat';
+import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument, AngularFirestoreModule, USE_EMULATOR } from '@angular/fire/compat/firestore';
+import { COMMON_CONFIG } from '../../../src/test-config';
 import 'firebase/compat/firestore';
-import { rando } from '../../utils';
+import { rando } from '../../../src/utils';
 
 describe('AngularFirestore', () => {
-  let app: FirebaseApp;
   let afs: AngularFirestore;
 
   beforeEach(() => {
@@ -17,16 +15,15 @@ describe('AngularFirestore', () => {
         AngularFirestoreModule.enablePersistence()
       ],
       providers: [
-        { provide: USE_EMULATOR, useValue: ['localhost', 8080] }
+        { provide: USE_EMULATOR, useValue: ['localhost', 8089] }
       ]
     });
 
-    app = TestBed.inject(FirebaseApp);
     afs = TestBed.inject(AngularFirestore);
   });
 
-  afterEach(() => {
-    afs.firestore.disableNetwork();
+  afterEach(async () => {
+    await afs.firestore.disableNetwork();
   });
 
   it('should be the properly initialized type', () => {
@@ -94,7 +91,6 @@ describe('AngularFirestore', () => {
 });
 
 describe('AngularFirestore with different app', () => {
-  let app: FirebaseApp;
   let afs: AngularFirestore;
   let firebaseAppName: string;
 
@@ -108,12 +104,11 @@ describe('AngularFirestore with different app', () => {
       providers: [
         { provide: FIREBASE_APP_NAME, useValue: firebaseAppName },
         { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG },
-        { provide: USE_EMULATOR, useValue: ['localhost', 8080] }
+        { provide: USE_EMULATOR, useValue: ['localhost', 8089] }
       ]
     });
 
 
-    app = TestBed.inject(FirebaseApp);
     afs = TestBed.inject(AngularFirestore);
   });
 
@@ -136,7 +131,6 @@ describe('AngularFirestore with different app', () => {
 
 
 describe('AngularFirestore without persistance', () => {
-  let app: FirebaseApp;
   let afs: AngularFirestore;
 
   beforeEach(() => {
@@ -146,11 +140,10 @@ describe('AngularFirestore without persistance', () => {
         AngularFirestoreModule
       ],
       providers: [
-        { provide: USE_EMULATOR, useValue: ['localhost', 8080] }
+        { provide: USE_EMULATOR, useValue: ['localhost', 8089] }
       ]
     });
 
-    app = TestBed.inject(FirebaseApp);
     afs = TestBed.inject(AngularFirestore);
   });
 

@@ -3,16 +3,15 @@ import {
   InjectionToken,
   Injector,
   ModuleWithProviders,
+  VERSION as NG_VERSION,
   NgModule,
   NgZone,
   Optional,
   PLATFORM_ID,
-  VERSION as NG_VERSION,
 } from '@angular/core';
-import { FirebaseApp as IFirebaseApp, getApp, registerVersion } from 'firebase/app';
-
-import { FirebaseApp, FirebaseApps } from './app';
 import { VERSION, ɵAngularFireSchedulers } from '@angular/fire';
+import { FirebaseApp as IFirebaseApp, getApp, registerVersion } from 'firebase/app';
+import { FirebaseApp, FirebaseApps } from './app';
 
 export function defaultFirebaseAppFactory(provided: FirebaseApp[]|undefined) {
   // Use the provided app, if there is only one, otherwise fetch the default app
@@ -23,7 +22,7 @@ export function defaultFirebaseAppFactory(provided: FirebaseApp[]|undefined) {
 // With FIREBASE_APPS I wanted to capture the default app instance, if it is initialized by
 // the reserved URL; ɵPROVIDED_FIREBASE_APPS is not for public consumption and serves to ensure that all
 // provideFirebaseApp(...) calls are satisfied before FirebaseApp$ or FirebaseApp is resolved
-export const PROVIDED_FIREBASE_APPS = new InjectionToken<Array<FirebaseApp>>('angularfire2._apps');
+export const PROVIDED_FIREBASE_APPS = new InjectionToken<FirebaseApp[]>('angularfire2._apps');
 
 // Injecting FirebaseApp will now only inject the default Firebase App
 // this allows allows beginners to import /__/firebase/init.js to auto initialize Firebase App
@@ -57,10 +56,11 @@ export function firebaseAppFactory(fn: (injector: Injector) => IFirebaseApp) {
   ]
 })
 export class FirebaseAppModule {
-  // tslint:disable-next-line:ban-types
+  // eslint-disable-next-line @typescript-eslint/ban-types
   constructor(@Inject(PLATFORM_ID) platformId: Object) {
     registerVersion('angularfire', VERSION.full, 'core');
     registerVersion('angularfire', VERSION.full, 'app');
+    // eslint-disable-next-line @typescript-eslint/no-base-to-string
     registerVersion('angular', NG_VERSION.full, platformId.toString());
   }
 }

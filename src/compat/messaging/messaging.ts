@@ -1,17 +1,18 @@
 import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
-import firebase from 'firebase/compat/app';
-import { concat, EMPTY, Observable, of } from 'rxjs';
-import { catchError, defaultIfEmpty, map, mergeMap, observeOn, switchMap, switchMapTo, shareReplay, subscribeOn } from 'rxjs/operators';
 import { ɵAngularFireSchedulers } from '@angular/fire';
-import { ɵlazySDKProxy, ɵPromiseProxy, ɵapplyMixins } from '@angular/fire/compat';
-import { ɵfirebaseAppFactory, FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance } from '@angular/fire/compat';
+import { ɵPromiseProxy, ɵapplyMixins, ɵlazySDKProxy } from '@angular/fire/compat';
+import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance, ɵfirebaseAppFactory } from '@angular/fire/compat';
 import { FirebaseOptions } from 'firebase/app';
-import { proxyPolyfillCompat } from './base';
+import firebase from 'firebase/compat/app';
 import { isSupported } from 'firebase/messaging';
+import { EMPTY, Observable, concat, of } from 'rxjs';
+import { catchError, defaultIfEmpty, map, mergeMap, observeOn, shareReplay, subscribeOn, switchMap, switchMapTo } from 'rxjs/operators';
+import { proxyPolyfillCompat } from './base';
 
 export const VAPID_KEY = new InjectionToken<string>('angularfire2.messaging.vapid-key');
 export const SERVICE_WORKER = new InjectionToken<Promise<ServiceWorkerRegistration>>('angularfire2.messaging.service-worker-registeration');
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface AngularFireMessaging extends Omit<ɵPromiseProxy<firebase.messaging.Messaging>, 'deleteToken' | 'getToken' | 'requestPermission'> {
 }
 
@@ -30,7 +31,7 @@ export class AngularFireMessaging {
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) name: string | null | undefined,
-    // tslint:disable-next-line:ban-types
+    // eslint-disable-next-line @typescript-eslint/ban-types
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
     schedulers: ɵAngularFireSchedulers,
@@ -45,8 +46,8 @@ export class AngularFireMessaging {
       switchMap(isSupported),
       switchMap(supported => supported ? import('firebase/compat/messaging') : EMPTY),
       map(() => ɵfirebaseAppFactory(options, zone, name)),
-      switchMap(app => ɵcacheInstance(`${app.name}.messaging`, 'AngularFireMessaging', app.name, async () => {
-        return app.messaging();
+      switchMap(app => ɵcacheInstance(`${app.name}.messaging`, 'AngularFireMessaging', app.name, () => {
+        return of(app.messaging());
       }, [])),
       shareReplay({ bufferSize: 1, refCount: false })
     );
@@ -63,6 +64,7 @@ export class AngularFireMessaging {
       observeOn(schedulers.insideAngular),
       switchMap(async messaging => {
         if (Notification.permission === 'granted') {
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
           const serviceWorkerRegistration = serviceWorker ? await serviceWorker : null;
           return await messaging.getToken({ vapidKey, serviceWorkerRegistration });
         } else {

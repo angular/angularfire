@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { FirebaseApp, provideFirebaseApp, getApp, initializeApp, deleteApp } from '@angular/fire/app';
-import { Database, provideDatabase, getDatabase, connectDatabaseEmulator, goOffline } from '@angular/fire/database';
+import { FirebaseApp, getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { Database, connectDatabaseEmulator, getDatabase, goOffline, provideDatabase } from '@angular/fire/database';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../utils';
 
@@ -19,7 +19,7 @@ describe('Database', () => {
                 provideFirebaseApp(() => initializeApp(COMMON_CONFIG, appName)),
                 provideDatabase(() => {
                     providedDatabase = getDatabase(getApp(appName));
-                    connectDatabaseEmulator(providedDatabase, 'localhost', 9000);
+                    connectDatabaseEmulator(providedDatabase, 'localhost', 9002);
                     return providedDatabase;
                 }),
             ],

@@ -1,6 +1,6 @@
 import { Observable, SchedulerLike } from 'rxjs';
-import { listChanges } from './changes';
 import { ChildEvent, DatabaseQuery, SnapshotAction } from '../interfaces';
+import { listChanges } from './changes';
 import { validateEventsArray } from './utils';
 
 export function snapshotChanges<T>(
