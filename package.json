@@ -1,6 +1,6 @@
 {
   "name": "@angular/fire",
-  "version": "17.0.0",
+  "version": "17.1.0",
   "description": "Angular + Firebase = ❤️",
   "private": true,
   "scripts": {
@@ -55,7 +55,7 @@
     "@angular/platform-browser-dynamic": "^17.0.0",
     "@angular/router": "^17.0.0",
     "@schematics/angular": "^17.0.0",
-    "firebase": "^10.7.0",
+    "firebase": "^10.12.0",
     "firebase-admin": "^9.11.1",
     "firebase-functions": "^3.6.0",
     "firebase-tools": "^13.0.0",

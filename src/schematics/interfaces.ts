@@ -12,10 +12,11 @@ export const enum FEATURES {
   Firestore,
   Storage,
   RemoteConfig,
+  VertexAI,
 }
 
 export const featureOptions = [
-  { name: 'ng deploy -- hosting', value: FEATURES.Hosting },
+  { name: 'ng deploy -- Hosting', value: FEATURES.Hosting },
   { name: 'Authentication', value: FEATURES.Authentication },
   { name: 'Google Analytics', value: FEATURES.Analytics },
   { name: 'App Check', value: FEATURES.AppCheck },
@@ -26,6 +27,7 @@ export const featureOptions = [
   { name: 'Performance Monitoring', value: FEATURES.Performance },
   { name: 'Cloud Storage', value: FEATURES.Storage },
   { name: 'Remote Config', value: FEATURES.RemoteConfig },
+  { name: 'VertexAI (preview)', value: FEATURES.VertexAI },
 ];
 
 export const enum PROJECT_TYPE { Static, CloudFunctions, CloudRun, WebFrameworks }
