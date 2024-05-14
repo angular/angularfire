@@ -1,22 +1,21 @@
-import { AngularFireModule, FirebaseApp } from '@angular/fire/compat';
-import { QueryGroupFn, Query , AngularFirestore, AngularFirestoreCollectionGroup, AngularFirestoreModule, USE_EMULATOR } from '@angular/fire/compat/firestore';
+import { TestBed } from '@angular/core/testing';
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFirestore, AngularFirestoreCollectionGroup , AngularFirestoreModule, Query, QueryGroupFn, USE_EMULATOR } from '@angular/fire/compat/firestore';
 import { BehaviorSubject } from 'rxjs';
 import { skip, switchMap, take } from 'rxjs/operators';
-import { TestBed } from '@angular/core/testing';
-import { COMMON_CONFIG } from '../../../test-config';
-import 'firebase/compat/firestore';
-
+import { COMMON_CONFIG } from '../../../../src/test-config';
+import { rando } from '../../../../src/utils';
 import {
+  FAKE_STOCK_DATA,
+  Stock,
   createRandomStocks,
   delayAdd,
   delayDelete,
   delayUpdate,
   deleteThemAll,
-  FAKE_STOCK_DATA,
-  randomName,
-  Stock
+  randomName
 } from '../utils.spec';
-import { rando } from '../../../utils';
+import 'firebase/compat/firestore';
 
 async function collectionHarness(afs: AngularFirestore, items: number, queryGroupFn?: QueryGroupFn<Stock>) {
   const randomCollectionName = randomName(afs.firestore);
@@ -30,7 +29,6 @@ async function collectionHarness(afs: AngularFirestore, items: number, queryGrou
 }
 
 describe('AngularFirestoreCollectionGroup', () => {
-  let app: FirebaseApp;
   let afs: AngularFirestore;
 
   beforeEach(() => {
@@ -40,11 +38,10 @@ describe('AngularFirestoreCollectionGroup', () => {
         AngularFirestoreModule
       ],
       providers: [
-        { provide: USE_EMULATOR, useValue: ['localhost', 8080] }
+        { provide: USE_EMULATOR, useValue: ['localhost', 8089] }
       ]
     });
 
-    app = TestBed.inject(FirebaseApp);
     afs = TestBed.inject(AngularFirestore);
   });
 
@@ -74,7 +71,9 @@ describe('AngularFirestoreCollectionGroup', () => {
           });
           // Delete them all
           const promises = names.map(name => ref.doc(name).delete());
-          Promise.all(promises).then(done).catch(fail);
+          Promise.all(promises)
+            .then(() => { done(); })
+            .catch(() => { done.fail(); });
         });
       })();
     });
@@ -84,14 +83,19 @@ describe('AngularFirestoreCollectionGroup', () => {
         const ITEMS = 4;
         const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
         const changes = stocks.valueChanges();
-        const sub = changes.subscribe(() => {
-        });
+        const sub = changes.subscribe(() => undefined);
         sub.add(
           changes.pipe(take(1)).subscribe(data => {
             expect(data.length).toEqual(ITEMS);
             sub.unsubscribe();
           }).add(() => {
-            deleteThemAll(names, ref).then(done).catch(done.fail);
+            deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           })
         );
       })();
@@ -102,12 +106,17 @@ describe('AngularFirestoreCollectionGroup', () => {
         const ITEMS = 4;
         const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
         const changes = stocks.valueChanges();
-        changes.pipe(take(1)).subscribe(() => {
-        }).add(() => {
+        changes.pipe(take(1)).subscribe(() => undefined).add(() => {
           changes.pipe(take(1)).subscribe(data => {
             expect(data.length).toEqual(ITEMS);
           }).add(() => {
-            deleteThemAll(names, ref).then(done).catch(done.fail);
+            deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           });
         });
       })();
@@ -135,7 +144,13 @@ describe('AngularFirestoreCollectionGroup', () => {
           if (count === 2) {
             expect(data.length).toEqual(0);
             sub.unsubscribe();
-            deleteThemAll(names, ref).then(done).catch(done.fail);
+            deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           }
         });
       })();
@@ -180,7 +195,13 @@ describe('AngularFirestoreCollectionGroup', () => {
             const change = data.filter(x => x.payload.doc.id === names[0])[0];
             expect(change.type).toEqual('modified');
             sub.unsubscribe();
-            deleteThemAll(names, ref).then(done).catch(done.fail);
+            deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           }
         });
       })();
@@ -191,14 +212,19 @@ describe('AngularFirestoreCollectionGroup', () => {
         const ITEMS = 4;
         const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
         const changes = stocks.snapshotChanges();
-        const sub = changes.subscribe(() => {
-        });
+        const sub = changes.subscribe(() => undefined);
         sub.add(
           changes.pipe(take(1)).subscribe(data => {
             expect(data.length).toEqual(ITEMS);
             sub.unsubscribe();
           }).add(() => {
-            deleteThemAll(names, ref).then(done).catch(done.fail);
+            deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           })
         );
       })();
@@ -209,12 +235,17 @@ describe('AngularFirestoreCollectionGroup', () => {
         const ITEMS = 4;
         const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
         const changes = stocks.snapshotChanges();
-        changes.pipe(take(1)).subscribe(() => {
-        }).add(() => {
+        changes.pipe(take(1)).subscribe(() => undefined).add(() => {
           changes.pipe(take(1)).subscribe(data => {
             expect(data.length).toEqual(ITEMS);
           }).add(() => {
-            deleteThemAll(names, ref).then(done).catch(done.fail);
+            deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           });
         });
       })();
@@ -243,7 +274,13 @@ describe('AngularFirestoreCollectionGroup', () => {
             expect(change.type).toEqual('modified');
             expect(change.payload.oldIndex).toEqual(firstIndex);
             sub.unsubscribe();
-            deleteThemAll(names, ref).then(done).catch(done.fail);
+            deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           }
         });
       })();
@@ -260,7 +297,13 @@ describe('AngularFirestoreCollectionGroup', () => {
           expect(data.length).toEqual(1);
           expect(change.payload.doc.data().price).toEqual(2);
           expect(change.type).toEqual('modified');
-          deleteThemAll(names, ref).then(done).catch(done.fail);
+          deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
         });
 
         delayUpdate(ref, names[0], { price: 2 });
@@ -281,7 +324,13 @@ describe('AngularFirestoreCollectionGroup', () => {
           expect(data.length).toEqual(ITEMS + 1);
           expect(change.payload.doc.data().price).toEqual(2);
           expect(change.type).toEqual('added');
-          deleteThemAll(names, ref).then(done).catch(done.fail);
+          deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           done();
         });
 
@@ -342,7 +391,13 @@ describe('AngularFirestoreCollectionGroup', () => {
             expect(change.type).toEqual('modified');
           }
         }).add(() => {
-          deleteThemAll(names, ref).then(done).catch(done.fail);
+          deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
         });
 
         names = names.concat([nextId]);
@@ -362,7 +417,13 @@ describe('AngularFirestoreCollectionGroup', () => {
           const change = data.filter(x => x.payload.doc.id === names[0]);
           expect(data.length).toEqual(ITEMS - 1);
           expect(change.length).toEqual(0);
-          deleteThemAll(names, ref).then(done).catch(done.fail);
+          deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           done();
         });
 
@@ -392,7 +453,13 @@ describe('AngularFirestoreCollectionGroup', () => {
             // We used the same piece of data so they should all equal
             expect(action.payload.doc.data()).toEqual(FAKE_STOCK_DATA);
           });
-          deleteThemAll(names, ref).then(done).catch(done.fail);
+          deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
         });
       })();
     });
@@ -410,7 +477,13 @@ describe('AngularFirestoreCollectionGroup', () => {
           if (count === 2) {
             expect(data.length).toEqual(1);
             expect(data[0].type).toEqual('modified');
-            deleteThemAll(names, ref).then(done).catch(done.fail);
+            deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           }
         });
       })();
@@ -421,14 +494,19 @@ describe('AngularFirestoreCollectionGroup', () => {
         const ITEMS = 4;
         const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
         const changes = stocks.stateChanges();
-        const sub = changes.subscribe(() => {
-        });
+        const sub = changes.subscribe(() => undefined);
         sub.add(
           changes.pipe(take(1)).subscribe(data => {
             expect(data.length).toEqual(ITEMS);
             sub.unsubscribe();
           }).add(() => {
-            deleteThemAll(names, ref).then(done).catch(done.fail);
+            deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           })
         );
       })();
@@ -439,12 +517,17 @@ describe('AngularFirestoreCollectionGroup', () => {
         const ITEMS = 4;
         const { ref, stocks, names } = await collectionHarness(afs, ITEMS);
         const changes = stocks.stateChanges();
-        changes.pipe(take(1)).subscribe(() => {
-        }).add(() => {
+        changes.pipe(take(1)).subscribe(() => undefined).add(() => {
           changes.pipe(take(1)).subscribe(data => {
             expect(data.length).toEqual(ITEMS);
           }).add(() => {
-            deleteThemAll(names, ref).then(done).catch(done.fail);
+            deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           });
         });
       })();
@@ -460,7 +543,13 @@ describe('AngularFirestoreCollectionGroup', () => {
           expect(data.length).toEqual(1);
           expect(data[0].payload.doc.data().price).toEqual(2);
           expect(data[0].type).toEqual('modified');
-          deleteThemAll(names, ref).then(done).catch(done.fail);
+          deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           done();
         });
 
@@ -482,7 +571,13 @@ describe('AngularFirestoreCollectionGroup', () => {
           expect(data.length).toEqual(1);
           expect(data[0].payload.doc.data().price).toEqual(2);
           expect(data[0].type).toEqual('added');
-          deleteThemAll(names, ref).then(done).catch(done.fail);
+          deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           done();
         });
 
@@ -501,7 +596,13 @@ describe('AngularFirestoreCollectionGroup', () => {
           sub.unsubscribe();
           expect(data.length).toEqual(1);
           expect(data[0].type).toEqual('removed');
-          deleteThemAll(names, ref).then(done).catch(done.fail);
+          deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           done();
         });
 
@@ -525,7 +626,13 @@ describe('AngularFirestoreCollectionGroup', () => {
             sub.unsubscribe();
             expect(data.length).toEqual(ITEMS + 1);
             expect(data[data.length - 1].type).toEqual('modified');
-            deleteThemAll(names, ref).then(done).catch(done.fail);
+            deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           }
         });
       })();
@@ -540,7 +647,13 @@ describe('AngularFirestoreCollectionGroup', () => {
           sub.unsubscribe();
           expect(data.length).toEqual(1);
           expect(data[0].type).toEqual('removed');
-          deleteThemAll(names, ref).then(done).catch(done.fail);
+          deleteThemAll(names, ref)
+              .then(() => {
+                done()
+              })
+              .catch(() => {
+                done.fail()
+              });
           done();
         });
 

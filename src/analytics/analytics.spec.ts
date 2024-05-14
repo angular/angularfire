@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { FirebaseApp, provideFirebaseApp, getApp, initializeApp, deleteApp } from '@angular/fire/app';
-import { Analytics, provideAnalytics, getAnalytics, isSupported } from '@angular/fire/analytics';
+import { Analytics, getAnalytics, isSupported, provideAnalytics } from '@angular/fire/analytics';
+import { FirebaseApp, getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { COMMON_CONFIG_TOO } from '../test-config';
 import { rando } from '../utils';
 

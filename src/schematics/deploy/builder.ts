@@ -1,8 +1,8 @@
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
-import deploy, { DeployBuilderOptions } from './actions';
+import { getFirebaseTools } from '../firebaseTools';
 import { BuildTarget } from '../interfaces';
 import { getFirebaseProjectNameFromFs } from '../utils';
-import { getFirebaseTools } from '../firebaseTools';
+import deploy, { DeployBuilderOptions } from './actions';
 
 // Call the createBuilder() function to create a builder. This mirrors
 // createJobHandler() but add typings specific to Architect Builders.

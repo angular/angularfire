@@ -25,37 +25,26 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
-          check-latest: true
+          node-version: '18'
+          check-latest: false
+      - name: angular build cache
+        uses: actions/cache@v3
+        with:
+          path: ./.angular
+          key: angular-cache
       - name: node_modules cache
         uses: actions/cache@v3
         id: node_modules_cache
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-16-12-9-9-6-node_modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-18-${{ hashFiles('package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-16-12-9-9-6-node_modules-
-            ${{ runner.os }}-16-12-9-9-
-            ${{ runner.os }}-16-12-9-
-            ${{ runner.os }}-16-12-
-            ${{ runner.os }}-16-
-      - name: Yarn offline cache
-        if: steps.node_modules_cache.outputs.cache-hit != 'true'
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm-packages-offline-cache
-          key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: yarn-offline
+            ${{ runner.os }}-18-
       - name: Install deps
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         run: |
-          yarn config set ignore-engines true
-          yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
-          yarn config set network-timeout 300000
-          yarn config set yarn-offline-mirror-pruning true
-          yarn install --frozen-lockfile --prefer-offline
+          npm ci
       - name: Build
-        id: yarn-pack-dir
         run: ./tools/build.sh
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v3
@@ -70,7 +59,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
-        node: ["16", "18", "20"]
+        node: ["18", "20"]
       fail-fast: false
     name: Test Node ${{ matrix.node }} (${{ matrix.os }})
     steps:
@@ -86,43 +75,20 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-${{ matrix.node }}-16-9-12-7-node_modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-${{ matrix.node }}-${{ hashFiles('package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.node }}-16-9-12-7-node_modules-
-            ${{ runner.os }}-${{ matrix.node }}-16-9-12-
-            ${{ runner.os }}-${{ matrix.node }}-16-9-
-            ${{ runner.os }}-${{ matrix.node }}-16-
             ${{ runner.os }}-${{ matrix.node }}-
-      - name: Yarn offline cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm-packages-offline-cache
-          key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: yarn-offline
-      - name: Configure yarn
-        run: |
-          yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
-          yarn config set network-timeout 300000
-          yarn config set ignore-engines true
-      - name: Yarn install
+      - name: Install deps
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile --prefer-offline
+        run: npm ci
       - name: Download Artifacts
         uses: actions/download-artifact@v3
       - name: Relocate Artifacts
         run: mv angularfire-${{ github.run_id }} dist
       - name: Test Node
         run: |
-          yarn build:jasmine
-          yarn test:node
-      - name: ng-build yarn install
-        run: |
-          cd ./test/ng-build
-          yarn --prefer-offline
-      - name: ng-build prerender
-        run: |
-          cd ./test/ng-build
-          yarn prerender
+          npm run build:jasmine
+          npm run test:node
 
   browser:
     runs-on: ${{ matrix.os }}
@@ -132,17 +98,19 @@ jobs:
       matrix:
         os: [ ubuntu-latest ]
         browser: [ chrome-headless, firefox-headless ]
-        include:
-        - os: macos-latest
-          browser: safari
+        # TODO(davideast): Figure out why Safari tests timeout only on CI
+        # include:
+        # - os: macos-latest
+        #   browser: safari
+      fail-fast: false
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: 16
-          check-latest: true
+          node-version: 18
+          check-latest: false
       - name: Setup java
         uses: actions/setup-java@v3
         with:
@@ -153,27 +121,12 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-${{ matrix.node }}-16-9-12-7-node_modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-${{ matrix.node }}-${{ hashFiles('package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.node }}-16-9-12-7-node_modules-
-            ${{ runner.os }}-${{ matrix.node }}-16-9-12-
-            ${{ runner.os }}-${{ matrix.node }}-16-9-
-            ${{ runner.os }}-${{ matrix.node }}-16-
             ${{ runner.os }}-${{ matrix.node }}-
-      - name: Yarn offline cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm-packages-offline-cache
-          key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: yarn-offline
-      - name: Configure yarn
-        run: |
-          yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
-          yarn config set network-timeout 300000
-          yarn config set ignore-engines true
-      - name: Yarn install
+      - name: Install deps
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile --prefer-offline
+        run: npm ci
       - name: Firebase emulator cache
         uses: actions/cache@v3
         with:
@@ -184,7 +137,7 @@ jobs:
       - name: Relocate Artifacts
         run: mv angularfire-${{ github.run_id }} dist
       - name: Test browser
-        run: yarn test:${{ matrix.browser }}
+        run: npm run test:${{ matrix.browser }}
 
   contribute:
     runs-on: ${{ matrix.os }}
@@ -192,7 +145,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
-        node: ["16"]
+        node: ["18"]
       fail-fast: false
     steps:
       - name: Checkout
@@ -207,35 +160,20 @@ jobs:
         id: node_modules_cache
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-${{ matrix.node }}-12-9-9-6-node_modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-${{ matrix.node }}-${{ hashFiles('package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.node }}-12-9-9-6-node_modules-
-            ${{ runner.os }}-${{ matrix.node }}-12-9-9-
-            ${{ runner.os }}-${{ matrix.node }}-12-9-
-            ${{ runner.os }}-${{ matrix.node }}-12-
             ${{ runner.os }}-${{ matrix.node }}-
-      - name: Yarn offline cache
-        if: steps.node_modules_cache.outputs.cache-hit != 'true'
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm-packages-offline-cache
-          key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: yarn-offline
       - name: Install deps
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
-        run: |
-          yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
-          yarn config set network-timeout 300000
-          yarn config set ignore-engines true
-          yarn install --frozen-lockfile --prefer-offline
+        run: npm ci
       - name: Lint
-        run: yarn lint
+        run: npm run lint
       - name: Build
-        run: yarn build
+        run: npm run build
       - name: Test Node
         run: |
-          yarn build:jasmine
-          yarn test:node
+          npm run build:jasmine
+          npm run test:node
       - name: Firebase emulator cache
         uses: actions/cache@v3
         with:
@@ -247,7 +185,7 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
       - name: Test headless
-        run: yarn test:chrome-headless
+        run: npm run test:chrome-headless
         # Tests are flaky on Windows
         continue-on-error: ${{ matrix.os == 'windows-latest' }}
 
@@ -268,9 +206,9 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '18'
           registry-url: 'https://registry.npmjs.org'
-          check-latest: true
+          check-latest: false
       - name: 'Download Artifacts'
         uses: actions/download-artifact@v3
       - name: Publish

@@ -1,3 +1,3 @@
-import { ɵisMessagingSupportedFactory } from '@angular/fire';
+import { isMessagingSupportedFactory } from './is-messaging-supported-factory';
 
-export const isSupported = ɵisMessagingSupportedFactory.async;
+export const isSupported = isMessagingSupportedFactory.async;

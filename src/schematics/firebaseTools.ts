@@ -1,7 +1,8 @@
-import { FirebaseTools } from './interfaces';
-import { spawn, execSync } from 'child_process';
+/* eslint-disable @typescript-eslint/no-var-requires */
+import { execSync, spawn } from 'child_process';
 import ora from 'ora';
 import * as semver from 'semver';
+import { FirebaseTools } from './interfaces';
 
 declare global {
     var firebaseTools: FirebaseTools|undefined;
@@ -43,8 +44,8 @@ export const getFirebaseTools = () => globalThis.firebaseTools ?
         globalThis.firebaseTools = firebaseTools;
         const version = firebaseTools.cli.version();
         console.log(`Using firebase-tools version ${version}`);
-        if (semver.compare(version, '9.9.0') === -1) {
-            console.error('firebase-tools version 9.9+ is required, please upgrade and run again');
+        if (semver.compare(version, '13.0.0') === -1) {
+            console.error('firebase-tools version 13.0.0+ is required, please upgrade and run again');
             return Promise.reject();
         }
         return firebaseTools;

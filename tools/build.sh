@@ -16,6 +16,6 @@ fi;
 
 npm --no-git-tag-version --allow-same-version -f version $OVERRIDE_VERSION
 
-yarn build &&
+npm run build &&
     echo "npm publish . --tag $NPM_TAG" > ./dist/packages-dist/publish.sh &&
     chmod +x ./dist/packages-dist/publish.sh

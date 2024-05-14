@@ -1,8 +1,8 @@
+import { keepUnstableUntilFirst, observeOutsideAngular } from '@angular/fire';
+import { Observable, from, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { ListOptions, ListResult, Reference, SettableMetadata, StringFormat, UploadMetadata } from './interfaces';
 import { AngularFireUploadTask, createUploadTask } from './task';
-import { from, Observable, of } from 'rxjs';
-import { observeOutsideAngular, keepUnstableUntilFirst } from '@angular/fire';
-import { switchMap } from 'rxjs/operators';
 
 export interface AngularFireStorageReference {
   getDownloadURL(): Observable<any>;

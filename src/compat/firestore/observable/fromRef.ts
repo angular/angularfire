@@ -1,8 +1,8 @@
-import { asyncScheduler, Observable, SchedulerLike } from 'rxjs';
-import { Action, DocumentReference, DocumentSnapshot, Query, QuerySnapshot, Reference } from '../interfaces';
+import { Observable, SchedulerLike, asyncScheduler } from 'rxjs';
 import { map, pairwise, startWith } from 'rxjs/operators';
+import { Action, DocumentReference, DocumentSnapshot, Query, QuerySnapshot, Reference } from '../interfaces';
 
-function _fromRef<T, R>(ref: Reference<T>, scheduler: SchedulerLike = asyncScheduler): Observable<R> {
+function _fromRef<R>(ref: Reference, scheduler: SchedulerLike = asyncScheduler): Observable<R> {
   return new Observable(subscriber => {
     let unsubscribe: () => void;
     if (scheduler != null) {
@@ -22,7 +22,7 @@ function _fromRef<T, R>(ref: Reference<T>, scheduler: SchedulerLike = asyncSched
 }
 
 export function fromRef<R, T>(ref: DocumentReference<T> | Query<T>, scheduler?: SchedulerLike) {
-  return _fromRef<typeof ref, R>(ref, scheduler);
+  return _fromRef<R>(ref, scheduler);
 }
 
 export function fromDocRef<T>(ref: DocumentReference<T>, scheduler?: SchedulerLike): Observable<Action<DocumentSnapshot<T>>> {
@@ -30,7 +30,8 @@ export function fromDocRef<T>(ref: DocumentReference<T>, scheduler?: SchedulerLi
     .pipe(
       startWith<DocumentSnapshot<T>, undefined>(undefined),
       pairwise(),
-      map(([priorPayload, payload]) => {
+      map((snapshots: [DocumentSnapshot<T>, DocumentSnapshot<T>]) => {
+        const [priorPayload, payload] = snapshots;
         if (!payload.exists) {
           return { payload, type: 'removed' };
         }

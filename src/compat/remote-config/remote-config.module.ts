@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
-import { AngularFireRemoteConfig } from './remote-config';
-import firebase from 'firebase/compat/app';
 import { VERSION } from '@angular/fire';
+import firebase from 'firebase/compat/app';
+import { AngularFireRemoteConfig } from './remote-config';
 
 @NgModule({
   providers: [ AngularFireRemoteConfig ]

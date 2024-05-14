@@ -1,17 +1,15 @@
-import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
-import { EMPTY, of } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
-import { map, shareReplay, switchMap, observeOn } from 'rxjs/operators';
+import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
 import { ɵAngularFireSchedulers } from '@angular/fire';
-import { ɵlazySDKProxy, ɵPromiseProxy, ɵapplyMixins, ɵcacheInstance } from '@angular/fire/compat';
+import { ɵPromiseProxy, ɵapplyMixins, ɵcacheInstance, ɵlazySDKProxy } from '@angular/fire/compat';
 import { FirebaseApp } from '@angular/fire/compat';
-import firebase from 'firebase/compat/app';
-import { proxyPolyfillCompat } from './base';
 import { isSupported } from 'firebase/analytics';
+import firebase from 'firebase/compat/app';
+import { EMPTY, of } from 'rxjs';
+import { map, observeOn, shareReplay, switchMap } from 'rxjs/operators';
+import { proxyPolyfillCompat } from './base';
 
-export interface Config {
-  [key: string]: any;
-}
+export type Config = Record<string, any>;
 
 export const COLLECTION_ENABLED = new InjectionToken<boolean>('angularfire2.analytics.analyticsCollectionEnabled');
 export const APP_VERSION = new InjectionToken<string>('angularfire2.analytics.appVersion');
@@ -27,6 +25,7 @@ const GTAG_FUNCTION_NAME = 'gtag'; // TODO rename these
 const DATA_LAYER_NAME = 'dataLayer';
 const SEND_TO_KEY = 'send_to';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface AngularFireAnalytics extends ɵPromiseProxy<firebase.analytics.Analytics> {
 }
 
@@ -36,7 +35,7 @@ export interface AngularFireAnalytics extends ɵPromiseProxy<firebase.analytics.
 export class AngularFireAnalytics {
 
   private measurementId: string;
-  private analyticsInitialized: Promise<void> = new Promise(() => {});
+  private analyticsInitialized = new Promise<void>(() => undefined);
 
   async updateConfig(config: Config) {
     await this.analyticsInitialized;
@@ -50,7 +49,7 @@ export class AngularFireAnalytics {
     @Optional() @Inject(APP_NAME) providedAppName: string | null,
     @Optional() @Inject(DEBUG_MODE) debugModeEnabled: boolean | null,
     @Optional() @Inject(CONFIG) providedConfig: Config | null,
-    // tslint:disable-next-line:ban-types
+    // eslint-disable-next-line @typescript-eslint/ban-types
     @Inject(PLATFORM_ID) platformId: Object,
     zone: NgZone,
     schedulers: ɵAngularFireSchedulers,
@@ -92,7 +91,7 @@ export class AngularFireAnalytics {
             }
           }
           if (debugModeEnabled && typeof console !== 'undefined') {
-            // tslint:disable-next-line:no-console
+            // eslint-disable-next-line no-console
             console.info(...args);
           }
           /**
@@ -101,7 +100,6 @@ export class AngularFireAnalytics {
            * like an array and contains more information then just indexes. Transforming this into arrow function
            * caused issue #2505 where analytics no longer sent any data.
            */
-          // tslint:disable-next-line: only-arrow-functions
           (function(..._args: any[]) {
             window[DATA_LAYER_NAME].push(arguments);
           })(...args);
