@@ -6,6 +6,8 @@
         "outDir": "tools",
         "skipLibCheck": true,
         "lib": ["es2019"],
+        "module": "commonjs",
+        "target": "ES2020",
         "plugins": [
             { "transform": "ts-transformer-keys/transformer" }
         ],

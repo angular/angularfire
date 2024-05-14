@@ -1,10 +1,10 @@
-import { FirebaseStorage } from 'firebase/storage';
 import { ɵgetAllInstancesOf } from '@angular/fire';
+import { FirebaseStorage } from 'firebase/storage';
 import { from, timer } from 'rxjs';
 import { concatMap, distinct } from 'rxjs/operators';
 
 // see notes in core/firebase.app.module.ts for why we're building the class like this
-// tslint:disable-next-line:no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Storage extends FirebaseStorage {}
 
 export class Storage {
@@ -15,7 +15,7 @@ export class Storage {
 
 export const STORAGE_PROVIDER_NAME = 'storage';
 
-// tslint:disable-next-line:no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface StorageInstances extends Array<FirebaseStorage> {}
 
 export class StorageInstances {

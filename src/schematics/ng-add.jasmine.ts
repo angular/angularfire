@@ -1,8 +1,7 @@
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
-import { setupProject } from '@angular/fire/schematics/setup';
+import { FEATURES } from './interfaces';
+import { setupProject } from  './setup';
 import 'jasmine';
-import { join as pathJoin } from 'path';
-import { FEATURES, PROJECT_TYPE } from './interfaces';
 
 const PROJECT_NAME = 'pie-ka-chu';
 const PROJECT_ROOT = 'pirojok';
@@ -88,87 +87,62 @@ function generateAngularJsonWithServer() {
 }
 
 const initialFirebaseJson = `{
-  \"hosting\": [
+  "hosting": [
     {
-      \"target\": \"pie-ka-chu\",
-      \"public\": \"dist/ikachu\",
-      \"ignore\": [
-        \"**/.*\"
-      ],
-      \"headers\": [
-        {
-          \"source\": \"*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].+(css|js)\",
-          \"headers\": [
-            {
-              \"key\": \"Cache-Control\",
-              \"value\": \"public,max-age=31536000,immutable\"
-            }
-          ]
-        },
-        {
-          \"source\": \"/@(ngsw-worker.js|ngsw.json)\",
-          \"headers\": [
-            {
-              \"key\": \"Cache-Control\",
-              \"value\": \"no-cache\"
-            }
-          ]
-        }
-      ],
-      \"rewrites\": [
-        {
-          \"source\": \"**\",
-          \"destination\": \"/index.html\"
-        }
-      ]
+      "target": "pie-ka-chu",
+      "source": ".",
+      "frameworksBackend": {}
     }
   ]
 }`;
 
 const initialFirebaserc = `{
-  \"targets\": {
-    \"pirojok-111e3\": {
-      \"hosting\": {
-        \"pie-ka-chu\": [
-          \"pirojok-111e3\"
+  "targets": {
+    "pirojok-111e3": {
+      "hosting": {
+        "pie-ka-chu": [
+          "pirojok-111e3"
         ]
       }
     }
   },
-  \"projects\": {
-    \"default\": \"pirojok-111e3\"
+  "projects": {
+    "default": "pirojok-111e3"
   }
 }`;
 
 const initialAngularJson = `{
-  \"defaultProject\": \"pie-ka-chu\",
-  \"projects\": {
-    \"pie-ka-chu\": {
-      \"projectType\": \"application\",
-      \"root\": \"pirojok\",
-      \"architect\": {
-        \"build\": {
-          \"options\": {
-            \"outputPath\": \"dist/ikachu\"
+  "defaultProject": "pie-ka-chu",
+  "projects": {
+    "pie-ka-chu": {
+      "projectType": "application",
+      "root": "pirojok",
+      "architect": {
+        "build": {
+          "options": {
+            "outputPath": "dist/ikachu"
           }
         },
-        \"deploy\": {
-          \"builder\": \"@angular/fire:deploy\",
-          \"options\": {
-            \"prerender\": false,
-            \"ssr\": false,
-            \"firebaseProject\": \"pirojok-111e3\"
-          }
+        "deploy": {
+          "builder": "@angular/fire:deploy",
+          "options": {
+            "version": 2
+          },
+          "configurations": {
+            "production": {},
+            "development": {}
+          },
+          "defaultConfiguration": "production"
         }
       }
     },
-    \"pi-catch-you\": {
-      \"projectType\": \"application\",
-      \"root\": \"pirojok\",
-      \"architect\": {
-        \"build\": {
-          \"options\": {
-            \"outputPath\": \"dist/ikachu\"
+    "pi-catch-you": {
+      "projectType": "application",
+      "root": "pirojok",
+      "architect": {
+        "build": {
+          "options": {
+            "outputPath": "dist/ikachu"
           }
         }
       }
@@ -177,87 +151,62 @@ const initialAngularJson = `{
 }`;
 
 const overwriteFirebaseJson = `{
-  \"hosting\": [
+  "hosting": [
     {
-      \"target\": \"pie-ka-chu\",
-      \"public\": \"dist/ikachu\",
-      \"ignore\": [
-        \"**/.*\"
-      ],
-      \"headers\": [
-        {
-          \"source\": \"*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].+(css|js)\",
-          \"headers\": [
-            {
-              \"key\": \"Cache-Control\",
-              \"value\": \"public,max-age=31536000,immutable\"
-            }
-          ]
-        },
-        {
-          \"source\": \"/@(ngsw-worker.js|ngsw.json)\",
-          \"headers\": [
-            {
-              \"key\": \"Cache-Control\",
-              \"value\": \"no-cache\"
-            }
-          ]
-        }
-      ],
-      \"rewrites\": [
-        {
-          \"source\": \"**\",
-          \"destination\": \"/index.html\"
-        }
-      ]
+      "target": "pie-ka-chu",
+      "source": ".",
+      "frameworksBackend": {}
     }
   ]
 }`;
 
 const overwriteFirebaserc = `{
-  \"targets\": {
-    \"pirojok-111e3\": {
-      \"hosting\": {
-        \"pie-ka-chu\": [
-          \"pirojok-111e3\"
+  "targets": {
+    "pirojok-111e3": {
+      "hosting": {
+        "pie-ka-chu": [
+          "pirojok-111e3"
         ]
       }
     }
   },
-  \"projects\": {
-    \"default\": \"pirojok-111e3\"
+  "projects": {
+    "default": "pirojok-111e3"
   }
 }`;
 
 const overwriteAngularJson = `{
-  \"defaultProject\": \"pie-ka-chu\",
-  \"projects\": {
-    \"pie-ka-chu\": {
-      \"projectType\": \"application\",
-      \"root\": \"pirojok\",
-      \"architect\": {
-        \"build\": {
-          \"options\": {
-            \"outputPath\": \"dist/ikachu\"
+  "defaultProject": "pie-ka-chu",
+  "projects": {
+    "pie-ka-chu": {
+      "projectType": "application",
+      "root": "pirojok",
+      "architect": {
+        "build": {
+          "options": {
+            "outputPath": "dist/ikachu"
           }
         },
-        \"deploy\": {
-          \"builder\": \"@angular/fire:deploy\",
-          \"options\": {
-            \"prerender\": false,
-            \"ssr\": false,
-            \"firebaseProject\": \"pirojok-111e3\"
-          }
+        "deploy": {
+          "builder": "@angular/fire:deploy",
+          "options": {
+            "version": 2
+          },
+          "configurations": {
+            "production": {},
+            "development": {}
+          },
+          "defaultConfiguration": "production"
         }
       }
     },
-    \"pi-catch-you\": {
-      \"projectType\": \"application\",
-      \"root\": \"pirojok\",
-      \"architect\": {
-        \"build\": {
-          \"options\": {
-            \"outputPath\": \"dist/ikachu\"
+    "pi-catch-you": {
+      "projectType": "application",
+      "root": "pirojok",
+      "architect": {
+        "build": {
+          "options": {
+            "outputPath": "dist/ikachu"
           }
         }
       }
@@ -266,136 +215,86 @@ const overwriteAngularJson = `{
 }`;
 
 const projectFirebaseJson = `{
-  \"hosting\": [
+  "hosting": [
     {
-      \"target\": \"pie-ka-chu\",
-      \"public\": \"dist/ikachu\",
-      \"ignore\": [
-        \"**/.*\"
-      ],
-      \"headers\": [
-        {
-          \"source\": \"*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].+(css|js)\",
-          \"headers\": [
-            {
-              \"key\": \"Cache-Control\",
-              \"value\": \"public,max-age=31536000,immutable\"
-            }
-          ]
-        },
-        {
-          \"source\": \"/@(ngsw-worker.js|ngsw.json)\",
-          \"headers\": [
-            {
-              \"key\": \"Cache-Control\",
-              \"value\": \"no-cache\"
-            }
-          ]
-        }
-      ],
-      \"rewrites\": [
-        {
-          \"source\": \"**\",
-          \"destination\": \"/index.html\"
-        }
-      ]
+      "target": "pie-ka-chu",
+      "source": ".",
+      "frameworksBackend": {}
     },
     {
-      \"target\": \"pi-catch-you\",
-      \"public\": \"dist/ikachu\",
-      \"ignore\": [
-        \"**/.*\"
-      ],
-      \"headers\": [
-        {
-          \"source\": \"*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].+(css|js)\",
-          \"headers\": [
-            {
-              \"key\": \"Cache-Control\",
-              \"value\": \"public,max-age=31536000,immutable\"
-            }
-          ]
-        },
-        {
-          \"source\": \"/@(ngsw-worker.js|ngsw.json)\",
-          \"headers\": [
-            {
-              \"key\": \"Cache-Control\",
-              \"value\": \"no-cache\"
-            }
-          ]
-        }
-      ],
-      \"rewrites\": [
-        {
-          \"source\": \"**\",
-          \"destination\": \"/index.html\"
-        }
-      ]
+      "target": "pi-catch-you",
+      "source": ".",
+      "frameworksBackend": {}
     }
   ]
 }`;
 
 const projectFirebaserc = `{
-  \"targets\": {
-    \"pirojok-111e3\": {
-      \"hosting\": {
-        \"pie-ka-chu\": [
-          \"pirojok-111e3\"
+  "targets": {
+    "pirojok-111e3": {
+      "hosting": {
+        "pie-ka-chu": [
+          "pirojok-111e3"
         ]
       }
     },
-    \"bi-catch-you-77e7e\": {
-      \"hosting\": {
-        \"pi-catch-you\": [
-          \"bi-catch-you-77e7e\"
+    "bi-catch-you-77e7e": {
+      "hosting": {
+        "pi-catch-you": [
+          "bi-catch-you-77e7e"
         ]
       }
     }
   },
-  \"projects\": {
-    \"default\": \"bi-catch-you-77e7e\"
+  "projects": {
+    "default": "bi-catch-you-77e7e"
   }
 }`;
 
 const projectAngularJson = `{
-  \"defaultProject\": \"pie-ka-chu\",
-  \"projects\": {
-    \"pie-ka-chu\": {
-      \"projectType\": \"application\",
-      \"root\": \"pirojok\",
-      \"architect\": {
-        \"build\": {
-          \"options\": {
-            \"outputPath\": \"dist/ikachu\"
+  "defaultProject": "pie-ka-chu",
+  "projects": {
+    "pie-ka-chu": {
+      "projectType": "application",
+      "root": "pirojok",
+      "architect": {
+        "build": {
+          "options": {
+            "outputPath": "dist/ikachu"
           }
         },
-        \"deploy\": {
-          \"builder\": \"@angular/fire:deploy\",
-          \"options\": {
-            \"prerender": false,
-            \"ssr\": false,
-            \"firebaseProject\": \"pirojok-111e3\"
-          }
+        "deploy": {
+          "builder": "@angular/fire:deploy",
+          "options": {
+            "version": 2
+          },
+          "configurations": {
+            "production": {},
+            "development": {}
+          },
+          "defaultConfiguration": "production"
         }
       }
     },
-    \"pi-catch-you\": {
-      \"projectType\": \"application\",
-      \"root\": \"pirojok\",
-      \"architect\": {
-        \"build\": {
-          \"options\": {
-            \"outputPath\": \"dist/ikachu\"
+    "pi-catch-you": {
+      "projectType": "application",
+      "root": "pirojok",
+      "architect": {
+        "build": {
+          "options": {
+            "outputPath": "dist/ikachu"
           }
         },
-        \"deploy\": {
-          \"builder\": \"@angular/fire:deploy\",
-          \"options\": {
-            \"prerender\": false,
-            \"ssr\": false,
-            \"firebaseProject\": \"bi-catch-you-77e7e\"
-          }
+        "deploy": {
+          "builder": "@angular/fire:deploy",
+          "options": {
+            "version": 2
+          },
+          "configurations": {
+            "production": {},
+            "development": {}
+          },
+          "defaultConfiguration": "production"
         }
       }
     }
@@ -405,33 +304,9 @@ const projectAngularJson = `{
 const universalFirebaseJson = {
   hosting: [{
     target: 'pie-ka-chu',
-    public: 'dist/ikachu',
-    ignore: [
-      '**/.*'
-    ],
-    headers: [{
-      source: '*.[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].+(css|js)',
-      headers: [{
-        key: 'Cache-Control',
-        value: 'public,max-age=31536000,immutable'
-      }]
-    }, {
-      source: '/@(ngsw-worker.js|ngsw.json)',
-      headers: [{
-        key: 'Cache-Control',
-        value: 'no-cache',
-      }],
-    }],
-    rewrites: [
-      {
-        source: '**',
-        function: 'ssr_pie-ka-chu'
-      }
-    ]
+    source: '.',
+    frameworksBackend: {},
   }],
-  functions: {
-    source: 'dist/pie-ka-chu/functions'
-  }
 };
 
 describe('ng-add', () => {
@@ -444,114 +319,95 @@ describe('ng-add', () => {
       tree.create('package.json', JSON.stringify(generatePackageJson()));
     });
 
-    it('generates new files if starting from scratch', async () => {
-      const result = await setupProject(tree, {} as any, [FEATURES.Hosting], {
+    it('generates new files if starting from scratch', () => {
+      setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-        projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
-        prerender: false,
       });
-      expect(result.read('firebase.json').toString()).toEqual(initialFirebaseJson);
-      expect(result.read('.firebaserc').toString()).toEqual(initialFirebaserc);
-      expect(result.read('angular.json').toString()).toEqual(initialAngularJson);
+      expect(tree.read('firebase.json')?.toString()).toEqual(initialFirebaseJson);
+      expect(tree.read('.firebaserc')?.toString()).toEqual(initialFirebaserc);
+      expect(tree.read('angular.json')?.toString()).toEqual(initialAngularJson);
     });
 
-    it('uses default project', async () => {
-      const result = await setupProject(tree, {} as any, [FEATURES.Hosting], {
+    it('uses default project', () => {
+      setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-        projectType: PROJECT_TYPE.Static,
         project: undefined,
-        prerender: false,
       });
-      expect(result.read('firebase.json').toString()).toEqual(overwriteFirebaseJson);
-      expect(result.read('.firebaserc').toString()).toEqual(overwriteFirebaserc);
-      expect(result.read('angular.json').toString()).toEqual(overwriteAngularJson);
+      expect(tree.read('firebase.json')?.toString()).toEqual(overwriteFirebaseJson);
+      expect(tree.read('.firebaserc')?.toString()).toEqual(overwriteFirebaserc);
+      expect(tree.read('angular.json')?.toString()).toEqual(overwriteAngularJson);
     });
 
-    it('runs if source root is relative to workspace root', async () => {
+    it('runs if source root is relative to workspace root', () => {
       const angularJson = generateAngularJson();
       const project: {root: string, sourceRoot?: string} = angularJson.projects[PROJECT_NAME];
       project.sourceRoot = `${project.root}/src`;
       tree.overwrite('angular.json', JSON.stringify(angularJson));
-      const promise = setupProject(tree, {} as any, [FEATURES.Hosting], {
+      setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-        projectType: PROJECT_TYPE.Static,
         project: undefined,
-        prerender: false,
       });
-      await expectAsync(promise).toBeResolved();
     });
 
-    it('overrides existing files', async () => {
-      const tempTree = await setupProject(tree, {} as any, [FEATURES.Hosting], {
+    it('overrides existing files', () => {
+      setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-        projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
-        prerender: false,
       });
-      const result = await setupProject(tree, {} as any, [FEATURES.Hosting], {
+      setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: OTHER_FIREBASE_PROJECT_NAME } as any,
-        projectType: PROJECT_TYPE.Static,
         project: OTHER_PROJECT_NAME,
-        prerender: false,
       });
-      expect(result.read('firebase.json').toString()).toEqual(projectFirebaseJson);
-      expect(result.read('.firebaserc').toString()).toEqual(projectFirebaserc);
-      expect(result.read('angular.json').toString()).toEqual(projectAngularJson);
+      expect(tree.read('firebase.json')?.toString()).toEqual(projectFirebaseJson);
+      expect(tree.read('.firebaserc')?.toString()).toEqual(projectFirebaserc);
+      expect(tree.read('angular.json')?.toString()).toEqual(projectAngularJson);
     });
   });
 
   describe('error handling', () => {
-    it('fails if project not defined', async () => {
+    it('fails if project not defined', () => {
       const tree = Tree.empty();
       const angularJSON = generateAngularJson();
       delete angularJSON.defaultProject;
       tree.create('angular.json', JSON.stringify(angularJSON));
       tree.create('package.json', JSON.stringify(generatePackageJson()));
-      await expectAsync(setupProject(tree, {} as any, [FEATURES.Hosting], {
+      expect(() => setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-        projectType: PROJECT_TYPE.Static,
         project: undefined,
-        prerender: false,
-      })).toBeRejectedWith(
+      })).toThrow(
         new SchematicsException('No Angular project selected and no default project in the workspace')
       );
     });
 
-    it('Should throw if angular.json not found', async () => {
-      await expectAsync(setupProject(Tree.empty(), {} as any, [FEATURES.Hosting], {
+    it('Should throw if angular.json not found', () => {
+      expect(() => setupProject(Tree.empty(), {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-        projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
-        prerender: false,
-      })).toBeRejectedWith(new SchematicsException('Could not find angular.json'));
+      })).toThrow(new SchematicsException('Could not find angular.json'));
     });
 
-    it('Should throw if angular.json  can not be parsed', async () => {
+    it('Should throw if angular.json  can not be parsed', () => {
       const tree = Tree.empty();
       tree.create('angular.json', 'hi');
       tree.create('package.json', JSON.stringify(generatePackageJson()));
-      await expectAsync(setupProject(tree, {} as any, [FEATURES.Hosting], {
+      expect(() => setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-        projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
-        prerender: false,
-      })).toBeRejectedWith(new SchematicsException('Could not parse angular.json'));
+      })).toThrow(new SchematicsException('Could not parse angular.json'));
     });
 
-    it('Should throw if specified project does not exist ', async () => {
+    it('Should throw if specified project does not exist ', () => {
       const tree = Tree.empty();
       tree.create('angular.json', JSON.stringify({ projects: {} }));
       tree.create('package.json', JSON.stringify(generatePackageJson()));
-      await expectAsync(setupProject(tree, {} as any, [FEATURES.Hosting], {
+      expect(() => setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-        projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
-        prerender: false,
-      })).toBeRejectedWith(new SchematicsException('The specified Angular project is not defined in this workspace'));
+      })).toThrow(new SchematicsException('The specified Angular project is not defined in this workspace'));
     });
 
-    it('Should throw if specified project is not application', async () => {
+    it('Should throw if specified project is not application', () => {
       const tree = Tree.empty();
       tree.create(
         'angular.json',
@@ -560,15 +416,13 @@ describe('ng-add', () => {
         })
       );
       tree.create('package.json', JSON.stringify(generatePackageJson()));
-      await expectAsync(setupProject(tree, {} as any, [FEATURES.Hosting], {
+      expect(() => setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-        projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
-        prerender: false,
-      })).toBeRejectedWith(new SchematicsException('Deploy requires an Angular project type of "application" in angular.json'));
+      })).toThrow(new SchematicsException('Deploy requires an Angular project type of "application" in angular.json'));
     });
 
-    it('Should throw if app does not have architect configured', async () => {
+    it('Should throw if app does not have architect configured', () => {
       const tree = Tree.empty();
       tree.create(
         'angular.json',
@@ -577,13 +431,11 @@ describe('ng-add', () => {
         })
       );
       tree.create('package.json', JSON.stringify(generatePackageJson()));
-      await expectAsync(setupProject(tree, {} as any, [FEATURES.Hosting], {
+      expect(() => setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-        projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
-        prerender: false,
-      })).toBeRejectedWith(
-        new SchematicsException('Cannot read the output path (architect.build.options.outputPath) of the Angular project "pie-ka-chu" in angular.json')
+      })).toThrow(
+        new SchematicsException('Angular project "pie-ka-chu" has a malformed angular.json')
       );
     });
 
@@ -619,18 +471,18 @@ describe('ng-add', () => {
       ).toThrowError(/firebase.json: Unexpected token/);
     });*/
 
-    it('Should throw if .firebaserc is broken', async () => {
+    it('Should throw if .firebaserc is broken', () => {
       const tree = Tree.empty();
       tree.create('angular.json', JSON.stringify(generateAngularJson()));
       tree.create('package.json', JSON.stringify(generatePackageJson()));
       tree.create('.firebaserc', `I'm broken 😔`);
-      await expectAsync(setupProject(tree, {} as any, [FEATURES.Hosting], {
+      expect(() => setupProject(tree, {} as any, [FEATURES.Hosting], {
         firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-        projectType: PROJECT_TYPE.Static,
         project: PROJECT_NAME,
-        prerender: false,
-      })).toBeRejectedWith(
-        new SchematicsException('Error when parsing .firebaserc: Unexpected token I in JSON at position 0')
+      })).toThrow(
+        parseInt(process.versions.node, 10) >= 20 ?
+          new SchematicsException(`Error when parsing .firebaserc: Unexpected token 'I', "I'm broken 😔" is not valid JSON`) :
+          new SchematicsException('Error when parsing .firebaserc: Unexpected token I in JSON at position 0')
       );
     });
 
@@ -674,52 +526,36 @@ describe('ng-add', () => {
     }); */
 
     describe('universal app', () => {
-      it('should fail without a server project', async () => {
-        const tree = Tree.empty();
-        tree.create('angular.json', JSON.stringify(generateAngularJson()));
-        tree.create('package.json', JSON.stringify(generatePackageJson()));
 
-        await expectAsync(setupProject(tree, {} as any, [FEATURES.Hosting], {
-          firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-          projectType: PROJECT_TYPE.CloudFunctions,
-          project: PROJECT_NAME,
-          prerender: false,
-        })).toBeRejectedWith(
-          new SchematicsException('Cannot read the output path (architect.server.options.outputPath) of the Angular project "pie-ka-chu" in angular.json')
-        );
-      });
-
-      it('should add a @angular/fire builder', async () => {
+      it('should add a @angular/fire builder', () => {
         const tree = Tree.empty();
         tree.create('angular.json', JSON.stringify(generateAngularJsonWithServer()));
         tree.create('package.json', JSON.stringify(generatePackageJson()));
 
         // TODO mock addTask
-        const result = await setupProject(tree, {addTask: () => {}} as any, [FEATURES.Hosting], {
+        setupProject(tree, {addTask: () => undefined} as any, [FEATURES.Hosting], {
           firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-          projectType: PROJECT_TYPE.CloudFunctions,
           project: PROJECT_NAME,
-          prerender: false,
         });
 
-        const workspace = JSON.parse((await result.read('angular.json')).toString());
-        expect(workspace.projects['pie-ka-chu'].architect.deploy.options.ssr).toEqual('cloud-functions');
+        const angularJSON = tree.read('angular.json')?.toString();
+        const workspace = angularJSON && JSON.parse(angularJSON);
+        expect(workspace?.projects['pie-ka-chu']?.architect?.deploy).toBeTruthy();
       });
 
-      it('should configure firebase.json', async () => {
+      it('should configure firebase.json', () => {
         const tree = Tree.empty();
         tree.create('angular.json', JSON.stringify(generateAngularJsonWithServer()));
         tree.create('package.json', JSON.stringify(generatePackageJson()));
 
         // TODO mock addTask
-        const result = await setupProject(tree, {addTask: () => {}} as any, [FEATURES.Hosting], {
+        setupProject(tree, {addTask: () => undefined} as any, [FEATURES.Hosting], {
           firebaseProject: { projectId: FIREBASE_PROJECT } as any,
-          projectType: PROJECT_TYPE.CloudFunctions,
           project: PROJECT_NAME,
-          prerender: false,
         });
 
-        const firebaseJson = JSON.parse((await result.read('firebase.json')).toString());
+        const firebaseJsonData= tree.read('firebase.json')?.toString();
+        const firebaseJson = firebaseJsonData && JSON.parse(firebaseJsonData);
         expect(firebaseJson).toEqual(universalFirebaseJson);
       });
     });

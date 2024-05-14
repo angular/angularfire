@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
-import { Observable, of, pipe, UnaryFunction } from 'rxjs';
-import { map, switchMap, take } from 'rxjs/operators';
-import firebase from 'firebase/compat/app';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
+import firebase from 'firebase/compat/app';
+import { Observable, UnaryFunction, of, pipe } from 'rxjs';
+import { map, switchMap, take } from 'rxjs/operators';
 
 export type AuthPipeGenerator = (next: ActivatedRouteSnapshot, state: RouterStateSnapshot) => AuthPipe;
 export type AuthPipe = UnaryFunction<Observable<firebase.User|null>, Observable<boolean|string|any[]>>;
@@ -47,6 +47,7 @@ export const idTokenResult = switchMap((user: firebase.User|null) => user ? user
 export const emailVerified: AuthPipe = map(user => !!user && user.emailVerified);
 export const customClaims = pipe(idTokenResult, map(idTokenResult => idTokenResult ? idTokenResult.claims : []));
 export const hasCustomClaim: (claim: string) => AuthPipe =
+  // eslint-disable-next-line no-prototype-builtins
   (claim) => pipe(customClaims, map(claims =>  claims.hasOwnProperty(claim)));
 export const redirectUnauthorizedTo: (redirect: string|any[]) => AuthPipe =
   (redirect) => pipe(loggedIn, map(loggedIn => loggedIn || redirect));

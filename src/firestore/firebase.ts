@@ -3,22 +3,32 @@ export * from 'firebase/firestore';
 import { ɵzoneWrap } from '@angular/fire';
 import {
   addDoc as _addDoc,
+  aggregateFieldEqual as _aggregateFieldEqual,
+  aggregateQuerySnapshotEqual as _aggregateQuerySnapshotEqual,
+  and as _and,
   arrayRemove as _arrayRemove,
   arrayUnion as _arrayUnion,
+  average as _average,
   clearIndexedDbPersistence as _clearIndexedDbPersistence,
   collection as _collection,
   collectionGroup as _collectionGroup,
   connectFirestoreEmulator as _connectFirestoreEmulator,
+  count as _count,
+  deleteAllPersistentCacheIndexes as _deleteAllPersistentCacheIndexes,
   deleteDoc as _deleteDoc,
   deleteField as _deleteField,
   disableNetwork as _disableNetwork,
+  disablePersistentCacheIndexAutoCreation as _disablePersistentCacheIndexAutoCreation,
   doc as _doc,
   documentId as _documentId,
   enableIndexedDbPersistence as _enableIndexedDbPersistence,
   enableMultiTabIndexedDbPersistence as _enableMultiTabIndexedDbPersistence,
   enableNetwork as _enableNetwork,
+  enablePersistentCacheIndexAutoCreation as _enablePersistentCacheIndexAutoCreation,
   endAt as _endAt,
   endBefore as _endBefore,
+  getAggregateFromServer as _getAggregateFromServer,
+  getCountFromServer as _getCountFromServer,
   getDoc as _getDoc,
   getDocFromCache as _getDocFromCache,
   getDocFromServer as _getDocFromServer,
@@ -26,25 +36,35 @@ import {
   getDocsFromCache as _getDocsFromCache,
   getDocsFromServer as _getDocsFromServer,
   getFirestore as _getFirestore,
+  getPersistentCacheIndexManager as _getPersistentCacheIndexManager,
   increment as _increment,
   initializeFirestore as _initializeFirestore,
   limit as _limit,
   limitToLast as _limitToLast,
   loadBundle as _loadBundle,
+  memoryEagerGarbageCollector as _memoryEagerGarbageCollector,
+  memoryLocalCache as _memoryLocalCache,
+  memoryLruGarbageCollector as _memoryLruGarbageCollector,
   namedQuery as _namedQuery,
   onSnapshot as _onSnapshot,
   onSnapshotsInSync as _onSnapshotsInSync,
+  or as _or,
   orderBy as _orderBy,
+  persistentLocalCache as _persistentLocalCache,
+  persistentMultipleTabManager as _persistentMultipleTabManager,
+  persistentSingleTabManager as _persistentSingleTabManager,
   query as _query,
   queryEqual as _queryEqual,
   refEqual as _refEqual,
   runTransaction as _runTransaction,
   serverTimestamp as _serverTimestamp,
   setDoc as _setDoc,
+  setIndexConfiguration as _setIndexConfiguration,
   setLogLevel as _setLogLevel,
   snapshotEqual as _snapshotEqual,
   startAfter as _startAfter,
   startAt as _startAt,
+  sum as _sum,
   terminate as _terminate,
   updateDoc as _updateDoc,
   waitForPendingWrites as _waitForPendingWrites,
@@ -53,22 +73,32 @@ import {
 } from 'firebase/firestore';
 
 export const addDoc = ɵzoneWrap(_addDoc, true);
+export const aggregateFieldEqual = ɵzoneWrap(_aggregateFieldEqual, true);
+export const aggregateQuerySnapshotEqual = ɵzoneWrap(_aggregateQuerySnapshotEqual, true);
+export const and = ɵzoneWrap(_and, true);
 export const arrayRemove = ɵzoneWrap(_arrayRemove, true);
 export const arrayUnion = ɵzoneWrap(_arrayUnion, true);
+export const average = ɵzoneWrap(_average, true);
 export const clearIndexedDbPersistence = ɵzoneWrap(_clearIndexedDbPersistence, true);
 export const collection = ɵzoneWrap(_collection, true);
 export const collectionGroup = ɵzoneWrap(_collectionGroup, true);
 export const connectFirestoreEmulator = ɵzoneWrap(_connectFirestoreEmulator, true);
+export const count = ɵzoneWrap(_count, true);
+export const deleteAllPersistentCacheIndexes = ɵzoneWrap(_deleteAllPersistentCacheIndexes, true);
 export const deleteDoc = ɵzoneWrap(_deleteDoc, true);
 export const deleteField = ɵzoneWrap(_deleteField, true);
 export const disableNetwork = ɵzoneWrap(_disableNetwork, true);
+export const disablePersistentCacheIndexAutoCreation = ɵzoneWrap(_disablePersistentCacheIndexAutoCreation, true);
 export const doc = ɵzoneWrap(_doc, true);
 export const documentId = ɵzoneWrap(_documentId, true);
 export const enableIndexedDbPersistence = ɵzoneWrap(_enableIndexedDbPersistence, true);
 export const enableMultiTabIndexedDbPersistence = ɵzoneWrap(_enableMultiTabIndexedDbPersistence, true);
 export const enableNetwork = ɵzoneWrap(_enableNetwork, true);
+export const enablePersistentCacheIndexAutoCreation = ɵzoneWrap(_enablePersistentCacheIndexAutoCreation, true);
 export const endAt = ɵzoneWrap(_endAt, true);
 export const endBefore = ɵzoneWrap(_endBefore, true);
+export const getAggregateFromServer = ɵzoneWrap(_getAggregateFromServer, true);
+export const getCountFromServer = ɵzoneWrap(_getCountFromServer, true);
 export const getDoc = ɵzoneWrap(_getDoc, true);
 export const getDocFromCache = ɵzoneWrap(_getDocFromCache, true);
 export const getDocFromServer = ɵzoneWrap(_getDocFromServer, true);
@@ -76,25 +106,35 @@ export const getDocs = ɵzoneWrap(_getDocs, true);
 export const getDocsFromCache = ɵzoneWrap(_getDocsFromCache, true);
 export const getDocsFromServer = ɵzoneWrap(_getDocsFromServer, true);
 export const getFirestore = ɵzoneWrap(_getFirestore, true);
+export const getPersistentCacheIndexManager = ɵzoneWrap(_getPersistentCacheIndexManager, true);
 export const increment = ɵzoneWrap(_increment, true);
 export const initializeFirestore = ɵzoneWrap(_initializeFirestore, true);
 export const limit = ɵzoneWrap(_limit, true);
 export const limitToLast = ɵzoneWrap(_limitToLast, true);
 export const loadBundle = ɵzoneWrap(_loadBundle, true);
+export const memoryEagerGarbageCollector = ɵzoneWrap(_memoryEagerGarbageCollector, true);
+export const memoryLocalCache = ɵzoneWrap(_memoryLocalCache, true);
+export const memoryLruGarbageCollector = ɵzoneWrap(_memoryLruGarbageCollector, true);
 export const namedQuery = ɵzoneWrap(_namedQuery, true);
 export const onSnapshot = ɵzoneWrap(_onSnapshot, true);
 export const onSnapshotsInSync = ɵzoneWrap(_onSnapshotsInSync, true);
+export const or = ɵzoneWrap(_or, true);
 export const orderBy = ɵzoneWrap(_orderBy, true);
+export const persistentLocalCache = ɵzoneWrap(_persistentLocalCache, true);
+export const persistentMultipleTabManager = ɵzoneWrap(_persistentMultipleTabManager, true);
+export const persistentSingleTabManager = ɵzoneWrap(_persistentSingleTabManager, true);
 export const query = ɵzoneWrap(_query, true);
 export const queryEqual = ɵzoneWrap(_queryEqual, true);
 export const refEqual = ɵzoneWrap(_refEqual, true);
 export const runTransaction = ɵzoneWrap(_runTransaction, true);
 export const serverTimestamp = ɵzoneWrap(_serverTimestamp, true);
 export const setDoc = ɵzoneWrap(_setDoc, true);
+export const setIndexConfiguration = ɵzoneWrap(_setIndexConfiguration, true);
 export const setLogLevel = ɵzoneWrap(_setLogLevel, true);
 export const snapshotEqual = ɵzoneWrap(_snapshotEqual, true);
 export const startAfter = ɵzoneWrap(_startAfter, true);
 export const startAt = ɵzoneWrap(_startAt, true);
+export const sum = ɵzoneWrap(_sum, true);
 export const terminate = ɵzoneWrap(_terminate, true);
 export const updateDoc = ɵzoneWrap(_updateDoc, true);
 export const waitForPendingWrites = ɵzoneWrap(_waitForPendingWrites, true);

@@ -1,17 +1,17 @@
-import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, PLATFORM_ID, Injector } from '@angular/core';
-import { FirebasePerformance } from 'firebase/performance';
-import { ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
-import { Performance, PerformanceInstances, PERFORMANCE_PROVIDER_NAME } from './performance';
-import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
-import { registerVersion } from 'firebase/app';
 import { isPlatformBrowser } from '@angular/common';
+import { InjectionToken, Injector, ModuleWithProviders, NgModule, NgZone, Optional, PLATFORM_ID } from '@angular/core';
+import { VERSION, ɵAngularFireSchedulers, ɵgetDefaultInstanceOf } from '@angular/fire';
+import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
+import { registerVersion } from 'firebase/app';
+import { FirebasePerformance } from 'firebase/performance';
+import { PERFORMANCE_PROVIDER_NAME, Performance, PerformanceInstances } from './performance';
 
 export const PROVIDED_PERFORMANCE_INSTANCES = new InjectionToken<Performance[]>('angularfire2.performance-instances');
 
 export function defaultPerformanceInstanceFactory(
   provided: FirebasePerformance[]|undefined,
   defaultApp: FirebaseApp,
-  // tslint:disable-next-line:ban-types
+  // eslint-disable-next-line @typescript-eslint/ban-types
   platform: Object
 ) {
   if (!isPlatformBrowser(platform)) { return null; }
@@ -20,7 +20,7 @@ export function defaultPerformanceInstanceFactory(
 }
 
 export function performanceInstanceFactory(fn: (injector: Injector) => FirebasePerformance) {
-  // tslint:disable-next-line:ban-types
+  // eslint-disable-next-line @typescript-eslint/ban-types
   return (zone: NgZone, platform: Object, injector: Injector) => {
     if (!isPlatformBrowser(platform)) { return null; }
     const performance = zone.runOutsideAngular(() => fn(injector));

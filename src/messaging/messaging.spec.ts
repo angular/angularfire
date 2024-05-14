@@ -1,11 +1,10 @@
 import { TestBed } from '@angular/core/testing';
-import { FirebaseApp, provideFirebaseApp, getApp, initializeApp, deleteApp } from '@angular/fire/app';
-import { Messaging, provideMessaging, getMessaging, isSupported } from '@angular/fire/messaging';
+import { getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { Messaging, getMessaging, isSupported, provideMessaging } from '@angular/fire/messaging';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../utils';
 
 describe('Messaging', () => {
-  let app: FirebaseApp;
   let messaging: Messaging;
   let providedMessaging: Messaging;
   let appName: string;
@@ -31,13 +30,21 @@ describe('Messaging', () => {
                 }),
             ],
         });
-        app = TestBed.inject(FirebaseApp);
         messaging = TestBed.inject(Messaging);
     });
 
-    it('should be injectable', () => {
-        expect(providedMessaging).toBeTruthy();
-        expect(messaging).toEqual(providedMessaging);
+    it('should be injectable', done => {
+      (async () => {
+        const supported = await isSupported();
+        if (supported) {
+          expect(providedMessaging).toBeTruthy();
+          expect(messaging).toEqual(providedMessaging);
+        } else {
+          expect(providedMessaging).toBeUndefined();
+          expect(messaging).toBeNull();
+        }
+        done();
+      })();
     });
 
   });

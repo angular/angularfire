@@ -3,17 +3,24 @@ export * from 'firebase/firestore/lite';
 import { ɵzoneWrap } from '@angular/fire';
 import {
   addDoc as _addDoc,
+  aggregateFieldEqual as _aggregateFieldEqual,
+  aggregateQuerySnapshotEqual as _aggregateQuerySnapshotEqual,
+  and as _and,
   arrayRemove as _arrayRemove,
   arrayUnion as _arrayUnion,
+  average as _average,
   collection as _collection,
   collectionGroup as _collectionGroup,
   connectFirestoreEmulator as _connectFirestoreEmulator,
+  count as _count,
   deleteDoc as _deleteDoc,
   deleteField as _deleteField,
   doc as _doc,
   documentId as _documentId,
   endAt as _endAt,
   endBefore as _endBefore,
+  getAggregate as _getAggregate,
+  getCount as _getCount,
   getDoc as _getDoc,
   getDocs as _getDocs,
   getFirestore as _getFirestore,
@@ -21,6 +28,7 @@ import {
   initializeFirestore as _initializeFirestore,
   limit as _limit,
   limitToLast as _limitToLast,
+  or as _or,
   orderBy as _orderBy,
   query as _query,
   queryEqual as _queryEqual,
@@ -32,6 +40,7 @@ import {
   snapshotEqual as _snapshotEqual,
   startAfter as _startAfter,
   startAt as _startAt,
+  sum as _sum,
   terminate as _terminate,
   updateDoc as _updateDoc,
   where as _where,
@@ -39,17 +48,24 @@ import {
 } from 'firebase/firestore/lite';
 
 export const addDoc = ɵzoneWrap(_addDoc, true);
+export const aggregateFieldEqual = ɵzoneWrap(_aggregateFieldEqual, true);
+export const aggregateQuerySnapshotEqual = ɵzoneWrap(_aggregateQuerySnapshotEqual, true);
+export const and = ɵzoneWrap(_and, true);
 export const arrayRemove = ɵzoneWrap(_arrayRemove, true);
 export const arrayUnion = ɵzoneWrap(_arrayUnion, true);
+export const average = ɵzoneWrap(_average, true);
 export const collection = ɵzoneWrap(_collection, true);
 export const collectionGroup = ɵzoneWrap(_collectionGroup, true);
 export const connectFirestoreEmulator = ɵzoneWrap(_connectFirestoreEmulator, true);
+export const count = ɵzoneWrap(_count, true);
 export const deleteDoc = ɵzoneWrap(_deleteDoc, true);
 export const deleteField = ɵzoneWrap(_deleteField, true);
 export const doc = ɵzoneWrap(_doc, true);
 export const documentId = ɵzoneWrap(_documentId, true);
 export const endAt = ɵzoneWrap(_endAt, true);
 export const endBefore = ɵzoneWrap(_endBefore, true);
+export const getAggregate = ɵzoneWrap(_getAggregate, true);
+export const getCount = ɵzoneWrap(_getCount, true);
 export const getDoc = ɵzoneWrap(_getDoc, true);
 export const getDocs = ɵzoneWrap(_getDocs, true);
 export const getFirestore = ɵzoneWrap(_getFirestore, true);
@@ -57,6 +73,7 @@ export const increment = ɵzoneWrap(_increment, true);
 export const initializeFirestore = ɵzoneWrap(_initializeFirestore, true);
 export const limit = ɵzoneWrap(_limit, true);
 export const limitToLast = ɵzoneWrap(_limitToLast, true);
+export const or = ɵzoneWrap(_or, true);
 export const orderBy = ɵzoneWrap(_orderBy, true);
 export const query = ɵzoneWrap(_query, true);
 export const queryEqual = ɵzoneWrap(_queryEqual, true);
@@ -68,6 +85,7 @@ export const setLogLevel = ɵzoneWrap(_setLogLevel, true);
 export const snapshotEqual = ɵzoneWrap(_snapshotEqual, true);
 export const startAfter = ɵzoneWrap(_startAfter, true);
 export const startAt = ɵzoneWrap(_startAt, true);
+export const sum = ɵzoneWrap(_sum, true);
 export const terminate = ɵzoneWrap(_terminate, true);
 export const updateDoc = ɵzoneWrap(_updateDoc, true);
 export const where = ɵzoneWrap(_where, true);
