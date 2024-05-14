@@ -46,12 +46,8 @@ export class PerformanceComponent {
 
 ## Firebase API
 
-The [Performance documentation](https://firebase.google.com/docs/reference/js/performance.md#performance_package) is available on the Firebase website.
+AngularFire wraps the Firebase JS SDK to ensure proper functionality in Angular, while providing the same API.
 
-## Services
+Update the imports from `import { ... } from 'firebase/performance'` to `import { ... } from '@angular/fire/performance'` and follow the official documentation.
 
-Coming soon.
-
-## Convenience observables
-
-Coming soon.
+[Getting Started](https://firebase.google.com/docs/perf-mon/get-started-web) | [API Reference](https://firebase.google.com/docs/reference/js/performance)

@@ -54,14 +54,8 @@ export class UserProfileComponent {
 
 ## Firebase API
 
-The [Firebase API for Google Analytics documentation](https://firebase.google.com/docs/reference/js/analytics.md#analytics_package) is available on the Firebase website.
+AngularFire wraps the Firebase JS SDK to ensure proper functionality in Angular, while providing the same API.
 
-## Services
+Update the imports from `import { ... } from 'firebase/analytics'` to `import { ... } from '@angular/fire/analytics'` and follow the official documentation.
 
-### ScreenTrackingService
-
-Coming soon, for now [please review the documentation](https://firebase.google.com/docs/analytics/screenviews)
-
-### UserTrackingService
-Coming soon
-
+[Getting Started](https://firebase.google.com/docs/analytics/get-started?platform=web) | [API Reference](https://firebase.google.com/docs/reference/js/analytics)
