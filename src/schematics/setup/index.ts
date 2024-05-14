@@ -5,7 +5,7 @@ import { SchematicContext, Tree, chain } from '@angular-devkit/schematics';
 import { addRootProvider } from '@schematics/angular/utility';
 import { getFirebaseTools } from '../firebaseTools';
 import {
-  DeployOptions, FEATURES, FirebaseApp, FirebaseHostingSite, FirebaseProject,
+  DeployOptions, FEATURES, FirebaseApp, FirebaseProject,
 } from '../interfaces';
 import {
   addIgnoreFiles,
@@ -18,12 +18,7 @@ import { appPrompt, featuresPrompt, projectPrompt, userPrompt } from './prompts'
 export interface SetupConfig extends DeployOptions {
   firebaseProject: FirebaseProject,
   firebaseApp?: FirebaseApp,
-  firebaseHostingSite?: FirebaseHostingSite,
   sdkConfig?: Record<string, string>,
-  buildTarget?: [string, string],
-  serveTarget?: [string, string],
-  project?: string,
-  ssrRegion?: string,
 }
 
 export const setupProject =
