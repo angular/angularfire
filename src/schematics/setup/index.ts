@@ -2,7 +2,7 @@ import { writeFileSync } from 'fs';
 import { join } from 'path';
 import { asWindowsPath, normalize } from '@angular-devkit/core';
 import { SchematicContext, SchematicsException, Tree, chain } from '@angular-devkit/schematics';
-import { addRootImport } from '@schematics/angular/utility';
+import { addRootProvider } from '@schematics/angular/utility';
 import {
   generateFirebaseRc,
   overwriteIfExists,
@@ -64,7 +64,7 @@ export const setupProject =
     const featuresToImport = features.filter(it => it !== FEATURES.Hosting);
     if (featuresToImport.length > 0) {
       return chain([
-        addRootImport(projectName, ({code, external}) => {
+        addRootProvider(projectName, ({code, external}) => {
           external('initializeApp', '@angular/fire/app');
           return code`${external('provideFirebaseApp', '@angular/fire/app')}(() => initializeApp(${JSON.stringify(config.sdkConfig)}))`;
         }),
