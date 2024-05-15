@@ -190,4 +190,16 @@ import { } from '@angular/fire/app-check';
 ```
 </td>
   </tr>
+  <tr>
+    <td>
+
+#### [Vertex AI](docs/vertexai.md#vertex-ai-preview)
+```ts
+import { } from '@angular/fire/vertexai-preview';
+```
+</td>
+    <td>
+
+    </td>
+  </tr>
 </table>
