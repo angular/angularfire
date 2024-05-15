@@ -11,28 +11,31 @@ App Check helps protect your API resources from abuse by preventing unauthorized
 [Learn More](https://firebase.google.com/docs/app-check)
 
 ## Dependency Injection
+
 As a prerequisite, ensure that `AngularFire` has been added to your project via
 ```bash
 ng add @angular/fire
 ```
 
-Provide an App Check instance and configuration in the application's `NgModule` (`app.module.ts`):
+Provide a App Check instance in the application's `app.config.ts`:
 
 ```ts
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { provideAppCheck } from '@angular/fire/app-check';
+import { provideAppCheck, initializeAppCheck, ReCaptchaV3Provider } from '@angular/fire/app-check';
 
-@NgModule({
-  imports: [
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideFirebaseApp(() => initializeApp({ ... })),
     provideAppCheck(() => initializeAppCheck(getApp(), {
         provider: new ReCaptchaV3Provider(/* configuration */),
-      })),
-  ]
+    })),
+    ...
+  ],
+  ...
 })
 ```
 
-Next inject it into your component:
+Next inject `AppCheck` it into your component:
 
 ```ts
 import { Component, inject} from '@angular/core';
@@ -40,7 +43,7 @@ import { AppCheck } from '@angular/fire/app-check';
 
 @Component({ ... })
 export class AppCheckComponent {
-  private appCheck: AppCheck = inject(AppCheck);
+  private appCheck = inject(AppCheck);
   ...
 }
 ```

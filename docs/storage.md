@@ -19,21 +19,23 @@ As a prerequisite, ensure that `AngularFire` has been added to your project via
 ng add @angular/fire
 ```
 
-Provide a Firebase Storage instance in the application's `NgModule` (`app.module.ts`):
+Provide a Cloud Storage instance in the application's `app.config.ts`:
 
 ```ts
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { getStorage, provideStorage } from '@angular/fire/storage';
+import { provideStorage, getStorage } from '@angular/fire/storage';
 
-@NgModule({
-  imports: [
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideFirebaseApp(() => initializeApp({ ... })),
     provideStorage(() => getStorage()),
-  ]
+    ...
+  ],
+  ...
 })
 ```
 
-Next inject it into your component:
+Next inject `Storage` into your component:
 
 ```ts
 import { Component, inject} from '@angular/core';
@@ -41,11 +43,10 @@ import { Storage } from '@angular/fire/storage';
 
 @Component({ ... })
 export class StorageComponent {
-  private storage: Storage = inject(Storage);
+  private storage = inject(Storage);
   ...
 }
 ```
-
 
 ## Firebase API
 

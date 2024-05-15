@@ -17,21 +17,23 @@ As a prerequisite, ensure that `AngularFire` has been added to your project via
 ng add @angular/fire
 ```
 
-Provide a Cloud Functions instance in the application's `NgModule` (`app.module.ts`):
+Provide a Cloud Functions instance in the application's `app.config.ts`:
 
 ```ts
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { getFunctions, provideFunctions } from '@angular/fire/functions';
+import { provideFunctions, getFunctions } from '@angular/fire/functions';
 
-@NgModule({
-  imports: [
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideFirebaseApp(() => initializeApp({ ... })),
     provideFunctions(() => getFunctions()),
-  ]
+    ...
+  ],
+  ...
 })
 ```
 
-Next inject it into your component:
+Next inject `Functions` into your component:
 
 ```ts
 import { Component, inject} from '@angular/core';
@@ -39,7 +41,7 @@ import { Functions } from '@angular/fire/functions';
 
 @Component({ ... })
 export class AppComponent {
-  private functions: Functions = inject(Functions);
+  private functions = inject(Functions);
   ...
 }
 ```

@@ -9,6 +9,7 @@
 Google Analytics is an app measurement solution, available at no charge, that provides insight on app usage and user engagement.
 
 [Learn more](https://firebase.google.com/docs/analytics)
+
 ## Dependency Injection
 
 As a prerequisite, ensure that `AngularFire` has been added to your project via
@@ -16,38 +17,31 @@ As a prerequisite, ensure that `AngularFire` has been added to your project via
 ng add @angular/fire
 ```
 
-Provide a Google Analytics instance in the application's `NgModule` (`app.module.ts`):
+Provide a Analytics instance in the application's `app.config.ts`:
 
 ```ts
-@NgModule({
-  declarations: [
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { provideAnalytics, getAnalytics } from '@angular/fire/analytics';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideFirebaseApp(() => initializeApp({ ... })),
+    provideAnalytics(() => getAnalytics()),
     ...
   ],
-  imports: [
-    ...
-    // App initialization
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideAnalytics(() => getAnalytics())
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
-})
-export class AppModule { }
+  ...,
+}
 ```
 
-In your component class, for example `user-profile.component.ts` import and inject `Firestore`:
+Next inject `Analytics` into your component:
 
 ```typescript
 import { Component, inject } from '@angular/core';
 import { Analytics } from '@angular/fire/analytics';
 
-@Component({
-    standalone: true,
-    selector: 'app-user-profile',
-    ...
-})
+@Component({ ... })
 export class UserProfileComponent {
-    private analytics: Analytics = inject(Analytics);
+    private analytics = inject(Analytics);
     ...
 }
 ```

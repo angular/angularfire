@@ -17,21 +17,23 @@ As a prerequisite, ensure that `AngularFire` has been added to your project via
 ng add @angular/fire
 ```
 
-Provide a Performance instance and configuration in the application's `NgModule` (`app.module.ts`):
+Provide a Performance instance in the application's `app.config.ts`:
 
 ```ts
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { getPerformance, providePerformance} from '@angular/fire/performance';
+import { providePerformance, getPerformance } from '@angular/fire/performance';
 
-@NgModule({
-  imports: [
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideFirebaseApp(() => initializeApp({ ... })),
     providePerformance(() => getPerformance()),
-  ]
+    ...
+  ],
+  ...
 })
 ```
 
-Next inject it into your component:
+Next inject `Performance` into your component:
 
 ```ts
 import { Component, inject} from '@angular/core';
@@ -39,7 +41,7 @@ import { Performance } from '@angular/fire/performance';
 
 @Component({ ... })
 export class PerformanceComponent {
-  private performance: Performance = inject(Performance);
+  private performance = inject(Performance);
   ...
 }
 ```
