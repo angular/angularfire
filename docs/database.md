@@ -17,32 +17,32 @@ As a prerequisite, ensure that `AngularFire` has been added to your project via
 ng add @angular/fire
 ```
 
-Provide an RTBD instance in the application's `NgModule` (`app.module.ts`):
+Provide a Database instance in the application's `app.config.ts`:
 
 ```ts
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { getDatabase, provideDatabase } from '@angular/fire/database';
+import { provideDatabase, getDatabase } from '@angular/fire/database';
 
-@NgModule({
-  imports: [
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideFirebaseApp(() => initializeApp({ ... })),
     provideDatabase(() => getDatabase()),
-  ]
+    ...
+  ],
+  ...
 })
 ```
 
-Next inject it into your component:
+Next inject `Database` into your component:
 
 ```ts
 import { Component, inject } from '@angular/core';
 import { Database } from '@angular/fire/database';
 
 @Component({...})
-extend class DepartmentComponent {
-  private database: Database = inject(Database);
-
-  constructor() {
-  }
+export class DepartmentComponent {
+  private database = inject(Database);
+  ...
 }
 ```
 

@@ -8,18 +8,40 @@
 
 Firebase FCM allows you to register devices with unique FCM tokens, that you can later programtically send notifications to using Firebase Cloud Functions. It is up to the application to update these tokens in Firebase if you want to use them in other layers of your application, i.e send a notification to all administrators, etc. In that case, you would likely want to store your fcm tokens on your user collection, or a sub collection or another collection with different permissions.
 
-# Provide Messaging to your existing application
+## Dependency Injection
 
+As a prerequisite, ensure that `AngularFire` has been added to your project via
+```bash
+ng add @angular/fire
 ```
-import { getMessaging, provideMessaging } from "@angular/fire/messaging";
 
-bootstrapApplication(AppComponent, {
+Provide a Cloud Messaging instance in the application's `app.config.ts`:
+
+```ts
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { provideMessaging, getMessaging } from '@angular/fire/messaging';
+
+export const appConfig: ApplicationConfig = {
   providers: [
-	  ...,
-      provideMessaging(() => getMessaging())
-    ),
+    provideFirebaseApp(() => initializeApp({ ... })),
+    provideMessaging(() => getMessaging()),
+    ...
   ],
-});
+  ...
+})
+```
+
+Next inject `Messaging` into your component:
+
+```ts
+import { Component, inject} from '@angular/core';
+import { Messaging } from '@angular/fire/messaging';
+
+@Component({ ... })
+export class AppComponent {
+  private messaging = inject(Messaging);
+  ...
+}
 ```
 
 # Create a Firebase Messaging Service Worker 

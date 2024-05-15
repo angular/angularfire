@@ -20,21 +20,23 @@ As a prerequisite, ensure that `AngularFire` has been added to your project via
 ng add @angular/fire
 ```
 
-Provide an auth instance in the application's `NgModule` (`app.module.ts`):
+Provide a Auth instance in the application's `app.config.ts`:
 
 ```ts
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { getAuth, provideAuth } from '@angular/fire/auth';
+import { provideAuth, getAuth } from '@angular/fire/auth';
 
-@NgModule({
-  imports: [
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideFirebaseApp(() => initializeApp({ ... })),
     provideAuth(() => getAuth()),
-  ]
+    ...
+  ],
+  ...
 })
 ```
 
-Next inject it into your component:
+Next inject `Auth` into your component:
 
 ```ts
 import { Component, inject} from '@angular/core';
@@ -42,7 +44,7 @@ import { Auth } from '@angular/fire/auth';
 
 @Component({ ... })
 export class LoginComponent {
-  private auth: Auth = inject(Auth);
+  private auth = inject(Auth);
   ...
 }
 ```
@@ -51,7 +53,7 @@ export class LoginComponent {
 
 AngularFire wraps the Firebase JS SDK to ensure proper functionality in Angular, while providing the same API.
 
-Update the imports from `import { ... } from 'firebase/auth'` to `import { ... } from '@angular/fire/auth'` and follow the offical documentation.
+Update the imports from `import { ... } from 'firebase/auth'` to `import { ... } from '@angular/fire/auth'` and follow the official documentation.
 
 [Getting Started](https://firebase.google.com/docs/auth/web/start) | [API Reference](https://firebase.google.com/docs/reference/js/auth)
 

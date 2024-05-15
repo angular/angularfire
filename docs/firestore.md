@@ -18,39 +18,31 @@ As a prerequisite, ensure that `AngularFire` has been added to your project via
 ```bash
 ng add @angular/fire
 ```
-Provide a Firestore instance in the application's `NgModule` (`app.module.ts`):
+Provide a Firestore instance in the application's `app.config.ts`:
 
-```typescript
-@NgModule({
-  declarations: [
+```ts
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { provideFirestore, getFirestore } from '@angular/fire/firestore';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideFirebaseApp(() => initializeApp({ ... })),
+    provideFirestore(() => getFirestore()),
     ...
   ],
-  imports: [
-    ...
-    // App initialization
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideFirestore(() => getFirestore())
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
-})
-export class AppModule { }
+  ...
+}
 ```
 
-
-In your component class, for example `user-profile.component.ts` import and inject `Firestore`:
+Next inject `Firestore` into your component:
 
 ```typescript
 import { Component, inject } from '@angular/core';
 import { Firestore } from '@angular/fire/firestore';
 
-@Component({
-    standalone: true,
-    selector: 'app-user-profile',
-    ...
-})
+@Component({ ... })
 export class UserProfileComponent {
-    private firestore: Firestore = inject(Firestore);
+    private firestore = inject(Firestore);
     ...
 }
 ```
