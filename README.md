@@ -198,8 +198,6 @@ import { } from '@angular/fire/app-check';
 import { } from '@angular/fire/vertexai-preview';
 ```
 </td>
-    <td>
 
-    </td>
   </tr>
 </table>
