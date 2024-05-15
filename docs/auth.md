@@ -57,6 +57,39 @@ Update the imports from `import { ... } from 'firebase/auth'` to `import { ... }
 
 [Getting Started](https://firebase.google.com/docs/auth/web/start) | [API Reference](https://firebase.google.com/docs/reference/js/auth)
 
+## Server-side Rendering
+
+To support Auth context in server-side rendering, you can provide `FirebaseServerApp`:
+
+```ts
+import { ApplicationConfig, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { provideFirebaseApp, initializeApp, initializeServeApp, initializeServerApp } from '@angular/fire/app';
+import { provideAuth, getAuth } from '@angular/fire/auth';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideFirebaseApp(() => {
+      if (isPlatformBrowser(inject(PLATFORM_ID))) {
+        return initializeApp(firebaseConfig);
+      }
+      // Optional, since it's null in dev-mode and SSG
+      const request = inject(REQUEST, { optional: true });
+      const authIdToken = request?.headers.authorization?.split("Bearer ")[1];
+      return initializeServerApp(firebaseConfig, {
+        authIdToken,
+        releaseOnDeref: request || undefined
+      });
+    }),
+    provideAuth(() => getAuth(inject(FirebaseApp)),
+    ...
+  ],
+  ...
+})
+```
+
+Follow Firebase's [ Session Management with Service Workers documentation](https://firebase.google.com/docs/auth/web/service-worker-sessions) to learn how to pass the `idToken` to the server. __Note: this will not currently work in dev-mode as Angular SSR does not provide a method to get the Request headers.__
+
 ## Convenience observables
 
 AngularFire provides observables to allow convenient use of the Firebase Authentication with RXJS.
