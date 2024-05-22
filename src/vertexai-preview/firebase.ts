@@ -2,8 +2,8 @@
 export * from 'firebase/vertexai-preview';
 import { ɵzoneWrap } from '@angular/fire';
 import {
-  getGenerativeModel as _getGenerativeModel,
-  getVertexAI as _getVertexAI
+  getVertexAI as _getVertexAI,
+  getGenerativeModel as _getGenerativeModel
 } from 'firebase/vertexai-preview';
 
 export const getVertexAI = ɵzoneWrap(_getVertexAI, true);

@@ -10,9 +10,9 @@ import {
   setConsent as _setConsent,
   setCurrentScreen as _setCurrentScreen,
   setDefaultEventParameters as _setDefaultEventParameters,
+  settings as _settings,
   setUserId as _setUserId,
-  setUserProperties as _setUserProperties,
-  settings as _settings
+  setUserProperties as _setUserProperties
 } from 'firebase/analytics';
 
 export {
