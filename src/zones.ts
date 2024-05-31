@@ -17,10 +17,6 @@ import {
 } from 'rxjs';
 import { observeOn, subscribeOn, tap } from 'rxjs/operators';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-function noop() {
-}
-
 /**
  * Schedules tasks so that they are invoked inside the Zone that is passed in the constructor.
  */
@@ -56,7 +52,7 @@ class BlockUntilFirstOperator<T> implements Operator<T, T> {
   ) {}
 
   call(subscriber: Subscriber<T>, source: Observable<T>): TeardownLogic {
-    const taskDone = this.zone.run(() => this.pendingTasks.add());
+    const taskDone: VoidFunction = this.zone.run(() => this.pendingTasks.add());
     // maybe this is a race condition, invoke in a timeout
     // hold for 10ms while I try to figure out what is going on
     const unscheduleTask = () => setTimeout(taskDone, 10);
@@ -195,12 +191,12 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       return run(
         () =>
-          new Promise((resolve, reject) =>
+          new Promise((resolve, reject) => {
             ret.then(
               (it) => run(() => resolve(it)),
               (reason) => run(() => reject(reason))
-            )
-          )
+            );
+          })
       );
     } else if (typeof ret === 'function' && taskDone) {
       // Handle unsubscribe
