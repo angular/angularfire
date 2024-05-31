@@ -98,7 +98,7 @@ function sliceAndSplice<T>(
 export function combineChange<T>(combined: DocumentChange<T>[], change: DocumentChange<T>): DocumentChange<T>[] {
   switch (change.type) {
     case 'added':
-      if (combined[change.newIndex] && combined[change.newIndex].doc.ref.isEqual(change.doc.ref)) {
+      if (combined[change.newIndex]?.doc.ref.isEqual(change.doc.ref)) {
         // Not sure why the duplicates are getting fired
       } else {
         return sliceAndSplice(combined, change.newIndex, 0, change);
@@ -119,7 +119,7 @@ export function combineChange<T>(combined: DocumentChange<T>[], change: Document
       }
       break;
     case 'removed':
-      if (combined[change.oldIndex] && combined[change.oldIndex].doc.ref.isEqual(change.doc.ref)) {
+      if (combined[change.oldIndex]?.doc.ref.isEqual(change.doc.ref)) {
         return sliceAndSplice(combined, change.oldIndex, 1);
       }
       break;
