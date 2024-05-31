@@ -1,16 +1,28 @@
-import {
-    collection, query, orderBy, fromRef,
-    updateDoc, doc, increment, serverTimestamp, addDoc, SetOptions,
-    DocumentData, QueryDocumentSnapshot, SnapshotOptions,
-    loadBundle, LoadBundleTaskProgress, namedQuery,
-} from '@angular/fire/firestore';
-import { map, switchMap, filter, tap } from 'rxjs/operators';
-import { firestore } from '../getFirestore';
-import type { app, firestore as adminFirestore } from 'firebase-admin';
-import { makeStateKey, TransferState } from '@angular/platform-browser';
-import { keepUnstableUntilFirst } from '@angular/fire';
-import { from, Observable, of } from 'rxjs';
 import { NgZone } from '@angular/core';
+import { keepUnstableUntilFirst } from '@angular/fire';
+import {
+    DocumentData,
+    LoadBundleTaskProgress,
+    QueryDocumentSnapshot,
+    SetOptions,
+    SnapshotOptions,
+    addDoc,
+    collection,
+    doc,
+    fromRef,
+    increment,
+    loadBundle,
+    namedQuery,
+    orderBy,
+    query,
+    serverTimestamp,
+    updateDoc,
+} from '@angular/fire/firestore';
+import { TransferState, makeStateKey } from '@angular/platform-browser';
+import type { firestore as adminFirestore, app } from 'firebase-admin';
+import { Observable, from, of } from 'rxjs';
+import { filter, map, switchMap, tap } from 'rxjs/operators';
+import { firestore } from '../getFirestore';
 
 function isClientSnapshot(snap: QueryDocumentSnapshot|adminFirestore.QueryDocumentSnapshot): snap is QueryDocumentSnapshot {
     return (snap as QueryDocumentSnapshot).metadata !== undefined;
@@ -73,15 +85,15 @@ export const snapshotChanges = (state: TransferState, zone: NgZone, admin: app.A
             orderBy('updatedAt', 'desc').
             withConverter(Animal);
         return from(zone.runOutsideAngular(() => animalsCollection.get())).pipe(
-            keepUnstableUntilFirst,
-            tap(it => {
+            <any>keepUnstableUntilFirst,
+            tap((it: any) => {
                 const bundle = firestore.bundle().add(queryName, it).build();
                 state.set(key, bundle.toString());
             }),
-            map(it =>
+            map((it: any) =>
                 it.docs.
-                    map(change => change.data()).
-                    filter(it => it._VALID)
+                    map((change: any) => change.data()).
+                    filter((it: any) => it._VALID)
             )
         );
     } else {

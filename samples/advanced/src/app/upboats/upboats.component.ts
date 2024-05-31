@@ -1,11 +1,11 @@
 import { Component, Inject, NgZone, OnInit, Optional } from '@angular/core';
+import { Auth, User, user } from '@angular/fire/auth';
+import { traceUntilFirst } from '@angular/fire/performance';
+import { TransferState, makeStateKey } from '@angular/platform-browser';
+import type { app } from 'firebase-admin';
 import { Observable, of } from 'rxjs';
 import { filter, shareReplay, startWith, switchMap, tap } from 'rxjs/operators';
-import { makeStateKey, TransferState } from '@angular/platform-browser';
-import { traceUntilFirst } from '@angular/fire/performance';
-import { Auth, user, User } from '@angular/fire/auth';
 import { FIREBASE_ADMIN } from '../app.module';
-import type { app } from 'firebase-admin';
 
 import type { Animal } from './lazyFirestore';
 
@@ -51,9 +51,9 @@ export class UpboatsComponent implements OnInit {
     this.animals = start.pipe(
       switchMap(() => this.lazyFirestore),
       switchMap(({ snapshotChanges }) => snapshotChanges(state, zone, admin)),
-      traceUntilFirst('animals'),
-      tap(it => {
-        const cachedAnimals = it.map(animal => ({ ...animal, hasPendingWrites: false, fromCache: true }));
+      <any>traceUntilFirst('animals'),
+      tap((it: any) => {
+        const cachedAnimals = it.map((animal: any) => ({ ...animal, hasPendingWrites: false, fromCache: true }));
         state.set(key, cachedAnimals);
       }),
       existing ? startWith(existing) : tap(),

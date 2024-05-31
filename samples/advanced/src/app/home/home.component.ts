@@ -18,7 +18,6 @@ import { RESPONSE } from '@nguniversal/express-engine/tokens';
     <app-storage></app-storage>
     <app-functions></app-functions>
   `,
-  styles: [``]
 })
 export class HomeComponent {
   constructor(
