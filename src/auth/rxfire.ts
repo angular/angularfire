@@ -2,8 +2,8 @@
 import { ɵzoneWrap } from '@angular/fire';
 import {
   authState as _authState,
-  user as _user,
-  idToken as _idToken
+  idToken as _idToken,
+  user as _user
 } from 'rxfire/auth';
 
 export const authState = ɵzoneWrap(_authState, true);
