@@ -1,23 +1,29 @@
 import { NgModule } from '@angular/core';
-import { getRemoteConfig, provideRemoteConfig } from '@angular/fire/remote-config';
 import { getAnalytics, provideAnalytics } from '@angular/fire/analytics';
-import { getMessaging, provideMessaging } from '@angular/fire/messaging';
 import { getApp } from '@angular/fire/app';
+import { getMessaging, provideMessaging } from '@angular/fire/messaging';
+import { getRemoteConfig, provideRemoteConfig } from '@angular/fire/remote-config';
 
-import { AppModule } from './app.module';
-import { AppComponent } from './app.component';
+import { provideAuth } from '@angular/fire/auth';
+import { BrowserTransferStateModule } from '@angular/platform-browser';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
-import { BrowserTransferStateModule } from '@angular/platform-browser';
-import { provideAuth } from '@angular/fire/auth';
+import { AppComponent } from './app.component';
+import { AppModule } from './app.module';
 
-import { initializeAuth, browserPopupRedirectResolver, indexedDBLocalPersistence } from '@angular/fire/auth';
+import { browserPopupRedirectResolver, indexedDBLocalPersistence, initializeAuth } from '@angular/fire/auth';
 import { connectAuthEmulatorInDevMode } from './emulators';
 
 @NgModule({
   imports: [
     AppModule,
     BrowserTransferStateModule,
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: environment.production,
+      registrationStrategy: 'registerWhenStable:30000'
+    }),
+  ],
+  providers: [
     provideRemoteConfig(() => getRemoteConfig()),
     provideAnalytics(() => getAnalytics()),
     provideMessaging(() => getMessaging()),
@@ -28,10 +34,6 @@ import { connectAuthEmulatorInDevMode } from './emulators';
       });
       connectAuthEmulatorInDevMode(auth);
       return auth;
-    }),
-    ServiceWorkerModule.register('ngsw-worker.js', {
-      enabled: environment.production,
-      registrationStrategy: 'registerWhenStable:30000'
     }),
   ],
   bootstrap: [AppComponent],

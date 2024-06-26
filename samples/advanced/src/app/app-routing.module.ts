@@ -16,7 +16,7 @@ if (typeof process !== 'undefined' && process.env?.FUNCTION_NAME) {
 
 @NgModule({
   imports: [RouterModule.forRoot(routes, {
-    initialNavigation: 'enabled'
+    initialNavigation: 'enabledNonBlocking'
   })],
   exports: [RouterModule]
 })

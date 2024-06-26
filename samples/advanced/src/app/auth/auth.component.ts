@@ -29,7 +29,7 @@ export class AuthComponent implements OnInit, OnDestroy {
     if (auth) {
       this.user = authState(this.auth);
       this.userDisposable = authState(this.auth).pipe(
-        traceUntilFirst('auth'),
+        <any>traceUntilFirst('auth'),
         map(u => !!u)
       ).subscribe(isLoggedIn => {
         this.showLoginButton = !isLoggedIn;

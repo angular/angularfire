@@ -1,6 +1,6 @@
 import { Component, OnInit, Optional } from '@angular/core';
-import { RemoteConfig, getAllChanges } from '@angular/fire/remote-config';
 import { traceUntilFirst } from '@angular/fire/performance';
+import { RemoteConfig, getAllChanges } from '@angular/fire/remote-config';
 import { EMPTY, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
@@ -16,7 +16,7 @@ export class RemoteConfigComponent implements OnInit {
   constructor(@Optional() remoteConfig: RemoteConfig) {
     if (remoteConfig) {
       this.change$ = getAllChanges(remoteConfig).pipe(
-        traceUntilFirst('remote-config'),
+        <any>traceUntilFirst('remote-config'),
         tap(it => console.log('REMOTE CONFIG', it)),
       );
     } else {
