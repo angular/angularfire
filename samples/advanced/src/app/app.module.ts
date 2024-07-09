@@ -23,9 +23,6 @@ import { AppCheckComponent } from './app-check/app-check.component';
 
 export const FIREBASE_ADMIN = new InjectionToken<app.App>('firebase-admin');
 
-// @ts-ignore
-globalThis.FIREBASE_APPCHECK_DEBUG_TOKEN = "92efef26-9cb5-431b-80c3-8f405df341ad";
-
 @NgModule({
   declarations: [
     AppComponent,
