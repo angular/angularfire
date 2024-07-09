@@ -1,14 +1,14 @@
 {
   "targets": {
-    "aftest-94085": {
+    "angularfire2-test": {
       "hosting": {
         "sample": [
-          "aftest-94085"
+          "angularfire2-test"
         ]
       }
     }
   },
   "projects": {
-    "default": "aftest-94085"
+    "default": "angularfire2-test"
   }
 }
