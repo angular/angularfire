@@ -5,7 +5,6 @@ import { getMessaging, provideMessaging } from '@angular/fire/messaging';
 import { getRemoteConfig, provideRemoteConfig } from '@angular/fire/remote-config';
 
 import { provideAuth } from '@angular/fire/auth';
-import { BrowserTransferStateModule } from '@angular/platform-browser';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
@@ -17,7 +16,6 @@ import { connectAuthEmulatorInDevMode } from './emulators';
 @NgModule({
   imports: [
     AppModule,
-    BrowserTransferStateModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production,
       registrationStrategy: 'registerWhenStable:30000'
