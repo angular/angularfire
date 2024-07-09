@@ -1,6 +1,6 @@
 import { InjectionToken, NgModule, Optional } from '@angular/core';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
-import { CustomProvider, ReCaptchaV3Provider, initializeAppCheck, provideAppCheck } from '@angular/fire/app-check';
+import { CustomProvider, ReCaptchaEnterpriseProvider, initializeAppCheck, provideAppCheck } from '@angular/fire/app-check';
 import { FunctionsModule } from '@angular/fire/functions';
 import { BrowserModule } from '@angular/platform-browser';
 
@@ -22,6 +22,9 @@ import type { app } from 'firebase-admin';
 import { AppCheckComponent } from './app-check/app-check.component';
 
 export const FIREBASE_ADMIN = new InjectionToken<app.App>('firebase-admin');
+
+// @ts-ignore
+globalThis.FIREBASE_APPCHECK_DEBUG_TOKEN = "92efef26-9cb5-431b-80c3-8f405df341ad";
 
 @NgModule({
   declarations: [
@@ -55,7 +58,7 @@ export const FIREBASE_ADMIN = new InjectionToken<app.App>('firebase-admin');
         });
         return initializeAppCheck(undefined, { provider, isTokenAutoRefreshEnabled: false });
       } else {
-        const provider = new ReCaptchaV3Provider(environment.recaptcha3SiteKey);
+        const provider = new ReCaptchaEnterpriseProvider(environment.recaptcha3SiteKey);
         return initializeAppCheck(undefined, { provider, isTokenAutoRefreshEnabled: true });
       }
     }, [new Optional(), FIREBASE_ADMIN]),
