@@ -1,7 +1,7 @@
 import { Component, Inject, Optional } from '@angular/core';
 import { FirebaseApp } from '@angular/fire/app';
 import { Response } from 'express';
-import { RESPONSE } from '@nguniversal/express-engine/tokens';
+import { RESPONSE } from '../../express.tokens';
 
 @Component({
   selector: 'app-home',

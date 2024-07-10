@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, makeStateKey, TransferState } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { makeStateKey, TransferState } from '@angular/platform-browser';
+
 import { startWith, switchMap, tap } from 'rxjs/operators';
 import { traceUntilFirst } from '@angular/fire/performance';
 

@@ -1,4 +1,4 @@
-import { NgZone } from '@angular/core';
+import { NgZone, makeStateKey, TransferState } from '@angular/core';
 import { keepUnstableUntilFirst } from '@angular/fire';
 import {
     DocumentData,
@@ -18,7 +18,7 @@ import {
     serverTimestamp,
     updateDoc,
 } from '@angular/fire/firestore';
-import { TransferState, makeStateKey } from '@angular/platform-browser';
+
 import type { firestore as adminFirestore, app } from 'firebase-admin';
 import { Observable, from, of } from 'rxjs';
 import { filter, map, switchMap, tap } from 'rxjs/operators';

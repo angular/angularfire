@@ -1,7 +1,7 @@
-import { Component, Inject, NgZone, OnInit, Optional } from '@angular/core';
+import { Component, Inject, NgZone, OnInit, Optional, makeStateKey, TransferState } from '@angular/core';
 import { Auth, User, user } from '@angular/fire/auth';
 import { traceUntilFirst } from '@angular/fire/performance';
-import { TransferState, makeStateKey } from '@angular/platform-browser';
+
 import type { app } from 'firebase-admin';
 import { Observable, of } from 'rxjs';
 import { filter, shareReplay, startWith, switchMap, tap } from 'rxjs/operators';
