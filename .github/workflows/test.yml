@@ -3,7 +3,7 @@ name: Test and publish
 on:
   push:
     branches:
-      - master
+      - main
     paths-ignore:
       - "**/*.md"
   pull_request:
@@ -201,7 +201,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Publish (NPM)
     needs: ['build', 'test', 'browser']
-    if: ${{ github.ref == 'refs/heads/master' || github.event_name == 'release' }}
+    if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'release' }}
     steps:
       - name: Setup node
         uses: actions/setup-node@v3
