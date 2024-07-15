@@ -1,16 +1,15 @@
 import { NgModule } from '@angular/core';
-import { ServerModule, ServerTransferStateModule } from '@angular/platform-server';
+import { ServerModule } from '@angular/platform-server';
 import * as admin from 'firebase-admin';
 
-import { AppModule, FIREBASE_ADMIN } from './app.module';
-import { AppComponent } from './app.component';
 import { environment } from 'src/environments/environment';
+import { AppComponent } from './app.component';
+import { AppModule, FIREBASE_ADMIN } from './app.module';
 
 @NgModule({
   imports: [
     AppModule,
     ServerModule,
-    ServerTransferStateModule,
   ],
   providers: [
     { provide: FIREBASE_ADMIN, useFactory: () => admin.apps[0] || admin.initializeApp(

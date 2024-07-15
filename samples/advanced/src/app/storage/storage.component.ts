@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, makeStateKey, TransferState } from '@angular/core';
+import { keepUnstableUntilFirst } from '@angular/fire';
+import { traceUntilFirst } from '@angular/fire/performance';
+
 import { Observable, of } from 'rxjs';
 import { startWith, switchMap, tap } from 'rxjs/operators';
-import { makeStateKey, TransferState } from '@angular/platform-browser';
-import { traceUntilFirst } from '@angular/fire/performance';
-import { keepUnstableUntilFirst } from '@angular/fire';
 
 const TRANSPARENT_PNG
   = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
@@ -28,11 +28,11 @@ export class StorageComponent implements OnInit {
     this.downloadUrl$ = existing ? of(existing) : of(undefined).pipe(
       switchMap(() => import('./lazyStorage')),
       switchMap(({ iconUrl }) => iconUrl),
-      keepUnstableUntilFirst,
-      traceUntilFirst('storage'),
+      <any>keepUnstableUntilFirst,
+      <any>traceUntilFirst('storage'),
       tap(it => state.set(key, it)),
       startWith(TRANSPARENT_PNG),
-    );
+    ) as any;
   }
 
   ngOnInit(): void {

@@ -89,10 +89,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "sample:build:production"
+              "buildTarget": "sample:build:production"
             },
             "development": {
-              "browserTarget": "sample:build:development"
+              "buildTarget": "sample:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -100,7 +100,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "sample:build"
+            "buildTarget": "sample:build"
           }
         },
         "test": {
@@ -127,8 +127,8 @@
           "options": {
             "ssr": "cloud-functions",
             "prerender": true,
-            "firebaseProject": "aftest-94085",
-            "firebaseHostingSite": "aftest-94085",
+            "firebaseProject": "angularfire2-test",
+            "firebaseHostingSite": "angularfire2-test",
             "functionName": "ssr_sample",
             "functionsNodeVersion": "16",
             "region": "us-central1",
@@ -147,7 +147,8 @@
             "optimization": false,
             "sourceMap": true,
             "extractLicenses": false,
-            "externalDependencies": []
+            "externalDependencies": [],
+            "buildOptimizer": false
           },
           "configurations": {
             "production": {
@@ -165,13 +166,15 @@
             "development": {
               "optimization": false,
               "sourceMap": true,
-              "extractLicenses": false
+              "extractLicenses": false,
+              "vendorChunk": true,
+              "buildOptimizer": false
             }
           },
           "defaultConfiguration": "production"
         },
         "serve-ssr": {
-          "builder": "@nguniversal/builders:ssr-dev-server",
+          "builder": "@angular-devkit/build-angular:ssr-dev-server",
           "configurations": {
             "development": {
               "browserTarget": "sample:build:development",
@@ -185,7 +188,7 @@
           "defaultConfiguration": "development"
         },
         "prerender": {
-          "builder": "@nguniversal/builders:prerender",
+          "builder": "@angular-devkit/build-angular:prerender",
           "options": {
             "routes": [
               "/"
@@ -205,6 +208,5 @@
         }
       }
     }
-  },
-  "defaultProject": "sample"
+  }
 }

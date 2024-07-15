@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, makeStateKey, TransferState } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { startWith, switchMap, tap } from 'rxjs/operators';
-import { makeStateKey, TransferState } from '@angular/platform-browser';
+
 import { traceUntilFirst } from '@angular/fire/performance';
 
 @Component({
@@ -14,7 +14,6 @@ import { traceUntilFirst } from '@angular/fire/performance';
       <small>Persistence enabled: <code>{{ (persistenceEnabled | async) ?? false }}</code></small>
     </p>
   `,
-  styles: [``]
 })
 export class FirestoreComponent implements OnInit {
 
@@ -28,7 +27,7 @@ export class FirestoreComponent implements OnInit {
       switchMap(() => import('./lazyFirestore')),
       tap(({ persistenceEnabled }) => this.persistenceEnabled = persistenceEnabled),
       switchMap(({ valueChanges }) => valueChanges),
-      traceUntilFirst('firestore'),
+      <any>traceUntilFirst('firestore'),
       tap(it => state.set(key, it)),
       existing ? startWith(existing) : tap(),
     );

@@ -1,9 +1,9 @@
 {
   "targets": {
-    "aftest-94085": {
+    "angularfire2-test": {
       "hosting": {
         "sample": [
-          "aftest-94085"
+          "angularfire2-test"
         ]
       }
     }
