@@ -8,6 +8,6 @@ import {
 } from 'rxfire/performance';
 
 export const traceUntil = ɵzoneWrap(_traceUntil, true);
-export const traceWhile = ɵzoneWrap(_traceWhile, true);
 export const traceUntilComplete = ɵzoneWrap(_traceUntilComplete, true);
 export const traceUntilFirst = ɵzoneWrap(_traceUntilFirst, true);
+export const traceWhile = ɵzoneWrap(_traceWhile, true);

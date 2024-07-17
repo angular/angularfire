@@ -6,5 +6,5 @@ import {
   getVertexAI as _getVertexAI
 } from 'firebase/vertexai-preview';
 
-export const getVertexAI = ɵzoneWrap(_getVertexAI, true);
 export const getGenerativeModel = ɵzoneWrap(_getGenerativeModel, true);
+export const getVertexAI = ɵzoneWrap(_getVertexAI, true);

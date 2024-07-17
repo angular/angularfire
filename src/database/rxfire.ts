@@ -16,11 +16,11 @@ export {
   ListenerMethods
 } from 'rxfire/database';
 
+export const auditTrail = ɵzoneWrap(_auditTrail, true);
+export const changeToData = ɵzoneWrap(_changeToData, true);
 export const fromRef = ɵzoneWrap(_fromRef, true);
-export const stateChanges = ɵzoneWrap(_stateChanges, true);
 export const list = ɵzoneWrap(_list, true);
 export const listVal = ɵzoneWrap(_listVal, true);
-export const auditTrail = ɵzoneWrap(_auditTrail, true);
 export const object = ɵzoneWrap(_object, true);
 export const objectVal = ɵzoneWrap(_objectVal, true);
-export const changeToData = ɵzoneWrap(_changeToData, true);
+export const stateChanges = ɵzoneWrap(_stateChanges, true);

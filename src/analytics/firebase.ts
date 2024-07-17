@@ -27,6 +27,6 @@ export const setAnalyticsCollectionEnabled = ɵzoneWrap(_setAnalyticsCollectionE
 export const setConsent = ɵzoneWrap(_setConsent, true);
 export const setCurrentScreen = ɵzoneWrap(_setCurrentScreen, true);
 export const setDefaultEventParameters = ɵzoneWrap(_setDefaultEventParameters, true);
-export const settings = ɵzoneWrap(_settings, true);
 export const setUserId = ɵzoneWrap(_setUserId, true);
 export const setUserProperties = ɵzoneWrap(_setUserProperties, true);
+export const settings = ɵzoneWrap(_settings, true);

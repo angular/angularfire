@@ -1,6 +1,6 @@
-import { join } from 'path';
 import { spawn } from 'cross-spawn';
 import { copy, writeFile } from 'fs-extra';
+import { join } from 'path';
 import { keys as tsKeys } from 'ts-transformer-keys';
 
 interface OverrideOptions {
@@ -19,7 +19,7 @@ function zoneWrapExports() {
     overrides: Record<string, OverrideOptions | null> = {}
   ) => {
     const imported = await import(path);
-    const toBeExported: [string, string, boolean][] = exports.
+    const toBeExported: [string, string, boolean][] = exports.sort().
       filter(it => !it.startsWith('_') && overrides[it] !== null && overrides[it]?.override !== true).
       map(importName => {
         const zoneWrap = typeof imported[importName] === 'function' &&

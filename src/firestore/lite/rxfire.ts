@@ -12,10 +12,10 @@ import {
 } from 'rxfire/firestore/lite';
 
 export const collectionSnapshots = ɵzoneWrap(_collection, true);
-export const collectionData = ɵzoneWrap(_collectionData, true);
-export const collectionCountSnap = ɵzoneWrap(_collectionCountSnap, true);
 export const collectionCount = ɵzoneWrap(_collectionCount, true);
+export const collectionCountSnap = ɵzoneWrap(_collectionCountSnap, true);
+export const collectionData = ɵzoneWrap(_collectionData, true);
 export const docSnapshots = ɵzoneWrap(_doc, true);
 export const docData = ɵzoneWrap(_docData, true);
-export const snapToData = ɵzoneWrap(_snapToData, true);
 export const fromRef = ɵzoneWrap(_fromRef, true);
+export const snapToData = ɵzoneWrap(_snapToData, true);

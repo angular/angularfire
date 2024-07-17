@@ -7,5 +7,5 @@ import {
 } from 'rxfire/auth';
 
 export const authState = ɵzoneWrap(_authState, true);
-export const user = ɵzoneWrap(_user, true);
 export const idToken = ɵzoneWrap(_idToken, true);
+export const user = ɵzoneWrap(_user, true);
