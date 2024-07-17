@@ -17,6 +17,8 @@ import {
 } from 'rxjs';
 import { observeOn, subscribeOn, tap } from 'rxjs/operators';
 
+declare const Zone: {current: unknown} | undefined; 
+
 /**
  * Schedules tasks so that they are invoked inside the Zone that is passed in the constructor.
  */
@@ -33,9 +35,13 @@ export class ɵZoneScheduler implements SchedulerLike {
     // Wrap the specified work function to make sure that if nested scheduling takes place the
     // work is executed in the correct zone
     const workInZone = function(this: SchedulerAction<any>, state: any) {
-      targetZone.runGuarded(() => {
+      if (targetZone) {
+        targetZone.runGuarded(() => {
+          work.apply(this, [state]);
+        });
+      } else {
         work.apply(this, [state]);
-      });
+      }
     };
 
     // Scheduling itself needs to be run in zone to ensure setInterval calls for async scheduling are done
@@ -72,12 +78,13 @@ export class ɵAngularFireSchedulers {
 
   constructor(public ngZone: NgZone, public pendingTasks: ExperimentalPendingTasks) {
     this.outsideAngular = ngZone.runOutsideAngular(
-      // @ts-ignore
-      () => new ɵZoneScheduler(Zone.current)
+      () => new ɵZoneScheduler(typeof Zone === 'undefined' ? undefined : Zone.current)
     );
     this.insideAngular = ngZone.run(
-      // @ts-ignore
-      () => new ɵZoneScheduler(Zone.current, asyncScheduler)
+      () => new ɵZoneScheduler(
+        typeof Zone === 'undefined' ? undefined : Zone.current,
+        asyncScheduler
+      )
     );
     globalThis.ɵAngularFireScheduler ||= this;
   }
@@ -140,20 +147,15 @@ export function ɵkeepUnstableUntilFirstFactory(
   };
 }
 
-// @ts-ignore
 const zoneWrapFn = (
   it: (...args: any[]) => any,
   taskDone: VoidFunction | undefined
 ) => {
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const _this = this;
-  // function() is needed for the arguments object
-  return function() {
-    const _arguments = arguments;
+  return (...args: any[]) => {
     if (taskDone) {
       setTimeout(taskDone, 10);
     }
-    return run(() => it.apply(_this, _arguments));
+    return run(() => it.apply(this, args));
   };
 };
 
