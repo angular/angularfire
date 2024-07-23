@@ -179,7 +179,7 @@ export const ɵzoneWrap = <T extends (...args: any[]) => unknown>(
   blockUntilFirst: boolean
 ): T => {
   return ((...args: unknown[]) => {
-    let taskDone: VoidFunction | undefined;
+    let argsTaskDone: VoidFunction | undefined;
 
     // If this is a callback function, e.g, onSnapshot, we need to wrap each user callback to run in
     // the NgZone, and if we're blocking, take out a pending task that we resolve once one of the
@@ -187,9 +187,9 @@ export const ɵzoneWrap = <T extends (...args: any[]) => unknown>(
     for (let i = 0; i < args.length; i++) {
       if (typeof args[i] === 'function') {
         if (blockUntilFirst) {
-          taskDone ||= createPendingTask(10);
+          argsTaskDone ||= createPendingTask(10);
         }
-        args[i] = zoneWrapFn(args[i] as () => unknown, taskDone);
+        args[i] = zoneWrapFn(args[i] as () => unknown, argsTaskDone);
       }
     }
 
@@ -210,25 +210,31 @@ export const ɵzoneWrap = <T extends (...args: any[]) => unknown>(
     }
 
     if (ret instanceof Observable) {
+      // If we're blocking and about to return an `Observable`, keep Angular unstable until we
+      // receive the first value.
       return ret.pipe(keepUnstableUntilFirst);
     } else if (ret instanceof Promise) {
-      return run(
-        () =>
-          new Promise((resolve, reject) => {
-            ret.then(
-              (it) => run(() => resolve(it)),
-              (reason) => run(() => reject(reason))
-            );
-          })
+      // If we're blocking and about to return a `Promise`, take out an pending task and complete
+      // it when the promise resolves.
+      const taskDone = createPendingTask();
+      return run(() =>
+        new Promise((resolve, reject) => {
+          ret.then(
+            (it) => run(() => resolve(it)),
+            (reason) => run(() => reject(reason))
+          );
+        }).finally(taskDone)
       );
-    } else if (typeof ret === 'function' && taskDone) {
-      // Handle unsubscribe
+    } else if (typeof ret === 'function' && argsTaskDone) {
+      // If we're blocking and about to return an unsubscribe function, make sure to complete the
+      // task we took out earlier, for the arguments, on unsubscribe.
       return (...innerArgs: unknown[]) => {
-        taskDone();
+        argsTaskDone();
         return ret.apply(this, innerArgs);
       };
     } else {
-      // TODO how do we handle storage uploads in Zone? and other stuff with cancel() etc?
+      // We're blocking but there's nothing to wait for, so just return.
+      // TODO: how do we handle storage uploads in Zone? and other stuff with cancel() etc?
       return run(() => ret);
     }
   }) as T;
