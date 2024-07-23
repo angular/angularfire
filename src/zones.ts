@@ -1,9 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import {
-  ExperimentalPendingTasks,
-  Injectable,
-  NgZone
-} from '@angular/core';
+import { ExperimentalPendingTasks, Injectable, NgZone } from '@angular/core';
 import {
   Observable,
   Operator,
@@ -13,28 +9,31 @@ import {
   Subscription,
   TeardownLogic,
   asyncScheduler,
-  queueScheduler
+  queueScheduler,
 } from 'rxjs';
 import { observeOn, subscribeOn, tap } from 'rxjs/operators';
 
-declare const Zone: {current: unknown} | undefined; 
+declare const Zone: { current: unknown } | undefined;
 
 /**
  * Schedules tasks so that they are invoked inside the Zone that is passed in the constructor.
  */
 export class ɵZoneScheduler implements SchedulerLike {
-  constructor(private zone: any, private delegate: any = queueScheduler) {
-  }
+  constructor(private zone: any, private delegate: any = queueScheduler) {}
 
   now() {
     return this.delegate.now();
   }
 
-  schedule(work: (this: SchedulerAction<any>, state?: any) => void, delay?: number, state?: any): Subscription {
+  schedule(
+    work: (this: SchedulerAction<any>, state?: any) => void,
+    delay?: number,
+    state?: any
+  ): Subscription {
     const targetZone = this.zone;
     // Wrap the specified work function to make sure that if nested scheduling takes place the
     // work is executed in the correct zone
-    const workInZone = function(this: SchedulerAction<any>, state: any) {
+    const workInZone = function (this: SchedulerAction<any>, state: any) {
       if (targetZone) {
         targetZone.runGuarded(() => {
           work.apply(this, [state]);
@@ -63,9 +62,16 @@ class BlockUntilFirstOperator<T> implements Operator<T, T> {
     // hold for 10ms while I try to figure out what is going on
     const unscheduleTask = () => setTimeout(taskDone, 10);
 
-    return source.pipe(
-      tap({ next: unscheduleTask, complete: unscheduleTask, error: unscheduleTask })
-    ).subscribe(subscriber).add(unscheduleTask);
+    return source
+      .pipe(
+        tap({
+          next: unscheduleTask,
+          complete: unscheduleTask,
+          error: unscheduleTask,
+        })
+      )
+      .subscribe(subscriber)
+      .add(unscheduleTask);
   }
 }
 
@@ -76,26 +82,36 @@ export class ɵAngularFireSchedulers {
   public readonly outsideAngular: ɵZoneScheduler;
   public readonly insideAngular: ɵZoneScheduler;
 
-  constructor(public ngZone: NgZone, public pendingTasks: ExperimentalPendingTasks) {
+  constructor(
+    public ngZone: NgZone,
+    public pendingTasks: ExperimentalPendingTasks
+  ) {
     this.outsideAngular = ngZone.runOutsideAngular(
-      () => new ɵZoneScheduler(typeof Zone === 'undefined' ? undefined : Zone.current)
+      () =>
+        new ɵZoneScheduler(
+          typeof Zone === 'undefined' ? undefined : Zone.current
+        )
     );
     this.insideAngular = ngZone.run(
-      () => new ɵZoneScheduler(
-        typeof Zone === 'undefined' ? undefined : Zone.current,
-        asyncScheduler
-      )
+      () =>
+        new ɵZoneScheduler(
+          typeof Zone === 'undefined' ? undefined : Zone.current,
+          asyncScheduler
+        )
     );
     globalThis.ɵAngularFireScheduler ||= this;
   }
 }
 
 function getSchedulers() {
-  const schedulers = globalThis.ɵAngularFireScheduler as ɵAngularFireSchedulers|undefined;
+  const schedulers = globalThis.ɵAngularFireScheduler as
+    | ɵAngularFireSchedulers
+    | undefined;
   if (!schedulers) {
     throw new Error(
-`Either AngularFireModule has not been provided in your AppModule (this can be done manually or implictly using
-provideFirebaseApp) or you're calling an AngularFire method outside of an NgModule (which is not supported).`);
+      `Either AngularFireModule has not been provided in your AppModule (this can be done manually or implictly using
+provideFirebaseApp) or you're calling an AngularFire method outside of an NgModule (which is not supported).`
+    );
   }
   return schedulers;
 }
@@ -159,7 +175,7 @@ const zoneWrapFn = (
   };
 };
 
-export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
+export const ɵzoneWrap = <T = unknown>(it: T, blockUntilFirst: boolean): T => {
   // function() is needed for the arguments object
   return function () {
     let taskDone: VoidFunction | undefined;
@@ -181,7 +197,7 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
         const schedulers = getSchedulers();
         return ret.pipe(
           subscribeOn(schedulers.outsideAngular),
-          observeOn(schedulers.insideAngular),
+          observeOn(schedulers.insideAngular)
         );
       } else {
         return run(() => ret);
