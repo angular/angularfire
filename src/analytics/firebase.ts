@@ -10,9 +10,9 @@ import {
   setConsent as _setConsent,
   setCurrentScreen as _setCurrentScreen,
   setDefaultEventParameters as _setDefaultEventParameters,
-  settings as _settings,
   setUserId as _setUserId,
-  setUserProperties as _setUserProperties
+  setUserProperties as _setUserProperties,
+  settings as _settings
 } from 'firebase/analytics';
 
 export {
@@ -27,6 +27,6 @@ export const setAnalyticsCollectionEnabled = ɵzoneWrap(_setAnalyticsCollectionE
 export const setConsent = ɵzoneWrap(_setConsent, true);
 export const setCurrentScreen = ɵzoneWrap(_setCurrentScreen, true);
 export const setDefaultEventParameters = ɵzoneWrap(_setDefaultEventParameters, true);
-export const settings = ɵzoneWrap(_settings, true);
 export const setUserId = ɵzoneWrap(_setUserId, true);
 export const setUserProperties = ɵzoneWrap(_setUserProperties, true);
+export const settings = ɵzoneWrap(_settings, true);

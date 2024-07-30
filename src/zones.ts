@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { Injectable, NgZone } from '@angular/core';
+import {
+  ExperimentalPendingTasks,
+  Injectable,
+  NgZone
+} from '@angular/core';
 import {
   Observable,
   Operator,
@@ -13,9 +17,7 @@ import {
 } from 'rxjs';
 import { observeOn, subscribeOn, tap } from 'rxjs/operators';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-function noop() {
-}
+declare const Zone: {current: unknown} | undefined; 
 
 /**
  * Schedules tasks so that they are invoked inside the Zone that is passed in the constructor.
@@ -33,9 +35,13 @@ export class ɵZoneScheduler implements SchedulerLike {
     // Wrap the specified work function to make sure that if nested scheduling takes place the
     // work is executed in the correct zone
     const workInZone = function(this: SchedulerAction<any>, state: any) {
-      targetZone.runGuarded(() => {
+      if (targetZone) {
+        targetZone.runGuarded(() => {
+          work.apply(this, [state]);
+        });
+      } else {
         work.apply(this, [state]);
-      });
+      }
     };
 
     // Scheduling itself needs to be run in zone to ensure setInterval calls for async scheduling are done
@@ -46,31 +52,20 @@ export class ɵZoneScheduler implements SchedulerLike {
 }
 
 class BlockUntilFirstOperator<T> implements Operator<T, T> {
-  // @ts-ignore
-  private task: MacroTask | null = null;
-
-  constructor(private zone: any) {
-  }
+  constructor(
+    private zone: any,
+    private pendingTasks: ExperimentalPendingTasks
+  ) {}
 
   call(subscriber: Subscriber<T>, source: Observable<T>): TeardownLogic {
-    const unscheduleTask = this.unscheduleTask.bind(this);
-    // @ts-ignore
-    this.task = this.zone.run(() => Zone.current.scheduleMacroTask('firebaseZoneBlock', noop, {}, noop, noop));
+    const taskDone: VoidFunction = this.zone.run(() => this.pendingTasks.add());
+    // maybe this is a race condition, invoke in a timeout
+    // hold for 10ms while I try to figure out what is going on
+    const unscheduleTask = () => setTimeout(taskDone, 10);
 
     return source.pipe(
       tap({ next: unscheduleTask, complete: unscheduleTask, error: unscheduleTask })
     ).subscribe(subscriber).add(unscheduleTask);
-  }
-
-  private unscheduleTask() {
-    // maybe this is a race condition, invoke in a timeout
-    // hold for 10ms while I try to figure out what is going on
-    setTimeout(() => {
-      if (this.task != null && this.task.state === 'scheduled') {
-        this.task.invoke();
-        this.task = null;
-      }
-    }, 10);
   }
 }
 
@@ -81,11 +76,16 @@ export class ɵAngularFireSchedulers {
   public readonly outsideAngular: ɵZoneScheduler;
   public readonly insideAngular: ɵZoneScheduler;
 
-  constructor(public ngZone: NgZone) {
-    // @ts-ignore
-    this.outsideAngular = ngZone.runOutsideAngular(() => new ɵZoneScheduler(Zone.current));
-    // @ts-ignore
-    this.insideAngular = ngZone.run(() => new ɵZoneScheduler(Zone.current, asyncScheduler));
+  constructor(public ngZone: NgZone, public pendingTasks: ExperimentalPendingTasks) {
+    this.outsideAngular = ngZone.runOutsideAngular(
+      () => new ɵZoneScheduler(typeof Zone === 'undefined' ? undefined : Zone.current)
+    );
+    this.insideAngular = ngZone.run(
+      () => new ɵZoneScheduler(
+        typeof Zone === 'undefined' ? undefined : Zone.current,
+        asyncScheduler
+      )
+    );
     globalThis.ɵAngularFireScheduler ||= this;
   }
 }
@@ -126,10 +126,14 @@ export function keepUnstableUntilFirst<T>(obs$: Observable<T>): Observable<T> {
  * value from firebase but doesn't block the zone forever since the firebase subscription
  * is still alive.
  */
-export function ɵkeepUnstableUntilFirstFactory(schedulers: ɵAngularFireSchedulers) {
-  return function keepUnstableUntilFirst<T>(obs$: Observable<T>): Observable<T> {
+export function ɵkeepUnstableUntilFirstFactory(
+  schedulers: ɵAngularFireSchedulers
+) {
+  return function keepUnstableUntilFirst<T>(
+    obs$: Observable<T>
+  ): Observable<T> {
     obs$ = obs$.lift(
-      new BlockUntilFirstOperator(schedulers.ngZone)
+      new BlockUntilFirstOperator(schedulers.ngZone, schedulers.pendingTasks)
     );
 
     return obs$.pipe(
@@ -143,40 +147,32 @@ export function ɵkeepUnstableUntilFirstFactory(schedulers: ɵAngularFireSchedul
   };
 }
 
-// @ts-ignore
-const zoneWrapFn = (it: (...args: any[]) => any, macrotask: MacroTask|undefined) => {
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const _this = this;
-  // function() is needed for the arguments object
-  return function() {
-    const _arguments = arguments;
-    if (macrotask) {
-      setTimeout(() => {
-        if (macrotask.state === 'scheduled') {
-          macrotask.invoke();
-        }
-      }, 10);
+const zoneWrapFn = (
+  it: (...args: any[]) => any,
+  taskDone: VoidFunction | undefined
+) => {
+  return (...args: any[]) => {
+    if (taskDone) {
+      setTimeout(taskDone, 10);
     }
-    return run(() => it.apply(_this, _arguments));
+    return run(() => it.apply(this, args));
   };
 };
 
 export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
   // function() is needed for the arguments object
-  return function() {
-    // @ts-ignore
-    let macrotask: MacroTask | undefined;
+  return function () {
+    let taskDone: VoidFunction | undefined;
     const _arguments = arguments;
-    // if this is a callback function, e.g, onSnapshot, we should create a microtask and invoke it
+    // if this is a callback function, e.g, onSnapshot, we should create a pending task and complete it
     // only once one of the callback functions is tripped.
     for (let i = 0; i < arguments.length; i++) {
       if (typeof _arguments[i] === 'function') {
         if (blockUntilFirst) {
-          // @ts-ignore
-          macrotask ||= run(() => Zone.current.scheduleMacroTask('firebaseZoneBlock', noop, {}, noop, noop));
+          taskDone ||= run(() => getSchedulers().pendingTasks.add());
         }
         // TODO create a microtask to track callback functions
-        _arguments[i] = zoneWrapFn(_arguments[i], macrotask);
+        _arguments[i] = zoneWrapFn(_arguments[i], taskDone);
       }
     }
     const ret = runOutsideAngular(() => (it as any).apply(this, _arguments));
@@ -195,16 +191,20 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
       return ret.pipe(keepUnstableUntilFirst) as any;
     } else if (ret instanceof Promise) {
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      return run(() => new Promise((resolve, reject) => ret.then(it => run(() => resolve(it)), reason => run(() => reject(reason)))));
-    } else if (typeof ret === 'function' && macrotask) {
+      return run(
+        () =>
+          new Promise((resolve, reject) => {
+            ret.then(
+              (it) => run(() => resolve(it)),
+              (reason) => run(() => reject(reason))
+            );
+          })
+      );
+    } else if (typeof ret === 'function' && taskDone) {
       // Handle unsubscribe
       // function() is needed for the arguments object
-      return function() {
-        setTimeout(() => {
-          if (macrotask && macrotask.state === 'scheduled') {
-            macrotask.invoke();
-          }
-        }, 10);
+      return function () {
+        setTimeout(taskDone, 10);
         return ret.apply(this, arguments);
       };
     } else {
