@@ -3,11 +3,14 @@ import { traceUntilFirst } from '@angular/fire/performance';
 import { RemoteConfig, getAllChanges } from '@angular/fire/remote-config';
 import { EMPTY, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { NgIf, AsyncPipe } from '@angular/common';
 
 @Component({
-  selector: 'app-remote-config',
-  template: `<ng-container *ngIf="change$ | async"></ng-container>`,
-  styles: []
+    selector: 'app-remote-config',
+    template: `<ng-container *ngIf="change$ | async"></ng-container>`,
+    styles: [],
+    standalone: true,
+    imports: [NgIf, AsyncPipe]
 })
 export class RemoteConfigComponent implements OnInit {
 

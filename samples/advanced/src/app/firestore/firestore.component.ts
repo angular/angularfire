@@ -3,10 +3,11 @@ import { Observable, of } from 'rxjs';
 import { startWith, switchMap, tap } from 'rxjs/operators';
 
 import { traceUntilFirst } from '@angular/fire/performance';
+import { AsyncPipe, JsonPipe } from '@angular/common';
 
 @Component({
-  selector: 'app-firestore',
-  template: `
+    selector: 'app-firestore',
+    template: `
     <p>
       Firestore!
       <code>{{ testDocValue$ | async | json }}</code>
@@ -14,6 +15,8 @@ import { traceUntilFirst } from '@angular/fire/performance';
       <small>Persistence enabled: <code>{{ (persistenceEnabled | async) ?? false }}</code></small>
     </p>
   `,
+    standalone: true,
+    imports: [AsyncPipe, JsonPipe],
 })
 export class FirestoreComponent implements OnInit {
 

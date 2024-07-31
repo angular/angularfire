@@ -3,10 +3,11 @@ import { Messaging, getToken, onMessage } from '@angular/fire/messaging';
 import { EMPTY, from, Observable } from 'rxjs';
 import { share, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+import { NgIf, AsyncPipe, JsonPipe, SlicePipe } from '@angular/common';
 
 @Component({
-  selector: 'app-messaging',
-  template: `
+    selector: 'app-messaging',
+    template: `
     <p>
       Messaging!
       <code>{{ token$ | async | slice:0:12 }}<ng-container *ngIf="(token$ | async) !== null">&hellip;</ng-container></code>
@@ -14,7 +15,9 @@ import { environment } from 'src/environments/environment';
       <button (click)="request()" *ngIf="showRequest">Request FCM token</button>
     </p>
   `,
-  styles: []
+    styles: [],
+    standalone: true,
+    imports: [NgIf, AsyncPipe, JsonPipe, SlicePipe]
 })
 export class MessagingComponent implements OnInit {
 

@@ -1,17 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { Functions, httpsCallableData } from '@angular/fire/functions';
 import { EMPTY, Observable } from 'rxjs';
+import { AsyncPipe, JsonPipe } from '@angular/common';
 
 @Component({
-  selector: 'app-functions',
-  template: `
+    selector: 'app-functions',
+    template: `
     <p>
       Functions!
       <code>{{ response$ | async | json }}</code>
       <button (click)="request()">Call!</button>
     </p>
   `,
-  styles: []
+    styles: [],
+    standalone: true,
+    imports: [AsyncPipe, JsonPipe]
 })
 export class FunctionsComponent implements OnInit {
 

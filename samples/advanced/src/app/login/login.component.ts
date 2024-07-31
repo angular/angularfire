@@ -3,15 +3,15 @@ import { Auth, GoogleAuthProvider, signInWithPopup, signInAnonymously } from '@a
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-login',
-  template: `
+    selector: 'app-login',
+    template: `
     <p>
       <button (click)="loginWithGoogle()">Log in with Google</button>
       <button (click)="loginAnonymously()">Log in with Anonymously</button>
     </p>
   `,
-  styles: [
-  ]
+    styles: [],
+    standalone: true
 })
 export class LoginComponent implements OnInit {
 

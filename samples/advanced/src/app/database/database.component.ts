@@ -3,16 +3,19 @@ import { Observable, of } from 'rxjs';
 
 import { startWith, switchMap, tap } from 'rxjs/operators';
 import { traceUntilFirst } from '@angular/fire/performance';
+import { AsyncPipe, JsonPipe } from '@angular/common';
 
 @Component({
-  selector: 'app-database',
-  template: `
+    selector: 'app-database',
+    template: `
     <p>
       Database!
       <code>{{ testObjectValue$ | async | json }}</code>
     </p>
   `,
-  styles: []
+    styles: [],
+    standalone: true,
+    imports: [AsyncPipe, JsonPipe]
 })
 export class DatabaseComponent implements OnInit {
 

@@ -8,10 +8,11 @@ import { filter, shareReplay, startWith, switchMap, tap } from 'rxjs/operators';
 import { FIREBASE_ADMIN } from '../app.module';
 
 import type { Animal } from './lazyFirestore';
+import { NgFor, NgIf, AsyncPipe } from '@angular/common';
 
 @Component({
-  selector: 'app-upboats',
-  template: `
+    selector: 'app-upboats',
+    template: `
     <ul>
       <li *ngFor="let animal of animals | async">
         <span>{{ animal.name }}</span>
@@ -23,7 +24,9 @@ import type { Animal } from './lazyFirestore';
     </ul>
     <button (click)="newAnimal()" [disabled]="!this.user">New animal</button>
   `,
-  styles: []
+    styles: [],
+    standalone: true,
+    imports: [NgFor, NgIf, AsyncPipe]
 })
 export class UpboatsComponent implements OnInit {
 

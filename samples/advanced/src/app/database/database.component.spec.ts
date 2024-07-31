@@ -8,8 +8,8 @@ describe('DatabaseComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ DatabaseComponent ]
-    })
+    imports: [DatabaseComponent]
+})
     .compileComponents();
   }));
 
