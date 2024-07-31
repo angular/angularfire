@@ -11,6 +11,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "dev:ssr": "cd ../.emulator && firebase emulators:exec --import seed \"cd ../advanced && ng run sample:serve-ssr\"",
+    "dev:ssr:zoneless": "cd ../.emulator && firebase emulators:exec --import seed \"cd ../advanced && ng run sample:serve-ssr:zoneless\"",
     "serve:ssr": "node dist/sample/server/main.js",
     "build:ssr": "ng build && ng run sample:server",
     "prerender": "ng run sample:prerender"
