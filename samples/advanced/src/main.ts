@@ -1,8 +1,4 @@
-import {
-  enableProdMode,
-  mergeApplicationConfig,
-  provideExperimentalZonelessChangeDetection,
-} from '@angular/core';
+import { enableProdMode, mergeApplicationConfig } from '@angular/core';
 
 import { getAnalytics, provideAnalytics } from '@angular/fire/analytics';
 import { getApp } from '@angular/fire/app';
@@ -43,7 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
           connectAuthEmulatorInDevMode(auth);
           return auth;
         }),
-        provideExperimentalZonelessChangeDetection(),
       ],
     })
   ).catch((err) => console.error(err));

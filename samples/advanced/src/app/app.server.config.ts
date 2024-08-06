@@ -5,7 +5,7 @@ import { ApplicationConfig, mergeApplicationConfig } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { appConfig, FIREBASE_ADMIN } from './app.config';
 
-const serverConfig: ApplicationConfig = {
+const config: ApplicationConfig = {
   providers: [
     provideServerRendering(),
     {
@@ -25,4 +25,4 @@ const serverConfig: ApplicationConfig = {
   ],
 };
 
-export const config = mergeApplicationConfig(appConfig, serverConfig);
+export const serverConfig = mergeApplicationConfig(appConfig, config);
