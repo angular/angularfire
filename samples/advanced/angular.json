@@ -27,7 +27,7 @@
             "outputPath": "dist/sample/browser",
             "index": "src/index.html",
             "main": "src/main.ts",
-            "polyfills": "src/polyfills.ts",
+            "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "statsJson": true,
             "assets": [
@@ -36,9 +36,7 @@
               "src/firebase-messaging-sw.js",
               "src/manifest.webmanifest"
             ],
-            "styles": [
-              "src/styles.css"
-            ],
+            "styles": ["src/styles.css"],
             "scripts": [],
             "vendorChunk": true,
             "extractLicenses": false,
@@ -67,7 +65,8 @@
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.prod.ts"
-                }, {
+                },
+                {
                   "replace": "src/app/emulators.ts",
                   "with": "src/app/emulators.prod.ts"
                 }
@@ -81,6 +80,25 @@
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
+            },
+            "zoneless": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true,
+              "polyfills": [],
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.zoneless.ts"
+                },
+                {
+                  "replace": "src/app/zone-providers.ts",
+                  "with": "src/app/zone-providers.zoneless.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -93,6 +111,9 @@
             },
             "development": {
               "buildTarget": "sample:build:development"
+            },
+            "zoneless": {
+              "buildTarget": "sample:build:zoneless"
             }
           },
           "defaultConfiguration": "development"
@@ -116,9 +137,7 @@
               "src/firebase-messaging-sw.js",
               "src/manifest.webmanifest"
             ],
-            "styles": [
-              "src/styles.css"
-            ],
+            "styles": ["src/styles.css"],
             "scripts": []
           }
         },
@@ -157,7 +176,8 @@
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.prod.ts"
-                }, {
+                },
+                {
                   "replace": "src/app/emulators.ts",
                   "with": "src/app/emulators.prod.ts"
                 }
@@ -169,6 +189,23 @@
               "extractLicenses": false,
               "vendorChunk": true,
               "buildOptimizer": false
+            },
+            "zoneless": {
+              "optimization": false,
+              "sourceMap": true,
+              "extractLicenses": false,
+              "vendorChunk": true,
+              "buildOptimizer": false,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.zoneless.ts"
+                },
+                {
+                  "replace": "src/app/zone-providers.ts",
+                  "with": "src/app/zone-providers.zoneless.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -183,6 +220,10 @@
             "production": {
               "browserTarget": "sample:build:production",
               "serverTarget": "sample:server:production"
+            },
+            "zoneless": {
+              "browserTarget": "sample:build:zoneless",
+              "serverTarget": "sample:server:zoneless"
             }
           },
           "defaultConfiguration": "development"
@@ -190,9 +231,7 @@
         "prerender": {
           "builder": "@angular-devkit/build-angular:prerender",
           "options": {
-            "routes": [
-              "/"
-            ]
+            "routes": ["/"]
           },
           "configurations": {
             "production": {
@@ -202,6 +241,10 @@
             "development": {
               "browserTarget": "sample:build:development",
               "serverTarget": "sample:server:development"
+            },
+            "zoneless": {
+              "browserTarget": "sample:build:zoneless",
+              "serverTarget": "sample:server:zoneless"
             }
           },
           "defaultConfiguration": "production"

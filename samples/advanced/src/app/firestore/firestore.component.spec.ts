@@ -8,8 +8,8 @@ describe('FirestoreComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ FirestoreComponent ]
-    })
+    imports: [FirestoreComponent]
+})
     .compileComponents();
   }));
 

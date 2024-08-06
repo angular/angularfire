@@ -3,11 +3,12 @@ import { Auth, authState, signInAnonymously, signOut, User } from '@angular/fire
 import { EMPTY, Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { traceUntilFirst } from '@angular/fire/performance';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { NgIf, AsyncPipe } from '@angular/common';
 
 @Component({
-  selector: 'app-auth',
-  template: `
+    selector: 'app-auth',
+    template: `
     <p>
       Auth!
       <code>{{ (user | async)?.uid }}</code>
@@ -15,7 +16,9 @@ import { Router } from '@angular/router';
       <button (click)="logout()" *ngIf="showLogoutButton">Log out</button>
     </p>
   `,
-  styles: []
+    styles: [],
+    standalone: true,
+    imports: [NgIf, RouterLink, AsyncPipe]
 })
 export class AuthComponent implements OnInit, OnDestroy {
 
