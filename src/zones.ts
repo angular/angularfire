@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { ExperimentalPendingTasks, Injectable, NgZone } from '@angular/core';
 import {
   Observable,
@@ -175,23 +174,24 @@ const zoneWrapFn = (
   };
 };
 
-export const ɵzoneWrap = <T = unknown>(it: T, blockUntilFirst: boolean): T => {
-  // function() is needed for the arguments object
-  return function () {
+export const ɵzoneWrap = <T extends (...args: any[]) => unknown>(
+  it: T,
+  blockUntilFirst: boolean
+): T => {
+  return ((...args: unknown[]) => {
     let taskDone: VoidFunction | undefined;
-    const _arguments = arguments;
-    // if this is a callback function, e.g, onSnapshot, we should create a pending task and complete it
-    // only once one of the callback functions is tripped.
-    for (let i = 0; i < arguments.length; i++) {
-      if (typeof _arguments[i] === 'function') {
+    // if this is a callback function, e.g, onSnapshot, we should create a pending task and complete
+    // it only once one of the callback functions is tripped.
+    for (let i = 0; i < args.length; i++) {
+      if (typeof args[i] === 'function') {
         if (blockUntilFirst) {
           taskDone ||= run(() => getSchedulers().pendingTasks.add());
         }
         // TODO create a microtask to track callback functions
-        _arguments[i] = zoneWrapFn(_arguments[i], taskDone);
+        args[i] = zoneWrapFn(args[i] as () => unknown, taskDone);
       }
     }
-    const ret = runOutsideAngular(() => (it as any).apply(this, _arguments));
+    const ret = runOutsideAngular(() => it.apply(this, args));
     if (!blockUntilFirst) {
       if (ret instanceof Observable) {
         const schedulers = getSchedulers();
@@ -204,9 +204,8 @@ export const ɵzoneWrap = <T = unknown>(it: T, blockUntilFirst: boolean): T => {
       }
     }
     if (ret instanceof Observable) {
-      return ret.pipe(keepUnstableUntilFirst) as any;
+      return ret.pipe(keepUnstableUntilFirst);
     } else if (ret instanceof Promise) {
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       return run(
         () =>
           new Promise((resolve, reject) => {
@@ -218,14 +217,13 @@ export const ɵzoneWrap = <T = unknown>(it: T, blockUntilFirst: boolean): T => {
       );
     } else if (typeof ret === 'function' && taskDone) {
       // Handle unsubscribe
-      // function() is needed for the arguments object
-      return function () {
+      return (...innerArgs: unknown[]) => {
         setTimeout(taskDone, 10);
-        return ret.apply(this, arguments);
+        return ret.apply(this, innerArgs);
       };
     } else {
       // TODO how do we handle storage uploads in Zone? and other stuff with cancel() etc?
       return run(() => ret);
     }
-  } as any;
+  }) as T;
 };
