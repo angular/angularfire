@@ -1,4 +1,10 @@
-import { ExperimentalPendingTasks, Injectable, NgZone } from '@angular/core';
+import {
+  ErrorHandler,
+  ExperimentalPendingTasks,
+  Injectable,
+  NgZone,
+  inject,
+} from '@angular/core';
 import {
   Observable,
   Operator,
@@ -33,12 +39,16 @@ export class ɵZoneScheduler implements SchedulerLike {
     // Wrap the specified work function to make sure that if nested scheduling takes place the
     // work is executed in the correct zone
     const workInZone = function (this: SchedulerAction<any>, state: any) {
-      if (targetZone) {
-        targetZone.runGuarded(() => {
+      try {
+        if (targetZone) {
+          targetZone.run(() => {
+            work.apply(this, [state]);
+          });
+        } else {
           work.apply(this, [state]);
-        });
-      } else {
-        work.apply(this, [state]);
+        }
+      } catch (e) {
+        getSchedulers().errorHandler.handleError(e);
       }
     };
 
@@ -72,20 +82,20 @@ class BlockUntilFirstOperator<T> implements Operator<T, T> {
   providedIn: 'root',
 })
 export class ɵAngularFireSchedulers {
+  readonly errorHandler = inject(ErrorHandler);
+  readonly ngZone = inject(NgZone);
+  readonly pendingTasks = inject(ExperimentalPendingTasks);
   public readonly outsideAngular: ɵZoneScheduler;
   public readonly insideAngular: ɵZoneScheduler;
 
-  constructor(
-    public ngZone: NgZone,
-    public pendingTasks: ExperimentalPendingTasks
-  ) {
-    this.outsideAngular = ngZone.runOutsideAngular(
+  constructor() {
+    this.outsideAngular = this.ngZone.runOutsideAngular(
       () =>
         new ɵZoneScheduler(
           typeof Zone === 'undefined' ? undefined : Zone.current
         )
     );
-    this.insideAngular = ngZone.run(
+    this.insideAngular = this.ngZone.run(
       () =>
         new ɵZoneScheduler(
           typeof Zone === 'undefined' ? undefined : Zone.current,
