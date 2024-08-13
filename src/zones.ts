@@ -169,8 +169,9 @@ const zoneWrapFn = (
   taskDone: VoidFunction | undefined
 ) => {
   return (...args: any[]) => {
+    const ret = run(() => it.apply(this, args));
     taskDone?.();
-    return run(() => it.apply(this, args));
+    return ret;
   };
 };
 
@@ -239,8 +240,9 @@ export const ɵzoneWrap = <T extends (...args: any[]) => unknown>(
       // If we're blocking and about to return an unsubscribe function, make sure to complete the
       // task we took out earlier, for the arguments, on unsubscribe.
       return (...innerArgs: unknown[]) => {
+        const innerRet = ret.apply(this, innerArgs);
         argsTaskDone();
-        return ret.apply(this, innerArgs);
+        return innerRet;
       };
     } else {
       // We're blocking but there's nothing to wait for, so just return.
