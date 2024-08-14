@@ -60,21 +60,29 @@ export class ɵZoneScheduler implements SchedulerLike {
 }
 
 class BlockUntilFirstOperator<T> implements Operator<T, T> {
-  call(subscriber: Subscriber<T>, source: Observable<T>): TeardownLogic {
+  private readonly taskDone;
+
+  constructor() {
     // maybe this is a race condition, invoke in a timeout
     // hold for 10ms while I try to figure out what is going on
     const taskDone = createPendingTask(10);
+    this.taskDone = (r: string) => {
+      console.warn(`>>> DONE: BlockUntilFirstOperator ${taskDone.id} ${r}`);
+      taskDone();
+    };
+  }
 
+  call(subscriber: Subscriber<T>, source: Observable<T>): TeardownLogic {
     return source
       .pipe(
         tap({
-          next: taskDone,
-          complete: taskDone,
-          error: taskDone,
+          next: () => this.taskDone('(next)'),
+          complete: () => this.taskDone('(complete)'),
+          error: () => this.taskDone('(error)'),
         })
       )
       .subscribe(subscriber)
-      .add(taskDone);
+      .add(() => this.taskDone('(unsubscribed)'));
   }
 }
 
@@ -175,20 +183,34 @@ const zoneWrapFn = (
   };
 };
 
+let nextId = 0;
+
 /**
  * Creates a pending tasks and returns a callback that can be used to complete it.
  * Optionally takes a timeout, in ms, to delay the completion of the task after the callback is
  * invoked.
  */
-export function createPendingTask(timeout?: number): VoidFunction {
+export function createPendingTask(
+  timeout?: number
+): VoidFunction & { id: number } {
   const taskDone = run(() => getSchedulers().pendingTasks.add());
-  return timeout !== undefined ? () => setTimeout(taskDone, timeout) : taskDone;
+  const r =
+    timeout !== undefined ? () => setTimeout(taskDone, timeout) : taskDone;
+  (r as any).id = nextId++;
+  console.warn(`>>> PENDING ${(r as any).id}`);
+  return r as any;
 }
+
+const rename = (f, n) =>
+  new Function(
+    `const f = arguments[0]; return function ${n} () { return f.apply(this, arguments); }`
+  )(f);
 
 export const ɵzoneWrap = <T extends (...args: any[]) => unknown>(
   it: T,
   blockUntilFirst: boolean
 ): T => {
+  console.warn(`>>> WRAP ${it.name ?? '(unknown)'}`);
   return ((...args: unknown[]) => {
     let argsTaskDone: VoidFunction | undefined;
 
@@ -205,7 +227,7 @@ export const ɵzoneWrap = <T extends (...args: any[]) => unknown>(
     }
 
     // Run the function outside the NgZone, passing the wrapped arguments.
-    const ret = runOutsideAngular(() => it.apply(this, args));
+    let ret = runOutsideAngular(() => it.apply(this, args));
 
     // If we're not blocking we don't need to take out a pending task.
     if (!blockUntilFirst) {
@@ -220,7 +242,12 @@ export const ɵzoneWrap = <T extends (...args: any[]) => unknown>(
       }
     }
 
+    if (typeof ret === 'function') {
+      ret = ɵzoneWrap(rename(ret, `${it.name}_return`), blockUntilFirst);
+    }
+
     if (ret instanceof Observable) {
+      console.warn(`>>> PIPE OBSERVABLE`);
       // If we're blocking and about to return an `Observable`, keep Angular unstable until we
       // receive the first value.
       return ret.pipe(keepUnstableUntilFirst);
