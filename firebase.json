@@ -3,30 +3,37 @@
     "rules": "test/database.rules.json"
   },
   "firestore": {
-    "rules": "test/firestore.rules",
-    "indexes": "test/firestore.indexes.json"
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
   },
   "storage": {
     "rules": "test/storage.rules"
   },
   "emulators": {
-    "auth": {
-      "port": 9098
-    },
     "functions": {
       "port": 5001
     },
     "firestore": {
       "port": 8089
     },
-    "database": {
-      "port": 9002
-    },
-    "storage": {
-      "port": 9199
-    },
     "ui": {
       "enabled": false
     }
-  }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run lint",
+        "npm --prefix \"$RESOURCE_DIR\" run build"
+      ]
+    }
+  ]
 }
