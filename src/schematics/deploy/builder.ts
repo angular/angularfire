@@ -25,7 +25,7 @@ export default createBuilder(
       throw new Error('The Firebase Project specified by your angular.json or .firebaserc is in conflict');
     }
 
-    const firebaseHostingSite = options.firebaseHostingSite || defulatFirebaseHostingSite;
+    const firebaseHostingSite = options.firebaseHostingSite || defaultFirebaseHostingSite;
     if (!firebaseHostingSite) {
       throw new Error(`Cannot determine the Firebase Hosting Site from your angular.json or .firebaserc`);
     }
