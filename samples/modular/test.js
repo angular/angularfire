@@ -5,14 +5,14 @@ const { initializeMessaging, isSupported } = require('firebase/messaging');
 const { getFunctions, httpsCallable } = require("firebase/functions");
 // Initialize Firebase
 var config = {
-    apiKey: "AIzaSyB3BYpqf_FrZ2WQidSh9Ml04kuXJp3fvVk",
-    authDomain: "chholland-test.firebaseapp.com",
-    databaseURL: "https://chholland-test.firebaseio.com",
-    projectId: "chholland-test",
-    storageBucket: "chholland-test.appspot.com",
-    messagingSenderId: "91336787373",
-    appId: "1:91336787373:web:a3dffe45ec797267",
-    measurementId: "G-RV2DRJVZ88"
+    apiKey: "AIzaSyBVSy3YpkVGiKXbbxeK0qBnu3-MNZ9UIjA",
+    authDomain: "angularfire2-test.firebaseapp.com",
+    databaseURL: "https://angularfire2-test.firebaseio.com",
+    projectId: "angularfire2-test",
+    storageBucket: "angularfire2-test.appspot.com",
+    messagingSenderId: "920323787688",
+    appId: "1:920323787688:web:2253a0e5eb5b9a8b",
+    measurementId: "G-W20QDV5CZP"
 };
 // Initialize Firebase
 const app = initializeApp(config);
