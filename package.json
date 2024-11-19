@@ -55,6 +55,7 @@
     "@angular/platform-browser-dynamic": "^19.0.0",
     "@angular/router": "^19.0.0",
     "@schematics/angular": "^19.0.0",
+    "esbuild": "^0.24.0",
     "firebase": "^11.0.0",
     "firebase-functions": "^6.1.0",
     "fs-extra": "^8.0.1",
