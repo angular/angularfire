@@ -67,6 +67,7 @@ import {
   sum as _sum,
   terminate as _terminate,
   updateDoc as _updateDoc,
+  vector as _vector,
   waitForPendingWrites as _waitForPendingWrites,
   where as _where,
   writeBatch as _writeBatch
@@ -137,6 +138,7 @@ export const startAt = ɵzoneWrap(_startAt, true);
 export const sum = ɵzoneWrap(_sum, true);
 export const terminate = ɵzoneWrap(_terminate, true);
 export const updateDoc = ɵzoneWrap(_updateDoc, true);
+export const vector = ɵzoneWrap(_vector, true);
 export const waitForPendingWrites = ɵzoneWrap(_waitForPendingWrites, true);
 export const where = ɵzoneWrap(_where, true);
 export const writeBatch = ɵzoneWrap(_writeBatch, true);

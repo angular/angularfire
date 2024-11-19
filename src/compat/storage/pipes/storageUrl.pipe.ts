@@ -42,7 +42,7 @@ export class GetDownloadURLPipe implements PipeTransform, OnDestroy {
 }
 
 @NgModule({
-  declarations: [ GetDownloadURLPipe ],
+  imports: [ GetDownloadURLPipe ],
   exports: [ GetDownloadURLPipe ],
 })
 export class GetDownloadURLPipeModule {}

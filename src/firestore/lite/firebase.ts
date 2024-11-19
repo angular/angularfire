@@ -43,6 +43,7 @@ import {
   sum as _sum,
   terminate as _terminate,
   updateDoc as _updateDoc,
+  vector as _vector,
   where as _where,
   writeBatch as _writeBatch
 } from 'firebase/firestore/lite';
@@ -88,5 +89,6 @@ export const startAt = ɵzoneWrap(_startAt, true);
 export const sum = ɵzoneWrap(_sum, true);
 export const terminate = ɵzoneWrap(_terminate, true);
 export const updateDoc = ɵzoneWrap(_updateDoc, true);
+export const vector = ɵzoneWrap(_vector, true);
 export const where = ɵzoneWrap(_where, true);
 export const writeBatch = ɵzoneWrap(_writeBatch, true);

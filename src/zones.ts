@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
-  ExperimentalPendingTasks,
   Injectable,
-  NgZone
+  NgZone,
+  PendingTasks
 } from '@angular/core';
 import {
   Observable,
@@ -54,7 +54,7 @@ export class ɵZoneScheduler implements SchedulerLike {
 class BlockUntilFirstOperator<T> implements Operator<T, T> {
   constructor(
     private zone: any,
-    private pendingTasks: ExperimentalPendingTasks
+    private pendingTasks: PendingTasks
   ) {}
 
   call(subscriber: Subscriber<T>, source: Observable<T>): TeardownLogic {
@@ -76,7 +76,7 @@ export class ɵAngularFireSchedulers {
   public readonly outsideAngular: ɵZoneScheduler;
   public readonly insideAngular: ɵZoneScheduler;
 
-  constructor(public ngZone: NgZone, public pendingTasks: ExperimentalPendingTasks) {
+  constructor(public ngZone: NgZone, public pendingTasks: PendingTasks) {
     this.outsideAngular = ngZone.runOutsideAngular(
       () => new ɵZoneScheduler(typeof Zone === 'undefined' ? undefined : Zone.current)
     );
