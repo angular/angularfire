@@ -1,4 +1,4 @@
-import { HttpsOptions } from 'firebase-functions/https';
+import type { HttpsOptions } from 'firebase-functions/https';
 
 export const enum FEATURES {
   Authentication,

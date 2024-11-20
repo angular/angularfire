@@ -176,6 +176,10 @@ async function compileSchematics() {
       src('schematics', "update", "v7", "index.ts"),
     ],
     format: "cjs",
+    // turns out schematics don't support ESM, need to use webpack or shim these
+    // format: "esm",
+    // splitting: true,
+    // outExtension: {".js": ".mjs"},
     bundle: true,
     minify: true,
     platform: "node",
@@ -190,7 +194,6 @@ async function compileSchematics() {
       "firebase-tools"
     ],
     outdir: dest('schematics'),
-    //outExtension: {".js": ".mjs"},
   });
   await Promise.all([
     copy(src('schematics', 'versions.json'), dest('schematics', 'versions.json')),

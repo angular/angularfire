@@ -31,7 +31,9 @@ export const setupProject =
       return chain([
         addRootProvider(projectName, ({code, external}) => {
           external('initializeApp', '@angular/fire/app');
-          return code`${external('provideFirebaseApp', '@angular/fire/app')}(() => initializeApp(${JSON.stringify(config.sdkConfig)}))`;
+          return code`${external('provideFirebaseApp', '@angular/fire/app')}(() => initializeApp(${
+            config.sdkConfig ? `{ ${Object.entries(config.sdkConfig).map(([k, v]) => `${k}: ${JSON.stringify(v)}`).join(", ")} }` : ""
+          }))`;
         }),
         ...featureToRules(features, projectName),
       ]);
@@ -76,6 +78,7 @@ export const ngAddSetupProject = (
 
       const result = await firebaseTools.apps.sdkconfig('web', firebaseApp.appId, { nonInteractive: true, projectRoot });
       sdkConfig = result.sdkConfig;
+      delete sdkConfig.locationId;
 
     }
 
