@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { FirebaseApp, getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
-import { VertexAI, getVertexAI, provideVertexAI } from '@angular/fire/vertexai-preview';
+import { VertexAI, getVertexAI, provideVertexAI } from '@angular/fire/vertexai';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../utils';
 

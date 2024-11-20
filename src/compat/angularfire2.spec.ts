@@ -1,4 +1,4 @@
-import { CompilerFactory, DoBootstrap, ExperimentalPendingTasks, NgModule, NgZone, PlatformRef } from '@angular/core';
+import { CompilerFactory, DoBootstrap, NgModule, NgZone, PendingTasks, PlatformRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ɵAngularFireSchedulers, ɵZoneScheduler, ɵkeepUnstableUntilFirstFactory } from '@angular/fire';
 import { AngularFireModule, FirebaseApp } from '@angular/fire/compat';
@@ -100,7 +100,7 @@ describe('angularfire', () => {
         runOutsideAngular: outsideZone.runGuarded.bind(outsideZone),
         runTask: insideZone.run.bind(insideZone)
       } as NgZone;
-      schedulers = new ɵAngularFireSchedulers(ngZone, TestBed.inject(ExperimentalPendingTasks));
+      schedulers = new ɵAngularFireSchedulers(ngZone, TestBed.inject(PendingTasks));
     });
 
     it('should re-schedule emissions asynchronously', done => {
@@ -158,7 +158,7 @@ describe('angularfire', () => {
           } as NgZone,
           outsideAngular: new ɵZoneScheduler(outsideZone, testScheduler),
           insideAngular: new ɵZoneScheduler(insideZone, testScheduler),
-          pendingTasks: TestBed.inject(ExperimentalPendingTasks),
+          pendingTasks: TestBed.inject(PendingTasks),
         };
         const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(trackingSchedulers);
 

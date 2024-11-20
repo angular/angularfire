@@ -1,4 +1,4 @@
-import { RuntimeOptions } from 'firebase-functions';
+import type { HttpsOptions } from 'firebase-functions/https';
 
 export const enum FEATURES {
   Authentication,
@@ -176,7 +176,7 @@ export interface DeployBuilderSchema {
   prerender?: boolean;
   functionName?: string;
   functionsNodeVersion?: number|string;
-  functionsRuntimeOptions?: RuntimeOptions;
+  functionsRuntimeOptions?: HttpsOptions;
   cloudRunOptions?: Partial<CloudRunOptions>;
   outputPath?: string;
   CF3v2?: boolean;

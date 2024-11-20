@@ -193,9 +193,9 @@ import { } from '@angular/fire/app-check';
   <tr>
     <td>
 
-#### [Vertex AI](docs/vertexai.md#vertex-ai-preview)
+#### [Vertex AI](docs/vertexai.md#vertex-ai)
 ```ts
-import { } from '@angular/fire/vertexai-preview';
+import { } from '@angular/fire/vertexai';
 ```
 </td>
 

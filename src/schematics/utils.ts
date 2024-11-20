@@ -189,8 +189,8 @@ export function featureToRules(features: FEATURES[], projectName: string) {
           });
         case FEATURES.VertexAI:
           return addRootProvider(projectName, ({code, external}) => {
-            external('getVertexAI', '@angular/fire/vertexai-preview');
-            return code`${external('provideVertexAI', '@angular/fire/vertexai-preview')}(() => getVertexAI())`;
+            external('getVertexAI', '@angular/fire/vertexai');
+            return code`${external('provideVertexAI', '@angular/fire/vertexai')}(() => getVertexAI())`;
           });
         default:
           return undefined;

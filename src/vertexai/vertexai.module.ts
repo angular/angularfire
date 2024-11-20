@@ -11,7 +11,7 @@ import { VERSION, ɵAngularFireSchedulers, ɵgetDefaultInstanceOf } from '@angul
 import { ɵAppCheckInstances } from '@angular/fire';
 import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
 import { registerVersion } from 'firebase/app';
-import { VertexAI as FirebaseVertexAI } from 'firebase/vertexai-preview';
+import { VertexAI as FirebaseVertexAI } from 'firebase/vertexai';
 import { VERTEX_AI_PROVIDER_NAME, VertexAI, VertexAIInstances } from './vertexai';
 
 export const PROVIDED_VERTEX_AI_INSTANCES = new InjectionToken<VertexAI[]>('angularfire2.vertexai-instances');

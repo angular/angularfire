@@ -2,6 +2,7 @@ import { spawn } from 'cross-spawn';
 import { copy, writeFile } from 'fs-extra';
 import { join } from 'path';
 import { keys as tsKeys } from 'ts-transformer-keys';
+import * as esbuild from "esbuild";
 
 interface OverrideOptions {
   exportName?: string;
@@ -119,7 +120,7 @@ ${exportedZoneWrappedFns}
       collection: { exportName: 'collectionSnapshots' },
     }),
     reexport('firestore/lite', 'firebase', 'firebase/firestore/lite', tsKeys<typeof import('firebase/firestore/lite')>()),
-    reexport('vertexai-preview', 'firebase', 'firebase/vertexai-preview', tsKeys<typeof import('firebase/vertexai-preview')>()),
+    reexport('vertexai', 'firebase', 'firebase/vertexai', tsKeys<typeof import('firebase/vertexai')>()),
   ]);
 }
 
@@ -165,16 +166,45 @@ function spawnPromise(command: string, args: string[]) {
 }
 
 async function compileSchematics() {
-  await spawnPromise(`npx`, ['tsc', '-p', src('schematics', 'tsconfig.json')]);
-  return Promise.all([
+  await esbuild.build({
+    entryPoints: [
+      src('schematics', "update", "index.ts"),
+      src('schematics', "deploy", "actions.ts"),
+      src('schematics', "deploy", "builder.ts"),
+      src('schematics', "add", "index.ts"),
+      src('schematics', "setup", "index.ts"),
+      src('schematics', "update", "v7", "index.ts"),
+    ],
+    format: "cjs",
+    // turns out schematics don't support ESM, need to use webpack or shim these
+    // format: "esm",
+    // splitting: true,
+    // outExtension: {".js": ".mjs"},
+    bundle: true,
+    minify: true,
+    platform: "node",
+    target: "es2016",
+    external: [
+      "@angular-devkit/schematics",
+      "@angular-devkit/architect",
+      "@angular-devkit/core",
+      "rxjs",
+      "@schematics/angular",
+      "jsonc-parser",
+      "firebase-tools"
+    ],
+    outdir: dest('schematics'),
+  });
+  await Promise.all([
+    copy(src('schematics', 'versions.json'), dest('schematics', 'versions.json')),
     copy(src('schematics', 'builders.json'), dest('schematics', 'builders.json')),
     copy(src('schematics', 'collection.json'), dest('schematics', 'collection.json')),
     copy(src('schematics', 'migration.json'), dest('schematics', 'migration.json')),
     copy(src('schematics', 'deploy', 'schema.json'), dest('schematics', 'deploy', 'schema.json')),
     copy(src('schematics', 'add', 'schema.json'), dest('schematics', 'add', 'schema.json')),
     copy(src('schematics', 'setup', 'schema.json'), dest('schematics', 'setup', 'schema.json')),
-    replaceSchematicVersions()
   ]);
+  await replaceSchematicVersions();
 }
 
 async function buildLibrary() {

@@ -1,5 +1,5 @@
 import { SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
-import * as semver from 'semver';
+import { intersects as semverIntersects } from 'semver';
 import { FirebaseHostingSite } from './interfaces';
 
 export const shortSiteName = (site?: FirebaseHostingSite) => site?.name?.split('/').pop();
@@ -48,7 +48,7 @@ export const addDependencies = (
     const existingVersion = existingDeps[depName];
     if (existingVersion) {
       try {
-        if (!semver.intersects(existingVersion, dep.version)) {
+        if (!semverIntersects(existingVersion, dep.version)) {
           context.logger.warn(`⚠️ The ${depName} devDependency specified in your package.json (${existingVersion}) does not fulfill AngularFire's dependency (${dep.version})`);
           // TODO offer to fix
         }
