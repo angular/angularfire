@@ -102,12 +102,12 @@ export function keepUnstableUntilFirst<T>(obs$: Observable<T>): Observable<T> {
  * is still alive.
  */
 export function ɵkeepUnstableUntilFirstFactory(
-  _schedulers: ɵAngularFireSchedulers
+  schedulers: ɵAngularFireSchedulers
 ) {
   return function keepUnstableUntilFirst<T>(
     obs$: Observable<T>
   ): Observable<T> {
-    return obs$.pipe(pendingUntilEvent(getSchedulers().injector));
+    return obs$.pipe(pendingUntilEvent(schedulers.injector));
   }
 }
 
@@ -117,7 +117,7 @@ const zoneWrapFn = (
 ) => {
   return (...args: any[]) => {
     if (taskDone) {
-      setTimeout(taskDone, 10);
+      setTimeout(taskDone, 0);
     }
     return run(() => it.apply(this, args));
   };
@@ -152,7 +152,12 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
       }
     }
     if (ret instanceof Observable) {
-      return ret.pipe(keepUnstableUntilFirst) as any;
+      const schedulers = getSchedulers();
+      return ret.pipe(
+        subscribeOn(schedulers.outsideAngular),
+        observeOn(schedulers.insideAngular),
+        keepUnstableUntilFirst,
+      );
     } else if (ret instanceof Promise) {
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       return run(
@@ -168,7 +173,7 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
       // Handle unsubscribe
       // function() is needed for the arguments object
       return function () {
-        setTimeout(taskDone, 10);
+        setTimeout(taskDone, 0);
         return ret.apply(this, arguments);
       };
     } else {
