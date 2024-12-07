@@ -155,6 +155,14 @@ export function featureToRules(features: FEATURES[], projectName: string) {
             external('getDatabase', '@angular/fire/database');
             return code`${external('provideDatabase', '@angular/fire/database')}(() => getDatabase())`;
           });
+        case FEATURES.DataConnect:
+          throw "unimplemented.";
+        //  TODO need to add the generation of the project, grab the connector config
+        //  that requires this go async
+        //  return addRootProvider(projectName, ({code, external}) => {
+        //    external('getDataConnect', '@angular/fire/data-connect');
+        //    return code`${external('provideDataConnect', '@angular/fire/data-connect')}(() => getDataConnect())`;
+        //  });
         case FEATURES.Firestore:
           return addRootProvider(projectName, ({code, external}) => {
             external('getFirestore', '@angular/fire/firestore');
