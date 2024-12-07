@@ -1,21 +1,21 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
   Injectable,
+  Injector,
   NgZone,
-  PendingTasks
+  PendingTasks,
+  inject
 } from '@angular/core';
+import { pendingUntilEvent } from '@angular/core/rxjs-interop';
 import {
   Observable,
-  Operator,
   SchedulerAction,
   SchedulerLike,
-  Subscriber,
   Subscription,
-  TeardownLogic,
   asyncScheduler,
   queueScheduler
 } from 'rxjs';
-import { observeOn, subscribeOn, tap } from 'rxjs/operators';
+import { observeOn, subscribeOn } from 'rxjs/operators';
 
 declare const Zone: {current: unknown} | undefined; 
 
@@ -51,24 +51,6 @@ export class ɵZoneScheduler implements SchedulerLike {
   }
 }
 
-class BlockUntilFirstOperator<T> implements Operator<T, T> {
-  constructor(
-    private zone: any,
-    private pendingTasks: PendingTasks
-  ) {}
-
-  call(subscriber: Subscriber<T>, source: Observable<T>): TeardownLogic {
-    const taskDone: VoidFunction = this.zone.run(() => this.pendingTasks.add());
-    // maybe this is a race condition, invoke in a timeout
-    // hold for 10ms while I try to figure out what is going on
-    const unscheduleTask = () => setTimeout(taskDone, 10);
-
-    return source.pipe(
-      tap({ next: unscheduleTask, complete: unscheduleTask, error: unscheduleTask })
-    ).subscribe(subscriber).add(unscheduleTask);
-  }
-}
-
 @Injectable({
   providedIn: 'root',
 })
@@ -76,7 +58,7 @@ export class ɵAngularFireSchedulers {
   public readonly outsideAngular: ɵZoneScheduler;
   public readonly insideAngular: ɵZoneScheduler;
 
-  constructor(public ngZone: NgZone, public pendingTasks: PendingTasks) {
+  constructor(public ngZone: NgZone, public pendingTasks: PendingTasks, public injector: Injector) {
     this.outsideAngular = ngZone.runOutsideAngular(
       () => new ɵZoneScheduler(typeof Zone === 'undefined' ? undefined : Zone.current)
     );
@@ -86,18 +68,11 @@ export class ɵAngularFireSchedulers {
         asyncScheduler
       )
     );
-    globalThis.ɵAngularFireScheduler ||= this;
   }
 }
 
 function getSchedulers() {
-  const schedulers = globalThis.ɵAngularFireScheduler as ɵAngularFireSchedulers|undefined;
-  if (!schedulers) {
-    throw new Error(
-`Either AngularFireModule has not been provided in your AppModule (this can be done manually or implictly using
-provideFirebaseApp) or you're calling an AngularFire method outside of an NgModule (which is not supported).`);
-  }
-  return schedulers;
+  return inject(ɵAngularFireSchedulers);
 }
 
 function runOutsideAngular<T>(fn: (...args: any[]) => T): T {
@@ -117,34 +92,7 @@ export function observeInsideAngular<T>(obs$: Observable<T>): Observable<T> {
 }
 
 export function keepUnstableUntilFirst<T>(obs$: Observable<T>): Observable<T> {
-  return ɵkeepUnstableUntilFirstFactory(getSchedulers())(obs$);
-}
-
-/**
- * Operator to block the zone until the first value has been emitted or the observable
- * has completed/errored. This is used to make sure that universal waits until the first
- * value from firebase but doesn't block the zone forever since the firebase subscription
- * is still alive.
- */
-export function ɵkeepUnstableUntilFirstFactory(
-  schedulers: ɵAngularFireSchedulers
-) {
-  return function keepUnstableUntilFirst<T>(
-    obs$: Observable<T>
-  ): Observable<T> {
-    obs$ = obs$.lift(
-      new BlockUntilFirstOperator(schedulers.ngZone, schedulers.pendingTasks)
-    );
-
-    return obs$.pipe(
-      // Run the subscribe body outside of Angular (e.g. calling Firebase SDK to add a listener to a change event)
-      subscribeOn(schedulers.outsideAngular),
-      // Run operators inside the angular zone (e.g. side effects via tap())
-      observeOn(schedulers.insideAngular)
-      // INVESTIGATE https://github.com/angular/angularfire/pull/2315
-      // share()
-    );
-  };
+  return obs$.pipe(pendingUntilEvent(getSchedulers().injector));
 }
 
 const zoneWrapFn = (
@@ -194,7 +142,7 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
       return run(
         () =>
           new Promise((resolve, reject) => {
-            ret.then(
+            getSchedulers().pendingTasks.run(() => ret).then(
               (it) => run(() => resolve(it)),
               (reason) => run(() => reject(reason))
             );

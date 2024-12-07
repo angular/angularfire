@@ -36,7 +36,7 @@
     "@angular/platform-server": { "optional": true }
   },
   "dependencies": {
-    "firebase": "^11.0.0",
+    "firebase": "^11.0.2",
     "rxfire": "^6.0.5",
     "@angular-devkit/schematics": "^19.0.0",
     "@schematics/angular": "^19.0.0",

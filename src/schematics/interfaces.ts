@@ -5,6 +5,7 @@ export const enum FEATURES {
   Analytics,
   AppCheck,
   Database,
+  DataConnect,
   Functions,
   Messaging,
   Performance,
@@ -20,12 +21,13 @@ export const featureOptions = [
   { name: 'App Check', value: FEATURES.AppCheck },
   { name: 'Firestore', value: FEATURES.Firestore },
   { name: 'Realtime Database', value: FEATURES.Database },
+  // { name: 'Data Connect', value: FEATURES.DataConnect },
   { name: 'Cloud Functions (callable)', value: FEATURES.Functions },
   { name: 'Cloud Messaging', value: FEATURES.Messaging },
   { name: 'Performance Monitoring', value: FEATURES.Performance },
   { name: 'Cloud Storage', value: FEATURES.Storage },
   { name: 'Remote Config', value: FEATURES.RemoteConfig },
-  { name: 'VertexAI (preview)', value: FEATURES.VertexAI },
+  { name: 'Vertex AI', value: FEATURES.VertexAI },
 ];
 
 export const enum PROJECT_TYPE { Static, CloudFunctions, CloudRun, WebFrameworks }

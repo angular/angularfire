@@ -80,6 +80,7 @@ ${exportedZoneWrappedFns}
     }),
     reexport('database', 'rxfire', 'rxfire/database', tsKeys<typeof import('rxfire/database')>()),
     reexport('database', 'firebase', 'firebase/database', tsKeys<typeof import('firebase/database')>()),
+    reexport('data-connect', 'firebase', 'firebase/data-connect', tsKeys<typeof import('firebase/data-connect')>()),
     reexport('firestore', 'rxfire', 'rxfire/firestore', tsKeys<typeof import('rxfire/firestore')>(), {
       doc: { exportName: 'docSnapshots' },
       collection: { exportName: 'collectionSnapshots' },
