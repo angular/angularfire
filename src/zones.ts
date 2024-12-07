@@ -92,7 +92,23 @@ export function observeInsideAngular<T>(obs$: Observable<T>): Observable<T> {
 }
 
 export function keepUnstableUntilFirst<T>(obs$: Observable<T>): Observable<T> {
-  return obs$.pipe(pendingUntilEvent(getSchedulers().injector));
+   return ɵkeepUnstableUntilFirstFactory(getSchedulers())(obs$);
+}
+
+/**
+ * Operator to block the zone until the first value has been emitted or the observable
+ * has completed/errored. This is used to make sure that universal waits until the first
+ * value from firebase but doesn't block the zone forever since the firebase subscription
+ * is still alive.
+ */
+export function ɵkeepUnstableUntilFirstFactory(
+  _schedulers: ɵAngularFireSchedulers
+) {
+  return function keepUnstableUntilFirst<T>(
+    obs$: Observable<T>
+  ): Observable<T> {
+    return obs$.pipe(pendingUntilEvent(getSchedulers().injector));
+  }
 }
 
 const zoneWrapFn = (
