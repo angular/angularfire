@@ -1,5 +1,6 @@
 import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
-import { keepUnstableUntilFirst, ɵAngularFireSchedulers } from '@angular/fire';
+import { pendingUntilEvent } from '@angular/core/rxjs-interop';
+import { ɵAngularFireSchedulers } from '@angular/fire';
 import { ɵPromiseProxy, ɵapplyMixins, ɵlazySDKProxy } from '@angular/fire/compat';
 import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance, ɵfirebaseAppFactory } from '@angular/fire/compat';
 import { FirebaseOptions } from 'firebase/app';
@@ -185,7 +186,7 @@ export class AngularFireRemoteConfig {
 
     this.parameters = concat(default$, existing$, fresh$).pipe(
       scanToParametersArray(remoteConfig$),
-      keepUnstableUntilFirst,
+      pendingUntilEvent(),
       shareReplay({ bufferSize: 1, refCount: true })
     );
 

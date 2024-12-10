@@ -1,4 +1,4 @@
-import { keepUnstableUntilFirst } from '@angular/fire';
+import { pendingUntilEvent } from '@angular/core/rxjs-interop';
 import firebase from 'firebase/compat/app';
 import { Observable, from } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -74,7 +74,7 @@ export class AngularFirestoreDocument<T = DocumentData> {
   snapshotChanges(): Observable<Action<DocumentSnapshot<T>>> {
     const scheduledFromDocRef$ = fromDocRef<T>(this.ref, this.afs.schedulers.outsideAngular);
     return scheduledFromDocRef$.pipe(
-      keepUnstableUntilFirst
+      pendingUntilEvent()
     );
   }
 
@@ -102,7 +102,7 @@ export class AngularFirestoreDocument<T = DocumentData> {
    */
   get(options?: firebase.firestore.GetOptions) {
     return from(this.ref.get(options)).pipe(
-      keepUnstableUntilFirst,
+      pendingUntilEvent(),
     );
   }
 }

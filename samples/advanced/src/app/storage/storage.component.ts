@@ -1,5 +1,5 @@
 import { Component, OnInit, makeStateKey, TransferState } from '@angular/core';
-import { keepUnstableUntilFirst } from '@angular/fire';
+import { pendingUntilEvent } from '@angular/core/rxjs-interop';
 import { traceUntilFirst } from '@angular/fire/performance';
 
 import { Observable, of } from 'rxjs';
@@ -31,7 +31,7 @@ export class StorageComponent implements OnInit {
     this.downloadUrl$ = existing ? of(existing) : of(undefined).pipe(
       switchMap(() => import('./lazyStorage')),
       switchMap(({ iconUrl }) => iconUrl),
-      <any>keepUnstableUntilFirst,
+      pendingUntilEvent(),
       <any>traceUntilFirst('storage'),
       tap(it => state.set(key, it)),
       startWith(TRANSPARENT_PNG),

@@ -1,4 +1,4 @@
-import { NgZone, PendingTasks } from '@angular/core';
+import { NgZone } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ɵAngularFireSchedulers } from '@angular/fire';
 import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire/compat';
@@ -41,7 +41,7 @@ describe('AngularFireDatabase', () => {
     });
 
     it('should accept a Firebase App in the constructor', (done) => {
-      const schedulers = new ɵAngularFireSchedulers(zone, TestBed.inject(PendingTasks));
+      const schedulers = new ɵAngularFireSchedulers();
       const database = new AngularFireDatabase(
         app.options, rando(), undefined, {}, zone, schedulers, undefined, undefined,
         undefined, undefined, undefined, undefined, undefined, undefined, undefined,

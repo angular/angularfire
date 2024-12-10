@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { keepUnstableUntilFirst } from '@angular/fire';
+import { pendingUntilEvent } from '@angular/core/rxjs-interop';
 import { AppCheck, getToken } from '@angular/fire/app-check';
 import { traceUntilFirst } from '@angular/fire/performance';
 import { Observable, from } from 'rxjs';
@@ -24,7 +24,7 @@ export class AppCheckComponent implements OnInit {
 
   constructor(appCheck: AppCheck) {
     this.change$ = from(getToken(appCheck)).pipe(
-      <any>keepUnstableUntilFirst,
+      pendingUntilEvent(),
       <any>traceUntilFirst('app-check'),
       share(),
     );

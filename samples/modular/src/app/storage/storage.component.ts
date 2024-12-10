@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { from, Observable } from 'rxjs';
 import { startWith } from 'rxjs/operators';
-import { TransferState } from '@angular/platform-browser';
 import { traceUntilFirst } from '@angular/fire/performance';
 import { getDownloadURL, ref, Storage } from '@angular/fire/storage';
-import { keepUnstableUntilFirst } from '@angular/fire';
+import { pendingUntilEvent } from '@angular/core/rxjs-interop';
 
 const TRANSPARENT_PNG
   = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
@@ -26,7 +25,7 @@ export class StorageComponent implements OnInit {
   constructor(storage: Storage) {
     const icon = ref(storage, 'google-g.png');
     this.downloadUrl$ = from(getDownloadURL(icon)).pipe(
-      keepUnstableUntilFirst,
+      pendingUntilEvent(),
       traceUntilFirst('storage'),
       startWith(TRANSPARENT_PNG),
     );

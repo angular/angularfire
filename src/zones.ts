@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
   Injectable,
-  Injector,
   NgZone,
   PendingTasks,
   inject
@@ -58,7 +57,8 @@ export class ɵAngularFireSchedulers {
   public readonly outsideAngular: ɵZoneScheduler;
   public readonly insideAngular: ɵZoneScheduler;
 
-  constructor(public ngZone: NgZone, public pendingTasks: PendingTasks, public injector: Injector) {
+  constructor() {
+    const ngZone = inject(NgZone);
     this.outsideAngular = ngZone.runOutsideAngular(
       () => new ɵZoneScheduler(typeof Zone === 'undefined' ? undefined : Zone.current)
     );
@@ -76,11 +76,11 @@ function getSchedulers() {
 }
 
 function runOutsideAngular<T>(fn: (...args: any[]) => T): T {
-  return getSchedulers().ngZone.runOutsideAngular(() => fn());
+  return inject(NgZone).runOutsideAngular(() => fn());
 }
 
 function run<T>(fn: (...args: any[]) => T): T {
-  return getSchedulers().ngZone.run(() => fn());
+  return inject(NgZone).run(() => fn());
 }
 
 export function observeOutsideAngular<T>(obs$: Observable<T>): Observable<T> {
@@ -91,33 +91,13 @@ export function observeInsideAngular<T>(obs$: Observable<T>): Observable<T> {
   return obs$.pipe(observeOn(getSchedulers().insideAngular));
 }
 
-export function keepUnstableUntilFirst<T>(obs$: Observable<T>): Observable<T> {
-   return ɵkeepUnstableUntilFirstFactory(getSchedulers())(obs$);
-}
-
-/**
- * Operator to block the zone until the first value has been emitted or the observable
- * has completed/errored. This is used to make sure that universal waits until the first
- * value from firebase but doesn't block the zone forever since the firebase subscription
- * is still alive.
- */
-export function ɵkeepUnstableUntilFirstFactory(
-  schedulers: ɵAngularFireSchedulers
-) {
-  return function keepUnstableUntilFirst<T>(
-    obs$: Observable<T>
-  ): Observable<T> {
-    return obs$.pipe(pendingUntilEvent(schedulers.injector));
-  }
-}
-
 const zoneWrapFn = (
   it: (...args: any[]) => any,
   taskDone: VoidFunction | undefined
 ) => {
   return (...args: any[]) => {
     if (taskDone) {
-      setTimeout(taskDone, 0);
+      setTimeout(taskDone, 10);
     }
     return run(() => it.apply(this, args));
   };
@@ -133,7 +113,7 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
     for (let i = 0; i < arguments.length; i++) {
       if (typeof _arguments[i] === 'function') {
         if (blockUntilFirst) {
-          taskDone ||= run(() => getSchedulers().pendingTasks.add());
+          taskDone ||= run(() => inject(PendingTasks).add());
         }
         // TODO create a microtask to track callback functions
         _arguments[i] = zoneWrapFn(_arguments[i], taskDone);
@@ -156,14 +136,14 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
       return ret.pipe(
         subscribeOn(schedulers.outsideAngular),
         observeOn(schedulers.insideAngular),
-        keepUnstableUntilFirst,
+        pendingUntilEvent(),
       );
     } else if (ret instanceof Promise) {
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       return run(
         () =>
           new Promise((resolve, reject) => {
-            getSchedulers().pendingTasks.run(() => ret).then(
+            inject(PendingTasks).run(() => ret).then(
               (it) => run(() => resolve(it)),
               (reason) => run(() => reject(reason))
             );
@@ -173,7 +153,7 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
       // Handle unsubscribe
       // function() is needed for the arguments object
       return function () {
-        setTimeout(taskDone, 0);
+        setTimeout(taskDone, 10);
         return ret.apply(this, arguments);
       };
     } else {

@@ -1,5 +1,5 @@
 import { isPlatformServer } from '@angular/common';
-import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
+import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID, inject } from '@angular/core';
 import { ɵAngularFireSchedulers } from '@angular/fire';
 import { AppCheckInstances } from '@angular/fire/app-check';
 import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance, ɵfirebaseAppFactory } from '@angular/fire/compat';
@@ -197,7 +197,7 @@ export class AngularFirestore {
       collectionRef = pathOrRef;
     }
     const { ref, query } = associateQuery<T>(collectionRef, queryFn);
-    const refInZone = this.schedulers.ngZone.run(() => ref);
+    const refInZone = inject(NgZone).run(() => ref);
     return new AngularFirestoreCollection<T>(refInZone, query, this);
   }
 
@@ -227,7 +227,7 @@ export class AngularFirestore {
     } else {
       ref = pathOrRef;
     }
-    const refInZone = this.schedulers.ngZone.run(() => ref);
+    const refInZone = inject(NgZone).run(() => ref);
     return new AngularFirestoreDocument<T>(refInZone, this);
   }
 
