@@ -2,11 +2,11 @@
 import { TestBed } from '@angular/core/testing';
 import { ɵZoneScheduler } from '@angular/fire';
 import { AngularFireModule } from '@angular/fire/compat';
-import { AngularFireDatabase, AngularFireDatabaseModule, fromRef } from '@angular/fire/compat/database';
+import { AngularFireDatabase, AngularFireDatabaseModule, USE_EMULATOR, fromRef } from '@angular/fire/compat/database';
 import firebase from 'firebase/compat/app';
 import { take } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
-import { COMMON_CONFIG } from '../../../../src/test-config';
+import { COMMON_CONFIG, databaseEmulatorPort } from '../../../../src/test-config';
 import { rando } from '../../../../src/utils';
 
 describe('fromRef', () => {
@@ -28,16 +28,12 @@ describe('fromRef', () => {
         AngularFireDatabaseModule
       ],
       providers: [
-        { provide: URL, useValue: 'http://localhost:9000' }
+        { provide: USE_EMULATOR, useValue: ['localhost', databaseEmulatorPort] }
       ]
     });
 
     db = TestBed.inject(AngularFireDatabase);
     ref = (path: string) => db.database.ref(path);
-  });
-
-  afterEach(() => {
-    db.database.goOffline();
   });
 
   it('it should be async by default', (done) => {

@@ -21,3 +21,18 @@ export const COMMON_CONFIG_TOO = {
     databaseName: 'angularfire2-test',
     measurementId: 'G-W20QDV5CZZ'
 };
+
+declare global {
+  interface Window {
+    __karma__ : {
+        config: {
+            args: any[]
+        }
+    };
+  }
+}
+
+export const firestoreEmulatorPort: number = window.__karma__.config.args.find((it) => it[0] === "FIRESTORE_EMULATOR_PORT")[1];
+export const storageEmulatorPort: number = window.__karma__.config.args.find((it) => it[0] === "STORAGE_EMULATOR_PORT")[1];
+export const authEmulatorPort: number = window.__karma__.config.args.find((it) => it[0] === "AUTH_EMULATOR_PORT")[1];
+export const databaseEmulatorPort: number = window.__karma__.config.args.find((it) => it[0] === "DATABASE_EMULATOR_PORT")[1];

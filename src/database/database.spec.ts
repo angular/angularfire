@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { FirebaseApp, getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
-import { Database, connectDatabaseEmulator, getDatabase, goOffline, provideDatabase } from '@angular/fire/database';
+import { Database, connectDatabaseEmulator, getDatabase, provideDatabase } from '@angular/fire/database';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../utils';
 
@@ -26,10 +26,6 @@ describe('Database', () => {
         });
         app = TestBed.inject(FirebaseApp);
         database = TestBed.inject(Database);
-    });
-
-    afterEach(() => {
-        goOffline(database);
     });
 
     it('should be injectable', () => {
