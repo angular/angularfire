@@ -1,6 +1,7 @@
 import { isPlatformServer } from '@angular/common';
 import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
-import { keepUnstableUntilFirst, ɵAngularFireSchedulers } from '@angular/fire';
+import { pendingUntilEvent } from '@angular/core/rxjs-interop';
+import { ɵAngularFireSchedulers } from '@angular/fire';
 import { AppCheckInstances } from '@angular/fire/app-check';
 import { ɵPromiseProxy, ɵapplyMixins, ɵlazySDKProxy } from '@angular/fire/compat';
 import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp, ɵcacheInstance, ɵfirebaseAppFactory } from '@angular/fire/compat';
@@ -121,7 +122,7 @@ export class AngularFireAuth {
 
       const redirectResult = auth.pipe(
         switchMap(auth => auth.getRedirectResult().then(it => it, () => null)),
-        keepUnstableUntilFirst,
+        pendingUntilEvent(),
         shareReplay({ bufferSize: 1, refCount: false }),
       );
 

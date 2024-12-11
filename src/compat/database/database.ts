@@ -1,4 +1,4 @@
-import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
+import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID, inject } from '@angular/core';
 import { ɵAngularFireSchedulers } from '@angular/fire';
 import { AppCheckInstances } from '@angular/fire/app-check';
 import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance, ɵfirebaseAppFactory } from '@angular/fire/compat';
@@ -68,7 +68,7 @@ export class AngularFireDatabase {
   }
 
   list<T>(pathOrRef: PathReference, queryFn?: QueryFn): AngularFireList<T> {
-    const ref = this.schedulers.ngZone.runOutsideAngular(() => getRef(this.database, pathOrRef));
+    const ref = inject(NgZone).runOutsideAngular(() => getRef(this.database, pathOrRef));
     let query: DatabaseQuery = ref;
     if (queryFn) {
       query = queryFn(ref);
@@ -77,12 +77,12 @@ export class AngularFireDatabase {
   }
 
   object<T>(pathOrRef: PathReference): AngularFireObject<T> {
-    const ref = this.schedulers.ngZone.runOutsideAngular(() => getRef(this.database, pathOrRef));
+    const ref = inject(NgZone).runOutsideAngular(() => getRef(this.database, pathOrRef));
     return createObjectReference<T>(ref, this);
   }
 
   createPushId() {
-    const ref = this.schedulers.ngZone.runOutsideAngular(() => this.database.ref());
+    const ref = inject(NgZone).runOutsideAngular(() => this.database.ref());
     return ref.push().key;
   }
 

@@ -1,5 +1,5 @@
 import { NgZone, makeStateKey, TransferState } from '@angular/core';
-import { keepUnstableUntilFirst } from '@angular/fire';
+import { pendingUntilEvent } from '@angular/core/rxjs-interop';
 import {
     DocumentData,
     LoadBundleTaskProgress,
@@ -85,7 +85,7 @@ export const snapshotChanges = (state: TransferState, zone: NgZone, admin: app.A
             orderBy('updatedAt', 'desc').
             withConverter(Animal);
         return from(zone.runOutsideAngular(() => animalsCollection.get())).pipe(
-            <any>keepUnstableUntilFirst,
+            pendingUntilEvent(),
             tap((it: any) => {
                 const bundle = firestore.bundle().add(queryName, it).build();
                 state.set(key, bundle.toString());

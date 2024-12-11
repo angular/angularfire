@@ -1,10 +1,10 @@
-import { NgZone, PendingTasks } from '@angular/core';
+import { NgZone } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ɵAngularFireSchedulers } from '@angular/fire';
 import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire/compat';
-import { AngularFireDatabase, AngularFireDatabaseModule, URL } from '@angular/fire/compat/database';
+import { AngularFireDatabase, AngularFireDatabaseModule, USE_EMULATOR } from '@angular/fire/compat/database';
 import 'firebase/compat/database';
-import { COMMON_CONFIG } from '../../../src/test-config';
+import { COMMON_CONFIG, databaseEmulatorPort } from '../../../src/test-config';
 import { rando } from '../../../src/utils';
 
 describe('AngularFireDatabase', () => {
@@ -21,7 +21,7 @@ describe('AngularFireDatabase', () => {
         AngularFireDatabaseModule
       ],
       providers: [
-        { provide: URL, useValue: 'http://localhost:9000' }
+        { provide: USE_EMULATOR, useValue: ['localhost', databaseEmulatorPort] }
       ]
     });
 
@@ -41,7 +41,7 @@ describe('AngularFireDatabase', () => {
     });
 
     it('should accept a Firebase App in the constructor', (done) => {
-      const schedulers = new ɵAngularFireSchedulers(zone, TestBed.inject(PendingTasks));
+      const schedulers = TestBed.runInInjectionContext(() => new ɵAngularFireSchedulers());
       const database = new AngularFireDatabase(
         app.options, rando(), undefined, {}, zone, schedulers, undefined, undefined,
         undefined, undefined, undefined, undefined, undefined, undefined, undefined,
@@ -62,11 +62,9 @@ describe('AngularFireDatabase', () => {
 describe('AngularFireDatabase w/options', () => {
   let db: AngularFireDatabase;
   let firebaseAppName: string;
-  let url: string;
-
+  
   beforeEach(() => {
     firebaseAppName = rando();
-    url = `http://localhost:${Math.floor(Math.random() * 9999)}`;
     TestBed.configureTestingModule({
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
@@ -75,15 +73,11 @@ describe('AngularFireDatabase w/options', () => {
       providers: [
         { provide: FIREBASE_APP_NAME, useValue: firebaseAppName },
         { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG },
-        { provide: URL, useValue: url }
+        { provide: USE_EMULATOR, useValue: ['localhost', databaseEmulatorPort] }
       ]
     });
 
     db = TestBed.inject(AngularFireDatabase);
-  });
-
-  afterEach(() => {
-    db.database.goOffline();
   });
 
   describe('<constructor>', () => {

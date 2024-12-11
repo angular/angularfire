@@ -1,4 +1,4 @@
-import { keepUnstableUntilFirst } from '@angular/fire';
+import { pendingUntilEvent } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs/operators';
 import { AngularFireDatabase } from '../database';
 import { AngularFireObject, DatabaseQuery } from '../interfaces';
@@ -9,7 +9,7 @@ export function createObjectReference<T= any>(query: DatabaseQuery, afDatabase: 
     query,
     snapshotChanges<T>() {
       return createObjectSnapshotChanges<T>(query, afDatabase.schedulers.outsideAngular)().pipe(
-        keepUnstableUntilFirst
+        pendingUntilEvent()
       );
     },
     update(data: Partial<T>) { return query.ref.update(data as any) as Promise<void>; },
@@ -18,7 +18,7 @@ export function createObjectReference<T= any>(query: DatabaseQuery, afDatabase: 
     valueChanges<T>() {
       const snapshotChanges$ = createObjectSnapshotChanges(query, afDatabase.schedulers.outsideAngular)();
       return snapshotChanges$.pipe(
-        keepUnstableUntilFirst,
+        pendingUntilEvent(),
         map(action => action.payload.exists() ? action.payload.val() as T : null)
       );
     },

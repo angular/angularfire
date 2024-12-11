@@ -1,4 +1,4 @@
-import { keepUnstableUntilFirst } from '@angular/fire';
+import { pendingUntilEvent } from '@angular/core/rxjs-interop';
 import firebase from 'firebase/compat/app';
 import { Observable, from } from 'rxjs';
 import { filter, map, pairwise, scan, startWith } from 'rxjs/operators';
@@ -74,7 +74,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
       pairwise(),
       filter(([prior, current]: DocumentChangeTuple<T>) => current.length > 0 || !prior),
       map(([, current]) => current),
-      keepUnstableUntilFirst
+      pendingUntilEvent()
     );
   }
 
@@ -94,7 +94,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
     const validatedEvents = validateEventsArray(events);
     const scheduledSortedChanges$ = sortedChanges<T>(this.query, validatedEvents, this.afs.schedulers.outsideAngular);
     return scheduledSortedChanges$.pipe(
-      keepUnstableUntilFirst
+      pendingUntilEvent()
     );
   }
 
@@ -121,7 +121,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
             return a.data();
           }
         })),
-        keepUnstableUntilFirst
+        pendingUntilEvent()
       );
   }
 
@@ -130,7 +130,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
    */
   get(options?: firebase.firestore.GetOptions) {
     return from(this.query.get(options)).pipe(
-      keepUnstableUntilFirst,
+      pendingUntilEvent(),
     );
   }
 

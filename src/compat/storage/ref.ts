@@ -1,4 +1,5 @@
-import { keepUnstableUntilFirst, observeOutsideAngular } from '@angular/fire';
+import { pendingUntilEvent } from '@angular/core/rxjs-interop';
+import { observeOutsideAngular } from '@angular/fire';
 import { Observable, from, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { ListOptions, ListResult, Reference, SettableMetadata, StringFormat, UploadMetadata } from './interfaces';
@@ -27,12 +28,12 @@ export function createStorageRef(
     getDownloadURL: () => of(undefined).pipe(
       observeOutsideAngular,
       switchMap(() => ref.getDownloadURL()),
-      keepUnstableUntilFirst
+      pendingUntilEvent()
     ),
     getMetadata: () => of(undefined).pipe(
       observeOutsideAngular,
       switchMap(() => ref.getMetadata()),
-      keepUnstableUntilFirst
+      pendingUntilEvent()
     ),
     delete: () => from(ref.delete()),
     child: (path: string) => createStorageRef(ref.child(path)),
