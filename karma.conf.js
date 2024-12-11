@@ -5,7 +5,7 @@ const dns = require('node:dns');
 // https://github.com/firebase/firebase-tools/issues/5755#issuecomment-1535445383
 dns.setDefaultResultOrder('ipv4first');
 
-let firestoreEmulatorPort, storageEmulatorPort, authEmulatorPort, databaseEmulatorPort;
+let firestoreEmulatorPort, storageEmulatorPort, authEmulatorPort, databaseEmulatorPort, functionsEmulatorPort;
 if (process.env.FIRESTORE_EMULATOR_HOST &&
     process.env.STORAGE_EMULATOR_HOST &&
     process.env.FIREBASE_AUTH_EMULATOR_HOST &&
@@ -14,8 +14,10 @@ if (process.env.FIRESTORE_EMULATOR_HOST &&
       storageEmulatorPort = parseInt(process.env.STORAGE_EMULATOR_HOST.split(":")[2], 10); // 'http://127.0.0.1:9199'
       authEmulatorPort = parseInt(process.env.FIREBASE_AUTH_EMULATOR_HOST.split(":")[1], 10); // '127.0.0.1:9098'
       databaseEmulatorPort = parseInt(process.env.FIREBASE_DATABASE_EMULATOR_HOST.split(":")[1], 10); // '127.0.0.1:9002'
+      functionsEmulatorPort = 5001; // TODO figure out why this env variable isn't present
 } else {
-  throw "Missing emulator environment variables.";
+  console.error("Missing emulator environments variables");
+  process.exit(1);
 }
 
 // Karma configuration file, see link for more information
@@ -39,7 +41,8 @@ module.exports = function (config) {
         ["FIRESTORE_EMULATOR_PORT", firestoreEmulatorPort],
         ["DATABASE_EMULATOR_PORT", databaseEmulatorPort],
         ["STORAGE_EMULATOR_PORT", storageEmulatorPort],
-        ["AUTH_EMULATOR_PORT", authEmulatorPort]
+        ["AUTH_EMULATOR_PORT", authEmulatorPort],
+        ["FUNCTIONS_EMULATOR_PORT", functionsEmulatorPort],
       ],
     },
     coverageIstanbulReporter: {

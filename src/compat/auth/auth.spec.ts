@@ -25,7 +25,7 @@ describe('AngularFireAuth', () => {
       ],
       providers: [
         { provide: SETTINGS, useValue: { appVerificationDisabledForTesting: true } },
-        { provide: USE_EMULATOR, useValue: `http://localhost:${authEmulatorPort}` },
+        { provide: USE_EMULATOR, useValue: [`http://localhost:${authEmulatorPort}`] },
       ]
     });
 
@@ -138,7 +138,7 @@ describe('AngularFireAuth with different app', () => {
       providers: [
         { provide: FIREBASE_APP_NAME, useValue: firebaseAppName },
         { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG },
-        { provide: USE_EMULATOR, useValue: `http://localhost:${authEmulatorPort}` },
+        { provide: USE_EMULATOR, useValue: [`http://localhost:${authEmulatorPort}`] },
       ]
     });
     app = TestBed.inject(FirebaseApp);
