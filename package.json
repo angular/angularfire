@@ -75,8 +75,8 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^19.0.0",
-    "@angular-eslint/builder": "19.0.0-alpha.0",
-    "@angular-eslint/eslint-plugin": "19.0.0-alpha.0",
+    "@angular-eslint/builder": "^19.0.0",
+    "@angular-eslint/eslint-plugin": "^19.0.0",
     "@angular/animations": "^19.0.0",
     "@angular/cli": "^19.0.0",
     "@angular/compiler-cli": "^19.0.0",
