@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { FirebaseApp, getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
-import { RemoteConfig, getRemoteConfig, isSupported, provideRemoteConfig } from '@angular/fire/remote-config';
+import { RemoteConfig, getRemoteConfig, provideRemoteConfig } from '@angular/fire/remote-config';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../utils';
 
@@ -9,14 +9,6 @@ describe('RemoteConfig', () => {
   let remoteConfig: RemoteConfig;
   let providedRemoteConfig: RemoteConfig;
   let appName: string;
-
-  beforeAll(done => {
-    // The APP_INITIALIZER that is making isSupported() sync for DI may not
-    // be done evaulating by the time we inject from the TestBed. We can
-    // ensure correct behavior by waiting for the (global) isSuppported() promise
-    // to resolve.
-    isSupported().then(() => done());
-  });
 
   describe('single injection', () => {
 

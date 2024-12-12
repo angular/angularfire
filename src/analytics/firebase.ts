@@ -5,6 +5,7 @@ import {
   getAnalytics as _getAnalytics,
   getGoogleAnalyticsClientId as _getGoogleAnalyticsClientId,
   initializeAnalytics as _initializeAnalytics,
+  isSupported as _isSupported,
   logEvent as _logEvent,
   setAnalyticsCollectionEnabled as _setAnalyticsCollectionEnabled,
   setConsent as _setConsent,
@@ -15,13 +16,10 @@ import {
   settings as _settings
 } from 'firebase/analytics';
 
-export {
-  isSupported
-} from './overrides';
-
 export const getAnalytics = ɵzoneWrap(_getAnalytics, true);
 export const getGoogleAnalyticsClientId = ɵzoneWrap(_getGoogleAnalyticsClientId, true);
 export const initializeAnalytics = ɵzoneWrap(_initializeAnalytics, true);
+export const isSupported = ɵzoneWrap(_isSupported, true);
 export const logEvent = ɵzoneWrap(_logEvent, true);
 export const setAnalyticsCollectionEnabled = ɵzoneWrap(_setAnalyticsCollectionEnabled, true);
 export const setConsent = ɵzoneWrap(_setConsent, true);

@@ -19,7 +19,7 @@ describe('Auth', () => {
                 provideFirebaseApp(() => initializeApp(COMMON_CONFIG, appName)),
                 provideAuth(() => {
                     providedAuth = getAuth(getApp(appName));
-                    connectAuthEmulator(providedAuth, `http://localhost:${authEmulatorPort}`);
+                    connectAuthEmulator(providedAuth, `http://localhost:${authEmulatorPort}`, { disableWarnings: true });
                     return providedAuth;
                 }),
             ],

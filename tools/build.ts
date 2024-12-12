@@ -64,9 +64,7 @@ ${exportedZoneWrappedFns}
     await writeFile(filePath, fileOutput);
   };
   return Promise.all([
-    reexport('analytics', 'firebase', 'firebase/analytics', tsKeys<typeof import('firebase/analytics')>(), {
-      isSupported: { override: true },
-    }),
+    reexport('analytics', 'firebase', 'firebase/analytics', tsKeys<typeof import('firebase/analytics')>()),
     reexport('app', 'firebase', 'firebase/app', tsKeys<typeof import('firebase/app')>()),
     reexport('app-check', 'firebase', 'firebase/app-check', tsKeys<typeof import('firebase/app-check')>()),
     reexport('auth', 'rxfire', 'rxfire/auth', tsKeys<typeof import('rxfire/auth')>()),
@@ -91,8 +89,8 @@ ${exportedZoneWrappedFns}
     }),
     reexport('functions', 'firebase', 'firebase/functions', tsKeys<typeof import('firebase/functions')>()),
     reexport('messaging', 'firebase', 'firebase/messaging', tsKeys<typeof import('firebase/messaging')>(), {
-      onMessage: { blockUntilFirst: false },
-      isSupported: { override: true },
+      isSupported: { blockUntilFirst: false },
+      onMessage: { blockUntilFirst: false }
     }),
     reexport('remote-config', 'rxfire', 'rxfire/remote-config', tsKeys<typeof import('rxfire/remote-config')>(), {
       getValue: { exportName: 'getValueChanges' },
@@ -101,9 +99,7 @@ ${exportedZoneWrappedFns}
       getBoolean: { exportName: 'getBooleanChanges' },
       getAll: { exportName: 'getAllChanges' },
     }),
-    reexport('remote-config', 'firebase', 'firebase/remote-config', tsKeys<typeof import('firebase/remote-config')>(), {
-      isSupported: { override: true },
-    }),
+    reexport('remote-config', 'firebase', 'firebase/remote-config', tsKeys<typeof import('firebase/remote-config')>()),
     reexport('storage', 'rxfire', 'rxfire/storage', tsKeys<typeof import('rxfire/storage')>(), {
       getDownloadURL: null,
       getMetadata: null,

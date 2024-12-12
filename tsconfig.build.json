@@ -5,7 +5,7 @@
     "compilerOptions": {
         "outDir": "tools",
         "skipLibCheck": true,
-        "lib": ["es2019"],
+        "lib": ["es2019", "dom"],
         "module": "commonjs",
         "target": "ES2020",
         "plugins": [

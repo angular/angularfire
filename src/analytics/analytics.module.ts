@@ -1,11 +1,12 @@
+import { isPlatformBrowser } from '@angular/common';
 import {
-  APP_INITIALIZER,
   EnvironmentProviders,
   InjectionToken,
   Injector,
   NgModule,
   NgZone,
   Optional,
+  PLATFORM_ID,
   makeEnvironmentProviders,
 } from '@angular/core';
 import { VERSION, ɵAngularFireSchedulers, ɵgetDefaultInstanceOf } from '@angular/fire';
@@ -13,21 +14,20 @@ import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
 import { Analytics as FirebaseAnalytics } from 'firebase/analytics';
 import { registerVersion } from 'firebase/app';
 import { ANALYTICS_PROVIDER_NAME, Analytics, AnalyticsInstances } from './analytics';
-import { isAnalyticsSupportedFactory } from './is-analytics-supported-factory';
 import { ScreenTrackingService } from './screen-tracking.service';
 import { UserTrackingService } from './user-tracking.service';
 
 export const PROVIDED_ANALYTICS_INSTANCES = new InjectionToken<Analytics[]>('angularfire2.analytics-instances');
 
-export function defaultAnalyticsInstanceFactory(provided: FirebaseAnalytics[]|undefined, defaultApp: FirebaseApp) {
-  if (!isAnalyticsSupportedFactory.sync()) { return null; }
+export function defaultAnalyticsInstanceFactory(provided: FirebaseAnalytics[]|undefined, defaultApp: FirebaseApp, platformId: object) {
+  if (!isPlatformBrowser(platformId)) { return null; }
   const defaultAnalytics = ɵgetDefaultInstanceOf<FirebaseAnalytics>(ANALYTICS_PROVIDER_NAME, provided, defaultApp);
   return defaultAnalytics && new Analytics(defaultAnalytics);
 }
 
 export function analyticsInstanceFactory(fn: (injector: Injector) => FirebaseAnalytics) {
-  return (zone: NgZone, injector: Injector) => {
-    if (!isAnalyticsSupportedFactory.sync()) { return null; }
+  return (zone: NgZone, injector: Injector, platformId: object) => {
+    if (!isPlatformBrowser(platformId)) { return null; }
     const analytics = zone.runOutsideAngular(() => fn(injector));
     return new Analytics(analytics);
   };
@@ -46,18 +46,14 @@ const DEFAULT_ANALYTICS_INSTANCE_PROVIDER = {
   deps: [
     [new Optional(), PROVIDED_ANALYTICS_INSTANCES ],
     FirebaseApp,
+    PLATFORM_ID,
   ]
 };
 
 @NgModule({
   providers: [
     DEFAULT_ANALYTICS_INSTANCE_PROVIDER,
-    ANALYTICS_INSTANCES_PROVIDER,
-    {
-      provide: APP_INITIALIZER,
-      useValue: isAnalyticsSupportedFactory.async,
-      multi: true,
-    }
+    ANALYTICS_INSTANCES_PROVIDER
   ]
 })
 export class AnalyticsModule {
@@ -76,17 +72,13 @@ export function provideAnalytics(fn: (injector: Injector) => FirebaseAnalytics, 
     DEFAULT_ANALYTICS_INSTANCE_PROVIDER,
     ANALYTICS_INSTANCES_PROVIDER,
     {
-      provide: APP_INITIALIZER,
-      useValue: isAnalyticsSupportedFactory.async,
-      multi: true,
-    },
-    {
       provide: PROVIDED_ANALYTICS_INSTANCES,
       useFactory: analyticsInstanceFactory(fn),
       multi: true,
       deps: [
         NgZone,
         Injector,
+        PLATFORM_ID,
         ɵAngularFireSchedulers,
         FirebaseApps,
         ...deps,

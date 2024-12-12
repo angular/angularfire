@@ -9,14 +9,6 @@ describe('Messaging', () => {
   let providedMessaging: Messaging;
   let appName: string;
 
-  beforeAll(done => {
-    // The APP_INITIALIZER that is making isSupported() sync for DI may not
-    // be done evaulating by the time we inject from the TestBed. We can
-    // ensure correct behavior by waiting for the (global) isSuppported() promise
-    // to resolve.
-    isSupported().then(() => done());
-  });
-
   describe('single injection', () => {
 
     beforeEach(() => {
@@ -33,18 +25,15 @@ describe('Messaging', () => {
         messaging = TestBed.inject(Messaging);
     });
 
-    it('should be injectable', done => {
-      (async () => {
-        const supported = await isSupported();
-        if (supported) {
-          expect(providedMessaging).toBeTruthy();
-          expect(messaging).toEqual(providedMessaging);
-        } else {
-          expect(providedMessaging).toBeUndefined();
-          expect(messaging).toBeNull();
-        }
-        done();
-      })();
+    it('should be injectable', async () => {
+      const supported = await TestBed.runInInjectionContext(isSupported);
+      if (supported) {
+        expect(providedMessaging).toBeTruthy();
+        expect(messaging).toEqual(providedMessaging);
+      } else {
+        expect(providedMessaging).toBeUndefined();
+        expect(messaging).toBeNull();
+      }
     });
 
   });
