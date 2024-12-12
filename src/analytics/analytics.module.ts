@@ -1,4 +1,4 @@
-import { isPlatformServer } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import {
   EnvironmentProviders,
   InjectionToken,
@@ -20,14 +20,14 @@ import { UserTrackingService } from './user-tracking.service';
 export const PROVIDED_ANALYTICS_INSTANCES = new InjectionToken<Analytics[]>('angularfire2.analytics-instances');
 
 export function defaultAnalyticsInstanceFactory(provided: FirebaseAnalytics[]|undefined, defaultApp: FirebaseApp, platformId: object) {
-  if (isPlatformServer(platformId)) { return null; }
+  if (!isPlatformBrowser(platformId)) { return null; }
   const defaultAnalytics = ɵgetDefaultInstanceOf<FirebaseAnalytics>(ANALYTICS_PROVIDER_NAME, provided, defaultApp);
   return defaultAnalytics && new Analytics(defaultAnalytics);
 }
 
 export function analyticsInstanceFactory(fn: (injector: Injector) => FirebaseAnalytics) {
   return (zone: NgZone, injector: Injector, platformId: object) => {
-    if (isPlatformServer(platformId)) { return null; }
+    if (!isPlatformBrowser(platformId)) { return null; }
     const analytics = zone.runOutsideAngular(() => fn(injector));
     return new Analytics(analytics);
   };
