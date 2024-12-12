@@ -1,18 +1,18 @@
+import { isPlatformServer } from '@angular/common';
 import {
-  APP_INITIALIZER,
   EnvironmentProviders,
   InjectionToken,
   Injector,
   NgModule,
   NgZone,
   Optional,
+  PLATFORM_ID,
   makeEnvironmentProviders,
 } from '@angular/core';
 import { VERSION, ɵAngularFireSchedulers, ɵgetDefaultInstanceOf } from '@angular/fire';
 import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
 import { registerVersion } from 'firebase/app';
 import { RemoteConfig as FirebaseRemoteConfig } from 'firebase/remote-config';
-import { isRemoteConfigSupportedFactory } from './is-remote-config-supported-factory';
 import { REMOTE_CONFIG_PROVIDER_NAME, RemoteConfig, RemoteConfigInstances } from './remote-config';
 
 export const PROVIDED_REMOTE_CONFIG_INSTANCES = new InjectionToken<RemoteConfig[]>('angularfire2.remote-config-instances');
@@ -20,15 +20,16 @@ export const PROVIDED_REMOTE_CONFIG_INSTANCES = new InjectionToken<RemoteConfig[
 export function defaultRemoteConfigInstanceFactory(
   provided: FirebaseRemoteConfig[]|undefined,
   defaultApp: FirebaseApp,
+  platformId: object,
 ) {
-  if (!isRemoteConfigSupportedFactory.sync()) { return null; }
+  if (isPlatformServer(platformId)) { return null; }
   const defaultRemoteConfig = ɵgetDefaultInstanceOf<FirebaseRemoteConfig>(REMOTE_CONFIG_PROVIDER_NAME, provided, defaultApp);
   return defaultRemoteConfig && new RemoteConfig(defaultRemoteConfig);
 }
 
 export function remoteConfigInstanceFactory(fn: (injector: Injector) => FirebaseRemoteConfig) {
-  return (zone: NgZone, injector: Injector) => {
-    if (!isRemoteConfigSupportedFactory.sync()) { return null; }
+  return (zone: NgZone, injector: Injector, platformId: object) => {
+    if (isPlatformServer(platformId)) { return null; }
     const remoteConfig = zone.runOutsideAngular(() => fn(injector));
     return new RemoteConfig(remoteConfig);
   };
@@ -47,6 +48,7 @@ const DEFAULT_REMOTE_CONFIG_INSTANCE_PROVIDER = {
   deps: [
     [new Optional(), PROVIDED_REMOTE_CONFIG_INSTANCES ],
     FirebaseApp,
+    PLATFORM_ID,
   ]
 };
 
@@ -54,11 +56,6 @@ const DEFAULT_REMOTE_CONFIG_INSTANCE_PROVIDER = {
   providers: [
     DEFAULT_REMOTE_CONFIG_INSTANCE_PROVIDER,
     REMOTE_CONFIG_INSTANCES_PROVIDER,
-    {
-      provide: APP_INITIALIZER,
-      useValue: isRemoteConfigSupportedFactory.async,
-      multi: true,
-    },
   ]
 })
 export class RemoteConfigModule {
@@ -76,17 +73,13 @@ export function provideRemoteConfig(
     DEFAULT_REMOTE_CONFIG_INSTANCE_PROVIDER,
     REMOTE_CONFIG_INSTANCES_PROVIDER,
     {
-      provide: APP_INITIALIZER,
-      useValue: isRemoteConfigSupportedFactory.async,
-      multi: true,
-    },
-    {
       provide: PROVIDED_REMOTE_CONFIG_INSTANCES,
       useFactory: remoteConfigInstanceFactory(fn),
       multi: true,
       deps: [
         NgZone,
         Injector,
+        PLATFORM_ID,
         ɵAngularFireSchedulers,
         FirebaseApps,
         ...deps,
