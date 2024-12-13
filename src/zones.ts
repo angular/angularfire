@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
   Injectable,
+  Injector,
   NgZone,
   PendingTasks,
   inject
@@ -97,7 +98,7 @@ const zoneWrapFn = (
 ) => {
   return (...args: any[]) => {
     if (taskDone) {
-      setTimeout(taskDone, 10);
+      setTimeout(taskDone, 0);
     }
     return run(() => it.apply(this, args));
   };
@@ -108,12 +109,22 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
   return function () {
     let taskDone: VoidFunction | undefined;
     const _arguments = arguments;
+    let schedulers: ɵAngularFireSchedulers;
+    let pendingTasks: PendingTasks;
+    let injector: Injector;
+    try {
+      schedulers = getSchedulers();
+      pendingTasks = inject(PendingTasks);
+      injector = inject(Injector);
+    } catch(e) {
+      return (it as any).apply(this, _arguments);
+    }
     // if this is a callback function, e.g, onSnapshot, we should create a pending task and complete it
     // only once one of the callback functions is tripped.
     for (let i = 0; i < arguments.length; i++) {
       if (typeof _arguments[i] === 'function') {
         if (blockUntilFirst) {
-          taskDone ||= run(() => inject(PendingTasks).add());
+          taskDone ||= run(() => pendingTasks.add());
         }
         // TODO create a microtask to track callback functions
         _arguments[i] = zoneWrapFn(_arguments[i], taskDone);
@@ -122,7 +133,6 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
     const ret = runOutsideAngular(() => (it as any).apply(this, _arguments));
     if (!blockUntilFirst) {
       if (ret instanceof Observable) {
-        const schedulers = getSchedulers();
         return ret.pipe(
           subscribeOn(schedulers.outsideAngular),
           observeOn(schedulers.insideAngular),
@@ -132,18 +142,17 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
       }
     }
     if (ret instanceof Observable) {
-      const schedulers = getSchedulers();
       return ret.pipe(
         subscribeOn(schedulers.outsideAngular),
         observeOn(schedulers.insideAngular),
-        pendingUntilEvent(),
+        pendingUntilEvent(injector),
       );
     } else if (ret instanceof Promise) {
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       return run(
         () =>
           new Promise((resolve, reject) => {
-            inject(PendingTasks).run(() => ret).then(
+            pendingTasks.run(() => ret).then(
               (it) => run(() => resolve(it)),
               (reason) => run(() => reject(reason))
             );
@@ -153,7 +162,7 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
       // Handle unsubscribe
       // function() is needed for the arguments object
       return function () {
-        setTimeout(taskDone, 10);
+        setTimeout(taskDone, 0);
         return ret.apply(this, arguments);
       };
     } else {
