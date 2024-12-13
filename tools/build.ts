@@ -75,6 +75,7 @@ ${exportedZoneWrappedFns}
       browserSessionPersistence: null,
       indexedDBLocalPersistence: null,
       prodErrorMap: null,
+      beforeAuthStateChanged: { blockUntilFirst: false },
     }),
     reexport('database', 'rxfire', 'rxfire/database', tsKeys<typeof import('rxfire/database')>()),
     reexport('database', 'firebase', 'firebase/database', tsKeys<typeof import('firebase/database')>()),
