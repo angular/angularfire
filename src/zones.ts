@@ -4,7 +4,9 @@ import {
   Injector,
   NgZone,
   PendingTasks,
-  inject
+  inject,
+  isDevMode,
+  runInInjectionContext
 } from '@angular/core';
 import { pendingUntilEvent } from '@angular/core/rxjs-interop';
 import {
@@ -76,31 +78,71 @@ function getSchedulers() {
   return inject(ɵAngularFireSchedulers);
 }
 
+var alreadyWarned = false;
+function warnOutsideInjectionContext(original: any, operation: string) {
+  if (isDevMode()) {
+    console.warn(`Firebase API outside injection context (${operation})`, original);
+    if (!alreadyWarned) {
+      alreadyWarned = true;
+      console.error("Calling Firebase APIs outside of an Injection context may destabilize your application leading to subtle change-detection and hydration bugs. Find more at https://github.com/angular/angularfire/blob/main/docs/zones.md");
+    }
+  }
+}
+
 function runOutsideAngular<T>(fn: (...args: any[]) => T): T {
-  return inject(NgZone).runOutsideAngular(() => fn());
+  let ngZone: NgZone|undefined;
+  try {
+    ngZone = inject(NgZone);
+  } catch(e) {
+    warnOutsideInjectionContext(fn, "runOutsideAngular");
+  }
+  if (!ngZone) {return fn();}
+  return ngZone.runOutsideAngular(() => fn());
 }
 
 function run<T>(fn: (...args: any[]) => T): T {
-  return inject(NgZone).run(() => fn());
+  let ngZone: NgZone|undefined;
+  try {
+    ngZone = inject(NgZone);
+  } catch(e) {
+    warnOutsideInjectionContext(fn, "run");
+  }
+  if (!ngZone) {return fn();}
+  return ngZone.run(() => fn());
 }
 
 export function observeOutsideAngular<T>(obs$: Observable<T>): Observable<T> {
-  return obs$.pipe(observeOn(getSchedulers().outsideAngular));
+  let schedulers: ɵAngularFireSchedulers|undefined;
+  try {
+    schedulers = getSchedulers();
+  } catch(e) {
+    warnOutsideInjectionContext(obs$, "observeOutsideAngular");
+  }
+  if (!schedulers) {return obs$;}
+  return obs$.pipe(observeOn(schedulers.outsideAngular));
 }
 
 export function observeInsideAngular<T>(obs$: Observable<T>): Observable<T> {
-  return obs$.pipe(observeOn(getSchedulers().insideAngular));
+  let schedulers: ɵAngularFireSchedulers|undefined;
+  try {
+    schedulers = getSchedulers();
+  } catch(e) {
+    warnOutsideInjectionContext(obs$, "observeInsideAngular");
+  }
+  if (!schedulers) {return obs$;}
+  return obs$.pipe(observeOn(schedulers.insideAngular));
 }
 
 const zoneWrapFn = (
   it: (...args: any[]) => any,
-  taskDone: VoidFunction | undefined
+  taskDone: VoidFunction | undefined,
+  injector: Injector,
 ) => {
   return (...args: any[]) => {
     if (taskDone) {
       setTimeout(taskDone, 0);
     }
-    return run(() => it.apply(this, args));
+    return runInInjectionContext(injector, () => run(() => it.apply(this, args)));
   };
 };
 
@@ -117,6 +159,7 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
       pendingTasks = inject(PendingTasks);
       injector = inject(Injector);
     } catch(e) {
+      warnOutsideInjectionContext(it, "ɵzoneWrap");
       return (it as any).apply(this, _arguments);
     }
     // if this is a callback function, e.g, onSnapshot, we should create a pending task and complete it
@@ -127,7 +170,7 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
           taskDone ||= run(() => pendingTasks.add());
         }
         // TODO create a microtask to track callback functions
-        _arguments[i] = zoneWrapFn(_arguments[i], taskDone);
+        _arguments[i] = zoneWrapFn(_arguments[i], taskDone, injector);
       }
     }
     const ret = runOutsideAngular(() => (it as any).apply(this, _arguments));
