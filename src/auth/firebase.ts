@@ -59,7 +59,7 @@ import {
 } from 'firebase/auth';
 
 export const applyActionCode = ɵzoneWrap(_applyActionCode, true);
-export const beforeAuthStateChanged = ɵzoneWrap(_beforeAuthStateChanged, true);
+export const beforeAuthStateChanged = ɵzoneWrap(_beforeAuthStateChanged, false);
 export const checkActionCode = ɵzoneWrap(_checkActionCode, true);
 export const confirmPasswordReset = ɵzoneWrap(_confirmPasswordReset, true);
 export const connectAuthEmulator = ɵzoneWrap(_connectAuthEmulator, true);
