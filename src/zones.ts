@@ -81,7 +81,7 @@ function getSchedulers() {
 var alreadyWarned = false;
 function warnOutsideInjectionContext(original: any, operation: string) {
   if (isDevMode()) {
-    console.warn(`Firebase API outside injection context (${operation})`, original);
+    console.warn(`Firebase API called outside injection context: ${operation}(${original})`);
     if (!alreadyWarned) {
       alreadyWarned = true;
       console.error("Calling Firebase APIs outside of an Injection context may destabilize your application leading to subtle change-detection and hydration bugs. Find more at https://github.com/angular/angularfire/blob/main/docs/zones.md");
