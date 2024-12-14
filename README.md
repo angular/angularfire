@@ -33,9 +33,9 @@ export const appConfig: ApplicationConfig = {
 ```
 
 ```ts
+import { AsyncPipe } from '@angular/common';
 import { inject } from '@angular/core';
 import { Firestore, collectionData, collection } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
 
 interface Item {
   name: string,
@@ -44,7 +44,6 @@ interface Item {
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   template: `
   <ul>
     @for (item of (item$ | async); track item) {
@@ -53,29 +52,15 @@ interface Item {
       </li>
     }
   </ul>
-  `
+  `,
+  imports: [AsyncPipe]
 })
 export class AppComponent {
-  item$: Observable<Item[]>;
-  firestore: Firestore = inject(Firestore);
-
-  constructor() {
-    const itemCollection = collection(this.firestore, 'items');
-    this.item$ = collectionData<Item>(itemCollection);
-  }
+  firestore = inject(Firestore);
+  itemCollection = collection(this.firestore, 'items');
+  item$ = collectionData<Item>(itemCollection);
 }
 ```
-
-### Polyfills
-
-Neither AngularFire nor Firebase ship with polyfills. To have compatibility across a wide-range of environments, we suggest the following polyfills be added to your application:
-
-| API | Environments | Suggested Polyfill | License |
-|-----|--------------|--------------------|---------|
-| Various ES5+ features  | Safari &lt; 10 | [`core-js/stable`](https://github.com/zloirock/core-js#readme) | MIT |
-| `globalThis` | [Chrome &lt; 71<br>Safari &lt; 12.1<br>iOS &lt; 12.2<br>Node &lt; 12](https://caniuse.com/mdn-javascript_builtins_globalthis) | [`globalThis`](https://github.com/es-shims/globalThis#readme) | MIT |
-| `Proxy` | [Safari &lt; 10](https://caniuse.com/proxy) | [`proxy-polyfill`](https://github.com/GoogleChrome/proxy-polyfill#readme) | Apache 2.0 |
-| `fetch` | [Safari &lt; 10.1<br>iOS &lt; 10.3](https://caniuse.com/fetch) | [`cross-fetch`](https://github.com/lquixada/cross-fetch#readme) | MIT |
 
 ## Resources
 
@@ -85,15 +70,11 @@ Neither AngularFire nor Firebase ship with polyfills. To have compatibility acro
 
 [Stackblitz Template](https://stackblitz.com/edit/angular-fire-start) - Remember to set your Firebase configuration in `app/app.module.ts`.
 
-[Upgrading to v7.0? Check out our guide.](docs/version-7-upgrade.md)
+[Upgrading from v6.0? Check out our guide.](docs/version-7-upgrade.md)
 
-### Sample apps
+### Sample app
 
-We have three sample apps in this repository:
-
-1. [`samples/compat`](samples/compat) a kitchen sink application that demonstrates use of the "compatibility" API
-1. [`samples/modular`](samples/modular) a kitchen sink application that demonstrates the new tree-shakable API
-1. [`samples/advanced`](samples/advanced) the same app as `samples/modular` but demonstrates more advanced concepts such as Angular Universal state-transfer, dynamically importing Firebase feature modules, and Firestore data bundling.
+The [`sample`](sample) folder contains a kitchen sink application that demonstrates use of the "modular" API, in a zoneless server-rendered application, with all the bells and whistles.
 
 ### Having troubles?
 
