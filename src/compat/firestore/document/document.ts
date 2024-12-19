@@ -1,3 +1,4 @@
+import { EnvironmentInjector, inject } from '@angular/core';
 import { pendingUntilEvent } from '@angular/core/rxjs-interop';
 import firebase from 'firebase/compat/app';
 import { Observable, from } from 'rxjs';
@@ -30,6 +31,7 @@ import { fromDocRef } from '../observable/fromRef';
  * Observable.from(fakeStock).subscribe(value => console.log(value));
  */
 export class AngularFirestoreDocument<T = DocumentData> {
+  private readonly injector = inject(EnvironmentInjector);
 
   /**
    * The constructor takes in a DocumentReference to provide wrapper methods
@@ -74,7 +76,7 @@ export class AngularFirestoreDocument<T = DocumentData> {
   snapshotChanges(): Observable<Action<DocumentSnapshot<T>>> {
     const scheduledFromDocRef$ = fromDocRef<T>(this.ref, this.afs.schedulers.outsideAngular);
     return scheduledFromDocRef$.pipe(
-      pendingUntilEvent()
+      pendingUntilEvent(this.injector)
     );
   }
 
@@ -102,7 +104,7 @@ export class AngularFirestoreDocument<T = DocumentData> {
    */
   get(options?: firebase.firestore.GetOptions) {
     return from(this.ref.get(options)).pipe(
-      pendingUntilEvent(),
+      pendingUntilEvent(this.injector)
     );
   }
 }

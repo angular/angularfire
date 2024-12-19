@@ -1,3 +1,4 @@
+import { EnvironmentInjector, inject } from '@angular/core';
 import { pendingUntilEvent } from '@angular/core/rxjs-interop';
 import firebase from 'firebase/compat/app';
 import { Observable, from } from 'rxjs';
@@ -27,6 +28,8 @@ import { fromCollectionRef } from '../observable/fromRef';
  * fakeStock.valueChanges().subscribe(value => console.log(value));
  */
 export class AngularFirestoreCollectionGroup<T = DocumentData> {
+  private readonly injector = inject(EnvironmentInjector);
+
   /**
    * The constructor takes in a CollectionGroupQuery to provide wrapper methods
    * for data operations and data streaming.
@@ -43,14 +46,14 @@ export class AngularFirestoreCollectionGroup<T = DocumentData> {
   stateChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction<T>[]> {
     if (!events || events.length === 0) {
       return docChanges<T>(this.query, this.afs.schedulers.outsideAngular).pipe(
-        pendingUntilEvent()
+        pendingUntilEvent(this.injector)
       );
     }
     return docChanges<T>(this.query, this.afs.schedulers.outsideAngular)
       .pipe(
         map(actions => actions.filter(change => events.indexOf(change.type) > -1)),
         filter(changes =>  changes.length > 0),
-        pendingUntilEvent()
+        pendingUntilEvent(this.injector)
       );
   }
 
@@ -70,7 +73,7 @@ export class AngularFirestoreCollectionGroup<T = DocumentData> {
     const validatedEvents = validateEventsArray(events);
     const scheduledSortedChanges$ = sortedChanges<T>(this.query, validatedEvents, this.afs.schedulers.outsideAngular);
     return scheduledSortedChanges$.pipe(
-      pendingUntilEvent()
+      pendingUntilEvent(this.injector)
     );
   }
 
@@ -98,7 +101,7 @@ export class AngularFirestoreCollectionGroup<T = DocumentData> {
             return a.data();
           }
         })),
-        pendingUntilEvent()
+        pendingUntilEvent(this.injector)
       );
   }
 
@@ -107,7 +110,7 @@ export class AngularFirestoreCollectionGroup<T = DocumentData> {
    */
   get(options?: firebase.firestore.GetOptions) {
     return from(this.query.get(options)).pipe(
-      pendingUntilEvent()
+      pendingUntilEvent(this.injector)
     );
   }
 
