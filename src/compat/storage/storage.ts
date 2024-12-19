@@ -1,4 +1,4 @@
-import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
+import { EnvironmentInjector, Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID, inject } from '@angular/core';
 import { ɵAngularFireSchedulers } from '@angular/fire';
 import { AppCheckInstances } from '@angular/fire/app-check';
 import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance, ɵfirebaseAppFactory } from '@angular/fire/compat';
@@ -27,6 +27,7 @@ export const USE_EMULATOR = new InjectionToken<UseEmulatorArguments>('angularfir
 })
 export class AngularFireStorage {
   public readonly storage: firebase.storage.Storage;
+  private readonly injector = inject(EnvironmentInjector);
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
@@ -59,16 +60,16 @@ export class AngularFireStorage {
   }
 
   ref(path: string) {
-    return createStorageRef(this.storage.ref(path));
+    return createStorageRef(this.storage.ref(path), this.injector);
   }
 
   refFromURL(path: string) {
-    return createStorageRef(this.storage.refFromURL(path));
+    return createStorageRef(this.storage.refFromURL(path), this.injector);
   }
 
   upload(path: string, data: any, metadata?: UploadMetadata) {
     const storageRef = this.storage.ref(path);
-    const ref = createStorageRef(storageRef);
+    const ref = createStorageRef(storageRef, this.injector);
     return ref.put(data, metadata);
   }
 

@@ -1,5 +1,5 @@
 import { isPlatformServer } from '@angular/common';
-import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID, inject } from '@angular/core';
+import { EnvironmentInjector, Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID, inject, runInInjectionContext } from '@angular/core';
 import { ɵAngularFireSchedulers } from '@angular/fire';
 import { AppCheckInstances } from '@angular/fire/app-check';
 import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance, ɵfirebaseAppFactory } from '@angular/fire/compat';
@@ -121,6 +121,7 @@ export function associateQuery<T>(collectionRef: CollectionReference<T>, queryFn
 export class AngularFirestore {
   public readonly firestore: firebase.firestore.Firestore;
   public readonly persistenceEnabled$: Observable<boolean>;
+  private readonly injector = inject(EnvironmentInjector);
 
   /**
    * Each Feature of AngularFire has a FirebaseApp injected. This way we
@@ -197,7 +198,7 @@ export class AngularFirestore {
       collectionRef = pathOrRef;
     }
     const { ref, query } = associateQuery<T>(collectionRef, queryFn);
-    const refInZone = inject(NgZone).run(() => ref);
+    const refInZone = runInInjectionContext(this.injector, () => inject(NgZone).run(() => ref));
     return new AngularFirestoreCollection<T>(refInZone, query, this);
   }
 
@@ -227,7 +228,7 @@ export class AngularFirestore {
     } else {
       ref = pathOrRef;
     }
-    const refInZone = inject(NgZone).run(() => ref);
+    const refInZone = runInInjectionContext(this.injector, () => inject(NgZone).run(() => ref));
     return new AngularFirestoreDocument<T>(refInZone, this);
   }
 

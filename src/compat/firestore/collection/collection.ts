@@ -1,3 +1,4 @@
+import { EnvironmentInjector, inject } from '@angular/core';
 import { pendingUntilEvent } from '@angular/core/rxjs-interop';
 import firebase from 'firebase/compat/app';
 import { Observable, from } from 'rxjs';
@@ -41,6 +42,8 @@ export function validateEventsArray(events?: DocumentChangeType[]) {
  * fakeStock.valueChanges().subscribe(value => console.log(value));
  */
 export class AngularFirestoreCollection<T = DocumentData> {
+  private readonly injector = inject(EnvironmentInjector);
+
   /**
    * The constructor takes in a CollectionReference and Query to provide wrapper methods
    * for data operations and data streaming.
@@ -74,7 +77,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
       pairwise(),
       filter(([prior, current]: DocumentChangeTuple<T>) => current.length > 0 || !prior),
       map(([, current]) => current),
-      pendingUntilEvent()
+      pendingUntilEvent(this.injector)
     );
   }
 
@@ -94,7 +97,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
     const validatedEvents = validateEventsArray(events);
     const scheduledSortedChanges$ = sortedChanges<T>(this.query, validatedEvents, this.afs.schedulers.outsideAngular);
     return scheduledSortedChanges$.pipe(
-      pendingUntilEvent()
+      pendingUntilEvent(this.injector)
     );
   }
 
@@ -121,7 +124,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
             return a.data();
           }
         })),
-        pendingUntilEvent()
+        pendingUntilEvent(this.injector)
       );
   }
 
@@ -130,7 +133,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
    */
   get(options?: firebase.firestore.GetOptions) {
     return from(this.query.get(options)).pipe(
-      pendingUntilEvent(),
+      pendingUntilEvent(this.injector)
     );
   }
 
