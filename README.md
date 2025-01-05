@@ -46,7 +46,7 @@ interface Item {
   selector: 'app-root',
   template: `
   <ul>
-    @for (item of (item$ | async); track item) {
+    @for (item of (items$ | async); track item) {
       <li>
         {{ item.name }}
       </li>
@@ -58,7 +58,7 @@ interface Item {
 export class AppComponent {
   firestore = inject(Firestore);
   itemCollection = collection(this.firestore, 'items');
-  item$ = collectionData<Item>(itemCollection);
+  items$ = collectionData<Item>(itemCollection);
 }
 ```
 
