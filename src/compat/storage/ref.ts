@@ -1,3 +1,4 @@
+import { Injector } from '@angular/core';
 import { pendingUntilEvent } from '@angular/core/rxjs-interop';
 import { observeOutsideAngular } from '@angular/fire';
 import { Observable, from, of } from 'rxjs';
@@ -22,21 +23,22 @@ export interface AngularFireStorageReference {
  * creates observable methods from promise based methods.
  */
 export function createStorageRef(
-  ref: Reference
+  ref: Reference,
+  injector?: Injector
 ): AngularFireStorageReference {
   return {
     getDownloadURL: () => of(undefined).pipe(
       observeOutsideAngular,
       switchMap(() => ref.getDownloadURL()),
-      pendingUntilEvent()
+      pendingUntilEvent(injector)
     ),
     getMetadata: () => of(undefined).pipe(
       observeOutsideAngular,
       switchMap(() => ref.getMetadata()),
-      pendingUntilEvent()
+      pendingUntilEvent(injector)
     ),
     delete: () => from(ref.delete()),
-    child: (path: string) => createStorageRef(ref.child(path)),
+    child: (path: string) => createStorageRef(ref.child(path), injector),
     updateMetadata: (meta: SettableMetadata) => from(ref.updateMetadata(meta)),
     put: (data: any, metadata?: UploadMetadata) => {
       const task = ref.put(data, metadata);

@@ -1,5 +1,5 @@
 import { isPlatformServer } from '@angular/common';
-import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
+import { EnvironmentInjector, Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID, inject } from '@angular/core';
 import { pendingUntilEvent } from '@angular/core/rxjs-interop';
 import { ɵAngularFireSchedulers } from '@angular/fire';
 import { AppCheckInstances } from '@angular/fire/app-check';
@@ -54,6 +54,8 @@ export const ɵauthFactory = (
   providedIn: 'any'
 })
 export class AngularFireAuth {
+
+  private readonly injector = inject(EnvironmentInjector);
 
   /**
    * Observable of authentication state; as of Firebase 4.0 this is only triggered via sign-in/out
@@ -122,7 +124,7 @@ export class AngularFireAuth {
 
       const redirectResult = auth.pipe(
         switchMap(auth => auth.getRedirectResult().then(it => it, () => null)),
-        pendingUntilEvent(),
+        pendingUntilEvent(this.injector),
         shareReplay({ bufferSize: 1, refCount: false }),
       );
 
