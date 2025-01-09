@@ -1,4 +1,4 @@
-import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
+import { EnvironmentInjector, Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID, inject } from '@angular/core';
 import { pendingUntilEvent } from '@angular/core/rxjs-interop';
 import { ɵAngularFireSchedulers } from '@angular/fire';
 import { ɵPromiseProxy, ɵapplyMixins, ɵlazySDKProxy } from '@angular/fire/compat';
@@ -121,6 +121,8 @@ export class AngularFireRemoteConfig {
   readonly booleans: Observable<Record<string, boolean | undefined>> & Record<string, Observable<boolean>>;
   readonly strings: Observable<Record<string, string | undefined>> & Record<string, Observable<string | undefined>>;
 
+  private readonly injector = inject(EnvironmentInjector);
+
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) name: string | null | undefined,
@@ -186,7 +188,7 @@ export class AngularFireRemoteConfig {
 
     this.parameters = concat(default$, existing$, fresh$).pipe(
       scanToParametersArray(remoteConfig$),
-      pendingUntilEvent(),
+      pendingUntilEvent(this.injector),
       shareReplay({ bufferSize: 1, refCount: true })
     );
 
