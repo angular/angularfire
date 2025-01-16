@@ -15,7 +15,7 @@
     "@angular/common": "^19.0.0",
     "@angular/compiler": "^19.0.0",
     "@angular/core": "^19.0.0",
-    "@angular/fire": "file:../angularfire/angular-fire-19.0.0.tgz",
+    "@angular/fire": "file:../angular-fire-19.0.0.tgz",
     "@angular/forms": "^19.0.0",
     "@angular/platform-browser": "^19.0.0",
     "@angular/platform-browser-dynamic": "^19.0.0",

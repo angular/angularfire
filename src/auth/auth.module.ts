@@ -8,8 +8,8 @@ import {
   makeEnvironmentProviders,
 } from '@angular/core';
 import { VERSION, ɵAngularFireSchedulers, ɵgetDefaultInstanceOf } from '@angular/fire';
-import { ɵAppCheckInstances } from '@angular/fire';
 import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
+import { AppCheckInstances } from '@angular/fire/app-check';
 import { registerVersion } from 'firebase/app';
 import { Auth as FirebaseAuth } from 'firebase/auth';
 import { AUTH_PROVIDER_NAME, Auth, AuthInstances } from './auth';
@@ -70,7 +70,7 @@ export function provideAuth(fn: (injector: Injector) => FirebaseAuth, ...deps: a
         Injector,
         ɵAngularFireSchedulers,
         FirebaseApps,
-        [new Optional(), ɵAppCheckInstances ],
+        [new Optional(), AppCheckInstances ],
         ...deps,
       ]
     }

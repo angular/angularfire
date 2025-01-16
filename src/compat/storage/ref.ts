@@ -1,8 +1,8 @@
 import { Injector } from '@angular/core';
 import { pendingUntilEvent } from '@angular/core/rxjs-interop';
-import { observeOutsideAngular } from '@angular/fire';
+import { ɵAngularFireSchedulers } from '@angular/fire';
 import { Observable, from, of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { observeOn, switchMap } from 'rxjs/operators';
 import { ListOptions, ListResult, Reference, SettableMetadata, StringFormat, UploadMetadata } from './interfaces';
 import { AngularFireUploadTask, createUploadTask } from './task';
 
@@ -28,12 +28,12 @@ export function createStorageRef(
 ): AngularFireStorageReference {
   return {
     getDownloadURL: () => of(undefined).pipe(
-      observeOutsideAngular,
+      observeOn(injector.get(ɵAngularFireSchedulers).outsideAngular),
       switchMap(() => ref.getDownloadURL()),
       pendingUntilEvent(injector)
     ),
     getMetadata: () => of(undefined).pipe(
-      observeOutsideAngular,
+      observeOn(injector.get(ɵAngularFireSchedulers).outsideAngular),
       switchMap(() => ref.getMetadata()),
       pendingUntilEvent(injector)
     ),

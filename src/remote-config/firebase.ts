@@ -13,6 +13,7 @@ import {
   getString as _getString,
   getValue as _getValue,
   isSupported as _isSupported,
+  setCustomSignals as _setCustomSignals,
   setLogLevel as _setLogLevel
 } from 'firebase/remote-config';
 
@@ -27,4 +28,5 @@ export const getRemoteConfig = ɵzoneWrap(_getRemoteConfig, true);
 export const getString = ɵzoneWrap(_getString, true);
 export const getValue = ɵzoneWrap(_getValue, true);
 export const isSupported = ɵzoneWrap(_isSupported, true);
+export const setCustomSignals = ɵzoneWrap(_setCustomSignals, true);
 export const setLogLevel = ɵzoneWrap(_setLogLevel, true);

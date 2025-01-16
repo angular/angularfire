@@ -1,7 +1,9 @@
-import { ɵAPP_CHECK_PROVIDER_NAME, ɵgetAllInstancesOf } from '@angular/fire';
+import { ɵgetAllInstancesOf } from '@angular/fire';
 import { AppCheck as FirebaseAppCheck } from 'firebase/app-check';
 import { from, timer } from 'rxjs';
 import { concatMap, distinct } from 'rxjs/operators';
+
+export const APP_CHECK_PROVIDER_NAME = 'app-check';
 
 // see notes in core/firebase.app.module.ts for why we're building the class like this
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -13,7 +15,16 @@ export class AppCheck {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface AppCheckInstances extends Array<AppCheck> {}
+
+export class AppCheckInstances {
+  constructor() {
+    return ɵgetAllInstancesOf<AppCheck>(APP_CHECK_PROVIDER_NAME);
+  }
+}
+
 export const appCheckInstance$ = timer(0, 300).pipe(
-  concatMap(() => from(ɵgetAllInstancesOf<FirebaseAppCheck>(ɵAPP_CHECK_PROVIDER_NAME))),
+  concatMap(() => from(ɵgetAllInstancesOf<FirebaseAppCheck>(APP_CHECK_PROVIDER_NAME))),
   distinct(),
 );

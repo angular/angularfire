@@ -8,8 +8,8 @@ import {
   makeEnvironmentProviders,
 } from '@angular/core';
 import { VERSION, ɵAngularFireSchedulers, ɵgetDefaultInstanceOf } from '@angular/fire';
-import { ɵAppCheckInstances } from '@angular/fire';
 import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
+import { AppCheckInstances } from '@angular/fire/app-check';
 import { AuthInstances  } from '@angular/fire/auth';
 import { registerVersion } from 'firebase/app';
 import { Firestore as FirebaseFirestore } from 'firebase/firestore';
@@ -74,7 +74,7 @@ export function provideFirestore(fn: (injector: Injector) => FirebaseFirestore, 
         FirebaseApps,
         // Firestore+Auth work better if Auth is loaded first
         [new Optional(), AuthInstances ],
-        [new Optional(), ɵAppCheckInstances ],
+        [new Optional(), AppCheckInstances ],
         ...deps,
       ]
     }

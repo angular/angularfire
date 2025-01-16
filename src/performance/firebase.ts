@@ -9,4 +9,4 @@ import {
 
 export const getPerformance = ɵzoneWrap(_getPerformance, true);
 export const initializePerformance = ɵzoneWrap(_initializePerformance, true);
-export const trace = ɵzoneWrap(_trace, true);
+export const trace = ɵzoneWrap(_trace, true, 2);
