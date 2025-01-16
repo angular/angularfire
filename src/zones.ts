@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
+  EnvironmentInjector,
   Injectable,
-  Injector,
   NgZone,
   PendingTasks,
   inject,
@@ -19,7 +19,18 @@ import {
 } from 'rxjs';
 import { observeOn, subscribeOn } from 'rxjs/operators';
 
-declare const Zone: {current: unknown} | undefined; 
+declare const Zone: {current: unknown} | undefined;
+
+export enum LogLevel {
+  "SILENT" = 0, 
+  "WARN" = 1,
+  "VERBOSE" = 2,
+}
+
+
+var currentLogLevel = (isDevMode() && typeof Zone !== "undefined") ? LogLevel.WARN : LogLevel.SILENT;
+
+export const setLogLevel = (logLevel: LogLevel) => currentLogLevel = logLevel;
 
 /**
  * Schedules tasks so that they are invoked inside the Zone that is passed in the constructor.
@@ -79,12 +90,12 @@ function getSchedulers() {
 }
 
 var alreadyWarned = false;
-function warnOutsideInjectionContext(original: any, operation: string) {
-  if (isDevMode()) {
-    if (!alreadyWarned) {
-      alreadyWarned = true;
-      console.warn("Calling Firebase APIs outside of an Injection context may destabilize your application leading to subtle change-detection and hydration bugs. Find more at https://github.com/angular/angularfire/blob/main/docs/zones.md");
-    }
+function warnOutsideInjectionContext(original: any, operation: string, logLevel=LogLevel.WARN) {
+  if (!alreadyWarned && (currentLogLevel > LogLevel.SILENT || isDevMode())) {
+    alreadyWarned = true;
+    console.warn("Calling Firebase APIs outside of an Injection context may destabilize your application leading to subtle change-detection and hydration bugs. Find more at https://github.com/angular/angularfire/blob/main/docs/zones.md");
+  }
+  if (currentLogLevel >= logLevel) {
     console.warn(`Firebase API called outside injection context: ${operation}(${original.name})`);
   }
 }
@@ -111,32 +122,10 @@ function run<T>(fn: (...args: any[]) => T): T {
   return ngZone.run(() => fn());
 }
 
-export function observeOutsideAngular<T>(obs$: Observable<T>): Observable<T> {
-  let schedulers: ɵAngularFireSchedulers|undefined;
-  try {
-    schedulers = getSchedulers();
-  } catch(e) {
-    warnOutsideInjectionContext(obs$, "observeOutsideAngular");
-  }
-  if (!schedulers) {return obs$;}
-  return obs$.pipe(observeOn(schedulers.outsideAngular));
-}
-
-export function observeInsideAngular<T>(obs$: Observable<T>): Observable<T> {
-  let schedulers: ɵAngularFireSchedulers|undefined;
-  try {
-    schedulers = getSchedulers();
-  } catch(e) {
-    warnOutsideInjectionContext(obs$, "observeInsideAngular");
-  }
-  if (!schedulers) {return obs$;}
-  return obs$.pipe(observeOn(schedulers.insideAngular));
-}
-
 const zoneWrapFn = (
   it: (...args: any[]) => any,
   taskDone: VoidFunction | undefined,
-  injector: Injector,
+  injector: EnvironmentInjector,
 ) => {
   return (...args: any[]) => {
     if (taskDone) {
@@ -146,18 +135,19 @@ const zoneWrapFn = (
   };
 };
 
-export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
+export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, zoneLogLevel?: LogLevel): T => {
+  zoneLogLevel ||= blockUntilFirst ? LogLevel.VERBOSE : LogLevel.WARN;
   // function() is needed for the arguments object
   return function () {
     let taskDone: VoidFunction | undefined;
     const _arguments = arguments;
     let schedulers: ɵAngularFireSchedulers;
     let pendingTasks: PendingTasks;
-    let injector: Injector;
+    let injector: EnvironmentInjector;
     try {
       schedulers = getSchedulers();
       pendingTasks = inject(PendingTasks);
-      injector = inject(Injector);
+      injector = inject(EnvironmentInjector);
     } catch(e) {
       warnOutsideInjectionContext(it, "ɵzoneWrap");
       return (it as any).apply(this, _arguments);

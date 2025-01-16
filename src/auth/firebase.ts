@@ -23,7 +23,6 @@ import {
   linkWithPhoneNumber as _linkWithPhoneNumber,
   linkWithPopup as _linkWithPopup,
   linkWithRedirect as _linkWithRedirect,
-  multiFactor as _multiFactor,
   onAuthStateChanged as _onAuthStateChanged,
   onIdTokenChanged as _onIdTokenChanged,
   parseActionCodeURL as _parseActionCodeURL,
@@ -59,14 +58,14 @@ import {
 } from 'firebase/auth';
 
 export const applyActionCode = ɵzoneWrap(_applyActionCode, true);
-export const beforeAuthStateChanged = ɵzoneWrap(_beforeAuthStateChanged, false);
+export const beforeAuthStateChanged = ɵzoneWrap(_beforeAuthStateChanged, true);
 export const checkActionCode = ɵzoneWrap(_checkActionCode, true);
-export const confirmPasswordReset = ɵzoneWrap(_confirmPasswordReset, true);
+export const confirmPasswordReset = ɵzoneWrap(_confirmPasswordReset, true, 2);
 export const connectAuthEmulator = ɵzoneWrap(_connectAuthEmulator, true);
-export const createUserWithEmailAndPassword = ɵzoneWrap(_createUserWithEmailAndPassword, true);
-export const deleteUser = ɵzoneWrap(_deleteUser, true);
-export const fetchSignInMethodsForEmail = ɵzoneWrap(_fetchSignInMethodsForEmail, true);
-export const getAdditionalUserInfo = ɵzoneWrap(_getAdditionalUserInfo, true);
+export const createUserWithEmailAndPassword = ɵzoneWrap(_createUserWithEmailAndPassword, true, 2);
+export const deleteUser = ɵzoneWrap(_deleteUser, true, 2);
+export const fetchSignInMethodsForEmail = ɵzoneWrap(_fetchSignInMethodsForEmail, true, 2);
+export const getAdditionalUserInfo = ɵzoneWrap(_getAdditionalUserInfo, true, 2);
 export const getAuth = ɵzoneWrap(_getAuth, true);
 export const getIdToken = ɵzoneWrap(_getIdToken, true);
 export const getIdTokenResult = ɵzoneWrap(_getIdTokenResult, true);
@@ -75,40 +74,39 @@ export const getRedirectResult = ɵzoneWrap(_getRedirectResult, true);
 export const initializeAuth = ɵzoneWrap(_initializeAuth, true);
 export const initializeRecaptchaConfig = ɵzoneWrap(_initializeRecaptchaConfig, true);
 export const isSignInWithEmailLink = ɵzoneWrap(_isSignInWithEmailLink, true);
-export const linkWithCredential = ɵzoneWrap(_linkWithCredential, true);
-export const linkWithPhoneNumber = ɵzoneWrap(_linkWithPhoneNumber, true);
-export const linkWithPopup = ɵzoneWrap(_linkWithPopup, true);
-export const linkWithRedirect = ɵzoneWrap(_linkWithRedirect, true);
-export const multiFactor = ɵzoneWrap(_multiFactor, true);
+export const linkWithCredential = ɵzoneWrap(_linkWithCredential, true, 2);
+export const linkWithPhoneNumber = ɵzoneWrap(_linkWithPhoneNumber, true, 2);
+export const linkWithPopup = ɵzoneWrap(_linkWithPopup, true, 2);
+export const linkWithRedirect = ɵzoneWrap(_linkWithRedirect, true, 2);
 export const onAuthStateChanged = ɵzoneWrap(_onAuthStateChanged, true);
 export const onIdTokenChanged = ɵzoneWrap(_onIdTokenChanged, true);
 export const parseActionCodeURL = ɵzoneWrap(_parseActionCodeURL, true);
-export const reauthenticateWithCredential = ɵzoneWrap(_reauthenticateWithCredential, true);
-export const reauthenticateWithPhoneNumber = ɵzoneWrap(_reauthenticateWithPhoneNumber, true);
-export const reauthenticateWithPopup = ɵzoneWrap(_reauthenticateWithPopup, true);
-export const reauthenticateWithRedirect = ɵzoneWrap(_reauthenticateWithRedirect, true);
-export const reload = ɵzoneWrap(_reload, true);
-export const revokeAccessToken = ɵzoneWrap(_revokeAccessToken, true);
-export const sendEmailVerification = ɵzoneWrap(_sendEmailVerification, true);
-export const sendPasswordResetEmail = ɵzoneWrap(_sendPasswordResetEmail, true);
-export const sendSignInLinkToEmail = ɵzoneWrap(_sendSignInLinkToEmail, true);
+export const reauthenticateWithCredential = ɵzoneWrap(_reauthenticateWithCredential, true, 2);
+export const reauthenticateWithPhoneNumber = ɵzoneWrap(_reauthenticateWithPhoneNumber, true, 2);
+export const reauthenticateWithPopup = ɵzoneWrap(_reauthenticateWithPopup, true, 2);
+export const reauthenticateWithRedirect = ɵzoneWrap(_reauthenticateWithRedirect, true, 2);
+export const reload = ɵzoneWrap(_reload, true, 2);
+export const revokeAccessToken = ɵzoneWrap(_revokeAccessToken, true, 2);
+export const sendEmailVerification = ɵzoneWrap(_sendEmailVerification, true, 2);
+export const sendPasswordResetEmail = ɵzoneWrap(_sendPasswordResetEmail, true, 2);
+export const sendSignInLinkToEmail = ɵzoneWrap(_sendSignInLinkToEmail, true, 2);
 export const setPersistence = ɵzoneWrap(_setPersistence, true);
-export const signInAnonymously = ɵzoneWrap(_signInAnonymously, true);
-export const signInWithCredential = ɵzoneWrap(_signInWithCredential, true);
-export const signInWithCustomToken = ɵzoneWrap(_signInWithCustomToken, true);
-export const signInWithEmailAndPassword = ɵzoneWrap(_signInWithEmailAndPassword, true);
-export const signInWithEmailLink = ɵzoneWrap(_signInWithEmailLink, true);
-export const signInWithPhoneNumber = ɵzoneWrap(_signInWithPhoneNumber, true);
-export const signInWithPopup = ɵzoneWrap(_signInWithPopup, true);
-export const signInWithRedirect = ɵzoneWrap(_signInWithRedirect, true);
-export const signOut = ɵzoneWrap(_signOut, true);
-export const unlink = ɵzoneWrap(_unlink, true);
-export const updateCurrentUser = ɵzoneWrap(_updateCurrentUser, true);
-export const updateEmail = ɵzoneWrap(_updateEmail, true);
-export const updatePassword = ɵzoneWrap(_updatePassword, true);
-export const updatePhoneNumber = ɵzoneWrap(_updatePhoneNumber, true);
-export const updateProfile = ɵzoneWrap(_updateProfile, true);
-export const useDeviceLanguage = ɵzoneWrap(_useDeviceLanguage, true);
-export const validatePassword = ɵzoneWrap(_validatePassword, true);
-export const verifyBeforeUpdateEmail = ɵzoneWrap(_verifyBeforeUpdateEmail, true);
-export const verifyPasswordResetCode = ɵzoneWrap(_verifyPasswordResetCode, true);
+export const signInAnonymously = ɵzoneWrap(_signInAnonymously, true, 2);
+export const signInWithCredential = ɵzoneWrap(_signInWithCredential, true, 2);
+export const signInWithCustomToken = ɵzoneWrap(_signInWithCustomToken, true, 2);
+export const signInWithEmailAndPassword = ɵzoneWrap(_signInWithEmailAndPassword, true, 2);
+export const signInWithEmailLink = ɵzoneWrap(_signInWithEmailLink, true, 2);
+export const signInWithPhoneNumber = ɵzoneWrap(_signInWithPhoneNumber, true, 2);
+export const signInWithPopup = ɵzoneWrap(_signInWithPopup, true, 2);
+export const signInWithRedirect = ɵzoneWrap(_signInWithRedirect, true, 2);
+export const signOut = ɵzoneWrap(_signOut, true, 2);
+export const unlink = ɵzoneWrap(_unlink, true, 2);
+export const updateCurrentUser = ɵzoneWrap(_updateCurrentUser, true, 2);
+export const updateEmail = ɵzoneWrap(_updateEmail, true, 2);
+export const updatePassword = ɵzoneWrap(_updatePassword, true, 2);
+export const updatePhoneNumber = ɵzoneWrap(_updatePhoneNumber, true, 2);
+export const updateProfile = ɵzoneWrap(_updateProfile, true, 2);
+export const useDeviceLanguage = ɵzoneWrap(_useDeviceLanguage, true, 2);
+export const validatePassword = ɵzoneWrap(_validatePassword, true, 2);
+export const verifyBeforeUpdateEmail = ɵzoneWrap(_verifyBeforeUpdateEmail, true, 2);
+export const verifyPasswordResetCode = ɵzoneWrap(_verifyPasswordResetCode, true, 2);

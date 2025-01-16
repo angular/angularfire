@@ -20,7 +20,7 @@ import {
 } from 'firebase/storage';
 
 export const connectStorageEmulator = ɵzoneWrap(_connectStorageEmulator, true);
-export const deleteObject = ɵzoneWrap(_deleteObject, true);
+export const deleteObject = ɵzoneWrap(_deleteObject, true, 2);
 export const getBlob = ɵzoneWrap(_getBlob, true);
 export const getBytes = ɵzoneWrap(_getBytes, true);
 export const getDownloadURL = ɵzoneWrap(_getDownloadURL, true);
@@ -29,8 +29,8 @@ export const getStorage = ɵzoneWrap(_getStorage, true);
 export const getStream = ɵzoneWrap(_getStream, true);
 export const list = ɵzoneWrap(_list, true);
 export const listAll = ɵzoneWrap(_listAll, true);
-export const ref = ɵzoneWrap(_ref, true);
-export const updateMetadata = ɵzoneWrap(_updateMetadata, true);
+export const ref = ɵzoneWrap(_ref, true, 2);
+export const updateMetadata = ɵzoneWrap(_updateMetadata, true, 2);
 export const uploadBytes = ɵzoneWrap(_uploadBytes, true);
 export const uploadBytesResumable = ɵzoneWrap(_uploadBytesResumable, true);
 export const uploadString = ɵzoneWrap(_uploadString, true);

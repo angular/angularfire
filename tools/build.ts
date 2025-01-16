@@ -4,12 +4,62 @@ import { join } from 'path';
 import { keys as tsKeys } from 'ts-transformer-keys';
 import * as esbuild from "esbuild";
 
+enum LogLevel {
+  "WARN" = 1,
+  "VERBOSE" = 2,
+};
+
 interface OverrideOptions {
   exportName?: string;
   zoneWrap?: boolean;
   blockUntilFirst?: boolean;
   override?: boolean;
+  logLevel?: LogLevel;
 }
+
+const firestoreOverrides = {
+  addDoc: { logLevel: LogLevel.VERBOSE },
+  aggregateFieldEqual: { logLevel: LogLevel.VERBOSE },
+  aggregateQuerySnapshotEqual: { logLevel: LogLevel.VERBOSE },
+  and: { logLevel: LogLevel.VERBOSE },
+  arrayRemove: null,
+  arrayUnion: null,
+  average: null,
+  collection: { logLevel: LogLevel.VERBOSE },
+  collectionGroup: { logLevel: LogLevel.VERBOSE },
+  count: null,
+  deleteDoc: { logLevel: LogLevel.VERBOSE },
+  deleteField: { logLevel: LogLevel.VERBOSE },
+  doc: { logLevel: LogLevel.VERBOSE },
+  documentId: { logLevel: LogLevel.VERBOSE },
+  endAt: { logLevel: LogLevel.VERBOSE },
+  endBefore: { logLevel: LogLevel.VERBOSE },
+  increment: { logLevel: LogLevel.VERBOSE },
+  limit: { logLevel: LogLevel.VERBOSE },
+  limitToLast: { logLevel: LogLevel.VERBOSE },
+  memoryEagerGarbageCollector: null,
+  memoryLocalCache: null,
+  memoryLruGarbageCollector: null,
+  namedQuery: { logLevel: LogLevel.VERBOSE },
+  or: { logLevel: LogLevel.VERBOSE },
+  orderBy: { logLevel: LogLevel.VERBOSE },
+  persistentLocalCache: null,
+  persistentMultipleTabManager: null,
+  persistentSingleTabManager: null,
+  query: { logLevel: LogLevel.VERBOSE },
+  queryEqual: { logLevel: LogLevel.VERBOSE },
+  refEqual: { logLevel: LogLevel.VERBOSE },
+  serverTimestamp: null,
+  setDoc: { logLevel: LogLevel.VERBOSE },
+  snapshotEqual: { logLevel: LogLevel.VERBOSE },
+  startAfter: { logLevel: LogLevel.VERBOSE },
+  startAt: { logLevel: LogLevel.VERBOSE },
+  sum: { logLevel: LogLevel.VERBOSE },
+  updateDoc: { logLevel: LogLevel.VERBOSE },
+  vector: { logLevel: LogLevel.VERBOSE },
+  where: { logLevel: LogLevel.VERBOSE },
+  writeBatch: { logLevel: LogLevel.VERBOSE },
+};
 
 function zoneWrapExports() {
   const reexport = async (
@@ -41,7 +91,7 @@ function zoneWrapExports() {
       `${importName}${exportName === importName ? '' : `as ${exportName}`}`).join(',\n  ');
     const overriddenFns = overridden.join(',\n  ');
     const exportedZoneWrappedFns = zoneWrapped.map(([importName, exportName]) =>
-      `export const ${exportName} = ɵzoneWrap(_${importName}, ${overrides[importName]?.blockUntilFirst ?? true});`)
+      `export const ${exportName} = ɵzoneWrap(_${importName}, ${overrides[importName]?.blockUntilFirst ?? true}${overrides[importName]?.logLevel ? `, ${overrides[importName].logLevel}` : ""});`)
         .join('\n');
     const filePath = join(process.cwd(), 'src', `${module}/${name}.ts`);
     // TODO(davideast): Create a builder pattern for this file for readability
@@ -64,9 +114,20 @@ ${exportedZoneWrappedFns}
     await writeFile(filePath, fileOutput);
   };
   return Promise.all([
-    reexport('analytics', 'firebase', 'firebase/analytics', tsKeys<typeof import('firebase/analytics')>()),
+    reexport('analytics', 'firebase', 'firebase/analytics', tsKeys<typeof import('firebase/analytics')>(), {
+      isSupported: { blockUntilFirst: false },
+      logEvent: { blockUntilFirst: false, logLevel: LogLevel.VERBOSE },
+      setAnalyticsCollectionEnabled: { logLevel: LogLevel.VERBOSE },
+      setConsent: { logLevel: LogLevel.VERBOSE },
+      setCurrentScreen: { logLevel: LogLevel.VERBOSE },
+      setDefaultEventParameters: { logLevel: LogLevel.VERBOSE },
+      setUserId: { logLevel: LogLevel.VERBOSE },
+      setUserProperties: { logLevel: LogLevel.VERBOSE },
+    }),
     reexport('app', 'firebase', 'firebase/app', tsKeys<typeof import('firebase/app')>()),
-    reexport('app-check', 'firebase', 'firebase/app-check', tsKeys<typeof import('firebase/app-check')>()),
+    reexport('app-check', 'firebase', 'firebase/app-check', tsKeys<typeof import('firebase/app-check')>(), {
+      getLimitedUseToken: { logLevel: LogLevel.VERBOSE },
+    }),
     reexport('auth', 'rxfire', 'rxfire/auth', tsKeys<typeof import('rxfire/auth')>()),
     reexport('auth', 'firebase', 'firebase/auth', tsKeys<typeof import('firebase/auth')>(), {
       debugErrorMap: null,
@@ -75,25 +136,92 @@ ${exportedZoneWrappedFns}
       browserSessionPersistence: null,
       indexedDBLocalPersistence: null,
       prodErrorMap: null,
-      beforeAuthStateChanged: { blockUntilFirst: false },
+      multiFactor: null,
+      linkWithCredential: { logLevel: LogLevel.VERBOSE },
+      linkWithPhoneNumber: { logLevel: LogLevel.VERBOSE },
+      linkWithPopup: { logLevel: LogLevel.VERBOSE },
+      linkWithRedirect: { logLevel: LogLevel.VERBOSE },
+      signInAnonymously: { logLevel: LogLevel.VERBOSE },
+      signInWithCredential: { logLevel: LogLevel.VERBOSE },
+      signInWithCustomToken: { logLevel: LogLevel.VERBOSE },
+      signInWithEmailAndPassword: { logLevel: LogLevel.VERBOSE },
+      signInWithEmailLink: { logLevel: LogLevel.VERBOSE },
+      signInWithPhoneNumber: { logLevel: LogLevel.VERBOSE },
+      signInWithPopup: { logLevel: LogLevel.VERBOSE },
+      signInWithRedirect: { logLevel: LogLevel.VERBOSE },
+      signOut: { logLevel: LogLevel.VERBOSE },
+      confirmPasswordReset: { logLevel: LogLevel.VERBOSE },
+      deleteUser: { logLevel: LogLevel.VERBOSE },
+      createUserWithEmailAndPassword: { logLevel: LogLevel.VERBOSE },
+      fetchSignInMethodsForEmail: { logLevel: LogLevel.VERBOSE },
+      getAdditionalUserInfo: { logLevel: LogLevel.VERBOSE },
+      reauthenticateWithCredential: { logLevel: LogLevel.VERBOSE },
+      reauthenticateWithPhoneNumber: { logLevel: LogLevel.VERBOSE },
+      reauthenticateWithPopup: { logLevel: LogLevel.VERBOSE },
+      reauthenticateWithRedirect: { logLevel: LogLevel.VERBOSE },
+      reload : { logLevel: LogLevel.VERBOSE },
+      revokeAccessToken: { logLevel: LogLevel.VERBOSE },
+      sendEmailVerification: { logLevel: LogLevel.VERBOSE },
+      sendPasswordResetEmail: { logLevel: LogLevel.VERBOSE },
+      sendSignInLinkToEmail: { logLevel: LogLevel.VERBOSE },
+      unlink: { logLevel: LogLevel.VERBOSE },
+      updateCurrentUser: { logLevel: LogLevel.VERBOSE },
+      updateEmail: { logLevel: LogLevel.VERBOSE },
+      updatePassword: { logLevel: LogLevel.VERBOSE },
+      updatePhoneNumber: { logLevel: LogLevel.VERBOSE },
+      updateProfile: { logLevel: LogLevel.VERBOSE },
+      useDeviceLanguage: { logLevel: LogLevel.VERBOSE },
+      validatePassword: { logLevel: LogLevel.VERBOSE },
+      verifyBeforeUpdateEmail: { logLevel: LogLevel.VERBOSE },
+      verifyPasswordResetCode: { logLevel: LogLevel.VERBOSE },
     }),
     reexport('database', 'rxfire', 'rxfire/database', tsKeys<typeof import('rxfire/database')>()),
-    reexport('database', 'firebase', 'firebase/database', tsKeys<typeof import('firebase/database')>()),
-    reexport('data-connect', 'firebase', 'firebase/data-connect', tsKeys<typeof import('firebase/data-connect')>()),
+    reexport('database', 'firebase', 'firebase/database', tsKeys<typeof import('firebase/database')>(), {
+      child: { logLevel: LogLevel.VERBOSE },
+      endAt: { logLevel: LogLevel.VERBOSE },
+      endBefore: { logLevel: LogLevel.VERBOSE },
+      equalTo: { logLevel: LogLevel.VERBOSE },
+      increment: { logLevel: LogLevel.VERBOSE },
+      limitToFirst: { logLevel: LogLevel.VERBOSE },
+      limitToLast: { logLevel: LogLevel.VERBOSE },
+      orderByChild: { logLevel: LogLevel.VERBOSE },
+      orderByKey: { logLevel: LogLevel.VERBOSE },
+      orderByPriority: { logLevel: LogLevel.VERBOSE },
+      orderByValue: { logLevel: LogLevel.VERBOSE },
+      push: { logLevel: LogLevel.VERBOSE },
+      query: { logLevel: LogLevel.VERBOSE },
+      ref: { logLevel: LogLevel.VERBOSE },
+      refFromURL: { logLevel: LogLevel.VERBOSE },
+      remove: { logLevel: LogLevel.VERBOSE },
+      serverTimestamp: null,
+      set: { logLevel: LogLevel.VERBOSE },
+      setPriority: { logLevel: LogLevel.VERBOSE },
+      setWithPriority: { logLevel: LogLevel.VERBOSE },
+      startAfter: { logLevel: LogLevel.VERBOSE },
+      startAt: { logLevel: LogLevel.VERBOSE },
+      update: { logLevel: LogLevel.VERBOSE },
+    }),
+    reexport('data-connect', 'firebase', 'firebase/data-connect', tsKeys<typeof import('firebase/data-connect')>(), {
+      mutationRef: { logLevel: LogLevel.VERBOSE },
+      queryRef: { logLevel: LogLevel.VERBOSE },
+      toQueryRef: { logLevel: LogLevel.VERBOSE },
+    }),
     reexport('firestore', 'rxfire', 'rxfire/firestore', tsKeys<typeof import('rxfire/firestore')>(), {
       doc: { exportName: 'docSnapshots' },
       collection: { exportName: 'collectionSnapshots' },
     }),
-    reexport('firestore', 'firebase', 'firebase/firestore', tsKeys<typeof import('firebase/firestore')>()),
+    reexport('firestore', 'firebase', 'firebase/firestore', tsKeys<typeof import('firebase/firestore')>(), firestoreOverrides),
     reexport('functions', 'rxfire', 'rxfire/functions', ["httpsCallable"], {
       httpsCallable: { exportName: 'httpsCallableData' },
     }),
     reexport('functions', 'firebase', 'firebase/functions', tsKeys<typeof import('firebase/functions')>()),
     reexport('messaging', 'firebase', 'firebase/messaging', tsKeys<typeof import('firebase/messaging')>(), {
       isSupported: { blockUntilFirst: false },
-      onMessage: { blockUntilFirst: false }
+      onMessage: { blockUntilFirst: false },
+      deleteToken: { logLevel: LogLevel.VERBOSE },
     }),
     reexport('remote-config', 'rxfire', 'rxfire/remote-config', tsKeys<typeof import('rxfire/remote-config')>(), {
+      isSupported: { blockUntilFirst: false },
       getValue: { exportName: 'getValueChanges' },
       getString: { exportName: 'getStringChanges' },
       getNumber: { exportName: 'getNumberChanges' },
@@ -107,17 +235,23 @@ ${exportedZoneWrappedFns}
       uploadBytesResumable: null,
       uploadString: null,
     }),
-    reexport('storage', 'firebase', 'firebase/storage', tsKeys<typeof import('firebase/storage')>()),
+    reexport('storage', 'firebase', 'firebase/storage', tsKeys<typeof import('firebase/storage')>(), {
+      deleteObject: { logLevel: LogLevel.VERBOSE },
+      ref: { logLevel: LogLevel.VERBOSE },
+      updateMetadata: { logLevel: LogLevel.VERBOSE },
+    }),
     reexport('performance', 'rxfire', 'rxfire/performance', tsKeys<typeof import('rxfire/performance')>(), {
       getPerformance$: null,
       trace: null,
     }),
-    reexport('performance', 'firebase', 'firebase/performance', tsKeys<typeof import('firebase/performance')>()),
+    reexport('performance', 'firebase', 'firebase/performance', tsKeys<typeof import('firebase/performance')>(), {
+      trace: { logLevel: LogLevel.VERBOSE },
+    }),
     reexport('firestore/lite', 'rxfire', 'rxfire/firestore/lite', tsKeys<typeof import('rxfire/firestore/lite')>(), {
       doc: { exportName: 'docSnapshots' },
       collection: { exportName: 'collectionSnapshots' },
     }),
-    reexport('firestore/lite', 'firebase', 'firebase/firestore/lite', tsKeys<typeof import('firebase/firestore/lite')>()),
+    reexport('firestore/lite', 'firebase', 'firebase/firestore/lite', tsKeys<typeof import('firebase/firestore/lite')>(), firestoreOverrides),
     reexport('vertexai', 'firebase', 'firebase/vertexai', tsKeys<typeof import('firebase/vertexai')>()),
   ]);
 }
