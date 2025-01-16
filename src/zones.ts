@@ -85,39 +85,25 @@ export class ɵAngularFireSchedulers {
   }
 }
 
-function getSchedulers() {
-  return inject(ɵAngularFireSchedulers);
-}
-
 var alreadyWarned = false;
-function warnOutsideInjectionContext(original: any, operation: string, logLevel=LogLevel.WARN) {
+function warnOutsideInjectionContext(original: any, logLevel: LogLevel) {
   if (!alreadyWarned && (currentLogLevel > LogLevel.SILENT || isDevMode())) {
     alreadyWarned = true;
     console.warn("Calling Firebase APIs outside of an Injection context may destabilize your application leading to subtle change-detection and hydration bugs. Find more at https://github.com/angular/angularfire/blob/main/docs/zones.md");
   }
   if (currentLogLevel >= logLevel) {
-    console.warn(`Firebase API called outside injection context: ${operation}(${original.name})`);
+    console.warn(`Firebase API called outside injection context: ${original.name}`);
   }
 }
 
 function runOutsideAngular<T>(fn: (...args: any[]) => T): T {
-  let ngZone: NgZone|undefined;
-  try {
-    ngZone = inject(NgZone);
-  } catch(e) {
-    warnOutsideInjectionContext(fn, "runOutsideAngular");
-  }
+  const ngZone = inject(NgZone, { optional: true });
   if (!ngZone) {return fn();}
   return ngZone.runOutsideAngular(() => fn());
 }
 
 function run<T>(fn: (...args: any[]) => T): T {
-  let ngZone: NgZone|undefined;
-  try {
-    ngZone = inject(NgZone);
-  } catch(e) {
-    warnOutsideInjectionContext(fn, "run");
-  }
+  const ngZone = inject(NgZone, { optional: true });
   if (!ngZone) {return fn();}
   return ngZone.run(() => fn());
 }
@@ -135,8 +121,8 @@ const zoneWrapFn = (
   };
 };
 
-export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, zoneLogLevel?: LogLevel): T => {
-  zoneLogLevel ||= blockUntilFirst ? LogLevel.VERBOSE : LogLevel.WARN;
+export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, logLevel?: LogLevel): T => {
+  logLevel ||= blockUntilFirst ? LogLevel.WARN : LogLevel.VERBOSE;
   // function() is needed for the arguments object
   return function () {
     let taskDone: VoidFunction | undefined;
@@ -145,11 +131,11 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, zoneLogL
     let pendingTasks: PendingTasks;
     let injector: EnvironmentInjector;
     try {
-      schedulers = getSchedulers();
+      schedulers = inject(ɵAngularFireSchedulers);
       pendingTasks = inject(PendingTasks);
       injector = inject(EnvironmentInjector);
     } catch(e) {
-      warnOutsideInjectionContext(it, "ɵzoneWrap");
+      warnOutsideInjectionContext(it, logLevel);
       return (it as any).apply(this, _arguments);
     }
     // if this is a callback function, e.g, onSnapshot, we should create a pending task and complete it
@@ -189,8 +175,7 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, zoneLogL
               (it) => runInInjectionContext(injector, () => run(() => resolve(it))),
               (reason) => runInInjectionContext(injector, () => run(() => reject(reason)))
             );
-          })
-      );
+      }));
     } else if (typeof ret === 'function' && taskDone) {
       // Handle unsubscribe
       // function() is needed for the arguments object
