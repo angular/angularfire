@@ -47,5 +47,8 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.6.2"
+  },
+  "overrides": {
+    "@firebase/remote-config": "file:/Users/jamesdaniels/Code/firebase-js-sdk/packages/remote-config/firebase-remote-config-0.5.0.tgz"
   }
 }
