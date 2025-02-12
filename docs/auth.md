@@ -106,7 +106,7 @@ import { Auth, User, user } from '@angular/fire/auth';
 
 export class UserComponent implements OnDestroy {
   private auth: Auth = inject(Auth);
-  user$ = user(auth);
+  user$ = user(this.auth);
   userSubscription: Subscription;
   ...
 
