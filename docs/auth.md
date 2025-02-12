@@ -136,7 +136,7 @@ import { Auth, authState } from '@angular/fire/auth';
 
 export class UserComponent implements OnDestroy {
   private auth: Auth = inject(Auth);
-  authState$ = authState(auth);
+  authState$ = authState(this.auth);
   authStateSubscription: Subscription;
   ...
 
@@ -165,7 +165,7 @@ import { Auth, idToken } from '@angular/fire/auth';
 
 export class UserComponent implements OnDestroy {
   private auth: Auth = inject(Auth);
-  idToken$ = idToken(auth);
+  idToken$ = idToken(this.auth);
   idTokenSubscription: Subscription;
   ...
 
