@@ -83,6 +83,7 @@ import { Observable, tap } from "rxjs";
   providedIn: "root",
 })
 export class FcmService {
+  message$: Observable<any>;
   constructor(private msg: Messaging){
     Notification.requestPermission().then(
     (notificationPermissions: NotificationPermission) => {
@@ -105,19 +106,20 @@ export class FcmService {
           console.log('my fcm token', x);
           // This is a good place to then store it on your database for each user
         });
-	});  
-    }
+	   });  
+    
     this.message$ = new Observable((sub) => onMessage(this.msg, (msg) =>     
       sub.next(msg))).pipe(
 	    tap((msg) => {
 	      console.log("My Firebase Cloud Message", msg);
 	    })
     );
-    }
-  deleteToken(){
+  }
+ async deleteToken(){
     // We can also delete fcm tokens, make sure to also update this on your firestore db if you are storing them as well
     await deleteToken(this.msg);
   }
+}
 ```
 
 # Testing and Sending Notifications
