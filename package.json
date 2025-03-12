@@ -12,6 +12,7 @@
     "test:chrome-headless": "npx --yes firebase-tools@latest emulators:exec --project=demo-123 \"ng test --watch=false --browsers=ChromeHeadless\"",
     "test:firefox-headless": "npx --yes firebase-tools@latest emulators:exec --project=demo-123 \"ng test --watch=false --browsers=FirefoxHeadless\"",
     "lint": "ng lint",
+    "lint:fix": "ng lint --fix",
     "test:node": "node -r tsconfig-paths/register ./dist/out-tsc/jasmine/tools/jasmine.mjs --input-type=commonjs",
     "test:node-esm": "node -r tsconfig-paths/register ./dist/out-tsc/jasmine/tools/jasmine.mjs",
     "test:typings": "node ./tools/run-typings-test.js",
@@ -116,7 +117,8 @@
     "ts-patch": "^3.2.1",
     "ts-transformer-keys": "^0.4.4",
     "tslint": "~6.1.0",
-    "typescript": ">=5.5 <5.7"
+    "typescript": ">=5.5 <5.7",
+    "yaml": "^2.7.0"
   },
   "typings": "index.d.ts"
 }

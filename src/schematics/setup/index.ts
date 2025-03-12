@@ -1,17 +1,20 @@
-import { writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { asWindowsPath, normalize } from '@angular-devkit/core';
 import { SchematicContext, Tree, chain } from '@angular-devkit/schematics';
 import { addRootProvider } from '@schematics/angular/utility';
 import { getFirebaseTools } from '../firebaseTools';
 import {
-  DeployOptions, FEATURES, FirebaseApp, FirebaseProject,
+  DataConnectConnectorConfig,
+  DeployOptions, FEATURES, FirebaseApp, FirebaseJSON, FirebaseProject,
 } from '../interfaces';
 import {
   addIgnoreFiles,
   featureToRules,
   getFirebaseProjectNameFromHost,
   getProject,
+  parseDataConnectConfig,
+  setupTanstackDependencies,
 } from '../utils';
 import { appPrompt, featuresPrompt, projectPrompt, userPrompt } from './prompts';
 
@@ -19,6 +22,9 @@ export interface SetupConfig extends DeployOptions {
   firebaseProject: FirebaseProject,
   firebaseApp?: FirebaseApp,
   sdkConfig?: Record<string, string>,
+  firebaseJsonConfig?: FirebaseJSON;
+  dataConnectConfig?: DataConnectConnectorConfig | null;
+  firebaseJsonPath: string;
 }
 
 export const setupProject =
@@ -35,7 +41,7 @@ export const setupProject =
             config.sdkConfig ? `{ ${Object.entries(config.sdkConfig).map(([k, v]) => `${k}: ${JSON.stringify(v)}`).join(", ")} }` : ""
           }))`;
         }),
-        ...featureToRules(features, projectName),
+        ...featureToRules(features, projectName, config.dataConnectConfig),
       ]);
     }
 };
@@ -56,6 +62,10 @@ export const ngAddSetupProject = (
 
     // Add the firebase files if they don't exist already so login.use works
     if (!host.exists('/firebase.json')) { writeFileSync(join(projectRoot, 'firebase.json'), '{}'); }
+    
+    let firebaseJson: FirebaseJSON = JSON.parse(
+      readFileSync(join(projectRoot, "firebase.json")).toString()
+    );
 
     const user = await userPrompt({ projectRoot });
     const defaultUser = await firebaseTools.login(options);
@@ -72,6 +82,11 @@ export const ngAddSetupProject = (
     let firebaseApp: FirebaseApp|undefined;
     let sdkConfig: Record<string, string>|undefined;
 
+    const setupConfig: SetupConfig = {
+      ...options, firebaseProject, firebaseApp, sdkConfig,
+      firebaseJsonConfig: firebaseJson,
+      firebaseJsonPath: projectRoot
+    };
     if (features.length) {
 
       firebaseApp = await appPrompt(firebaseProject, undefined, { projectRoot });
@@ -79,12 +94,45 @@ export const ngAddSetupProject = (
       const result = await firebaseTools.apps.sdkconfig('web', firebaseApp.appId, { nonInteractive: true, projectRoot });
       sdkConfig = result.sdkConfig;
       delete sdkConfig.locationId;
-
+      setupConfig.sdkConfig = sdkConfig;
+      setupConfig.firebaseApp = firebaseApp;
+      // set up data connect locally if data connect hasn't already been initialized.
+      if(features.includes(FEATURES.DataConnect)) {
+        if (!firebaseJson.dataconnect) {
+          try {
+            await firebaseTools.init("dataconnect", {
+              projectRoot,
+              project: firebaseProject.projectId,
+            });
+            // Update firebaseJson values to include newly added dataconnect field in firebase.json.
+            firebaseJson = JSON.parse(
+              readFileSync(join(projectRoot, "firebase.json")).toString()
+            );
+            setupConfig.firebaseJsonConfig = firebaseJson;
+          } catch (e) {
+            console.error(e);
+          }
+        }
+          let dataConnectConfig = parseDataConnectConfig(setupConfig);
+          if(!dataConnectConfig?.connectorYaml.generate?.javascriptSdk) {
+            await firebaseTools.init("dataconnect:sdk", {
+              projectRoot,
+              project: firebaseProject.projectId,
+            });
+          }
+          // Parse through sdk again
+          dataConnectConfig = parseDataConnectConfig(setupConfig);
+          if(dataConnectConfig?.angular) {
+            context.logger.info('Generated Angular SDK Enabled. Setting up Tanstack Dependencies.');
+            setupTanstackDependencies(host, context);
+          } else {
+            context.logger.info('Generated Angular SDK Disabled. Please add `angular: true` to your connector.yaml and re-run `ng add @angular/fire`');
+          }
+          setupConfig.dataConnectConfig = dataConnectConfig;
+        }
+      
     }
 
-    return setupProject(host, context, features, {
-      ...options, firebaseProject, firebaseApp, sdkConfig,
-    });
-
+    return setupProject(host, context, features, setupConfig);
   }
 };
