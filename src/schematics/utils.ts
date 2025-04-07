@@ -391,9 +391,8 @@ export function setupTanstackDependencies(
     !packageJson.devDependencies["@tanstack-query-firebase/angular"]
   ) {
     // TODO(mtewani): Check if dependency is valid first.
-    // add tanstack query firebase
     packageJson.dependencies["@tanstack-query-firebase/angular"] =
-      "0.0.1-alpha.7";
+      "^1.0.0";
     packageJson.dependencies["@tanstack/angular-query-experimental"] = "5.66.4";
     overwriteIfExists(host, "package.json", stringifyFormatted(packageJson));
     context.addTask(new NodePackageInstallTask());
