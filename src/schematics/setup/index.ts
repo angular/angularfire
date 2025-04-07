@@ -123,11 +123,11 @@ export const ngAddSetupProject = (
           // Parse through sdk again
           dataConnectConfig = parseDataConnectConfig(setupConfig);
           if(dataConnectConfig?.angular) {
-            context.logger.info('Generated Angular SDK Enabled. Setting up Tanstack Dependencies.');
-            setupTanstackDependencies(host, context);
+            context.logger.info('Generated Angular SDK Enabled.');
           } else {
-            context.logger.info('Generated Angular SDK Disabled. Please add `angular: true` to your connector.yaml and re-run `ng add @angular/fire`');
+            context.logger.info('Generated Angular SDK Disabled. Please add `angular: true` to your connector.yaml');
           }
+          setupTanstackDependencies(host, context);
           setupConfig.dataConnectConfig = dataConnectConfig;
         }
       
