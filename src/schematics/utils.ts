@@ -230,7 +230,7 @@ export function featureToRules(
               }
               if (config.angular) {
                 angularConfig = `, ${external(
-                  "provideTanStack",
+                  "provideTanStackQuery",
                   "@tanstack/angular-query-experimental"
                 )}(new ${external(
                   "QueryClient",
@@ -393,7 +393,7 @@ export function setupTanstackDependencies(
   ) {
     packageJson.dependencies[tanstackFirebasePackage] =
       "^1.0.0";
-    packageJson.dependencies[tanstackFirebasePackage] = "5.66.4";
+    packageJson.dependencies["@tanstack/angular-query-experimental"] = "5.66.4";
     overwriteIfExists(host, "package.json", stringifyFormatted(packageJson));
     context.addTask(new NodePackageInstallTask());
   }
