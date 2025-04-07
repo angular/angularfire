@@ -63,6 +63,9 @@ const initMocks = () => {
         create: () => Promise.reject(),
       }
     },
+    init() {
+      return Promise.resolve()
+    },
     deploy: (_: FirebaseDeployConfig) => Promise.resolve(),
     use: () => Promise.resolve(),
     logger: {
