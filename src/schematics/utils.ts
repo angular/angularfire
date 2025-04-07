@@ -239,7 +239,7 @@ export function featureToRules(
               }
             }
             return code`${external(
-              "provideDataConnectQuery",
+              "provideDataConnect",
               "@angular/fire/data-connect"
             )}(() => getDataConnect(${configAsStr}))${angularConfig ?? ""}`;
           });
@@ -386,13 +386,14 @@ export function setupTanstackDependencies(
   context: SchematicContext
 ) {
   const packageJson: PackageJson = safeReadJSON("package.json", host);
+  const tanstackFirebasePackage = "@tanstack-query-firebase/angular";
   if (
-    !packageJson.dependencies["@tanstack-query-firebase/angular"] &&
-    !packageJson.devDependencies["@tanstack-query-firebase/angular"]
+    !packageJson.dependencies[tanstackFirebasePackage] &&
+    !packageJson.devDependencies[tanstackFirebasePackage]
   ) {
-    packageJson.dependencies["@tanstack-query-firebase/angular"] =
+    packageJson.dependencies[tanstackFirebasePackage] =
       "^1.0.0";
-    packageJson.dependencies["@tanstack/angular-query-experimental"] = "5.66.4";
+    packageJson.dependencies[tanstackFirebasePackage] = "5.66.4";
     overwriteIfExists(host, "package.json", stringifyFormatted(packageJson));
     context.addTask(new NodePackageInstallTask());
   }
