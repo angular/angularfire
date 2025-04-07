@@ -390,7 +390,6 @@ export function setupTanstackDependencies(
     !packageJson.dependencies["@tanstack-query-firebase/angular"] &&
     !packageJson.devDependencies["@tanstack-query-firebase/angular"]
   ) {
-    // TODO(mtewani): Check if dependency is valid first.
     packageJson.dependencies["@tanstack-query-firebase/angular"] =
       "^1.0.0";
     packageJson.dependencies["@tanstack/angular-query-experimental"] = "5.66.4";
