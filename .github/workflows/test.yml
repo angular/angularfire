@@ -47,7 +47,7 @@ jobs:
       - name: Build
         run: ./tools/build.sh
       - name: 'Upload Artifact'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: angularfire-${{ github.run_id }}
           path: dist
