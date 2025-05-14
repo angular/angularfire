@@ -13,7 +13,7 @@ export class AI {
   }
 }
 
-export const AI_PROVIDER_NAME = 'ai';
+export const AI_PROVIDER_NAME = 'AI';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface AIInstances extends Array<FirebaseAI> {}
