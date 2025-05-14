@@ -1,9 +1,8 @@
 import { TestBed } from '@angular/core/testing';
-import { AI, getAI } from '@angular/fire/ai';
+import { AI, getAI, provideAI } from '@angular/fire/ai';
 import { FirebaseApp, getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../utils';
-import { provideAI } from './ai.module';
 
 describe('AI', () => {
   let app: FirebaseApp;
