@@ -114,6 +114,7 @@ ${exportedZoneWrappedFns}
     await writeFile(filePath, fileOutput);
   };
   return Promise.all([
+    reexport('ai', 'firebase', 'firebase/ai', tsKeys<typeof import('firebase/ai')>()),
     reexport('analytics', 'firebase', 'firebase/analytics', tsKeys<typeof import('firebase/analytics')>(), {
       isSupported: { blockUntilFirst: false },
       logEvent: { blockUntilFirst: false, logLevel: LogLevel.VERBOSE },
@@ -252,7 +253,6 @@ ${exportedZoneWrappedFns}
       collection: { exportName: 'collectionSnapshots' },
     }),
     reexport('firestore/lite', 'firebase', 'firebase/firestore/lite', tsKeys<typeof import('firebase/firestore/lite')>(), firestoreOverrides),
-    reexport('vertexai', 'firebase', 'firebase/vertexai', tsKeys<typeof import('firebase/vertexai')>()),
   ]);
 }
 
