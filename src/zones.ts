@@ -171,10 +171,11 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, logLevel
       return run(
         () =>
           new Promise((resolve, reject) => {
-            pendingTasks.run(() => ret).then(
+            pendingTasks.run(() => ret.then(
               (it) => runInInjectionContext(injector, () => run(() => resolve(it))),
               (reason) => runInInjectionContext(injector, () => run(() => reject(reason)))
-            );
+            )
+          );
       }));
     } else if (typeof ret === 'function' && taskDone) {
       // Handle unsubscribe
