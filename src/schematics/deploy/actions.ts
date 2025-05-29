@@ -465,7 +465,7 @@ or the new Firebase App Hosting product https://firebase.google.com/docs/app-hos
           open(plainText.split(': ')[1]);
         }
       }
-      return [info.message, ...(info[tripleBeam.SPLAT as any] || [])]
+      return [info.message, ...(info[tripleBeam.SPLAT as any] || []) as any]
         .filter((chunk) => typeof chunk === 'string')
         .join(' ');
     })
