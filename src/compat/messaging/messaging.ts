@@ -73,7 +73,7 @@ export class AngularFireMessaging {
       })
     );
 
-    const notificationPermission$ = new Observable<string>(emitter => {
+    const notificationPermission$ = new Observable<void>(emitter => {
       navigator.permissions.query({ name: 'notifications' }).then(notificationPerm => {
         notificationPerm.onchange = () => emitter.next();
       });

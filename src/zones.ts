@@ -169,13 +169,15 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, logLevel
     } else if (ret instanceof Promise) {
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       return run(
-        () =>
-          new Promise((resolve, reject) => {
-            pendingTasks.run(() => ret).then(
+        () => {
+          pendingTasks.run(() => ret);
+          return new Promise((resolve, reject) => {
+            ret.then(
               (it) => runInInjectionContext(injector, () => run(() => resolve(it))),
               (reason) => runInInjectionContext(injector, () => run(() => reject(reason)))
-            );
-      }));
+            )
+        });
+      });
     } else if (typeof ret === 'function' && taskDone) {
       // Handle unsubscribe
       // function() is needed for the arguments object
