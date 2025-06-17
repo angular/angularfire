@@ -58,7 +58,7 @@ interface Item {
 export class AppComponent {
   firestore = inject(Firestore);
   itemCollection = collection(this.firestore, 'items');
-  item$ = collectionData<Item>(itemCollection);
+  item$ = collectionData<Item>(this.itemCollection);
 }
 ```
 
