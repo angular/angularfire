@@ -47,7 +47,7 @@ jobs:
       - name: Build
         run: ./tools/build.sh
       - name: 'Upload Artifact'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: angularfire-${{ github.run_id }}
           path: dist
@@ -82,7 +82,7 @@ jobs:
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         run: npm ci
       - name: Download Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
       - name: Relocate Artifacts
         run: mv angularfire-${{ github.run_id }} dist
       - name: Test Node
@@ -133,7 +133,7 @@ jobs:
           path: ~/.cache/firebase/emulators
           key: firebase_emulators
       - name: Download Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
       - name: Relocate Artifacts
         run: mv angularfire-${{ github.run_id }} dist
       - name: Test browser
@@ -210,7 +210,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           check-latest: false
       - name: 'Download Artifacts'
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
       - name: Publish
         run: |
           cd ./angularfire-${{ github.run_id }}/packages-dist
