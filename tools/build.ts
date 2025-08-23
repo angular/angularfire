@@ -114,6 +114,7 @@ ${exportedZoneWrappedFns}
     await writeFile(filePath, fileOutput);
   };
   return Promise.all([
+    reexport('ai', 'firebase', 'firebase/ai', tsKeys<typeof import('firebase/ai')>()),
     reexport('analytics', 'firebase', 'firebase/analytics', tsKeys<typeof import('firebase/analytics')>(), {
       isSupported: { blockUntilFirst: false },
       logEvent: { blockUntilFirst: false, logLevel: LogLevel.VERBOSE },
