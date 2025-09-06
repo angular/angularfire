@@ -54,7 +54,7 @@ There are two parts to Firebase Messaging, a Service Worker and the DOM API. Ang
 
 It may be wise to use file replacements or environments here for different environments
 
-```
+```ts
 // This sample application is using 9.22, make sure you are importing the same version
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
@@ -74,7 +74,7 @@ const messaging = getMessaging(firebaseApp);
 
 # Example messaging service
 
-```
+```ts
 import { Injectable } from "@angular/core";
 import { Messaging, getToken, onMessage, deleteToken } from "@angular/fire/messaging";
 import { Observable, tap } from "rxjs";
@@ -126,7 +126,7 @@ Firebase will allow you to send a test notification under Engage > Messaging > N
 
 Here is a barebones Node example:
 
-```
+```ts
 export const sendTestMessage = onRequest(async (_, res) => {
   try {
     const message = {
@@ -147,7 +147,7 @@ export const sendTestMessage = onRequest(async (_, res) => {
 
 Here is a Node example that listens for a new comment on a collection, then sends a notification, and also adds it to a cache on Firebase so users can click through them.
 
-```
+```ts
 exports.onPostReply =
   onDocumentCreated("comments/{commentId}", async (event) => {
     if (!event) throw new Error("No event found for document creation");
