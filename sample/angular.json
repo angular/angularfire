@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ng19-test": {
+    "ng20-test": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,10 +13,9 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/ng19-test",
+            "outputPath": "dist/ng20-test",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "polyfills": [],
             "tsConfig": "tsconfig.app.json",
             "assets": [
               {
@@ -24,9 +23,7 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.css"
-            ],
+            "styles": ["src/styles.css"],
             "scripts": [],
             "server": "src/main.server.ts",
             "outputMode": "server",
@@ -63,10 +60,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "ng19-test:build:production"
+              "buildTarget": "ng20-test:build:production"
             },
             "development": {
-              "buildTarget": "ng19-test:build:development"
+              "buildTarget": "ng20-test:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -77,7 +74,7 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
-            "polyfills": [],
+            "main": "src/test.ts",
             "tsConfig": "tsconfig.spec.json",
             "assets": [
               {
@@ -85,9 +82,7 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.css"
-            ],
+            "styles": ["src/styles.css"],
             "scripts": []
           }
         }
@@ -119,5 +114,8 @@
     "@schematics/angular:resolver": {
       "typeSeparator": "."
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }

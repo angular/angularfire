@@ -1,8 +1,19 @@
-import { Component, inject, makeStateKey, PLATFORM_ID, TransferState } from '@angular/core';
-import { startWith, tap } from 'rxjs';
-import { connectDatabaseEmulator, getDatabase, objectVal, ref } from '@angular/fire/database';
-import { AsyncPipe, isPlatformServer, JsonPipe } from '@angular/common';
+import { AsyncPipe, JsonPipe, isPlatformServer } from '@angular/common';
+import {
+  Component,
+  PLATFORM_ID,
+  TransferState,
+  inject,
+  makeStateKey,
+} from '@angular/core';
 import { FirebaseApp } from '@angular/fire/app';
+import {
+  connectDatabaseEmulator,
+  getDatabase,
+  objectVal,
+  ref,
+} from '@angular/fire/database';
+import { startWith, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 @Component({
@@ -13,28 +24,36 @@ import { environment } from '../../environments/environment';
       <code>{{ testObjectValue$ | async | json }}</code>
     </p>
   `,
-  imports: [AsyncPipe, JsonPipe]
+  imports: [AsyncPipe, JsonPipe],
 })
 export class DatabaseComponent {
-
   private readonly database;
 
   private readonly transferState = inject(TransferState);
-  private readonly transferStateKey = makeStateKey<unknown|undefined>("database:test");
+  private readonly transferStateKey = makeStateKey<unknown | undefined>(
+    'database:test'
+  );
   protected readonly testObjectValue$;
 
   constructor() {
     this.database = getDatabase(inject(FirebaseApp));
-    if (!(this.database as any)._instanceStarted && environment.emulatorPorts?.database) {
-      connectDatabaseEmulator(this.database, "localhost", environment.emulatorPorts.database);
+    if (
+      !(this.database as any)._instanceStarted &&
+      environment.emulatorPorts?.database
+    ) {
+      connectDatabaseEmulator(
+        this.database,
+        'localhost',
+        environment.emulatorPorts.database
+      );
     }
 
-    this.testObjectValue$ = objectVal(ref(this.database, "test")).pipe(
-      isPlatformServer(inject(PLATFORM_ID)) ?
-          tap(it => this.transferState.set(this.transferStateKey, it)) :
-          this.transferState.hasKey(this.transferStateKey) ?
-            startWith(this.transferState.get(this.transferStateKey, undefined)) :
-            tap()
+    this.testObjectValue$ = objectVal(ref(this.database, 'test')).pipe(
+      isPlatformServer(inject(PLATFORM_ID))
+        ? tap((it) => this.transferState.set(this.transferStateKey, it))
+        : this.transferState.hasKey(this.transferStateKey)
+        ? startWith(this.transferState.get(this.transferStateKey, undefined))
+        : tap()
     );
   }
 }
