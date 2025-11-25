@@ -21,7 +21,7 @@ export function defaultPerformanceInstanceFactory(
   provided: FirebasePerformance[]|undefined,
   defaultApp: FirebaseApp,
   // eslint-disable-next-line @typescript-eslint/ban-types
-  platform: Object
+  platform: object
 ) {
   if (!isPlatformBrowser(platform)) { return null; }
   const defaultPerformance = ɵgetDefaultInstanceOf<FirebasePerformance>(PERFORMANCE_PROVIDER_NAME, provided, defaultApp);
@@ -30,7 +30,7 @@ export function defaultPerformanceInstanceFactory(
 
 export function performanceInstanceFactory(fn: (injector: Injector) => FirebasePerformance) {
   // eslint-disable-next-line @typescript-eslint/ban-types
-  return (zone: NgZone, platform: Object, injector: Injector) => {
+  return (zone: NgZone, platform: object, injector: Injector) => {
     if (!isPlatformBrowser(platform)) { return null; }
     const performance = zone.runOutsideAngular(() => fn(injector));
     return new Performance(performance);

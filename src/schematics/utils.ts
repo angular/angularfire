@@ -38,7 +38,7 @@ export function getWorkspace(host: Tree): {
     throw new SchematicsException(`Could not find angular.json`);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+   
   const { parse } = require("jsonc-parser");
 
   const workspace = parse(configBuffer.toString()) as Workspace | undefined;

@@ -16,7 +16,7 @@ export class UserTrackingService implements OnDestroy {
   constructor(
     analytics: AngularFireAnalytics,
     // eslint-disable-next-line @typescript-eslint/ban-types
-    @Inject(PLATFORM_ID) platformId: Object,
+    @Inject(PLATFORM_ID) platformId: object,
     auth: AngularFireAuth,
     zone: NgZone,
   ) {

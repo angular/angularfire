@@ -9,7 +9,7 @@
       "downlevelIteration": true,
       "emitDecoratorMetadata": true,
       "experimentalDecorators": true,
-      "module": "esnext",
+      "module": "preserve",
       "moduleResolution": "bundler",
       "importHelpers": true,
       "target": "es2020",

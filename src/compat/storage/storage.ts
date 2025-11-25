@@ -34,7 +34,7 @@ export class AngularFireStorage {
     @Optional() @Inject(FIREBASE_APP_NAME) name: string | null | undefined,
     @Optional() @Inject(BUCKET) storageBucket: string | null,
     // eslint-disable-next-line @typescript-eslint/ban-types
-    @Inject(PLATFORM_ID) platformId: Object,
+    @Inject(PLATFORM_ID) platformId: object,
     zone: NgZone,
     schedulers: ɵAngularFireSchedulers,
     @Optional() @Inject(MAX_UPLOAD_RETRY_TIME) maxUploadRetryTime: any,

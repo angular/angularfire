@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
+ 
 import {
   EnvironmentInjector,
   Injectable,
@@ -167,7 +167,7 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, logLevel
         pendingUntilEvent(injector),
       );
     } else if (ret instanceof Promise) {
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+       
       return run(
         () => {
           const removeTask = pendingTasks.add();

@@ -60,7 +60,7 @@ export class AngularFireModule {
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-types
-  constructor(@Inject(PLATFORM_ID) platformId: Object) {
+  constructor(@Inject(PLATFORM_ID) platformId: object) {
     firebase.registerVersion('angularfire', VERSION.full, 'core');
     firebase.registerVersion('angularfire', VERSION.full, 'app-compat');
     // eslint-disable-next-line @typescript-eslint/no-base-to-string

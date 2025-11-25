@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+ 
 import { execSync, spawn } from 'child_process';
 import ora from 'ora';
 import { compare as semverCompare } from 'semver';

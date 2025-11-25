@@ -11,7 +11,7 @@ import { Observable, Subject, from, merge, of } from 'rxjs';
 import { filter, first, map, observeOn, shareReplay, subscribeOn, switchMap, switchMapTo } from 'rxjs/operators';
 import { proxyPolyfillCompat } from './base';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+ 
 export interface AngularFireAuth extends ɵPromiseProxy<firebase.auth.Auth> {}
 
 type UseEmulatorArguments = Parameters<firebase.auth.Auth['useEmulator']>;
@@ -88,7 +88,7 @@ export class AngularFireAuth {
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) name: string|null|undefined,
     // eslint-disable-next-line @typescript-eslint/ban-types
-    @Inject(PLATFORM_ID) platformId: Object,
+    @Inject(PLATFORM_ID) platformId: object,
     zone: NgZone,
     schedulers: ɵAngularFireSchedulers,
     @Optional() @Inject(USE_EMULATOR) useEmulator: any, // can't use the tuple here

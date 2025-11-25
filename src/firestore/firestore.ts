@@ -4,7 +4,7 @@ import { from, timer } from 'rxjs';
 import { concatMap, distinct } from 'rxjs/operators';
 
 // see notes in core/firebase.app.module.ts for why we're building the class like this
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+ 
 export interface Firestore extends FirebaseFirestore {}
 
 export class Firestore {
@@ -15,7 +15,7 @@ export class Firestore {
 
 export const FIRESTORE_PROVIDER_NAME = 'firestore';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+ 
 export interface FirestoreInstances extends Array<FirebaseFirestore> {}
 
 export class FirestoreInstances {

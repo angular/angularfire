@@ -29,7 +29,7 @@ export type ConfigTemplate = Record<string, string | number | boolean>;
 export const SETTINGS = new InjectionToken<Settings>('angularfire2.remoteConfig.settings');
 export const DEFAULTS = new InjectionToken<ConfigTemplate>('angularfire2.remoteConfig.defaultConfig');
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+ 
 export interface AngularFireRemoteConfig extends ɵPromiseProxy<firebase.remoteConfig.RemoteConfig> {
 }
 
@@ -50,7 +50,7 @@ const proxyAll = (observable: Observable<Parameter[]>, as: 'numbers' | 'booleans
 // TODO export as implements Partial<...> so minor doesn't break us
 export class Value implements firebase.remoteConfig.Value {
   asBoolean() {
-    return ['1', 'true', 't', 'y', 'yes', 'on'].indexOf(this._value.toLowerCase()) > -1;
+    return ['1', 'true', 't', 'y', 'yes', 'on'].includes(this._value.toLowerCase());
   }
 
   asString() {
@@ -131,7 +131,7 @@ export class AngularFireRemoteConfig {
     private zone: NgZone,
     schedulers: ɵAngularFireSchedulers,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-types
-    @Inject(PLATFORM_ID) platformId: Object
+    @Inject(PLATFORM_ID) platformId: object
   ) {
     const remoteConfig$ = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),
@@ -255,7 +255,7 @@ const typedMethod = (it: any) => {
 export function scanToObject(): OperatorFunction<Parameter, Record<string, string | undefined>>;
 export function scanToObject(to: 'numbers'): OperatorFunction<Parameter, Record<string, number | undefined>>;
 export function scanToObject(to: 'booleans'): OperatorFunction<Parameter, Record<string, boolean | undefined>>;
-// eslint-disable-next-line @typescript-eslint/unified-signatures
+ 
 export function scanToObject(to: 'strings'): OperatorFunction<Parameter, Record<string, string | undefined>>;
 export function scanToObject<T extends ConfigTemplate>(template: T): OperatorFunction<Parameter, T & Record<string, string | undefined>>;
 export function scanToObject<T extends ConfigTemplate>(to: 'numbers' | 'booleans' | 'strings' | T = 'strings') {
@@ -280,7 +280,7 @@ export function scanToObject<T extends ConfigTemplate>(to: 'numbers' | 'booleans
 export function mapToObject(): OperatorFunction<Parameter[], Record<string, string | undefined>>;
 export function mapToObject(to: 'numbers'): OperatorFunction<Parameter[], Record<string, number | undefined>>;
 export function mapToObject(to: 'booleans'): OperatorFunction<Parameter[], Record<string, boolean | undefined>>;
-// eslint-disable-next-line @typescript-eslint/unified-signatures
+ 
 export function mapToObject(to: 'strings'): OperatorFunction<Parameter[], Record<string, string | undefined>>;
 export function mapToObject<T extends ConfigTemplate>(template: T):
   OperatorFunction<Parameter[], T & Record<string, string | undefined>>;
