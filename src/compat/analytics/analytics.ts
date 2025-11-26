@@ -25,7 +25,7 @@ const GTAG_FUNCTION_NAME = 'gtag'; // TODO rename these
 const DATA_LAYER_NAME = 'dataLayer';
 const SEND_TO_KEY = 'send_to';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+ 
 export interface AngularFireAnalytics extends ɵPromiseProxy<firebase.analytics.Analytics> {
 }
 
@@ -49,8 +49,8 @@ export class AngularFireAnalytics {
     @Optional() @Inject(APP_NAME) providedAppName: string | null,
     @Optional() @Inject(DEBUG_MODE) debugModeEnabled: boolean | null,
     @Optional() @Inject(CONFIG) providedConfig: Config | null,
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    @Inject(PLATFORM_ID) platformId: Object,
+
+    @Inject(PLATFORM_ID) platformId: object,
     zone: NgZone,
     schedulers: ɵAngularFireSchedulers,
   ) {

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+ 
 import { execSync, spawn } from 'child_process';
 import ora from 'ora';
 import { compare as semverCompare } from 'semver';
@@ -14,11 +14,11 @@ export const getFirebaseTools = () => globalThis.firebaseTools ?
         process.env.FIREBASE_CLI_EXPERIMENTS ||= 'webframeworks';
         try {
             resolve(require('firebase-tools'));
-        } catch (e) {
+        } catch (_) {
             try {
                 const root = execSync('npm root --location=global').toString().trim();
                 resolve(require(`${root}/firebase-tools`));
-            } catch (e) {
+            } catch (_) {
                 const spinner = ora({
                     text: `Installing firebase-tools...`,
                     // Workaround for https://github.com/sindresorhus/ora/issues/136.
