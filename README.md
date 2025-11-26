@@ -1,7 +1,7 @@
 
 # AngularFire
 
-AngularFire smooths over the rough edges an Angular developer might encounter when implementing the framework-agnostic
+AngularFire smooths over the rough edges an Angular developer might encounter with implementing the framework-agnostic
 [Firebase JS SDK](https://github.com/firebase/firebase-js-sdk) & aims to provide a more natural developer experience
 by conforming to Angular conventions.
 
