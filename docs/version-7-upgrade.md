@@ -296,3 +296,31 @@ export class Foo {
     }
 }
 ```
+### Changes to Auth
+on ios native, provideAuth() needs to initializeAuth() first:
+```
+import {
+  getAuth,
+  indexedDBLocalPersistence,
+  initializeAuth,
+  provideAuth,
+} from '@angular/fire/auth';
+
+@NgModule({
+  declarations: [AppComponent],
+  entryComponents: [],
+  imports: [
+    ...
+    provideAuth(() => {
+      if (Capacitor.isNativePlatform()) {
+        return initializeAuth(getApp(), {
+          persistence: indexedDBLocalPersistence,
+        });
+      } else {
+        return getAuth();
+      }
+    }),
+  ]
+})
+
+```
