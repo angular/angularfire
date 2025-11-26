@@ -49,7 +49,7 @@ export class AngularFireAnalytics {
     @Optional() @Inject(APP_NAME) providedAppName: string | null,
     @Optional() @Inject(DEBUG_MODE) debugModeEnabled: boolean | null,
     @Optional() @Inject(CONFIG) providedConfig: Config | null,
-    // eslint-disable-next-line @typescript-eslint/ban-types
+
     @Inject(PLATFORM_ID) platformId: object,
     zone: NgZone,
     schedulers: ɵAngularFireSchedulers,

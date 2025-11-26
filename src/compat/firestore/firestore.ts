@@ -133,7 +133,7 @@ export class AngularFirestore {
     @Optional() @Inject(FIREBASE_APP_NAME) name: string | null | undefined,
     @Optional() @Inject(ENABLE_PERSISTENCE) shouldEnablePersistence: boolean | null,
     @Optional() @Inject(SETTINGS) settings: Settings | null,
-    // eslint-disable-next-line @typescript-eslint/ban-types
+
     @Inject(PLATFORM_ID) platformId: object,
     zone: NgZone,
     public schedulers: ɵAngularFireSchedulers,

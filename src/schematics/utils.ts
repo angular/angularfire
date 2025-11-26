@@ -99,7 +99,7 @@ export function getFirebaseProjectNameFromFs(
     const buffer = readFileSync(path);
     const rc: FirebaseRc = JSON.parse(buffer.toString());
     return projectFromRc(rc, target);
-  } catch (e) {
+  } catch (_) {
     return [undefined, undefined];
   }
 }
@@ -375,7 +375,7 @@ export function parseDataConnectConfig(
       package: connectorJson.generate.javascriptSdk.package,
       angular: connectorJson.generate.javascriptSdk.angular,
     };
-  } catch (e) {
+  } catch (_) {
     console.error("Couldn't parse dataconnect.yaml", e);
     return null;
   }

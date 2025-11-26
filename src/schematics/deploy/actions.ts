@@ -237,7 +237,7 @@ export const deployToFunction = async (
         join(newStaticOut, 'index.html'),
         join(newStaticOut, 'index.original.html')
       );
-    } catch (e) { /* empty */ }
+    } catch (_) { /* empty */ }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -346,7 +346,7 @@ export const deployToCloudRun = async (
         join(newStaticOut, 'index.html'),
         join(newStaticOut, 'index.original.html')
       );
-    } catch (e) { /* empty */ }
+    } catch (_) { /* empty */ }
   }
 
   if (options.preview) {
@@ -453,7 +453,7 @@ or the new Firebase App Hosting product https://firebase.google.com/docs/app-hos
       project: firebaseProject,
       projectRoot: context.workspaceRoot,
     });
-  } catch (e) {
+  } catch (_) {
     throw new Error(`Cannot select firebase project '${firebaseProject}'`);
   }
 

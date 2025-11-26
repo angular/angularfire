@@ -63,7 +63,6 @@ export function firebaseAppFactory(fn: (injector: Injector) => IFirebaseApp) {
   ]
 })
 export class FirebaseAppModule {
-  // eslint-disable-next-line @typescript-eslint/ban-types
   constructor(@Inject(PLATFORM_ID) platformId: object) {
     registerVersion('angularfire', VERSION.full, 'core');
     registerVersion('angularfire', VERSION.full, 'app');

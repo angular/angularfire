@@ -134,7 +134,7 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, logLevel
       schedulers = inject(ɵAngularFireSchedulers);
       pendingTasks = inject(PendingTasks);
       injector = inject(EnvironmentInjector);
-    } catch(e) {
+    } catch (_) {
       warnOutsideInjectionContext(it, logLevel);
       return (it as any).apply(this, _arguments);
     }

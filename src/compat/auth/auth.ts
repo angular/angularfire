@@ -87,7 +87,7 @@ export class AngularFireAuth {
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) name: string|null|undefined,
-    // eslint-disable-next-line @typescript-eslint/ban-types
+
     @Inject(PLATFORM_ID) platformId: object,
     zone: NgZone,
     schedulers: ɵAngularFireSchedulers,

@@ -1,4 +1,4 @@
-import { EnvironmentInjector, Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID, inject } from '@angular/core';
+import { EnvironmentInjector, Inject, Injectable, InjectionToken, NgZone, Optional, inject } from '@angular/core';
 import { pendingUntilEvent } from '@angular/core/rxjs-interop';
 import { ɵAngularFireSchedulers } from '@angular/fire';
 import { ɵPromiseProxy, ɵapplyMixins, ɵlazySDKProxy } from '@angular/fire/compat';
@@ -130,8 +130,6 @@ export class AngularFireRemoteConfig {
     @Optional() @Inject(DEFAULTS) defaultConfig: ConfigTemplate | null,
     private zone: NgZone,
     schedulers: ɵAngularFireSchedulers,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars,@typescript-eslint/ban-types
-    @Inject(PLATFORM_ID) platformId: object
   ) {
     const remoteConfig$ = of(undefined).pipe(
       observeOn(schedulers.outsideAngular),

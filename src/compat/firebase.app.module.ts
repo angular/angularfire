@@ -15,7 +15,7 @@ export function ɵfirebaseAppFactory(options: FirebaseOptions, zone: NgZone, nam
   const config = typeof nameOrConfig === 'object' && nameOrConfig || {};
   config.name = config.name || name;
   // Added any due to some inconsistency between @firebase/app and firebase types
-  const existingApp = firebase.apps.filter(app => app && app.name === config.name)[0];
+  const existingApp = firebase.apps.find(app => app && app.name === config.name);
   // We support FirebaseConfig, initializeApp's public type only accepts string; need to cast as any
   // Could be solved with https://github.com/firebase/firebase-js-sdk/pull/1206
   const app = (existingApp || zone.runOutsideAngular(() => firebase.initializeApp(options, config as any)));
@@ -24,11 +24,11 @@ export function ɵfirebaseAppFactory(options: FirebaseOptions, zone: NgZone, nam
       const hmr = !!(module as any).hot;
       log('error', `${app.name} Firebase App already initialized with different options${hmr ? ', you may need to reload as Firebase is not HMR aware.' : '.'}`);
     }
-  } catch (e) { /* empty */ }
+  } catch (_) { /* empty */ }
   return new FirebaseApp(app);
 }
 
-const log = (level: 'log'|'error'|'info'|'warn', ...args: any) => {
+const log = (level: 'log' | 'error' | 'info' | 'warn', ...args: any) => {
   if (isDevMode() && typeof console !== 'undefined') {
     // eslint-disable-next-line no-console
     console[level](...args);
@@ -53,13 +53,12 @@ export class AngularFireModule {
     return {
       ngModule: AngularFireModule,
       providers: [
-        {provide: FIREBASE_OPTIONS, useValue: options},
-        {provide: FIREBASE_APP_NAME, useValue: nameOrConfig}
+        { provide: FIREBASE_OPTIONS, useValue: options },
+        { provide: FIREBASE_APP_NAME, useValue: nameOrConfig }
       ]
     };
   }
 
-  // eslint-disable-next-line @typescript-eslint/ban-types
   constructor(@Inject(PLATFORM_ID) platformId: object) {
     firebase.registerVersion('angularfire', VERSION.full, 'core');
     firebase.registerVersion('angularfire', VERSION.full, 'app-compat');

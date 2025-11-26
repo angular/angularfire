@@ -20,7 +20,7 @@ export const PROVIDED_PERFORMANCE_INSTANCES = new InjectionToken<Performance[]>(
 export function defaultPerformanceInstanceFactory(
   provided: FirebasePerformance[]|undefined,
   defaultApp: FirebaseApp,
-  // eslint-disable-next-line @typescript-eslint/ban-types
+
   platform: object
 ) {
   if (!isPlatformBrowser(platform)) { return null; }
@@ -29,7 +29,7 @@ export function defaultPerformanceInstanceFactory(
 }
 
 export function performanceInstanceFactory(fn: (injector: Injector) => FirebasePerformance) {
-  // eslint-disable-next-line @typescript-eslint/ban-types
+
   return (zone: NgZone, platform: object, injector: Injector) => {
     if (!isPlatformBrowser(platform)) { return null; }
     const performance = zone.runOutsideAngular(() => fn(injector));

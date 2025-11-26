@@ -26,7 +26,7 @@ export class AngularFirePerformance {
     @Optional() @Inject(INSTRUMENTATION_ENABLED) instrumentationEnabled: boolean | null,
     @Optional() @Inject(DATA_COLLECTION_ENABLED) dataCollectionEnabled: boolean | null,
     private zone: NgZone,
-    // eslint-disable-next-line @typescript-eslint/ban-types
+
     @Inject(PLATFORM_ID) platformId: object
   ) {
 
@@ -107,7 +107,7 @@ export const traceWhile = <T = any>(
         }
       },
       () => undefined,
-      () => options && options.orComplete && traceSubscription && traceSubscription.unsubscribe()
+      () => options?.orComplete && traceSubscription?.unsubscribe()
     )
   ).subscribe(subscriber);
 });
