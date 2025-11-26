@@ -84,7 +84,7 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53
       - name: Relocate Artifacts
-        run: mv angularfire-${{ github.run_id }} dist
+        run: mv angularfire dist
       - name: Test Node
         run: |
           npm run build:jasmine
@@ -135,7 +135,7 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53
       - name: Relocate Artifacts
-        run: mv angularfire-${{ github.run_id }} dist
+        run: mv angularfire dist
       - name: Test browser
         run: npm run test:${{ matrix.browser }}
 
@@ -213,7 +213,7 @@ jobs:
         uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53
       - name: Publish
         run: |
-          cd ./angularfire-${{ github.run_id }}/packages-dist
+          cd ./angularfire/packages-dist
           chmod +x publish.sh
           ./publish.sh
         env:
