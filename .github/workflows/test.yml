@@ -59,7 +59,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
-        node: ["18", "20", "22"]
+        node: ["20", "22", "24"]
       fail-fast: false
     name: Test Node ${{ matrix.node }} (${{ matrix.os }})
     steps:
