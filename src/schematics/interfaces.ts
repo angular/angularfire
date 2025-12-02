@@ -12,7 +12,7 @@ export const enum FEATURES {
   Firestore,
   Storage,
   RemoteConfig,
-  VertexAI,
+  AI,
 }
 
 export const featureOptions = [
@@ -27,7 +27,7 @@ export const featureOptions = [
   { name: 'Performance Monitoring', value: FEATURES.Performance },
   { name: 'Cloud Storage', value: FEATURES.Storage },
   { name: 'Remote Config', value: FEATURES.RemoteConfig },
-  { name: 'Vertex AI', value: FEATURES.VertexAI },
+  { name: 'AI', value: FEATURES.AI },
 ];
 
 export const enum PROJECT_TYPE { Static, CloudFunctions, CloudRun, WebFrameworks }
