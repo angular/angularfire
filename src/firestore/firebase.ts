@@ -17,6 +17,7 @@ import {
   disablePersistentCacheIndexAutoCreation as _disablePersistentCacheIndexAutoCreation,
   doc as _doc,
   documentId as _documentId,
+  documentSnapshotFromJSON as _documentSnapshotFromJSON,
   enableIndexedDbPersistence as _enableIndexedDbPersistence,
   enableMultiTabIndexedDbPersistence as _enableMultiTabIndexedDbPersistence,
   enableNetwork as _enableNetwork,
@@ -40,11 +41,13 @@ import {
   loadBundle as _loadBundle,
   namedQuery as _namedQuery,
   onSnapshot as _onSnapshot,
+  onSnapshotResume as _onSnapshotResume,
   onSnapshotsInSync as _onSnapshotsInSync,
   or as _or,
   orderBy as _orderBy,
   query as _query,
   queryEqual as _queryEqual,
+  querySnapshotFromJSON as _querySnapshotFromJSON,
   refEqual as _refEqual,
   runTransaction as _runTransaction,
   setDoc as _setDoc,
@@ -77,6 +80,7 @@ export const disableNetwork = ɵzoneWrap(_disableNetwork, true);
 export const disablePersistentCacheIndexAutoCreation = ɵzoneWrap(_disablePersistentCacheIndexAutoCreation, true);
 export const doc = ɵzoneWrap(_doc, true, 2);
 export const documentId = ɵzoneWrap(_documentId, true, 2);
+export const documentSnapshotFromJSON = ɵzoneWrap(_documentSnapshotFromJSON, true);
 export const enableIndexedDbPersistence = ɵzoneWrap(_enableIndexedDbPersistence, true);
 export const enableMultiTabIndexedDbPersistence = ɵzoneWrap(_enableMultiTabIndexedDbPersistence, true);
 export const enableNetwork = ɵzoneWrap(_enableNetwork, true);
@@ -100,11 +104,13 @@ export const limitToLast = ɵzoneWrap(_limitToLast, true, 2);
 export const loadBundle = ɵzoneWrap(_loadBundle, true);
 export const namedQuery = ɵzoneWrap(_namedQuery, true, 2);
 export const onSnapshot = ɵzoneWrap(_onSnapshot, true);
+export const onSnapshotResume = ɵzoneWrap(_onSnapshotResume, true);
 export const onSnapshotsInSync = ɵzoneWrap(_onSnapshotsInSync, true);
 export const or = ɵzoneWrap(_or, true, 2);
 export const orderBy = ɵzoneWrap(_orderBy, true, 2);
 export const query = ɵzoneWrap(_query, true, 2);
 export const queryEqual = ɵzoneWrap(_queryEqual, true, 2);
+export const querySnapshotFromJSON = ɵzoneWrap(_querySnapshotFromJSON, true);
 export const refEqual = ɵzoneWrap(_refEqual, true, 2);
 export const runTransaction = ɵzoneWrap(_runTransaction, true);
 export const setDoc = ɵzoneWrap(_setDoc, true, 2);

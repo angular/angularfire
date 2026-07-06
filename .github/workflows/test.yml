@@ -21,19 +21,19 @@ jobs:
     name: Build
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903
         with:
           node-version: '20'
           check-latest: false
       - name: angular build cache
-        uses: actions/cache@v3
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: ./.angular
           key: angular-cache
       - name: node_modules cache
-        uses: actions/cache@v3
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
         id: node_modules_cache
         with:
           path: ./node_modules
@@ -47,7 +47,7 @@ jobs:
       - name: Build
         run: ./tools/build.sh
       - name: 'Upload Artifact'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
         with:
           name: angularfire-${{ github.run_id }}
           path: dist
@@ -59,20 +59,20 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
-        node: ["18", "20", "22"]
+        node: ["20", "22", "24"]
       fail-fast: false
     name: Test Node ${{ matrix.node }} (${{ matrix.os }})
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903
         with:
           node-version: ${{ matrix.node }}
           check-latest: true
       - name: node_modules cache
         id: node_modules_cache
-        uses: actions/cache@v3
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: ./node_modules
           key: ${{ runner.os }}-${{ matrix.node }}-${{ hashFiles('package-lock.json') }}
@@ -82,9 +82,10 @@ jobs:
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         run: npm ci
       - name: Download Artifacts
-        uses: actions/download-artifact@v4
-      - name: Relocate Artifacts
-        run: mv angularfire-${{ github.run_id }} dist
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53
+        with:
+          name: angularfire-${{ github.run_id }}
+          path: dist
       - name: Test Node
         run: |
           npm run build:jasmine
@@ -105,20 +106,20 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903
         with:
           node-version: 20
           check-latest: false
       - name: Setup java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165
         with:
           distribution: 'temurin'
-          java-version: '11'
+          java-version: '21'
       - name: node_modules cache
         id: node_modules_cache
-        uses: actions/cache@v3
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: ./node_modules
           key: ${{ runner.os }}-${{ matrix.node }}-${{ hashFiles('package-lock.json') }}
@@ -128,14 +129,15 @@ jobs:
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         run: npm ci
       - name: Firebase emulator cache
-        uses: actions/cache@v3
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: ~/.cache/firebase/emulators
           key: firebase_emulators
       - name: Download Artifacts
-        uses: actions/download-artifact@v4
-      - name: Relocate Artifacts
-        run: mv angularfire-${{ github.run_id }} dist
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53
+        with:
+          name: angularfire-${{ github.run_id }}
+          path: dist
       - name: Test browser
         run: npm run test:${{ matrix.browser }}
 
@@ -149,14 +151,14 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903
         with:
           node-version: ${{ matrix.node }}
           check-latest: true
       - name: node_modules cache
-        uses: actions/cache@v3
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
         id: node_modules_cache
         with:
           path: ./node_modules
@@ -175,15 +177,15 @@ jobs:
           npm run build:jasmine
           npm run test:node
       - name: Firebase emulator cache
-        uses: actions/cache@v3
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: ~/.cache/firebase/emulators
           key: firebase_emulators
       - name: Setup java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165
         with:
           distribution: 'temurin'
-          java-version: '11'
+          java-version: '21'
       - name: Test headless
         run: npm run test:chrome-headless
         # Tests are flaky on Windows
@@ -204,16 +206,19 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'release' }}
     steps:
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
           check-latest: false
       - name: 'Download Artifacts'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53
+        with:
+          name: angularfire-${{ github.run_id }}
+          path: dist
       - name: Publish
         run: |
-          cd ./angularfire-${{ github.run_id }}/packages-dist
+          cd ./dist/packages-dist
           chmod +x publish.sh
           ./publish.sh
         env:
