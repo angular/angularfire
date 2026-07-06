@@ -116,7 +116,7 @@ jobs:
         uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165
         with:
           distribution: 'temurin'
-          java-version: '11'
+          java-version: '21'
       - name: node_modules cache
         id: node_modules_cache
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
@@ -185,7 +185,7 @@ jobs:
         uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165
         with:
           distribution: 'temurin'
-          java-version: '11'
+          java-version: '21'
       - name: Test headless
         run: npm run test:chrome-headless
         # Tests are flaky on Windows
