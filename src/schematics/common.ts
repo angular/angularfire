@@ -52,7 +52,7 @@ export const addDependencies = (
           context.logger.warn(`⚠️ The ${depName} devDependency specified in your package.json (${existingVersion}) does not fulfill AngularFire's dependency (${dep.version})`);
           // TODO offer to fix
         }
-      } catch (e) {
+      } catch (_) {
         if (existingVersion !== dep.version) {
           context.logger.warn(`⚠️ The ${depName} devDependency specified in your package.json (${existingVersion}) does not fulfill AngularFire's dependency (${dep.version})`);
           // TODO offer to fix

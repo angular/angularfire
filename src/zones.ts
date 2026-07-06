@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
+ 
 import {
   EnvironmentInjector,
   Injectable,
@@ -134,7 +134,7 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, logLevel
       schedulers = inject(ɵAngularFireSchedulers);
       pendingTasks = inject(PendingTasks);
       injector = inject(EnvironmentInjector);
-    } catch(e) {
+    } catch (_) {
       warnOutsideInjectionContext(it, logLevel);
       return (it as any).apply(this, _arguments);
     }
@@ -167,15 +167,17 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, logLevel
         pendingUntilEvent(injector),
       );
     } else if (ret instanceof Promise) {
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+       
       return run(
-        () =>
-          new Promise((resolve, reject) => {
-            pendingTasks.run(() => ret).then(
+        () => {
+          const removeTask = pendingTasks.add();
+          return new Promise((resolve, reject) => {
+            ret.then(
               (it) => runInInjectionContext(injector, () => run(() => resolve(it))),
               (reason) => runInInjectionContext(injector, () => run(() => reject(reason)))
-            );
-      }));
+            ).finally(removeTask);
+        });
+      });
     } else if (typeof ret === 'function' && taskDone) {
       // Handle unsubscribe
       // function() is needed for the arguments object

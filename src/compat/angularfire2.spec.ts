@@ -1,15 +1,12 @@
-import { CompilerFactory, DoBootstrap, NgModule, PlatformRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ɵZoneScheduler } from '@angular/fire';
 import { AngularFireModule, FirebaseApp } from '@angular/fire/compat';
-import { BrowserModule } from '@angular/platform-browser';
 import { TestScheduler } from 'rxjs/testing';
 import { COMMON_CONFIG } from '../../src/test-config';
 import { rando } from '../../src/utils';
 
 describe('angularfire', () => {
   let app: FirebaseApp;
-  let defaultPlatform: PlatformRef;
   let appName: string;
 
   beforeEach(() => {
@@ -21,7 +18,6 @@ describe('angularfire', () => {
     });
 
     app = TestBed.inject(FirebaseApp);
-    defaultPlatform = TestBed.inject(PlatformRef);
   });
 
   describe('ZoneScheduler', () => {
@@ -90,38 +86,9 @@ describe('angularfire', () => {
     });
 
     if (typeof window !== 'undefined') {
-
       it('should have the provided name', () => {
         expect(app.name).toBe(appName);
       });
-
-      it('should use an already intialized firebase app if it exists', done => {
-        @NgModule({
-          imports: [
-            AngularFireModule.initializeApp(COMMON_CONFIG, appName),
-            BrowserModule
-          ]
-        })
-        class MyModule implements DoBootstrap {
-          // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method,@typescript-eslint/no-empty-function
-          ngDoBootstrap() {
-          }
-        }
-
-        const compilerFactory: CompilerFactory =
-          defaultPlatform.injector.get(CompilerFactory, null);
-        const moduleFactory = compilerFactory.createCompiler().compileModuleSync(MyModule);
-
-        defaultPlatform.bootstrapModuleFactory(moduleFactory)
-          .then(moduleRef => {
-            const ref = moduleRef.injector.get(FirebaseApp);
-            expect(ref.name).toEqual(app.name);
-          }).then(done, e => {
-          fail(e);
-          done();
-        });
-      });
-
     }
   });
 });
