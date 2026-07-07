@@ -32,26 +32,8 @@ jobs:
         with:
           node-version: '20'
           check-latest: false
-          package-manager-cache: false
-      - name: angular build cache
-        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
-        with:
-          path: ./.angular
-          key: angular-cache
-          lookup-only: true
-      - name: node_modules cache
-        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
-        id: node_modules_cache
-        with:
-          path: ./node_modules
-          key: ${{ runner.os }}-20-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-20-
-          lookup-only: true
       - name: Install deps
-        if: steps.node_modules_cache.outputs.cache-hit != 'true'
-        run: |
-          npm ci
+        run: npm ci
       - name: Build
         run: ./tools/build.sh
       - name: 'Upload Artifact'
@@ -80,18 +62,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           check-latest: true
-          package-manager-cache: false
-      - name: node_modules cache
-        id: node_modules_cache
-        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
-        with:
-          path: ./node_modules
-          key: ${{ runner.os }}-${{ matrix.node }}-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.node }}-
-          lookup-only: true
       - name: Install deps
-        if: steps.node_modules_cache.outputs.cache-hit != 'true'
         run: npm ci
       - name: Download Artifacts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.1.8
@@ -126,30 +97,13 @@ jobs:
         with:
           node-version: 20
           check-latest: false
-          package-manager-cache: false
       - name: Setup java
         uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4.2.1
         with:
           distribution: 'temurin'
           java-version: '21'
-      - name: node_modules cache
-        id: node_modules_cache
-        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
-        with:
-          path: ./node_modules
-          key: ${{ runner.os }}-${{ matrix.node }}-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.node }}-
-          lookup-only: true
       - name: Install deps
-        if: steps.node_modules_cache.outputs.cache-hit != 'true'
         run: npm ci
-      - name: Firebase emulator cache
-        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
-        with:
-          path: ~/.cache/firebase/emulators
-          key: firebase_emulators
-          lookup-only: true
       - name: Download Artifacts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.1.8
         with:
@@ -176,18 +130,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           check-latest: true
-          package-manager-cache: false
-      - name: node_modules cache
-        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
-        id: node_modules_cache
-        with:
-          path: ./node_modules
-          key: ${{ runner.os }}-${{ matrix.node }}-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.node }}-
-          lookup-only: true
       - name: Install deps
-        if: steps.node_modules_cache.outputs.cache-hit != 'true'
         run: npm ci
       #- name: Lint
       #  run: npm run lint
@@ -197,12 +140,6 @@ jobs:
         run: |
           npm run build:jasmine
           npm run test:node
-      - name: Firebase emulator cache
-        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
-        with:
-          path: ~/.cache/firebase/emulators
-          key: firebase_emulators
-          lookup-only: true
       - name: Setup java
         uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4.2.1
         with:
@@ -233,7 +170,6 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
           check-latest: false
-          package-manager-cache: false
       - name: 'Download Artifacts'
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.1.8
         with:
