@@ -45,7 +45,7 @@ export const getFirebaseTools = () => globalThis.firebaseTools ?
         const version = firebaseTools.cli.version();
         console.log(`Using firebase-tools version ${version}`);
         if (semverCompare(version, '14.0.0') === -1) {
-            console.error('firebase-tools version 13.0.0+ is required, please upgrade and run again');
+            console.error('firebase-tools version 14.0.0+ is required, please upgrade and run again');
             return Promise.reject();
         }
         return firebaseTools;
