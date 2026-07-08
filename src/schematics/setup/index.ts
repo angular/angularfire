@@ -16,6 +16,11 @@ import {
   parseDataConnectConfig,
   setupTanstackDependencies,
 } from '../utils';
+import {
+  addFirestoreToFirebaseJson,
+  createFirestoreStarterFiles,
+  setDefaultProjectInFirebaseRc,
+} from './firebaseConfigs';
 import { appPrompt, featuresPrompt, projectPrompt, userPrompt } from './prompts';
 
 // FirebaseOptions keys — apps.sdkconfig responses include management-API extras that initializeApp() rejects.
@@ -84,7 +89,9 @@ export const ngAddSetupProject = (
     const [ defaultProjectName ] = getFirebaseProjectNameFromHost(host, ngProjectName);
 
     const firebaseProject = await projectPrompt(defaultProjectName, { projectRoot, account: user.email });
-    
+
+    createFirestoreStarterFiles(host, context, features, firebaseJson);
+
     let firebaseApp: FirebaseApp|undefined;
     let sdkConfig: Record<string, string>|undefined;
 
@@ -139,8 +146,13 @@ export const ngAddSetupProject = (
           setupTanstackDependencies(host, context);
           setupConfig.dataConnectConfig = dataConnectConfig;
         }
-      
+
     }
+
+    // Both write the real filesystem, after the last firebaseTools.init call — init writes
+    // .firebaserc and rewrites firebase.json on disk during the run.
+    setDefaultProjectInFirebaseRc(projectRoot, firebaseProject.projectId);
+    addFirestoreToFirebaseJson(projectRoot, context, features);
 
     return setupProject(host, context, features, setupConfig);
   }

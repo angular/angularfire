@@ -155,9 +155,15 @@ export interface DataConnectConfig {
   source?: string;
 }
 
+export interface FirebaseFirestoreConfig {
+  rules?: string;
+  indexes?: string;
+}
+
 export interface FirebaseJSON {
   hosting?: FirebaseHostingConfig[] | FirebaseHostingConfig;
   functions?: FirebaseFunctionsConfig;
+  firestore?: FirebaseFirestoreConfig;
   dataconnect?: DataConnectConfig;
 }
 
