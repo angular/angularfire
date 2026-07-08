@@ -8,8 +8,8 @@ import {
   makeEnvironmentProviders,
 } from '@angular/core';
 import { VERSION, ɵAngularFireSchedulers, ɵgetDefaultInstanceOf } from '@angular/fire';
-import { ɵAppCheckInstances } from '@angular/fire';
 import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
+import { AppCheckInstances } from '@angular/fire/app-check';
 import { AuthInstances } from '@angular/fire/auth';
 import { registerVersion } from 'firebase/app';
 import { Database as FirebaseDatabase } from 'firebase/database';
@@ -73,7 +73,7 @@ export function provideDatabase(fn: (injector: Injector) => FirebaseDatabase, ..
         FirebaseApps,
         // Database+Auth work better if Auth is loaded first
         [new Optional(), AuthInstances ],
-        [new Optional(), ɵAppCheckInstances ],
+        [new Optional(), AppCheckInstances ],
         ...deps,
       ]
     }

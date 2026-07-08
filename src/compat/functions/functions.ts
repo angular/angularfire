@@ -17,7 +17,7 @@ type UseEmulatorArguments = Parameters<firebase.functions.Functions['useEmulator
 export const USE_EMULATOR = new InjectionToken<UseEmulatorArguments>('angularfire2.functions.use-emulator');
 
 // override httpsCallable for compatibility with 5.x
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+ 
 export interface AngularFireFunctions extends Omit<ɵPromiseProxy<firebase.functions.Functions>, 'httpsCallable'> {
 }
 

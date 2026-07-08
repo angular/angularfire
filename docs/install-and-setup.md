@@ -42,12 +42,14 @@ Open `/src/app/app.component.ts`, and make the following changes to :
 
 ```ts
 import { Component, inject } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
 import { Firestore } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
-  styleUrls: ['app.component.css']
+  styleUrls: ['app.component.css'],
+  imports: [AsyncPipe],
 })
 export class AppComponent {
   firestore: Firestore = inject(Firestore);
@@ -64,11 +66,14 @@ In `/src/app/app.component.ts`:
 
 ```ts
 import { Component, inject } from '@angular/core';
-import { Firestore, collection, collectionData } from '@angular/fire/firestore';
+import { AsyncPipe } from '@angular/common';
 import { Observable } from 'rxjs';
+import { Firestore, collection, collectionData } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [AsyncPipe],
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.css']
 })
@@ -87,9 +92,9 @@ Open `/src/app/app.component.html`:
 
 ```html
 <ul>
-  <li class="text" *ngFor="let item of items$ | async">
-    {{item.name}}
-  </li>
+  @for (item of items$ | async; track item) {
+    <li>{{ item.name }}</li>
+  }
 </ul>
 ```
 

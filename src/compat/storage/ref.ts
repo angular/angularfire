@@ -1,6 +1,8 @@
-import { keepUnstableUntilFirst, observeOutsideAngular } from '@angular/fire';
+import { Injector } from '@angular/core';
+import { pendingUntilEvent } from '@angular/core/rxjs-interop';
+import { ɵAngularFireSchedulers } from '@angular/fire';
 import { Observable, from, of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { observeOn, switchMap } from 'rxjs/operators';
 import { ListOptions, ListResult, Reference, SettableMetadata, StringFormat, UploadMetadata } from './interfaces';
 import { AngularFireUploadTask, createUploadTask } from './task';
 
@@ -10,8 +12,8 @@ export interface AngularFireStorageReference {
   delete(): Observable<any>;
   child(path: string): AngularFireStorageReference;
   updateMetadata(meta: SettableMetadata): Observable<any>;
-  put(data: any, metadata?: UploadMetadata | undefined): AngularFireUploadTask;
-  putString(data: string, format?: string | undefined, metadata?: UploadMetadata | undefined): AngularFireUploadTask;
+  put(data: any, metadata?: UploadMetadata  ): AngularFireUploadTask;
+  putString(data: string, format?: string  , metadata?: UploadMetadata  ): AngularFireUploadTask;
   list(options?: ListOptions): Observable<ListResult>;
   listAll(): Observable<ListResult>;
 }
@@ -21,21 +23,22 @@ export interface AngularFireStorageReference {
  * creates observable methods from promise based methods.
  */
 export function createStorageRef(
-  ref: Reference
+  ref: Reference,
+  injector?: Injector
 ): AngularFireStorageReference {
   return {
     getDownloadURL: () => of(undefined).pipe(
-      observeOutsideAngular,
+      observeOn(injector.get(ɵAngularFireSchedulers).outsideAngular),
       switchMap(() => ref.getDownloadURL()),
-      keepUnstableUntilFirst
+      pendingUntilEvent(injector)
     ),
     getMetadata: () => of(undefined).pipe(
-      observeOutsideAngular,
+      observeOn(injector.get(ɵAngularFireSchedulers).outsideAngular),
       switchMap(() => ref.getMetadata()),
-      keepUnstableUntilFirst
+      pendingUntilEvent(injector)
     ),
     delete: () => from(ref.delete()),
-    child: (path: string) => createStorageRef(ref.child(path)),
+    child: (path: string) => createStorageRef(ref.child(path), injector),
     updateMetadata: (meta: SettableMetadata) => from(ref.updateMetadata(meta)),
     put: (data: any, metadata?: UploadMetadata) => {
       const task = ref.put(data, metadata);

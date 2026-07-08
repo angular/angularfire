@@ -1,5 +1,5 @@
 import { isPlatformServer } from '@angular/common';
-import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
+import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID, inject } from '@angular/core';
 import { ɵAngularFireSchedulers } from '@angular/fire';
 import { AppCheckInstances } from '@angular/fire/app-check';
 import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance, ɵfirebaseAppFactory } from '@angular/fire/compat';
@@ -121,6 +121,7 @@ export function associateQuery<T>(collectionRef: CollectionReference<T>, queryFn
 export class AngularFirestore {
   public readonly firestore: firebase.firestore.Firestore;
   public readonly persistenceEnabled$: Observable<boolean>;
+  private readonly ngZone = inject(NgZone);
 
   /**
    * Each Feature of AngularFire has a FirebaseApp injected. This way we
@@ -132,8 +133,8 @@ export class AngularFirestore {
     @Optional() @Inject(FIREBASE_APP_NAME) name: string | null | undefined,
     @Optional() @Inject(ENABLE_PERSISTENCE) shouldEnablePersistence: boolean | null,
     @Optional() @Inject(SETTINGS) settings: Settings | null,
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    @Inject(PLATFORM_ID) platformId: Object,
+
+    @Inject(PLATFORM_ID) platformId: object,
     zone: NgZone,
     public schedulers: ɵAngularFireSchedulers,
     @Optional() @Inject(PERSISTENCE_SETTINGS) persistenceSettings: PersistenceSettings | null,
@@ -197,7 +198,7 @@ export class AngularFirestore {
       collectionRef = pathOrRef;
     }
     const { ref, query } = associateQuery<T>(collectionRef, queryFn);
-    const refInZone = this.schedulers.ngZone.run(() => ref);
+    const refInZone = this.ngZone.run(() => ref);
     return new AngularFirestoreCollection<T>(refInZone, query, this);
   }
 
@@ -227,7 +228,7 @@ export class AngularFirestore {
     } else {
       ref = pathOrRef;
     }
-    const refInZone = this.schedulers.ngZone.run(() => ref);
+    const refInZone = this.ngZone.run(() => ref);
     return new AngularFirestoreDocument<T>(refInZone, this);
   }
 

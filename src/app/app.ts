@@ -15,7 +15,7 @@ import { concatMap, distinct } from 'rxjs/operators';
 //   constructor(private app: FirebaseApp) { }
 //   ngOnDestroy() { deleteApp(this.app); }
 //
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+ 
 export interface FirebaseApp extends IFirebaseApp {}
 
 export class FirebaseApp {
@@ -24,7 +24,7 @@ export class FirebaseApp {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+ 
 export interface FirebaseApps extends Array<IFirebaseApp> {}
 
 export class FirebaseApps {

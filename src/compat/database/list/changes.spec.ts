@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { AngularFireModule } from '@angular/fire/compat';
-import { AngularFireDatabase, AngularFireDatabaseModule, URL, listChanges } from '@angular/fire/compat/database';
+import { AngularFireDatabase, AngularFireDatabaseModule, USE_EMULATOR, listChanges } from '@angular/fire/compat/database';
 import firebase from 'firebase/compat/app';
 import { skip, take } from 'rxjs/operators';
-import { COMMON_CONFIG } from '../../../../src/test-config';
+import { COMMON_CONFIG, databaseEmulatorPort } from '../../../../src/test-config';
 import 'firebase/compat/database';
 import { rando } from '../../../../src/utils';
 
@@ -25,16 +25,12 @@ describe('listChanges', () => {
         AngularFireDatabaseModule
       ],
       providers: [
-        { provide: URL, useValue: 'http://localhost:9000' }
+        { provide: USE_EMULATOR, useValue: ['localhost', databaseEmulatorPort] }
       ]
     });
 
     db = TestBed.inject(AngularFireDatabase);
     ref = (path: string) => db.database.ref(path);
-  });
-
-  afterEach(() => {
-    db.database.goOffline();
   });
 
   describe('events', () => {

@@ -1,17 +1,12 @@
-import { CompilerFactory, DoBootstrap, ExperimentalPendingTasks, NgModule, NgZone, PlatformRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { ɵAngularFireSchedulers, ɵZoneScheduler, ɵkeepUnstableUntilFirstFactory } from '@angular/fire';
+import { ɵZoneScheduler } from '@angular/fire';
 import { AngularFireModule, FirebaseApp } from '@angular/fire/compat';
-import { BrowserModule } from '@angular/platform-browser';
-import { Observable, Subject, of } from 'rxjs';
-import { tap } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
 import { COMMON_CONFIG } from '../../src/test-config';
 import { rando } from '../../src/utils';
 
 describe('angularfire', () => {
   let app: FirebaseApp;
-  let defaultPlatform: PlatformRef;
   let appName: string;
 
   beforeEach(() => {
@@ -23,7 +18,6 @@ describe('angularfire', () => {
     });
 
     app = TestBed.inject(FirebaseApp);
-    defaultPlatform = TestBed.inject(PlatformRef);
   });
 
   describe('ZoneScheduler', () => {
@@ -85,112 +79,6 @@ describe('angularfire', () => {
     });
   });
 
-  describe('keepUnstableUntilFirstFactory', () => {
-    let schedulers: ɵAngularFireSchedulers;
-    let outsideZone: Zone;
-    let insideZone: Zone;
-    beforeEach(() => {
-      outsideZone = Zone.current;
-      insideZone = Zone.current.fork({
-        name: 'ngZone'
-      });
-      const ngZone = {
-        run: insideZone.run.bind(insideZone),
-        runGuarded: insideZone.runGuarded.bind(insideZone),
-        runOutsideAngular: outsideZone.runGuarded.bind(outsideZone),
-        runTask: insideZone.run.bind(insideZone)
-      } as NgZone;
-      schedulers = new ɵAngularFireSchedulers(ngZone, TestBed.inject(ExperimentalPendingTasks));
-    });
-
-    it('should re-schedule emissions asynchronously', done => {
-      const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(schedulers);
-
-      let ran = false;
-      of(null).pipe(
-        keepUnstableOp,
-        tap(() => ran = true)
-      ).subscribe(() => {
-        expect(ran).toEqual(true);
-        done();
-      }, () => fail('Should not error'));
-
-      expect(ran).toEqual(false);
-    });
-
-    it(`should subscribe outside angular and observe inside angular`, done => {
-
-      const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(schedulers);
-
-      insideZone.run(() => {
-        new Observable(s => {
-          expect(Zone.current).toEqual(outsideZone);
-          s.next('test');
-        }).pipe(
-          keepUnstableOp,
-          tap(() => {
-            expect(Zone.current).toEqual(insideZone);
-          })
-        ).subscribe(() => {
-          expect(Zone.current).toEqual(insideZone);
-          done();
-        }, err => {
-          fail(err);
-        });
-      });
-
-    });
-
-    // TODO(davideast): new Zone['TaskTrackingZoneSpec'](); no longer works
-    xit('should block until first emission', done => {
-      const testScheduler = new TestScheduler(null);
-      testScheduler.run(helpers => {
-        const outsideZone = Zone.current;
-        // eslint-disable-next-line @typescript-eslint/dot-notation
-        const taskTrack = new Zone['TaskTrackingZoneSpec']();
-        const insideZone = Zone.current.fork(taskTrack);
-        const trackingSchedulers: ɵAngularFireSchedulers = {
-          ngZone: {
-            run: insideZone.run.bind(insideZone),
-            runGuarded: insideZone.runGuarded.bind(insideZone),
-            runOutsideAngular: outsideZone.runGuarded.bind(outsideZone),
-            runTask: insideZone.run.bind(insideZone)
-          } as NgZone,
-          outsideAngular: new ɵZoneScheduler(outsideZone, testScheduler),
-          insideAngular: new ɵZoneScheduler(insideZone, testScheduler),
-          pendingTasks: TestBed.inject(ExperimentalPendingTasks),
-        };
-        const keepUnstableOp = ɵkeepUnstableUntilFirstFactory(trackingSchedulers);
-
-        const s = new Subject();
-        s.pipe(
-          keepUnstableOp
-        ).subscribe(() => undefined, err => {
-          fail(err);
-        }, () => undefined);
-
-        // Flush to ensure all async scheduled functions are run
-        helpers.flush();
-        // Should now be blocked until first item arrives
-        expect(taskTrack.macroTasks.length).toBe(1);
-        expect(taskTrack.macroTasks[0].source).toBe('firebaseZoneBlock');
-
-        // Emit next item
-        s.next(123);
-        helpers.flush();
-
-        // TODO drop this, it's to work around my 15ms timeout hack
-        setTimeout(() => {
-          // Should not be blocked after first item
-          expect(taskTrack.macroTasks.length).toBe(0);
-          done();
-        }, 150);
-
-      });
-    });
-
-  });
-
   describe('FirebaseApp', () => {
 
     it('should provide a FirebaseApp for the FirebaseApp binding', () => {
@@ -198,38 +86,9 @@ describe('angularfire', () => {
     });
 
     if (typeof window !== 'undefined') {
-
       it('should have the provided name', () => {
         expect(app.name).toBe(appName);
       });
-
-      it('should use an already intialized firebase app if it exists', done => {
-        @NgModule({
-          imports: [
-            AngularFireModule.initializeApp(COMMON_CONFIG, appName),
-            BrowserModule
-          ]
-        })
-        class MyModule implements DoBootstrap {
-          // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method,@typescript-eslint/no-empty-function
-          ngDoBootstrap() {
-          }
-        }
-
-        const compilerFactory: CompilerFactory =
-          defaultPlatform.injector.get(CompilerFactory, null);
-        const moduleFactory = compilerFactory.createCompiler().compileModuleSync(MyModule);
-
-        defaultPlatform.bootstrapModuleFactory(moduleFactory)
-          .then(moduleRef => {
-            const ref = moduleRef.injector.get(FirebaseApp);
-            expect(ref.name).toEqual(app.name);
-          }).then(done, e => {
-          fail(e);
-          done();
-        });
-      });
-
     }
   });
 });

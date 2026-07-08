@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { TestBed } from '@angular/core/testing';
 import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire/compat';
-import { AngularFireAuth, AngularFireAuthModule, SETTINGS } from '@angular/fire/compat/auth';
+import { AngularFireAuth, AngularFireAuthModule, SETTINGS, USE_EMULATOR } from '@angular/fire/compat/auth';
 import firebase from 'firebase/compat/app';
 import { Observable, Subject } from 'rxjs';
-import { COMMON_CONFIG } from '../../../src/test-config';
+import { COMMON_CONFIG, authEmulatorPort } from '../../../src/test-config';
 import 'firebase/compat/auth';
 import { rando } from '../../../src/utils';
 
@@ -24,7 +24,8 @@ describe('AngularFireAuth', () => {
         AngularFireAuthModule
       ],
       providers: [
-        { provide: SETTINGS, useValue: { appVerificationDisabledForTesting: true } }
+        { provide: SETTINGS, useValue: { appVerificationDisabledForTesting: true } },
+        { provide: USE_EMULATOR, useValue: [`http://localhost:${authEmulatorPort}`] },
       ]
     });
 
@@ -136,10 +137,10 @@ describe('AngularFireAuth with different app', () => {
       ],
       providers: [
         { provide: FIREBASE_APP_NAME, useValue: firebaseAppName },
-        { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG }
+        { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG },
+        { provide: USE_EMULATOR, useValue: [`http://localhost:${authEmulatorPort}`] },
       ]
     });
-
     app = TestBed.inject(FirebaseApp);
     afAuth = TestBed.inject(AngularFireAuth);
   });

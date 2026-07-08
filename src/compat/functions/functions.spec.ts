@@ -13,6 +13,10 @@ describe('AngularFireFunctions', () => {
       imports: [
         AngularFireModule.initializeApp(COMMON_CONFIG, rando()),
         AngularFireFunctionsModule
+      ],
+      providers: [
+        { provide: USE_EMULATOR, useValue: ['localhost', 9999] },
+        { provide: REGION, useValue: 'us-central1' },
       ]
     });
 
@@ -44,7 +48,7 @@ describe('AngularFireFunctions with different app', () => {
         { provide: FIREBASE_APP_NAME, useValue: firebaseAppName },
         { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG },
         { provide: USE_EMULATOR, useValue: ['localhost', 9999] },
-        { provide: REGION, useValue: 'asia-northeast1' }
+        { provide: REGION, useValue: 'us-central1' },
       ]
     });
 

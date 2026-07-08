@@ -9,7 +9,7 @@ import {
   setTokenAutoRefreshEnabled as _setTokenAutoRefreshEnabled
 } from 'firebase/app-check';
 
-export const getLimitedUseToken = ɵzoneWrap(_getLimitedUseToken, true);
+export const getLimitedUseToken = ɵzoneWrap(_getLimitedUseToken, true, 2);
 export const getToken = ɵzoneWrap(_getToken, true);
 export const initializeAppCheck = ɵzoneWrap(_initializeAppCheck, true);
 export const onTokenChanged = ɵzoneWrap(_onTokenChanged, true);

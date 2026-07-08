@@ -28,5 +28,21 @@
     "ui": {
       "enabled": false
     }
-  }
+  },
+  "functions": [
+    {
+      "source": "test/functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run build"
+      ]
+    }
+  ]
 }

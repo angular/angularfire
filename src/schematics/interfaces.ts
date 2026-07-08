@@ -1,10 +1,11 @@
-import { RuntimeOptions } from 'firebase-functions';
+import type { HttpsOptions } from 'firebase-functions/https';
 
 export const enum FEATURES {
   Authentication,
   Analytics,
   AppCheck,
   Database,
+  DataConnect,
   Functions,
   Messaging,
   Performance,
@@ -20,12 +21,13 @@ export const featureOptions = [
   { name: 'App Check', value: FEATURES.AppCheck },
   { name: 'Firestore', value: FEATURES.Firestore },
   { name: 'Realtime Database', value: FEATURES.Database },
+  { name: 'Data Connect', value: FEATURES.DataConnect },
   { name: 'Cloud Functions (callable)', value: FEATURES.Functions },
   { name: 'Cloud Messaging', value: FEATURES.Messaging },
   { name: 'Performance Monitoring', value: FEATURES.Performance },
   { name: 'Cloud Storage', value: FEATURES.Storage },
   { name: 'Remote Config', value: FEATURES.RemoteConfig },
-  { name: 'VertexAI (preview)', value: FEATURES.VertexAI },
+  { name: 'Vertex AI', value: FEATURES.VertexAI },
 ];
 
 export const enum PROJECT_TYPE { Static, CloudFunctions, CloudRun, WebFrameworks }
@@ -130,6 +132,8 @@ export interface FirebaseTools {
   serve(options: any): Promise<any>;
 
   use(options: any, lol: any): Promise<any>;
+
+  init(feature: string, options: any): Promise<any>;
 }
 
 export interface FirebaseHostingRewrite {
@@ -147,9 +151,14 @@ export interface FirebaseHostingConfig {
 
 export type FirebaseFunctionsConfig = Record<string, any>;
 
+export interface DataConnectConfig {
+  source?: string;
+}
+
 export interface FirebaseJSON {
   hosting?: FirebaseHostingConfig[] | FirebaseHostingConfig;
   functions?: FirebaseFunctionsConfig;
+  dataconnect?: DataConnectConfig;
 }
 
 export interface FirebaseRcTarget {
@@ -176,7 +185,7 @@ export interface DeployBuilderSchema {
   prerender?: boolean;
   functionName?: string;
   functionsNodeVersion?: number|string;
-  functionsRuntimeOptions?: RuntimeOptions;
+  functionsRuntimeOptions?: HttpsOptions;
   cloudRunOptions?: Partial<CloudRunOptions>;
   outputPath?: string;
   CF3v2?: boolean;
@@ -222,4 +231,37 @@ export interface WorkspaceProject {
 export interface Workspace {
   defaultProject?: string;
   projects: Record<string, WorkspaceProject>;
+}
+
+export interface ConnectorConfig {
+  location: string;
+  connector: string;
+  service: string;
+}
+export interface ConnectorYaml {
+  connectorId: string;
+  generate?: {
+    javascriptSdk?: {
+      package: string;
+      outputDir: string;
+      packageJsonDir?: string;
+      angular?: boolean;
+    }
+  }
+}
+export interface DataConnectYaml {
+  location: string;
+  serviceId: string;
+  connectorDirs: string[];
+}
+export interface DataConnectConnectorConfig  {
+  connectorYaml: ConnectorYaml;
+  connectorConfig?: ConnectorConfig;
+  angular?: boolean;
+  package?: string;
+}
+
+export interface PackageJson {
+  dependencies: Record<string, string>;
+  devDependencies: Record<string, string>;
 }

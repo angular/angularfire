@@ -5,6 +5,7 @@ import { GetDownloadURLPipeModule } from './pipes/storageUrl.pipe';
 import { AngularFireStorage } from './storage';
 
 @NgModule({
+  imports: [ GetDownloadURLPipeModule ],
   exports: [ GetDownloadURLPipeModule ],
   providers: [ AngularFireStorage ]
 })

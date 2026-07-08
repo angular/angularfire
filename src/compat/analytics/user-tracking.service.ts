@@ -1,4 +1,4 @@
-import { isPlatformServer } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import { Inject, Injectable, NgZone, OnDestroy, PLATFORM_ID } from '@angular/core';
 import { VERSION } from '@angular/fire';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
@@ -15,13 +15,13 @@ export class UserTrackingService implements OnDestroy {
   // TODO a user properties injector
   constructor(
     analytics: AngularFireAnalytics,
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    @Inject(PLATFORM_ID) platformId: Object,
+
+    @Inject(PLATFORM_ID) platformId: object,
     auth: AngularFireAuth,
     zone: NgZone,
   ) {
     firebase.registerVersion('angularfire', VERSION.full, 'compat-user-tracking');
-    if (!isPlatformServer(platformId)) {
+    if (isPlatformBrowser(platformId)) {
       let resolveInitialized;
       this.initialized = zone.runOutsideAngular(() => new Promise(resolve => resolveInitialized = resolve));
       this.disposables = [

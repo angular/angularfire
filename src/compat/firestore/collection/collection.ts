@@ -1,4 +1,5 @@
-import { keepUnstableUntilFirst } from '@angular/fire';
+import { EnvironmentInjector, inject } from '@angular/core';
+import { pendingUntilEvent } from '@angular/core/rxjs-interop';
 import firebase from 'firebase/compat/app';
 import { Observable, from } from 'rxjs';
 import { filter, map, pairwise, scan, startWith } from 'rxjs/operators';
@@ -41,6 +42,8 @@ export function validateEventsArray(events?: DocumentChangeType[]) {
  * fakeStock.valueChanges().subscribe(value => console.log(value));
  */
 export class AngularFirestoreCollection<T = DocumentData> {
+  private readonly injector = inject(EnvironmentInjector);
+
   /**
    * The constructor takes in a CollectionReference and Query to provide wrapper methods
    * for data operations and data streaming.
@@ -64,7 +67,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
     let source = docChanges<T>(this.query, this.afs.schedulers.outsideAngular);
     if (events && events.length > 0) {
       source = source.pipe(
-        map(actions => actions.filter(change => events.indexOf(change.type) > -1))
+        map(actions => actions.filter(change => events.includes(change.type)))
       );
     }
     return source.pipe(
@@ -74,7 +77,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
       pairwise(),
       filter(([prior, current]: DocumentChangeTuple<T>) => current.length > 0 || !prior),
       map(([, current]) => current),
-      keepUnstableUntilFirst
+      pendingUntilEvent(this.injector)
     );
   }
 
@@ -94,7 +97,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
     const validatedEvents = validateEventsArray(events);
     const scheduledSortedChanges$ = sortedChanges<T>(this.query, validatedEvents, this.afs.schedulers.outsideAngular);
     return scheduledSortedChanges$.pipe(
-      keepUnstableUntilFirst
+      pendingUntilEvent(this.injector)
     );
   }
 
@@ -107,7 +110,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
   valueChanges(): Observable<T[]>;
   // eslint-disable-next-line no-empty-pattern
   valueChanges({}): Observable<T[]>;
-  valueChanges<K extends string>(options: {idField: K}): Observable<(T & { [T in K]: string })[]>;
+  valueChanges<K extends string>(options: {idField: K}): Observable<(T & Record<K, string>)[]>;
   valueChanges<K extends string>(options: {idField?: K} = {}): Observable<T[]> {
     return fromCollectionRef<T>(this.query, this.afs.schedulers.outsideAngular)
       .pipe(
@@ -116,12 +119,12 @@ export class AngularFirestoreCollection<T = DocumentData> {
             return {
               ...a.data() as any,
               ...{ [options.idField]: a.id }
-            } as T & { [T in K]: string };
+            } as T & Record<K, string>;
           } else {
             return a.data();
           }
         })),
-        keepUnstableUntilFirst
+        pendingUntilEvent(this.injector)
       );
   }
 
@@ -130,7 +133,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
    */
   get(options?: firebase.firestore.GetOptions) {
     return from(this.query.get(options)).pipe(
-      keepUnstableUntilFirst,
+      pendingUntilEvent(this.injector)
     );
   }
 
