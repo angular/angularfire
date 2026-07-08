@@ -1,4 +1,4 @@
-import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID, inject } from '@angular/core';
+import { EnvironmentInjector, Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID, inject } from '@angular/core';
 import { ɵAngularFireSchedulers } from '@angular/fire';
 import { AppCheckInstances } from '@angular/fire/app-check';
 import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, ɵcacheInstance, ɵfirebaseAppFactory } from '@angular/fire/compat';
@@ -31,13 +31,14 @@ export const USE_EMULATOR = new InjectionToken<UseEmulatorArguments>('angularfir
 })
 export class AngularFireDatabase {
   public readonly database: firebase.database.Database;
+  private readonly injector = inject(EnvironmentInjector);
 
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) name: string | null | undefined,
     @Optional() @Inject(URL) databaseURL: string | null,
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    @Inject(PLATFORM_ID) platformId: Object,
+
+    @Inject(PLATFORM_ID) platformId: object,
     zone: NgZone,
     public schedulers: ɵAngularFireSchedulers,
     @Optional() @Inject(USE_EMULATOR) _useEmulator: any, // tuple isn't working here
@@ -73,12 +74,12 @@ export class AngularFireDatabase {
     if (queryFn) {
       query = queryFn(ref);
     }
-    return createListReference<T>(query, this);
+    return createListReference<T>(query, this, this.injector);
   }
 
   object<T>(pathOrRef: PathReference): AngularFireObject<T> {
     const ref = inject(NgZone).runOutsideAngular(() => getRef(this.database, pathOrRef));
-    return createObjectReference<T>(ref, this);
+    return createObjectReference<T>(ref, this, this.injector);
   }
 
   createPushId() {

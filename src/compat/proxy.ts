@@ -43,7 +43,7 @@ export const ɵlazySDKProxy = (klass: any, observable: Observable<any>, zone: Ng
         }
         return klass[name];
       }
-      if (noopFunctions.indexOf(name) > -1) {
+      if (noopFunctions.includes(name)) {
         return () => undefined;
       }
       const promise = observable.toPromise().then(mod => {

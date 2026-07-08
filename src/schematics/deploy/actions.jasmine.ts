@@ -3,7 +3,7 @@ import { join } from 'path';
 import { BuilderContext, BuilderRun, ScheduleOptions, Target } from '@angular-devkit/architect';
 import { JsonObject, logging } from '@angular-devkit/core';
 import { BuildTarget, FSHost, FirebaseDeployConfig, FirebaseTools } from '../interfaces';
-import deploy, { deployToFunction } from './actions'
+import deploy, { deployToFunction } from './actions.js'
 import 'jasmine';
 
 let context: BuilderContext;
@@ -62,6 +62,9 @@ const initMocks = () => {
         list: () => Promise.resolve({sites: []}),
         create: () => Promise.reject(),
       }
+    },
+    init() {
+      return Promise.resolve()
     },
     deploy: (_: FirebaseDeployConfig) => Promise.resolve(),
     use: () => Promise.resolve(),

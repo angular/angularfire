@@ -1,5 +1,5 @@
 import { isPlatformServer } from '@angular/common';
-import { Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID } from '@angular/core';
+import { EnvironmentInjector, Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID, inject } from '@angular/core';
 import { pendingUntilEvent } from '@angular/core/rxjs-interop';
 import { ɵAngularFireSchedulers } from '@angular/fire';
 import { AppCheckInstances } from '@angular/fire/app-check';
@@ -11,7 +11,7 @@ import { Observable, Subject, from, merge, of } from 'rxjs';
 import { filter, first, map, observeOn, shareReplay, subscribeOn, switchMap, switchMapTo } from 'rxjs/operators';
 import { proxyPolyfillCompat } from './base';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+ 
 export interface AngularFireAuth extends ɵPromiseProxy<firebase.auth.Auth> {}
 
 type UseEmulatorArguments = Parameters<firebase.auth.Auth['useEmulator']>;
@@ -55,6 +55,8 @@ export const ɵauthFactory = (
 })
 export class AngularFireAuth {
 
+  private readonly injector = inject(EnvironmentInjector);
+
   /**
    * Observable of authentication state; as of Firebase 4.0 this is only triggered via sign-in/out
    */
@@ -85,8 +87,8 @@ export class AngularFireAuth {
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) name: string|null|undefined,
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    @Inject(PLATFORM_ID) platformId: Object,
+
+    @Inject(PLATFORM_ID) platformId: object,
     zone: NgZone,
     schedulers: ɵAngularFireSchedulers,
     @Optional() @Inject(USE_EMULATOR) useEmulator: any, // can't use the tuple here
@@ -122,7 +124,7 @@ export class AngularFireAuth {
 
       const redirectResult = auth.pipe(
         switchMap(auth => auth.getRedirectResult().then(it => it, () => null)),
-        pendingUntilEvent(),
+        pendingUntilEvent(this.injector),
         shareReplay({ bufferSize: 1, refCount: false }),
       );
 

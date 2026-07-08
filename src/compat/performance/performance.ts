@@ -10,7 +10,7 @@ import { proxyPolyfillCompat } from './base';
 export const INSTRUMENTATION_ENABLED = new InjectionToken<boolean>('angularfire2.performance.instrumentationEnabled');
 export const DATA_COLLECTION_ENABLED = new InjectionToken<boolean>('angularfire2.performance.dataCollectionEnabled');
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+ 
 export interface AngularFirePerformance extends ɵPromiseProxy<firebase.performance.Performance> {
 }
 
@@ -26,8 +26,8 @@ export class AngularFirePerformance {
     @Optional() @Inject(INSTRUMENTATION_ENABLED) instrumentationEnabled: boolean | null,
     @Optional() @Inject(DATA_COLLECTION_ENABLED) dataCollectionEnabled: boolean | null,
     private zone: NgZone,
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    @Inject(PLATFORM_ID) platformId: Object
+
+    @Inject(PLATFORM_ID) platformId: object
   ) {
 
     this.performance = of(undefined).pipe(
@@ -52,7 +52,7 @@ export class AngularFirePerformance {
 }
 
 const trace$ = (traceId: string) => {
-  // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
+   
   if (typeof window !== 'undefined' && window.performance?.mark) {
     const entries = window.performance.getEntriesByName(traceId, 'measure') || [];
     const startMarkName = `_${traceId}Start[${entries.length}]`;
@@ -107,7 +107,7 @@ export const traceWhile = <T = any>(
         }
       },
       () => undefined,
-      () => options && options.orComplete && traceSubscription && traceSubscription.unsubscribe()
+      () => options?.orComplete && traceSubscription?.unsubscribe()
     )
   ).subscribe(subscriber);
 });

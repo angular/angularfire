@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
+import { AI, getAI, provideAI } from '@angular/fire/ai';
 import { FirebaseApp, getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
-import { VertexAI, getVertexAI, provideVertexAI } from '@angular/fire/vertexai';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../utils';
 
-describe('VertexAI', () => {
+describe('AI', () => {
   let app: FirebaseApp;
-  let vertexAI: VertexAI;
-  let providedVertexAI: VertexAI;
+  let ai: AI;
+  let providedAI: AI;
   let appName: string;
 
   describe('single injection', () => {
@@ -17,20 +17,20 @@ describe('VertexAI', () => {
         TestBed.configureTestingModule({
             providers: [
                 provideFirebaseApp(() => initializeApp(COMMON_CONFIG, appName)),
-                provideVertexAI(() => {
-                    providedVertexAI = getVertexAI(getApp(appName));
-                    return providedVertexAI;
+                provideAI(() => {
+                    providedAI = getAI(getApp(appName));
+                    return providedAI;
                 }),
             ],
         });
         app = TestBed.inject(FirebaseApp);
-        vertexAI = TestBed.inject(VertexAI);
+        ai = TestBed.inject(AI);
     });
 
     it('should be injectable', () => {
-        expect(providedVertexAI).toBeTruthy();
-        expect(vertexAI).toEqual(providedVertexAI);
-        expect(vertexAI.app).toEqual(app);
+        expect(providedAI).toBeTruthy();
+        expect(ai).toEqual(providedAI);
+        expect(ai.app).toEqual(app);
     });
 
   });

@@ -9,7 +9,7 @@ import {
   onMessage as _onMessage
 } from 'firebase/messaging';
 
-export const deleteToken = ɵzoneWrap(_deleteToken, true);
+export const deleteToken = ɵzoneWrap(_deleteToken, true, 2);
 export const getMessaging = ɵzoneWrap(_getMessaging, true);
 export const getToken = ɵzoneWrap(_getToken, true);
 export const isSupported = ɵzoneWrap(_isSupported, false);

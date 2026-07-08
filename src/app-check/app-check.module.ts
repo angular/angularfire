@@ -10,16 +10,16 @@ import {
   isDevMode,
   makeEnvironmentProviders,
 } from '@angular/core';
-import { VERSION, ɵAPP_CHECK_PROVIDER_NAME, ɵAngularFireSchedulers, ɵAppCheckInstances, ɵgetDefaultInstanceOf } from '@angular/fire';
+import { VERSION, ɵAngularFireSchedulers, ɵgetDefaultInstanceOf } from '@angular/fire';
 import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
 import { registerVersion } from 'firebase/app';
 import { AppCheck as FirebaseAppCheck } from 'firebase/app-check';
-import { AppCheck } from './app-check';
+import { APP_CHECK_PROVIDER_NAME, AppCheck, AppCheckInstances } from './app-check';
 
 export const PROVIDED_APP_CHECK_INSTANCES = new InjectionToken<AppCheck[]>('angularfire2.app-check-instances');
 
 export function defaultAppCheckInstanceFactory(provided: FirebaseAppCheck[]|undefined, defaultApp: FirebaseApp) {
-  const defaultAppCheck = ɵgetDefaultInstanceOf<FirebaseAppCheck>(ɵAPP_CHECK_PROVIDER_NAME, provided, defaultApp);
+  const defaultAppCheck = ɵgetDefaultInstanceOf<FirebaseAppCheck>(APP_CHECK_PROVIDER_NAME, provided, defaultApp);
   return defaultAppCheck && new AppCheck(defaultAppCheck);
 }
 
@@ -38,7 +38,7 @@ export function appCheckInstanceFactory(fn: (injector: Injector) => FirebaseAppC
 }
 
 const APP_CHECK_INSTANCES_PROVIDER = {
-  provide: ɵAppCheckInstances,
+  provide: AppCheckInstances,
   deps: [
     [new Optional(), PROVIDED_APP_CHECK_INSTANCES ],
   ]
