@@ -37,8 +37,8 @@ export class AngularFireDatabase {
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) name: string | null | undefined,
     @Optional() @Inject(URL) databaseURL: string | null,
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    @Inject(PLATFORM_ID) platformId: Object,
+
+    @Inject(PLATFORM_ID) platformId: object,
     zone: NgZone,
     public schedulers: ɵAngularFireSchedulers,
     @Optional() @Inject(USE_EMULATOR) _useEmulator: any, // tuple isn't working here

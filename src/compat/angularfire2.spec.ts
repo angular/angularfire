@@ -1,15 +1,12 @@
-import { CompilerFactory, DoBootstrap, NgModule, PlatformRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ɵZoneScheduler } from '@angular/fire';
 import { AngularFireModule, FirebaseApp } from '@angular/fire/compat';
-import { BrowserModule } from '@angular/platform-browser';
 import { TestScheduler } from 'rxjs/testing';
 import { COMMON_CONFIG } from '../../src/test-config';
 import { rando } from '../../src/utils';
 
 describe('angularfire', () => {
   let app: FirebaseApp;
-  let defaultPlatform: PlatformRef;
   let appName: string;
 
   beforeEach(() => {
@@ -21,7 +18,6 @@ describe('angularfire', () => {
     });
 
     app = TestBed.inject(FirebaseApp);
-    defaultPlatform = TestBed.inject(PlatformRef);
   });
 
   describe('ZoneScheduler', () => {

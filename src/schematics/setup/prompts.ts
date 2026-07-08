@@ -5,7 +5,7 @@ import { getFirebaseTools } from '../firebaseTools';
 import { FEATURES, FirebaseApp, FirebaseProject, featureOptions } from '../interfaces';
 import { shortAppId } from '../utils';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
 
 const NEW_OPTION = '~~angularfire-new~~';
@@ -74,7 +74,7 @@ export const searchApps = (apps: FirebaseApp[]) =>
 
 type Prompt = <K extends string, U= unknown>(questions: { name: K, source: (...args) =>
   Promise<{ value: U }[]>, default?: U | ((o: U[]) => U | Promise<U>), [key: string]: any }) =>
-    Promise<{[T in K]: U }>;
+    Promise<Record<K, U>>;
 
 const autocomplete: Prompt = (questions) => inquirer.prompt(questions);
 

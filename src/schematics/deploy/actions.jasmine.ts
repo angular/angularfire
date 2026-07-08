@@ -3,7 +3,7 @@ import { join } from 'path';
 import { BuilderContext, BuilderRun, ScheduleOptions, Target } from '@angular-devkit/architect';
 import { JsonObject, logging } from '@angular-devkit/core';
 import { BuildTarget, FSHost, FirebaseDeployConfig, FirebaseTools } from '../interfaces';
-import deploy, { deployToFunction } from './actions'
+import deploy, { deployToFunction } from './actions.js'
 import 'jasmine';
 
 let context: BuilderContext;
