@@ -18,6 +18,12 @@ import {
 } from '../utils';
 import { appPrompt, featuresPrompt, projectPrompt, userPrompt } from './prompts';
 
+// FirebaseOptions keys — apps.sdkconfig responses include management-API extras that initializeApp() rejects.
+const firebaseOptionsKeys = [
+  'apiKey', 'authDomain', 'databaseURL', 'projectId', 'storageBucket',
+  'messagingSenderId', 'appId', 'measurementId', 'recaptchaSiteKey',
+];
+
 export interface SetupConfig extends DeployOptions {
   firebaseProject: FirebaseProject,
   firebaseApp?: FirebaseApp,
@@ -92,8 +98,11 @@ export const ngAddSetupProject = (
       firebaseApp = await appPrompt(firebaseProject, undefined, { projectRoot });
 
       const result = await firebaseTools.apps.sdkconfig('web', firebaseApp.appId, { nonInteractive: true, projectRoot });
-      sdkConfig = result.sdkConfig;
-      delete sdkConfig.locationId;
+      sdkConfig = Object.fromEntries(
+        firebaseOptionsKeys
+          .filter(key => result.sdkConfig[key] !== undefined)
+          .map(key => [key, result.sdkConfig[key]])
+      );
       setupConfig.sdkConfig = sdkConfig;
       setupConfig.firebaseApp = firebaseApp;
       // set up data connect locally if data connect hasn't already been initialized.
