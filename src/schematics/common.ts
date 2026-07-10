@@ -1,5 +1,3 @@
-import { readFileSync } from 'fs';
-import { join } from 'path';
 import { SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
 import {
   intersects as semverIntersects,
@@ -73,19 +71,9 @@ export const addDependencies = (
   overwriteIfExists(host, 'package.json', stringifyFormatted(packageJson));
 };
 
-/**
- * Reads the exact version of the installed `@angular/fire` package from its own manifest — the
- * compiled schematics run from `<package root>/schematics/<entry>/`, so the manifest sits two
- * directories up. Returns undefined when that layout doesn't hold (e.g. running from source),
- * so callers skip pinning instead of failing the schematic.
- */
-const readInstalledVersion = () => {
-  try {
-    return JSON.parse(readFileSync(join(__dirname, '..', '..', 'package.json')).toString()).version;
-  } catch {
-    return undefined;
-  }
-};
+// The build writes the published version over this placeholder in the compiled schematics
+// (tools/build.ts, replaceSchematicVersions); running from source leaves the placeholder.
+const angularFireVersion = 'ANGULARFIRE2_VERSION';
 
 /**
  * Pins the workspace's `@angular/fire` entry to the exact installed version when `ng add` wrote a
@@ -96,23 +84,31 @@ const readInstalledVersion = () => {
 export const pinInstalledPrereleaseVersion = (
   host: Tree,
   context: SchematicContext,
-  installedVersion = readInstalledVersion(),
+  installedVersion = angularFireVersion,
 ) => {
   if (!host.exists('package.json')) { return; }
   const packageJson = safeReadJSON('package.json', host);
 
-  const declaredAngularFireVersion = packageJson.dependencies?.['@angular/fire'];
-  if (
-    typeof declaredAngularFireVersion !== 'string' ||
-    !(declaredAngularFireVersion.startsWith('^') || declaredAngularFireVersion.startsWith('~'))
-  ) { return; }
+  const dependencySection = ['dependencies', 'devDependencies'].find(
+    section => typeof packageJson[section]?.['@angular/fire'] === 'string',
+  );
+  if (!dependencySection) { return; }
+
+  const declaredAngularFireVersion = packageJson[dependencySection]['@angular/fire'];
+  if (!(declaredAngularFireVersion.startsWith('^') || declaredAngularFireVersion.startsWith('~'))) { return; }
+
+  if (!semverValid(installedVersion)) {
+    context.logger.warn(
+      'Could not determine the installed @angular/fire version; leaving the declared version range as-is.'
+    );
+    return;
+  }
 
   if (
-    semverValid(installedVersion) &&
     semverPrerelease(installedVersion) &&
     semverSatisfies(installedVersion, declaredAngularFireVersion, { includePrerelease: true })
   ) {
-    packageJson.dependencies['@angular/fire'] = installedVersion;
+    packageJson[dependencySection]['@angular/fire'] = installedVersion;
     overwriteIfExists(host, 'package.json', stringifyFormatted(packageJson));
     context.logger.info(
       `Pinned @angular/fire to the exact version ${installedVersion} — a prerelease range like ` +

@@ -5,11 +5,11 @@ import 'jasmine';
 
 const context = { logger: new logging.Logger('test') } as unknown as SchematicContext;
 
-const treeWithAngularFire = (declaredVersion: string) => {
+const treeWithAngularFire = (declaredVersion: string, section = 'dependencies') => {
   const tree = new HostTree();
   tree.create('package.json', JSON.stringify({
     name: 'test-app',
-    dependencies: {
+    [section]: {
       '@angular/fire': declaredVersion,
       firebase: '^12.4.0',
     },
@@ -17,8 +17,10 @@ const treeWithAngularFire = (declaredVersion: string) => {
   return tree;
 };
 
-const dependenciesIn = (tree: HostTree) =>
-  JSON.parse(tree.readText('package.json')).dependencies;
+const sectionIn = (tree: HostTree, section: string) =>
+  JSON.parse(tree.readText('package.json'))[section];
+
+const dependenciesIn = (tree: HostTree) => sectionIn(tree, 'dependencies');
 
 describe('pinInstalledPrereleaseVersion', () => {
 
@@ -64,10 +66,22 @@ describe('pinInstalledPrereleaseVersion', () => {
     expect(dependenciesIn(tree)['@angular/fire']).toBe('^21.0.0-rc.0');
   });
 
-  it('does not pin when the installed version is not valid semver', () => {
+  it('warns and does not pin when the installed version is not valid semver', () => {
+    const warnSpy = spyOn(context.logger, 'warn');
     const tree = treeWithAngularFire('^21.0.0-rc.0');
     pinInstalledPrereleaseVersion(tree, context, 'ANGULARFIRE2_VERSION');
+    expect(warnSpy).toHaveBeenCalled();
     expect(dependenciesIn(tree)['@angular/fire']).toBe('^21.0.0-rc.0');
+  });
+
+  it('does nothing when the @angular/fire entry is not a string', () => {
+    const tree = new HostTree();
+    tree.create('package.json', JSON.stringify({
+      name: 'test-app',
+      dependencies: { '@angular/fire': { version: '^21.0.0-rc.0' } },
+    }));
+    expect(() => pinInstalledPrereleaseVersion(tree, context, '21.0.0-rc.0')).not.toThrow();
+    expect(dependenciesIn(tree)['@angular/fire']).toEqual({ version: '^21.0.0-rc.0' });
   });
 
   it('does nothing when @angular/fire is not a dependency', () => {
@@ -82,10 +96,22 @@ describe('pinInstalledPrereleaseVersion', () => {
     expect(() => pinInstalledPrereleaseVersion(tree, context, '21.0.0-rc.0')).not.toThrow();
   });
 
-  it('skips gracefully when the installed version cannot be determined', () => {
-    const tree = treeWithAngularFire('^21.0.0-rc.0');
-    pinInstalledPrereleaseVersion(tree, context, undefined);
-    expect(dependenciesIn(tree)['@angular/fire']).toBe('^21.0.0-rc.0');
+  it('pins a prerelease range found in devDependencies', () => {
+    const tree = treeWithAngularFire('^21.0.0-rc.0', 'devDependencies');
+    pinInstalledPrereleaseVersion(tree, context, '21.0.0-rc.0');
+    expect(sectionIn(tree, 'devDependencies')['@angular/fire']).toBe('21.0.0-rc.0');
+  });
+
+  it('pins the dependencies entry when @angular/fire appears in both sections', () => {
+    const tree = new HostTree();
+    tree.create('package.json', JSON.stringify({
+      name: 'test-app',
+      dependencies: { '@angular/fire': '^21.0.0-rc.0' },
+      devDependencies: { '@angular/fire': '^21.0.0-rc.0' },
+    }, null, 2));
+    pinInstalledPrereleaseVersion(tree, context, '21.0.0-rc.0');
+    expect(dependenciesIn(tree)['@angular/fire']).toBe('21.0.0-rc.0');
+    expect(sectionIn(tree, 'devDependencies')['@angular/fire']).toBe('^21.0.0-rc.0');
   });
 
 });
