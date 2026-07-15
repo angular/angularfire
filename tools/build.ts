@@ -1,6 +1,6 @@
 import { spawn } from 'cross-spawn';
 import { copy, writeFile } from 'fs-extra';
-import { join } from 'path';
+import { join, sep } from 'path';
 import { keys as tsKeys } from 'ts-transformer-keys';
 import * as esbuild from "esbuild";
 
@@ -273,6 +273,21 @@ async function replacePackageCoreVersion() {
   });
 }
 
+async function writeVersionOverPlaceholder(root: { version: string }) {
+  const replace = require('replace-in-file');
+  const replacements = await replace({
+    // Glob patterns need forward slashes even on Windows.
+    files: `${dest('schematics').split(sep).join('/')}/**/*.js`,
+    from: /ANGULARFIRE2_VERSION/g,
+    to: root.version,
+    // Zero matches should reach the guard below, not replace-in-file's generic rejection.
+    allowEmptyPaths: true,
+  });
+  if (!replacements.some(replacement => replacement.hasChanged)) {
+    throw new Error('No ANGULARFIRE2_VERSION placeholder found in the compiled schematics — the version pin would ship disabled.');
+  }
+}
+
 async function replaceSchematicVersions() {
   const root = await rootPackage;
   const packagesPath = dest('schematics', 'versions.json');
@@ -283,6 +298,7 @@ async function replaceSchematicVersions() {
   Object.keys(dependencies.firebaseFunctionsDependencies).forEach(name => {
     dependencies.firebaseFunctionsDependencies[name].version = root.dependencies[name] || root.devDependencies[name];
   });
+  await writeVersionOverPlaceholder(root);
   return writeFile(packagesPath, JSON.stringify(dependencies, null, 2));
 }
 
