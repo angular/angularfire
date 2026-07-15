@@ -62,7 +62,14 @@ export const ngAddSetupProject = (
 
   const features = await featuresPrompt();
 
-  if (features.length > 0) {
+  if (features.length === 0) {
+    context.logger.warn(
+      'No features were selected, so there is nothing to set up. ' +
+      'At the "What features would you like to setup?" prompt, use the arrow keys to move, ' +
+      'press Space to select each feature you want, then Enter to confirm. ' +
+      'Re-run ng add @angular/fire to try again.'
+    );
+  } else {
 
     const firebaseTools = await getFirebaseTools();
 
