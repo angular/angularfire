@@ -147,18 +147,19 @@ export const ngAddSetupProject = (
 
     }
 
-    // Re-read firebase.json after the last firebaseTools.init call — init rewrites it on disk
-    // mid-run, staging files against a stale pre-init copy risks the same Tree/disk collision
-    // .firebaserc hit earlier in this file (a Tree-staged file colliding with one firebase-tools
-    // already wrote to disk, which crashes the schematic when the Tree commits). Right now no
-    // init call adds a firestore section, so this is defensive against a future one that might.
-    const firebaseJsonAfterInit: FirebaseJSON = JSON.parse(
-      readFileSync(join(projectRoot, "firebase.json")).toString()
-    );
-    // Must run before addFirestoreToFirebaseJson below: that call is what adds the firestore
-    // section on a normal run. If it ran first, this read would see the section it just added
-    // and skip creating the files — leaving firebase.json pointing at rules/indexes files that
-    // were never created.
+    // Read after the init calls, never before — firebase-tools rewrites firebase.json on disk
+    // mid-run. A failed read isn't fatal: createFirestoreStarterFiles falls back to checking the
+    // disk for each file it would create.
+    let firebaseJsonAfterInit: FirebaseJSON | undefined;
+    try {
+      firebaseJsonAfterInit = JSON.parse(
+        readFileSync(join(projectRoot, "firebase.json")).toString()
+      );
+    } catch (e) {
+      context.logger.warn(`Could not re-read firebase.json after setup (${e.message}).`);
+    }
+    // Must run before addFirestoreToFirebaseJson: that call adds the firestore section, and if it
+    // ran first this snapshot would see it and skip creating the files it points at.
     createFirestoreStarterFiles(host, context, features, firebaseJsonAfterInit);
 
     // Both write the real filesystem, after the last firebaseTools.init call — init writes
