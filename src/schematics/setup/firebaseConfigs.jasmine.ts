@@ -165,4 +165,12 @@ describe('addFirestoreToFirebaseJson', () => {
     expect(warnSpy).toHaveBeenCalled();
   });
 
+  it('warns and skips when firebase.json parses to a non-object', () => {
+    writeFileSync(join(projectRoot, 'firebase.json'), 'null');
+    const warnSpy = spyOn(context.logger, 'warn');
+    addFirestoreToFirebaseJson(projectRoot, context, [FEATURES.Firestore]);
+    expect(warnSpy).toHaveBeenCalled();
+    expect(readFileSync(join(projectRoot, 'firebase.json')).toString()).toBe('null');
+  });
+
 });

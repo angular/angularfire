@@ -62,6 +62,12 @@ export const setDefaultProjectInFirebaseRc = (projectRoot: string, projectId: st
  * whose firebase.json already has a `firestore` section is left entirely untouched: its section
  * may point at differently-named files, and creating the default-named ones would only add
  * orphans nothing references.
+ *
+ * `firebaseJsonConfig`, when passed, should be the post-init snapshot of firebase.json (read
+ * after the last `firebaseTools.init` call and before `addFirestoreToFirebaseJson` runs) — see
+ * the call site in `ngAddSetupProject` for why that order matters. Passing a stale pre-init
+ * snapshot risks staging the default-named starter files on top of files firebase-tools already
+ * wrote to disk, colliding when the Tree commits.
  */
 export const createFirestoreStarterFiles = (
   host: Tree,
@@ -101,19 +107,22 @@ export const addFirestoreToFirebaseJson = (
   features: FEATURES[],
 ) => {
   if (!features.includes(FEATURES.Firestore)) { return; }
-  // Re-read first: firebaseTools.init calls may have rewritten firebase.json on disk.
-  let firebaseJson: FirebaseJSON;
+  // firebaseTools.init calls may have rewritten firebase.json on disk, so re-read it, add the
+  // firestore section if absent, and write it back. The whole read-check-write is guarded: a
+  // failed read (missing or unparseable file), a parse that isn't a usable object (reading
+  // `.firestore` off `null`/`undefined` throws; assigning it on a non-object primitive throws
+  // too), or a failed write (disk full, permissions) all warn and leave the file for the user to
+  // finish, rather than crashing the schematic with a raw Node error.
   try {
-    firebaseJson = JSON.parse(readFileSync(join(projectRoot, 'firebase.json')).toString());
+    const firebaseJson: FirebaseJSON = JSON.parse(readFileSync(join(projectRoot, 'firebase.json')).toString());
+    if (!firebaseJson.firestore) {
+      firebaseJson.firestore = { rules: 'firestore.rules', indexes: 'firestore.indexes.json' };
+      writeFileSync(join(projectRoot, 'firebase.json'), stringifyFormatted(firebaseJson));
+    }
   } catch (e) {
     context.logger.warn(
-      `Could not read firebase.json to add the firestore section (${e.message}). Add ` +
-      '{ "firestore": { "rules": "firestore.rules", "indexes": "firestore.indexes.json" } } to it manually.'
+      `Could not update firebase.json with the firestore section (${e.message}). Check firebase.json ` +
+      'and add { "firestore": { "rules": "firestore.rules", "indexes": "firestore.indexes.json" } } manually.'
     );
-    return;
-  }
-  if (!firebaseJson.firestore) {
-    firebaseJson.firestore = { rules: 'firestore.rules', indexes: 'firestore.indexes.json' };
-    writeFileSync(join(projectRoot, 'firebase.json'), stringifyFormatted(firebaseJson));
   }
 };
