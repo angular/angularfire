@@ -26,7 +26,6 @@
     "@angular/common": "^21.0.0",
     "@angular/core": "^21.0.0",
     "@angular/platform-browser": "^21.0.0",
-    "@angular/platform-browser-dynamic": "^21.0.0",
     "@angular/platform-server": "^21.0.0",
     "rxjs": "~7.8.0",
     "firebase-tools": "^14.0.0 || ^15.0.0"
