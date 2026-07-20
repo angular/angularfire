@@ -16,7 +16,18 @@ If you have not deployed yet, follow Firebase's own guides: [Get started with Ap
 
 A freshly deployed Angular SSR app usually *looks* fine in a browser, the page renders and works. But the server may be sending an almost-empty HTML shell and letting the browser do all the rendering. When that happens you lose the whole point of SSR: crawlers and link previews see no content, and first paint on slow devices is worse.
 
-There is no error in the deploy output and no error in the browser. The only trace is a line in the server logs (`firebase functions:log`), which nothing prompts you to check.
+There is no error in the deploy output and no error in the browser. The only trace is in your backend's server logs, which nothing prompts you to check.
+
+App Hosting runs on Cloud Run, not Cloud Functions, so its logs live in Cloud Logging:
+
+- In the Firebase console, open your backend and go to its **Logs** tab, then look at **Runtime logs**.
+- From a terminal, use `gcloud`:
+
+  ```bash
+  gcloud logging read 'resource.type=cloud_run_revision AND resource.labels.service_name=YOUR_BACKEND_ID' --project YOUR_PROJECT_ID --limit 10
+  ```
+
+See Firebase's [View logs and metrics](https://firebase.google.com/docs/app-hosting/logging) guide for more.
 
 ## The 30-second check to run after every deploy
 
