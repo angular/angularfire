@@ -66,6 +66,8 @@ export class AppComponent {
 
 [Quickstart](docs/install-and-setup.md) - Get your first application up and running by following our quickstart guide.
 
+[Deploying SSR to App Hosting](docs/app-hosting.md) - Deploy a server-rendered app to Firebase App Hosting, and avoid the silent SSR-to-CSR fallback.
+
 [Contributing](CONTRIBUTING.md)
 
 [Stackblitz Template](https://stackblitz.com/edit/angular-fire-start) - Remember to set your Firebase configuration in `app/app.module.ts`.
