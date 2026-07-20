@@ -8,6 +8,10 @@
 
 This guide covers one thing that trips up almost every new SSR deployment: **the server can silently stop server-rendering and fall back to client-side rendering (CSR), with no error anywhere obvious.** It explains how to detect that in 30 seconds and how to fix it.
 
+## How to deploy
+
+If you have not deployed yet, follow Firebase's own guides: [Get started with App Hosting](https://firebase.google.com/docs/app-hosting/get-started) to connect a GitHub repository (App Hosting builds and deploys on every push), or [Alternative ways to deploy](https://firebase.google.com/docs/app-hosting/alt-deploy) to deploy with `firebase deploy` from your own machine. Both build your app the same way in Google Cloud Build. The rest of this guide covers an Angular-specific issue you can hit once your app is deployed either way.
+
 ## The symptom: SSR silently downgrades to CSR
 
 A freshly deployed Angular SSR app usually *looks* fine in a browser, the page renders and works. But the server may be sending an almost-empty HTML shell and letting the browser do all the rendering. When that happens you lose the whole point of SSR: crawlers and link previews see no content, and first paint on slow devices is worse.
