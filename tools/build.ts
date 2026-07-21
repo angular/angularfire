@@ -322,6 +322,7 @@ async function compileSchematics() {
       src('schematics', "add", "index.ts"),
       src('schematics', "setup", "index.ts"),
       src('schematics', "update", "v7", "index.ts"),
+      src('schematics', "update", "v21", "index.ts"),
     ],
     format: "cjs",
     // turns out schematics don't support ESM, need to use webpack or shim these

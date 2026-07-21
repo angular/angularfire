@@ -3,6 +3,7 @@ import {
   intersects as semverIntersects,
   prerelease as semverPrerelease,
   satisfies as semverSatisfies,
+  subset as semverSubset,
   valid as semverValid,
 } from 'semver';
 import { FirebaseHostingSite } from './interfaces';
@@ -69,6 +70,74 @@ export const addDependencies = (
   });
 
   overwriteIfExists(host, 'package.json', stringifyFormatted(packageJson));
+};
+
+// Must stay identical to `dependencies.firebase` in `src/package.json`: if the two drift, the
+// alignment below can pin workspaces outside the range the library actually installs against,
+// re-creating the duplicate-SDK trees it exists to prevent.
+export const firebaseVersionRange = '^12.4.0';
+
+/**
+ * Aligns the workspace's `firebase` entry with the range `@angular/fire` requires.
+ *
+ * `@angular/fire` bundles its own `firebase` dependency, so a workspace pinned to an older
+ * major never conflicts at install time; npm silently nests a second SDK copy under
+ * `@angular/fire`, and the two copies reject each other's objects at runtime (#3684, #3681,
+ * #3682). Rewriting the workspace's range before the install runs is the only point where
+ * that class of breakage can be headed off.
+ *
+ * Returns whether `package.json` was modified, so callers can skip scheduling an install
+ * when nothing changed (`ng update` re-runs the v21 migration on rc-to-stable updates).
+ */
+export const alignFirebaseVersion = (
+  host: Tree,
+  context: SchematicContext,
+): boolean => {
+  if (!host.exists('package.json')) {
+    throw new SchematicsException('Could not locate package.json');
+  }
+  const packageJson = safeReadJSON('package.json', host);
+
+  const sectionsWithFirebase = ['dependencies', 'devDependencies'].filter(
+    section => typeof packageJson[section]?.firebase === 'string',
+  );
+
+  if (sectionsWithFirebase.length === 0) {
+    packageJson.dependencies ??= {};
+    packageJson.dependencies.firebase = firebaseVersionRange;
+    context.logger.info(`Added firebase ${firebaseVersionRange} to your package.json.`);
+    overwriteIfExists(host, 'package.json', stringifyFormatted(packageJson));
+    return true;
+  }
+
+  let changed = false;
+  for (const section of sectionsWithFirebase) {
+    const declaredFirebaseVersion = packageJson[section].firebase;
+    let alreadyCompatible: boolean;
+    try {
+      alreadyCompatible = semverSubset(declaredFirebaseVersion, firebaseVersionRange);
+    } catch (_) {
+      context.logger.warn(
+        `⚠️ The firebase version in your package.json (${declaredFirebaseVersion}) is not a semver ` +
+        `range, so it was left as-is; make sure it resolves inside ${firebaseVersionRange}, the ` +
+        'range @angular/fire requires; a version outside it can leave the install with two copies of the firebase SDK.'
+      );
+      continue;
+    }
+    if (alreadyCompatible) { continue; }
+    packageJson[section].firebase = firebaseVersionRange;
+    context.logger.info(
+      `Updated the firebase version in your package.json from ${declaredFirebaseVersion} to ` +
+      `${firebaseVersionRange}, the range @angular/fire requires; a workspace range outside it ` +
+      'can leave the install with a second copy of the firebase SDK, which fails at runtime.'
+    );
+    changed = true;
+  }
+
+  if (changed) {
+    overwriteIfExists(host, 'package.json', stringifyFormatted(packageJson));
+  }
+  return changed;
 };
 
 // The build writes the published version over this placeholder in the compiled schematics
