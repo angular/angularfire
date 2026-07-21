@@ -28,5 +28,6 @@
         "add/index.ts",
         "setup/index.ts",
         "update/v7/index.ts",
+        "update/v21/index.ts",
     ]
 }
