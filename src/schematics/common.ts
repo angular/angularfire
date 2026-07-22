@@ -1,5 +1,10 @@
 import { SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
-import { intersects as semverIntersects } from 'semver';
+import {
+  intersects as semverIntersects,
+  prerelease as semverPrerelease,
+  satisfies as semverSatisfies,
+  valid as semverValid,
+} from 'semver';
 import { FirebaseHostingSite } from './interfaces';
 
 export const shortSiteName = (site?: FirebaseHostingSite) => site?.name?.split('/').pop();
@@ -52,7 +57,7 @@ export const addDependencies = (
           context.logger.warn(`⚠️ The ${depName} devDependency specified in your package.json (${existingVersion}) does not fulfill AngularFire's dependency (${dep.version})`);
           // TODO offer to fix
         }
-      } catch (e) {
+      } catch (_) {
         if (existingVersion !== dep.version) {
           context.logger.warn(`⚠️ The ${depName} devDependency specified in your package.json (${existingVersion}) does not fulfill AngularFire's dependency (${dep.version})`);
           // TODO offer to fix
@@ -64,4 +69,51 @@ export const addDependencies = (
   });
 
   overwriteIfExists(host, 'package.json', stringifyFormatted(packageJson));
+};
+
+// The build writes the published version over this placeholder in the compiled schematics
+// (tools/build.ts, replaceSchematicVersions); running from source leaves the placeholder.
+const angularFireVersion = 'ANGULARFIRE2_VERSION';
+
+/**
+ * Pins the workspace's `@angular/fire` entry to the exact installed version when `ng add` wrote a
+ * prerelease range. A prerelease range like `^21.0.0-rc.0` also matches the canary build published
+ * for every merge to main, so a later fresh install can silently replace the version the user
+ * chose. Stable ranges are left untouched.
+ */
+export const pinInstalledPrereleaseVersion = (
+  host: Tree,
+  context: SchematicContext,
+  installedVersion = angularFireVersion,
+) => {
+  if (!host.exists('package.json')) { return; }
+  const packageJson = safeReadJSON('package.json', host);
+
+  const dependencySection = ['dependencies', 'devDependencies'].find(
+    section => typeof packageJson[section]?.['@angular/fire'] === 'string',
+  );
+  if (!dependencySection) { return; }
+
+  const declaredAngularFireVersion = packageJson[dependencySection]['@angular/fire'];
+  if (!(declaredAngularFireVersion.startsWith('^') || declaredAngularFireVersion.startsWith('~'))) { return; }
+
+  if (!semverValid(installedVersion)) {
+    context.logger.warn(
+      'Could not determine the installed @angular/fire version; leaving the declared version range as-is.'
+    );
+    return;
+  }
+
+  if (
+    semverPrerelease(installedVersion) &&
+    semverSatisfies(installedVersion, declaredAngularFireVersion, { includePrerelease: true })
+  ) {
+    packageJson[dependencySection]['@angular/fire'] = installedVersion;
+    overwriteIfExists(host, 'package.json', stringifyFormatted(packageJson));
+    context.logger.info(
+      `Pinned @angular/fire to the exact version ${installedVersion} — a prerelease range like ` +
+      `${declaredAngularFireVersion} also matches unreviewed canary builds, so a later install ` +
+      'could silently change versions.'
+    );
+  }
 };

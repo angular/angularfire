@@ -16,7 +16,18 @@ import {
   parseDataConnectConfig,
   setupTanstackDependencies,
 } from '../utils';
+import {
+  addFirestoreToFirebaseJson,
+  createFirestoreStarterFiles,
+  setDefaultProjectInFirebaseRc,
+} from './firebaseConfigs';
 import { appPrompt, featuresPrompt, projectPrompt, userPrompt } from './prompts';
+
+// FirebaseOptions keys — apps.sdkconfig responses include management-API extras that initializeApp() rejects.
+const firebaseOptionsKeys = [
+  'apiKey', 'authDomain', 'databaseURL', 'projectId', 'storageBucket',
+  'messagingSenderId', 'appId', 'measurementId', 'recaptchaSiteKey',
+];
 
 export interface SetupConfig extends DeployOptions {
   firebaseProject: FirebaseProject,
@@ -78,7 +89,7 @@ export const ngAddSetupProject = (
     const [ defaultProjectName ] = getFirebaseProjectNameFromHost(host, ngProjectName);
 
     const firebaseProject = await projectPrompt(defaultProjectName, { projectRoot, account: user.email });
-    
+
     let firebaseApp: FirebaseApp|undefined;
     let sdkConfig: Record<string, string>|undefined;
 
@@ -92,8 +103,11 @@ export const ngAddSetupProject = (
       firebaseApp = await appPrompt(firebaseProject, undefined, { projectRoot });
 
       const result = await firebaseTools.apps.sdkconfig('web', firebaseApp.appId, { nonInteractive: true, projectRoot });
-      sdkConfig = result.sdkConfig;
-      delete sdkConfig.locationId;
+      sdkConfig = Object.fromEntries(
+        firebaseOptionsKeys
+          .filter(key => result.sdkConfig[key] !== undefined)
+          .map(key => [key, result.sdkConfig[key]])
+      );
       setupConfig.sdkConfig = sdkConfig;
       setupConfig.firebaseApp = firebaseApp;
       // set up data connect locally if data connect hasn't already been initialized.
@@ -130,8 +144,28 @@ export const ngAddSetupProject = (
           setupTanstackDependencies(host, context);
           setupConfig.dataConnectConfig = dataConnectConfig;
         }
-      
+
     }
+
+    // Read after the init calls, never before — firebase-tools rewrites firebase.json on disk
+    // mid-run. A failed read isn't fatal: createFirestoreStarterFiles falls back to checking the
+    // disk for each file it would create.
+    let firebaseJsonAfterInit: FirebaseJSON | undefined;
+    try {
+      firebaseJsonAfterInit = JSON.parse(
+        readFileSync(join(projectRoot, "firebase.json")).toString()
+      );
+    } catch (e) {
+      context.logger.warn(`Could not re-read firebase.json after setup (${e.message}).`);
+    }
+    // Must run before addFirestoreToFirebaseJson: that call adds the firestore section, and if it
+    // ran first this snapshot would see it and skip creating the files it points at.
+    createFirestoreStarterFiles(host, context, features, firebaseJsonAfterInit);
+
+    // Both write the real filesystem, after the last firebaseTools.init call — init writes
+    // .firebaserc and rewrites firebase.json on disk during the run.
+    setDefaultProjectInFirebaseRc(projectRoot, firebaseProject.projectId);
+    addFirestoreToFirebaseJson(projectRoot, context, features);
 
     return setupProject(host, context, features, setupConfig);
   }

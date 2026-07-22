@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+ 
 import { execSync, spawn } from 'child_process';
 import ora from 'ora';
 import { compare as semverCompare } from 'semver';
@@ -8,17 +8,20 @@ declare global {
     var firebaseTools: FirebaseTools|undefined;
 }
 
+// The minimum firebase-tools version the schematics require.
+const minFirebaseToolsVersion = '14.0.0';
+
 export const getFirebaseTools = () => globalThis.firebaseTools ?
     Promise.resolve(globalThis.firebaseTools) :
     new Promise<FirebaseTools>((resolve, reject) => {
         process.env.FIREBASE_CLI_EXPERIMENTS ||= 'webframeworks';
         try {
             resolve(require('firebase-tools'));
-        } catch (e) {
+        } catch (_) {
             try {
                 const root = execSync('npm root --location=global').toString().trim();
                 resolve(require(`${root}/firebase-tools`));
-            } catch (e) {
+            } catch (_) {
                 const spinner = ora({
                     text: `Installing firebase-tools...`,
                     // Workaround for https://github.com/sindresorhus/ora/issues/136.
@@ -44,8 +47,8 @@ export const getFirebaseTools = () => globalThis.firebaseTools ?
         globalThis.firebaseTools = firebaseTools;
         const version = firebaseTools.cli.version();
         console.log(`Using firebase-tools version ${version}`);
-        if (semverCompare(version, '13.0.0') === -1) {
-            console.error('firebase-tools version 13.0.0+ is required, please upgrade and run again');
+        if (semverCompare(version, minFirebaseToolsVersion) === -1) {
+            console.error(`firebase-tools version ${minFirebaseToolsVersion}+ is required, please upgrade and run again`);
             return Promise.reject();
         }
         return firebaseTools;

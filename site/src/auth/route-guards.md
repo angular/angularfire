@@ -7,20 +7,20 @@ eleventyNavigation:
 
 ## Route users with AngularFire guards
 
-`AngularFireAuthGuard` provides a prebuilt [`canActivate` Router Guard](https://angular.io/api/router/CanActivate) using `AngularFireAuth`. By default unauthenticated users are not permitted to navigate to protected routes:
+`AuthGuard` provides a prebuilt [`canActivate` Router Guard](https://angular.io/api/router/CanActivate) using `AngularFireAuth`. By default unauthenticated users are not permitted to navigate to protected routes:
 
 ```ts
-import { AngularFireAuthGuard } from '@angular/fire/auth-guard';
+import { AuthGuard } from '@angular/fire/auth-guard';
 
 export const routes: Routes = [
     { path: '',      component: AppComponent },
-    { path: 'items', component: ItemListComponent, canActivate: [AngularFireAuthGuard] },
+    { path: 'items', component: ItemListComponent, canActivate: [AuthGuard] },
 ]
 ```
 
 ## Customizing the behavior
 
-To customize the behavior of `AngularFireAuthGuard`, you can pass an RXJS pipe through the route data's `authGuardPipe` key.
+To customize the behavior of `AuthGuard`, you can pass an RXJS pipe through the route data's `authGuardPipe` key.
 
 The `auth-guard` module provides the following pre-built pipes:
 
@@ -36,7 +36,7 @@ The `auth-guard` module provides the following pre-built pipes:
 Example use:
 
 ```ts
-import { AngularFireAuthGuard, hasCustomClaim, redirectUnauthorizedTo, redirectLoggedInTo } from '@angular/fire/auth-guard';
+import { AuthGuard, hasCustomClaim, redirectUnauthorizedTo, redirectLoggedInTo } from '@angular/fire/auth-guard';
 
 const adminOnly = () => hasCustomClaim('admin');
 const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['login']);
@@ -45,10 +45,10 @@ const belongsToAccount = (next) => hasCustomClaim(`account-${next.params.id}`);
 
 export const routes: Routes = [
     { path: '',      component: AppComponent },
-    { path: 'login', component: LoginComponent,        canActivate: [AngularFireAuthGuard], data: { authGuardPipe: redirectLoggedInToItems }},
-    { path: 'items', component: ItemListComponent,     canActivate: [AngularFireAuthGuard], data: { authGuardPipe: redirectUnauthorizedToLogin }},
-    { path: 'admin', component: AdminComponent,        canActivate: [AngularFireAuthGuard], data: { authGuardPipe: adminOnly }},
-    { path: 'accounts/:id', component: AdminComponent, canActivate: [AngularFireAuthGuard], data: { authGuardPipe: belongsToAccount }}
+    { path: 'login', component: LoginComponent,        canActivate: [AuthGuard], data: { authGuardPipe: redirectLoggedInToItems }},
+    { path: 'items', component: ItemListComponent,     canActivate: [AuthGuard], data: { authGuardPipe: redirectUnauthorizedToLogin }},
+    { path: 'admin', component: AdminComponent,        canActivate: [AuthGuard], data: { authGuardPipe: adminOnly }},
+    { path: 'accounts/:id', component: AdminComponent, canActivate: [AuthGuard], data: { authGuardPipe: belongsToAccount }}
 ];
 ```
 
@@ -68,7 +68,7 @@ export const routes: Routes = [
 
 ## Compose your own pipes
 
-`AngularFireAuthGuard` pipes are RXJS operators which transform an optional User to a boolean or Array (for redirects). You can easily build your own to customize behavior further:
+`AuthGuard` pipes are RXJS operators which transform an optional User to a boolean or Array (for redirects). You can easily build your own to customize behavior further:
 
 ```ts
 import { map } from 'rxjs/operators';
@@ -92,7 +92,7 @@ const editorOnly = () => pipe(customClaims, map(claims => claims.role === 'edito
 
 ## Using router state
 
-`AngularFireAuthGuard` will also accept `AuthPipeGenerator`s which generate `AuthPipe`s given the router state:
+`AuthGuard` will also accept `AuthPipeGenerator`s which generate `AuthPipe`s given the router state:
 
 ```ts
 import { pipe } from 'rxjs';
