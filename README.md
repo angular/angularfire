@@ -119,6 +119,13 @@ import { } from '@angular/fire/firestore';
 </td>
     <td>
 
+#### [Data Connect](docs/data-connect.md#data-connect)
+```ts
+import { } from '@angular/fire/data-connect';
+```
+</td>
+    <td>
+
 #### [Cloud Functions](docs/functions.md#cloud-functions)
 ```ts
 import { } from '@angular/fire/functions';
