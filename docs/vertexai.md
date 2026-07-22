@@ -19,12 +19,12 @@ Provide a Vertex AI instance in the application's `app.config.ts`:
 
 ```ts
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { provideVertexAI, getVertexAI } from '@angular/fire/vertexai-preview';
+import { provideVertexAI, getAI } from '@angular/fire/vertexai-preview';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideFirebaseApp(() => initializeApp({ ... })),
-    provideVertexAI(() => getVertexAI()),
+    provideVertexAI(() => getAI()),
     ...
   ],
   ...,
@@ -35,11 +35,11 @@ Next inject `VertexAI` into your component:
 
 ```typescript
 import { Component, inject } from '@angular/core';
-import { VertexAI } from '@angular/fire/vertexai';
+import { AI } from '@angular/fire/ai';
 
 @Component({ ... })
 export class MyComponent {
-    private vertexAI = inject(VertexAI);
+    private ai = inject(AI);
     ...
 }
 ```
@@ -48,6 +48,6 @@ export class MyComponent {
 
 AngularFire wraps the Firebase JS SDK to ensure proper functionality in Angular, while providing the same API.
 
-Update the imports from `import { ... } from 'firebase/vertexai'` to `import { ... } from '@angular/fire/vertexai'` and follow the official documentation.
+Update the imports from `import { ... } from 'firebase/vertexai'` to `import { ... } from '@angular/fire/ai'` and follow the official documentation.
 
 [Getting Started](https://firebase.google.com/docs/vertex-ai/get-started?platform=web) | [API Reference](https://firebase.google.com/docs/reference/js/vertexai)
