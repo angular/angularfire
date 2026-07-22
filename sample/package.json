@@ -1,40 +1,39 @@
 {
-  "name": "ng19-test",
+  "name": "ng20-test",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "firebase emulators:exec --import seed \"ng serve\"",
+    "start": "npx --yes firebase-tools@latest emulators:exec --import seed \"ng serve\"",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:ng19-test": "node dist/ng19-test/server/server.mjs"
+    "serve:ssr:ng20-test": "node dist/ng20-test/server/server.mjs"
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^19.0.0",
-    "@angular/common": "^19.0.0",
-    "@angular/compiler": "^19.0.0",
-    "@angular/core": "^19.0.0",
-    "@angular/fire": "file:../angular-fire-19.0.0.tgz",
-    "@angular/forms": "^19.0.0",
-    "@angular/platform-browser": "^19.0.0",
-    "@angular/platform-browser-dynamic": "^19.0.0",
-    "@angular/platform-server": "^19.0.0",
-    "@angular/router": "^19.0.0",
-    "@angular/ssr": "^19.0.0",
+    "@angular/animations": "^20.2.4",
+    "@angular/common": "^20.2.4",
+    "@angular/compiler": "^20.2.4",
+    "@angular/core": "^20.2.4",
+    "@angular/fire": "file:../angular-fire-20.0.0.tgz",
+    "@angular/forms": "^20.2.4",
+    "@angular/platform-browser": "^20.2.4",
+    "@angular/platform-browser-dynamic": "^20.2.4",
+    "@angular/platform-server": "^20.2.4",
+    "@angular/router": "^20.2.4",
+    "@angular/ssr": "^20.2.2",
     "cookie-parser": "^1.4.7",
     "cookie-store": "^4.0.0-next.4",
     "express": "^4.18.2",
     "firebase-admin": "^13.0.1",
     "js-cookie": "^3.0.5",
     "rxjs": "~7.8.0",
-    "tslib": "^2.3.0",
-    "zone.js": "~0.15.0"
+    "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^19.0.0",
-    "@angular/cli": "^19.0.0",
-    "@angular/compiler-cli": "^19.0.0",
+    "@angular/build": "^20.2.2",
+    "@angular/cli": "^20.2.2",
+    "@angular/compiler-cli": "^20.2.4",
     "@types/cookie-parser": "^1.4.8",
     "@types/express": "^4.17.17",
     "@types/jasmine": "~5.1.0",
@@ -46,6 +45,6 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.6.2"
+    "typescript": "~5.9.2"
   }
 }
