@@ -172,7 +172,7 @@ export class UserComponent implements OnDestroy {
   constructor() {
     this.idTokenSubscription = this.idToken$.subscribe((token: string | null) => {
         //handle idToken changes here. Note, that user will be null if there is no currently logged in user.
-     console.log(string);
+     console.log(token);
     })
   }
 
