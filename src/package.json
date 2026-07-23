@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "firebase": "^12.4.0",
-    "rxfire": "^6.1.0",
+    "rxfire": "^6.2.0",
     "@angular-devkit/schematics": "^21.0.0",
     "@schematics/angular": "^21.0.0",
     "tslib": "^2.3.0"
