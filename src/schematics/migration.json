@@ -6,6 +6,11 @@
             "description": "Update @angular/fire to v7",
             "factory": "./update/v7#ngUpdate"
         },
+        "migration-v21": {
+            "version": "21.0.0",
+            "description": "Align the workspace's firebase dependency with the range @angular/fire 21 requires, so the install cannot contain two copies of the firebase SDK",
+            "factory": "./update/v21#ngUpdate"
+        },
         "ng-post-upgate": {
             "description": "Print out results after ng-update",
             "factory": "./update#ngPostUpdate",
