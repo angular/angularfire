@@ -18,6 +18,37 @@ When an application is unstable change-detection, two-way binding, and rehydrati
 
 There are a number of situations where AngularFire's Zone wrapping is inconsequential such adding/deleting/updating a document in response to user-input, signing a user in, calling a Cloud Function, etc. So long as no long-lived side-effects are kicked off, your application should be ok. Most Promise based APIs are fairly safe without zone wrapping. 
 
+## Keeping calls inside an injection context
+
+A common way to trip the warning is calling an AngularFire API from inside an asynchronous callback, for example building a Firestore query inside a `switchMap` on the signed-in user. The surrounding service is created inside an injection context, but the callback runs *later*, after that context is gone, so AngularFire can no longer wrap the call.
+
+Capture an `EnvironmentInjector` while the context is still active (any field initializer or constructor), then re-establish it inside the callback with [`runInInjectionContext`](https://angular.dev/api/core/runInInjectionContext):
+
+```ts
+private readonly injector = inject(EnvironmentInjector);
+
+readonly todos$ = this.user$.pipe(
+  switchMap((user) =>
+    runInInjectionContext(this.injector, () =>
+      collectionData(collection(this.firestore, `users/${user.uid}/todos`)),
+    ),
+  ),
+);
+```
+
+Inside `runInInjectionContext`, AngularFire can wrap the call again, so the SSR/change-detection guarantees are restored and the warning goes away.
+
+If a call doesn't depend on the async value, prefer hoisting it out of the callback entirely and running it once where the injection context is still active:
+
+```ts
+// Built once where the context is live, then reused, so no wrapping is needed:
+private readonly items$ = collectionData(collection(this.firestore, "items"));
+
+readonly refreshed$ = this.refresh$.pipe(switchMap(() => this.items$));
+```
+
+Reach for `runInInjectionContext` only when the call genuinely must run inside the callback, as the per-user query above does (it needs the signed-in user's `uid`).
+
 ## Logging
 
 You may see a log warning, `Calling Firebase APIs outside of an Injection context may destabilize your application leading to subtle change-detection and hydration bugs. Find more at https://github.com/angular/angularfire/blob/main/docs/zones.md` when developing your application.

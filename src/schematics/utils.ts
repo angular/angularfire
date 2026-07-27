@@ -375,7 +375,7 @@ export function parseDataConnectConfig(
       package: connectorJson.generate.javascriptSdk.package,
       angular: connectorJson.generate.javascriptSdk.angular,
     };
-  } catch (_) {
+  } catch (e) {
     console.error("Couldn't parse dataconnect.yaml", e);
     return null;
   }
