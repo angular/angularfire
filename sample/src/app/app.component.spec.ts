@@ -26,10 +26,10 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have the 'ng20-test' title`, () => {
+  it(`should have the 'ng21-test' title`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('ng20-test');
+    expect(app.title).toEqual('ng21-test');
   });
 
   it('should render title', () => {
