@@ -27,7 +27,7 @@ export const featureOptions = [
   { name: 'Performance Monitoring', value: FEATURES.Performance },
   { name: 'Cloud Storage', value: FEATURES.Storage },
   { name: 'Remote Config', value: FEATURES.RemoteConfig },
-  { name: 'AI', value: FEATURES.AI },
+  { name: 'AI Logic', value: FEATURES.AI },
 ];
 
 export const enum PROJECT_TYPE { Static, CloudFunctions, CloudRun, WebFrameworks }
