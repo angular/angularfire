@@ -17,5 +17,5 @@ fi;
 npm --no-git-tag-version --allow-same-version -f version $OVERRIDE_VERSION
 
 npm run build &&
-    echo "npm publish . --tag $NPM_TAG" > ./dist/packages-dist/publish.sh &&
+    echo "npm publish . --registry https://wombat-dressing-room.appspot.com --tag $NPM_TAG" > ./dist/packages-dist/publish.sh &&
     chmod +x ./dist/packages-dist/publish.sh
