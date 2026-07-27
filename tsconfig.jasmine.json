@@ -2,7 +2,7 @@
     "extends": "./tsconfig.base.json",
     "compilerOptions": {
       "outDir": "dist/out-tsc/jasmine",
-      "module": "commonjs",
+      "module": "preserve",
       "target": "es2015",
       "allowJs": true,
       "resolveJsonModule": true,

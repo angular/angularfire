@@ -6,7 +6,7 @@ import { concatMap, distinct } from 'rxjs/operators';
 export const APP_CHECK_PROVIDER_NAME = 'app-check';
 
 // see notes in core/firebase.app.module.ts for why we're building the class like this
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+ 
 export interface AppCheck extends FirebaseAppCheck {}
 
 export class AppCheck {
@@ -15,7 +15,7 @@ export class AppCheck {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+ 
 export interface AppCheckInstances extends Array<AppCheck> {}
 
 export class AppCheckInstances {

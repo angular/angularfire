@@ -167,7 +167,7 @@ describe('AngularFirestoreCollection', () => {
           // length but the updated item is now modified
           if (count === 2) {
             expect(data.length).toEqual(ITEMS);
-            const change = data.filter(x => x.payload.doc.id === firstName)[0];
+            const change = data.find(x => x.payload.doc.id === firstName);
             expect(change.type).toEqual('modified');
             sub.unsubscribe();
             done();
@@ -219,14 +219,14 @@ describe('AngularFirestoreCollection', () => {
           // the first time should all be 'added'
           if (count === 1) {
             // make an update
-            firstIndex = data.filter(d => d.payload.doc.id === names[0])[0].payload.newIndex;
+            firstIndex = data.find(d => d.payload.doc.id === names[0]).payload.newIndex;
             stocks.doc(names[0]).update({ price: 2 });
           }
           // on the second round, make sure the array is still the same
           // length but the updated item is now modified
           if (count === 2) {
             expect(data.length).toEqual(ITEMS);
-            const change = data.filter(x => x.payload.doc.id === names[0])[0];
+            const change = data.find(x => x.payload.doc.id === names[0]);
             expect(change.type).toEqual('modified');
             expect(change.payload.oldIndex).toEqual(firstIndex);
             sub.unsubscribe();
@@ -244,7 +244,7 @@ describe('AngularFirestoreCollection', () => {
 
         const sub = TestBed.runInInjectionContext(() => stocks.snapshotChanges(['modified'])).pipe(skip(1)).subscribe(data => {
           sub.unsubscribe();
-          const change = data.filter(x => x.payload.doc.id === names[0])[0];
+          const change = data.find(x => x.payload.doc.id === names[0]);
           expect(data.length).toEqual(1);
           expect(change.payload.doc.data().price).toEqual(2);
           expect(change.type).toEqual('modified');
@@ -264,7 +264,7 @@ describe('AngularFirestoreCollection', () => {
 
         const sub = TestBed.runInInjectionContext(() => stocks.snapshotChanges(['added'])).pipe(skip(1)).subscribe(data => {
           sub.unsubscribe();
-          const change = data.filter(x => x.payload.doc.id === nextId)[0];
+          const change = data.find(x => x.payload.doc.id === nextId);
           expect(data.length).toEqual(ITEMS + 1);
           expect(change.payload.doc.data().price).toEqual(2);
           expect(change.type).toEqual('added');

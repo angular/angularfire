@@ -51,7 +51,7 @@ export class AngularFirestoreCollectionGroup<T = DocumentData> {
     }
     return docChanges<T>(this.query, this.afs.schedulers.outsideAngular)
       .pipe(
-        map(actions => actions.filter(change => events.indexOf(change.type) > -1)),
+        map(actions => actions.filter(change => events.includes(change.type))),
         filter(changes =>  changes.length > 0),
         pendingUntilEvent(this.injector)
       );
@@ -86,7 +86,7 @@ export class AngularFirestoreCollectionGroup<T = DocumentData> {
   valueChanges(): Observable<T[]>;
   // eslint-disable-next-line no-empty-pattern
   valueChanges({}): Observable<T[]>;
-  valueChanges<K extends string>(options: {idField: K}): Observable<(T & { [T in K]: string })[]>;
+  valueChanges<K extends string>(options: {idField: K}): Observable<(T & Record<K, string>)[]>;
   valueChanges<K extends string>(options: {idField?: K} = {}): Observable<T[]> {
     const fromCollectionRefScheduled$ = fromCollectionRef<T>(this.query, this.afs.schedulers.outsideAngular);
     return fromCollectionRefScheduled$
@@ -96,7 +96,7 @@ export class AngularFirestoreCollectionGroup<T = DocumentData> {
             return {
               [options.idField]: a.id,
               ...a.data()
-            } as T & { [T in K]: string };
+            } as T & Record<K, string>;
           } else {
             return a.data();
           }

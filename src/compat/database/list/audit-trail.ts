@@ -54,7 +54,7 @@ function waitForLoaded<T>(query: DatabaseQuery, action$: Observable<SnapshotActi
       // This is the magical part, only emit when the last load key
       // in the dataset has been loaded by a child event. At this point
       // we can assume the dataset is "whole".
-      skipWhile(meta => meta.loadedKeys.indexOf(meta.lastKeyToLoad) === -1),
+      skipWhile(meta => !meta.loadedKeys.includes(meta.lastKeyToLoad)),
       // Pluck off the meta data because the user only cares
       // to iterate through the snapshots
       map(meta => meta.actions)

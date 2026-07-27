@@ -1,17 +1,22 @@
 import { SpawnOptionsWithoutStdio, execSync, spawn } from 'child_process';
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 import { BuilderContext, targetFromTargetString } from '@angular-devkit/architect';
 import { SchematicsException } from '@angular-devkit/schematics';
-import { copySync, removeSync } from 'fs-extra';
+import fsExtra from 'fs-extra';
 import * as inquirer from 'inquirer';
 import open from 'open';
 import { satisfies } from 'semver';
 import tripleBeam from 'triple-beam';
 import * as winston from 'winston';
 import { BuildTarget, CloudRunOptions, DeployBuilderSchema, FSHost, FirebaseTools } from '../interfaces';
-import { firebaseFunctionsDependencies } from '../versions.json';
-import { DEFAULT_FUNCTION_NAME, defaultFunction, defaultPackage, dockerfile, functionGen2 } from './functions-templates';
+import { DEFAULT_FUNCTION_NAME, defaultFunction, defaultPackage, dockerfile, functionGen2 } from './functions-templates.js';
+
+// @ts-ignore
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+const { copySync, removeSync, readJsonSync } = fsExtra;
 
 const DEFAULT_EMULATOR_PORT = 5000;
 const DEFAULT_EMULATOR_HOST = 'localhost';
@@ -123,6 +128,7 @@ const findPackageVersion = (packageManager: string, name: string) => {
 const getPackageJson = (context: BuilderContext, workspaceRoot: string, options: DeployBuilderOptions, main?: string) => {
   const dependencies: Record<string, string> = {};
   const devDependencies: Record<string, string> = {};
+  const { firebaseFunctionsDependencies } = readJsonSync(join(__dirname, '..', 'versions.json'));
   if (options.ssr !== 'cloud-run') {
     Object.keys(firebaseFunctionsDependencies).forEach(name => {
       const { version, dev } = firebaseFunctionsDependencies[name];
@@ -231,7 +237,7 @@ export const deployToFunction = async (
         join(newStaticOut, 'index.html'),
         join(newStaticOut, 'index.original.html')
       );
-    } catch (e) { /* empty */ }
+    } catch (_) { /* empty */ }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -340,7 +346,7 @@ export const deployToCloudRun = async (
         join(newStaticOut, 'index.html'),
         join(newStaticOut, 'index.original.html')
       );
-    } catch (e) { /* empty */ }
+    } catch (_) { /* empty */ }
   }
 
   if (options.preview) {
@@ -447,7 +453,7 @@ or the new Firebase App Hosting product https://firebase.google.com/docs/app-hos
       project: firebaseProject,
       projectRoot: context.workspaceRoot,
     });
-  } catch (e) {
+  } catch (_) {
     throw new Error(`Cannot select firebase project '${firebaseProject}'`);
   }
 

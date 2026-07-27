@@ -46,7 +46,7 @@ interface Item {
   selector: 'app-root',
   template: `
   <ul>
-    @for (item of (item$ | async); track item) {
+    @for (item of (items$ | async); track item) {
       <li>
         {{ item.name }}
       </li>
@@ -58,13 +58,15 @@ interface Item {
 export class AppComponent {
   firestore = inject(Firestore);
   itemCollection = collection(this.firestore, 'items');
-  item$ = collectionData<Item>(itemCollection);
+  items$ = collectionData<Item>(this.itemCollection);
 }
 ```
 
 ## Resources
 
 [Quickstart](docs/install-and-setup.md) - Get your first application up and running by following our quickstart guide.
+
+[Deploying SSR to App Hosting](docs/app-hosting.md) - Deploy a server-rendered app to Firebase App Hosting, and avoid the silent SSR-to-CSR fallback.
 
 [Contributing](CONTRIBUTING.md)
 
@@ -174,9 +176,9 @@ import { } from '@angular/fire/app-check';
   <tr>
     <td>
 
-#### [Vertex AI](docs/vertexai.md#vertex-ai)
+#### [AI Logic](docs/ai.md#ai-logic)
 ```ts
-import { } from '@angular/fire/vertexai';
+import { } from '@angular/fire/ai';
 ```
 </td>
 

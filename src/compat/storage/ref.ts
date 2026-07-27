@@ -12,8 +12,8 @@ export interface AngularFireStorageReference {
   delete(): Observable<any>;
   child(path: string): AngularFireStorageReference;
   updateMetadata(meta: SettableMetadata): Observable<any>;
-  put(data: any, metadata?: UploadMetadata | undefined): AngularFireUploadTask;
-  putString(data: string, format?: string | undefined, metadata?: UploadMetadata | undefined): AngularFireUploadTask;
+  put(data: any, metadata?: UploadMetadata  ): AngularFireUploadTask;
+  putString(data: string, format?: string  , metadata?: UploadMetadata  ): AngularFireUploadTask;
   list(options?: ListOptions): Observable<ListResult>;
   listAll(): Observable<ListResult>;
 }

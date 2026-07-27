@@ -5,10 +5,12 @@ import {
   getAI as _getAI,
   getGenerativeModel as _getGenerativeModel,
   getImagenModel as _getImagenModel,
-  getVertexAI as _getVertexAI
+  getLiveGenerativeModel as _getLiveGenerativeModel,
+  startAudioConversation as _startAudioConversation
 } from 'firebase/ai';
 
 export const getAI = ɵzoneWrap(_getAI, true);
 export const getGenerativeModel = ɵzoneWrap(_getGenerativeModel, true);
 export const getImagenModel = ɵzoneWrap(_getImagenModel, true);
-export const getVertexAI = ɵzoneWrap(_getVertexAI, true);
+export const getLiveGenerativeModel = ɵzoneWrap(_getLiveGenerativeModel, true);
+export const startAudioConversation = ɵzoneWrap(_startAudioConversation, true);

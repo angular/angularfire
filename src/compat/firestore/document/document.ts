@@ -87,14 +87,14 @@ export class AngularFirestoreDocument<T = DocumentData> {
    * provided `idField` property name.
    */
   valueChanges(options?: unknown): Observable<T | undefined>;
-  valueChanges<K extends string>(options: { idField: K }): Observable<(T & { [T in K]: string }) | undefined>;
+  valueChanges<K extends string>(options: { idField: K }): Observable<(T & Record<K, string>) | undefined>;
   valueChanges<K extends string>(options: { idField?: K } = {}): Observable<T | undefined> {
     return this.snapshotChanges().pipe(
       map(({ payload }) =>
         options.idField ? {
           ...payload.data(),
           ...{ [options.idField]: payload.id }
-        } as T & { [T in K]: string } : payload.data()
+        } as T & Record<K, string> : payload.data()
       )
     );
   }

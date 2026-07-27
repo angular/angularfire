@@ -12,7 +12,7 @@ export default createBuilder(
       throw new Error('Cannot deploy the application without a target');
     }
 
-    const [defaultFirebaseProject, defulatFirebaseHostingSite] = getFirebaseProjectNameFromFs(
+    const [defaultFirebaseProject, defaultFirebaseHostingSite] = getFirebaseProjectNameFromFs(
       context.workspaceRoot,
       context.target.project
     );
@@ -25,11 +25,11 @@ export default createBuilder(
       throw new Error('The Firebase Project specified by your angular.json or .firebaserc is in conflict');
     }
 
-    const firebaseHostingSite = options.firebaseHostingSite || defulatFirebaseHostingSite;
+    const firebaseHostingSite = options.firebaseHostingSite || defaultFirebaseHostingSite;
     if (!firebaseHostingSite) {
       throw new Error(`Cannot determine the Firebase Hosting Site from your angular.json or .firebaserc`);
     }
-    if (firebaseHostingSite !== defulatFirebaseHostingSite) {
+    if (firebaseHostingSite !== defaultFirebaseHostingSite) {
       throw new Error('The Firebase Hosting Site specified by your angular.json or .firebaserc is in conflict');
     }
 

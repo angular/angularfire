@@ -7,7 +7,7 @@ export { DataConnect };
 
 export const DATA_CONNECT_PROVIDER_NAME = 'data-connect';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+ 
 export interface DataConnectInstances extends Array<DataConnect> {}
 
 export class DataConnectInstances {

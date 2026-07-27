@@ -12,7 +12,7 @@ import { proxyPolyfillCompat } from './base';
 export const VAPID_KEY = new InjectionToken<string>('angularfire2.messaging.vapid-key');
 export const SERVICE_WORKER = new InjectionToken<Promise<ServiceWorkerRegistration>>('angularfire2.messaging.service-worker-registeration');
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+ 
 export interface AngularFireMessaging extends Omit<ɵPromiseProxy<firebase.messaging.Messaging>, 'deleteToken' | 'getToken' | 'requestPermission'> {
 }
 
@@ -31,8 +31,8 @@ export class AngularFireMessaging {
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) name: string | null | undefined,
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    @Inject(PLATFORM_ID) platformId: Object,
+
+    @Inject(PLATFORM_ID) platformId: object,
     zone: NgZone,
     schedulers: ɵAngularFireSchedulers,
     @Optional() @Inject(VAPID_KEY) vapidKey: string|null,

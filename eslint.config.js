@@ -96,6 +96,21 @@ module.exports = [
           "newlines-between": "never"
         },
       ],
+      '@angular-eslint/prefer-inject': 'off',
+      '@typescript-eslint/no-empty-object-type': 'off',
+      'import/named': 'off',
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          "argsIgnorePattern": "^_",
+          "varsIgnorePattern": "^_",
+          "caughtErrorsIgnorePattern": "^_",
+          "ignoreRestSiblings": true
+        }
+      ],
+      "@typescript-eslint/prefer-promise-reject-errors": "off",
+      "@typescript-eslint/no-require-imports": "off",
+      "@typescript-eslint/ban-ts-comment": "warn",
     },
   },
   {

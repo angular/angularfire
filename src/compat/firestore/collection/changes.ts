@@ -68,7 +68,7 @@ export function sortedChanges<T>(
 export function combineChanges<T>(current: DocumentChange<T>[], changes: DocumentChange<T>[], events: DocumentChangeType[]) {
   changes.forEach(change => {
     // skip unwanted change types
-    if (events.indexOf(change.type) > -1) {
+    if (events.includes(change.type)) {
       current = combineChange(current, change);
     }
   });

@@ -32,7 +32,7 @@ export function createListReference<T= any>(query: DatabaseQuery, afDatabase: An
       const snapshotChanges$ = snapshotChanges<T>(query, events, outsideAngularScheduler);
       return snapshotChanges$.pipe(
         map(actions => actions.map(a => {
-          if (options && options.idField) {
+          if (options?.idField) {
             return {
               ...a.payload.val() as T,
               ...{

@@ -38,7 +38,7 @@ export function getWorkspace(host: Tree): {
     throw new SchematicsException(`Could not find angular.json`);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+   
   const { parse } = require("jsonc-parser");
 
   const workspace = parse(configBuffer.toString()) as Workspace | undefined;
@@ -99,7 +99,7 @@ export function getFirebaseProjectNameFromFs(
     const buffer = readFileSync(path);
     const rc: FirebaseRc = JSON.parse(buffer.toString());
     return projectFromRc(rc, target);
-  } catch (e) {
+  } catch (_) {
     return [undefined, undefined];
   }
 }
@@ -293,13 +293,13 @@ export function featureToRules(
               "@angular/fire/remote-config"
             )}(() => getRemoteConfig())`;
           });
-        case FEATURES.VertexAI:
+        case FEATURES.AI:
           return addRootProvider(projectName, ({ code, external }) => {
-            external("getVertexAI", "@angular/fire/vertexai");
+            external("getAI", "@angular/fire/ai");
             return code`${external(
-              "provideVertexAI",
-              "@angular/fire/vertexai"
-            )}(() => getVertexAI())`;
+              "provideAI",
+              "@angular/fire/ai"
+            )}(() => getAI())`;
           });
         default:
           return undefined;

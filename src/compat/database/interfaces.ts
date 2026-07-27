@@ -6,7 +6,7 @@ export type FirebaseOperation = string | firebase.database.Reference | firebase.
 export interface AngularFireList<T> {
   query: DatabaseQuery;
   valueChanges(events?: ChildEvent[], options?: unknown): Observable<T[]>;
-  valueChanges<K extends string>(events?: ChildEvent[], options?: {idField: K}): Observable<(T & {[T in K]?: string})[]>;
+  valueChanges<K extends string>(events?: ChildEvent[], options?: {idField: K}): Observable<(T & Partial<Record<K, string>>)[]>;
   snapshotChanges(events?: ChildEvent[]): Observable<SnapshotAction<T>[]>;
   stateChanges(events?: ChildEvent[]): Observable<SnapshotAction<T>>;
   auditTrail(events?: ChildEvent[]): Observable<SnapshotAction<T>[]>;

@@ -67,7 +67,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
     let source = docChanges<T>(this.query, this.afs.schedulers.outsideAngular);
     if (events && events.length > 0) {
       source = source.pipe(
-        map(actions => actions.filter(change => events.indexOf(change.type) > -1))
+        map(actions => actions.filter(change => events.includes(change.type)))
       );
     }
     return source.pipe(
@@ -110,7 +110,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
   valueChanges(): Observable<T[]>;
   // eslint-disable-next-line no-empty-pattern
   valueChanges({}): Observable<T[]>;
-  valueChanges<K extends string>(options: {idField: K}): Observable<(T & { [T in K]: string })[]>;
+  valueChanges<K extends string>(options: {idField: K}): Observable<(T & Record<K, string>)[]>;
   valueChanges<K extends string>(options: {idField?: K} = {}): Observable<T[]> {
     return fromCollectionRef<T>(this.query, this.afs.schedulers.outsideAngular)
       .pipe(
@@ -119,7 +119,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
             return {
               ...a.data() as any,
               ...{ [options.idField]: a.id }
-            } as T & { [T in K]: string };
+            } as T & Record<K, string>;
           } else {
             return a.data();
           }
