@@ -74,6 +74,8 @@ export class AppComponent {
 
 [Upgrading from v6.0? Check out our guide.](docs/version-7-upgrade.md)
 
+[Upgrading from AngularFire 20? See the v21 upgrade guide.](docs/version-21-upgrade.md)
+
 ### Sample app
 
 The [`sample`](sample) folder contains a kitchen sink application that demonstrates use of the "modular" API, in a zoneless server-rendered application, with all the bells and whistles.

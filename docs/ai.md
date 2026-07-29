@@ -8,6 +8,8 @@ Firebase AI Logic gives you access to the latest generative AI models from Googl
 
 [Learn more](https://firebase.google.com/docs/ai-logic)
 
+> Firebase AI Logic was previously called **Vertex AI in Firebase**. If you are upgrading from AngularFire 20, the module moved from `@angular/fire/vertexai` to `@angular/fire/ai` and the symbols were renamed (`getVertexAI` to `getAI`, `provideVertexAI` to `provideAI`, `VertexAI` to `AI`). Running `ng update @angular/fire` rewrites these for you. See the [AngularFire 20 to 21 upgrade guide](./version-21-upgrade.md).
+
 ## Dependency Injection
 
 As a prerequisite, ensure that `AngularFire` has been added to your project via
