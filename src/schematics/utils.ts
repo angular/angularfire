@@ -221,11 +221,14 @@ export function featureToRules(
             const config = dataConnectConfig;
             let angularConfig: undefined | string;
             if (config) {
-              if (config.package) {
+              // config.package and the connectorConfig values below come from the project's own
+              // dataconnect.yaml/connector.yaml, not from a trusted schema — reject anything that
+              // isn't a plausible package specifier before using it as a module name.
+              if (config.package && /^[^'"\\\n\r]+$/.test(config.package)) {
                 configAsStr = external("connectorConfig", config.package);
-              } else {
+              } else if (config.connectorConfig) {
                 configAsStr = `{${Object.keys(config.connectorConfig as ConnectorConfig).map(
-                  (key) => `${key}: "${(config.connectorConfig as ConnectorConfig)[key]}"`
+                  (key) => `${key}: ${JSON.stringify((config.connectorConfig as ConnectorConfig)[key])}`
                 ).join(',')}}`;
               }
               if (config.angular) {
