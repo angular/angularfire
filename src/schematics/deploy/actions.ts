@@ -51,7 +51,7 @@ const spawnAsync = async (
       reject(error);
     });
     spawnProcess.on('close', (code) => {
-      if (code === 1) {
+      if (code !== 0) {
         reject(Buffer.concat(errorChunks).toString());
         return;
       }
@@ -279,6 +279,34 @@ export const deployToFunction = async (
 };
 
 
+// Exported (rather than kept private) so the argv shape can be asserted directly in tests,
+// without having to mock child_process.spawn.
+export const buildCloudRunBuildsSubmitArgs = (
+  cloudRunOut: string,
+  serviceId: string,
+  options: DeployBuilderOptions
+): string[] => [
+  'builds', 'submit', cloudRunOut,
+  '--tag', `gcr.io/${options.firebaseProject}/${serviceId}`,
+  '--project', options.firebaseProject,
+  '--quiet',
+];
+
+export const buildCloudRunDeployArgs = (
+  serviceId: string,
+  options: DeployBuilderOptions,
+  deployArguments: string[]
+): string[] => [
+  'run', 'deploy', serviceId,
+  '--image', `gcr.io/${options.firebaseProject}/${serviceId}`,
+  '--project', options.firebaseProject,
+  ...deployArguments,
+  '--platform', 'managed',
+  '--allow-unauthenticated',
+  '--region', options.region,
+  '--quiet',
+];
+
 export const deployToCloudRun = async (
   firebaseTools: FirebaseTools,
   context: BuilderContext,
@@ -368,22 +396,8 @@ export const deployToCloudRun = async (
   if (cloudRunOptions.vpcConnector) { deployArguments.push('--vpc-connector', cloudRunOptions.vpcConnector); }
 
   context.logger.info(`📦 Deploying to Cloud Run`);
-  await spawnAsync('gcloud', [
-    'builds', 'submit', cloudRunOut,
-    '--tag', `gcr.io/${options.firebaseProject}/${serviceId}`,
-    '--project', options.firebaseProject,
-    '--quiet',
-  ]);
-  await spawnAsync('gcloud', [
-    'run', 'deploy', serviceId,
-    '--image', `gcr.io/${options.firebaseProject}/${serviceId}`,
-    '--project', options.firebaseProject,
-    ...deployArguments,
-    '--platform', 'managed',
-    '--allow-unauthenticated',
-    '--region', options.region,
-    '--quiet',
-  ]);
+  await spawnAsync('gcloud', buildCloudRunBuildsSubmitArgs(cloudRunOut, serviceId, options));
+  await spawnAsync('gcloud', buildCloudRunDeployArgs(serviceId, options, deployArguments));
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const siteTarget = options.target ?? context.target!.project;
