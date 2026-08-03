@@ -357,6 +357,35 @@ async function compileSchematics() {
     copy(src('schematics', 'setup', 'schema.json'), dest('schematics', 'setup', 'schema.json')),
   ]);
   await replaceSchematicVersions();
+  await loadCompiledSchematics();
+}
+
+/**
+ * Loads every compiled schematic entry point, so a bundle that cannot even be required fails the
+ * build instead of shipping.
+ */
+async function loadCompiledSchematics() {
+  const entryPoints = [
+    join('update', 'index.js'),
+    join('deploy', 'actions.js'),
+    join('deploy', 'builder.js'),
+    join('add', 'index.js'),
+    join('setup', 'index.js'),
+    join('update', 'v7', 'index.js'),
+    join('update', 'v21', 'index.js'),
+  ];
+  const failures: string[] = [];
+  for (const entryPoint of entryPoints) {
+    const path = dest('schematics', entryPoint);
+    try {
+      require(path);
+    } catch (error) {
+      failures.push(`  ${entryPoint}: ${error}`);
+    }
+  }
+  if (failures.length) {
+    throw new Error(`Compiled schematics failed to load:\n${failures.join('\n')}`);
+  }
 }
 
 async function buildLibrary() {
