@@ -79,12 +79,14 @@ type Prompt = <K extends string, U= unknown>(questions: { name: K, source: (...a
 const autocomplete: Prompt = (questions) => inquirer.prompt(questions);
 
 
+export const featuresPromptMessage = 'What features would you like to setup?';
+
 export const featuresPrompt = async (): Promise<FEATURES[]> => {
   const { features } = await inquirer.prompt({
     type: 'checkbox',
     name: 'features',
     choices: featureOptions,
-    message: 'What features would you like to setup?',
+    message: featuresPromptMessage,
     default: [],
   }) as { features: FEATURES[] };
   return features;
