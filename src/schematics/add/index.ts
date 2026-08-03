@@ -1,6 +1,6 @@
 import { SchematicContext, Tree } from '@angular-devkit/schematics';
 import { NodePackageInstallTask, RunSchematicTask } from '@angular-devkit/schematics/tasks';
-import { addDependencies, pinInstalledPrereleaseVersion } from '../common';
+import { addDependencies, alignFirebaseVersion, pinInstalledPrereleaseVersion } from '../common';
 import { DeployOptions } from '../interfaces';
 import { peerDependencies } from '../versions.json';
 
@@ -10,6 +10,7 @@ export const ngAdd = (options: DeployOptions) => (tree: Tree, context: Schematic
     peerDependencies,
     context
   );
+  alignFirebaseVersion(tree, context);
   pinInstalledPrereleaseVersion(tree, context);
   const npmInstallTaskId = context.addTask(new NodePackageInstallTask());
   context.addTask(new RunSchematicTask('ng-add-setup-project', options), [npmInstallTaskId]);

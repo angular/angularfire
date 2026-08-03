@@ -322,6 +322,7 @@ async function compileSchematics() {
       src('schematics', "add", "index.ts"),
       src('schematics', "setup", "index.ts"),
       src('schematics', "update", "v7", "index.ts"),
+      src('schematics', "update", "v21", "index.ts"),
     ],
     format: "cjs",
     // turns out schematics don't support ESM, need to use webpack or shim these
@@ -339,7 +340,10 @@ async function compileSchematics() {
       "rxjs",
       "@schematics/angular",
       "jsonc-parser",
-      "firebase-tools"
+      "firebase-tools",
+      // The v21 migration parses user source with the TypeScript compiler; resolve it from
+      // the workspace at ng-update time instead of bundling ~3.5MB into the package.
+      "typescript"
     ],
     outdir: dest('schematics'),
   });

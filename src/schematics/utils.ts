@@ -293,13 +293,13 @@ export function featureToRules(
               "@angular/fire/remote-config"
             )}(() => getRemoteConfig())`;
           });
-        case FEATURES.VertexAI:
+        case FEATURES.AI:
           return addRootProvider(projectName, ({ code, external }) => {
-            external("getVertexAI", "@angular/fire/vertexai");
+            external("getAI", "@angular/fire/ai");
             return code`${external(
-              "provideVertexAI",
-              "@angular/fire/vertexai"
-            )}(() => getVertexAI())`;
+              "provideAI",
+              "@angular/fire/ai"
+            )}(() => getAI())`;
           });
         default:
           return undefined;
