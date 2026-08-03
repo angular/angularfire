@@ -183,9 +183,9 @@ import { } from '@angular/fire/app-check';
 </td>
     <td>
 
-#### [Vertex AI](docs/vertexai.md#vertex-ai)
+#### [AI Logic](docs/ai.md#ai-logic)
 ```ts
-import { } from '@angular/fire/vertexai';
+import { } from '@angular/fire/ai';
 ```
 </td>
   </tr>
