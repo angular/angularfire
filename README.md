@@ -144,11 +144,20 @@ import { } from '@angular/fire/storage';
   <tr>
     <td>
 
+#### [Data Connect](docs/data-connect.md#data-connect)
+```ts
+import { } from '@angular/fire/data-connect';
+```
+</td>
+    <td>
+
 #### [Performance Monitoring](docs/performance.md#performance-monitoring)
 ```ts
 import { } from '@angular/fire/performance';
 ```
 </td>
+  </tr>
+  <tr>
     <td>
 
 #### [Realtime Database](docs/database.md#realtime-database)
@@ -156,8 +165,6 @@ import { } from '@angular/fire/performance';
 import { } from '@angular/fire/database';
 ```
 </td>
-  </tr>
-  <tr>
     <td>
 
 #### [Remote Config](docs/remote-config.md#remote-config)
@@ -165,6 +172,8 @@ import { } from '@angular/fire/database';
 import { } from '@angular/fire/remote-config';
 ```
 </td>
+  </tr>
+  <tr>
     <td>
 
 #### [App Check](docs/app-check.md#app-check)
@@ -172,8 +181,6 @@ import { } from '@angular/fire/remote-config';
 import { } from '@angular/fire/app-check';
 ```
 </td>
-  </tr>
-  <tr>
     <td>
 
 #### [AI Logic](docs/ai.md#ai-logic)
@@ -181,6 +188,5 @@ import { } from '@angular/fire/app-check';
 import { } from '@angular/fire/ai';
 ```
 </td>
-
   </tr>
 </table>
