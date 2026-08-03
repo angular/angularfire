@@ -2,6 +2,10 @@
   "name": "@angular/fire",
   "version": "21.0.0-rc.0",
   "description": "Angular + Firebase = ❤️",
+  "publishConfig": {
+    "registry": "https://wombat-dressing-room.appspot.com",
+    "access": "public"
+  },
   "private": true,
   "scripts": {
     "test": "npm run build:jasmine && npm run test:node-esm && npm run test:chrome-headless",
