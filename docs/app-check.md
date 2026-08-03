@@ -20,7 +20,8 @@ ng add @angular/fire
 Provide a App Check instance in the application's `app.config.ts`:
 
 ```ts
-import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { ApplicationConfig } from '@angular/core';
+import { provideFirebaseApp, initializeApp, getApp } from '@angular/fire/app';
 import { provideAppCheck, initializeAppCheck, ReCaptchaV3Provider } from '@angular/fire/app-check';
 
 export const appConfig: ApplicationConfig = {
@@ -32,7 +33,7 @@ export const appConfig: ApplicationConfig = {
     ...
   ],
   ...
-})
+}
 ```
 
 Next inject `AppCheck` it into your component:

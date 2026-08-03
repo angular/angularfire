@@ -21,6 +21,7 @@ ng add @angular/fire
 Provide a Firestore instance in the application's `app.config.ts`:
 
 ```ts
+import { ApplicationConfig } from '@angular/core';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 
@@ -71,6 +72,7 @@ In `user-profile.component.ts`:
 ```typescript
 import { Firestore, collection, collectionData} from '@angular/fire/firestore';
 import { Component, inject } from '@angular/core';
+import { Observable } from 'rxjs';
 
 @Component ({
     selector: 'app-user-profile',
@@ -89,7 +91,7 @@ export class UserProfileComponent {
         this.users$ = collectionData(userProfileCollection) as Observable<UserProfile[]>;
     }
 }
-export Interface UserProfile {
+export interface UserProfile {
     username: string;
 }
 ```
@@ -114,8 +116,9 @@ To write to Cloud Firestore use the `addDoc` function. It will create a new docu
 
 
 ```typescript
-import { Firestore, collection, collectionData, addDoc} from '@angular/fire/firestore';
+import { Firestore, collection, collectionData, addDoc, CollectionReference, DocumentReference } from '@angular/fire/firestore';
 import { Component, inject } from '@angular/core';
+import { Observable } from 'rxjs';
 
 @Component ({
     selector: 'app-user-profile',
@@ -137,7 +140,7 @@ export class UserProfileComponent {
         });
     }
 }
-export Interface UserProfile {
+export interface UserProfile {
     username: string;
 }
 ```

@@ -20,6 +20,7 @@ ng add @angular/fire
 Provide a Performance instance in the application's `app.config.ts`:
 
 ```ts
+import { ApplicationConfig } from '@angular/core';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { providePerformance, getPerformance } from '@angular/fire/performance';
 
@@ -30,7 +31,7 @@ export const appConfig: ApplicationConfig = {
     ...
   ],
   ...
-})
+}
 ```
 
 Next inject `Performance` into your component:
