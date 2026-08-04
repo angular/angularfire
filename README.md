@@ -74,6 +74,8 @@ export class AppComponent {
 
 [Upgrading from v6.0? Check out our guide.](docs/version-7-upgrade.md)
 
+[Upgrading from AngularFire 20? See the v21 upgrade guide.](docs/version-21-upgrade.md)
+
 ### Sample app
 
 The [`sample`](sample) folder contains a kitchen sink application that demonstrates use of the "modular" API, in a zoneless server-rendered application, with all the bells and whistles.
@@ -144,11 +146,20 @@ import { } from '@angular/fire/storage';
   <tr>
     <td>
 
+#### [Data Connect](docs/data-connect.md#data-connect)
+```ts
+import { } from '@angular/fire/data-connect';
+```
+</td>
+    <td>
+
 #### [Performance Monitoring](docs/performance.md#performance-monitoring)
 ```ts
 import { } from '@angular/fire/performance';
 ```
 </td>
+  </tr>
+  <tr>
     <td>
 
 #### [Realtime Database](docs/database.md#realtime-database)
@@ -156,8 +167,6 @@ import { } from '@angular/fire/performance';
 import { } from '@angular/fire/database';
 ```
 </td>
-  </tr>
-  <tr>
     <td>
 
 #### [Remote Config](docs/remote-config.md#remote-config)
@@ -165,6 +174,8 @@ import { } from '@angular/fire/database';
 import { } from '@angular/fire/remote-config';
 ```
 </td>
+  </tr>
+  <tr>
     <td>
 
 #### [App Check](docs/app-check.md#app-check)
@@ -172,8 +183,6 @@ import { } from '@angular/fire/remote-config';
 import { } from '@angular/fire/app-check';
 ```
 </td>
-  </tr>
-  <tr>
     <td>
 
 #### [AI Logic](docs/ai.md#ai-logic)
@@ -181,6 +190,5 @@ import { } from '@angular/fire/app-check';
 import { } from '@angular/fire/ai';
 ```
 </td>
-
   </tr>
 </table>
