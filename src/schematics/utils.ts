@@ -7,10 +7,10 @@ import {
   Tree,
   chain,
 } from "@angular-devkit/schematics";
-import { NodePackageInstallTask } from "@angular-devkit/schematics/tasks";
+import { NodePackageInstallTask } from "@angular-devkit/schematics/tasks/index.js";
 import { addRootProvider } from "@schematics/angular/utility";
 import { parse } from "yaml";
-import { overwriteIfExists, safeReadJSON, stringifyFormatted } from "./common";
+import { overwriteIfExists, safeReadJSON, stringifyFormatted } from "./common.js";
 import {
   ConnectorConfig,
   ConnectorYaml,
@@ -148,6 +148,38 @@ ${addZonePatch ? "import 'zone.js/dist/zone-patch-rxjs';" : ""}`
   return host;
 }
 
+// config.package and the connectorConfig values below come from the project's own
+// dataconnect.yaml/connector.yaml, not from a trusted schema. isValidPackageSpecifier
+// rejects the characters that would let a value break out of the double-quoted string
+// literal it's interpolated into; it does not otherwise validate that the value is a
+// well-formed module specifier.
+const PACKAGE_SPECIFIER_PATTERN = /^[^'"\\\n\r]+$/;
+export function isValidPackageSpecifier(pkg: string): boolean {
+  return PACKAGE_SPECIFIER_PATTERN.test(pkg);
+}
+
+export function connectorConfigObjectLiteral(connectorConfig: ConnectorConfig): string {
+  return `{${(Object.keys(connectorConfig) as (keyof ConnectorConfig)[]).map(
+    (key) => `${key}: ${JSON.stringify(String(connectorConfig[key]))}`
+  ).join(',')}}`;
+}
+
+export type DataConnectProviderConfigResolution =
+  | { kind: "external"; package: string }
+  | { kind: "literal"; literal: string };
+
+export function resolveDataConnectProviderConfig(
+  config: DataConnectConnectorConfig | null | undefined
+): DataConnectProviderConfigResolution {
+  if (config?.package && isValidPackageSpecifier(config.package)) {
+    return { kind: "external", package: config.package };
+  }
+  if (config?.connectorConfig) {
+    return { kind: "literal", literal: connectorConfigObjectLiteral(config.connectorConfig) };
+  }
+  return { kind: "literal", literal: "{}" };
+}
+
 export function featureToRules(
   features: FEATURES[],
   projectName: string,
@@ -216,30 +248,21 @@ export function featureToRules(
         case FEATURES.DataConnect:
           return addRootProvider(projectName, ({ code, external }) => {
             external("getDataConnect", "@angular/fire/data-connect");
-            let configAsStr = "{}";
 
-            const config = dataConnectConfig;
+            const resolution = resolveDataConnectProviderConfig(dataConnectConfig);
+            const configAsStr = resolution.kind === "external"
+              ? external("connectorConfig", resolution.package)
+              : resolution.literal;
+
             let angularConfig: undefined | string;
-            if (config) {
-              // config.package and the connectorConfig values below come from the project's own
-              // dataconnect.yaml/connector.yaml, not from a trusted schema — reject anything that
-              // isn't a plausible package specifier before using it as a module name.
-              if (config.package && /^[^'"\\\n\r]+$/.test(config.package)) {
-                configAsStr = external("connectorConfig", config.package);
-              } else if (config.connectorConfig) {
-                configAsStr = `{${Object.keys(config.connectorConfig as ConnectorConfig).map(
-                  (key) => `${key}: ${JSON.stringify((config.connectorConfig as ConnectorConfig)[key])}`
-                ).join(',')}}`;
-              }
-              if (config.angular) {
-                angularConfig = `, ${external(
-                  "provideTanStackQuery",
-                  "@tanstack/angular-query-experimental"
-                )}(new ${external(
-                  "QueryClient",
-                  "@tanstack/angular-query-experimental"
-                )}())`;
-              }
+            if (dataConnectConfig?.angular) {
+              angularConfig = `, ${external(
+                "provideTanStackQuery",
+                "@tanstack/angular-query-experimental"
+              )}(new ${external(
+                "QueryClient",
+                "@tanstack/angular-query-experimental"
+              )}())`;
             }
             return code`${external(
               "provideDataConnect",
