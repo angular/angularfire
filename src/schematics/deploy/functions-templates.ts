@@ -37,7 +37,7 @@ export const defaultFunction = (
 ) => `const functions = require('firebase-functions');
 
 // Increase readability in Cloud Logging
-require("firebase-functions/lib/logger/compat");
+require("firebase-functions/logger/compat");
 
 const expressApp = require('./${path}/main').app();
 
@@ -55,7 +55,7 @@ export const functionGen2 = (
 ) => `const { onRequest } = require('firebase-functions/v2/https');
 
 // Increase readability in Cloud Logging
-require("firebase-functions/lib/logger/compat");
+require("firebase-functions/logger/compat");
 
 const expressApp = require('./${path}/main').app();
 
