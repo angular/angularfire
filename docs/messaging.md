@@ -77,14 +77,14 @@ const messaging = getMessaging(firebaseApp);
 
 ```
 import { Injectable } from "@angular/core";
-import { Messaging, getToken, onMessage, deleteToken } from "@angular/fire/messaging";
+import { Messaging, MessagePayload, getToken, onMessage, deleteToken } from "@angular/fire/messaging";
 import { Observable, tap } from "rxjs";
 
 @Injectable({
   providedIn: "root",
 })
 export class FcmService {
-  message$: Observable<unknown>;
+  message$: Observable<MessagePayload>;
 
   constructor(private msg: Messaging) {
     Notification.requestPermission().then(
@@ -109,7 +109,7 @@ export class FcmService {
           // This is a good place to then store it on your database for each user
         });
       });
-    this.message$ = new Observable((sub) =>
+    this.message$ = new Observable<MessagePayload>((sub) =>
       onMessage(this.msg, (msg) => sub.next(msg))).pipe(
         tap((msg) => {
           console.log("My Firebase Cloud Message", msg);
@@ -119,6 +119,7 @@ export class FcmService {
 
   async deleteToken() {
     // We can also delete fcm tokens, make sure to also update this on your firestore db if you are storing them as well
+    // This calls the imported deleteToken, not this method. Class methods are not in lexical scope
     await deleteToken(this.msg);
   }
 }
