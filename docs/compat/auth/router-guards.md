@@ -1,6 +1,6 @@
 # Route users with AngularFire guards
 
-`AngularFireAuthGuard` provides a prebuilt [`canActivate` Router Guard](https://angular.io/api/router/CanActivate) using `AngularFireAuth`. By default unauthenticated users are not permitted to navigate to protected routes:
+`AngularFireAuthGuard` provides a prebuilt [`canActivate` Router Guard](https://angular.dev/api/router/CanActivate) using `AngularFireAuth`. By default unauthenticated users are not permitted to navigate to protected routes:
 
 > **NOTE**: [AngularFire has a new tree-shakable API](../../../README.md#developer-guide), you're looking at the documentation for the compatability version of the library. [See the v7 upgrade guide for more information on this change.](../../version-7-upgrade.md).
 
