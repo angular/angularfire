@@ -8,7 +8,7 @@
         },
         "migration-v21": {
             "version": "21.0.0",
-            "description": "Align the workspace's firebase dependency with the range @angular/fire 21 requires, so the install cannot contain two copies of the firebase SDK",
+            "description": "Align the workspace's firebase dependency with the range @angular/fire 21 requires, and rewrite Vertex AI imports to Firebase AI Logic (getVertexAI callers keep the Vertex AI backend)",
             "factory": "./update/v21#ngUpdate"
         },
         "ng-post-upgate": {
