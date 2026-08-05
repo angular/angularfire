@@ -313,17 +313,21 @@ function spawnPromise(command: string, args: string[]) {
   .on('error', reject));
 }
 
+// Path segments of each schematic entry point, relative to `schematics/` and without the file
+// extension: esbuild compiles the `.ts` and loadCompiledSchematics requires the emitted `.js`.
+const schematicEntryPoints = [
+  ['update', 'index'],
+  ['deploy', 'actions'],
+  ['deploy', 'builder'],
+  ['add', 'index'],
+  ['setup', 'index'],
+  ['update', 'v7', 'index'],
+  ['update', 'v21', 'index'],
+];
+
 async function compileSchematics() {
   await esbuild.build({
-    entryPoints: [
-      src('schematics', "update", "index.ts"),
-      src('schematics', "deploy", "actions.ts"),
-      src('schematics', "deploy", "builder.ts"),
-      src('schematics', "add", "index.ts"),
-      src('schematics', "setup", "index.ts"),
-      src('schematics', "update", "v7", "index.ts"),
-      src('schematics', "update", "v21", "index.ts"),
-    ],
+    entryPoints: schematicEntryPoints.map(segments => `${src('schematics', ...segments)}.ts`),
     format: "cjs",
     // turns out schematics don't support ESM, need to use webpack or shim these
     // format: "esm",
@@ -365,22 +369,12 @@ async function compileSchematics() {
  * build instead of shipping.
  */
 async function loadCompiledSchematics() {
-  const entryPoints = [
-    join('update', 'index.js'),
-    join('deploy', 'actions.js'),
-    join('deploy', 'builder.js'),
-    join('add', 'index.js'),
-    join('setup', 'index.js'),
-    join('update', 'v7', 'index.js'),
-    join('update', 'v21', 'index.js'),
-  ];
   const failures: string[] = [];
-  for (const entryPoint of entryPoints) {
-    const path = dest('schematics', entryPoint);
+  for (const segments of schematicEntryPoints) {
     try {
-      require(path);
+      require(`${dest('schematics', ...segments)}.js`);
     } catch (error) {
-      failures.push(`  ${entryPoint}: ${error}`);
+      failures.push(`  ${join(...segments)}.js: ${error}`);
     }
   }
   if (failures.length) {
