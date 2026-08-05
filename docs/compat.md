@@ -1,5 +1,5 @@
 # AngularFire
-The official [Angular](https://angular.io/) library for [Firebase](https://firebase.google.com/).
+The official [Angular](https://angular.dev/) library for [Firebase](https://firebase.google.com/).
 
 <strong><pre>ng add @angular/fire</pre></strong>
 
