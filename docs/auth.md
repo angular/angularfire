@@ -23,6 +23,7 @@ ng add @angular/fire
 Provide an Auth instance in the application's `app.config.ts`:
 
 ```ts
+import { ApplicationConfig } from '@angular/core';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 
@@ -33,7 +34,7 @@ export const appConfig: ApplicationConfig = {
     ...
   ],
   ...
-})
+}
 ```
 
 Next inject `Auth` into your component:
@@ -186,15 +187,18 @@ export class UserComponent implements OnDestroy {
 ## Connecting the emulator suite
 
 ```ts
+import { ApplicationConfig } from '@angular/core';
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { connectAuthEmulator, getAuth, provideAuth } from '@angular/fire/auth';
 
-@NgModule({
-  imports: [
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideFirebaseApp(() => initializeApp({ ... })),
     provideAuth(() => {
       const auth = getAuth();
       connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
       return auth;
     }),
   ]
-})
+}
 ```
