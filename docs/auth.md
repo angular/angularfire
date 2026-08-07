@@ -20,9 +20,10 @@ As a prerequisite, ensure that `AngularFire` has been added to your project via
 ng add @angular/fire
 ```
 
-Provide a Auth instance in the application's `app.config.ts`:
+Provide an Auth instance in the application's `app.config.ts`:
 
 ```ts
+import { ApplicationConfig } from '@angular/core';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 
@@ -33,7 +34,7 @@ export const appConfig: ApplicationConfig = {
     ...
   ],
   ...
-})
+}
 ```
 
 Next inject `Auth` into your component:
@@ -171,8 +172,8 @@ export class UserComponent implements OnDestroy {
 
   constructor() {
     this.idTokenSubscription = this.idToken$.subscribe((token: string | null) => {
-        //handle idToken changes here. Note, that user will be null if there is no currently logged in user.
-     console.log(string);
+        //handle idToken changes here. Note, that token will be null if there is no currently logged in user.
+     console.log(token);
     })
   }
 
@@ -186,15 +187,18 @@ export class UserComponent implements OnDestroy {
 ## Connecting the emulator suite
 
 ```ts
+import { ApplicationConfig } from '@angular/core';
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { connectAuthEmulator, getAuth, provideAuth } from '@angular/fire/auth';
 
-@NgModule({
-  imports: [
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideFirebaseApp(() => initializeApp({ ... })),
     provideAuth(() => {
       const auth = getAuth();
       connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
       return auth;
     }),
   ]
-})
+}
 ```

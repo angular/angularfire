@@ -58,7 +58,7 @@ Instability can be difficult to track down. To help with debugging, AngularFire 
 There are three logging levels in AngularFire:
 
 * **Silent**: when the logging level is set to silent only the above banner is displayed when AngularFire APIs are called outside of an injection context, this is the default when using Zoneless change-detection.
-* **Warn**: when the logging level is set to warn, only blocking reads, long-lived tasks, and APIs with high risk of destabilizing your application are called, this is the default when using ZoneJS.
+* **Warn**: when the logging level is set to warn, only blocking reads, long-lived tasks, and APIs with high risk of destabilizing your application are logged, this is the default when using ZoneJS.
 * **Verbose**: when the logging level is set to verbose, all AngularFire APIs called outside of an injection context are logged—helping you track down APIs that may be destabilizing your application
 
 You can change the log-level like so:

@@ -17,10 +17,11 @@ As a prerequisite, ensure that `AngularFire` has been added to your project via
 ng add @angular/fire
 ```
 
-Provide a App Check instance in the application's `app.config.ts`:
+Provide an App Check instance in the application's `app.config.ts`:
 
 ```ts
-import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { ApplicationConfig } from '@angular/core';
+import { provideFirebaseApp, initializeApp, getApp } from '@angular/fire/app';
 import { provideAppCheck, initializeAppCheck, ReCaptchaV3Provider } from '@angular/fire/app-check';
 
 export const appConfig: ApplicationConfig = {
@@ -32,7 +33,7 @@ export const appConfig: ApplicationConfig = {
     ...
   ],
   ...
-})
+}
 ```
 
 Next inject `AppCheck` it into your component:
@@ -54,4 +55,4 @@ AngularFire wraps the Firebase JS SDK to ensure proper functionality in Angular,
 
 Update the imports from `import { ... } from 'firebase/app-check'` to `import { ... } from '@angular/fire/app-check'` and follow the official documentation.
 
-[Getting Started](https://firebase.google.com/docs/app-check/web/recaptcha-enterprise-provider) | [API Reference](https://firebase.google.com/docs/reference/js/app-check)
+[Getting Started](https://firebase.google.com/docs/app-check/web/recaptcha-provider) | [API Reference](https://firebase.google.com/docs/reference/js/app-check)
