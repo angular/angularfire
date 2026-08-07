@@ -13,8 +13,9 @@ import * as winston from 'winston';
 import { BuildTarget, CloudRunOptions, DeployBuilderSchema, FSHost, FirebaseTools } from '../interfaces';
 import { DEFAULT_FUNCTION_NAME, defaultFunction, defaultPackage, dockerfile, functionGen2 } from './functions-templates.js';
 
-// @ts-ignore
-const __dirname = dirname(fileURLToPath(import.meta.url));
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore `import.meta` is rejected by the --module es2015 pass of `npm run build:jasmine`.
+const moduleDirectory = typeof __dirname === 'string' ? __dirname : dirname(fileURLToPath(import.meta.url));
 
 const { copySync, removeSync, readJsonSync } = fsExtra;
 
@@ -128,7 +129,7 @@ const findPackageVersion = (packageManager: string, name: string) => {
 const getPackageJson = (context: BuilderContext, workspaceRoot: string, options: DeployBuilderOptions, main?: string) => {
   const dependencies: Record<string, string> = {};
   const devDependencies: Record<string, string> = {};
-  const { firebaseFunctionsDependencies } = readJsonSync(join(__dirname, '..', 'versions.json'));
+  const { firebaseFunctionsDependencies } = readJsonSync(join(moduleDirectory, '..', 'versions.json'));
   if (options.ssr !== 'cloud-run') {
     Object.keys(firebaseFunctionsDependencies).forEach(name => {
       const { version, dev } = firebaseFunctionsDependencies[name];

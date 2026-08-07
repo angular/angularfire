@@ -313,17 +313,21 @@ function spawnPromise(command: string, args: string[]) {
   .on('error', reject));
 }
 
+// Path segments of each schematic entry point, relative to `schematics/` and without the file
+// extension: esbuild compiles the `.ts` and loadCompiledSchematics requires the emitted `.js`.
+const schematicEntryPoints = [
+  ['update', 'index'],
+  ['deploy', 'actions'],
+  ['deploy', 'builder'],
+  ['add', 'index'],
+  ['setup', 'index'],
+  ['update', 'v7', 'index'],
+  ['update', 'v21', 'index'],
+];
+
 async function compileSchematics() {
   await esbuild.build({
-    entryPoints: [
-      src('schematics', "update", "index.ts"),
-      src('schematics', "deploy", "actions.ts"),
-      src('schematics', "deploy", "builder.ts"),
-      src('schematics', "add", "index.ts"),
-      src('schematics', "setup", "index.ts"),
-      src('schematics', "update", "v7", "index.ts"),
-      src('schematics', "update", "v21", "index.ts"),
-    ],
+    entryPoints: schematicEntryPoints.map(segments => `${src('schematics', ...segments)}.ts`),
     format: "cjs",
     // turns out schematics don't support ESM, need to use webpack or shim these
     // format: "esm",
@@ -340,7 +344,10 @@ async function compileSchematics() {
       "rxjs",
       "@schematics/angular",
       "jsonc-parser",
-      "firebase-tools"
+      "firebase-tools",
+      // The v21 migration parses user source with the TypeScript compiler; resolve it from
+      // the workspace at ng-update time instead of bundling ~3.5MB into the package.
+      "typescript"
     ],
     outdir: dest('schematics'),
   });
@@ -354,6 +361,25 @@ async function compileSchematics() {
     copy(src('schematics', 'setup', 'schema.json'), dest('schematics', 'setup', 'schema.json')),
   ]);
   await replaceSchematicVersions();
+  await loadCompiledSchematics();
+}
+
+/**
+ * Loads every compiled schematic entry point, so a bundle that cannot even be required fails the
+ * build instead of shipping.
+ */
+async function loadCompiledSchematics() {
+  const failures: string[] = [];
+  for (const segments of schematicEntryPoints) {
+    try {
+      require(`${dest('schematics', ...segments)}.js`);
+    } catch (error) {
+      failures.push(`  ${join(...segments)}.js: ${error}`);
+    }
+  }
+  if (failures.length) {
+    throw new Error(`Compiled schematics failed to load:\n${failures.join('\n')}`);
+  }
 }
 
 async function buildLibrary() {

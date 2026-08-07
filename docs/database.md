@@ -20,6 +20,7 @@ ng add @angular/fire
 Provide a Database instance in the application's `app.config.ts`:
 
 ```ts
+import { ApplicationConfig } from '@angular/core';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideDatabase, getDatabase } from '@angular/fire/database';
 
@@ -30,7 +31,7 @@ export const appConfig: ApplicationConfig = {
     ...
   ],
   ...
-})
+}
 ```
 
 Next inject `Database` into your component:
@@ -131,22 +132,26 @@ The `fromRef()` function creates an observable that emits reference changes.
 ## Connecting to the emulator suite
 
 ```ts
+import { ApplicationConfig } from '@angular/core';
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { connectDatabaseEmulator, getDatabase, provideDatabase } from '@angular/fire/database';
 
-@NgModule({
-  imports: [
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideFirebaseApp(() => initializeApp({ ... })),
     provideDatabase(() => {
       const database = getDatabase();
       connectDatabaseEmulator(database, 'localhost', 9000);
       return database;
     }),
   ]
-})
+}
 ```
 
 ## Working with multiple instances
 
 ```ts
+import { ApplicationConfig } from '@angular/core';
 import { provideFirebaseApp, FirebaseApp, initializeApp } from '@angular/fire/app';
 import { getDatabase, provideDatabase } from '@angular/fire/database';
 
@@ -156,14 +161,14 @@ const DATABASE_SHARD_URLS = [
   'https://BAZ.firebaseio.com',
 ];
 
-@NgModule({
-  imports: [
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideFirebaseApp(() => initializeApp({ ... })),
     provideDatabase((app: FirebaseApp) => getDatabase(app, DATABASE_SHARD_URLS[0])),
     provideDatabase((app: FirebaseApp) => getDatabase(app, DATABASE_SHARD_URLS[1])),
     provideDatabase((app: FirebaseApp) => getDatabase(app, DATABASE_SHARD_URLS[2])),
   ]
-})
+}
 ```
 
 ```ts
