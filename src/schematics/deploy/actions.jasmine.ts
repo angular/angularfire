@@ -2,8 +2,8 @@
 import { join } from 'path';
 import { BuilderContext, BuilderRun, ScheduleOptions, Target } from '@angular-devkit/architect';
 import { JsonObject, logging } from '@angular-devkit/core';
-import { BuildTarget, FSHost, FirebaseDeployConfig, FirebaseTools } from '../interfaces';
-import deploy, { deployToFunction } from './actions.js'
+import { BuildTarget, DeployBuilderSchema, FSHost, FirebaseDeployConfig, FirebaseTools } from '../interfaces';
+import deploy, { buildCloudRunBuildsSubmitArgs, buildCloudRunDeployArgs, deployToFunction } from './actions.js'
 import 'jasmine';
 
 let context: BuilderContext;
@@ -299,4 +299,45 @@ describe('universal deployment', () => {
     await deployToFunction(firebaseMock, context, '/home/user', projectTargets, true, fsHost);
     expect(spy).not.toHaveBeenCalled();
   });*/
+});
+
+describe('Cloud Run gcloud argv construction', () => {
+  // Regression coverage for the argv-injection fix: these options used to be interpolated
+  // into a single command string and split on whitespace, so a value containing a space
+  // would land as extra, unintended argv entries. They're now passed straight through as
+  // individual array elements.
+  const INJECTED_REGION = 'us-central1 --set-env-vars=INJECTED=owned';
+  const INJECTED_PROJECT = `${FIREBASE_PROJECT} --format=json`;
+
+  it('keeps a region value containing a space as a single --region argument', () => {
+    const options: DeployBuilderSchema = { firebaseProject: FIREBASE_PROJECT, region: INJECTED_REGION };
+    const args = buildCloudRunDeployArgs('my-service', options, []);
+
+    expect(args[args.indexOf('--region') + 1]).toBe(INJECTED_REGION);
+    expect(args).not.toContain('--set-env-vars=INJECTED=owned');
+  });
+
+  it('keeps a firebaseProject value containing a space as a single --project argument (deploy)', () => {
+    const options: DeployBuilderSchema = { firebaseProject: INJECTED_PROJECT, region: 'us-central1' };
+    const args = buildCloudRunDeployArgs('my-service', options, []);
+
+    expect(args[args.indexOf('--project') + 1]).toBe(INJECTED_PROJECT);
+    expect(args).not.toContain('--format=json');
+  });
+
+  it('keeps a firebaseProject value containing a space as a single --project argument (builds submit)', () => {
+    const options: DeployBuilderSchema = { firebaseProject: INJECTED_PROJECT };
+    const args = buildCloudRunBuildsSubmitArgs('cloudRunOut', 'my-service', options);
+
+    expect(args[args.indexOf('--project') + 1]).toBe(INJECTED_PROJECT);
+    expect(args).not.toContain('--format=json');
+  });
+
+  it('passes cloudRunOptions through as their own argv entries', () => {
+    const options: DeployBuilderSchema = { firebaseProject: FIREBASE_PROJECT, region: 'us-central1' };
+    const args = buildCloudRunDeployArgs('my-service', options, ['--vpc-connector', 'my-connector --unset-env-vars=OWNED']);
+
+    expect(args[args.indexOf('--vpc-connector') + 1]).toBe('my-connector --unset-env-vars=OWNED');
+    expect(args).not.toContain('--unset-env-vars=OWNED');
+  });
 });
