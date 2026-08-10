@@ -1,4 +1,4 @@
-import { SpawnOptionsWithoutStdio, execSync, spawn } from 'child_process';
+import { SpawnOptionsWithoutStdio, execFileSync, spawn } from 'child_process';
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
@@ -121,8 +121,50 @@ const defaultFsHost: FSHost = {
   existsSync,
 };
 
+// Package managers AngularFire is willing to shell out to when resolving
+// dependency versions. Kept in sync with the Angular CLI's own list. The value
+// comes from `cli.packageManager` in angular.json, which this builder reads with
+// a raw `JSON.parse`, i.e. it is NOT run through the Angular CLI's own schema
+// validation, so it must be checked here before it is ever used as an argv0.
+export const SUPPORTED_PACKAGE_MANAGERS = ['npm', 'yarn', 'pnpm', 'cnpm', 'bun'];
+
+export const assertSupportedPackageManager = (packageManager: string): string => {
+  if (!SUPPORTED_PACKAGE_MANAGERS.includes(packageManager)) {
+    throw new SchematicsException(
+      `Unsupported package manager "${packageManager}" in angular.json (cli.packageManager). ` +
+      `Expected one of: ${SUPPORTED_PACKAGE_MANAGERS.join(', ')}.`
+    );
+  }
+  return packageManager;
+};
+
+// A dependency name comes from `architect.<project>.server.options.externalDependencies`
+// in angular.json. Reject anything that is not a plain package specifier so it can
+// neither inject shell metacharacters (defence in depth alongside execFileSync) nor
+// be parsed as a CLI flag by the package manager (argument injection).
+export const assertSafeDependencyName = (name: string): string => {
+  // Valid npm package names / esbuild external globs never contain whitespace or
+  // shell metacharacters, and never start with a dash. Reject anything else so the
+  // value can neither inject a shell command (defence in depth alongside
+  // execFileSync) nor be parsed as a package-manager flag (argument injection).
+  if (typeof name !== 'string' || name.length === 0 || name.startsWith('-') ||
+      /[\s;&|$`(){}<>!\\'"]/.test(name)) {
+    throw new SchematicsException(
+      `Invalid dependency name ${JSON.stringify(name)} in angular.json (server externalDependencies).`
+    );
+  }
+  return name;
+};
+
 const findPackageVersion = (packageManager: string, name: string) => {
-  const match = execSync(`${packageManager} list ${name}`).toString().match(`[^|s]${escapeRegExp(name)}[@| ][^s]+(s.+)?$`);
+  // Run the package manager without a shell (execFileSync + argument array) so a
+  // dependency name or package-manager value taken from angular.json cannot be
+  // interpreted as a shell command.
+  const output = execFileSync(assertSupportedPackageManager(packageManager), [
+    'list',
+    assertSafeDependencyName(name),
+  ]).toString();
+  const match = output.match(`[^|s]${escapeRegExp(name)}[@| ][^s]+(s.+)?$`);
   return match ? match[0].split(new RegExp(`${escapeRegExp(name)}[@| ]`))[1].split(/\s/)[0] : null;
 };
 
@@ -245,7 +287,10 @@ export const deployToFunction = async (
   const siteTarget = options.target ?? context.target!.project;
 
   if (fsHost.existsSync(functionsPackageJsonPath)) {
-    execSync(`npm --prefix ${functionsOut} install`);
+    // Pass the output directory as an argument rather than interpolating it into
+    // a shell string; `functionsOut` derives from the `outputPath` deploy option
+    // (angular.json) and must not be able to inject shell commands.
+    execFileSync('npm', ['--prefix', functionsOut, 'install']);
   } else {
     console.error(`No package.json exists at ${functionsOut}`);
   }

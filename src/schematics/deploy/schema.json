@@ -67,7 +67,8 @@
     },
     "outputPath": {
       "type": "string",
-      "description": "Where to output the deploy artifacts"
+      "description": "Where to output the deploy artifacts",
+      "pattern": "^[^;&|$`<>\\n\\r()]*$"
     },
     "functionsRuntimeOptions": {
       "type": "object",

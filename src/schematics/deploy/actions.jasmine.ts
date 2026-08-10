@@ -3,7 +3,7 @@ import { join } from 'path';
 import { BuilderContext, BuilderRun, ScheduleOptions, Target } from '@angular-devkit/architect';
 import { JsonObject, logging } from '@angular-devkit/core';
 import { BuildTarget, FSHost, FirebaseDeployConfig, FirebaseTools } from '../interfaces';
-import deploy, { deployToFunction } from './actions.js'
+import deploy, { assertSafeDependencyName, assertSupportedPackageManager, deployToFunction } from './actions.js'
 import 'jasmine';
 
 let context: BuilderContext;
@@ -299,4 +299,37 @@ describe('universal deployment', () => {
     await deployToFunction(firebaseMock, context, '/home/user', projectTargets, true, fsHost);
     expect(spy).not.toHaveBeenCalled();
   });*/
+});
+
+describe('deploy input validation (command-injection hardening)', () => {
+  describe('assertSupportedPackageManager', () => {
+    ['npm', 'yarn', 'pnpm', 'cnpm', 'bun'].forEach((pm) => {
+      it(`allows the supported package manager "${pm}"`, () => {
+        expect(assertSupportedPackageManager(pm)).toBe(pm);
+      });
+    });
+
+    it('rejects a package manager carrying a shell payload', () => {
+      expect(() => assertSupportedPackageManager('npm; touch /tmp/pwned #'))
+        .toThrowError(/Unsupported package manager/);
+    });
+
+    it('rejects an arbitrary executable path', () => {
+      expect(() => assertSupportedPackageManager('/tmp/evil')).toThrowError(/Unsupported package manager/);
+    });
+  });
+
+  describe('assertSafeDependencyName', () => {
+    ['rxjs', '@angular/core', '@angular/*', 'some-pkg', 'a.b_c'].forEach((name) => {
+      it(`allows the valid dependency name "${name}"`, () => {
+        expect(assertSafeDependencyName(name)).toBe(name);
+      });
+    });
+
+    ['evil; touch /tmp/pwned #', 'a b', '$(id)', '`id`', 'a|b', 'a&b', '-rf', '', 'a>b'].forEach((name) => {
+      it(`rejects the unsafe dependency name ${JSON.stringify(name)}`, () => {
+        expect(() => assertSafeDependencyName(name)).toThrowError(/Invalid dependency name/);
+      });
+    });
+  });
 });
