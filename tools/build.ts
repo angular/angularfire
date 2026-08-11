@@ -362,6 +362,7 @@ async function compileSchematics() {
   });
   await Promise.all([
     copy(src('schematics', 'versions.json'), dest('schematics', 'versions.json')),
+    copy(src('schematics', 'package.json'), dest('schematics', 'package.json')),
     copy(src('schematics', 'builders.json'), dest('schematics', 'builders.json')),
     copy(src('schematics', 'collection.json'), dest('schematics', 'collection.json')),
     copy(src('schematics', 'migration.json'), dest('schematics', 'migration.json')),
