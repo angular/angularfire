@@ -1,9 +1,10 @@
-import { SpawnOptionsWithoutStdio, execFileSync, spawn } from 'child_process';
+import { SpawnOptionsWithoutStdio, SpawnSyncOptions, spawn } from 'child_process';
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { BuilderContext, targetFromTargetString } from '@angular-devkit/architect';
 import { SchematicsException } from '@angular-devkit/schematics';
+import crossSpawn from 'cross-spawn';
 import fsExtra from 'fs-extra';
 import * as inquirer from 'inquirer';
 import open from 'open';
@@ -156,11 +157,39 @@ export const assertSafeDependencyName = (name: string): string => {
   return name;
 };
 
-const findPackageVersion = (packageManager: string, name: string) => {
-  // Run the package manager without a shell (execFileSync + argument array) so a
-  // dependency name or package-manager value taken from angular.json cannot be
-  // interpreted as a shell command.
-  const output = execFileSync(assertSupportedPackageManager(packageManager), [
+// All shelling out from the deploy builder funnels through this single runner.
+// cross-spawn (v7) resolves the platform-appropriate executable and escapes each
+// argument, so a value taken from angular.json is passed as an argv entry and can
+// never be parsed as shell syntax. Unlike child_process.execFile it can launch a
+// Windows `.cmd`/`.bat` shim (npm, yarn, pnpm and cnpm all ship as `.cmd` shims
+// there), so `ng deploy` keeps working cross-platform. We deliberately avoid
+// `shell: true`, whose args-array form Node runtime-deprecates (DEP0190) because
+// it concatenates the arguments without escaping, reopening the injection.
+// It is exported as an object so tests can assert the deploy code shells out only
+// through here and never regresses to execSync or `shell: true`.
+export const processHost = {
+  runPackageBin(
+    command: string,
+    args: string[],
+    options: SpawnSyncOptions = {},
+  ): Buffer {
+    const result = crossSpawn.sync(command, args, options);
+    if (result.error) { throw result.error; }
+    if (result.status !== 0) {
+      throw new SchematicsException(
+        `Command "${command}" exited with ${result.signal ? `signal ${result.signal}` : `code ${result.status}`}.`
+      );
+    }
+    return result.stdout;
+  },
+};
+
+export const findPackageVersion = (packageManager: string, name: string) => {
+  // Run the package manager without a shell (argument array, no `shell` option)
+  // so a dependency name or package-manager value taken from angular.json cannot
+  // be interpreted as a shell command. Both values are validated first, so an
+  // unsupported manager or unsafe name throws before anything is ever spawned.
+  const output = processHost.runPackageBin(assertSupportedPackageManager(packageManager), [
     'list',
     assertSafeDependencyName(name),
   ]).toString();
@@ -287,10 +316,12 @@ export const deployToFunction = async (
   const siteTarget = options.target ?? context.target!.project;
 
   if (fsHost.existsSync(functionsPackageJsonPath)) {
-    // Pass the output directory as an argument rather than interpolating it into
-    // a shell string; `functionsOut` derives from the `outputPath` deploy option
-    // (angular.json) and must not be able to inject shell commands.
-    execFileSync('npm', ['--prefix', functionsOut, 'install']);
+    // Pass the output directory as an argv entry rather than interpolating it
+    // into a shell string; `functionsOut` derives from the `outputPath` deploy
+    // option (angular.json) and must not be able to inject shell commands. npm is
+    // a `.cmd` shim on Windows, which child_process.execFile cannot launch, so
+    // this goes through the shell-free cross-spawn runner instead.
+    processHost.runPackageBin('npm', ['--prefix', functionsOut, 'install'], { stdio: 'inherit' });
   } else {
     console.error(`No package.json exists at ${functionsOut}`);
   }
