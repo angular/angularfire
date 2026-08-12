@@ -33,12 +33,12 @@ export const defaultPackage = (
   private: true
 });
 
+// `.region()` lives on the /v1 subpath since firebase-functions 6. Requiring the package root
+// instead still resolves, and fails only when the deployed function serves its first request.
 export const defaultFunction = (
   path: string,
   options: DeployBuilderOptions,
   functionName: string|undefined,
-// `.region()` lives on the /v1 subpath since firebase-functions 6. Requiring the package root
-// instead still resolves, and fails only when the deployed function serves its first request.
 ) => `const functions = require('firebase-functions/v1');
 
 // Increase readability in Cloud Logging
