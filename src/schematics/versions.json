@@ -2,7 +2,7 @@
     "peerDependencies": {
     },
     "firebaseFunctionsDependencies": {
-        "firebase-admin": { "dev": false, "version": "0.0.0" },
-        "firebase-functions": { "dev": false, "version":  "0.0.0" }
+        "firebase-admin": { "dev": false, "version": "FIREBASE_ADMIN_VERSION" },
+        "firebase-functions": { "dev": false, "version": "FIREBASE_FUNCTIONS_VERSION" }
     }
 }

@@ -1,6 +1,7 @@
 import { spawn } from 'cross-spawn';
+import { readFileSync, readdirSync } from 'fs';
 import { copy, writeFile } from 'fs-extra';
-import { join } from 'path';
+import { join, sep } from 'path';
 import { keys as tsKeys } from 'ts-transformer-keys';
 import * as esbuild from "esbuild";
 
@@ -274,6 +275,82 @@ async function replacePackageCoreVersion() {
   });
 }
 
+/** The placeholder a package's version is written as in src/schematics/versions.json, e.g.
+ * firebase-admin becomes FIREBASE_ADMIN_VERSION. That file is hand-written, so a placeholder
+ * spelled any other way is not a compile error: it only fails the build in the checks below. */
+const versionPlaceholder = (name: string) => `${name.toUpperCase().replace(/[^A-Z0-9]+/g, '_')}_VERSION`;
+
+/** Every compiled schematic bundle, as a glob for replace-in-file. */
+const compiledSchematicsGlob = () => `${dest('schematics').split(sep).join('/')}/**/*.js`;
+
+/** Every compiled schematic bundle, as absolute paths. */
+const compiledSchematicFiles = (directory: string): string[] =>
+  readdirSync(directory, { withFileTypes: true }).flatMap(entry => {
+    const entryPath = join(directory, entry.name);
+    if (entry.isDirectory()) { return compiledSchematicFiles(entryPath); }
+    return entryPath.endsWith('.js') ? [entryPath] : [];
+  });
+
+/** The schematics ship as esbuild bundles, so `import { firebaseFunctionsDependencies } from
+ * '../versions.json'` is inlined at compile time and the copied versions.json is never read at
+ * runtime. Rewriting only that copy leaves the placeholder baked into the emitted JavaScript. */
+async function writeSchematicVersionsIntoBundles(versions: Record<string, string | undefined>) {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const replace = require('replace-in-file');
+  for (const [name, version] of Object.entries(versions)) {
+    if (!version) {
+      throw new Error(`No version resolved for ${name}, so the generated Cloud Functions manifest would not install. Add it to the root package.json.`);
+    }
+    const placeholder = versionPlaceholder(name);
+    const replacements = await replace({
+      // Glob patterns need forward slashes even on Windows.
+      files: compiledSchematicsGlob(),
+      // (?![A-Z0-9_]) stops FIREBASE_ADMIN_VERSION from also matching the start of a misspelled
+      // FIREBASE_ADMIN_VERSIONS, which would replace part of it and leave "^13.0.0S" behind.
+      from: new RegExp(`${placeholder}(?![A-Z0-9_])`, 'g'),
+      to: version,
+      // When the glob matches no files at all, return an empty result instead of rejecting, so the
+      // failure comes out of the check below with a message that says where we looked.
+      allowEmptyPaths: true,
+    });
+    if (!replacements.some(replacement => replacement.hasChanged)) {
+      throw new Error(`No ${placeholder} placeholder found in the compiled schematics. Check that src/schematics/versions.json spells it exactly that way, and that the build is reading ${compiledSchematicsGlob()}.`);
+    }
+  }
+}
+
+/** A compiled bundle that still contains one or more of our placeholders. */
+interface BundleWithPlaceholders {
+  file: string;
+  placeholders: string[];
+}
+
+/** Fails the build if any of our version placeholders is still present in a compiled bundle.
+ * Checks only the placeholders named in `packageNames`, because a blanket search for anything
+ * ending in _VERSION also hits SEMVER_SPEC_VERSION and TERM_PROGRAM_VERSION from bundled
+ * libraries, which are not ours and are supposed to be there. */
+function assertNoVersionPlaceholdersRemain(packageNames: string[]) {
+  const files = compiledSchematicFiles(dest('schematics'));
+  if (files.length === 0) {
+    throw new Error(`No compiled schematics found under ${dest('schematics')}, so no version placeholder could have been replaced.`);
+  }
+  const ourPlaceholders = packageNames.map(versionPlaceholder);
+  const bundlesWithPlaceholders: BundleWithPlaceholders[] = files
+    .map(file => {
+      const contents = readFileSync(file, 'utf8');
+      return { file, placeholders: ourPlaceholders.filter(placeholder => contents.includes(placeholder)) };
+    })
+    .filter(bundle => bundle.placeholders.length > 0);
+  if (bundlesWithPlaceholders.length > 0) {
+    const offendingBundles = bundlesWithPlaceholders
+      .map(bundle => `  ${bundle.file}: ${bundle.placeholders.join(', ')}`)
+      .join('\n');
+    throw new Error(`Unreplaced version placeholders in the compiled schematics:\n${offendingBundles}\nThe generated manifests would ship a placeholder instead of a version.`);
+  }
+}
+
+/** Resolves the versions src/schematics/versions.json asks for from the root package.json, then
+ * writes them both into the copied versions.json and into the compiled bundles that inlined them. */
 async function replaceSchematicVersions() {
   const root = await rootPackage;
   const packagesPath = dest('schematics', 'versions.json');
@@ -287,12 +364,15 @@ async function replaceSchematicVersions() {
     }
     return version;
   };
-  Object.keys(dependencies.peerDependencies).forEach(name => {
-    dependencies.peerDependencies[name].version = resolveVersion(name);
+  const resolved: Record<string, string> = {};
+  [dependencies.peerDependencies, dependencies.firebaseFunctionsDependencies].forEach(block => {
+    Object.keys(block).forEach(name => {
+      block[name].version = resolveVersion(name);
+      resolved[name] = block[name].version;
+    });
   });
-  Object.keys(dependencies.firebaseFunctionsDependencies).forEach(name => {
-    dependencies.firebaseFunctionsDependencies[name].version = resolveVersion(name);
-  });
+  await writeSchematicVersionsIntoBundles(resolved);
+  assertNoVersionPlaceholdersRemain(Object.keys(resolved));
   return writeFile(packagesPath, JSON.stringify(dependencies, null, 2));
 }
 
