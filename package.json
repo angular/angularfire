@@ -1,6 +1,6 @@
 {
   "name": "@angular/fire",
-  "version": "20.0.2",
+  "version": "20.1.0",
   "description": "Angular + Firebase = ❤️",
   "private": true,
   "scripts": {
