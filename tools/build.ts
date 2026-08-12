@@ -278,11 +278,20 @@ async function replaceSchematicVersions() {
   const root = await rootPackage;
   const packagesPath = dest('schematics', 'versions.json');
   const dependencies = await import(packagesPath);
+  // A missing version is dropped by JSON.stringify, so the package silently vanishes from the
+  // manifests the schematics generate. Fail the build instead.
+  const resolveVersion = (name: string): string => {
+    const version = root.dependencies[name] || root.devDependencies[name];
+    if (!version) {
+      throw new Error(`No version resolved for ${name} in the root package.json, so the schematics would generate manifests without it.`);
+    }
+    return version;
+  };
   Object.keys(dependencies.peerDependencies).forEach(name => {
-    dependencies.peerDependencies[name].version = root.dependencies[name] || root.devDependencies[name];
+    dependencies.peerDependencies[name].version = resolveVersion(name);
   });
   Object.keys(dependencies.firebaseFunctionsDependencies).forEach(name => {
-    dependencies.firebaseFunctionsDependencies[name].version = root.dependencies[name] || root.devDependencies[name];
+    dependencies.firebaseFunctionsDependencies[name].version = resolveVersion(name);
   });
   return writeFile(packagesPath, JSON.stringify(dependencies, null, 2));
 }
