@@ -87,6 +87,7 @@
     "@angular/cli": "^21.0.0",
     "@angular/compiler-cli": "^21.0.0",
     "@angular/platform-server": "^21.0.0",
+    "@types/cross-spawn": "^6.0.6",
     "@types/fs-extra": "^7.0.0",
     "@types/gzip-size": "^5.1.1",
     "@types/inquirer": "^0.0.44",
