@@ -3,7 +3,7 @@ import { join } from 'path';
 import { BuilderContext, BuilderRun, ScheduleOptions, Target } from '@angular-devkit/architect';
 import { JsonObject, logging } from '@angular-devkit/core';
 import { BuildTarget, DeployBuilderSchema, FSHost, FirebaseDeployConfig, FirebaseTools } from '../interfaces';
-import deploy, { buildCloudRunBuildsSubmitArgs, buildCloudRunDeployArgs, deployToFunction } from './actions.js'
+import deploy, { assertSafeDependencyName, assertSupportedPackageManager, buildCloudRunBuildsSubmitArgs, buildCloudRunDeployArgs, deployToFunction, findPackageVersion, processHost } from './actions.js'
 import 'jasmine';
 
 let context: BuilderContext;
@@ -339,5 +339,93 @@ describe('Cloud Run gcloud argv construction', () => {
 
     expect(args[args.indexOf('--vpc-connector') + 1]).toBe('my-connector --unset-env-vars=OWNED');
     expect(args).not.toContain('--unset-env-vars=OWNED');
+  });
+});
+
+describe('deploy input validation (command-injection hardening)', () => {
+  describe('assertSupportedPackageManager', () => {
+    ['npm', 'yarn', 'pnpm', 'cnpm', 'bun'].forEach((pm) => {
+      it(`allows the supported package manager "${pm}"`, () => {
+        expect(assertSupportedPackageManager(pm)).toBe(pm);
+      });
+    });
+
+    it('rejects a package manager carrying a shell payload', () => {
+      expect(() => assertSupportedPackageManager('npm; touch /tmp/pwned #'))
+        .toThrowError(/Unsupported package manager/);
+    });
+
+    it('rejects an arbitrary executable path', () => {
+      expect(() => assertSupportedPackageManager('/tmp/evil')).toThrowError(/Unsupported package manager/);
+    });
+  });
+
+  describe('assertSafeDependencyName', () => {
+    ['rxjs', '@angular/core', '@angular/*', 'some-pkg', 'a.b_c'].forEach((name) => {
+      it(`allows the valid dependency name "${name}"`, () => {
+        expect(assertSafeDependencyName(name)).toBe(name);
+      });
+    });
+
+    ['evil; touch /tmp/pwned #', 'a b', '$(id)', '`id`', 'a|b', 'a&b', '-rf', '', 'a>b'].forEach((name) => {
+      it(`rejects the unsafe dependency name ${JSON.stringify(name)}`, () => {
+        expect(() => assertSafeDependencyName(name)).toThrowError(/Invalid dependency name/);
+      });
+    });
+  });
+
+  // These guard the fix at its call sites: the validators above are only useful
+  // if the deploy code keeps routing every command through the shell-free runner.
+  // A regression to execSync/`shell: true`, or a dropped validator call, fails here.
+  describe('call sites route through the shell-free runner', () => {
+    beforeEach(() => initMocks());
+
+    it('installs functions dependencies via the runner with an argv array and no shell', async () => {
+      // The install branch only runs when the generated package.json exists.
+      spyOn(fsHost, 'existsSync').and.returnValue(true);
+      const runSpy = spyOn(processHost, 'runPackageBin').and.returnValue(Buffer.from(''));
+
+      await deployToFunction(
+        firebaseMock,
+        context,
+        workspaceRoot,
+        STATIC_BUILD_TARGET,
+        SERVER_BUILD_TARGET,
+        { preview: false },
+        undefined,
+        fsHost
+      );
+
+      expect(runSpy).toHaveBeenCalledTimes(1);
+      const [command, args, options] = runSpy.calls.mostRecent().args;
+      expect(command).toBe('npm');
+      expect(args).toEqual(['--prefix', join(workspaceRoot, 'dist'), 'install']);
+      // No shell: a `shell` option would reopen the injection this PR closes.
+      expect((options as any)?.shell).toBeFalsy();
+    });
+
+    it('runs the package manager through the runner with a validated argv array', () => {
+      const runSpy = spyOn(processHost, 'runPackageBin').and.returnValue(Buffer.from(''));
+
+      findPackageVersion('npm', 'rxjs');
+
+      expect(runSpy).toHaveBeenCalledWith('npm', ['list', 'rxjs']);
+    });
+
+    it('rejects an unsupported package manager before spawning anything', () => {
+      const runSpy = spyOn(processHost, 'runPackageBin');
+
+      expect(() => findPackageVersion('npm; touch /tmp/pwned #', 'rxjs'))
+        .toThrowError(/Unsupported package manager/);
+      expect(runSpy).not.toHaveBeenCalled();
+    });
+
+    it('rejects an unsafe dependency name before spawning anything', () => {
+      const runSpy = spyOn(processHost, 'runPackageBin');
+
+      expect(() => findPackageVersion('npm', 'evil; touch /tmp/pwned #'))
+        .toThrowError(/Invalid dependency name/);
+      expect(runSpy).not.toHaveBeenCalled();
+    });
   });
 });
