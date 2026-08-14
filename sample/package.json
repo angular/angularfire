@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "npx --yes firebase-tools@latest emulators:exec --import seed \"ng serve\"",
+    "start": "firebase emulators:exec --import seed \"ng serve\"",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
@@ -37,6 +37,7 @@
     "@types/jasmine": "~5.1.0",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^22.0.0",
+    "firebase-tools": "^15.0.0",
     "jasmine-core": "~5.4.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",

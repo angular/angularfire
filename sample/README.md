@@ -2,6 +2,17 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.0.
 
+## AngularFire tarball
+
+The sample consumes the library as `file:../angular-fire-21.0.0-rc.0.tgz`. Produce that file from the repository root before installing here:
+
+```bash
+npm ci
+npm run build
+```
+
+The root build ends with `npm pack ./dist/packages-dist`, which writes `angular-fire-<version>.tgz` next to this folder. When the root package version changes, update the `file:` path in `package.json` to match.
+
 ## Development server
 
 To start a local development server, run:
