@@ -13,6 +13,16 @@ npm run build
 
 The root build ends with `npm pack ./dist/packages-dist`, which writes `angular-fire-<version>.tgz` next to this folder. When the root package version changes, update the `file:` path in `package.json` to match.
 
+## Cloud Functions demo
+
+The Functions demo calls a Cloud Function whose source lives in `functions/`. It is its own small project, so install and build it once before starting the emulators, or the functions emulator will skip it with a warning:
+
+```bash
+cd functions
+npm install
+npm run build
+```
+
 ## Development server
 
 To start a local development server, run:
