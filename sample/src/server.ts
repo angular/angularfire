@@ -5,12 +5,10 @@ import {
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
 import express from 'express';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import cookieParser from "cookie-parser";
 
-const serverDistFolder = dirname(fileURLToPath(import.meta.url));
-const browserDistFolder = resolve(serverDistFolder, '../browser');
+const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
@@ -25,7 +23,7 @@ app.use(
 
 app.use(cookieParser());
 
-app.use('/**', (req, res, next) => {
+app.use((req, res, next) => {
   angularApp
     .handle(req, { authIdToken: req.cookies?.__session })
     .then((response) =>
@@ -34,9 +32,12 @@ app.use('/**', (req, res, next) => {
     .catch(next);
 });
 
-if (isMainModule(import.meta.url)) {
+if (isMainModule(import.meta.url) || process.env['pm_id']) {
   const port = process.env['PORT'] || 4000;
-  app.listen(port, () => {
+  app.listen(port, (error) => {
+    if (error) {
+      throw error;
+    }
     console.log(`Node Express server listening on http://localhost:${port}`);
   });
 }
