@@ -1,4 +1,4 @@
-import { Component, inject, makeStateKey, PLATFORM_ID, TransferState } from '@angular/core';
+import { Component, EnvironmentInjector, inject, makeStateKey, PLATFORM_ID, runInInjectionContext, TransferState } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, startWith, tap } from 'rxjs/operators';
 import { traceUntilFirst } from '@angular/fire/performance';
@@ -39,6 +39,7 @@ export type Animal = {
 })
 export class UpboatsComponent {
 
+  private readonly injector = inject(EnvironmentInjector);
   private readonly transferState = inject(TransferState);
   private readonly transferStateKeys = {
     disableInputs: makeStateKey<boolean>("upboats:disableInputs"),
@@ -84,25 +85,31 @@ export class UpboatsComponent {
   }
 
   async upboat(id: string) {
-    return await updateDoc(doc(this.firestore, `animals/${id}`), {
+    return await runInInjectionContext(this.injector, () =>
+      updateDoc(doc(this.firestore, `animals/${id}`), {
         upboats: increment(1),
         updatedAt: serverTimestamp(),
-    });
+      })
+    );
   }
 
   async downboat(id: string) {
-    return await updateDoc(doc(this.firestore, `animals/${id}`), {
-      upboats: increment(-1),
-      updatedAt: serverTimestamp(),
-    });
+    return await runInInjectionContext(this.injector, () =>
+      updateDoc(doc(this.firestore, `animals/${id}`), {
+        upboats: increment(-1),
+        updatedAt: serverTimestamp(),
+      })
+    );
   }
 
   async newAnimal() {
-    return await addDoc(collection(this.firestore, 'animals'), {
-      name: prompt('Can haz name?'),
-      upboats: 1,
-      updatedAt: serverTimestamp(),
-    });
+    return await runInInjectionContext(this.injector, () =>
+      addDoc(collection(this.firestore, 'animals'), {
+        name: prompt('Can haz name?'),
+        upboats: 1,
+        updatedAt: serverTimestamp(),
+      })
+    );
   }
 
 }
