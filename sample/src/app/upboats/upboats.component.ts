@@ -1,88 +1,55 @@
-import { AsyncPipe, isPlatformServer } from '@angular/common';
-import {
-  Component,
-  PLATFORM_ID,
-  TransferState,
-  inject,
-  makeStateKey,
-} from '@angular/core';
-import { FirebaseApp } from '@angular/fire/app';
-import { Auth } from '@angular/fire/auth';
-import {
-  addDoc,
-  collection,
-  collectionData,
-  connectFirestoreEmulator,
-  doc,
-  getFirestore,
-  increment,
-  orderBy,
-  query,
-  serverTimestamp,
-  updateDoc,
-} from '@angular/fire/firestore';
-import { traceUntilFirst } from '@angular/fire/performance';
+import { Component, inject, makeStateKey, PLATFORM_ID, TransferState } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, startWith, tap } from 'rxjs/operators';
-import { environment } from '../../environments/environment';
+import { traceUntilFirst } from '@angular/fire/performance';
+import { Auth } from '@angular/fire/auth';
+import { addDoc, collection, collectionData, connectFirestoreEmulator, doc, getFirestore, increment, orderBy, query, serverTimestamp, updateDoc } from '@angular/fire/firestore';
+import { AsyncPipe, isPlatformServer } from '@angular/common';
 import { authState } from '../auth/auth.component';
+import { FirebaseApp } from '@angular/fire/app';
+import { environment } from '../../environments/environment';
 
-export interface Animal {
-  name: string;
-  upboats: number;
-  id: string;
-  hasPendingWrites: boolean;
-}
+export type Animal = {
+  name: string,
+  upboats: number,
+  id: string,
+  hasPendingWrites: boolean,
+};
 
 @Component({
   selector: 'app-upboats',
   template: `
-    <div>
-      <ul>
-        @for (animal of (animals | async); track animal.id) {
+  <div>
+    <ul>
+      @for (animal of (animals | async); track animal.id) {
         <li>
           {{ animal.name }}
-          <button
-            (click)="upboat(animal.id)"
-            [disabled]="this.disableInputs | async"
-          >
-            👍
-          </button>
+          <button (click)="upboat(animal.id)" [disabled]="(this.disableInputs | async)">👍</button>
           {{ animal.upboats }}
-          <button
-            (click)="downboat(animal.id)"
-            [disabled]="this.disableInputs | async"
-          >
-            👎
-          </button>
+          <button (click)="downboat(animal.id)" [disabled]="(this.disableInputs | async)">👎</button>
           @if (animal.hasPendingWrites) { 🕒 }
         </li>
-        }
-      </ul>
-      <button (click)="newAnimal()" [disabled]="this.disableInputs | async">
-        New animal
-      </button>
-    </div>
+      }
+    </ul>
+    <button (click)="newAnimal()" [disabled]="(this.disableInputs | async)">New animal</button>
+  </div>
   `,
-  styles: ['div.is-deferred { opacity: 0.5; }'],
+  styles: ["div.is-deferred { opacity: 0.5; }"],
   imports: [AsyncPipe],
 })
 export class UpboatsComponent {
+
   private readonly transferState = inject(TransferState);
   private readonly transferStateKeys = {
-    disableInputs: makeStateKey<boolean>('upboats:disableInputs'),
-    animals: makeStateKey<Animal[]>('upboats:animals'),
+    disableInputs: makeStateKey<boolean>("upboats:disableInputs"),
+    animals: makeStateKey<Animal[]>("upboats:animals"),
   } as const;
 
   protected readonly disableInputs = authState(inject(Auth)).pipe(
-    map((it) => !it),
-    isPlatformServer(inject(PLATFORM_ID))
-      ? tap((it) =>
-          this.transferState.set(this.transferStateKeys.disableInputs, it)
-        )
-      : startWith(
-          this.transferState.get(this.transferStateKeys.disableInputs, true)
-        )
+    map(it => !it),
+    isPlatformServer(inject(PLATFORM_ID)) ?
+        tap(it => this.transferState.set(this.transferStateKeys.disableInputs, it)) :
+        startWith(this.transferState.get(this.transferStateKeys.disableInputs, true))
   );
 
   public readonly animals: Observable<Animal[]>;
@@ -91,22 +58,12 @@ export class UpboatsComponent {
 
   constructor() {
     this.firestore = getFirestore(inject(FirebaseApp));
-    if (
-      !(this.firestore as any)._settingsFrozen &&
-      environment.emulatorPorts?.firestore
-    ) {
-      connectFirestoreEmulator(
-        this.firestore,
-        'localhost',
-        environment.emulatorPorts.firestore
-      );
+    if (!(this.firestore as any)._settingsFrozen && environment.emulatorPorts?.firestore) {
+      connectFirestoreEmulator(this.firestore, "localhost", environment.emulatorPorts.firestore);
     }
 
-    const animalsCollection = collection(
-      this.firestore,
-      'animals'
-    ).withConverter<Animal>({
-      fromFirestore: (snapshot) => {
+    const animalsCollection = collection(this.firestore, 'animals').withConverter<Animal>({
+      fromFirestore: snapshot => {
         const { name, upboats } = snapshot.data();
         const { id } = snapshot;
         const { hasPendingWrites } = snapshot.metadata;
@@ -114,28 +71,22 @@ export class UpboatsComponent {
       },
       toFirestore: (it: any) => it,
     });
-    const animalsQuery = query(
-      animalsCollection,
-      orderBy('upboats', 'desc'),
-      orderBy('updatedAt', 'desc')
-    );
+    const animalsQuery = query(animalsCollection, orderBy('upboats', 'desc'), orderBy('updatedAt', 'desc'));
 
     this.animals = collectionData(animalsQuery).pipe(
       traceUntilFirst('animals'),
-      isPlatformServer(inject(PLATFORM_ID))
-        ? tap((it) =>
-            this.transferState.set(this.transferStateKeys.animals, it)
-          )
-        : this.transferState.hasKey(this.transferStateKeys.animals)
-        ? startWith(this.transferState.get(this.transferStateKeys.animals, []))
-        : tap()
+      isPlatformServer(inject(PLATFORM_ID)) ?
+        tap(it => this.transferState.set(this.transferStateKeys.animals, it)) :
+        this.transferState.hasKey(this.transferStateKeys.animals) ?
+          startWith(this.transferState.get(this.transferStateKeys.animals, [])) :
+          tap()
     );
   }
 
   async upboat(id: string) {
     return await updateDoc(doc(this.firestore, `animals/${id}`), {
-      upboats: increment(1),
-      updatedAt: serverTimestamp(),
+        upboats: increment(1),
+        updatedAt: serverTimestamp(),
     });
   }
 
@@ -153,4 +104,5 @@ export class UpboatsComponent {
       updatedAt: serverTimestamp(),
     });
   }
+
 }

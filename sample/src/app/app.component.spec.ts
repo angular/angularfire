@@ -1,10 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
-import {
-  provideClientHydration,
-  withIncrementalHydration,
-} from '@angular/platform-browser';
+import { provideClientHydration, withIncrementalHydration } from '@angular/platform-browser';
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
 

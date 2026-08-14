@@ -1,15 +1,12 @@
-import { type ApplicationConfig, mergeApplicationConfig } from '@angular/core';
-import {
-  ScreenTrackingService,
-  UserTrackingService,
-  getAnalytics,
-  provideAnalytics,
-} from '@angular/fire/analytics';
+import { mergeApplicationConfig, ApplicationConfig } from '@angular/core';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { getAnalytics, provideAnalytics, ScreenTrackingService, UserTrackingService } from '@angular/fire/analytics';
 import { getMessaging, provideMessaging } from '@angular/fire/messaging';
 import { getPerformance, providePerformance } from '@angular/fire/performance';
-import { environment } from '../environments/environment';
+
 import { appConfig } from './app.config';
+
+import { environment } from '../environments/environment';
 
 const clientConfig: ApplicationConfig = {
   providers: [
@@ -19,7 +16,7 @@ const clientConfig: ApplicationConfig = {
     UserTrackingService,
     provideMessaging(() => getMessaging()),
     providePerformance(() => getPerformance()),
-  ],
+  ]
 };
 
 export const config = mergeApplicationConfig(appConfig, clientConfig);
