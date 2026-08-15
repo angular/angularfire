@@ -25,13 +25,13 @@ npm run build
 
 ## Development server
 
-To start a local development server, run:
+Every demo in the sample talks to the local Firebase emulators, so start the emulator suite and the dev server together:
 
 ```bash
-ng serve
+npm start
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+This boots the emulators with seeded data and then runs `ng serve`. Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files. A bare `ng serve` also works, but the demos will have no backend to talk to.
 
 ## Code scaffolding
 
@@ -64,16 +64,6 @@ To execute unit tests with [Vitest](https://vitest.dev), use the following comma
 ```bash
 ng test
 ```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
 
 ## Additional Resources
 
