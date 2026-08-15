@@ -32,7 +32,7 @@
             "ssr": {
               "entry": "src/server.ts"
             },
-            "externalDependencies": ["firebase-admin", "cookie-store"]
+            "externalDependencies": ["firebase-admin"]
           },
           "configurations": {
             "production": {
