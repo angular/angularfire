@@ -20,6 +20,7 @@ ng add @angular/fire
 Provide a Cloud Functions instance in the application's `app.config.ts`:
 
 ```ts
+import { ApplicationConfig } from '@angular/core';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideFunctions, getFunctions } from '@angular/fire/functions';
 
@@ -30,7 +31,7 @@ export const appConfig: ApplicationConfig = {
     ...
   ],
   ...
-})
+}
 ```
 
 Next inject `Functions` into your component:

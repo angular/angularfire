@@ -1,6 +1,9 @@
 import { DeployBuilderOptions } from './actions';
 
-export const DEFAULT_NODE_VERSION = 14;
+// Must be a runtime Cloud Functions still accepts, and must satisfy the engines of @angular/core
+// (the function runs the Angular server) and of firebase-admin. The `dockerfile` template below
+// also drops it into `FROM node:<version>-slim`, so it picks the base image on the Cloud Run path.
+export const DEFAULT_NODE_VERSION = 22;
 export const DEFAULT_FUNCTION_NAME = 'ssr';
 
 const DEFAULT_FUNCTION_REGION = 'us-central1';
@@ -30,14 +33,16 @@ export const defaultPackage = (
   private: true
 });
 
+// `.region()` lives on the /v1 subpath since firebase-functions 6. Requiring the package root
+// instead still resolves, and fails only when the deployed function serves its first request.
 export const defaultFunction = (
   path: string,
   options: DeployBuilderOptions,
   functionName: string|undefined,
-) => `const functions = require('firebase-functions');
+) => `const functions = require('firebase-functions/v1');
 
 // Increase readability in Cloud Logging
-require("firebase-functions/lib/logger/compat");
+require("firebase-functions/logger/compat");
 
 const expressApp = require('./${path}/main').app();
 
@@ -55,7 +60,7 @@ export const functionGen2 = (
 ) => `const { onRequest } = require('firebase-functions/v2/https');
 
 // Increase readability in Cloud Logging
-require("firebase-functions/lib/logger/compat");
+require("firebase-functions/logger/compat");
 
 const expressApp = require('./${path}/main').app();
 
