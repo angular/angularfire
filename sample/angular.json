@@ -13,8 +13,6 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/ng21-test",
-            "index": "src/index.html",
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "assets": [
@@ -29,6 +27,9 @@
             "scripts": [],
             "server": "src/main.server.ts",
             "outputMode": "server",
+            "security": {
+              "allowedHosts": []
+            },
             "ssr": {
               "entry": "src/server.ts"
             },
@@ -69,9 +70,6 @@
             }
           },
           "defaultConfiguration": "development"
-        },
-        "extract-i18n": {
-          "builder": "@angular/build:extract-i18n"
         },
         "test": {
           "builder": "@angular/build:unit-test"
