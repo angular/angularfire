@@ -34,11 +34,11 @@ const DEFAULT_CLOUD_RUN_OPTIONS: Partial<CloudRunOptions> = {
 
 const spawnAsync = async (
   command: string,
+  args: string[],
   options?: SpawnOptionsWithoutStdio
 ) =>
   new Promise<Buffer>((resolve, reject) => {
-    const [spawnCommand, ...args] = command.split(/\s+/);
-    const spawnProcess = spawn(spawnCommand, args, options);
+    const spawnProcess = spawn(command, args, options);
     const chunks: Buffer[] = [];
     const errorChunks: Buffer[] = [];
     spawnProcess.stdout.on('data', (data) => {
@@ -53,7 +53,7 @@ const spawnAsync = async (
       reject(error);
     });
     spawnProcess.on('close', (code) => {
-      if (code === 1) {
+      if (code !== 0) {
         reject(Buffer.concat(errorChunks).toString());
         return;
       }
@@ -356,6 +356,34 @@ export const deployToFunction = async (
 };
 
 
+// Exported (rather than kept private) so the argv shape can be asserted directly in tests,
+// without having to mock child_process.spawn.
+export const buildCloudRunBuildsSubmitArgs = (
+  cloudRunOut: string,
+  serviceId: string,
+  options: DeployBuilderOptions
+): string[] => [
+  'builds', 'submit', cloudRunOut,
+  '--tag', `gcr.io/${options.firebaseProject}/${serviceId}`,
+  '--project', options.firebaseProject,
+  '--quiet',
+];
+
+export const buildCloudRunDeployArgs = (
+  serviceId: string,
+  options: DeployBuilderOptions,
+  deployArguments: string[]
+): string[] => [
+  'run', 'deploy', serviceId,
+  '--image', `gcr.io/${options.firebaseProject}/${serviceId}`,
+  '--project', options.firebaseProject,
+  ...deployArguments,
+  '--platform', 'managed',
+  '--allow-unauthenticated',
+  '--region', options.region,
+  '--quiet',
+];
+
 export const deployToCloudRun = async (
   firebaseTools: FirebaseTools,
   context: BuilderContext,
@@ -430,25 +458,23 @@ export const deployToCloudRun = async (
     throw new SchematicsException('Cloud Run preview not supported.');
   }
 
-  const deployArguments: any[] = [];
+  const deployArguments: string[] = [];
   const cloudRunOptions = options.cloudRunOptions || {};
   Object.entries(DEFAULT_CLOUD_RUN_OPTIONS).forEach(([k, v]) => {
     cloudRunOptions[k] ||= v;
   });
   // lean on the schema for validation (rather than sanitize)
-  if (cloudRunOptions.cpus) { deployArguments.push('--cpu', cloudRunOptions.cpus); }
-  if (cloudRunOptions.maxConcurrency) { deployArguments.push('--concurrency', cloudRunOptions.maxConcurrency); }
-  if (cloudRunOptions.maxInstances) { deployArguments.push('--max-instances', cloudRunOptions.maxInstances); }
-  if (cloudRunOptions.memory) { deployArguments.push('--memory', cloudRunOptions.memory); }
-  if (cloudRunOptions.minInstances) { deployArguments.push('--min-instances', cloudRunOptions.minInstances); }
-  if (cloudRunOptions.timeout) { deployArguments.push('--timeout', cloudRunOptions.timeout); }
+  if (cloudRunOptions.cpus) { deployArguments.push('--cpu', cloudRunOptions.cpus.toString()); }
+  if (cloudRunOptions.maxConcurrency) { deployArguments.push('--concurrency', cloudRunOptions.maxConcurrency.toString()); }
+  if (cloudRunOptions.maxInstances) { deployArguments.push('--max-instances', cloudRunOptions.maxInstances.toString()); }
+  if (cloudRunOptions.memory) { deployArguments.push('--memory', cloudRunOptions.memory.toString()); }
+  if (cloudRunOptions.minInstances) { deployArguments.push('--min-instances', cloudRunOptions.minInstances.toString()); }
+  if (cloudRunOptions.timeout) { deployArguments.push('--timeout', cloudRunOptions.timeout.toString()); }
   if (cloudRunOptions.vpcConnector) { deployArguments.push('--vpc-connector', cloudRunOptions.vpcConnector); }
 
-  // TODO validate serviceId, firebaseProject, and vpcConnector both to limit errors and opp for injection
-
   context.logger.info(`📦 Deploying to Cloud Run`);
-  await spawnAsync(`gcloud builds submit ${cloudRunOut} --tag gcr.io/${options.firebaseProject}/${serviceId} --project ${options.firebaseProject} --quiet`);
-  await spawnAsync(`gcloud run deploy ${serviceId} --image gcr.io/${options.firebaseProject}/${serviceId} --project ${options.firebaseProject} ${deployArguments.join(' ')} --platform managed --allow-unauthenticated --region=${options.region} --quiet`);
+  await spawnAsync('gcloud', buildCloudRunBuildsSubmitArgs(cloudRunOut, serviceId, options));
+  await spawnAsync('gcloud', buildCloudRunDeployArgs(serviceId, options, deployArguments));
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const siteTarget = options.target ?? context.target!.project;
@@ -482,7 +508,7 @@ export default async function deploy(
   }
 
   if (!firebaseToken && process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-    await spawnAsync(`gcloud auth activate-service-account --key-file ${process.env.GOOGLE_APPLICATION_CREDENTIALS}`);
+    await spawnAsync('gcloud', ['auth', 'activate-service-account', '--key-file', process.env.GOOGLE_APPLICATION_CREDENTIALS]);
     console.log(`Using Google Application Credentials.`);
   }
 
