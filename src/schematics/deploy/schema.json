@@ -51,7 +51,8 @@
     },
     "functionName": {
       "type": "string",
-      "description": "The name of the Cloud Function or Cloud Run serviceId to deploy SSR to"
+      "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,62}$",
+      "description": "The name of the Cloud Function or Cloud Run serviceId to deploy SSR to. Must start with a letter and contain only letters, numbers, hyphens and underscores; on the Cloud Functions path this value also becomes a JavaScript identifier, so use only letters and numbers there."
     },
     "functionsNodeVersion": {
       "oneOf": [{ "type": "number" }, { "type": "string" }],
@@ -63,7 +64,8 @@
     },
     "region": {
       "type": "string",
-      "description": "The region to deploy Cloud Functions or Cloud Run to"
+      "pattern": "^[a-z]+-[a-z]+\\d+$",
+      "description": "The region to deploy Cloud Functions or Cloud Run to, e.g. us-central1"
     },
     "outputPath": {
       "type": "string",
