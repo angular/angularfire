@@ -43,8 +43,11 @@
   "dependencies": {
     "firebase": "^12.4.0",
     "rxfire": "^6.2.0",
+    "@angular-devkit/architect": ">= 0.2100.0 < 0.2200.0",
+    "@angular-devkit/core": "^21.0.0",
     "@angular-devkit/schematics": "^21.0.0",
     "@schematics/angular": "^21.0.0",
+    "jsonc-parser": "^3.0.0",
     "tslib": "^2.3.0"
   },
   "ng-update": {
