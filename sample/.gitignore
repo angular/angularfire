@@ -45,6 +45,3 @@ Thumbs.db
 .firebase
 *-debug.log
 .runtimeconfig.json
-
-# Vitest browser-mode screenshots
-__screenshots__/
