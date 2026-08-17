@@ -139,22 +139,26 @@ The 2 hooks cover different moments:
 - `idToken` fires after an auth state change has completed, and also when Firebase refreshes the token in the background, which is what keeps the cookie current.
 - `beforeAuthStateChanged` fires earlier, while an auth state change is still in progress and before Firebase sets the new user, so a page load that races a sign-out cannot send a token for the user who just left and get their data rendered back. Its third argument puts the cookie back if another blocking callback rejects the auth state change.
 
-#### `beforeAuthStateChanged` from `firebase/auth`
-
-One import here is deliberately different from the rest of this guide. `beforeAuthStateChanged` comes from `firebase/auth` rather than `@angular/fire/auth`. AngularFire's version keeps the app marked as busy until its callback first runs, and this callback only runs when someone signs in or out.
-
-Importing it from `@angular/fire/auth` makes `ng build` hang during route extraction and fail with a timeout. That is a bug on our side and a fix is planned. Once it lands, this can be imported from `@angular/fire/auth` like everything else.
-
 Name the cookie `__session`. Behind Firebase Hosting it is the [only cookie forwarded](https://firebase.google.com/docs/hosting/manage-cache#using_cookies) to your server code, and any other name is dropped before your app sees it.
 
-#### Both attributes matter:
+#### Both attributes matter
+
+The cookie sync above sets `{ secure: true, sameSite: 'lax' }`, and neither attribute is optional.
 
 - `secure` keeps the cookie off unencrypted connections. Browsers make an exception for `localhost`, so local development still works.
 - `sameSite: 'lax'` keeps the cookie off cross-site requests while still sending it when someone follows a link into your app, which is what lets that first page render signed in. If your app never needs a signed-in first render from an external link, use `'strict'` instead.
 
+#### What this cookie carries
+
 This cookie carries a short-lived ID token that scripts on your page can read. Firebase already keeps the signed-in state in browser storage, so the cookie does not create a new place for a token to be stolen from, but it does travel on every request.
 
 If you need a session the browser cannot read, use Firebase's [session cookies](https://firebase.google.com/docs/auth/admin/manage-cookies) with the Admin SDK instead. Those cannot be handed to `initializeServerApp`, so that approach means verifying the cookie yourself and building your own server-side Auth context.
+
+#### `beforeAuthStateChanged` from `firebase/auth`
+
+One import in the code above is deliberately different from the rest of this guide. `beforeAuthStateChanged` comes from `firebase/auth` rather than `@angular/fire/auth`. AngularFire's version keeps the app marked as busy until its callback first runs, and this callback only runs when someone signs in or out.
+
+Importing it from `@angular/fire/auth` makes `ng build` hang during route extraction and fail with a timeout. That is a bug on our side, tracked in [#3748](https://github.com/angular/angularfire/issues/3748). Once the fix lands, this can be imported from `@angular/fire/auth` like everything else.
 
 ### 3. Pass the cookie into the render
 
@@ -234,7 +238,7 @@ export const appConfig: ApplicationConfig = {
 };
 ```
 
-#### 5 details here are what make this work:
+#### Five details make this work
 
 - **Keep exactly one `provideFirebaseApp`.** AngularFire hands you the app you provided only when a single one is registered, and falls back to the default app otherwise. A second registration anywhere in your configuration would make the server app be silently ignored.
 - **Pass `inject(FirebaseApp)` to every provider, not just `provideAuth`.** `ng add @angular/fire` writes them without an argument, which resolves the default app. On a signed-in request the factory above builds a server app instead, so a provider that asks for the default app fails outright on a freshly started server.
