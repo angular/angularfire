@@ -52,7 +52,7 @@
     "functionName": {
       "type": "string",
       "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,62}$",
-      "description": "The name of the Cloud Function or Cloud Run serviceId to deploy SSR to. Must start with a letter and contain only letters, numbers, hyphens and underscores."
+      "description": "The name of the Cloud Function or Cloud Run serviceId to deploy SSR to. Must start with a letter and contain only letters, numbers, hyphens and underscores; on the Cloud Functions path this value also becomes a JavaScript identifier, so use only letters and numbers there."
     },
     "functionsNodeVersion": {
       "oneOf": [{ "type": "number" }, { "type": "string" }],
