@@ -1,4 +1,4 @@
-import { Component, inject, makeStateKey, OnDestroy, PLATFORM_ID, TransferState } from '@angular/core';
+import { Component, EnvironmentInjector, inject, makeStateKey, OnDestroy, PLATFORM_ID, runInInjectionContext, TransferState } from '@angular/core';
 import { Auth, signInAnonymously, signOut, User } from '@angular/fire/auth';
 import { map, startWith, switchMap, tap } from 'rxjs/operators';
 import { AsyncPipe, isPlatformBrowser, isPlatformServer } from '@angular/common';
@@ -44,6 +44,7 @@ export const authState = ɵzoneWrap(_authState, true);
 export class AuthComponent implements OnDestroy {
 
   private readonly auth = inject(Auth);
+  private readonly injector = inject(EnvironmentInjector);
   protected readonly authState = authState(this.auth);
 
   private readonly transferState = inject(TransferState);
@@ -100,11 +101,11 @@ export class AuthComponent implements OnDestroy {
   }
 
   async logout() {
-    return await signOut(this.auth);
+    return await runInInjectionContext(this.injector, () => signOut(this.auth));
   }
 
   async loginAnonymously() {
-    return await signInAnonymously(this.auth);
+    return await runInInjectionContext(this.injector, () => signInAnonymously(this.auth));
   }
 
   async loginWithGoogle() {
