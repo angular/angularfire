@@ -2,7 +2,7 @@
 
 ## Before you begin
 
-- **Firebase CLI.** Setup uses the Firebase CLI (`firebase-tools`). `ng add` installs it if it is missing and prompts you to sign in, so you do not have to install it yourself first. To handle it ahead of time, run `npm install -g firebase-tools` then `firebase login`.
+- **Firebase CLI.** Setup uses the Firebase CLI (`firebase-tools`), version 14 or newer. `ng add` installs it if it is missing and prompts you to sign in, so you do not have to install it yourself first. It does not upgrade a copy you already have, so an older one stops setup with `firebase-tools version 14.0.0+ is required, please upgrade and run again`. To handle it ahead of time, or to clear that error, run `npm install -g firebase-tools` then `firebase login`.
 - **On the newest Angular major, use `@next`.** If `ng add @angular/fire` reports an Angular peer-dependency conflict, your Angular version is newer than AngularFire's default (`latest`) release. Install the version-matched pre-release instead: `ng add @angular/fire@next`.
 - **Harmless CLI noise.** The Firebase CLI may print a `punycode` deprecation warning or ask about enabling extra features (for example Gemini) during setup. These come from the CLI, not from AngularFire, and are safe to ignore.
 
