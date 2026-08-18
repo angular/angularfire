@@ -65,6 +65,58 @@ export type DeployBuilderOptions = DeployBuilderSchema & Record<string, any>;
 
 const escapeRegExp = (str: string) => str.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&');
 
+// A build target's outputPath (from angular.json's architect.<project>.<build>.options)
+// is interpolated raw into generated Cloud Function source (`require('./<path>/main')`)
+// and into the generated package.json start script, which the Cloud Run image runs through
+// a shell. That start script quotes the path (functions-templates.ts), so word splitting,
+// globbing and `~` expansion are already off; what remains live is the set below.
+//
+//   ' and \  break out of the require() string literal, as do the line terminators, since a
+//            JavaScript string literal cannot span a line
+//   " ` and $ stay live inside the double quotes of the start script: `"` closes them, and
+//            `` ` `` and `$(` are still command substitution in there
+//
+// A leading dash is rejected separately: quoting does not stop `node "-rf/main.js"` from
+// being read as a flag rather than a path.
+export const assertSafeOutputPath = (outputPath: string, targetName: string): void => {
+  if (/['"`\\$\n\r]/.test(outputPath) || outputPath.startsWith('-')) {
+    throw new SchematicsException(
+      `Unsafe outputPath ${JSON.stringify(outputPath)} for target '${targetName}' in angular.json.`
+    );
+  }
+};
+
+// functionName is interpolated raw into the generated Cloud Function source as the
+// `exports.<name>` assignment target (functions-templates.ts), which is executed when the
+// function loads. Allow only a plain JavaScript identifier so it cannot introduce further
+// statements; this also turns a name that would silently produce an unparseable file (for
+// example one containing a dash) into an explicit error.
+export const assertSafeFunctionName = (functionName: string | undefined): void => {
+  if (functionName !== undefined && !/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(functionName)) {
+    throw new SchematicsException(
+      `Unsafe functionName ${JSON.stringify(functionName)} in angular.json; expected a plain identifier.`
+    );
+  }
+};
+
+// functionsNodeVersion is interpolated raw into the generated Dockerfile's FROM line
+// (`FROM node:<version>-slim`), executed during the Cloud Run container build, so the value
+// is a Docker image tag. This is Docker's own tag grammar, which bounds the length at 128
+// and admits none of the characters that would open a new instruction (a line terminator)
+// or point FROM at different image content (a space, a slash, a colon or an `@`). `latest`
+// is grammatical but has never resolved here: the official image publishes its slim variant
+// as node:slim, so node:latest-slim does not exist.
+// Kept in step with the functionsNodeVersion pattern in schema.json.
+const NODE_IMAGE_TAG = /^(?!latest$)[\w][\w.-]{0,127}$/;
+
+export const assertSafeNodeVersion = (version: string | number | undefined): void => {
+  if (version !== undefined && !NODE_IMAGE_TAG.test(String(version))) {
+    throw new SchematicsException(
+      `Unsafe functionsNodeVersion ${JSON.stringify(version)} in angular.json; expected a node image tag, such as 22 or lts.`
+    );
+  }
+};
+
 const moveSync = (src: string, dest: string) => {
   copySync(src, dest);
   removeSync(src);
@@ -249,6 +301,7 @@ export const deployToFunction = async (
       `Cannot read the output path option of the Angular project '${staticBuildTarget.name}' in angular.json`
     );
   }
+  assertSafeOutputPath(staticBuildOptions.outputPath, staticBuildTarget.name);
 
   const serverBuildOptions = await context.getTargetOptions(targetFromTargetString(serverBuildTarget.name));
   if (!serverBuildOptions.outputPath || typeof serverBuildOptions.outputPath !== 'string') {
@@ -256,11 +309,13 @@ export const deployToFunction = async (
       `Cannot read the output path option of the Angular project '${serverBuildTarget.name}' in angular.json`
     );
   }
+  assertSafeOutputPath(serverBuildOptions.outputPath, serverBuildTarget.name);
 
   const staticOut = join(workspaceRoot, staticBuildOptions.outputPath);
   const serverOut = join(workspaceRoot, serverBuildOptions.outputPath);
 
   const functionsOut = options.outputPath ? join(workspaceRoot, options.outputPath) : dirname(serverOut);
+  assertSafeFunctionName(options.functionName);
   const functionName = options.functionName || DEFAULT_FUNCTION_NAME;
 
   const newStaticOut = join(functionsOut, staticBuildOptions.outputPath);
@@ -401,6 +456,7 @@ export const deployToCloudRun = async (
       `Cannot read the output path option of the Angular project '${staticBuildTarget.name}' in angular.json`
     );
   }
+  assertSafeOutputPath(staticBuildOptions.outputPath, staticBuildTarget.name);
 
   const serverBuildOptions = await context.getTargetOptions(targetFromTargetString(serverBuildTarget.name));
   if (!serverBuildOptions.outputPath || typeof serverBuildOptions.outputPath !== 'string') {
@@ -408,6 +464,11 @@ export const deployToCloudRun = async (
       `Cannot read the output path option of the Angular project '${serverBuildTarget.name}' in angular.json`
     );
   }
+  assertSafeOutputPath(serverBuildOptions.outputPath, serverBuildTarget.name);
+  // Checked here, alongside the outputPath screens, rather than next to the Dockerfile it
+  // guards: everything below wipes and refills the output directory, so rejecting late
+  // would leave that directory half-written before throwing.
+  assertSafeNodeVersion(options.functionsNodeVersion);
 
   const staticOut = join(workspaceRoot, staticBuildOptions.outputPath);
   const serverOut = join(workspaceRoot, serverBuildOptions.outputPath);
@@ -472,6 +533,9 @@ export const deployToCloudRun = async (
   if (cloudRunOptions.minInstances) { deployArguments.push('--min-instances', cloudRunOptions.minInstances.toString()); }
   if (cloudRunOptions.timeout) { deployArguments.push('--timeout', cloudRunOptions.timeout.toString()); }
   if (cloudRunOptions.vpcConnector) { deployArguments.push('--vpc-connector', cloudRunOptions.vpcConnector); }
+
+  // TODO validate firebaseProject, vpcConnector, and the outputPath deploy option both to
+  // limit errors and opp for injection
 
   context.logger.info(`📦 Deploying to Cloud Run`);
   await spawnAsync('gcloud', buildCloudRunBuildsSubmitArgs(cloudRunOut, serviceId, options));

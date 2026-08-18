@@ -23,7 +23,10 @@ export const defaultPackage = (
   description: 'Angular Universal Application',
   main: main ?? 'index.js',
   scripts: {
-    start: main ? `node ${main}` : 'firebase functions:shell',
+    // Quoted: `npm start` hands this to a shell, and `main` carries a build target's
+    // outputPath, so an unquoted path with a space in it splits and one with a glob
+    // character in it expands before node ever sees it.
+    start: main ? `node "${main}"` : 'firebase functions:shell',
   },
   engines: {
     node: (options.functionsNodeVersion || DEFAULT_NODE_VERSION).toString()
@@ -47,7 +50,7 @@ require("firebase-functions/logger/compat");
 const expressApp = require('./${path}/main').app();
 
 exports.${functionName || DEFAULT_FUNCTION_NAME} = functions
-  .region('${options.region || DEFAULT_FUNCTION_REGION}')
+  .region(${JSON.stringify(options.region || DEFAULT_FUNCTION_REGION)})
   .runWith(${JSON.stringify(options.functionsRuntimeOptions || DEFAULT_RUNTIME_OPTIONS)})
   .https
   .onRequest(expressApp);
