@@ -5,11 +5,8 @@
   },
   "dest": "../dist/packages-dist",
   "allowedNonPeerDependencies": [
+    "@angular-devkit/architect", "@angular-devkit/core",
     "@angular-devkit/schematics", "@schematics/angular",
-    "fuzzy", "inquirer-autocomplete-prompt",
-    "open", "jsonc-parser", "ora", "winston",
-    "triple-beam", "@schematics/angular", "node-fetch",
-    "semver", "inquirer", "fs-extra",
-    "firebase", "rxfire"
+    "jsonc-parser", "firebase", "rxfire"
   ]
 }
