@@ -1,0 +1,15 @@
+{
+  "$schema": "./node_modules/ng-packagr/ng-package.schema.json",
+  "lib": {
+    "entryFile": "public_api.ts"
+  },
+  "dest": "../dist/packages-dist",
+  "allowedNonPeerDependencies": [
+    "@angular-devkit/schematics", "@schematics/angular",
+    "fuzzy", "inquirer-autocomplete-prompt",
+    "open", "jsonc-parser", "ora", "winston",
+    "triple-beam", "@schematics/angular", "node-fetch",
+    "semver", "inquirer", "fs-extra",
+    "firebase", "rxfire"
+  ]
+}

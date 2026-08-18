@@ -1,11 +1,19 @@
-import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, Injector } from '@angular/core';
-import { Functions as FirebaseFunctions } from 'firebase/functions';
-import { ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
-import { Functions, FunctionsInstances, FUNCTIONS_PROVIDER_NAME } from './functions';
-import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
+import {
+  EnvironmentProviders,
+  InjectionToken,
+  Injector,
+  NgModule,
+  NgZone,
+  Optional,
+  makeEnvironmentProviders,
+} from '@angular/core';
+import { VERSION, ɵAngularFireSchedulers, ɵgetDefaultInstanceOf } from '@angular/fire';
+import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
+import { AppCheckInstances } from '@angular/fire/app-check';
 import { AuthInstances } from '@angular/fire/auth';
 import { registerVersion } from 'firebase/app';
-import { AppCheckInstances } from '@angular/fire/app-check';
+import { Functions as FirebaseFunctions } from 'firebase/functions';
+import { FUNCTIONS_PROVIDER_NAME, Functions, FunctionsInstances } from './functions';
 
 export const PROVIDED_FUNCTIONS_INSTANCES = new InjectionToken<Functions[]>('angularfire2.functions-instances');
 
@@ -49,10 +57,13 @@ export class FunctionsModule {
   }
 }
 
-export function provideFunctions(fn: (injector: Injector) => FirebaseFunctions, ...deps: any[]): ModuleWithProviders<FunctionsModule> {
-  return {
-    ngModule: FunctionsModule,
-    providers: [{
+export function provideFunctions(fn: (injector: Injector) => FirebaseFunctions, ...deps: any[]): EnvironmentProviders {
+  registerVersion('angularfire', VERSION.full, 'fn');
+
+  return makeEnvironmentProviders([
+    DEFAULT_FUNCTIONS_INSTANCE_PROVIDER,
+    FUNCTIONS_INSTANCES_PROVIDER,
+    {
       provide: PROVIDED_FUNCTIONS_INSTANCES,
       useFactory: functionsInstanceFactory(fn),
       multi: true,
@@ -66,6 +77,6 @@ export function provideFunctions(fn: (injector: Injector) => FirebaseFunctions, 
         [new Optional(), AppCheckInstances ],
         ...deps,
       ]
-    }]
-  };
+    }
+  ]);
 }

@@ -1,15 +1,15 @@
-import { ɵZoneScheduler } from '@angular/fire';
-import { AngularFireModule, FirebaseApp } from '@angular/fire/compat';
-import { AngularFireDatabase, AngularFireDatabaseModule, fromRef } from '@angular/fire/compat/database';
+/* eslint-disable @typescript-eslint/unbound-method */
 import { TestBed } from '@angular/core/testing';
-import { COMMON_CONFIG } from '../../../test-config';
+import { ɵZoneScheduler } from '@angular/fire';
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFireDatabase, AngularFireDatabaseModule, USE_EMULATOR, fromRef } from '@angular/fire/compat/database';
+import firebase from 'firebase/compat/app';
 import { take } from 'rxjs/operators';
 import { TestScheduler } from 'rxjs/testing';
-import { rando } from '../../../utils';
-import firebase from 'firebase/compat/app';
+import { COMMON_CONFIG, databaseEmulatorPort } from '../../../../src/test-config';
+import { rando } from '../../../../src/utils';
 
 describe('fromRef', () => {
-  let app: FirebaseApp;
   let db: AngularFireDatabase;
   let ref: (path: string) => firebase.database.Reference;
   let batch = {};
@@ -28,17 +28,12 @@ describe('fromRef', () => {
         AngularFireDatabaseModule
       ],
       providers: [
-        { provide: URL, useValue: 'http://localhost:9000' }
+        { provide: USE_EMULATOR, useValue: ['localhost', databaseEmulatorPort] }
       ]
     });
 
-    app = TestBed.inject(FirebaseApp);
     db = TestBed.inject(AngularFireDatabase);
     ref = (path: string) => db.database.ref(path);
-  });
-
-  afterEach(() => {
-    db.database.goOffline();
   });
 
   it('it should be async by default', (done) => {
@@ -70,11 +65,11 @@ describe('fromRef', () => {
 
     obs.subscribe(() => {
       expect(testScheduler.schedule).toHaveBeenCalled();
-      done();
+      // done();
     }, err => {
       console.error(err);
       expect(false).withContext('Shouldnt error').toEqual(true);
-      done();
+      // done();
     }, () => {
       expect(testScheduler.schedule).toHaveBeenCalled();
       done();
@@ -120,8 +115,7 @@ describe('fromRef', () => {
       scheduler
     );
     completeObservable.subscribe(
-      () => {
-      },
+      () => undefined,
       () => fail('Should not error'),
       () => expect(Zone.current.name).toEqual('ExpectedZone')
     );
@@ -144,9 +138,7 @@ describe('fromRef', () => {
     const itemRef = ref(rando());
     itemRef.set(batch);
     const obs = fromRef(itemRef, 'value', 'once');
-    obs.subscribe(() => {
-    }, () => {
-    }, done);
+    obs.subscribe(() => undefined, () => undefined, done);
   });
 
   it('it should listen and then unsubscribe', (done) => {
@@ -233,8 +225,7 @@ describe('fromRef', () => {
         sub.unsubscribe();
         done();
       });
-      itemRef.child(key).setPriority(-100, () => {
-      });
+      itemRef.child(key).setPriority(-100, () => undefined);
     });
 
     it('should stream back a value event', (done: any) => {

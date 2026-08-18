@@ -20,21 +20,24 @@ As a prerequisite, ensure that `AngularFire` has been added to your project via
 ng add @angular/fire
 ```
 
-Provide an auth instance in the application's `NgModule` (`app.module.ts`):
+Provide an Auth instance in the application's `app.config.ts`:
 
 ```ts
+import { ApplicationConfig } from '@angular/core';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { getAuth, provideAuth } from '@angular/fire/auth';
+import { provideAuth, getAuth } from '@angular/fire/auth';
 
-@NgModule({
-  imports: [
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideFirebaseApp(() => initializeApp({ ... })),
     provideAuth(() => getAuth()),
-  ]
-})
+    ...
+  ],
+  ...
+}
 ```
 
-Next inject it into your component:
+Next inject `Auth` into your component:
 
 ```ts
 import { Component, inject} from '@angular/core';
@@ -42,7 +45,7 @@ import { Auth } from '@angular/fire/auth';
 
 @Component({ ... })
 export class LoginComponent {
-  private auth: Auth = inject(Auth);
+  private auth = inject(Auth);
   ...
 }
 ```
@@ -51,9 +54,42 @@ export class LoginComponent {
 
 AngularFire wraps the Firebase JS SDK to ensure proper functionality in Angular, while providing the same API.
 
-Update the imports from `import { ... } from 'firebase/auth'` to `import { ... } from '@angular/fire/auth'` and follow the offical documentation.
+Update the imports from `import { ... } from 'firebase/auth'` to `import { ... } from '@angular/fire/auth'` and follow the official documentation.
 
 [Getting Started](https://firebase.google.com/docs/auth/web/start) | [API Reference](https://firebase.google.com/docs/reference/js/auth)
+
+## Server-side Rendering
+
+To support Auth context in server-side rendering, you can provide `FirebaseServerApp`:
+
+```ts
+import { ApplicationConfig, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { provideFirebaseApp, initializeApp, initializeServeApp, initializeServerApp } from '@angular/fire/app';
+import { provideAuth, getAuth } from '@angular/fire/auth';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideFirebaseApp(() => {
+      if (isPlatformBrowser(inject(PLATFORM_ID))) {
+        return initializeApp(firebaseConfig);
+      }
+      // Optional, since it's null in dev-mode and SSG
+      const request = inject(REQUEST, { optional: true });
+      const authIdToken = request?.headers.authorization?.split("Bearer ")[1];
+      return initializeServerApp(firebaseConfig, {
+        authIdToken,
+        releaseOnDeref: request || undefined
+      });
+    }),
+    provideAuth(() => getAuth(inject(FirebaseApp)),
+    ...
+  ],
+  ...
+})
+```
+
+Follow Firebase's [ Session Management with Service Workers documentation](https://firebase.google.com/docs/auth/web/service-worker-sessions) to learn how to pass the `idToken` to the server. __Note: this will not currently work in dev-mode as Angular SSR does not provide a method to get the Request headers.__
 
 ## Convenience observables
 
@@ -71,7 +107,7 @@ import { Auth, User, user } from '@angular/fire/auth';
 
 export class UserComponent implements OnDestroy {
   private auth: Auth = inject(Auth);
-  user$ = user(auth);
+  user$ = user(this.auth);
   userSubscription: Subscription;
   ...
 
@@ -101,7 +137,7 @@ import { Auth, authState } from '@angular/fire/auth';
 
 export class UserComponent implements OnDestroy {
   private auth: Auth = inject(Auth);
-  authState$ = authState(auth);
+  authState$ = authState(this.auth);
   authStateSubscription: Subscription;
   ...
 
@@ -130,14 +166,14 @@ import { Auth, idToken } from '@angular/fire/auth';
 
 export class UserComponent implements OnDestroy {
   private auth: Auth = inject(Auth);
-  idToken$ = idToken(auth);
+  idToken$ = idToken(this.auth);
   idTokenSubscription: Subscription;
   ...
 
   constructor() {
     this.idTokenSubscription = this.idToken$.subscribe((token: string | null) => {
-        //handle idToken changes here. Note, that user will be null if there is no currently logged in user.
-     console.log(string);
+        //handle idToken changes here. Note, that token will be null if there is no currently logged in user.
+     console.log(token);
     })
   }
 
@@ -151,15 +187,18 @@ export class UserComponent implements OnDestroy {
 ## Connecting the emulator suite
 
 ```ts
+import { ApplicationConfig } from '@angular/core';
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { connectAuthEmulator, getAuth, provideAuth } from '@angular/fire/auth';
 
-@NgModule({
-  imports: [
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideFirebaseApp(() => initializeApp({ ... })),
     provideAuth(() => {
       const auth = getAuth();
       connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
       return auth;
     }),
   ]
-})
+}
 ```

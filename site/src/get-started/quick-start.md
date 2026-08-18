@@ -73,7 +73,6 @@ Beginning in [Angular v14](https://blog.angular.io/angular-v14-is-now-available-
 The provider configuration for these applications should be added to the `bootstrapApplication` function in `main.ts`:
 
 ```ts
-import { importProvidersFrom } from '@angular/core';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { bootstrapApplication } from '@angular/platform-browser';
@@ -83,14 +82,10 @@ import { environment } from './environments/environment';
 
 bootstrapApplication(AppComponent, {
   providers: [
-    importProvidersFrom(
-      provideFirebaseApp(()=> initializeApp(environment.firebase))
-    ),
+    provideFirebaseApp(()=> initializeApp(environment.firebase))
   ],
 }).catch(err => console.error(err));
 ```
-
-Note that you are required to wrap the `provideFirebaseApp` function call in the `importProvidersFrom` function.
 
 ### Configuring Firebase features
 
@@ -126,7 +121,6 @@ export class AppModule {}
 
 ```ts
 // Standalone API based config (main.ts)
-import { importProvidersFrom } from '@angular/core';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore'
 import { getAuth, provideAuth } from '@angular/fire/auth';
@@ -137,11 +131,9 @@ import { environment } from './environments/environment';
 
 bootstrapApplication(AppComponent, {
   providers: [
-    importProvidersFrom(
-      provideFirebaseApp(() => initializeApp(environment.firebase)),
-      provideAuth(() => getAuth()),
-      provideFirestore(() => getFirestore())
-    ),
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideAuth(() => getAuth()),
+    provideFirestore(() => getFirestore())
   ],
 }).catch(err => console.error(err));
 ```

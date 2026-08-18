@@ -1,10 +1,9 @@
-import { fromRef } from '../observable/fromRef';
-import { merge, Observable, of, SchedulerLike } from 'rxjs';
-
+import { Observable, SchedulerLike, merge, of } from 'rxjs';
+import { distinctUntilChanged, scan, switchMap } from 'rxjs/operators';
 import { ChildEvent, DatabaseQuery, SnapshotAction } from '../interfaces';
+import { fromRef } from '../observable/fromRef';
 import { isNil } from '../utils';
 
-import { distinctUntilChanged, scan, switchMap } from 'rxjs/operators';
 
 export function listChanges<T = any>(ref: DatabaseQuery, events: ChildEvent[], scheduler?: SchedulerLike): Observable<SnapshotAction<T>[]> {
   return fromRef(ref, 'value', 'once', scheduler).pipe(
@@ -46,7 +45,7 @@ function buildView(current, action) {
   const afterPreviousKeyPosition = positionAfter(current, prevKey);
   switch (action.type) {
     case 'value':
-      if (action.payload && action.payload.exists()) {
+      if (action.payload?.exists()) {
         let prevKey = null;
         action.payload.forEach(payload => {
           const action = { payload, type: 'value', prevKey, key: payload.key };
@@ -60,7 +59,7 @@ function buildView(current, action) {
       if (currentKeyPosition > -1) {
         // check that the previouskey is what we expect, else reorder
         const previous = current[currentKeyPosition - 1];
-        if ((previous && previous.key || null) !== prevKey) {
+        if ((previous?.key || null) !== prevKey) {
           current = current.filter(x => x.payload.key !== payload.key);
           current.splice(afterPreviousKeyPosition, 0, action);
         }

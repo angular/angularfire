@@ -1,21 +1,31 @@
-import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, Injector, APP_INITIALIZER } from '@angular/core';
-import { Messaging as FirebaseMessaging } from 'firebase/messaging';
-import { ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, VERSION, ɵisMessagingSupportedFactory } from '@angular/fire';
-import { Messaging, MessagingInstances, MESSAGING_PROVIDER_NAME } from './messaging';
-import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
+import { isPlatformServer } from '@angular/common';
+import {
+  EnvironmentProviders,
+  InjectionToken,
+  Injector,
+  NgModule,
+  NgZone,
+  Optional,
+  PLATFORM_ID,
+  makeEnvironmentProviders,
+} from '@angular/core';
+import { VERSION, ɵAngularFireSchedulers, ɵgetDefaultInstanceOf } from '@angular/fire';
+import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
 import { registerVersion } from 'firebase/app';
+import { Messaging as FirebaseMessaging } from 'firebase/messaging';
+import { MESSAGING_PROVIDER_NAME, Messaging, MessagingInstances } from './messaging';
 
 const PROVIDED_MESSAGING_INSTANCES = new InjectionToken<Messaging[]>('angularfire2.messaging-instances');
 
-export function defaultMessagingInstanceFactory(provided: FirebaseMessaging[]|undefined, defaultApp: FirebaseApp) {
-  if (!ɵisMessagingSupportedFactory.sync()) { return null; }
+export function defaultMessagingInstanceFactory(provided: FirebaseMessaging[]|undefined, defaultApp: FirebaseApp, platformId: object) {
+  if (isPlatformServer(platformId)) { return null; }
   const defaultMessaging = ɵgetDefaultInstanceOf<FirebaseMessaging>(MESSAGING_PROVIDER_NAME, provided, defaultApp);
   return defaultMessaging && new Messaging(defaultMessaging);
 }
 
 export function messagingInstanceFactory(fn: (injector: Injector) => FirebaseMessaging) {
-  return (zone: NgZone, injector: Injector) => {
-    if (!ɵisMessagingSupportedFactory.sync()) { return null; }
+  return (zone: NgZone, injector: Injector, platformId: object) => {
+    if (isPlatformServer(platformId)) { return null; }
     const messaging = zone.runOutsideAngular(() => fn(injector));
     return new Messaging(messaging);
   };
@@ -34,6 +44,7 @@ const DEFAULT_MESSAGING_INSTANCE_PROVIDER = {
   deps: [
     [new Optional(), PROVIDED_MESSAGING_INSTANCES ],
     FirebaseApp,
+    PLATFORM_ID,
   ]
 };
 
@@ -41,11 +52,6 @@ const DEFAULT_MESSAGING_INSTANCE_PROVIDER = {
   providers: [
     DEFAULT_MESSAGING_INSTANCE_PROVIDER,
     MESSAGING_INSTANCES_PROVIDER,
-    {
-      provide: APP_INITIALIZER,
-      useValue: ɵisMessagingSupportedFactory.async,
-      multi: true,
-    },
   ]
 })
 export class MessagingModule {
@@ -54,20 +60,24 @@ export class MessagingModule {
   }
 }
 
-export function provideMessaging(fn: (injector: Injector) => FirebaseMessaging, ...deps: any[]): ModuleWithProviders<MessagingModule> {
-  return {
-    ngModule: MessagingModule,
-    providers: [{
+export function provideMessaging(fn: (injector: Injector) => FirebaseMessaging, ...deps: any[]): EnvironmentProviders {
+  registerVersion('angularfire', VERSION.full, 'fcm');
+
+  return makeEnvironmentProviders([
+    DEFAULT_MESSAGING_INSTANCE_PROVIDER,
+    MESSAGING_INSTANCES_PROVIDER,
+    {
       provide: PROVIDED_MESSAGING_INSTANCES,
       useFactory: messagingInstanceFactory(fn),
       multi: true,
       deps: [
         NgZone,
         Injector,
+        PLATFORM_ID,
         ɵAngularFireSchedulers,
         FirebaseApps,
         ...deps,
       ],
-    }]
-  };
+    }
+  ]);
 }

@@ -1,9 +1,11 @@
-import { fromCollectionRef } from '../observable/fromRef';
+import firebase from 'firebase/compat/app';
 import { Observable, SchedulerLike } from 'rxjs';
 import { distinctUntilChanged, map, pairwise, scan, startWith } from 'rxjs/operators';
-import { Action, QuerySnapshot, DocumentChange, DocumentChangeAction, DocumentChangeType, Query } from '../interfaces';
-import firebase from 'firebase/compat/app';
+import { Action, DocumentChange, DocumentChangeAction, DocumentChangeType, Query, QuerySnapshot } from '../interfaces';
+import { fromCollectionRef } from '../observable/fromRef';
 
+
+type ActionTupe = [Action<QuerySnapshot<firebase.firestore.DocumentData>>, Action<QuerySnapshot<firebase.firestore.DocumentData>>]
 /**
  * Return a stream of document changes on a query. These results are not in sort order but in
  * order of occurence.
@@ -13,7 +15,8 @@ export function docChanges<T>(query: Query, scheduler?: SchedulerLike): Observab
     .pipe(
       startWith<Action<QuerySnapshot<firebase.firestore.DocumentData>>, undefined>(undefined),
       pairwise(),
-      map(([priorAction, action]) => {
+      map((actionTuple: ActionTupe) => {
+        const [priorAction, action] = actionTuple;
         const docChanges = action.payload.docChanges();
         const actions = docChanges.map(change => ({ type: change.type, payload: change }));
         // the metadata has changed from the prior emission
@@ -65,7 +68,7 @@ export function sortedChanges<T>(
 export function combineChanges<T>(current: DocumentChange<T>[], changes: DocumentChange<T>[], events: DocumentChangeType[]) {
   changes.forEach(change => {
     // skip unwanted change types
-    if (events.indexOf(change.type) > -1) {
+    if (events.includes(change.type)) {
       current = combineChange(current, change);
     }
   });
@@ -95,7 +98,7 @@ function sliceAndSplice<T>(
 export function combineChange<T>(combined: DocumentChange<T>[], change: DocumentChange<T>): DocumentChange<T>[] {
   switch (change.type) {
     case 'added':
-      if (combined[change.newIndex] && combined[change.newIndex].doc.ref.isEqual(change.doc.ref)) {
+      if (combined[change.newIndex]?.doc.ref.isEqual(change.doc.ref)) {
         // Not sure why the duplicates are getting fired
       } else {
         return sliceAndSplice(combined, change.newIndex, 0, change);
@@ -116,7 +119,7 @@ export function combineChange<T>(combined: DocumentChange<T>[], change: Document
       }
       break;
     case 'removed':
-      if (combined[change.oldIndex] && combined[change.oldIndex].doc.ref.isEqual(change.doc.ref)) {
+      if (combined[change.oldIndex]?.doc.ref.isEqual(change.doc.ref)) {
         return sliceAndSplice(combined, change.oldIndex, 1);
       }
       break;

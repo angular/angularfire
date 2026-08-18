@@ -2,6 +2,7 @@
     "extends": "./tsconfig.base.json",
     "compilerOptions": {
       "outDir": "dist/out-tsc/spec",
+      "module": "preserve",
       "types": [
         "jasmine",
         "node"
@@ -13,7 +14,7 @@
     "include": [
       "src/**/*.spec.ts",
       "src/**/*.d.ts",
-      "node_modules/zone.js/dist/zone.js.d.ts"
+      "node_modules/zone.js/zone.d.ts"
     ]
   }
   

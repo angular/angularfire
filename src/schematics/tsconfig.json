@@ -17,7 +17,7 @@
         ],
         "skipLibCheck": true,
         "moduleResolution": "node",
-        "target": "es6",
+        "target": "es2018",
         "module": "commonjs",
         "outDir": "../../dist/packages-dist/schematics"
     },
@@ -28,5 +28,6 @@
         "add/index.ts",
         "setup/index.ts",
         "update/v7/index.ts",
+        "update/v21/index.ts",
     ]
 }

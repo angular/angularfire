@@ -1,17 +1,16 @@
 import { Injectable, Injector, NgZone, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs';
 import { VERSION } from '@angular/fire';
 import { Auth, authState } from '@angular/fire/auth';
 import { registerVersion } from 'firebase/app';
-
+import { Subscription } from 'rxjs';
 import { Analytics } from './analytics';
-import { setUserId, isSupported } from './firebase';
+import { isSupported, setUserId } from './firebase';
 
 @Injectable()
 export class UserTrackingService implements OnDestroy {
 
   public readonly initialized: Promise<void>;
-  private disposables: Array<Subscription> = [];
+  private disposables: Subscription[] = [];
 
   constructor(
     auth: Auth,

@@ -1,13 +1,11 @@
-import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp } from '@angular/fire/compat';
-import { AngularFirestore, USE_EMULATOR, AngularFirestoreModule, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
-
 import { TestBed } from '@angular/core/testing';
-import { COMMON_CONFIG } from '../../test-config';
+import { AngularFireModule, FIREBASE_APP_NAME, FIREBASE_OPTIONS } from '@angular/fire/compat';
+import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument, AngularFirestoreModule, USE_EMULATOR } from '@angular/fire/compat/firestore';
+import { COMMON_CONFIG, firestoreEmulatorPort } from '../../../src/test-config';
 import 'firebase/compat/firestore';
-import { rando } from '../../utils';
+import { rando } from '../../../src/utils';
 
 describe('AngularFirestore', () => {
-  let app: FirebaseApp;
   let afs: AngularFirestore;
 
   beforeEach(() => {
@@ -17,16 +15,11 @@ describe('AngularFirestore', () => {
         AngularFirestoreModule.enablePersistence()
       ],
       providers: [
-        { provide: USE_EMULATOR, useValue: ['localhost', 8080] }
+        { provide: USE_EMULATOR, useValue: ['localhost', firestoreEmulatorPort] }
       ]
     });
 
-    app = TestBed.inject(FirebaseApp);
     afs = TestBed.inject(AngularFirestore);
-  });
-
-  afterEach(() => {
-    afs.firestore.disableNetwork();
   });
 
   it('should be the properly initialized type', () => {
@@ -34,39 +27,39 @@ describe('AngularFirestore', () => {
   });
 
   it('should have an initialized Firebase app', () => {
-    expect(afs.firestore.app).toBeDefined();
+    expect(TestBed.runInInjectionContext(() => afs.firestore.app)).toBeDefined();
   });
 
   it('should create an AngularFirestoreDocument from a string path', () => {
-    const doc = afs.doc('a/doc');
+    const doc = TestBed.runInInjectionContext(() => afs.doc('a/doc'));
     expect(doc instanceof AngularFirestoreDocument).toBe(true);
   });
 
   it('should create an AngularFirestoreDocument from a string path', () => {
-    const doc = afs.doc(afs.doc('a/doc').ref);
+    const doc = TestBed.runInInjectionContext(() => afs.doc(afs.doc('a/doc').ref));
     expect(doc instanceof AngularFirestoreDocument).toBe(true);
   });
 
   it('should create an AngularFirestoreCollection from a string path', () => {
-    const collection = afs.collection('stuffs');
+    const collection = TestBed.runInInjectionContext(() => afs.collection('stuffs'));
     expect(collection instanceof AngularFirestoreCollection).toBe(true);
   });
 
   it('should create an AngularFirestoreCollection from a reference', () => {
-    const collection = afs.collection(afs.collection('stuffs').ref);
+    const collection = TestBed.runInInjectionContext(() => afs.collection(afs.collection('stuffs').ref));
     expect(collection instanceof AngularFirestoreCollection).toBe(true);
   });
 
   it('should throw on an invalid document path', () => {
-    const singleWrapper = () => afs.doc('collection');
-    const tripleWrapper = () => afs.doc('collection/doc/subcollection');
+    const singleWrapper = () => TestBed.runInInjectionContext(() => afs.doc('collection'));
+    const tripleWrapper = () => TestBed.runInInjectionContext(() => afs.doc('collection/doc/subcollection'));
     expect(singleWrapper).toThrowError();
     expect(tripleWrapper).toThrowError();
   });
 
   it('should throw on an invalid collection path', () => {
-    const singleWrapper = () => afs.collection('collection/doc');
-    const quadWrapper = () => afs.collection('collection/doc/subcollection/doc');
+    const singleWrapper = () => TestBed.runInInjectionContext(() => afs.collection('collection/doc'));
+    const quadWrapper = () => TestBed.runInInjectionContext(() => afs.collection('collection/doc/subcollection/doc'));
     expect(singleWrapper).toThrowError();
     expect(quadWrapper).toThrowError();
   });
@@ -74,7 +67,7 @@ describe('AngularFirestore', () => {
   if (typeof window === 'undefined') {
 
     it('should not enable persistence (Node.js)', (done) => {
-      afs.persistenceEnabled$.subscribe(isEnabled => {
+      TestBed.runInInjectionContext(() => afs.persistenceEnabled$).subscribe(isEnabled => {
         expect(isEnabled).toBe(false);
         done();
       });
@@ -83,7 +76,7 @@ describe('AngularFirestore', () => {
   } else {
 
     it('should enable persistence', (done) => {
-      afs.persistenceEnabled$.subscribe(isEnabled => {
+      TestBed.runInInjectionContext(() => afs.persistenceEnabled$).subscribe(isEnabled => {
         expect(isEnabled).toBe(true);
         done();
       });
@@ -94,7 +87,6 @@ describe('AngularFirestore', () => {
 });
 
 describe('AngularFirestore with different app', () => {
-  let app: FirebaseApp;
   let afs: AngularFirestore;
   let firebaseAppName: string;
 
@@ -108,12 +100,11 @@ describe('AngularFirestore with different app', () => {
       providers: [
         { provide: FIREBASE_APP_NAME, useValue: firebaseAppName },
         { provide: FIREBASE_OPTIONS, useValue: COMMON_CONFIG },
-        { provide: USE_EMULATOR, useValue: ['localhost', 8080] }
+        { provide: USE_EMULATOR, useValue: ['localhost', firestoreEmulatorPort] }
       ]
     });
 
 
-    app = TestBed.inject(FirebaseApp);
     afs = TestBed.inject(AngularFirestore);
   });
 
@@ -124,11 +115,11 @@ describe('AngularFirestore with different app', () => {
     });
 
     it('should have an initialized Firebase app', () => {
-      expect(afs.firestore.app).toBeDefined();
+      expect(TestBed.runInInjectionContext(() => afs.firestore.app)).toBeDefined();
     });
 
     it('should have an initialized Firebase app instance member', () => {
-      expect(afs.firestore.app.name).toEqual(firebaseAppName);
+      expect(TestBed.runInInjectionContext(() => afs.firestore.app.name)).toEqual(firebaseAppName);
     });
   });
 
@@ -136,7 +127,6 @@ describe('AngularFirestore with different app', () => {
 
 
 describe('AngularFirestore without persistance', () => {
-  let app: FirebaseApp;
   let afs: AngularFirestore;
 
   beforeEach(() => {
@@ -146,16 +136,15 @@ describe('AngularFirestore without persistance', () => {
         AngularFirestoreModule
       ],
       providers: [
-        { provide: USE_EMULATOR, useValue: ['localhost', 8080] }
+        { provide: USE_EMULATOR, useValue: ['localhost', firestoreEmulatorPort] }
       ]
     });
 
-    app = TestBed.inject(FirebaseApp);
     afs = TestBed.inject(AngularFirestore);
   });
 
   it('should not enable persistence', (done) => {
-    afs.persistenceEnabled$.subscribe(isEnabled => {
+    TestBed.runInInjectionContext(() => afs.persistenceEnabled$).subscribe(isEnabled => {
       expect(isEnabled).toBe(false);
       done();
     });

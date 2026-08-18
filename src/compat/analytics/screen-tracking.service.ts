@@ -1,13 +1,13 @@
 import { ComponentFactoryResolver, Injectable, NgZone, OnDestroy, Optional } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
-import { Router } from '@angular/router';
-import { AngularFireAnalytics } from './analytics';
-import { Title } from '@angular/platform-browser';
-import { UserTrackingService } from './user-tracking.service';
-import firebase from 'firebase/compat/app';
 import { VERSION } from '@angular/fire';
 import { ɵscreenViewEvent } from '@angular/fire/analytics';
+import { Title } from '@angular/platform-browser';
+import { Router } from '@angular/router';
+import firebase from 'firebase/compat/app';
+import { Subscription } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import { AngularFireAnalytics } from './analytics';
+import { UserTrackingService } from './user-tracking.service';
 
 const SCREEN_VIEW_EVENT = 'screen_view';
 

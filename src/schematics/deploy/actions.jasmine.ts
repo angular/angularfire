@@ -1,8 +1,9 @@
-import { JsonObject, logging } from '@angular-devkit/core';
-import { BuilderContext, BuilderRun, ScheduleOptions, Target } from '@angular-devkit/architect';
-import { BuildTarget, FirebaseDeployConfig, FirebaseTools, FSHost } from '../interfaces';
-import deploy, { deployToFunction } from '@angular/fire/schematics/deploy/actions';
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { join } from 'path';
+import { BuilderContext, BuilderRun, ScheduleOptions, Target } from '@angular-devkit/architect';
+import { JsonObject, logging } from '@angular-devkit/core';
+import { BuildTarget, DeployBuilderSchema, FSHost, FirebaseDeployConfig, FirebaseTools } from '../interfaces';
+import deploy, { assertSafeDependencyName, assertSupportedPackageManager, buildCloudRunBuildsSubmitArgs, buildCloudRunDeployArgs, deployToFunction, findPackageVersion, processHost } from './actions.js'
 import 'jasmine';
 
 let context: BuilderContext;
@@ -62,6 +63,9 @@ const initMocks = () => {
         create: () => Promise.reject(),
       }
     },
+    init() {
+      return Promise.resolve()
+    },
     deploy: (_: FirebaseDeployConfig) => Promise.resolve(),
     use: () => Promise.resolve(),
     logger: {
@@ -89,7 +93,7 @@ const initMocks = () => {
     id: 1,
     logger: new logging.NullLogger() as any,
     workspaceRoot: 'cwd',
-    getTargetOptions: async (target: Target) => {
+    getTargetOptions: (target: Target) => {
       if (target.target === 'build') {
         return { outputPath: 'dist/browser' };
       } else if (target.target === 'server') {
@@ -295,4 +299,133 @@ describe('universal deployment', () => {
     await deployToFunction(firebaseMock, context, '/home/user', projectTargets, true, fsHost);
     expect(spy).not.toHaveBeenCalled();
   });*/
+});
+
+describe('Cloud Run gcloud argv construction', () => {
+  // Regression coverage for the argv-injection fix: these options used to be interpolated
+  // into a single command string and split on whitespace, so a value containing a space
+  // would land as extra, unintended argv entries. They're now passed straight through as
+  // individual array elements.
+  const INJECTED_REGION = 'us-central1 --set-env-vars=INJECTED=owned';
+  const INJECTED_PROJECT = `${FIREBASE_PROJECT} --format=json`;
+
+  it('keeps a region value containing a space as a single --region argument', () => {
+    const options: DeployBuilderSchema = { firebaseProject: FIREBASE_PROJECT, region: INJECTED_REGION };
+    const args = buildCloudRunDeployArgs('my-service', options, []);
+
+    expect(args[args.indexOf('--region') + 1]).toBe(INJECTED_REGION);
+    expect(args).not.toContain('--set-env-vars=INJECTED=owned');
+  });
+
+  it('keeps a firebaseProject value containing a space as a single --project argument (deploy)', () => {
+    const options: DeployBuilderSchema = { firebaseProject: INJECTED_PROJECT, region: 'us-central1' };
+    const args = buildCloudRunDeployArgs('my-service', options, []);
+
+    expect(args[args.indexOf('--project') + 1]).toBe(INJECTED_PROJECT);
+    expect(args).not.toContain('--format=json');
+  });
+
+  it('keeps a firebaseProject value containing a space as a single --project argument (builds submit)', () => {
+    const options: DeployBuilderSchema = { firebaseProject: INJECTED_PROJECT };
+    const args = buildCloudRunBuildsSubmitArgs('cloudRunOut', 'my-service', options);
+
+    expect(args[args.indexOf('--project') + 1]).toBe(INJECTED_PROJECT);
+    expect(args).not.toContain('--format=json');
+  });
+
+  it('passes cloudRunOptions through as their own argv entries', () => {
+    const options: DeployBuilderSchema = { firebaseProject: FIREBASE_PROJECT, region: 'us-central1' };
+    const args = buildCloudRunDeployArgs('my-service', options, ['--vpc-connector', 'my-connector --unset-env-vars=OWNED']);
+
+    expect(args[args.indexOf('--vpc-connector') + 1]).toBe('my-connector --unset-env-vars=OWNED');
+    expect(args).not.toContain('--unset-env-vars=OWNED');
+  });
+});
+
+describe('deploy input validation (command-injection hardening)', () => {
+  describe('assertSupportedPackageManager', () => {
+    ['npm', 'yarn', 'pnpm', 'cnpm', 'bun'].forEach((pm) => {
+      it(`allows the supported package manager "${pm}"`, () => {
+        expect(assertSupportedPackageManager(pm)).toBe(pm);
+      });
+    });
+
+    it('rejects a package manager carrying a shell payload', () => {
+      expect(() => assertSupportedPackageManager('npm; touch /tmp/pwned #'))
+        .toThrowError(/Unsupported package manager/);
+    });
+
+    it('rejects an arbitrary executable path', () => {
+      expect(() => assertSupportedPackageManager('/tmp/evil')).toThrowError(/Unsupported package manager/);
+    });
+  });
+
+  describe('assertSafeDependencyName', () => {
+    ['rxjs', '@angular/core', '@angular/*', 'some-pkg', 'a.b_c'].forEach((name) => {
+      it(`allows the valid dependency name "${name}"`, () => {
+        expect(assertSafeDependencyName(name)).toBe(name);
+      });
+    });
+
+    ['evil; touch /tmp/pwned #', 'a b', '$(id)', '`id`', 'a|b', 'a&b', '-rf', '', 'a>b'].forEach((name) => {
+      it(`rejects the unsafe dependency name ${JSON.stringify(name)}`, () => {
+        expect(() => assertSafeDependencyName(name)).toThrowError(/Invalid dependency name/);
+      });
+    });
+  });
+
+  // These guard the fix at its call sites: the validators above are only useful
+  // if the deploy code keeps routing every command through the shell-free runner.
+  // A regression to execSync/`shell: true`, or a dropped validator call, fails here.
+  describe('call sites route through the shell-free runner', () => {
+    beforeEach(() => initMocks());
+
+    it('installs functions dependencies via the runner with an argv array and no shell', async () => {
+      // The install branch only runs when the generated package.json exists.
+      spyOn(fsHost, 'existsSync').and.returnValue(true);
+      const runSpy = spyOn(processHost, 'runPackageBin').and.returnValue(Buffer.from(''));
+
+      await deployToFunction(
+        firebaseMock,
+        context,
+        workspaceRoot,
+        STATIC_BUILD_TARGET,
+        SERVER_BUILD_TARGET,
+        { preview: false },
+        undefined,
+        fsHost
+      );
+
+      expect(runSpy).toHaveBeenCalledTimes(1);
+      const [command, args, options] = runSpy.calls.mostRecent().args;
+      expect(command).toBe('npm');
+      expect(args).toEqual(['--prefix', join(workspaceRoot, 'dist'), 'install']);
+      // No shell: a `shell` option would reopen the injection this PR closes.
+      expect((options as any)?.shell).toBeFalsy();
+    });
+
+    it('runs the package manager through the runner with a validated argv array', () => {
+      const runSpy = spyOn(processHost, 'runPackageBin').and.returnValue(Buffer.from(''));
+
+      findPackageVersion('npm', 'rxjs');
+
+      expect(runSpy).toHaveBeenCalledWith('npm', ['list', 'rxjs']);
+    });
+
+    it('rejects an unsupported package manager before spawning anything', () => {
+      const runSpy = spyOn(processHost, 'runPackageBin');
+
+      expect(() => findPackageVersion('npm; touch /tmp/pwned #', 'rxjs'))
+        .toThrowError(/Unsupported package manager/);
+      expect(runSpy).not.toHaveBeenCalled();
+    });
+
+    it('rejects an unsafe dependency name before spawning anything', () => {
+      const runSpy = spyOn(processHost, 'runPackageBin');
+
+      expect(() => findPackageVersion('npm', 'evil; touch /tmp/pwned #'))
+        .toThrowError(/Invalid dependency name/);
+      expect(runSpy).not.toHaveBeenCalled();
+    });
+  });
 });

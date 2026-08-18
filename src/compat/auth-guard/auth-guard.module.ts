@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
-import { AngularFireAuthGuard } from './auth-guard';
-import firebase from 'firebase/compat/app';
 import { VERSION } from '@angular/fire';
+import firebase from 'firebase/compat/app';
+import { AngularFireAuthGuard } from './auth-guard';
 
 @NgModule({
   providers: [ AngularFireAuthGuard ]

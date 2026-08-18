@@ -1,7 +1,7 @@
 <img align="right" width="30%" src="images/firestore-illo_1x.png">
 
 <small>
-<a href="https://github.com/angular/angularfire">AngularFire</a> &#10097; <a href="../README.md#developer-guide">Developer Guide</a> &#10097; Realtime Cloud Firestore
+<a href="https://github.com/angular/angularfire">AngularFire</a> &#10097; <a href="../README.md#developer-guide">Developer Guide</a> &#10097; Cloud Firestore
 </small>
 
 # Cloud Firestore
@@ -18,48 +18,47 @@ As a prerequisite, ensure that `AngularFire` has been added to your project via
 ```bash
 ng add @angular/fire
 ```
-Provide a Firestore instance in the application's `NgModule` (`app.module.ts`):
+Provide a Firestore instance in the application's `app.config.ts`:
 
-```typescript
-@NgModule({
-  declarations: [
+```ts
+import { ApplicationConfig } from '@angular/core';
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { provideFirestore, getFirestore } from '@angular/fire/firestore';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideFirebaseApp(() => initializeApp({ ... })),
+    provideFirestore(() => getFirestore()),
     ...
   ],
-  imports: [
-    ...
-    // App initialization
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideFirestore(() => getFirestore())
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
-})
-export class AppModule { }
+  ...
+}
 ```
 
-
-In your component class, for example `user-profile.component.ts` import and inject `Firestore`:
+Next inject `Firestore` into your component:
 
 ```typescript
 import { Component, inject } from '@angular/core';
 import { Firestore } from '@angular/fire/firestore';
 
-@Component({
-    standalone: true,
-    selector: 'app-user-profile',
-    ...
-})
+@Component({ ... })
 export class UserProfileComponent {
-    private firestore: Firestore = inject(Firestore);
+    private firestore = inject(Firestore);
     ...
 }
 ```
 
 ## Firebase API
-With the reference to Cloud Firestore available in a component it is now possible to connect read from and write to the database.
+
+AngularFire wraps the Firebase JS SDK to ensure proper functionality in Angular, while providing the same API.
+
+Update the imports from `import { ... } from 'firebase/firestore'` to `import { ... } from '@angular/fire/firestore'` and follow the official documentation.
+
+[Getting Started](https://firebase.google.com/docs/firestore/quickstart#web-modular-api) | [API Reference](https://firebase.google.com/docs/reference/js/firestore)
 
 ### Reading data
-In Cloud Firestore data is stored in `documents` and `documents` are stored in `collections`. The path to data follows `<collection_name>/<document_id>` and continues if there are subcollections. For example, `"users/ABC1245/posts/XYZ6789"` represents:
+
+In Cloud Firestore data is stored in `documents` and `documents` are stored in `collections`. The path to data follows `<collection_name>/<document_id>` and continues if there are subcollections. For example, `"users/ABC12345/posts/XYZ6789"` represents:
 * `users` collection
 * document id `ABC12345`
 * `posts` collection
@@ -73,6 +72,7 @@ In `user-profile.component.ts`:
 ```typescript
 import { Firestore, collection, collectionData} from '@angular/fire/firestore';
 import { Component, inject } from '@angular/core';
+import { Observable } from 'rxjs';
 
 @Component ({
     selector: 'app-user-profile',
@@ -91,7 +91,7 @@ export class UserProfileComponent {
         this.users$ = collectionData(userProfileCollection) as Observable<UserProfile[]>;
     }
 }
-export Interface UserProfile {
+export interface UserProfile {
     username: string;
 }
 ```
@@ -111,12 +111,14 @@ export Interface UserProfile {
 The `async` pipe handles unsubscribing from observables.
 
 ### Writing data
+
 To write to Cloud Firestore use the `addDoc` function. It will create a new document at the path specified by the collection. In `user-profile.component.ts`, we'll update the code to add a new document on a `<button>` click.
 
 
 ```typescript
-import { Firestore, collection, collectionData, addDoc} from '@angular/fire/firestore';
+import { Firestore, collection, collectionData, addDoc, CollectionReference, DocumentReference } from '@angular/fire/firestore';
 import { Component, inject } from '@angular/core';
+import { Observable } from 'rxjs';
 
 @Component ({
     selector: 'app-user-profile',
@@ -138,7 +140,7 @@ export class UserProfileComponent {
         });
     }
 }
-export Interface UserProfile {
+export interface UserProfile {
     username: string;
 }
 ```

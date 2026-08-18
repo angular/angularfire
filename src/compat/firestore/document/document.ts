@@ -1,11 +1,12 @@
-import { from, Observable } from 'rxjs';
-import { keepUnstableUntilFirst } from '@angular/fire';
+import { EnvironmentInjector, inject } from '@angular/core';
+import { pendingUntilEvent } from '@angular/core/rxjs-interop';
+import firebase from 'firebase/compat/app';
+import { Observable, from } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { AngularFirestoreCollection } from '../collection/collection';
+import { AngularFirestore, associateQuery } from '../firestore';
 import { Action, DocumentData, DocumentReference, DocumentSnapshot, QueryFn, SetOptions } from '../interfaces';
 import { fromDocRef } from '../observable/fromRef';
-import { map } from 'rxjs/operators';
-import { AngularFirestore, associateQuery } from '../firestore';
-import { AngularFirestoreCollection } from '../collection/collection';
-import firebase from 'firebase/compat/app';
 
 /**
  * AngularFirestoreDocument service
@@ -30,6 +31,7 @@ import firebase from 'firebase/compat/app';
  * Observable.from(fakeStock).subscribe(value => console.log(value));
  */
 export class AngularFirestoreDocument<T = DocumentData> {
+  private readonly injector = inject(EnvironmentInjector);
 
   /**
    * The constructor takes in a DocumentReference to provide wrapper methods
@@ -74,7 +76,7 @@ export class AngularFirestoreDocument<T = DocumentData> {
   snapshotChanges(): Observable<Action<DocumentSnapshot<T>>> {
     const scheduledFromDocRef$ = fromDocRef<T>(this.ref, this.afs.schedulers.outsideAngular);
     return scheduledFromDocRef$.pipe(
-      keepUnstableUntilFirst
+      pendingUntilEvent(this.injector)
     );
   }
 
@@ -84,15 +86,15 @@ export class AngularFirestoreDocument<T = DocumentData> {
    * If the `idField` option is provided, document IDs are included and mapped to the
    * provided `idField` property name.
    */
-  valueChanges(options?: { }): Observable<T | undefined>;
-  valueChanges<K extends string>(options: { idField: K }): Observable<(T & { [T in K]: string }) | undefined>;
+  valueChanges(options?: unknown): Observable<T | undefined>;
+  valueChanges<K extends string>(options: { idField: K }): Observable<(T & Record<K, string>) | undefined>;
   valueChanges<K extends string>(options: { idField?: K } = {}): Observable<T | undefined> {
     return this.snapshotChanges().pipe(
       map(({ payload }) =>
         options.idField ? {
           ...payload.data(),
           ...{ [options.idField]: payload.id }
-        } as T & { [T in K]: string } : payload.data()
+        } as T & Record<K, string> : payload.data()
       )
     );
   }
@@ -102,7 +104,7 @@ export class AngularFirestoreDocument<T = DocumentData> {
    */
   get(options?: firebase.firestore.GetOptions) {
     return from(this.ref.get(options)).pipe(
-      keepUnstableUntilFirst,
+      pendingUntilEvent(this.injector)
     );
   }
 }

@@ -1,10 +1,11 @@
 import { NgModule } from '@angular/core';
+import { VERSION } from '@angular/fire';
+import firebase from 'firebase/compat/app';
 import { GetDownloadURLPipeModule } from './pipes/storageUrl.pipe';
 import { AngularFireStorage } from './storage';
-import firebase from 'firebase/compat/app';
-import { VERSION } from '@angular/fire';
 
 @NgModule({
+  imports: [ GetDownloadURLPipeModule ],
   exports: [ GetDownloadURLPipeModule ],
   providers: [ AngularFireStorage ]
 })

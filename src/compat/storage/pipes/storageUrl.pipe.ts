@@ -1,6 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectorRef, NgModule, OnDestroy, Optional, Pipe, PipeTransform } from '@angular/core';
-import { makeStateKey, TransferState } from '@angular/platform-browser';
+import { ChangeDetectorRef, NgModule, OnDestroy, Optional, Pipe, PipeTransform, TransferState, makeStateKey } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { AngularFireStorage } from '../storage';
@@ -43,7 +42,7 @@ export class GetDownloadURLPipe implements PipeTransform, OnDestroy {
 }
 
 @NgModule({
-  declarations: [ GetDownloadURLPipe ],
+  imports: [ GetDownloadURLPipe ],
   exports: [ GetDownloadURLPipe ],
 })
 export class GetDownloadURLPipeModule {}

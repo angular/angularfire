@@ -9,6 +9,7 @@
 Google Analytics is an app measurement solution, available at no charge, that provides insight on app usage and user engagement.
 
 [Learn more](https://firebase.google.com/docs/analytics)
+
 ## Dependency Injection
 
 As a prerequisite, ensure that `AngularFire` has been added to your project via
@@ -16,52 +17,39 @@ As a prerequisite, ensure that `AngularFire` has been added to your project via
 ng add @angular/fire
 ```
 
-Provide a Google Analytics instance in the application's `NgModule` (`app.module.ts`):
+Provide an Analytics instance in the application's `app.config.ts`:
 
 ```ts
-@NgModule({
-  declarations: [
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { provideAnalytics, getAnalytics } from '@angular/fire/analytics';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideFirebaseApp(() => initializeApp({ ... })),
+    provideAnalytics(() => getAnalytics()),
     ...
   ],
-  imports: [
-    ...
-    // App initialization
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideAnalytics(() => getAnalytics())
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
-})
-export class AppModule { }
+  ...,
+}
 ```
 
-In your component class, for example `user-profile.component.ts` import and inject `Firestore`:
+Next inject `Analytics` into your component:
 
 ```typescript
 import { Component, inject } from '@angular/core';
 import { Analytics } from '@angular/fire/analytics';
 
-@Component({
-    standalone: true,
-    selector: 'app-user-profile',
-    ...
-})
+@Component({ ... })
 export class UserProfileComponent {
-    private analytics: Analytics = inject(Analytics);
+    private analytics = inject(Analytics);
     ...
 }
 ```
 
 ## Firebase API
 
-The [Firebase API for Google Analytics documentation](https://firebase.google.com/docs/reference/js/analytics.md#analytics_package) is available on the Firebase website.
+AngularFire wraps the Firebase JS SDK to ensure proper functionality in Angular, while providing the same API.
 
-## Services
+Update the imports from `import { ... } from 'firebase/analytics'` to `import { ... } from '@angular/fire/analytics'` and follow the official documentation.
 
-### ScreenTrackingService
-
-Coming soon, for now [please review the documentation](https://firebase.google.com/docs/analytics/screenviews)
-
-### UserTrackingService
-Coming soon
-
+[Getting Started](https://firebase.google.com/docs/analytics/get-started?platform=web) | [API Reference](https://firebase.google.com/docs/reference/js/analytics)

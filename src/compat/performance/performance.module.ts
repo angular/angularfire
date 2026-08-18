@@ -1,8 +1,8 @@
 import { NgModule, Optional } from '@angular/core';
+import { VERSION } from '@angular/fire';
+import firebase from 'firebase/compat/app';
 import { AngularFirePerformance } from './performance';
 import { PerformanceMonitoringService } from './performance.service';
-import firebase from 'firebase/compat/app';
-import { VERSION } from '@angular/fire';
 
 @NgModule({
   providers: [ AngularFirePerformance ]
@@ -14,7 +14,6 @@ export class AngularFirePerformanceModule {
   ) {
     firebase.registerVersion('angularfire', VERSION.full, 'perf-compat');
     // call anything here to get perf loading
-    // tslint:disable-next-line:no-unused-expression
-    perf.dataCollectionEnabled.then(() => {});
+    perf.dataCollectionEnabled.then(() => undefined);
   }
 }

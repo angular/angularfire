@@ -1,29 +1,33 @@
-import { RuntimeOptions } from 'firebase-functions';
+import type { HttpsOptions } from 'firebase-functions/https';
 
 export const enum FEATURES {
-  Hosting,
   Authentication,
   Analytics,
+  AppCheck,
   Database,
+  DataConnect,
   Functions,
   Messaging,
   Performance,
   Firestore,
   Storage,
   RemoteConfig,
+  AI,
 }
 
 export const featureOptions = [
-  { name: 'ng deploy -- hosting', value: FEATURES.Hosting },
   { name: 'Authentication', value: FEATURES.Authentication },
+  { name: 'Google Analytics', value: FEATURES.Analytics },
+  { name: 'App Check', value: FEATURES.AppCheck },
   { name: 'Firestore', value: FEATURES.Firestore },
   { name: 'Realtime Database', value: FEATURES.Database },
-  { name: 'Analytics', value: FEATURES.Analytics },
+  { name: 'Data Connect', value: FEATURES.DataConnect },
   { name: 'Cloud Functions (callable)', value: FEATURES.Functions },
   { name: 'Cloud Messaging', value: FEATURES.Messaging },
   { name: 'Performance Monitoring', value: FEATURES.Performance },
   { name: 'Cloud Storage', value: FEATURES.Storage },
   { name: 'Remote Config', value: FEATURES.RemoteConfig },
+  { name: 'AI Logic', value: FEATURES.AI },
 ];
 
 export const enum PROJECT_TYPE { Static, CloudFunctions, CloudRun, WebFrameworks }
@@ -39,15 +43,13 @@ export interface NgAddNormalizedOptions {
   firebaseApp: FirebaseApp|undefined;
   firebaseHostingSite: FirebaseHostingSite|undefined;
   sdkConfig: Record<string, string>|undefined;
-  prerender: boolean|undefined;
-  browserTarget: string|undefined;
-  serverTarget: string|undefined;
-  prerenderTarget: string|undefined;
+  buildTarget: [string,string]|undefined;
+  serveTarget: [string,string]|undefined;
   ssrRegion: string|undefined;
 }
 
 export interface DeployOptions {
-  project: string;
+  project?: string;
 }
 
 export interface FirebaseProject {
@@ -55,7 +57,7 @@ export interface FirebaseProject {
   projectNumber: string;
   displayName: string;
   name: string;
-  resources: { [key: string]: string };
+  resources: Record<string, string>;
   state: string;
 }
 
@@ -84,7 +86,7 @@ export interface FirebaseHostingSite {
 export interface FirebaseSDKConfig {
   fileName: string;
   fileContents: string;
-  sdkConfig: { [key: string]: string };
+  sdkConfig: Record<string, string>;
 }
 
 export interface FirebaseTools {
@@ -120,16 +122,18 @@ export interface FirebaseTools {
   };
 
   login: {
-    list(): Promise<{user: Record<string, any>}[]>;
+    list(): Promise<{user: Record<string, any>}[] | { users: undefined }>;
     add(): Promise<Record<string, any>>;
-    use(email: string, options?: {}): Promise<string>;
-  } & ((options?: {}) => Promise<Record<string, any>>);
+    use(email: string, options?: unknown): Promise<string>;
+  } & ((options?: unknown) => Promise<Record<string, any>>);
 
   deploy(config: FirebaseDeployConfig): Promise<any>;
 
   serve(options: any): Promise<any>;
 
   use(options: any, lol: any): Promise<any>;
+
+  init(feature: string, options: any): Promise<any>;
 }
 
 export interface FirebaseHostingRewrite {
@@ -145,11 +149,22 @@ export interface FirebaseHostingConfig {
   rewrites?: FirebaseHostingRewrite[];
 }
 
-export interface FirebaseFunctionsConfig { [key: string]: any; }
+export type FirebaseFunctionsConfig = Record<string, any>;
+
+export interface DataConnectConfig {
+  source?: string;
+}
+
+export interface FirebaseFirestoreConfig {
+  rules?: string;
+  indexes?: string;
+}
 
 export interface FirebaseJSON {
   hosting?: FirebaseHostingConfig[] | FirebaseHostingConfig;
   functions?: FirebaseFunctionsConfig;
+  firestore?: FirebaseFirestoreConfig;
+  dataconnect?: DataConnectConfig;
 }
 
 export interface FirebaseRcTarget {
@@ -176,7 +191,7 @@ export interface DeployBuilderSchema {
   prerender?: boolean;
   functionName?: string;
   functionsNodeVersion?: number|string;
-  functionsRuntimeOptions?: RuntimeOptions;
+  functionsRuntimeOptions?: HttpsOptions;
   cloudRunOptions?: Partial<CloudRunOptions>;
   outputPath?: string;
   CF3v2?: boolean;
@@ -195,7 +210,7 @@ export interface CloudRunOptions {
 
 export interface BuildTarget {
   name: string;
-  options?: {[name: string]: any};
+  options?: Record<string, any>;
 }
 
 export interface FSHost {
@@ -222,4 +237,37 @@ export interface WorkspaceProject {
 export interface Workspace {
   defaultProject?: string;
   projects: Record<string, WorkspaceProject>;
+}
+
+export interface ConnectorConfig {
+  location: string;
+  connector: string;
+  service: string;
+}
+export interface ConnectorYaml {
+  connectorId: string;
+  generate?: {
+    javascriptSdk?: {
+      package: string;
+      outputDir: string;
+      packageJsonDir?: string;
+      angular?: boolean;
+    }
+  }
+}
+export interface DataConnectYaml {
+  location: string;
+  serviceId: string;
+  connectorDirs: string[];
+}
+export interface DataConnectConnectorConfig  {
+  connectorYaml: ConnectorYaml;
+  connectorConfig?: ConnectorConfig;
+  angular?: boolean;
+  package?: string;
+}
+
+export interface PackageJson {
+  dependencies: Record<string, string>;
+  devDependencies: Record<string, string>;
 }

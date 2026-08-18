@@ -1,24 +1,40 @@
-import { Injectable, NgZone } from '@angular/core';
+ 
 import {
-  asyncScheduler,
+  EnvironmentInjector,
+  Injectable,
+  NgZone,
+  PendingTasks,
+  inject,
+  isDevMode,
+  runInInjectionContext
+} from '@angular/core';
+import { pendingUntilEvent } from '@angular/core/rxjs-interop';
+import {
   Observable,
-  Operator,
-  queueScheduler,
   SchedulerAction,
   SchedulerLike,
-  Subscriber,
   Subscription,
-  TeardownLogic
+  asyncScheduler,
+  queueScheduler
 } from 'rxjs';
-import { observeOn, subscribeOn, tap } from 'rxjs/operators';
+import { observeOn, subscribeOn } from 'rxjs/operators';
 
-function noop() {
+declare const Zone: {current: unknown} | undefined;
+
+export enum LogLevel {
+  "SILENT" = 0, 
+  "WARN" = 1,
+  "VERBOSE" = 2,
 }
+
+
+var currentLogLevel = (isDevMode() && typeof Zone !== "undefined") ? LogLevel.WARN : LogLevel.SILENT;
+
+export const setLogLevel = (logLevel: LogLevel) => currentLogLevel = logLevel;
 
 /**
  * Schedules tasks so that they are invoked inside the Zone that is passed in the constructor.
  */
-// tslint:disable-next-line:class-name
 export class ɵZoneScheduler implements SchedulerLike {
   constructor(private zone: any, private delegate: any = queueScheduler) {
   }
@@ -32,9 +48,13 @@ export class ɵZoneScheduler implements SchedulerLike {
     // Wrap the specified work function to make sure that if nested scheduling takes place the
     // work is executed in the correct zone
     const workInZone = function(this: SchedulerAction<any>, state: any) {
-      targetZone.runGuarded(() => {
+      if (targetZone) {
+        targetZone.runGuarded(() => {
+          work.apply(this, [state]);
+        });
+      } else {
         work.apply(this, [state]);
-      });
+      }
     };
 
     // Scheduling itself needs to be run in zone to ensure setInterval calls for async scheduling are done
@@ -44,140 +64,94 @@ export class ɵZoneScheduler implements SchedulerLike {
   }
 }
 
-class BlockUntilFirstOperator<T> implements Operator<T, T> {
-  private task: MacroTask | null = null;
-
-  constructor(private zone: any) {
-  }
-
-  call(subscriber: Subscriber<T>, source: Observable<T>): TeardownLogic {
-    const unscheduleTask = this.unscheduleTask.bind(this);
-    this.task = this.zone.run(() => Zone.current.scheduleMacroTask('firebaseZoneBlock', noop, {}, noop, noop));
-
-    return source.pipe(
-      tap({ next: unscheduleTask, complete: unscheduleTask, error: unscheduleTask })
-    ).subscribe(subscriber).add(unscheduleTask);
-  }
-
-  private unscheduleTask() {
-    // maybe this is a race condition, invoke in a timeout
-    // hold for 10ms while I try to figure out what is going on
-    setTimeout(() => {
-      if (this.task != null && this.task.state === 'scheduled') {
-        this.task.invoke();
-        this.task = null;
-      }
-    }, 10);
-  }
-}
-
 @Injectable({
   providedIn: 'root',
 })
-// tslint:disable-next-line:class-name
 export class ɵAngularFireSchedulers {
   public readonly outsideAngular: ɵZoneScheduler;
   public readonly insideAngular: ɵZoneScheduler;
 
-  constructor(public ngZone: NgZone) {
-    this.outsideAngular = ngZone.runOutsideAngular(() => new ɵZoneScheduler(Zone.current));
-    this.insideAngular = ngZone.run(() => new ɵZoneScheduler(Zone.current, asyncScheduler));
-    globalThis.ɵAngularFireScheduler ||= this;
+  constructor() {
+    const ngZone = inject(NgZone);
+    this.outsideAngular = ngZone.runOutsideAngular(
+      () => new ɵZoneScheduler(typeof Zone === 'undefined' ? undefined : Zone.current)
+    );
+    this.insideAngular = ngZone.run(
+      () => new ɵZoneScheduler(
+        typeof Zone === 'undefined' ? undefined : Zone.current,
+        asyncScheduler
+      )
+    );
   }
 }
 
-function getSchedulers() {
-  const schedulers = globalThis.ɵAngularFireScheduler as ɵAngularFireSchedulers|undefined;
-  if (!schedulers) {
-    throw new Error(
-`Either AngularFireModule has not been provided in your AppModule (this can be done manually or implictly using
-provideFirebaseApp) or you're calling an AngularFire method outside of an NgModule (which is not supported).`);
+var alreadyWarned = false;
+function warnOutsideInjectionContext(original: any, logLevel: LogLevel) {
+  if (!alreadyWarned && (currentLogLevel > LogLevel.SILENT || isDevMode())) {
+    alreadyWarned = true;
+    console.warn("Calling Firebase APIs outside of an Injection context may destabilize your application leading to subtle change-detection and hydration bugs. Find more at https://github.com/angular/angularfire/blob/main/docs/zones.md");
   }
-  return schedulers;
+  if (currentLogLevel >= logLevel) {
+    console.warn(`Firebase API called outside injection context: ${original.name}`);
+  }
 }
 
 function runOutsideAngular<T>(fn: (...args: any[]) => T): T {
-  return getSchedulers().ngZone.runOutsideAngular(() => fn());
+  const ngZone = inject(NgZone, { optional: true });
+  if (!ngZone) {return fn();}
+  return ngZone.runOutsideAngular(() => fn());
 }
 
 function run<T>(fn: (...args: any[]) => T): T {
-  return getSchedulers().ngZone.run(() => fn());
+  const ngZone = inject(NgZone, { optional: true });
+  if (!ngZone) {return fn();}
+  return ngZone.run(() => fn());
 }
 
-export function observeOutsideAngular<T>(obs$: Observable<T>): Observable<T> {
-  return obs$.pipe(observeOn(getSchedulers().outsideAngular));
-}
-
-export function observeInsideAngular<T>(obs$: Observable<T>): Observable<T> {
-  return obs$.pipe(observeOn(getSchedulers().insideAngular));
-}
-
-export function keepUnstableUntilFirst<T>(obs$: Observable<T>): Observable<T> {
-  const scheduler = getSchedulers();
-  return ɵkeepUnstableUntilFirstFactory(getSchedulers())(obs$);
-}
-
-/**
- * Operator to block the zone until the first value has been emitted or the observable
- * has completed/errored. This is used to make sure that universal waits until the first
- * value from firebase but doesn't block the zone forever since the firebase subscription
- * is still alive.
- */
-export function ɵkeepUnstableUntilFirstFactory(schedulers: ɵAngularFireSchedulers) {
-  return function keepUnstableUntilFirst<T>(obs$: Observable<T>): Observable<T> {
-    obs$ = obs$.lift(
-      new BlockUntilFirstOperator(schedulers.ngZone)
-    );
-
-    return obs$.pipe(
-      // Run the subscribe body outside of Angular (e.g. calling Firebase SDK to add a listener to a change event)
-      subscribeOn(schedulers.outsideAngular),
-      // Run operators inside the angular zone (e.g. side effects via tap())
-      observeOn(schedulers.insideAngular)
-      // INVESTIGATE https://github.com/angular/angularfire/pull/2315
-      // share()
-    );
-  };
-}
-
-const zoneWrapFn = (it: (...args: any[]) => any, macrotask: MacroTask|undefined) => {
-  const _this = this;
-  // function() is needed for the arguments object
-  // tslint:disable-next-line:only-arrow-functions
-  return function() {
-    const _arguments = arguments;
-    if (macrotask) {
-      setTimeout(() => {
-        if (macrotask.state === 'scheduled') {
-          macrotask.invoke();
-        }
-      }, 10);
+const zoneWrapFn = (
+  it: (...args: any[]) => any,
+  taskDone: VoidFunction | undefined,
+  injector: EnvironmentInjector,
+) => {
+  return (...args: any[]) => {
+    if (taskDone) {
+      setTimeout(taskDone, 0);
     }
-    return run(() => it.apply(_this, _arguments));
+    return runInInjectionContext(injector, () => run(() => it.apply(this, args)));
   };
 };
 
-export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
+export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, logLevel?: LogLevel): T => {
+  logLevel ||= blockUntilFirst ? LogLevel.WARN : LogLevel.VERBOSE;
   // function() is needed for the arguments object
-  // tslint:disable-next-line:only-arrow-functions
-  return function() {
-    let macrotask: MacroTask | undefined;
+  return function () {
+    let taskDone: VoidFunction | undefined;
     const _arguments = arguments;
-    // if this is a callback function, e.g, onSnapshot, we should create a microtask and invoke it
+    let schedulers: ɵAngularFireSchedulers;
+    let pendingTasks: PendingTasks;
+    let injector: EnvironmentInjector;
+    try {
+      schedulers = inject(ɵAngularFireSchedulers);
+      pendingTasks = inject(PendingTasks);
+      injector = inject(EnvironmentInjector);
+    } catch (_) {
+      warnOutsideInjectionContext(it, logLevel);
+      return (it as any).apply(this, _arguments);
+    }
+    // if this is a callback function, e.g, onSnapshot, we should create a pending task and complete it
     // only once one of the callback functions is tripped.
     for (let i = 0; i < arguments.length; i++) {
       if (typeof _arguments[i] === 'function') {
         if (blockUntilFirst) {
-          macrotask ||= run(() => Zone.current.scheduleMacroTask('firebaseZoneBlock', noop, {}, noop, noop));
+          taskDone ||= run(() => pendingTasks.add());
         }
         // TODO create a microtask to track callback functions
-        _arguments[i] = zoneWrapFn(_arguments[i], macrotask);
+        _arguments[i] = zoneWrapFn(_arguments[i], taskDone, injector);
       }
     }
     const ret = runOutsideAngular(() => (it as any).apply(this, _arguments));
     if (!blockUntilFirst) {
       if (ret instanceof Observable) {
-        const schedulers = getSchedulers();
         return ret.pipe(
           subscribeOn(schedulers.outsideAngular),
           observeOn(schedulers.insideAngular),
@@ -187,19 +161,28 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean): T => {
       }
     }
     if (ret instanceof Observable) {
-      return ret.pipe(keepUnstableUntilFirst) as any;
+      return ret.pipe(
+        subscribeOn(schedulers.outsideAngular),
+        observeOn(schedulers.insideAngular),
+        pendingUntilEvent(injector),
+      );
     } else if (ret instanceof Promise) {
-      return run(() => new Promise((resolve, reject) => ret.then(it => run(() => resolve(it)), reason => run(() => reject(reason)))));
-    } else if (typeof ret === 'function' && macrotask) {
+       
+      return run(
+        () => {
+          const removeTask = pendingTasks.add();
+          return new Promise((resolve, reject) => {
+            ret.then(
+              (it) => runInInjectionContext(injector, () => run(() => resolve(it))),
+              (reason) => runInInjectionContext(injector, () => run(() => reject(reason)))
+            ).finally(removeTask);
+        });
+      });
+    } else if (typeof ret === 'function' && taskDone) {
       // Handle unsubscribe
       // function() is needed for the arguments object
-      // tslint:disable-next-line:only-arrow-functions
-      return function() {
-        setTimeout(() => {
-          if (macrotask && macrotask.state === 'scheduled') {
-            macrotask.invoke();
-          }
-        }, 10);
+      return function () {
+        setTimeout(taskDone, 0);
         return ret.apply(this, arguments);
       };
     } else {

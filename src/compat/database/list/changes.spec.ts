@@ -1,14 +1,13 @@
-import firebase from 'firebase/compat/app';
-import { AngularFireModule, FirebaseApp } from '@angular/fire/compat';
-import { AngularFireDatabase, AngularFireDatabaseModule, listChanges, URL } from '@angular/fire/compat/database';
 import { TestBed } from '@angular/core/testing';
-import { COMMON_CONFIG } from '../../../test-config';
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFireDatabase, AngularFireDatabaseModule, USE_EMULATOR, listChanges } from '@angular/fire/compat/database';
+import firebase from 'firebase/compat/app';
 import { skip, take } from 'rxjs/operators';
+import { COMMON_CONFIG, databaseEmulatorPort } from '../../../../src/test-config';
 import 'firebase/compat/database';
-import { rando } from '../../../utils';
+import { rando } from '../../../../src/utils';
 
 describe('listChanges', () => {
-  let app: FirebaseApp;
   let db: AngularFireDatabase;
   let ref: (path: string) => firebase.database.Reference;
   let batch = {};
@@ -26,17 +25,12 @@ describe('listChanges', () => {
         AngularFireDatabaseModule
       ],
       providers: [
-        { provide: URL, useValue: 'http://localhost:9000' }
+        { provide: USE_EMULATOR, useValue: ['localhost', databaseEmulatorPort] }
       ]
     });
 
-    app = TestBed.inject(FirebaseApp);
     db = TestBed.inject(AngularFireDatabase);
     ref = (path: string) => db.database.ref(path);
-  });
-
-  afterEach(() => {
-    db.database.goOffline();
   });
 
   describe('events', () => {

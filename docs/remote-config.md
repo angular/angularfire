@@ -1,7 +1,7 @@
 <img align="right" width="30%" src="images/remote-config-illo_1x.png">
 
 <small>
-<a href="https://github.com/angular/angularfire">AngularFire</a> &#10097; <a href="../README.md#developer-guide">Developer Guide</a> &#10097; Realtime Remote Config
+<a href="https://github.com/angular/angularfire">AngularFire</a> &#10097; <a href="../README.md#developer-guide">Developer Guide</a> &#10097; Remote Config
 </small>
 
 # Remote Config
@@ -17,21 +17,24 @@ As a prerequisite, ensure that `AngularFire` has been added to your project via
 ng add @angular/fire
 ```
 
-Provide a Performance instance and configuration in the application's `NgModule` (`app.module.ts`):
+Provide a Remote Config instance in the application's `app.config.ts`:
 
 ```ts
+import { ApplicationConfig } from '@angular/core';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { getRemoteConfig, provideRemoteConfig} from '@angular/fire/remote-config';
+import { provideRemoteConfig, getRemoteConfig } from '@angular/fire/remote-config';
 
-@NgModule({
-  imports: [
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideFirebaseApp(() => initializeApp({ ... })),
     provideRemoteConfig(() => getRemoteConfig()),
-  ]
-})
+    ...
+  ],
+  ...
+}
 ```
 
-Next inject it into your component:
+Next inject `RemoteConfig` into your component:
 
 ```ts
 import { Component, inject} from '@angular/core';
@@ -39,15 +42,15 @@ import { RemoteConfig } from '@angular/fire/remote-config';
 
 @Component({ ... })
 export class RemoteConfigComponent {
-  private remoteConfig: RemoteConfig = inject(RemoteConfig);
+  private remoteConfig = inject(RemoteConfig);
   ...
 }
 ```
 
 ## Firebase API
 
-The [Remote Config documentation](https://firebase.google.com/docs/reference/js/remote-config) is available on the Firebase website.
+AngularFire wraps the Firebase JS SDK to ensure proper functionality in Angular, while providing the same API.
 
-## Convenience observables
+Update the imports from `import { ... } from 'firebase/remote-config'` to `import { ... } from '@angular/fire/remote-config'` and follow the official documentation.
 
-Coming soon.
+[Getting Started](https://firebase.google.com/docs/remote-config/get-started?platform=web) | [API Reference](https://firebase.google.com/docs/reference/js/remote-config)

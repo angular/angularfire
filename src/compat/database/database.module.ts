@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
-import { AngularFireDatabase } from './database';
-import firebase from 'firebase/compat/app';
 import { VERSION } from '@angular/fire';
+import firebase from 'firebase/compat/app';
+import { AngularFireDatabase } from './database';
 
 @NgModule({
   providers: [ AngularFireDatabase ]

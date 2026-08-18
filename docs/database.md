@@ -17,32 +17,33 @@ As a prerequisite, ensure that `AngularFire` has been added to your project via
 ng add @angular/fire
 ```
 
-Provide an RTBD instance in the application's `NgModule` (`app.module.ts`):
+Provide a Database instance in the application's `app.config.ts`:
 
 ```ts
+import { ApplicationConfig } from '@angular/core';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { getDatabase, provideDatabase } from '@angular/fire/database';
+import { provideDatabase, getDatabase } from '@angular/fire/database';
 
-@NgModule({
-  imports: [
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideFirebaseApp(() => initializeApp({ ... })),
     provideDatabase(() => getDatabase()),
-  ]
-})
+    ...
+  ],
+  ...
+}
 ```
 
-Next inject it into your component:
+Next inject `Database` into your component:
 
 ```ts
 import { Component, inject } from '@angular/core';
 import { Database } from '@angular/fire/database';
 
 @Component({...})
-extend class DepartmentComponent {
-  private database: Database = inject(Database);
-
-  constructor() {
-  }
+export class DepartmentComponent {
+  private database = inject(Database);
+  ...
 }
 ```
 
@@ -50,7 +51,7 @@ extend class DepartmentComponent {
 
 AngularFire wraps the Firebase JS SDK to ensure proper functionality in Angular, while providing the same API.
 
-Just change your imports from `import { ... } from 'firebase/database'` to `import { ... } from '@angular/fire/database'` and follow the offical documentation.
+Just change your imports from `import { ... } from 'firebase/database'` to `import { ... } from '@angular/fire/database'` and follow the official documentation.
 
 [Getting Started](https://firebase.google.com/docs/database/web/start) | [API Reference](https://firebase.google.com/docs/reference/js/database)
 
@@ -128,25 +129,29 @@ The `fromRef()` function creates an observable that emits reference changes.
 | **params**      | ref: `Reference\|Query`, event: `ListenEvent` |
 | **return**      | `Observable<QueryChange>`                |
 
-## Connecting the the emulator suite
+## Connecting to the emulator suite
 
 ```ts
+import { ApplicationConfig } from '@angular/core';
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { connectDatabaseEmulator, getDatabase, provideDatabase } from '@angular/fire/database';
 
-@NgModule({
-  imports: [
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideFirebaseApp(() => initializeApp({ ... })),
     provideDatabase(() => {
       const database = getDatabase();
       connectDatabaseEmulator(database, 'localhost', 9000);
       return database;
     }),
   ]
-})
+}
 ```
 
 ## Working with multiple instances
 
 ```ts
+import { ApplicationConfig } from '@angular/core';
 import { provideFirebaseApp, FirebaseApp, initializeApp } from '@angular/fire/app';
 import { getDatabase, provideDatabase } from '@angular/fire/database';
 
@@ -156,14 +161,14 @@ const DATABASE_SHARD_URLS = [
   'https://BAZ.firebaseio.com',
 ];
 
-@NgModule({
-  imports: [
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideFirebaseApp(() => initializeApp({ ... })),
     provideDatabase((app: FirebaseApp) => getDatabase(app, DATABASE_SHARD_URLS[0])),
     provideDatabase((app: FirebaseApp) => getDatabase(app, DATABASE_SHARD_URLS[1])),
     provideDatabase((app: FirebaseApp) => getDatabase(app, DATABASE_SHARD_URLS[2])),
   ]
-})
+}
 ```
 
 ```ts

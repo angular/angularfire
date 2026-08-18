@@ -1,7 +1,7 @@
 <img align="right" width="30%" src="images/functions-illo_1x.png">
 
 <small>
-<a href="https://github.com/angular/angularfire">AngularFire</a> &#10097; <a href="../README.md#developer-guide">Developer Guide</a> &#10097; Realtime Cloud Functions
+<a href="https://github.com/angular/angularfire">AngularFire</a> &#10097; <a href="../README.md#developer-guide">Developer Guide</a> &#10097; Cloud Functions
 </small>
 
 # Cloud Functions
@@ -17,21 +17,24 @@ As a prerequisite, ensure that `AngularFire` has been added to your project via
 ng add @angular/fire
 ```
 
-Provide a Cloud Functions instance in the application's `NgModule` (`app.module.ts`):
+Provide a Cloud Functions instance in the application's `app.config.ts`:
 
 ```ts
+import { ApplicationConfig } from '@angular/core';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { getFunctions, provideFunctions } from '@angular/fire/functions';
+import { provideFunctions, getFunctions } from '@angular/fire/functions';
 
-@NgModule({
-  imports: [
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideFirebaseApp(() => initializeApp({ ... })),
     provideFunctions(() => getFunctions()),
-  ]
-})
+    ...
+  ],
+  ...
+}
 ```
 
-Next inject it into your component:
+Next inject `Functions` into your component:
 
 ```ts
 import { Component, inject} from '@angular/core';
@@ -39,14 +42,15 @@ import { Functions } from '@angular/fire/functions';
 
 @Component({ ... })
 export class AppComponent {
-  private functions: Functions = inject(Functions);
+  private functions = inject(Functions);
   ...
 }
 ```
 
 ## Firebase API
-The [Firebase API for Cloud Functions documentation](https://firebase.google.com/docs/reference/js/functions) is available on the Firebase website.
 
-## Convenience observables
+AngularFire wraps the Firebase JS SDK to ensure proper functionality in Angular, while providing the same API.
 
-More details coming soon.
+Update the imports from `import { ... } from 'firebase/functions'` to `import { ... } from '@angular/fire/functions'` and follow the official documentation.
+
+[Call functions from your app](https://firebase.google.com/docs/functions/callable?gen=2nd#web-modular-api) | [API Reference](https://firebase.google.com/docs/reference/js/functions)

@@ -1,12 +1,3 @@
 {
-  "$schema": "../../node_modules/ng-packagr/package.schema.json",
-  "ngPackage": {
-    "lib": {
-      "umdModuleIds": {
-        "rxfire/analytics": "rxfire-analytics",
-        "firebase/analytics": "firebase-analytics"
-      },
-      "entryFile": "public_api.ts"
-    }
-  }
+  "$schema": "../../node_modules/ng-packagr/package.schema.json"
 }

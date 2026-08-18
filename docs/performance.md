@@ -1,7 +1,7 @@
 <img align="right" width="30%" src="images/performance-illo_1x.png">
 
 <small>
-<a href="https://github.com/angular/angularfire">AngularFire</a> &#10097; <a href="../README.md#developer-guide">Developer Guide</a> &#10097; Realtime Performance Monitoring
+<a href="https://github.com/angular/angularfire">AngularFire</a> &#10097; <a href="../README.md#developer-guide">Developer Guide</a> &#10097; Performance Monitoring
 </small>
 
 # Performance Monitoring
@@ -17,21 +17,24 @@ As a prerequisite, ensure that `AngularFire` has been added to your project via
 ng add @angular/fire
 ```
 
-Provide a Performance instance and configuration in the application's `NgModule` (`app.module.ts`):
+Provide a Performance instance in the application's `app.config.ts`:
 
 ```ts
+import { ApplicationConfig } from '@angular/core';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { getPerformance, providePerformance} from '@angular/fire/performance';
+import { providePerformance, getPerformance } from '@angular/fire/performance';
 
-@NgModule({
-  imports: [
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideFirebaseApp(() => initializeApp({ ... })),
     providePerformance(() => getPerformance()),
-  ]
-})
+    ...
+  ],
+  ...
+}
 ```
 
-Next inject it into your component:
+Next inject `Performance` into your component:
 
 ```ts
 import { Component, inject} from '@angular/core';
@@ -39,19 +42,15 @@ import { Performance } from '@angular/fire/performance';
 
 @Component({ ... })
 export class PerformanceComponent {
-  private performance: Performance = inject(Performance);
+  private performance = inject(Performance);
   ...
 }
 ```
 
 ## Firebase API
 
-The [Performance documentation](https://firebase.google.com/docs/reference/js/performance.md#performance_package) is available on the Firebase website.
+AngularFire wraps the Firebase JS SDK to ensure proper functionality in Angular, while providing the same API.
 
-## Services
+Update the imports from `import { ... } from 'firebase/performance'` to `import { ... } from '@angular/fire/performance'` and follow the official documentation.
 
-Coming soon.
-
-## Convenience observables
-
-Coming soon.
+[Getting Started](https://firebase.google.com/docs/perf-mon/get-started-web) | [API Reference](https://firebase.google.com/docs/reference/js/performance)

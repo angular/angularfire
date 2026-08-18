@@ -1,10 +1,18 @@
-import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, Injector } from '@angular/core';
-import { Auth as FirebaseAuth } from 'firebase/auth';
-import { ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
-import { Auth, AuthInstances, AUTH_PROVIDER_NAME } from './auth';
-import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
-import { registerVersion } from 'firebase/app';
+import {
+  EnvironmentProviders,
+  InjectionToken,
+  Injector,
+  NgModule,
+  NgZone,
+  Optional,
+  makeEnvironmentProviders,
+} from '@angular/core';
+import { VERSION, ɵAngularFireSchedulers, ɵgetDefaultInstanceOf } from '@angular/fire';
+import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
 import { AppCheckInstances } from '@angular/fire/app-check';
+import { registerVersion } from 'firebase/app';
+import { Auth as FirebaseAuth } from 'firebase/auth';
+import { AUTH_PROVIDER_NAME, Auth, AuthInstances } from './auth';
 
 export const PROVIDED_AUTH_INSTANCES = new InjectionToken<Auth[]>('angularfire2.auth-instances');
 
@@ -48,10 +56,12 @@ export class AuthModule {
   }
 }
 
-export function provideAuth(fn: (injector: Injector) => FirebaseAuth, ...deps: any[]): ModuleWithProviders<AuthModule> {
-  return {
-    ngModule: AuthModule,
-    providers: [{
+export function provideAuth(fn: (injector: Injector) => FirebaseAuth, ...deps: any[]): EnvironmentProviders {
+  registerVersion('angularfire', VERSION.full, 'auth');
+  return makeEnvironmentProviders([
+    DEFAULT_AUTH_INSTANCE_PROVIDER,
+    AUTH_INSTANCES_PROVIDER,
+    {
       provide: PROVIDED_AUTH_INSTANCES,
       useFactory: authInstanceFactory(fn),
       multi: true,
@@ -63,6 +73,6 @@ export function provideAuth(fn: (injector: Injector) => FirebaseAuth, ...deps: a
         [new Optional(), AppCheckInstances ],
         ...deps,
       ]
-    }]
-  };
+    }
+  ]);
 }

@@ -1,12 +1,3 @@
 {
-  "$schema": "../../node_modules/ng-packagr/package.schema.json",
-  "ngPackage": {
-    "lib": {
-      "umdModuleIds": {
-        "rxfire/performance": "rxfire-performance",
-        "firebase/performance": "firebase-performance"
-      },
-      "entryFile": "public_api.ts"
-    }
-  }
+  "$schema": "../../node_modules/ng-packagr/package.schema.json"
 }

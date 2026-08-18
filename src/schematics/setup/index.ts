@@ -1,100 +1,59 @@
-import { asWindowsPath, normalize } from '@angular-devkit/core';
-import { SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
-import {
-  getWorkspace, getProject, getFirebaseProjectNameFromHost, addEnvironmentEntry,
-  addToNgModule, addIgnoreFiles, addFixesToServer
-} from '../utils';
-import { projectTypePrompt, appPrompt, sitePrompt, projectPrompt, featuresPrompt, userPrompt } from './prompts';
-import {
-  FirebaseApp, FirebaseHostingSite, FirebaseProject, DeployOptions, NgAddNormalizedOptions,
-  FEATURES, PROJECT_TYPE
-} from '../interfaces';
-import { getFirebaseTools } from '../firebaseTools';
-import { writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { asWindowsPath, normalize } from '@angular-devkit/core';
+import { SchematicContext, Tree, chain } from '@angular-devkit/schematics';
+import { addRootProvider } from '@schematics/angular/utility';
+import { getFirebaseTools } from '../firebaseTools';
 import {
-  generateFirebaseRc,
-  overwriteIfExists,
-  safeReadJSON,
-  stringifyFormatted
-} from '../common';
-import { FirebaseJSON, Workspace, WorkspaceProject } from '../interfaces';
+  DataConnectConnectorConfig,
+  DeployOptions, FEATURES, FirebaseApp, FirebaseJSON, FirebaseProject,
+} from '../interfaces';
+import {
+  addIgnoreFiles,
+  featureToRules,
+  getFirebaseProjectNameFromHost,
+  getProject,
+  parseDataConnectConfig,
+  setupTanstackDependencies,
+} from '../utils';
+import {
+  addFirestoreToFirebaseJson,
+  createFirestoreStarterFiles,
+  setDefaultProjectInFirebaseRc,
+} from './firebaseConfigs';
+import { appPrompt, featuresPrompt, featuresPromptMessage, projectPrompt, userPrompt } from './prompts';
+
+// FirebaseOptions keys — apps.sdkconfig responses include management-API extras that initializeApp() rejects.
+const firebaseOptionsKeys = [
+  'apiKey', 'authDomain', 'databaseURL', 'projectId', 'storageBucket',
+  'messagingSenderId', 'appId', 'measurementId', 'recaptchaSiteKey',
+];
+
+export interface SetupConfig extends DeployOptions {
+  firebaseProject: FirebaseProject,
+  firebaseApp?: FirebaseApp,
+  sdkConfig?: Record<string, string>,
+  firebaseJsonConfig?: FirebaseJSON;
+  dataConnectConfig?: DataConnectConnectorConfig | null;
+  firebaseJsonPath: string;
+}
 
 export const setupProject =
-  async (tree: Tree, context: SchematicContext, features: FEATURES[], config: DeployOptions & {
-    firebaseProject: FirebaseProject,
-    firebaseApp?: FirebaseApp,
-    firebaseHostingSite?: FirebaseHostingSite,
-    sdkConfig?: Record<string, string>,
-    nodeVersion?: string,
-    browserTarget?: string,
-    serverTarget?: string,
-    prerenderTarget?: string,
-    project: string,
-    ssrRegion?: string,
-  }) => {
-    const { path: workspacePath, workspace } = getWorkspace(tree);
-
-    const { project, projectName } = getProject(config, tree);
-
-    const sourcePath = project.sourceRoot ?? project.root;
+  (tree: Tree, context: SchematicContext, features: FEATURES[], config: SetupConfig) => {
+    const { projectName } = getProject(config, tree);
 
     addIgnoreFiles(tree);
 
-    const featuresToImport = features.filter(it => it !== FEATURES.Hosting);
-    if (featuresToImport.length > 0) {
-      addToNgModule(tree, { features: featuresToImport, sourcePath });
-      addFixesToServer(tree, { features: featuresToImport, sourcePath });
-    }
-
-    if (config.sdkConfig) {
-      const source = `
-  firebase: {
-${Object.entries(config.sdkConfig).reduce(
-    (c, [k, v]) => c.concat(`    ${k}: '${v}'`),
-    [] as string[]
-).join(',\n')},
-  }`;
-
-      const environmentPath = `${sourcePath}/environments/environment.ts`;
-      addEnvironmentEntry(tree, `/${environmentPath}`, source);
-
-      // Iterate over the replacements for the environment file and add the config
-      Object.values(project.architect || {}).forEach(builder => {
-        Object.values(builder.configurations || {}).forEach(configuration => {
-          (configuration.fileReplacements || []).forEach((replacement: any) => {
-            if (replacement.replace === environmentPath) {
-              addEnvironmentEntry(tree, `/${replacement.with}`, source);
-            }
-          });
-        });
-      });
-    }
-
-    const options: NgAddNormalizedOptions = {
-      project: projectName,
-      firebaseProject: config.firebaseProject,
-      firebaseApp: config.firebaseApp,
-      firebaseHostingSite: config.firebaseHostingSite,
-      sdkConfig: config.sdkConfig,
-      prerender: undefined,
-      browserTarget: config.browserTarget,
-      serverTarget: config.serverTarget,
-      prerenderTarget: config.prerenderTarget,
-      ssrRegion: config.ssrRegion,
-    };
-
-    if (features.includes(FEATURES.Hosting)) {
-      return setupFirebase({
-        workspace,
-        workspacePath,
-        options,
-        tree,
-        context,
-        project
-      });
-    } else {
-      return Promise.resolve();
+    if (features.length) {
+      return chain([
+        addRootProvider(projectName, ({code, external}) => {
+          external('initializeApp', '@angular/fire/app');
+          return code`${external('provideFirebaseApp', '@angular/fire/app')}(() => initializeApp(${
+            config.sdkConfig ? `{ ${Object.entries(config.sdkConfig).map(([k, v]) => `${k}: ${JSON.stringify(v)}`).join(", ")} }` : ""
+          }))`;
+        }),
+        ...featureToRules(features, projectName, config.dataConnectConfig),
+      ]);
     }
 };
 
@@ -108,120 +67,113 @@ export const ngAddSetupProject = (
 
   const features = await featuresPrompt();
 
-  if (features.length > 0) {
+  if (features.length === 0) {
+    context.logger.warn(
+      'No features were selected, so there is nothing to set up. ' +
+      `At the "${featuresPromptMessage}" prompt, use the arrow keys to move, ` +
+      'press Space to select each feature you want, then Enter to confirm. ' +
+      'Re-run ng add @angular/fire to try again.'
+    );
+  } else {
 
     const firebaseTools = await getFirebaseTools();
 
     // Add the firebase files if they don't exist already so login.use works
     if (!host.exists('/firebase.json')) { writeFileSync(join(projectRoot, 'firebase.json'), '{}'); }
+    
+    let firebaseJson: FirebaseJSON = JSON.parse(
+      readFileSync(join(projectRoot, "firebase.json")).toString()
+    );
 
     const user = await userPrompt({ projectRoot });
-    await firebaseTools.login.use(user.email, { projectRoot });
+    const defaultUser = await firebaseTools.login(options);
+    if (user.email !== defaultUser?.email) {
+      await firebaseTools.login.use(user.email, { projectRoot });
+    }
 
-    const { project: ngProject, projectName: ngProjectName } = getProject(options, host);
+    const { projectName: ngProjectName } = getProject(options, host);
 
     const [ defaultProjectName ] = getFirebaseProjectNameFromHost(host, ngProjectName);
 
     const firebaseProject = await projectPrompt(defaultProjectName, { projectRoot, account: user.email });
 
-    let hosting = { };
-    let firebaseHostingSite: FirebaseHostingSite|undefined;
-
-    if (features.includes(FEATURES.Hosting)) {
-      // TODO read existing settings from angular.json, if available
-      const results = await projectTypePrompt(ngProject, ngProjectName);
-      hosting = { ...hosting, ...results };
-      firebaseHostingSite = await sitePrompt(firebaseProject, { projectRoot });
-    }
-
     let firebaseApp: FirebaseApp|undefined;
     let sdkConfig: Record<string, string>|undefined;
 
-    if (features.find(it => it !== FEATURES.Hosting)) {
+    const setupConfig: SetupConfig = {
+      ...options, firebaseProject, firebaseApp, sdkConfig,
+      firebaseJsonConfig: firebaseJson,
+      firebaseJsonPath: projectRoot
+    };
+    if (features.length) {
 
-      const defaultAppId = firebaseHostingSite?.appId;
-      firebaseApp = await appPrompt(firebaseProject, defaultAppId, { projectRoot });
+      firebaseApp = await appPrompt(firebaseProject, undefined, { projectRoot });
 
       const result = await firebaseTools.apps.sdkconfig('web', firebaseApp.appId, { nonInteractive: true, projectRoot });
-      sdkConfig = result.sdkConfig;
+      sdkConfig = Object.fromEntries(
+        firebaseOptionsKeys
+          .filter(key => result.sdkConfig[key] !== undefined)
+          .map(key => [key, result.sdkConfig[key]])
+      );
+      setupConfig.sdkConfig = sdkConfig;
+      setupConfig.firebaseApp = firebaseApp;
+      // set up data connect locally if data connect hasn't already been initialized.
+      if(features.includes(FEATURES.DataConnect)) {
+        if (!firebaseJson.dataconnect) {
+          try {
+            await firebaseTools.init("dataconnect", {
+              projectRoot,
+              project: firebaseProject.projectId,
+            });
+            // Update firebaseJson values to include newly added dataconnect field in firebase.json.
+            firebaseJson = JSON.parse(
+              readFileSync(join(projectRoot, "firebase.json")).toString()
+            );
+            setupConfig.firebaseJsonConfig = firebaseJson;
+          } catch (e) {
+            console.error(e);
+          }
+        }
+          let dataConnectConfig = parseDataConnectConfig(setupConfig);
+          if(!dataConnectConfig?.connectorYaml.generate?.javascriptSdk) {
+            await firebaseTools.init("dataconnect:sdk", {
+              projectRoot,
+              project: firebaseProject.projectId,
+            });
+          }
+          // Parse through sdk again
+          dataConnectConfig = parseDataConnectConfig(setupConfig);
+          if(dataConnectConfig?.angular) {
+            context.logger.info('Generated Angular SDK Enabled.');
+          } else {
+            context.logger.info('Generated Angular SDK Disabled. Please add `angular: true` to your connector.yaml');
+          }
+          setupTanstackDependencies(host, context);
+          setupConfig.dataConnectConfig = dataConnectConfig;
+        }
 
     }
 
-    await setupProject(host, context, features, {
-      ...options, ...hosting, firebaseProject, firebaseApp, firebaseHostingSite, sdkConfig,
-    });
+    // Read after the init calls, never before — firebase-tools rewrites firebase.json on disk
+    // mid-run. A failed read isn't fatal: createFirestoreStarterFiles falls back to checking the
+    // disk for each file it would create.
+    let firebaseJsonAfterInit: FirebaseJSON | undefined;
+    try {
+      firebaseJsonAfterInit = JSON.parse(
+        readFileSync(join(projectRoot, "firebase.json")).toString()
+      );
+    } catch (e) {
+      context.logger.warn(`Could not re-read firebase.json after setup (${e.message}).`);
+    }
+    // Must run before addFirestoreToFirebaseJson: that call adds the firestore section, and if it
+    // ran first this snapshot would see it and skip creating the files it points at.
+    createFirestoreStarterFiles(host, context, features, firebaseJsonAfterInit);
 
+    // Both write the real filesystem, after the last firebaseTools.init call — init writes
+    // .firebaserc and rewrites firebase.json on disk during the run.
+    setDefaultProjectInFirebaseRc(projectRoot, firebaseProject.projectId);
+    addFirestoreToFirebaseJson(projectRoot, context, features);
+
+    return setupProject(host, context, features, setupConfig);
   }
-};
-
-export function generateFirebaseJson(
-  tree: Tree,
-  path: string,
-  project: string,
-  region: string|undefined,
-) {
-  const firebaseJson: FirebaseJSON = tree.exists(path)
-    ? safeReadJSON(path, tree)
-    : {};
-
-  const newConfig = {
-    target: project,
-    source: '.',
-    frameworksBackend: {
-      region
-    }
-  };
-  if (firebaseJson.hosting === undefined) {
-    firebaseJson.hosting = [newConfig];
-  } else if (Array.isArray(firebaseJson.hosting)) {
-    const existingConfigIndex = firebaseJson.hosting.findIndex(config => config.target === newConfig.target);
-    if (existingConfigIndex > -1) {
-      firebaseJson.hosting.splice(existingConfigIndex, 1, newConfig);
-    } else {
-      firebaseJson.hosting.push(newConfig);
-    }
-  } else {
-    firebaseJson.hosting = [firebaseJson.hosting, newConfig];
-  }
-
-  overwriteIfExists(tree, path, stringifyFormatted(firebaseJson));
-}
-
-export const setupFirebase = (config: {
-  project: WorkspaceProject;
-  options: NgAddNormalizedOptions;
-  workspacePath: string;
-  workspace: Workspace;
-  tree: Tree;
-  context: SchematicContext;
-}) => {
-  const { tree, workspacePath, workspace, options } = config;
-  const project = workspace.projects[options.project];
-
-  if (!project.architect) {
-    throw new SchematicsException(`Angular project "${options.project}" has a malformed angular.json`);
-  }
-
-  project.architect.deploy = {
-    builder: '@angular/fire:deploy',
-    options: {
-      version: 2,
-      browserTarget: options.browserTarget,
-      ...(options.serverTarget ? {serverTarget: options.serverTarget} : {}),
-      ...(options.prerenderTarget ? {prerenderTarget: options.prerenderTarget} : {})
-    }
-  };
-
-  tree.overwrite(workspacePath, JSON.stringify(workspace, null, 2));
-
-  generateFirebaseJson(tree, 'firebase.json', options.project, options.ssrRegion);
-  generateFirebaseRc(
-    tree,
-    '.firebaserc',
-    options.firebaseProject.projectId,
-    options.firebaseHostingSite,
-    options.project
-  );
-
-  return tree;
 };

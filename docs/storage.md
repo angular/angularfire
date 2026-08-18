@@ -1,7 +1,7 @@
 <img align="right" width="30%" src="images/storage-illo_1x.png">
 
 <small>
-<a href="https://github.com/angular/angularfire">AngularFire</a> &#10097; <a href="../README.md#developer-guide">Developer Guide</a> &#10097; Realtime Cloud Storage
+<a href="https://github.com/angular/angularfire">AngularFire</a> &#10097; <a href="../README.md#developer-guide">Developer Guide</a> &#10097; Cloud Storage
 </small>
 
 # Cloud Storage
@@ -19,21 +19,24 @@ As a prerequisite, ensure that `AngularFire` has been added to your project via
 ng add @angular/fire
 ```
 
-Provide a Firebase Storage instance in the application's `NgModule` (`app.module.ts`):
+Provide a Cloud Storage instance in the application's `app.config.ts`:
 
 ```ts
+import { ApplicationConfig } from '@angular/core';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { getStorage, provideStorage } from '@angular/fire/storage';
+import { provideStorage, getStorage } from '@angular/fire/storage';
 
-@NgModule({
-  imports: [
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideFirebaseApp(() => initializeApp({ ... })),
     provideStorage(() => getStorage()),
-  ]
-})
+    ...
+  ],
+  ...
+}
 ```
 
-Next inject it into your component:
+Next inject `Storage` into your component:
 
 ```ts
 import { Component, inject} from '@angular/core';
@@ -41,17 +44,16 @@ import { Storage } from '@angular/fire/storage';
 
 @Component({ ... })
 export class StorageComponent {
-  private storage: Storage = inject(Storage);
+  private storage = inject(Storage);
   ...
 }
 ```
-
 
 ## Firebase API
 
 AngularFire wraps the Firebase JS SDK to ensure proper functionality in Angular, while providing the same API.
 
-Update the imports from `import { ... } from 'firebase/storage'` to `import { ... } from '@angular/fire/storage'` and follow the offical documentation.
+Update the imports from `import { ... } from 'firebase/storage'` to `import { ... } from '@angular/fire/storage'` and follow the official documentation.
 
 [Getting Started](https://firebase.google.com/docs/storage/web/start) | [API Reference](https://firebase.google.com/docs/reference/js/storage)
 

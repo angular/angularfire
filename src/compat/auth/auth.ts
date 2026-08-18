@@ -1,15 +1,17 @@
-import { Injectable, Inject, Optional, NgZone, PLATFORM_ID, InjectionToken } from '@angular/core';
-import { Observable, of, from, merge, Subject } from 'rxjs';
-import { switchMap, map, observeOn, shareReplay, first, filter, switchMapTo, subscribeOn } from 'rxjs/operators';
-import { ɵAngularFireSchedulers, keepUnstableUntilFirst } from '@angular/fire';
-import { ɵlazySDKProxy, ɵPromiseProxy, ɵapplyMixins } from '@angular/fire/compat';
-import { ɵfirebaseAppFactory, FIREBASE_OPTIONS, FIREBASE_APP_NAME, FirebaseApp, ɵcacheInstance } from '@angular/fire/compat';
+import { isPlatformServer } from '@angular/common';
+import { EnvironmentInjector, Inject, Injectable, InjectionToken, NgZone, Optional, PLATFORM_ID, inject } from '@angular/core';
+import { pendingUntilEvent } from '@angular/core/rxjs-interop';
+import { ɵAngularFireSchedulers } from '@angular/fire';
+import { AppCheckInstances } from '@angular/fire/app-check';
+import { ɵPromiseProxy, ɵapplyMixins, ɵlazySDKProxy } from '@angular/fire/compat';
+import { FIREBASE_APP_NAME, FIREBASE_OPTIONS, FirebaseApp, ɵcacheInstance, ɵfirebaseAppFactory } from '@angular/fire/compat';
 import { FirebaseOptions } from 'firebase/app';
 import firebase from 'firebase/compat/app';
-import { isPlatformServer } from '@angular/common';
+import { Observable, Subject, from, merge, of } from 'rxjs';
+import { filter, first, map, observeOn, shareReplay, subscribeOn, switchMap, switchMapTo } from 'rxjs/operators';
 import { proxyPolyfillCompat } from './base';
-import { AppCheckInstances } from '@angular/fire/app-check';
 
+ 
 export interface AngularFireAuth extends ɵPromiseProxy<firebase.auth.Auth> {}
 
 type UseEmulatorArguments = Parameters<firebase.auth.Auth['useEmulator']>;
@@ -53,6 +55,8 @@ export const ɵauthFactory = (
 })
 export class AngularFireAuth {
 
+  private readonly injector = inject(EnvironmentInjector);
+
   /**
    * Observable of authentication state; as of Firebase 4.0 this is only triggered via sign-in/out
    */
@@ -83,8 +87,8 @@ export class AngularFireAuth {
   constructor(
     @Inject(FIREBASE_OPTIONS) options: FirebaseOptions,
     @Optional() @Inject(FIREBASE_APP_NAME) name: string|null|undefined,
-    // tslint:disable-next-line:ban-types
-    @Inject(PLATFORM_ID) platformId: Object,
+
+    @Inject(PLATFORM_ID) platformId: object,
     zone: NgZone,
     schedulers: ɵAngularFireSchedulers,
     @Optional() @Inject(USE_EMULATOR) useEmulator: any, // can't use the tuple here
@@ -116,11 +120,11 @@ export class AngularFireAuth {
       //       as we're completely lazy. Let's eagerly load the Auth SDK here.
       //       There could potentially be race conditions still... but this greatly decreases the odds while
       //       we reevaluate the API.
-      const _ = auth.pipe(first()).subscribe();
+      auth.pipe(first()).subscribe();
 
       const redirectResult = auth.pipe(
         switchMap(auth => auth.getRedirectResult().then(it => it, () => null)),
-        keepUnstableUntilFirst,
+        pendingUntilEvent(this.injector),
         shareReplay({ bufferSize: 1, refCount: false }),
       );
 

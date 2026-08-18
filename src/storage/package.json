@@ -1,12 +1,3 @@
 {
-  "$schema": "../../node_modules/ng-packagr/package.schema.json",
-  "ngPackage": {
-    "lib": {
-      "umdModuleIds": {
-        "rxfire/storage": "rxfire-storage",
-        "firebase/storage": "firebase-storage"
-      },
-      "entryFile": "public_api.ts"
-    }
-  }
+  "$schema": "../../node_modules/ng-packagr/package.schema.json"
 }

@@ -1,11 +1,19 @@
-import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, Injector } from '@angular/core';
-import { FirebaseStorage } from 'firebase/storage';
-import { ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
-import { Storage, StorageInstances, STORAGE_PROVIDER_NAME } from './storage';
-import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
+import {
+  EnvironmentProviders,
+  InjectionToken,
+  Injector,
+  NgModule,
+  NgZone,
+  Optional,
+  makeEnvironmentProviders,
+} from '@angular/core';
+import { VERSION, ɵAngularFireSchedulers, ɵgetDefaultInstanceOf } from '@angular/fire';
+import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
+import { AppCheckInstances } from '@angular/fire/app-check';
 import { AuthInstances } from '@angular/fire/auth';
 import { registerVersion } from 'firebase/app';
-import { AppCheckInstances } from '@angular/fire/app-check';
+import { FirebaseStorage } from 'firebase/storage';
+import { STORAGE_PROVIDER_NAME, Storage, StorageInstances } from './storage';
 
 export const PROVIDED_STORAGE_INSTANCES = new InjectionToken<Storage[]>('angularfire2.storage-instances');
 
@@ -49,10 +57,13 @@ export class StorageModule {
   }
 }
 
-export function provideStorage(fn: (injector: Injector) => FirebaseStorage, ...deps: any[]): ModuleWithProviders<StorageModule> {
-  return {
-    ngModule: StorageModule,
-    providers: [{
+export function provideStorage(fn: (injector: Injector) => FirebaseStorage, ...deps: any[]): EnvironmentProviders {
+  registerVersion('angularfire', VERSION.full, 'gcs');
+
+  return makeEnvironmentProviders([
+    DEFAULT_STORAGE_INSTANCE_PROVIDER,
+    STORAGE_INSTANCES_PROVIDER,
+    {
       provide: PROVIDED_STORAGE_INSTANCES,
       useFactory: storageInstanceFactory(fn),
       multi: true,
@@ -66,6 +77,6 @@ export function provideStorage(fn: (injector: Injector) => FirebaseStorage, ...d
         [new Optional(), AppCheckInstances ],
         ...deps,
       ]
-    }]
-  };
+    }
+  ]);
 }

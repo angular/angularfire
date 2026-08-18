@@ -1,13 +1,13 @@
-import { from, Observable } from 'rxjs';
-import { fromCollectionRef } from '../observable/fromRef';
-import { filter, map, scan } from 'rxjs/operators';
+import { EnvironmentInjector, inject } from '@angular/core';
+import { pendingUntilEvent } from '@angular/core/rxjs-interop';
 import firebase from 'firebase/compat/app';
-import { keepUnstableUntilFirst } from '@angular/fire';
-
-import { DocumentChangeAction, DocumentChangeType, DocumentData, Query } from '../interfaces';
-import { validateEventsArray } from '../collection/collection';
+import { Observable, from } from 'rxjs';
+import { filter, map, scan } from 'rxjs/operators';
 import { docChanges, sortedChanges } from '../collection/changes';
+import { validateEventsArray } from '../collection/collection';
 import { AngularFirestore } from '../firestore';
+import { DocumentChangeAction, DocumentChangeType, DocumentData, Query } from '../interfaces';
+import { fromCollectionRef } from '../observable/fromRef';
 
 /**
  * AngularFirestoreCollectionGroup service
@@ -28,6 +28,8 @@ import { AngularFirestore } from '../firestore';
  * fakeStock.valueChanges().subscribe(value => console.log(value));
  */
 export class AngularFirestoreCollectionGroup<T = DocumentData> {
+  private readonly injector = inject(EnvironmentInjector);
+
   /**
    * The constructor takes in a CollectionGroupQuery to provide wrapper methods
    * for data operations and data streaming.
@@ -44,14 +46,14 @@ export class AngularFirestoreCollectionGroup<T = DocumentData> {
   stateChanges(events?: DocumentChangeType[]): Observable<DocumentChangeAction<T>[]> {
     if (!events || events.length === 0) {
       return docChanges<T>(this.query, this.afs.schedulers.outsideAngular).pipe(
-        keepUnstableUntilFirst
+        pendingUntilEvent(this.injector)
       );
     }
     return docChanges<T>(this.query, this.afs.schedulers.outsideAngular)
       .pipe(
-        map(actions => actions.filter(change => events.indexOf(change.type) > -1)),
+        map(actions => actions.filter(change => events.includes(change.type))),
         filter(changes =>  changes.length > 0),
-        keepUnstableUntilFirst
+        pendingUntilEvent(this.injector)
       );
   }
 
@@ -71,7 +73,7 @@ export class AngularFirestoreCollectionGroup<T = DocumentData> {
     const validatedEvents = validateEventsArray(events);
     const scheduledSortedChanges$ = sortedChanges<T>(this.query, validatedEvents, this.afs.schedulers.outsideAngular);
     return scheduledSortedChanges$.pipe(
-      keepUnstableUntilFirst
+      pendingUntilEvent(this.injector)
     );
   }
 
@@ -82,9 +84,9 @@ export class AngularFirestoreCollectionGroup<T = DocumentData> {
    * provided `idField` property name.
    */
   valueChanges(): Observable<T[]>;
-  // tslint:disable-next-line:unified-signatures
+  // eslint-disable-next-line no-empty-pattern
   valueChanges({}): Observable<T[]>;
-  valueChanges<K extends string>(options: {idField: K}): Observable<(T & { [T in K]: string })[]>;
+  valueChanges<K extends string>(options: {idField: K}): Observable<(T & Record<K, string>)[]>;
   valueChanges<K extends string>(options: {idField?: K} = {}): Observable<T[]> {
     const fromCollectionRefScheduled$ = fromCollectionRef<T>(this.query, this.afs.schedulers.outsideAngular);
     return fromCollectionRefScheduled$
@@ -94,12 +96,12 @@ export class AngularFirestoreCollectionGroup<T = DocumentData> {
             return {
               [options.idField]: a.id,
               ...a.data()
-            } as T & { [T in K]: string };
+            } as T & Record<K, string>;
           } else {
             return a.data();
           }
         })),
-        keepUnstableUntilFirst
+        pendingUntilEvent(this.injector)
       );
   }
 
@@ -108,7 +110,7 @@ export class AngularFirestoreCollectionGroup<T = DocumentData> {
    */
   get(options?: firebase.firestore.GetOptions) {
     return from(this.query.get(options)).pipe(
-      keepUnstableUntilFirst
+      pendingUntilEvent(this.injector)
     );
   }
 

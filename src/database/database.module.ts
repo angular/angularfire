@@ -1,11 +1,19 @@
-import { NgModule, Optional, NgZone, InjectionToken, ModuleWithProviders, Injector } from '@angular/core';
-import { Database as FirebaseDatabase } from 'firebase/database';
-import { AuthInstances } from '@angular/fire/auth';
-import { ɵgetDefaultInstanceOf, ɵAngularFireSchedulers, VERSION } from '@angular/fire';
-import { Database, DatabaseInstances, DATABASE_PROVIDER_NAME } from './database';
-import { FirebaseApps, FirebaseApp } from '@angular/fire/app';
-import { registerVersion } from 'firebase/app';
+import {
+  EnvironmentProviders,
+  InjectionToken,
+  Injector,
+  NgModule,
+  NgZone,
+  Optional,
+  makeEnvironmentProviders,
+} from '@angular/core';
+import { VERSION, ɵAngularFireSchedulers, ɵgetDefaultInstanceOf } from '@angular/fire';
+import { FirebaseApp, FirebaseApps } from '@angular/fire/app';
 import { AppCheckInstances } from '@angular/fire/app-check';
+import { AuthInstances } from '@angular/fire/auth';
+import { registerVersion } from 'firebase/app';
+import { Database as FirebaseDatabase } from 'firebase/database';
+import { DATABASE_PROVIDER_NAME, Database, DatabaseInstances } from './database';
 
 export const PROVIDED_DATABASE_INSTANCES = new InjectionToken<Database[]>('angularfire2.database-instances');
 
@@ -49,10 +57,12 @@ export class DatabaseModule {
   }
 }
 
-export function provideDatabase(fn: (injector: Injector) => FirebaseDatabase, ...deps: any[]): ModuleWithProviders<DatabaseModule> {
-  return {
-    ngModule: DatabaseModule,
-    providers: [{
+export function provideDatabase(fn: (injector: Injector) => FirebaseDatabase, ...deps: any[]): EnvironmentProviders {
+  registerVersion('angularfire', VERSION.full, 'rtdb');
+  return makeEnvironmentProviders([
+    DEFAULT_DATABASE_INSTANCE_PROVIDER,
+    DATABASE_INSTANCES_PROVIDER,
+    {
       provide: PROVIDED_DATABASE_INSTANCES,
       useFactory: databaseInstanceFactory(fn),
       multi: true,
@@ -66,6 +76,6 @@ export function provideDatabase(fn: (injector: Injector) => FirebaseDatabase, ..
         [new Optional(), AppCheckInstances ],
         ...deps,
       ]
-    }]
-  };
+    }
+  ]);
 }

@@ -1,13 +1,15 @@
-import { from, Observable } from 'rxjs';
-import { filter, map, pairwise, scan, startWith } from 'rxjs/operators';
+import { EnvironmentInjector, inject } from '@angular/core';
+import { pendingUntilEvent } from '@angular/core/rxjs-interop';
 import firebase from 'firebase/compat/app';
-import { keepUnstableUntilFirst } from '@angular/fire';
-
-import { CollectionReference, DocumentChangeAction, DocumentChangeType, DocumentData, DocumentReference, Query } from '../interfaces';
-import { docChanges, sortedChanges } from './changes';
+import { Observable, from } from 'rxjs';
+import { filter, map, pairwise, scan, startWith } from 'rxjs/operators';
 import { AngularFirestoreDocument } from '../document/document';
-import { fromCollectionRef } from '../observable/fromRef';
 import { AngularFirestore } from '../firestore';
+import { CollectionReference, DocumentChangeAction, DocumentChangeType, DocumentData, DocumentReference, Query } from '../interfaces';
+import { fromCollectionRef } from '../observable/fromRef';
+import { docChanges, sortedChanges } from './changes';
+
+type DocumentChangeTuple<T> = [DocumentChangeAction<T>[], DocumentChangeAction<T>[]];
 
 export function validateEventsArray(events?: DocumentChangeType[]) {
   if (!events || events.length === 0) {
@@ -40,6 +42,8 @@ export function validateEventsArray(events?: DocumentChangeType[]) {
  * fakeStock.valueChanges().subscribe(value => console.log(value));
  */
 export class AngularFirestoreCollection<T = DocumentData> {
+  private readonly injector = inject(EnvironmentInjector);
+
   /**
    * The constructor takes in a CollectionReference and Query to provide wrapper methods
    * for data operations and data streaming.
@@ -63,7 +67,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
     let source = docChanges<T>(this.query, this.afs.schedulers.outsideAngular);
     if (events && events.length > 0) {
       source = source.pipe(
-        map(actions => actions.filter(change => events.indexOf(change.type) > -1))
+        map(actions => actions.filter(change => events.includes(change.type)))
       );
     }
     return source.pipe(
@@ -71,9 +75,9 @@ export class AngularFirestoreCollection<T = DocumentData> {
       // that the collection has been resolve; even if it's empty
       startWith<DocumentChangeAction<T>[], undefined>(undefined),
       pairwise(),
-      filter(([prior, current]) => current.length > 0 || !prior),
-      map(([prior, current]) => current),
-      keepUnstableUntilFirst
+      filter(([prior, current]: DocumentChangeTuple<T>) => current.length > 0 || !prior),
+      map(([, current]) => current),
+      pendingUntilEvent(this.injector)
     );
   }
 
@@ -93,7 +97,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
     const validatedEvents = validateEventsArray(events);
     const scheduledSortedChanges$ = sortedChanges<T>(this.query, validatedEvents, this.afs.schedulers.outsideAngular);
     return scheduledSortedChanges$.pipe(
-      keepUnstableUntilFirst
+      pendingUntilEvent(this.injector)
     );
   }
 
@@ -104,23 +108,23 @@ export class AngularFirestoreCollection<T = DocumentData> {
    * provided `idField` property name.
    */
   valueChanges(): Observable<T[]>;
-  // tslint:disable-next-line:unified-signatures
+  // eslint-disable-next-line no-empty-pattern
   valueChanges({}): Observable<T[]>;
-  valueChanges<K extends string>(options: {idField: K}): Observable<(T & { [T in K]: string })[]>;
+  valueChanges<K extends string>(options: {idField: K}): Observable<(T & Record<K, string>)[]>;
   valueChanges<K extends string>(options: {idField?: K} = {}): Observable<T[]> {
     return fromCollectionRef<T>(this.query, this.afs.schedulers.outsideAngular)
       .pipe(
         map(actions => actions.payload.docs.map(a => {
           if (options.idField) {
             return {
-              ...a.data() as {},
+              ...a.data() as any,
               ...{ [options.idField]: a.id }
-            } as T & { [T in K]: string };
+            } as T & Record<K, string>;
           } else {
             return a.data();
           }
         })),
-        keepUnstableUntilFirst
+        pendingUntilEvent(this.injector)
       );
   }
 
@@ -129,7 +133,7 @@ export class AngularFirestoreCollection<T = DocumentData> {
    */
   get(options?: firebase.firestore.GetOptions) {
     return from(this.query.get(options)).pipe(
-      keepUnstableUntilFirst,
+      pendingUntilEvent(this.injector)
     );
   }
 

@@ -1,10 +1,10 @@
+import { join } from 'path';
 import { Rule, SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { overwriteIfExists, safeReadJSON, stringifyFormatted } from '../../common';
-import { peerDependencies, firebaseFunctionsDependencies } from '../../versions.json';
-import { join } from 'path';
+import { firebaseFunctionsDependencies, peerDependencies } from '../../versions.json';
 
-const IMPORT_REGEX = /(?<key>import|export)\s+(?:(?<alias>[\w,{}\s\*]+)\s+from)?\s*(?:(?<quote>["'])?(?<ref>[@\w\s\\\/.-]+)\3?)\s*(?<term>[;\n])/g;
+const IMPORT_REGEX = /(?<key>import|export)\s+(?:(?<alias>[\w,{}\s*]+)\s+from)?\s*(?:(?<quote>["'])?(?<ref>[@\w\s\\/.-]+)\3?)\s*(?<term>[;\n])/g;
 interface ImportRegexMatch {
     key: string;
     alias: string;

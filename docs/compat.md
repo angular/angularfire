@@ -1,5 +1,5 @@
 # AngularFire
-The official [Angular](https://angular.io/) library for [Firebase](https://firebase.google.com/).
+The official [Angular](https://angular.dev/) library for [Firebase](https://firebase.google.com/).
 
 <strong><pre>ng add @angular/fire</pre></strong>
 
@@ -38,7 +38,7 @@ Firebase offers two cloud-based, client-accessible database solutions that suppo
 
 ### Authenticate users
 
-- [Getting started with Firebase Authentication](acompat/uth/getting-started.md)
+- [Getting started with Firebase Authentication](compat/auth/getting-started.md)
 - [Route users with AngularFire guards](compat/auth/router-guards.md)
 
 ### Local Emulator Suite

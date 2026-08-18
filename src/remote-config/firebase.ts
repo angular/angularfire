@@ -12,12 +12,11 @@ import {
   getRemoteConfig as _getRemoteConfig,
   getString as _getString,
   getValue as _getValue,
+  isSupported as _isSupported,
+  onConfigUpdate as _onConfigUpdate,
+  setCustomSignals as _setCustomSignals,
   setLogLevel as _setLogLevel
 } from 'firebase/remote-config';
-
-export {
-  isSupported
-} from './overrides';
 
 export const activate = ɵzoneWrap(_activate, true);
 export const ensureInitialized = ɵzoneWrap(_ensureInitialized, true);
@@ -29,4 +28,7 @@ export const getNumber = ɵzoneWrap(_getNumber, true);
 export const getRemoteConfig = ɵzoneWrap(_getRemoteConfig, true);
 export const getString = ɵzoneWrap(_getString, true);
 export const getValue = ɵzoneWrap(_getValue, true);
+export const isSupported = ɵzoneWrap(_isSupported, true);
+export const onConfigUpdate = ɵzoneWrap(_onConfigUpdate, true);
+export const setCustomSignals = ɵzoneWrap(_setCustomSignals, true);
 export const setLogLevel = ɵzoneWrap(_setLogLevel, true);

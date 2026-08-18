@@ -1,12 +1,11 @@
 import { TestBed } from '@angular/core/testing';
-import { AngularFireModule, FirebaseApp } from '@angular/fire/compat';
+import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAnalytics, AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
 import { COMMON_CONFIG } from '../../test-config';
 import { rando } from '../../utils';
 
 
 describe('AngularFireAnalytics', () => {
-  let app: FirebaseApp;
   let analytics: AngularFireAnalytics;
 
   beforeEach(() => {
@@ -17,7 +16,6 @@ describe('AngularFireAnalytics', () => {
       ]
     });
 
-    app = TestBed.inject(FirebaseApp);
     analytics = TestBed.inject(AngularFireAnalytics);
   });
 

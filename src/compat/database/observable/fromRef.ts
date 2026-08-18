@@ -1,6 +1,6 @@
-import { AngularFireAction, DatabaseQuery, DatabaseSnapshot, ListenEvent } from '../interfaces';
-import { asyncScheduler, Observable, SchedulerLike } from 'rxjs';
+import { Observable, SchedulerLike, asyncScheduler } from 'rxjs';
 import { map, share } from 'rxjs/operators';
+import { AngularFireAction, DatabaseQuery, DatabaseSnapshot, ListenEvent } from '../interfaces';
 
 interface SnapshotPrevKey<T> {
   snapshot: DatabaseSnapshot<T>;
@@ -20,7 +20,7 @@ export function fromRef<T>(ref: DatabaseQuery,
                            scheduler: SchedulerLike = asyncScheduler
 ): Observable<AngularFireAction<DatabaseSnapshot<T>>> {
   return new Observable<SnapshotPrevKey<T>>(subscriber => {
-    let fn: any | null = null;
+    let fn: any = null;
     fn = ref[listenType](event, (snapshot, prevKey) => {
       scheduler.schedule(() => {
         subscriber.next({ snapshot, prevKey });
@@ -42,6 +42,7 @@ export function fromRef<T>(ref: DatabaseQuery,
       };
     } else {
       return {
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         unsubscribe() {
         }
       };

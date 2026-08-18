@@ -6,6 +6,7 @@ import {
   getApp as _getApp,
   getApps as _getApps,
   initializeApp as _initializeApp,
+  initializeServerApp as _initializeServerApp,
   onLog as _onLog,
   registerVersion as _registerVersion,
   setLogLevel as _setLogLevel
@@ -15,6 +16,7 @@ export const deleteApp = ɵzoneWrap(_deleteApp, true);
 export const getApp = ɵzoneWrap(_getApp, true);
 export const getApps = ɵzoneWrap(_getApps, true);
 export const initializeApp = ɵzoneWrap(_initializeApp, true);
+export const initializeServerApp = ɵzoneWrap(_initializeServerApp, true);
 export const onLog = ɵzoneWrap(_onLog, true);
 export const registerVersion = ɵzoneWrap(_registerVersion, true);
 export const setLogLevel = ɵzoneWrap(_setLogLevel, true);

@@ -1,5 +1,5 @@
-import { DatabaseReference, FirebaseOperation, FirebaseOperationCases, PathReference } from './interfaces';
 import firebase from 'firebase/compat/app';
+import { DatabaseReference, FirebaseOperation, FirebaseOperationCases, PathReference } from './interfaces';
 
 export function isString(value: any): boolean {
   return typeof value === 'string';

@@ -1,7 +1,7 @@
-import { UploadTask, UploadTaskSnapshot } from './interfaces';
-import { fromTask } from './observable/fromTask';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { UploadTask, UploadTaskSnapshot } from './interfaces';
+import { fromTask } from './observable/fromTask';
 
 export interface AngularFireUploadTask {
   task: UploadTask;
