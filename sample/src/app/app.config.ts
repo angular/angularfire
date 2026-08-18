@@ -1,4 +1,4 @@
-import { ApplicationConfig, inject, provideExperimentalZonelessChangeDetection } from '@angular/core';
+import { ApplicationConfig, inject, provideZonelessChangeDetection } from '@angular/core';
 import { connectAuthEmulator, getAuth, provideAuth } from '@angular/fire/auth';
 import { provideClientHydration, withIncrementalHydration } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
@@ -9,7 +9,7 @@ import { environment } from '../environments/environment';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideExperimentalZonelessChangeDetection(),
+    provideZonelessChangeDetection(),
     provideRouter(routes),
     provideClientHydration(withIncrementalHydration()),
     provideAuth(() => {

@@ -1,16 +1,45 @@
-# Ng19Test
+# AngularFire 21 Sample App
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.0.
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.0.
+
+## AngularFire tarball
+
+The sample consumes the library as `file:../angular-fire-21.0.0-rc.0.tgz`. Produce that file from the repository root before installing here:
+
+```bash
+npm ci
+npm run build
+```
+
+The root build ends with `npm pack ./dist/packages-dist`, which writes `angular-fire-<version>.tgz` next to this folder. When the root package version changes, update the `file:` path in `package.json` and the install command below to match.
+
+Then, from this `sample/` folder, install the dependencies by naming the tarball explicitly:
+
+```bash
+npm install ../angular-fire-21.0.0-rc.0.tgz
+```
+
+A plain `npm install` is not reliable here. `package-lock.json` records the integrity hash of the tarball built by whoever committed the lockfile, and a tarball you build yourself can hash differently. With a cold npm cache the install then fails with an `EINTEGRITY` error. With a warm cache that holds the recorded hash, npm installs the stale cached copy and exits successfully, so you would be testing a library you did not build. Naming the tarball installs the file on disk and rewrites the recorded hash in your local `package-lock.json`. Leave that lockfile change uncommitted.
+
+## Cloud Functions demo
+
+The Functions demo calls a Cloud Function whose source lives in `functions/`. It is its own small project, so install and build it once before starting the emulators, or the functions emulator will skip it with a warning:
+
+```bash
+cd functions
+npm install
+npm run build
+```
 
 ## Development server
 
-To start a local development server, run:
+Every demo in the sample talks to the local Firebase emulators, so start the emulator suite and the dev server together:
 
 ```bash
-ng serve
+npm start
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+This boots the emulators with seeded data and then runs `ng serve`. Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files. A bare `ng serve` also works, but the demos will have no backend to talk to.
 
 ## Code scaffolding
 
@@ -38,21 +67,11 @@ This will compile your project and store the build artifacts in the `dist/` dire
 
 ## Running unit tests
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+To execute unit tests with [Vitest](https://vitest.dev), use the following command:
 
 ```bash
 ng test
 ```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
 
 ## Additional Resources
 

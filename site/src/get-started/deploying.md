@@ -7,6 +7,8 @@ eleventyNavigation:
 
 ## Static or Server-side rendered
 
+> **This page is out of date.** It describes a setup flow that `ng add @angular/fire` no longer performs, and wiring the deploy target by hand from the samples below puts you on a deprecated path that warns on every deploy. For current guidance see [the Quickstart](https://github.com/angular/angularfire/blob/main/docs/install-and-setup.md), step 6, and for server-side rendered apps see the [App Hosting guide](https://github.com/angular/angularfire/blob/main/docs/app-hosting.md).
+
 In this guide, we'll look at how to use `@angular/fire` to automatically deploy an Angular application to Firebase Hosting or Cloud Functions by using the Angular CLI.
 
 `@angular/fire` uses Firebase functions to deploy your Angular Universal projects, with server-side rendering enabled.
@@ -98,13 +100,13 @@ To customize the deployment flow, you can use the configuration files you're alr
 
 ### Configuring Cloud Functions
 
-Setting `functionsNodeVersion` and `functionsRuntimeOptions` in your `angular.json` allow you to custimze the version of Node.js Cloud Functions is running and run-time settings like timeout, VPC connectors, and memory.
+Setting `functionsNodeVersion` and `functionsRuntimeOptions` in your `angular.json` allow you to customize the version of Node.js Cloud Functions is running and run-time settings like timeout, VPC connectors, and memory.
 
 ```json
 "deploy": {
     "builder": "@angular/fire:deploy",
     "options": {
-        "functionsNodeVersion": 12,
+        "functionsNodeVersion": 22,
         "functionsRuntimeOptions": {
           "memory": "2GB",
           "timeoutSeconds": 10,

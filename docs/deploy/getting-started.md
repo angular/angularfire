@@ -1,5 +1,7 @@
 # Deploy your application on Firebase Hosting & Functions
 
+> **This page is out of date.** It describes a setup flow that `ng add @angular/fire` no longer performs, and wiring the deploy target by hand from the samples below puts you on a deprecated path that warns on every deploy. For current guidance see [the Quickstart](../install-and-setup.md), step 6, and for server-side rendered apps see the [App Hosting guide](../app-hosting.md).
+
 In this guide, we'll look at how to use `@angular/fire` to automatically deploy an Angular application to Firebase hosting or functions by using the Angular CLI.
 
 `@angular/fire` uses Firebase functions to deploy your Angular universal projects, with server-side rendering enabled.
@@ -97,7 +99,7 @@ Setting `functionsNodeVersion` and `functionsRuntimeOptions` in your `angular.js
 "deploy": {
     "builder": "@angular/fire:deploy",
     "options": {
-        "functionsNodeVersion": 12,
+        "functionsNodeVersion": 22,
         "functionsRuntimeOptions": {
           "memory": "2GB",
           "timeoutSeconds": 10,
