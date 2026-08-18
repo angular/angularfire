@@ -36,5 +36,5 @@ import { UpboatsComponent } from './upboats/upboats.component';
   `,
 })
 export class AppComponent {
-  title = 'ng19-test';
+  title = 'ng21-test';
 }
