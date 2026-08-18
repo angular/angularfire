@@ -12,34 +12,33 @@ by conforming to Angular conventions.
 - **Observable based** - Utilize RxJS rather than callbacks for real-time streams.
 - **NgRx friendly API** - Integrate with NgRx using AngularFire's action based APIs.
 - **Lazy-loading** - AngularFire dynamically imports much of Firebase, reducing the time to load your app.
-- **Deploy schematics** - Get your Angular application deployed on Firebase Hosting with a single command.
 - **Google Analytics** - Zero-effort Angular Router awareness in Google Analytics.
 - **Router Guards** - Guard your Angular routes with built-in Firebase Authentication checks.
 
 ## Example use
 
 ```ts
+import { ApplicationConfig } from '@angular/core';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideFirebaseApp(() => initializeApp({ ... })),
+    provideFirebaseApp(() => initializeApp({ /* ...your Firebase config... */ })),
     provideFirestore(() => getFirestore()),
-    ...
+    // ...
   ],
-  ...
-})
+  // ...
+}
 ```
 
 ```ts
 import { AsyncPipe } from '@angular/common';
-import { inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Firestore, collectionData, collection } from '@angular/fire/firestore';
 
 interface Item {
-  name: string,
-  ...
+  name: string;
 };
 
 @Component({
@@ -55,7 +54,7 @@ interface Item {
   `,
   imports: [AsyncPipe]
 })
-export class AppComponent {
+export class App {
   firestore = inject(Firestore);
   itemCollection = collection(this.firestore, 'items');
   items$ = collectionData<Item>(this.itemCollection);
@@ -70,7 +69,7 @@ export class AppComponent {
 
 [Contributing](CONTRIBUTING.md)
 
-[Stackblitz Template](https://stackblitz.com/edit/angular-fire-start) - Remember to set your Firebase configuration in `app/app.module.ts`.
+[Stackblitz Template](https://stackblitz.com/edit/angular-fire-start) - A runnable AngularFire example. Add your own Firebase configuration to connect it to your project.
 
 [Upgrading from v6.0? Check out our guide.](docs/version-7-upgrade.md)
 
@@ -84,7 +83,7 @@ The [`sample`](sample) folder contains a kitchen sink application that demonstra
 
 Get help on our [Q&A board](https://github.com/angular/angularfire/discussions?discussions_q=category%3AQ%26A), the official [Firebase Mailing List](https://groups.google.com/forum/#!forum/firebase-talk), the [Firebase Community Slack](https://firebase.community/) (`#angularfire2`), the [Angular Community Discord](http://discord.gg/angular) (`#firebase`), [Gitter](https://gitter.im/angular/angularfire2), the [Firebase subreddit](https://www.reddit.com/r/firebase), or [Stack Overflow](https://stackoverflow.com/questions/tagged/angularfire2).
 
-> **NOTE:** While relatively stable, AngularFire is a [developer preview](https://angular.io/guide/releases#developer-preview) and is subject to change before general availability. Questions on the mailing list and issues filed here are answered on a <strong>best-effort basis</strong> by maintainers and other community members. If you are able to reproduce a problem with Firebase <em>outside of AngularFire's implementation</em>, please [file an issue on the Firebase JS SDK](https://github.com/firebase/firebase-js-sdk/issues) or reach out to the personalized [Firebase support channel](https://firebase.google.com/support/).
+> **NOTE:** Questions on the mailing list and issues filed here are answered on a <strong>best-effort basis</strong> by maintainers and other community members. If you are able to reproduce a problem with Firebase <em>outside of AngularFire's implementation</em>, please [file an issue on the Firebase JS SDK](https://github.com/firebase/firebase-js-sdk/issues) or reach out to the personalized [Firebase support channel](https://firebase.google.com/support/).
 
 ## Developer Guide
 
@@ -98,9 +97,25 @@ This developer guide assumes you're using the new tree-shakable AngularFire API,
   <tr>
     <td>
 
+#### [AI Logic](docs/ai.md#ai-logic)
+```ts
+import { } from '@angular/fire/ai';
+```
+</td>
+    <td>
+
 #### [Analytics](docs/analytics.md#analytics)
 ```ts
 import { } from '@angular/fire/analytics';
+```
+</td>
+  </tr>
+  <tr>
+    <td>
+
+#### [App Check](docs/app-check.md#app-check)
+```ts
+import { } from '@angular/fire/app-check';
 ```
 </td>
     <td>
@@ -172,22 +187,6 @@ import { } from '@angular/fire/database';
 #### [Remote Config](docs/remote-config.md#remote-config)
 ```ts
 import { } from '@angular/fire/remote-config';
-```
-</td>
-  </tr>
-  <tr>
-    <td>
-
-#### [App Check](docs/app-check.md#app-check)
-```ts
-import { } from '@angular/fire/app-check';
-```
-</td>
-    <td>
-
-#### [AI Logic](docs/ai.md#ai-logic)
-```ts
-import { } from '@angular/fire/ai';
 ```
 </td>
   </tr>
