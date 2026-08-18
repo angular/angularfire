@@ -20,6 +20,7 @@ ng add @angular/fire
 Provide a Remote Config instance in the application's `app.config.ts`:
 
 ```ts
+import { ApplicationConfig } from '@angular/core';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideRemoteConfig, getRemoteConfig } from '@angular/fire/remote-config';
 
@@ -30,7 +31,7 @@ export const appConfig: ApplicationConfig = {
     ...
   ],
   ...
-})
+}
 ```
 
 Next inject `RemoteConfig` into your component:

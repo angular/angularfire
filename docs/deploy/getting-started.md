@@ -99,7 +99,7 @@ Setting `functionsNodeVersion` and `functionsRuntimeOptions` in your `angular.js
 "deploy": {
     "builder": "@angular/fire:deploy",
     "options": {
-        "functionsNodeVersion": 12,
+        "functionsNodeVersion": 22,
         "functionsRuntimeOptions": {
           "memory": "2GB",
           "timeoutSeconds": 10,

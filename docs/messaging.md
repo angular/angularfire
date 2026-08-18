@@ -18,6 +18,7 @@ ng add @angular/fire
 Provide a Cloud Messaging instance in the application's `app.config.ts`:
 
 ```ts
+import { ApplicationConfig } from '@angular/core';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideMessaging, getMessaging } from '@angular/fire/messaging';
 
@@ -28,7 +29,7 @@ export const appConfig: ApplicationConfig = {
     ...
   ],
   ...
-})
+}
 ```
 
 Next inject `Messaging` into your component:
@@ -55,10 +56,10 @@ There are two parts to Firebase Messaging, a Service Worker and the DOM API. Ang
 It may be wise to use file replacements or environments here for different environments
 
 ```
-// This sample application is using 9.22, make sure you are importing the same version
+// This sample application is using 12.4.0, make sure you are importing the same version
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-import { getMessaging } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging-sw.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import { getMessaging } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-messaging-sw.js";
 
 const firebaseApp = initializeApp({
   apiKey: "",
@@ -76,23 +77,25 @@ const messaging = getMessaging(firebaseApp);
 
 ```
 import { Injectable } from "@angular/core";
-import { Messaging, getToken, onMessage, deleteToken } from "@angular/fire/messaging";
+import { Messaging, MessagePayload, getToken, onMessage, deleteToken } from "@angular/fire/messaging";
 import { Observable, tap } from "rxjs";
 
 @Injectable({
   providedIn: "root",
 })
 export class FcmService {
-  constructor(private msg: Messaging){
+  message$: Observable<MessagePayload>;
+
+  constructor(private msg: Messaging) {
     Notification.requestPermission().then(
-    (notificationPermissions: NotificationPermission) => {
-      if (notificationPermissions === "granted") {
-        console.log("Granted");
-      }
-      if (notificationPermissions === "denied") {
-        console.log("Denied");
-      }
-    });
+      (notificationPermissions: NotificationPermission) => {
+        if (notificationPermissions === "granted") {
+          console.log("Granted");
+        }
+        if (notificationPermissions === "denied") {
+          console.log("Denied");
+        }
+      });
     navigator.serviceWorker
       .register("/assets/firebase-messaging-sw.js", {
         type: "module",
@@ -101,23 +104,25 @@ export class FcmService {
         getToken(this.msg, {
           vapidKey: `an optional key generated on Firebase for your fcm tokens`,
           serviceWorkerRegistration: serviceWorkerRegistration,
-        }).then((x) => {
-          console.log('my fcm token', x);
+        }).then((token) => {
+          console.log('my fcm token', token);
           // This is a good place to then store it on your database for each user
         });
-	});  
-    }
-    this.message$ = new Observable((sub) => onMessage(this.msg, (msg) =>     
-      sub.next(msg))).pipe(
-	    tap((msg) => {
-	      console.log("My Firebase Cloud Message", msg);
-	    })
+      });
+    this.message$ = new Observable<MessagePayload>((sub) =>
+      onMessage(this.msg, (msg) => sub.next(msg))).pipe(
+        tap((msg) => {
+          console.log("My Firebase Cloud Message", msg);
+        })
     );
-    }
-  deleteToken(){
+  }
+
+  async deleteToken() {
     // We can also delete fcm tokens, make sure to also update this on your firestore db if you are storing them as well
+    // This calls the imported deleteToken, not this method. Class methods are not in lexical scope
     await deleteToken(this.msg);
   }
+}
 ```
 
 # Testing and Sending Notifications

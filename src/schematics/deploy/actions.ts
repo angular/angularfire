@@ -1,9 +1,10 @@
-import { SpawnOptionsWithoutStdio, execSync, spawn } from 'child_process';
+import { SpawnOptionsWithoutStdio, SpawnSyncOptions, spawn } from 'child_process';
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { BuilderContext, targetFromTargetString } from '@angular-devkit/architect';
 import { SchematicsException } from '@angular-devkit/schematics';
+import crossSpawn from 'cross-spawn';
 import fsExtra from 'fs-extra';
 import * as inquirer from 'inquirer';
 import open from 'open';
@@ -13,8 +14,9 @@ import * as winston from 'winston';
 import { BuildTarget, CloudRunOptions, DeployBuilderSchema, FSHost, FirebaseTools } from '../interfaces';
 import { DEFAULT_FUNCTION_NAME, defaultFunction, defaultPackage, dockerfile, functionGen2 } from './functions-templates.js';
 
-// @ts-ignore
-const __dirname = dirname(fileURLToPath(import.meta.url));
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore `import.meta` is rejected by the --module es2015 pass of `npm run build:jasmine`.
+const moduleDirectory = typeof __dirname === 'string' ? __dirname : dirname(fileURLToPath(import.meta.url));
 
 const { copySync, removeSync, readJsonSync } = fsExtra;
 
@@ -32,11 +34,11 @@ const DEFAULT_CLOUD_RUN_OPTIONS: Partial<CloudRunOptions> = {
 
 const spawnAsync = async (
   command: string,
+  args: string[],
   options?: SpawnOptionsWithoutStdio
 ) =>
   new Promise<Buffer>((resolve, reject) => {
-    const [spawnCommand, ...args] = command.split(/\s+/);
-    const spawnProcess = spawn(spawnCommand, args, options);
+    const spawnProcess = spawn(command, args, options);
     const chunks: Buffer[] = [];
     const errorChunks: Buffer[] = [];
     spawnProcess.stdout.on('data', (data) => {
@@ -51,7 +53,7 @@ const spawnAsync = async (
       reject(error);
     });
     spawnProcess.on('close', (code) => {
-      if (code === 1) {
+      if (code !== 0) {
         reject(Buffer.concat(errorChunks).toString());
         return;
       }
@@ -120,15 +122,85 @@ const defaultFsHost: FSHost = {
   existsSync,
 };
 
-const findPackageVersion = (packageManager: string, name: string) => {
-  const match = execSync(`${packageManager} list ${name}`).toString().match(`[^|s]${escapeRegExp(name)}[@| ][^s]+(s.+)?$`);
+// Package managers AngularFire is willing to shell out to when resolving
+// dependency versions. Kept in sync with the Angular CLI's own list. The value
+// comes from `cli.packageManager` in angular.json, which this builder reads with
+// a raw `JSON.parse`, i.e. it is NOT run through the Angular CLI's own schema
+// validation, so it must be checked here before it is ever used as an argv0.
+export const SUPPORTED_PACKAGE_MANAGERS = ['npm', 'yarn', 'pnpm', 'cnpm', 'bun'];
+
+export const assertSupportedPackageManager = (packageManager: string): string => {
+  if (!SUPPORTED_PACKAGE_MANAGERS.includes(packageManager)) {
+    throw new SchematicsException(
+      `Unsupported package manager "${packageManager}" in angular.json (cli.packageManager). ` +
+      `Expected one of: ${SUPPORTED_PACKAGE_MANAGERS.join(', ')}.`
+    );
+  }
+  return packageManager;
+};
+
+// A dependency name comes from `architect.<project>.server.options.externalDependencies`
+// in angular.json. Reject anything that is not a plain package specifier so it can
+// neither inject shell metacharacters (defence in depth alongside execFileSync) nor
+// be parsed as a CLI flag by the package manager (argument injection).
+export const assertSafeDependencyName = (name: string): string => {
+  // Valid npm package names / esbuild external globs never contain whitespace or
+  // shell metacharacters, and never start with a dash. Reject anything else so the
+  // value can neither inject a shell command (defence in depth alongside
+  // execFileSync) nor be parsed as a package-manager flag (argument injection).
+  if (typeof name !== 'string' || name.length === 0 || name.startsWith('-') ||
+      /[\s;&|$`(){}<>!\\'"]/.test(name)) {
+    throw new SchematicsException(
+      `Invalid dependency name ${JSON.stringify(name)} in angular.json (server externalDependencies).`
+    );
+  }
+  return name;
+};
+
+// All shelling out from the deploy builder funnels through this single runner.
+// cross-spawn (v7) resolves the platform-appropriate executable and escapes each
+// argument, so a value taken from angular.json is passed as an argv entry and can
+// never be parsed as shell syntax. Unlike child_process.execFile it can launch a
+// Windows `.cmd`/`.bat` shim (npm, yarn, pnpm and cnpm all ship as `.cmd` shims
+// there), so `ng deploy` keeps working cross-platform. We deliberately avoid
+// `shell: true`, whose args-array form Node runtime-deprecates (DEP0190) because
+// it concatenates the arguments without escaping, reopening the injection.
+// It is exported as an object so tests can assert the deploy code shells out only
+// through here and never regresses to execSync or `shell: true`.
+export const processHost = {
+  runPackageBin(
+    command: string,
+    args: string[],
+    options: SpawnSyncOptions = {},
+  ): Buffer {
+    const result = crossSpawn.sync(command, args, options);
+    if (result.error) { throw result.error; }
+    if (result.status !== 0) {
+      throw new SchematicsException(
+        `Command "${command}" exited with ${result.signal ? `signal ${result.signal}` : `code ${result.status}`}.`
+      );
+    }
+    return result.stdout;
+  },
+};
+
+export const findPackageVersion = (packageManager: string, name: string) => {
+  // Run the package manager without a shell (argument array, no `shell` option)
+  // so a dependency name or package-manager value taken from angular.json cannot
+  // be interpreted as a shell command. Both values are validated first, so an
+  // unsupported manager or unsafe name throws before anything is ever spawned.
+  const output = processHost.runPackageBin(assertSupportedPackageManager(packageManager), [
+    'list',
+    assertSafeDependencyName(name),
+  ]).toString();
+  const match = output.match(`[^|s]${escapeRegExp(name)}[@| ][^s]+(s.+)?$`);
   return match ? match[0].split(new RegExp(`${escapeRegExp(name)}[@| ]`))[1].split(/\s/)[0] : null;
 };
 
 const getPackageJson = (context: BuilderContext, workspaceRoot: string, options: DeployBuilderOptions, main?: string) => {
   const dependencies: Record<string, string> = {};
   const devDependencies: Record<string, string> = {};
-  const { firebaseFunctionsDependencies } = readJsonSync(join(__dirname, '..', 'versions.json'));
+  const { firebaseFunctionsDependencies } = readJsonSync(join(moduleDirectory, '..', 'versions.json'));
   if (options.ssr !== 'cloud-run') {
     Object.keys(firebaseFunctionsDependencies).forEach(name => {
       const { version, dev } = firebaseFunctionsDependencies[name];
@@ -244,7 +316,12 @@ export const deployToFunction = async (
   const siteTarget = options.target ?? context.target!.project;
 
   if (fsHost.existsSync(functionsPackageJsonPath)) {
-    execSync(`npm --prefix ${functionsOut} install`);
+    // Pass the output directory as an argv entry rather than interpolating it
+    // into a shell string; `functionsOut` derives from the `outputPath` deploy
+    // option (angular.json) and must not be able to inject shell commands. npm is
+    // a `.cmd` shim on Windows, which child_process.execFile cannot launch, so
+    // this goes through the shell-free cross-spawn runner instead.
+    processHost.runPackageBin('npm', ['--prefix', functionsOut, 'install'], { stdio: 'inherit' });
   } else {
     console.error(`No package.json exists at ${functionsOut}`);
   }
@@ -278,6 +355,34 @@ export const deployToFunction = async (
 
 };
 
+
+// Exported (rather than kept private) so the argv shape can be asserted directly in tests,
+// without having to mock child_process.spawn.
+export const buildCloudRunBuildsSubmitArgs = (
+  cloudRunOut: string,
+  serviceId: string,
+  options: DeployBuilderOptions
+): string[] => [
+  'builds', 'submit', cloudRunOut,
+  '--tag', `gcr.io/${options.firebaseProject}/${serviceId}`,
+  '--project', options.firebaseProject,
+  '--quiet',
+];
+
+export const buildCloudRunDeployArgs = (
+  serviceId: string,
+  options: DeployBuilderOptions,
+  deployArguments: string[]
+): string[] => [
+  'run', 'deploy', serviceId,
+  '--image', `gcr.io/${options.firebaseProject}/${serviceId}`,
+  '--project', options.firebaseProject,
+  ...deployArguments,
+  '--platform', 'managed',
+  '--allow-unauthenticated',
+  '--region', options.region,
+  '--quiet',
+];
 
 export const deployToCloudRun = async (
   firebaseTools: FirebaseTools,
@@ -353,25 +458,23 @@ export const deployToCloudRun = async (
     throw new SchematicsException('Cloud Run preview not supported.');
   }
 
-  const deployArguments: any[] = [];
+  const deployArguments: string[] = [];
   const cloudRunOptions = options.cloudRunOptions || {};
   Object.entries(DEFAULT_CLOUD_RUN_OPTIONS).forEach(([k, v]) => {
     cloudRunOptions[k] ||= v;
   });
   // lean on the schema for validation (rather than sanitize)
-  if (cloudRunOptions.cpus) { deployArguments.push('--cpu', cloudRunOptions.cpus); }
-  if (cloudRunOptions.maxConcurrency) { deployArguments.push('--concurrency', cloudRunOptions.maxConcurrency); }
-  if (cloudRunOptions.maxInstances) { deployArguments.push('--max-instances', cloudRunOptions.maxInstances); }
-  if (cloudRunOptions.memory) { deployArguments.push('--memory', cloudRunOptions.memory); }
-  if (cloudRunOptions.minInstances) { deployArguments.push('--min-instances', cloudRunOptions.minInstances); }
-  if (cloudRunOptions.timeout) { deployArguments.push('--timeout', cloudRunOptions.timeout); }
+  if (cloudRunOptions.cpus) { deployArguments.push('--cpu', cloudRunOptions.cpus.toString()); }
+  if (cloudRunOptions.maxConcurrency) { deployArguments.push('--concurrency', cloudRunOptions.maxConcurrency.toString()); }
+  if (cloudRunOptions.maxInstances) { deployArguments.push('--max-instances', cloudRunOptions.maxInstances.toString()); }
+  if (cloudRunOptions.memory) { deployArguments.push('--memory', cloudRunOptions.memory.toString()); }
+  if (cloudRunOptions.minInstances) { deployArguments.push('--min-instances', cloudRunOptions.minInstances.toString()); }
+  if (cloudRunOptions.timeout) { deployArguments.push('--timeout', cloudRunOptions.timeout.toString()); }
   if (cloudRunOptions.vpcConnector) { deployArguments.push('--vpc-connector', cloudRunOptions.vpcConnector); }
 
-  // TODO validate serviceId, firebaseProject, and vpcConnector both to limit errors and opp for injection
-
   context.logger.info(`📦 Deploying to Cloud Run`);
-  await spawnAsync(`gcloud builds submit ${cloudRunOut} --tag gcr.io/${options.firebaseProject}/${serviceId} --project ${options.firebaseProject} --quiet`);
-  await spawnAsync(`gcloud run deploy ${serviceId} --image gcr.io/${options.firebaseProject}/${serviceId} --project ${options.firebaseProject} ${deployArguments.join(' ')} --platform managed --allow-unauthenticated --region=${options.region} --quiet`);
+  await spawnAsync('gcloud', buildCloudRunBuildsSubmitArgs(cloudRunOut, serviceId, options));
+  await spawnAsync('gcloud', buildCloudRunDeployArgs(serviceId, options, deployArguments));
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const siteTarget = options.target ?? context.target!.project;
@@ -405,7 +508,7 @@ export default async function deploy(
   }
 
   if (!firebaseToken && process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-    await spawnAsync(`gcloud auth activate-service-account --key-file ${process.env.GOOGLE_APPLICATION_CREDENTIALS}`);
+    await spawnAsync('gcloud', ['auth', 'activate-service-account', '--key-file', process.env.GOOGLE_APPLICATION_CREDENTIALS]);
     console.log(`Using Google Application Credentials.`);
   }
 

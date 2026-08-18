@@ -100,13 +100,13 @@ To customize the deployment flow, you can use the configuration files you're alr
 
 ### Configuring Cloud Functions
 
-Setting `functionsNodeVersion` and `functionsRuntimeOptions` in your `angular.json` allow you to custimze the version of Node.js Cloud Functions is running and run-time settings like timeout, VPC connectors, and memory.
+Setting `functionsNodeVersion` and `functionsRuntimeOptions` in your `angular.json` allow you to customize the version of Node.js Cloud Functions is running and run-time settings like timeout, VPC connectors, and memory.
 
 ```json
 "deploy": {
     "builder": "@angular/fire:deploy",
     "options": {
-        "functionsNodeVersion": 12,
+        "functionsNodeVersion": 22,
         "functionsRuntimeOptions": {
           "memory": "2GB",
           "timeoutSeconds": 10,
