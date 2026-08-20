@@ -56,7 +56,8 @@
     },
     "functionsNodeVersion": {
       "oneOf": [{ "type": "number" }, { "type": "string" }],
-      "description": "Version of Node.js to run Cloud Functions / Run on"
+      "pattern": "^(?!latest$)[\\w][\\w.-]{0,127}$",
+      "description": "Version of Node.js to run Cloud Functions / Run on, e.g. 22. On Cloud Run this is the tag of the node base image (node:<version>-slim), so any tag that image publishes works, including lts and 22-bookworm; latest is excluded because its slim variant is published as node:slim. On Cloud Functions the value becomes the engines.node field, which firebase-tools resolves to a nodejs<version> runtime by concatenation, so a plain major version is the only shape that works there. Not a semver range: >=18 and ^20 are rejected outright, and 20.x, though a grammatical tag, matches no published image."
     },
     "CF3v2": {
       "type": "boolean",
