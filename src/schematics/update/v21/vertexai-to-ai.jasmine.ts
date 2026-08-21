@@ -746,6 +746,24 @@ describe('rewriteVertexAIToAI', () => {
     expect(warn.calls.mostRecent().args[0]).toContain('no longer exists in the new entry point');
   });
 
+  it('leaves getImagenModel in place and warns that the Imagen API is gone', () => {
+    const { context: spiedContext, warn } = contextWithLogSpies();
+    const source = [
+      `import { getVertexAI, getImagenModel } from '@angular/fire/vertexai';`,
+      `export const a = getVertexAI();`,
+      `export const model = getImagenModel(a, { model: 'imagen-3.0-generate-002' });`,
+    ].join('\n');
+    const tree = treeWith({ 'src/app/foo.ts': source });
+
+    rewriteVertexAIToAI(tree, spiedContext, typescript);
+
+    const out = tree.readText('src/app/foo.ts');
+    expect(out).toContain(`import { getAI, VertexAIBackend, getImagenModel } from '@angular/fire/ai';`);
+    expect(out).toContain(`getImagenModel(a, { model: 'imagen-3.0-generate-002' });`);
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.calls.mostRecent().args[0]).toContain('Imagen models were shut down');
+  });
+
   it('reuses an existing VertexAIBackend import instead of adding a second one', () => {
     const source = [
       `import { VertexAIBackend } from '@angular/fire/ai';`,

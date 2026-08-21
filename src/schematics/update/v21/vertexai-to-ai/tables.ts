@@ -30,6 +30,7 @@ export const SYMBOL_RENAMES: Record<string, string> = {
 // replacement, so the import keeps its name (breaking loudly) and the log explains why.
 export const REMOVED_SYMBOL_GUIDANCE: Record<string, string> = {
   VertexAIOptions: 'the new AIOptions takes a backend instead of a location, rebuild the options by hand',
+  getImagenModel: 'the Imagen models were shut down in August 2026 and firebase 12.18 removed the API, move image generation to the Gemini image models through getGenerativeModel',
 };
 
 export const GET_VERTEX_AI = 'getVertexAI';

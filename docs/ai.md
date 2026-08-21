@@ -4,7 +4,7 @@
 
 # AI Logic
 
-Firebase AI Logic gives you access to the latest generative AI models from Google: the Gemini models and Imagen models.
+Firebase AI Logic gives you access to the latest generative AI models from Google: the Gemini models, including the Gemini image models.
 
 [Learn more](https://firebase.google.com/docs/ai-logic)
 

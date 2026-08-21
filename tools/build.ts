@@ -114,7 +114,13 @@ ${exportedZoneWrappedFns}
     await writeFile(filePath, fileOutput);
   };
   return Promise.all([
-    reexport('ai', 'firebase', 'firebase/ai', tsKeys<typeof import('firebase/ai')>()),
+    reexport('ai', 'firebase', 'firebase/ai', tsKeys<typeof import('firebase/ai')>(), {
+      // Removed in @firebase/ai 2.15.0 (firebase 12.18.0), which the ^12.4.0 range
+      // resolves for fresh installs. A named import here would make consumer builds
+      // fail on that version, so only re-export it through the star export, which
+      // tracks whichever firebase is installed.
+      getImagenModel: null,
+    }),
     reexport('analytics', 'firebase', 'firebase/analytics', tsKeys<typeof import('firebase/analytics')>(), {
       isSupported: { blockUntilFirst: false },
       logEvent: { blockUntilFirst: false, logLevel: LogLevel.VERBOSE },
