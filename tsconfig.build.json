@@ -4,13 +4,14 @@
     ],
     "compilerOptions": {
         "outDir": "tools",
+        "rootDir": "tools",
+        "strict": false,
         "skipLibCheck": true,
         "lib": ["es2022", "dom"],
         "module": "commonjs",
         "target": "ES2020",
         "plugins": [
             { "transform": "ts-transformer-keys/transformer" }
-        ],
-        "baseUrl": "./"
+        ]
     }
 }

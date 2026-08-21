@@ -16,7 +16,7 @@ import { FirebaseApp, FirebaseApps } from './app';
 
 export function defaultFirebaseAppFactory(provided: FirebaseApp[]|undefined) {
   // Use the provided app, if there is only one, otherwise fetch the default app
-  if (provided && provided.length === 1) { return provided[0]; }
+  if (provided?.length === 1) { return provided[0]; }
   return new FirebaseApp(getApp());
 }
 

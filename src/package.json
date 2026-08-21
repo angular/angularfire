@@ -27,13 +27,13 @@
   "author": "angular,firebase",
   "license": "MIT",
   "peerDependencies": {
-    "@angular/common": "^21.0.0",
-    "@angular/core": "^21.0.0",
-    "@angular/platform-browser": "^21.0.0",
-    "@angular/platform-server": "^21.0.0",
+    "@angular/common": "^22.0.0",
+    "@angular/core": "^22.0.0",
+    "@angular/platform-browser": "^22.0.0",
+    "@angular/platform-server": "^22.0.0",
     "rxjs": "~7.8.0",
     "firebase-tools": "^14.0.0 || ^15.0.0",
-    "typescript": ">=5.8 <6.0"
+    "typescript": ">=6.0 <6.1"
   },
   "peerDependenciesMeta": {
     "firebase-tools": { "optional": true },
@@ -43,10 +43,10 @@
   "dependencies": {
     "firebase": "^12.4.0",
     "rxfire": "^6.2.0",
-    "@angular-devkit/architect": ">= 0.2100.0 < 0.2200.0",
-    "@angular-devkit/core": "^21.0.0",
-    "@angular-devkit/schematics": "^21.0.0",
-    "@schematics/angular": "^21.0.0",
+    "@angular-devkit/architect": ">= 0.2200.0 < 0.2300.0",
+    "@angular-devkit/core": "^22.0.0",
+    "@angular-devkit/schematics": "^22.0.0",
+    "@schematics/angular": "^22.0.0",
     "jsonc-parser": "^3.0.0",
     "tslib": "^2.3.0"
   },

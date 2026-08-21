@@ -34,7 +34,7 @@ Create a file called `server.ts` in the root of you project.
 
 ```ts
 // These are important and needed before anything else
-import 'zone.js/dist/zone-node';
+import 'zone.js/node';
 import 'reflect-metadata';
 
 import { enableProdMode } from '@angular/core';
