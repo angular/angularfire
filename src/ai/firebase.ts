@@ -4,13 +4,11 @@ import { ɵzoneWrap } from '@angular/fire';
 import {
   getAI as _getAI,
   getGenerativeModel as _getGenerativeModel,
-  getImagenModel as _getImagenModel,
   getLiveGenerativeModel as _getLiveGenerativeModel,
   startAudioConversation as _startAudioConversation
 } from 'firebase/ai';
 
 export const getAI = ɵzoneWrap(_getAI, true);
 export const getGenerativeModel = ɵzoneWrap(_getGenerativeModel, true);
-export const getImagenModel = ɵzoneWrap(_getImagenModel, true);
 export const getLiveGenerativeModel = ɵzoneWrap(_getLiveGenerativeModel, true);
 export const startAudioConversation = ɵzoneWrap(_startAudioConversation, true);
