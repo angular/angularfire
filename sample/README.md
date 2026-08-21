@@ -4,7 +4,7 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ## AngularFire tarball
 
-The sample consumes the library as `file:../angular-fire-21.0.0-rc.0.tgz`. Produce that file from the repository root before installing here:
+The sample consumes the library as `file:../angular-fire-21.0.0-rc.1.tgz`. Produce that file from the repository root before installing here:
 
 ```bash
 npm ci
@@ -16,7 +16,7 @@ The root build ends with `npm pack ./dist/packages-dist`, which writes `angular-
 Then, from this `sample/` folder, install the dependencies by naming the tarball explicitly:
 
 ```bash
-npm install ../angular-fire-21.0.0-rc.0.tgz
+npm install ../angular-fire-21.0.0-rc.1.tgz
 ```
 
 A plain `npm install` is not reliable here. `package-lock.json` records the integrity hash of the tarball built by whoever committed the lockfile, and a tarball you build yourself can hash differently. With a cold npm cache the install then fails with an `EINTEGRITY` error. With a warm cache that holds the recorded hash, npm installs the stale cached copy and exits successfully, so you would be testing a library you did not build. Naming the tarball installs the file on disk and rewrites the recorded hash in your local `package-lock.json`. Leave that lockfile change uncommitted.
