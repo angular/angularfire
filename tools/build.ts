@@ -331,7 +331,6 @@ function spawnPromise(command: string, args: string[]) {
 // Path segments of each schematic entry point, relative to `schematics/` and without the file
 // extension: esbuild compiles the `.ts` and loadCompiledSchematics requires the emitted `.js`.
 const schematicEntryPoints = [
-  ['update', 'index'],
   ['deploy', 'actions'],
   ['deploy', 'builder'],
   ['add', 'index'],

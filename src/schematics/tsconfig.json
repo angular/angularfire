@@ -22,7 +22,6 @@
         "outDir": "../../dist/packages-dist/schematics"
     },
     "files": [
-        "update/index.ts",
         "deploy/actions.ts",
         "deploy/builder.ts",
         "add/index.ts",
