@@ -38,7 +38,6 @@ export function getWorkspace(host: Tree): {
     throw new SchematicsException(`Could not find angular.json`);
   }
 
-   
   const { parse } = require("jsonc-parser");
 
   const workspace = parse(configBuffer.toString()) as Workspace | undefined;
@@ -130,7 +129,7 @@ export function addFixesToServer(host: Tree) {
   }
   const sourceText = text.toString("utf-8");
   const addZonePatch = !sourceText.includes(
-    "import 'zone.js/dist/zone-patch-rxjs';"
+    "import 'zone.js/plugins/zone-patch-rxjs';"
   );
 
   if (addZonePatch) {
@@ -138,9 +137,9 @@ export function addFixesToServer(host: Tree) {
       host,
       serverPath,
       sourceText.replace(
-        "import 'zone.js/dist/zone-node';",
-        `import 'zone.js/dist/zone-node';
-${addZonePatch ? "import 'zone.js/dist/zone-patch-rxjs';" : ""}`
+        "import 'zone.js/node';",
+        `import 'zone.js/node';
+${addZonePatch ? "import 'zone.js/plugins/zone-patch-rxjs';" : ""}`
       )
     );
   }

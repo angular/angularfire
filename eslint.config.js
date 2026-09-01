@@ -2,7 +2,7 @@ const tsParser = require('@typescript-eslint/parser');
 const js = require('@eslint/js');
 const globals = require('globals');
 const ts = require('@typescript-eslint/eslint-plugin');
-const ng = require('@angular-eslint/eslint-plugin');
+const angular = require('angular-eslint');
 const esImport = require('eslint-plugin-import');
 
 module.exports = [
@@ -10,7 +10,7 @@ module.exports = [
     files: ['**/*.ts'],
     plugins: {
       '@typescript-eslint': ts,
-      '@angular-eslint': ng,
+      '@angular-eslint': angular.tsPlugin,
       import: esImport,
     },
     languageOptions: {
@@ -26,7 +26,7 @@ module.exports = [
       ...js.configs.recommended.rules,
       ...ts.configs['recommended-requiring-type-checking'].rules,
       ...ts.configs['stylistic-type-checked'].rules,
-      ...ng.configs.recommended.rules,
+      ...angular.configs.tsRecommended[1].rules,
       ...esImport.configs.errors.rules,
       // eslint/js rules
       'no-undef': 'off',

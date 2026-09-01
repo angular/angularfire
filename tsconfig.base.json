@@ -3,10 +3,12 @@
     "compilerOptions": {
       "allowSyntheticDefaultImports": true,
       "baseUrl": "./",
+      // tsconfig-paths/register still requires baseUrl for the Node test scripts.
+      "ignoreDeprecations": "6.0",
+      "strict": false,
       "outDir": "./dist",
       "sourceMap": true,
       "declaration": false,
-      "downlevelIteration": true,
       "emitDecoratorMetadata": true,
       "experimentalDecorators": true,
       "module": "preserve",
@@ -22,8 +24,8 @@
         "dom"
       ],
       "paths": {
-        "@angular/fire": ["dist/packages-dist"],
-        "@angular/fire/*": ["dist/packages-dist/*"]
+        "@angular/fire": ["./dist/packages-dist"],
+        "@angular/fire/*": ["./dist/packages-dist/*"]
       }
     }
   }
