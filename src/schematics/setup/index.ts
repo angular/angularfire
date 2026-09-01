@@ -16,6 +16,7 @@ import {
   parseDataConnectConfig,
   setupTanstackDependencies,
 } from '../utils';
+import { warnAboutDuplicateFirebase } from './duplicateWarning';
 import {
   addFirestoreToFirebaseJson,
   createFirestoreStarterFiles,
@@ -64,6 +65,10 @@ export const ngAddSetupProject = (
   // TODO is there a public API for this?
   let projectRoot: string = (host as any)._backend._root;
   if (process.platform.startsWith('win32')) { projectRoot = asWindowsPath(normalize(projectRoot)); }
+
+  /* Before the prompt, so it runs whatever the user selects, and after the install task this
+   * schematic is scheduled behind, so node_modules is on disk to be queried. */
+  warnAboutDuplicateFirebase(projectRoot, context);
 
   const features = await featuresPrompt();
 
