@@ -72,10 +72,10 @@ export const addDependencies = (
   overwriteIfExists(host, 'package.json', stringifyFormatted(packageJson));
 };
 
-// Must stay identical to `dependencies.firebase` in `src/package.json`: if the two drift, the
-// alignment below can pin workspaces outside the range the library actually installs against,
-// re-creating the duplicate-SDK trees it exists to prevent.
-export const firebaseVersionRange = '^12.4.0';
+/* Must stay identical to `dependencies.firebase` in `src/package.json`: if the two drift, the
+ * alignment below can pin workspaces outside the range the library actually installs against,
+ * re-creating duplicate-SDK trees. */
+export const firebaseVersionRange = '^12.18.0';
 
 /**
  * Aligns the workspace's `firebase` entry with the range `@angular/fire` requires.

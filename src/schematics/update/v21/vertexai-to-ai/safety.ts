@@ -1,5 +1,5 @@
 // The analyses that decide when rewriting is NOT safe: local declarations that shadow a
-// tracked import name, and bindings of the injected names (getAI, VertexAIBackend) that come
+// tracked import name, and bindings of the injected names (getAI, AgentPlatformBackend) that come
 // from somewhere other than AI Logic. Both matter because the passes match identifiers by
 // text without scope analysis, and the design rule is to leave code whole and warn rather
 // than ever change behavior silently.
@@ -138,7 +138,7 @@ export const collectShadowedNames = (fileContext: FileContext): Set<string> => {
 };
 
 /**
- * Bindings of getAI or VertexAIBackend that do NOT come from an AI Logic module: a lexical
+ * Bindings of getAI or AgentPlatformBackend that do NOT come from an AI Logic module: a lexical
  * declaration, or any other import shape. The rewrite injects references to these names, so a
  * foreign binding would capture the rewritten calls or collide with the injected import. The
  * file's getVertexAI imports are left unmigrated instead.

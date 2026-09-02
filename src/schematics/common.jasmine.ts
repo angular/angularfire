@@ -1,10 +1,18 @@
 import { readFileSync } from 'fs';
 import { logging } from '@angular-devkit/core';
 import { HostTree, SchematicContext } from '@angular-devkit/schematics';
+import { minVersion as semverMinVersion } from 'semver';
 import { alignFirebaseVersion, firebaseVersionRange, pinInstalledPrereleaseVersion } from './common.js';
 import 'jasmine';
 
 const context = { logger: new logging.Logger('test') } as unknown as SchematicContext;
+
+// The version a workspace already declares, written into the test package.json below.
+const lowestRequiredVersion = semverMinVersion(firebaseVersionRange);
+if (!lowestRequiredVersion) {
+  throw new Error(`firebaseVersionRange ${firebaseVersionRange} matches no version`);
+}
+const alreadySupportedRange = `~${lowestRequiredVersion.version}`;
 
 const treeWithAngularFire = (declaredVersion: string, section = 'dependencies') => {
   const tree = new HostTree();
@@ -12,7 +20,7 @@ const treeWithAngularFire = (declaredVersion: string, section = 'dependencies') 
     name: 'test-app',
     [section]: {
       '@angular/fire': declaredVersion,
-      firebase: '^12.4.0',
+      firebase: firebaseVersionRange,
     },
   }, null, 2));
   return tree;
@@ -40,7 +48,7 @@ describe('pinInstalledPrereleaseVersion', () => {
   it('leaves other dependencies untouched when pinning', () => {
     const tree = treeWithAngularFire('^21.0.0-rc.0');
     pinInstalledPrereleaseVersion(tree, context, '21.0.0-rc.0');
-    expect(dependenciesIn(tree).firebase).toBe('^12.4.0');
+    expect(dependenciesIn(tree).firebase).toBe(firebaseVersionRange);
   });
 
   it('leaves a stable caret range untouched', () => {
@@ -148,9 +156,9 @@ describe('alignFirebaseVersion', () => {
   });
 
   it('leaves a compatible range untouched', () => {
-    const tree = treeWithFirebase('^12.6.0');
+    const tree = treeWithFirebase(alreadySupportedRange);
     expect(alignFirebaseVersion(tree, context)).toBeFalse();
-    expect(dependenciesIn(tree).firebase).toBe('^12.6.0');
+    expect(dependenciesIn(tree).firebase).toBe(alreadySupportedRange);
   });
 
   it('adds firebase when the workspace has none', () => {
@@ -198,11 +206,11 @@ describe('alignFirebaseVersion', () => {
     const tree = new HostTree();
     tree.create('package.json', JSON.stringify({
       name: 'test-app',
-      dependencies: { firebase: '^12.6.0' },
+      dependencies: { firebase: alreadySupportedRange },
       devDependencies: { firebase: '^11.0.0' },
     }, null, 2));
     expect(alignFirebaseVersion(tree, context)).toBeTrue();
-    expect(dependenciesIn(tree).firebase).toBe('^12.6.0');
+    expect(dependenciesIn(tree).firebase).toBe(alreadySupportedRange);
     expect(sectionIn(tree, 'devDependencies').firebase).toBe(firebaseVersionRange);
   });
 

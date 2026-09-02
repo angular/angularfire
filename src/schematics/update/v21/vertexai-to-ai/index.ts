@@ -10,11 +10,27 @@ import { overwriteIfExists, safeReadJSON } from '../../../common.js';
 import { resolveTypescript } from './compiler.js';
 import { collectUsageEdits, scanDeclarations } from './passes.js';
 import { collectInjectionConflicts, collectShadowedNames } from './safety.js';
-import { MODULE_SPECIFIER_REWRITES, REMOVED_SYMBOL_GUIDANCE } from './tables.js';
-import type { FileContext, FileRewrite, TextEdit, VertexClassification, VertexImport } from './types.js';
+import { BACKEND_CLASS, MODULE_SPECIFIER_REWRITES, REMOVED_SYMBOL_GUIDANCE } from './tables.js';
+import type { FileContext, FileRewrite, RegionChange, TextEdit, VertexClassification, VertexImport } from './types.js';
 import { buildVertexEdits } from './vertex-edits.js';
 
 const UPGRADE_GUIDE = 'see the AngularFire v21 upgrade guide (docs/version-21-upgrade.md)';
+
+/** The Live API entry points `@angular/fire/ai` exposes. A workspace calling either of them cannot
+ * run in `global`, so a region move to `global` breaks it rather than merely relocating it. */
+const LIVE_API_ENTRY_POINTS = ['getLiveGenerativeModel', 'startAudioConversation'];
+
+/** Appended to a region warning only when the workspace calls the Live API, so the common case
+ * stays short and the case that actually breaks says why. */
+const LIVE_API_CAVEAT =
+  'This workspace calls the Live API, which Firebase does not support in the global location, ' +
+  'so leaving this on global stops getLiveGenerativeModel and startAudioConversation from working. ';
+
+/** What to tell the reader to write. Without the Live API they are restoring a region we know they
+ * had, so it is named. With it they are choosing a region we cannot know, so it is not. */
+const regionRemedy = (backendReference: string, usesLiveApi: boolean): string => usesLiveApi
+  ? `Pass a location that supports the Live API to ${backendReference}, ${UPGRADE_GUIDE}`
+  : `Pass new ${backendReference}('us-central1') to keep the region you had, ${UPGRADE_GUIDE}`;
 
 /** One line of the migration log: a position in the file plus the message for it. */
 interface LogEntry {
@@ -64,6 +80,8 @@ const collectEditsForSourceFile = (fileContext: FileContext): FileRewrite => {
   return {
     edits: scan.edits.concat(vertexEdits.edits),
     vertexCallPositions: vertexEdits.callPositions,
+    defaultedLocations: vertexEdits.defaultedLocations,
+    conditionalLocations: vertexEdits.conditionalLocations,
     blockedCallPositions: vertexEdits.blockedCallPositions,
     unsupportedVertexUsages: vertex.unsupported,
     shadowedImports: scan.shadowedImports,
@@ -73,16 +91,58 @@ const collectEditsForSourceFile = (fileContext: FileContext): FileRewrite => {
   };
 };
 
+/** Opens both region warnings: "this call <verb>", or "this call and N others in this file <verb>".
+ * The two warnings need different verbs, so both forms are passed in. */
+const regionWarningSubject = (others: readonly RegionChange[], singular: string, plural: string): string =>
+  others.length === 0
+    ? `this call ${singular}`
+    : `this call and ${others.length} other${others.length === 1 ? '' : 's'} in this file ${plural}`;
+
+/** The one region warning a file earns, or nothing. getVertexAI defaulted to `us-central1` and
+ * AgentPlatformBackend defaults to `global`, so every rewritten call that passed no location
+ * changes region. Reported once per file. */
+const regionChangeLogEntry = (rewrite: FileRewrite, usesLiveApi: boolean): LogEntry[] => {
+  const [change, ...others] = rewrite.defaultedLocations;
+  if (change === undefined) { return []; }
+  return [{
+    level: 'warn',
+    position: change.position,
+    text: `${regionWarningSubject(others, 'now passes', 'now pass')} no location, ` +
+      'so the region changed from us-central1 to global. ' +
+      `us-central1 was getVertexAI's default and global is ${BACKEND_CLASS}'s. ` +
+      (usesLiveApi ? LIVE_API_CAVEAT : '') +
+      regionRemedy(change.backendReference, usesLiveApi),
+  }];
+};
+
+/** The one warning a file earns for a location that only runtime can resolve. An expression that
+ * turns out falsy used to select `us-central1` and now selects `global`. Static analysis cannot
+ * tell which, so this says what to check rather than asserting a change. */
+const conditionalRegionLogEntry = (rewrite: FileRewrite, usesLiveApi: boolean): LogEntry[] => {
+  const [change, ...others] = rewrite.conditionalLocations;
+  if (change === undefined) { return []; }
+  return [{
+    level: 'warn',
+    position: change.position,
+    text: `${regionWarningSubject(others, 'passes', 'pass')} a location this migration cannot resolve. ` +
+      'An empty value used to mean us-central1 and now means global, so the region changes if that expression is ever empty. ' +
+      (usesLiveApi ? LIVE_API_CAVEAT : '') +
+      `Check it, ${UPGRADE_GUIDE}`,
+  }];
+};
+
 /**
- * The log lines one file's rewrite produces: an info per rewritten getVertexAI call and a warn
- * per site deliberately left for manual migration.
+ * The log lines one file's rewrite produces: an info per rewritten getVertexAI call, one warn when
+ * the rewrite moved the file's region, and a warn per site deliberately left for manual migration.
  */
-const rewriteLogEntries = (rewrite: FileRewrite): LogEntry[] => [
+const rewriteLogEntries = (rewrite: FileRewrite, usesLiveApi: boolean): LogEntry[] => [
   ...rewrite.vertexCallPositions.map((position): LogEntry => ({
     level: 'info',
     position,
-    text: 'rewrote getVertexAI(...) to getAI(..., { backend: new VertexAIBackend(...) }) to keep the call on the Vertex AI backend',
+    text: `rewrote getVertexAI(...) to getAI(..., { backend: new ${BACKEND_CLASS}(...) }) to keep the call on the Agent Platform Gemini API (formerly Vertex AI)`,
   })),
+  ...regionChangeLogEntry(rewrite, usesLiveApi),
+  ...conditionalRegionLogEntry(rewrite, usesLiveApi),
   ...rewrite.unsupportedVertexUsages.map((usage): LogEntry => ({
     level: 'warn',
     position: usage.position,
@@ -102,7 +162,7 @@ const rewriteLogEntries = (rewrite: FileRewrite): LogEntry[] => [
     level: 'warn',
     position,
     text: rewrite.injectionConflicts.length > 0
-      ? 'left a rewritable getVertexAI call unrewritten because this file binds getAI or VertexAIBackend from another source (see that warning). Every use of the file\'s named getVertexAI imports is kept together so the pieces stay consistent, migrate them by hand'
+      ? `left a rewritable getVertexAI call unrewritten because this file binds getAI or ${BACKEND_CLASS} from another source (see that warning). Every use of the file's named getVertexAI imports is kept together so the pieces stay consistent, migrate them by hand`
       : 'left a rewritable getVertexAI call unrewritten because another getVertexAI use in this file cannot be rewritten (see its own warning). Every use of the file\'s named getVertexAI imports is kept together so the pieces stay consistent, migrate them by hand',
   })),
   ...rewrite.starExportPositions.map((position): LogEntry => ({
@@ -122,7 +182,7 @@ const rewriteLogEntries = (rewrite: FileRewrite): LogEntry[] => [
  *
  * @returns true when the file changed.
  */
-const rewriteFile = (host: Tree, context: SchematicContext, compiler: typeof ts, filePath: string, content: string): boolean => {
+const rewriteFile = (host: Tree, context: SchematicContext, compiler: typeof ts, filePath: string, content: string, usesLiveApi: boolean): boolean => {
   const fileContext: FileContext = {
     compiler,
     sourceFile: compiler.createSourceFile(filePath, content, compiler.ScriptTarget.Latest, true),
@@ -135,7 +195,7 @@ const rewriteFile = (host: Tree, context: SchematicContext, compiler: typeof ts,
     return false;
   }
   const rewrite = collectEditsForSourceFile(fileContext);
-  for (const entry of rewriteLogEntries(rewrite)) {
+  for (const entry of rewriteLogEntries(rewrite, usesLiveApi)) {
     const line = fileContext.sourceFile.getLineAndCharacterOfPosition(entry.position).line + 1;
     context.logger[entry.level](`${filePath}:${line}: ${entry.text}`);
   }
@@ -213,7 +273,7 @@ const shouldVisit = (filePath: string, srcRoots: string[]): boolean =>
  * `ng update` migration step: rewrite a workspace's Vertex AI imports and usages onto Firebase AI
  * Logic. Visits the TypeScript files under each project's source root and edits any that import from
  * an old entry point. getVertexAI calls keep their backend: they become
- * `getAI(app, { backend: new VertexAIBackend(location?) })`, and every rewritten or skipped
+ * `getAI(app, { backend: new AgentPlatformBackend(location?) })`, and every rewritten or skipped
  * getVertexAI site is logged.
  *
  * @param compiler the TypeScript compiler to parse with. Defaults to resolving the workspace's
@@ -232,6 +292,20 @@ export const rewriteVertexAIToAI = (host: Tree, context: SchematicContext, compi
     return false;
   }
 
+  /* Whether the workspace calls the Live API decides how loud the region warning has to be, and a
+   * Live API call usually sits in a different file from the getVertexAI call being rewritten. So it
+   * is answered across the whole tree before any file is rewritten, rather than per file. */
+  let usesLiveApi = false;
+  host.visit(filePath => {
+    if (usesLiveApi || !shouldVisit(filePath, srcRoots)) {
+      return;
+    }
+    const content = host.read(filePath)?.toString();
+    /* Accumulated with `||=` so one matching file anywhere decides it. A plain assignment would
+     * let the last file visited overwrite an earlier match, leaving the answer up to walk order. */
+    usesLiveApi ||= content !== undefined && LIVE_API_ENTRY_POINTS.some(entryPoint => content.includes(entryPoint));
+  });
+
   let changed = false;
   host.visit(filePath => {
     if (!shouldVisit(filePath, srcRoots)) {
@@ -249,7 +323,7 @@ export const rewriteVertexAIToAI = (host: Tree, context: SchematicContext, compi
       );
       return;
     }
-    changed = rewriteFile(host, context, resolvedCompiler, filePath, content) || changed;
+    changed = rewriteFile(host, context, resolvedCompiler, filePath, content, usesLiveApi) || changed;
   });
   return changed;
 };

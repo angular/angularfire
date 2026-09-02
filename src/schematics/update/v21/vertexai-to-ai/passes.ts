@@ -20,6 +20,8 @@ interface OptionsClassification {
   supported: boolean;
   /** The `location` property's source text, when present. */
   locationText?: string;
+  /** Whether that text leaves the emitted backend on its own `global` default (see types.ts). */
+  locationFallback?: 'certain' | 'possible';
   /** True when the literal contains an edit site pass 2 would also rewrite (see containsEditSite). */
   conflicting?: boolean;
 }
@@ -364,17 +366,39 @@ const classifyOptionsArgument = (optionsArgument: ts.Expression, fileContext: Fi
     tsc.isIdentifier(soleProperty.name) &&
     soleProperty.name.text === 'location'
   ) {
-    return { supported: true, locationText: soleProperty.initializer.getText(sourceFile) };
+    return {
+      supported: true,
+      locationText: soleProperty.initializer.getText(sourceFile),
+      locationFallback: classifyLocationFallback(soleProperty.initializer, fileContext),
+    };
   }
   if (soleProperty && tsc.isShorthandPropertyAssignment(soleProperty) && soleProperty.name.text === 'location') {
-    return { supported: true, locationText: 'location' };
+    return { supported: true, locationText: 'location', locationFallback: 'possible' };
   }
   return { supported: false };
 };
 
 /**
+ * Whether a written `location` still leaves the emitted backend on its own `global` default.
+ *
+ * On a falsy location, `getVertexAI` defaulted to 'us-central1', but `AgentPlatformBackend`
+ * defaults to the 'global' location. This is a region change the caller cannot see.
+ */
+const classifyLocationFallback = (
+  initializer: ts.Expression,
+  { compiler: tsc }: FileContext,
+): 'certain' | 'possible' | undefined => {
+  // Old options typed this as `location?: string`, whose falsy values are `''` and `undefined`.
+  if (tsc.isStringLiteral(initializer) || tsc.isNoSubstitutionTemplateLiteral(initializer)) {
+    return initializer.text === '' ? 'certain' : undefined;
+  }
+  if (tsc.isIdentifier(initializer) && initializer.text === 'undefined') { return 'certain'; }
+  return 'possible';
+};
+
+/**
  * Decide whether one getVertexAI call's argument shape can be rewritten to
- * `getAI(app, { backend: new VertexAIBackend(location?) })` without guessing.
+ * `getAI(app, { backend: new AgentPlatformBackend(location?) })` without guessing.
  *
  * Supported shapes: no arguments, an app argument alone, and an app argument plus an object
  * literal whose only property is `location` (or an empty literal). Anything else (a spread, a
@@ -401,7 +425,12 @@ const classifyVertexCall = (
   if (callArguments.length === 2 && !hasSpread) {
     const options = classifyOptionsArgument(callArguments[1], fileContext, editableBindings);
     if (options.supported) {
-      vertex.supportedCalls.push({ call, ...target, locationText: options.locationText });
+      vertex.supportedCalls.push({
+        call,
+        ...target,
+        locationText: options.locationText,
+        locationFallback: options.locationFallback,
+      });
       return;
     }
     conflicting = options.conflicting === true;
