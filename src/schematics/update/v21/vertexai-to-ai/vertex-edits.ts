@@ -1,17 +1,17 @@
 // Builders for the getVertexAI edits: the backend-preserving call rewrite, the import
-// specifier rename/repurpose/removal, and the VertexAIBackend import, with file-wide
+// specifier rename/repurpose/removal, and the AgentPlatformBackend import, with file-wide
 // dedup so no binding is ever injected twice.
 
 import type * as ts from 'typescript';
 import { BACKEND_CLASS, GET_AI, GET_VERTEX_AI } from './tables.js';
-import type { DeclarationScan, FileContext, ShadowedImport, SupportedVertexCall, TextEdit, VertexClassification, VertexEdits, VertexImport } from './types.js';
+import type { DeclarationScan, FileContext, RegionChange, ShadowedImport, SupportedVertexCall, TextEdit, VertexClassification, VertexEdits, VertexImport } from './types.js';
 
 /**
  * Turn the classified getVertexAI references into edits: rewritten calls, the import specifier
- * rename/replacement/removal, and the VertexAIBackend import. Every named-binding edit in the
+ * rename/replacement/removal, and the AgentPlatformBackend import. Every named-binding edit in the
  * file is skipped, so the binding stays coherent (the old import then fails to compile loudly,
  * and the log says why), when either a named-binding reference was unsupported or the file binds
- * getAI / VertexAIBackend from a non AI Logic source that the injected references would hit.
+ * getAI / AgentPlatformBackend from a non AI Logic source that the injected references would hit.
  *
  * @returns the getVertexAI edits plus the rewritten and skipped call positions for the log.
  */
@@ -24,6 +24,8 @@ export const buildVertexEdits = (
   const { sourceFile } = fileContext;
   const edits: TextEdit[] = [];
   const callPositions: number[] = [];
+  const defaultedLocations: RegionChange[] = [];
+  const conditionalLocations: RegionChange[] = [];
   const blockedCallPositions: number[] = [];
   const injectionBlocked = injectionConflicts.length > 0 && scan.vertexImports.length > 0;
   const bindingBlocked = vertex.unsupported.some(usage => usage.origin === 'binding') || injectionBlocked;
@@ -35,7 +37,7 @@ export const buildVertexEdits = (
       blockedCallPositions.push(supported.call.getStart(sourceFile));
       continue;
     }
-    // Namespace calls reach the backend as `ns.VertexAIBackend`, named imports as a bare name.
+    // Namespace calls reach the backend as `ns.AgentPlatformBackend`, named imports as a bare name.
     const backendReference = supported.namespaceAccess
       ? `${supported.namespaceAccess.expression.getText(sourceFile)}.${BACKEND_CLASS}`
       : BACKEND_CLASS;
@@ -52,9 +54,17 @@ export const buildVertexEdits = (
       const nameNode = supported.namespaceAccess.name;
       edits.push({ start: nameNode.getStart(sourceFile), end: nameNode.getEnd(), replacement: GET_AI });
     }
-    // Pin the call's arguments to the Vertex AI backend.
+    // Give the call the backend argument that keeps it on the same API getVertexAI used.
     edits.push(...vertexArgumentEdits(supported, fileContext, backendReference));
     callPositions.push(supported.call.getStart(sourceFile));
+
+    // A region can change when no valid location is specified, since defaults differ.
+    const regionChange: RegionChange = { position: supported.call.getStart(sourceFile), backendReference };
+    if (supported.locationText === undefined || supported.locationFallback === 'certain') {
+      defaultedLocations.push(regionChange);
+    } else if (supported.locationFallback === 'possible') {
+      conditionalLocations.push(regionChange);
+    }
   }
 
   if (!bindingBlocked) {
@@ -70,7 +80,14 @@ export const buildVertexEdits = (
       }
     }
   }
-  return { edits, callPositions, blockedCallPositions, injectionBlocked };
+  return {
+    edits,
+    callPositions,
+    defaultedLocations,
+    conditionalLocations,
+    blockedCallPositions,
+    injectionBlocked,
+  };
 };
 
 /** Every local name bound by any import declaration in the file (default, namespace, and named). */
@@ -100,11 +117,15 @@ const importedLocalNames = (fileContext: FileContext): Set<string> => {
 };
 
 /**
- * Build the argument edits that pin one rewritten call to the Vertex AI backend.
+ * Build the argument edits that put one rewritten call on the AI Logic backend class, carrying
+ * its own location across when it has one worth keeping.
  */
 const vertexArgumentEdits = (supported: SupportedVertexCall, fileContext: FileContext, backendReference: string): TextEdit[] => {
   const { sourceFile } = fileContext;
-  const backendObject = `{ backend: new ${backendReference}(${supported.locationText ?? ''}) }`;
+  /* Both backend classes run `if (location)` over their own default, so a location they are
+   * certain to ignore is dropped instead of being written through as a dead argument. */
+  const locationArgument = supported.locationFallback === 'certain' ? '' : supported.locationText ?? '';
+  const backendObject = `{ backend: new ${backendReference}(${locationArgument}) }`;
   const callArguments = supported.call.arguments;
   if (callArguments.length === 0) {
     // getAI's app parameter is optional but positional, so the options need an explicit undefined.
@@ -120,7 +141,7 @@ const vertexArgumentEdits = (supported: SupportedVertexCall, fileContext: FileCo
 
 /**
  * Build the import-specifier edits for one named getVertexAI import: rename it to getAI, or, when
- * the file already binds a local getAI, remove or repurpose it, and add the VertexAIBackend import
+ * the file already binds a local getAI, remove or repurpose it, and add the AgentPlatformBackend import
  * when the caller says a rewritten call needs it (at most once per file).
  */
 const vertexSpecifierEdits = (vertexImport: VertexImport, addBackend: boolean, fileHasGetAILocal: boolean, fileContext: FileContext): TextEdit[] => {

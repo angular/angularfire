@@ -1,7 +1,11 @@
+import { resolve } from 'path';
 import { logging } from '@angular-devkit/core';
 import { HostTree, SchematicContext } from '@angular-devkit/schematics';
+import { minVersion, satisfies } from 'semver';
 import * as typescript from 'typescript';
+import { firebaseVersionRange } from '../../common.js';
 import { applyEdits, rewriteVertexAIToAI } from './vertexai-to-ai/index.js';
+import { BACKEND_CLASS, BACKEND_CLASS_FIREBASE_FLOOR } from './vertexai-to-ai/tables.js';
 import 'jasmine';
 
 const context = { logger: new logging.Logger('test') } as unknown as SchematicContext;
@@ -39,8 +43,8 @@ describe('rewriteVertexAIToAI', () => {
 
     expect(changed).toBe(true);
     const out = tree.readText('src/app/foo.ts');
-    expect(out).toContain(`import { provideAI, getAI, VertexAIBackend, AI } from '@angular/fire/ai';`);
-    expect(out).toContain('provideAI(() => getAI(undefined, { backend: new VertexAIBackend() }))');
+    expect(out).toContain(`import { provideAI, getAI, AgentPlatformBackend, AI } from '@angular/fire/ai';`);
+    expect(out).toContain('provideAI(() => getAI(undefined, { backend: new AgentPlatformBackend() }))');
     expect(out).toContain('inject(AI)');
     expect(out).not.toContain('getVertexAI');
     expect(out).not.toContain('provideVertexAI');
@@ -58,11 +62,11 @@ describe('rewriteVertexAIToAI', () => {
     rewriteVertexAIToAI(tree, context, typescript);
 
     const out = tree.readText('src/app/foo.ts');
-    expect(out).toContain(`import { getAI, VertexAIBackend } from '@angular/fire/ai';`);
-    expect(out).toContain('getAI(getApp(), { backend: new VertexAIBackend() })');
+    expect(out).toContain(`import { getAI, AgentPlatformBackend } from '@angular/fire/ai';`);
+    expect(out).toContain('getAI(getApp(), { backend: new AgentPlatformBackend() })');
   });
 
-  it('moves a literal location option into the VertexAIBackend constructor', () => {
+  it('moves a literal location option into the AgentPlatformBackend constructor', () => {
     const source = [
       `import { getVertexAI } from '@angular/fire/vertexai';`,
       `import { getApp } from '@angular/fire/app';`,
@@ -73,7 +77,7 @@ describe('rewriteVertexAIToAI', () => {
     rewriteVertexAIToAI(tree, context, typescript);
 
     expect(tree.readText('src/app/foo.ts'))
-      .toContain(`getAI(getApp(), { backend: new VertexAIBackend('europe-west1') })`);
+      .toContain(`getAI(getApp(), { backend: new AgentPlatformBackend('europe-west1') })`);
   });
 
   it('replaces an empty options literal with the backend object', () => {
@@ -87,7 +91,295 @@ describe('rewriteVertexAIToAI', () => {
     rewriteVertexAIToAI(tree, context, typescript);
 
     expect(tree.readText('src/app/foo.ts'))
-      .toContain('getAI(getApp(), { backend: new VertexAIBackend() })');
+      .toContain('getAI(getApp(), { backend: new AgentPlatformBackend() })');
+  });
+
+  /* The migration writes an import of BACKEND_CLASS into the user's source. The emitted symbol
+   * has to exist at the BOTTOM of the declared range, not just in the version we build against. */
+  it('only emits a backend class that exists across the whole declared firebase range', () => {
+    const requiredFloor = BACKEND_CLASS_FIREBASE_FLOOR[BACKEND_CLASS];
+
+    expect(requiredFloor)
+      .withContext(`${BACKEND_CLASS} has no entry in BACKEND_CLASS_FIREBASE_FLOOR, so its floor is unstated`)
+      .toBeDefined();
+    expect(satisfies(minVersion(firebaseVersionRange), `>=${requiredFloor}`))
+      .withContext(
+        `the migration emits ${BACKEND_CLASS}, absent before firebase ${requiredFloor}, ` +
+        `but firebaseVersionRange is ${firebaseVersionRange}, so a workspace at the bottom of that ` +
+        'range gets rewritten source that does not compile. Raise the floor before shipping this.',
+      )
+      .toBeTrue();
+  });
+
+  describe('output compiles', () => {
+    const compilerOptions: typescript.CompilerOptions = {
+      strict: true,
+      noEmit: true,
+      skipLibCheck: true,
+      target: typescript.ScriptTarget.ES2022,
+      module: typescript.ModuleKind.ESNext,
+      moduleResolution: typescript.ModuleResolutionKind.Bundler,
+      // Ambient @types packages are irrelevant here and drag in unrelated diagnostics.
+      types: [],
+    };
+
+    /**
+     * Type-check one migrated file against the firebase actually installed. The file is served
+     * from memory at a real path inside the repo so that `firebase/ai` resolves through
+     * node_modules the way it would in a user's workspace.
+     */
+    const compile = (source: string): string[] => {
+      const filePath = resolve('migrated-output.ts').replace(/\\/g, '/');
+      const host = typescript.createCompilerHost(compilerOptions, true);
+      const readFromDisk = host.getSourceFile.bind(host);
+      const existsOnDisk = host.fileExists.bind(host);
+      const contentsOnDisk = host.readFile.bind(host);
+      host.getSourceFile = (name, languageVersion, onError, shouldCreate) => name === filePath
+        ? typescript.createSourceFile(name, source, languageVersion, true)
+        : readFromDisk(name, languageVersion, onError, shouldCreate);
+      host.fileExists = name => name === filePath || existsOnDisk(name);
+      host.readFile = name => name === filePath ? source : contentsOnDisk(name);
+      const program = typescript.createProgram([filePath], compilerOptions, host);
+      return typescript.getPreEmitDiagnostics(program)
+        .map(diagnostic => `TS${diagnostic.code}: ${typescript.flattenDiagnosticMessageText(diagnostic.messageText, ' ')}`);
+    };
+
+    /** Imports come from `firebase/vertexai` rather than `@angular/fire/vertexai` so the rewritten
+     * file imports `firebase/ai`, which resolves without any path mapping. */
+    const migrate = (body: string, imports = `import { getVertexAI } from 'firebase/vertexai';`) => {
+      const tree = treeWith({ 'src/app/foo.ts': [imports, `import { getApp } from 'firebase/app';`, body].join('\n') });
+      rewriteVertexAIToAI(tree, context, typescript);
+      return tree.readText('src/app/foo.ts');
+    };
+
+    it('emits a call that type-checks when no location was passed', () => {
+      expect(compile(migrate(`export const ai = getVertexAI(getApp());`))).toEqual([]);
+    });
+
+    it('emits a call that type-checks when a location was passed', () => {
+      expect(compile(migrate(`export const ai = getVertexAI(getApp(), { location: 'europe-west1' });`))).toEqual([]);
+    });
+
+    /* The empty string is dropped rather than written through, so this is the regression test
+     * for emitting a dead argument the constructor's signature rejects. */
+    it('emits a call that type-checks when the location was empty', () => {
+      expect(compile(migrate(`export const ai = getVertexAI(getApp(), { location: '' });`))).toEqual([]);
+    });
+
+    it('emits a namespace call that type-checks', () => {
+      const migrated = migrate(
+        `export const ai = vertexai.getVertexAI(getApp());`,
+        `import * as vertexai from 'firebase/vertexai';`,
+      );
+      expect(compile(migrated)).toEqual([]);
+    });
+  });
+
+  it('warns that the region moved when the call passed no location', () => {
+    const { context: spiedContext, warn } = contextWithLogSpies();
+    const source = [
+      `import { getVertexAI } from '@angular/fire/vertexai';`,
+      `export const vertex = getVertexAI();`,
+    ].join('\n');
+    const tree = treeWith({ 'src/app/foo.ts': source });
+
+    rewriteVertexAIToAI(tree, spiedContext, typescript);
+
+    const warnText = warn.calls.allArgs().map(callArgs => String(callArgs[0])).join('\n');
+    expect(warnText).toContain('this call now passes no location, so the region changed from us-central1 to global');
+    expect(warnText).toContain(`new AgentPlatformBackend('us-central1')`);
+  });
+
+  it('does not warn about the region when the call passed an explicit location', () => {
+    const { context: spiedContext, warn } = contextWithLogSpies();
+    const source = [
+      `import { getVertexAI } from '@angular/fire/vertexai';`,
+      `import { getApp } from '@angular/fire/app';`,
+      `export const vertex = getVertexAI(getApp(), { location: 'us-central1' });`,
+    ].join('\n');
+    const tree = treeWith({ 'src/app/foo.ts': source });
+
+    rewriteVertexAIToAI(tree, spiedContext, typescript);
+
+    // The explicit location is carried into the constructor, so nothing about the region changes.
+    expect(tree.readText('src/app/foo.ts'))
+      .toContain(`getAI(getApp(), { backend: new AgentPlatformBackend('us-central1') })`);
+    const warnText = warn.calls.allArgs().map(callArgs => String(callArgs[0])).join('\n');
+    expect(warnText).not.toContain('the region changed');
+  });
+
+  it('warns that the region moved when the location is a falsy literal the new backend ignores', () => {
+    // getVertexAI used to select 'us-central1', but AgentPlatformBackend now selects global.
+    for (const falsyLocation of ['undefined', `''`]) {
+      const { context: spiedContext, warn } = contextWithLogSpies();
+      const source = [
+        `import { getVertexAI } from '@angular/fire/vertexai';`,
+        `import { getApp } from '@angular/fire/app';`,
+        `export const vertex = getVertexAI(getApp(), { location: ${falsyLocation} });`,
+      ].join('\n');
+      const tree = treeWith({ 'src/app/foo.ts': source });
+
+      rewriteVertexAIToAI(tree, spiedContext, typescript);
+
+      const warnText = warn.calls.allArgs().map(callArgs => String(callArgs[0])).join('\n');
+      expect(warnText)
+        .withContext(`location: ${falsyLocation}`)
+        .toContain('no location, so the region changed from us-central1 to global');
+    }
+  });
+
+  it('warns that the region depends on runtime when the location is an expression', () => {
+    const { context: spiedContext, warn } = contextWithLogSpies();
+    const source = [
+      `import { getVertexAI } from '@angular/fire/vertexai';`,
+      `import { getApp } from '@angular/fire/app';`,
+      `declare const settings: { region: string };`,
+      `export const vertex = getVertexAI(getApp(), { location: settings.region });`,
+    ].join('\n');
+    const tree = treeWith({ 'src/app/foo.ts': source });
+
+    rewriteVertexAIToAI(tree, spiedContext, typescript);
+
+    expect(tree.readText('src/app/foo.ts'))
+      .toContain('new AgentPlatformBackend(settings.region)');
+    const warnText = warn.calls.allArgs().map(callArgs => String(callArgs[0])).join('\n');
+    expect(warnText).toContain('a location this migration cannot resolve');
+    // The region is not asserted to have changed, because only runtime knows.
+    expect(warnText).not.toContain('the region changed from us-central1 to global');
+  });
+
+  it('warns once per file however many calls moved region, and counts the rest', () => {
+    const { context: spiedContext, warn } = contextWithLogSpies();
+    const source = [
+      `import { getVertexAI } from '@angular/fire/vertexai';`,
+      `export const a = getVertexAI();`,
+      `export const b = getVertexAI();`,
+      `export const c = getVertexAI();`,
+      `export const d = getVertexAI();`,
+    ].join('\n');
+    const tree = treeWith({ 'src/app/foo.ts': source });
+
+    rewriteVertexAIToAI(tree, spiedContext, typescript);
+
+    const regionWarnings = warn.calls.allArgs()
+      .map(callArgs => String(callArgs[0]))
+      .filter(text => text.includes('the region changed from us-central1 to global'));
+    expect(regionWarnings.length).toBe(1);
+    expect(regionWarnings[0]).toContain('this call and 3 others in this file now pass');
+  });
+
+  it('uses the singular form when exactly one other call moved region', () => {
+    const { context: spiedContext, warn } = contextWithLogSpies();
+    const source = [
+      `import { getVertexAI } from '@angular/fire/vertexai';`,
+      `export const a = getVertexAI();`,
+      `export const b = getVertexAI();`,
+    ].join('\n');
+    const tree = treeWith({ 'src/app/foo.ts': source });
+
+    rewriteVertexAIToAI(tree, spiedContext, typescript);
+
+    const warnText = warn.calls.allArgs().map(callArgs => String(callArgs[0])).join('\n');
+    expect(warnText).toContain('this call and 1 other in this file');
+  });
+
+  it('does not claim the region changed for a shorthand location, which only runtime resolves', () => {
+    const { context: spiedContext, warn } = contextWithLogSpies();
+    const source = [
+      `import { getVertexAI } from '@angular/fire/vertexai';`,
+      `import { getApp } from '@angular/fire/app';`,
+      `declare const location: string;`,
+      `export const a = getVertexAI(getApp(), { location });`,
+    ].join('\n');
+    const tree = treeWith({ 'src/app/foo.ts': source });
+
+    rewriteVertexAIToAI(tree, spiedContext, typescript);
+
+    const warnText = warn.calls.allArgs().map(callArgs => String(callArgs[0])).join('\n');
+    /* Telling a user holding 'europe-west1' that they moved to global, and to pin us-central1,
+     * would move them off their own region. */
+    expect(warnText).not.toContain('the region changed from us-central1 to global');
+    expect(warnText).toContain('a location this migration cannot resolve');
+  });
+
+  it('names the backend the way the rewritten file binds it, for a namespace import', () => {
+    const { context: spiedContext, warn } = contextWithLogSpies();
+    const source = [
+      `import * as vai from '@angular/fire/vertexai';`,
+      `export const a = vai.getVertexAI();`,
+    ].join('\n');
+    const tree = treeWith({ 'src/app/foo.ts': source });
+
+    rewriteVertexAIToAI(tree, spiedContext, typescript);
+
+    const warnText = warn.calls.allArgs().map(callArgs => String(callArgs[0])).join('\n');
+    // A bare AgentPlatformBackend is not bound in this file, so advising it would not compile.
+    expect(warnText).toContain(`Pass new vai.AgentPlatformBackend('us-central1')`);
+  });
+
+  for (const liveApiEntryPoint of ['getLiveGenerativeModel', 'startAudioConversation']) {
+    it(`escalates the region warning when the workspace calls ${liveApiEntryPoint}`, () => {
+      const { context: spiedContext, warn } = contextWithLogSpies();
+      const tree = treeWith({
+        // Deliberately a different file: the Live API call rarely sits beside the getVertexAI one.
+        'src/app/live.ts': [
+          `import { ${liveApiEntryPoint} } from '@angular/fire/ai';`,
+          `export const model = ${liveApiEntryPoint};`,
+        ].join('\n'),
+        'src/app/foo.ts': [
+          `import { getVertexAI } from '@angular/fire/vertexai';`,
+          `export const a = getVertexAI();`,
+        ].join('\n'),
+        /* Sorts last and mentions no Live API call. One matching file anywhere has to be enough,
+         * so a later non-matching file must not undo the match above. */
+        'src/app/zzz-unrelated.ts': `export const unrelated = 1;`,
+      });
+
+      rewriteVertexAIToAI(tree, spiedContext, typescript);
+
+      const warnText = warn.calls.allArgs().map(callArgs => String(callArgs[0])).join('\n');
+      expect(warnText).toContain('This workspace calls the Live API');
+      expect(warnText).toContain('does not support in the global location');
+      expect(warnText).toContain('Pass a location that supports the Live API to AgentPlatformBackend');
+      expect(warnText).not.toContain(`new AgentPlatformBackend('us-central1')`);
+    });
+  }
+
+  it('escalates the runtime-resolved location warning too when the workspace calls the Live API', () => {
+    const { context: spiedContext, warn } = contextWithLogSpies();
+    const tree = treeWith({
+      'src/app/foo.ts': [
+        `import { getVertexAI } from '@angular/fire/vertexai';`,
+        `import { getApp } from '@angular/fire/app';`,
+        `declare const settings: { region: string };`,
+        `export const a = getVertexAI(getApp(), { location: settings.region });`,
+      ].join('\n'),
+      'src/app/live.ts': [
+        `import { startAudioConversation } from '@angular/fire/ai';`,
+        `export const model = startAudioConversation;`,
+      ].join('\n'),
+    });
+
+    rewriteVertexAIToAI(tree, spiedContext, typescript);
+
+    const warnText = warn.calls.allArgs().map(callArgs => String(callArgs[0])).join('\n');
+    expect(warnText).toContain('a location this migration cannot resolve');
+    expect(warnText).toContain('This workspace calls the Live API');
+  });
+
+  it('leaves the region warning unescalated when the workspace has no Live API call', () => {
+    const { context: spiedContext, warn } = contextWithLogSpies();
+    const source = [
+      `import { getVertexAI } from '@angular/fire/vertexai';`,
+      `export const a = getVertexAI();`,
+    ].join('\n');
+    const tree = treeWith({ 'src/app/foo.ts': source });
+
+    rewriteVertexAIToAI(tree, spiedContext, typescript);
+
+    const warnText = warn.calls.allArgs().map(callArgs => String(callArgs[0])).join('\n');
+    expect(warnText).toContain('the region changed from us-central1 to global');
+    expect(warnText).not.toContain('does not support in the global location');
   });
 
   it('logs each rewritten getVertexAI call', () => {
@@ -102,7 +394,7 @@ describe('rewriteVertexAIToAI', () => {
 
     expect(info).toHaveBeenCalledTimes(1);
     expect(info.calls.mostRecent().args[0]).toContain('/src/app/foo.ts:2');
-    expect(info.calls.mostRecent().args[0]).toContain('Vertex AI backend');
+    expect(info.calls.mostRecent().args[0]).toContain('Agent Platform Gemini API');
   });
 
   it('leaves a getVertexAI call with non-literal options in place and warns', () => {
@@ -161,10 +453,10 @@ describe('rewriteVertexAIToAI', () => {
     rewriteVertexAIToAI(tree, context, typescript);
 
     const out = tree.readText('src/app/foo.ts');
-    expect(out).toContain(`import { getAI, VertexAIBackend } from '@angular/fire/ai';`);
+    expect(out).toContain(`import { getAI, AgentPlatformBackend } from '@angular/fire/ai';`);
     // The plain getAI call is untouched, and only the getVertexAI call gets the backend pin.
     expect(out).toContain('const genAI = getAI();');
-    expect(out).toContain('const vertex = getAI(undefined, { backend: new VertexAIBackend() });');
+    expect(out).toContain('const vertex = getAI(undefined, { backend: new AgentPlatformBackend() });');
   });
 
   it('drops an unused getVertexAI specifier when getAI is already imported', () => {
@@ -188,8 +480,8 @@ describe('rewriteVertexAIToAI', () => {
     rewriteVertexAIToAI(tree, context, typescript);
 
     const out = tree.readText('src/app/foo.ts');
-    expect(out).toContain(`import { getAI as gv, VertexAIBackend } from '@angular/fire/ai';`);
-    expect(out).toContain('gv(getApp(), { backend: new VertexAIBackend() })');
+    expect(out).toContain(`import { getAI as gv, AgentPlatformBackend } from '@angular/fire/ai';`);
+    expect(out).toContain('gv(getApp(), { backend: new AgentPlatformBackend() })');
   });
 
   it('leaves a getVertexAI re-export in place and warns', () => {
@@ -229,8 +521,8 @@ describe('rewriteVertexAIToAI', () => {
     rewriteVertexAIToAI(tree, context, typescript);
 
     const out = tree.readText('src/app/foo.ts');
-    expect(out).toContain(`import { getAI, VertexAIBackend, AIError } from 'firebase/ai';`);
-    expect(out).toContain('getAI(getApp(), { backend: new VertexAIBackend() })');
+    expect(out).toContain(`import { getAI, AgentPlatformBackend, AIError } from 'firebase/ai';`);
+    expect(out).toContain('getAI(getApp(), { backend: new AgentPlatformBackend() })');
     expect(out).toContain('instanceof AIError');
   });
 
@@ -270,7 +562,7 @@ describe('rewriteVertexAIToAI', () => {
 
     const out = tree.readText('src/app/foo.ts');
     expect(out).toContain(`import * as vai from '@angular/fire/ai';`);
-    expect(out).toContain('vai.provideAI(() => vai.getAI(undefined, { backend: new vai.VertexAIBackend() }))');
+    expect(out).toContain('vai.provideAI(() => vai.getAI(undefined, { backend: new vai.AgentPlatformBackend() }))');
   });
 
   it('leaves unchanged symbols alone', () => {
@@ -380,7 +672,7 @@ describe('rewriteVertexAIToAI', () => {
 
     const out = tree.readText('src/app/foo.ts');
     expect(out).toContain('fire.AI');
-    expect(out).toContain('fire.getAI(undefined, { backend: new fire.VertexAIBackend() })');
+    expect(out).toContain('fire.getAI(undefined, { backend: new fire.AgentPlatformBackend() })');
     expect(out).not.toContain('getVertexAI');
   });
 
@@ -440,7 +732,7 @@ describe('rewriteVertexAIToAI', () => {
 
     const out = tree.readText('src/app/foo.ts');
     expect(out).toContain('get getVertexAI()');
-    expect(out).toContain('getAI(undefined, { backend: new VertexAIBackend() })');
+    expect(out).toContain('getAI(undefined, { backend: new AgentPlatformBackend() })');
   });
 
   it('does not treat a destructuring property key as a usage', () => {
@@ -457,7 +749,7 @@ describe('rewriteVertexAIToAI', () => {
     // the property key read from obj is not the import, so it is left untouched
     expect(out).toContain('const { getVertexAI: local } = obj;');
     // the direct call is still rewritten
-    expect(out).toContain('getAI(undefined, { backend: new VertexAIBackend() })');
+    expect(out).toContain('getAI(undefined, { backend: new AgentPlatformBackend() })');
   });
 
   it('leaves a binding initializer that hands the function around, and warns', () => {
@@ -534,7 +826,7 @@ describe('rewriteVertexAIToAI', () => {
     expect(warn).toHaveBeenCalledTimes(1);
   });
 
-  it('adds VertexAIBackend once for two getVertexAI specifiers in one import', () => {
+  it('adds AgentPlatformBackend once for two getVertexAI specifiers in one import', () => {
     const source = [
       `import { getVertexAI, getVertexAI as gv2 } from '@angular/fire/vertexai';`,
       `export const a = getVertexAI();`,
@@ -546,12 +838,12 @@ describe('rewriteVertexAIToAI', () => {
 
     const out = tree.readText('src/app/foo.ts');
     const importLine = out.split('\n')[0];
-    expect(importLine).toBe(`import { getAI, VertexAIBackend, getAI as gv2 } from '@angular/fire/ai';`);
-    expect(out).toContain('const a = getAI(undefined, { backend: new VertexAIBackend() });');
-    expect(out).toContain('const b = gv2(undefined, { backend: new VertexAIBackend() });');
+    expect(importLine).toBe(`import { getAI, AgentPlatformBackend, getAI as gv2 } from '@angular/fire/ai';`);
+    expect(out).toContain('const a = getAI(undefined, { backend: new AgentPlatformBackend() });');
+    expect(out).toContain('const b = gv2(undefined, { backend: new AgentPlatformBackend() });');
   });
 
-  it('adds VertexAIBackend once when two old entry points are imported', () => {
+  it('adds AgentPlatformBackend once when two old entry points are imported', () => {
     const source = [
       `import { getVertexAI } from '@angular/fire/vertexai';`,
       `import { getVertexAI as fbGet } from 'firebase/vertexai';`,
@@ -563,10 +855,10 @@ describe('rewriteVertexAIToAI', () => {
     rewriteVertexAIToAI(tree, context, typescript);
 
     const out = tree.readText('src/app/foo.ts');
-    expect(out).toContain(`import { getAI, VertexAIBackend } from '@angular/fire/ai';`);
+    expect(out).toContain(`import { getAI, AgentPlatformBackend } from '@angular/fire/ai';`);
     expect(out).toContain(`import { getAI as fbGet } from 'firebase/ai';`);
     // One import plus two constructor calls: the backend class is never double-imported.
-    expect((out.match(/VertexAIBackend/g) || []).length).toBe(3);
+    expect((out.match(/AgentPlatformBackend/g) || []).length).toBe(3);
   });
 
   it('repurposes the specifier when getAI is imported from the new entry point already', () => {
@@ -581,9 +873,9 @@ describe('rewriteVertexAIToAI', () => {
     rewriteVertexAIToAI(tree, context, typescript);
 
     const out = tree.readText('src/app/foo.ts');
-    expect(out).toContain(`import { VertexAIBackend } from '@angular/fire/ai';`);
+    expect(out).toContain(`import { AgentPlatformBackend } from '@angular/fire/ai';`);
     expect(out).toContain('const a = getAI();');
-    expect(out).toContain('const vertex = getAI(undefined, { backend: new VertexAIBackend() });');
+    expect(out).toContain('const vertex = getAI(undefined, { backend: new AgentPlatformBackend() });');
   });
 
   it('leaves getVertexAI unmigrated when getAI is imported from an unrelated module, and warns', () => {
@@ -606,7 +898,7 @@ describe('rewriteVertexAIToAI', () => {
     expect(warnText).toContain('already bound here from a source other than AI Logic');
     expect(warnText).toContain('fails to compile there');
     // The skipped call's own warning names the real cause, the foreign binding.
-    expect(warnText).toContain('binds getAI or VertexAIBackend from another source');
+    expect(warnText).toContain('binds getAI or AgentPlatformBackend from another source');
   });
 
   it('leaves getVertexAI unmigrated when the file declares its own getAI, and warns', () => {
@@ -654,7 +946,7 @@ describe('rewriteVertexAIToAI', () => {
     expect(tree.readText('src/app/foo.ts')).toContain('reg = { provideVertexAI: provideAI };');
   });
 
-  it('moves a shorthand location option into the VertexAIBackend constructor', () => {
+  it('moves a shorthand location option into the AgentPlatformBackend constructor', () => {
     const source = [
       `import { getVertexAI } from '@angular/fire/vertexai';`,
       `import { getApp } from '@angular/fire/app';`,
@@ -666,7 +958,7 @@ describe('rewriteVertexAIToAI', () => {
     rewriteVertexAIToAI(tree, context, typescript);
 
     expect(tree.readText('src/app/foo.ts'))
-      .toContain('getAI(getApp(), { backend: new VertexAIBackend(location) })');
+      .toContain('getAI(getApp(), { backend: new AgentPlatformBackend(location) })');
   });
 
   it('leaves a call whose location option references a rewritten symbol, and warns', () => {
@@ -739,11 +1031,15 @@ describe('rewriteVertexAIToAI', () => {
     const out = tree.readText('src/app/foo.ts');
     // VertexAIOptions has no drop-in successor, so it keeps its name (a loud break) while the
     // rest of the file still migrates.
-    expect(out).toContain(`import { getAI, VertexAIBackend, VertexAIOptions } from '@angular/fire/ai';`);
+    expect(out).toContain(`import { getAI, AgentPlatformBackend, VertexAIOptions } from '@angular/fire/ai';`);
     expect(out).toContain('let options: VertexAIOptions | undefined;');
-    expect(out).toContain('getAI(undefined, { backend: new VertexAIBackend() })');
-    expect(warn).toHaveBeenCalledTimes(1);
-    expect(warn.calls.mostRecent().args[0]).toContain('no longer exists in the new entry point');
+    expect(out).toContain('getAI(undefined, { backend: new AgentPlatformBackend() })');
+    /* Counted per message, not as a total: a total lets a lost region warning and a duplicated
+     * removed-symbol warning cancel each other out. */
+    const warnTexts = warn.calls.allArgs().map(callArgs => String(callArgs[0]));
+    expect(warnTexts.filter(text => text.includes('no longer exists in the new entry point')).length).toBe(1);
+    expect(warnTexts.filter(text => text.includes('the region changed from us-central1 to global')).length).toBe(1);
+    expect(warnTexts.length).toBe(2);
   });
 
   it('leaves getImagenModel in place and warns that the Imagen API is gone', () => {
@@ -758,15 +1054,19 @@ describe('rewriteVertexAIToAI', () => {
     rewriteVertexAIToAI(tree, spiedContext, typescript);
 
     const out = tree.readText('src/app/foo.ts');
-    expect(out).toContain(`import { getAI, VertexAIBackend, getImagenModel } from '@angular/fire/ai';`);
+    expect(out).toContain(`import { getAI, AgentPlatformBackend, getImagenModel } from '@angular/fire/ai';`);
+    expect(out).toContain('getAI(undefined, { backend: new AgentPlatformBackend() })');
     expect(out).toContain(`getImagenModel(a, { model: 'imagen-3.0-generate-002' });`);
-    expect(warn).toHaveBeenCalledTimes(1);
-    expect(warn.calls.mostRecent().args[0]).toContain('Imagen models were shut down');
+    // Counted per message so warning messages don't cancel each other out.
+    const warnTexts = warn.calls.allArgs().map(callArgs => String(callArgs[0]));
+    expect(warnTexts.filter(text => text.includes('Imagen models were shut down')).length).toBe(1);
+    expect(warnTexts.filter(text => text.includes('the region changed from us-central1 to global')).length).toBe(1);
+    expect(warnTexts.length).toBe(2);
   });
 
-  it('reuses an existing VertexAIBackend import instead of adding a second one', () => {
+  it('reuses an existing AgentPlatformBackend import instead of adding a second one', () => {
     const source = [
-      `import { VertexAIBackend } from '@angular/fire/ai';`,
+      `import { AgentPlatformBackend } from '@angular/fire/ai';`,
       `import { getVertexAI } from '@angular/fire/vertexai';`,
       `export const a = getVertexAI();`,
     ].join('\n');
@@ -775,11 +1075,11 @@ describe('rewriteVertexAIToAI', () => {
     rewriteVertexAIToAI(tree, context, typescript);
 
     const out = tree.readText('src/app/foo.ts');
-    expect(out).toContain(`import { VertexAIBackend } from '@angular/fire/ai';`);
+    expect(out).toContain(`import { AgentPlatformBackend } from '@angular/fire/ai';`);
     expect(out).toContain(`import { getAI } from '@angular/fire/ai';`);
-    expect(out).toContain('getAI(undefined, { backend: new VertexAIBackend() })');
+    expect(out).toContain('getAI(undefined, { backend: new AgentPlatformBackend() })');
     // The pre-existing import plus one constructor call: no duplicate binding.
-    expect((out.match(/VertexAIBackend/g) || []).length).toBe(2);
+    expect((out.match(/AgentPlatformBackend/g) || []).length).toBe(2);
   });
 
   it('rewrites a call whose location reads a property that merely shares a rewritten name', () => {
@@ -797,7 +1097,7 @@ describe('rewriteVertexAIToAI', () => {
     const out = tree.readText('src/app/foo.ts');
     // `settings.provideVertexAI` is a property NAME, which pass 2 never edits, so there is no
     // overlap and the call must still rewrite.
-    expect(out).toContain('getAI(getApp(), { backend: new VertexAIBackend(settings.provideVertexAI) })');
+    expect(out).toContain('getAI(getApp(), { backend: new AgentPlatformBackend(settings.provideVertexAI) })');
     expect(out).toContain('provideAI(() => 1)');
   });
 
@@ -813,7 +1113,7 @@ describe('rewriteVertexAIToAI', () => {
     rewriteVertexAIToAI(tree, context, typescript);
 
     expect(tree.readText('src/app/foo.ts'))
-      .toContain('getAI(getApp(), { backend: new VertexAIBackend(build({ getVertexAI: true })) })');
+      .toContain('getAI(getApp(), { backend: new AgentPlatformBackend(build({ getVertexAI: true })) })');
   });
 
   it('rewrites a namespace call whose location reads a non-renamed namespace member', () => {
@@ -827,7 +1127,7 @@ describe('rewriteVertexAIToAI', () => {
 
     // `vai.DEFAULT_LOCATION` gets no edit (DEFAULT_LOCATION is not renamed), so no overlap.
     expect(tree.readText('src/app/foo.ts'))
-      .toContain('vai.getAI(undefined, { backend: new vai.VertexAIBackend(vai.DEFAULT_LOCATION) })');
+      .toContain('vai.getAI(undefined, { backend: new vai.AgentPlatformBackend(vai.DEFAULT_LOCATION) })');
   });
 
   it('warns about a removed symbol reached through a namespace import', () => {
@@ -859,8 +1159,8 @@ describe('rewriteVertexAIToAI', () => {
     // a boundary offset. They compose, and must not trip the conflicting-edits backstop.
     expect(changed).toBe(true);
     const out = tree.readText('src/app/foo.ts');
-    expect(out).toContain(`import { getAI as gv, VertexAIBackend, getAI } from '@angular/fire/ai';`);
-    expect(out).toContain('gv(undefined, { backend: new VertexAIBackend() })');
+    expect(out).toContain(`import { getAI as gv, AgentPlatformBackend, getAI } from '@angular/fire/ai';`);
+    expect(out).toContain('gv(undefined, { backend: new AgentPlatformBackend() })');
     expect(out).toContain('const keep = getAI;');
   });
 
@@ -889,7 +1189,7 @@ describe('rewriteVertexAIToAI', () => {
 
     expect(changed).toBe(true);
     expect(tree.readText('src/app/foo.ts'))
-      .toContain('getAI(undefined, { backend: new VertexAIBackend() })');
+      .toContain('getAI(undefined, { backend: new AgentPlatformBackend() })');
   });
 
   it('skips a file with syntax errors instead of editing its broken tree, and warns', () => {
