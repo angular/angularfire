@@ -12,6 +12,7 @@ import { satisfies } from 'semver';
 import tripleBeam from 'triple-beam';
 import * as winston from 'winston';
 import { BuildTarget, CloudRunOptions, DeployBuilderSchema, FSHost, FirebaseTools } from '../interfaces';
+import { assertSafeDependencyName } from '../workspace.js';
 import { DEFAULT_FUNCTION_NAME, defaultFunction, defaultPackage, dockerfile, functionGen2 } from './functions-templates.js';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -191,23 +192,10 @@ export const assertSupportedPackageManager = (packageManager: string): string =>
   return packageManager;
 };
 
-// A dependency name comes from `architect.<project>.server.options.externalDependencies`
-// in angular.json. Reject anything that is not a plain package specifier so it can
-// neither inject shell metacharacters (defence in depth alongside execFileSync) nor
-// be parsed as a CLI flag by the package manager (argument injection).
-export const assertSafeDependencyName = (name: string): string => {
-  // Valid npm package names / esbuild external globs never contain whitespace or
-  // shell metacharacters, and never start with a dash. Reject anything else so the
-  // value can neither inject a shell command (defence in depth alongside
-  // execFileSync) nor be parsed as a package-manager flag (argument injection).
-  if (typeof name !== 'string' || name.length === 0 || name.startsWith('-') ||
-      /[\s;&|$`(){}<>!\\'"]/.test(name)) {
-    throw new SchematicsException(
-      `Invalid dependency name ${JSON.stringify(name)} in angular.json (server externalDependencies).`
-    );
-  }
-  return name;
-};
+/* Rejects a dependency name that is not a plain package specifier. Here the names come
+ * from `architect.<project>.server.options.externalDependencies` in angular.json.
+ * Re-exported so this file's existing importers and specs keep working. */
+export { assertSafeDependencyName };
 
 // All shelling out from the deploy builder funnels through this single runner.
 // cross-spawn (v7) resolves the platform-appropriate executable and escapes each
@@ -243,7 +231,7 @@ export const findPackageVersion = (packageManager: string, name: string) => {
   // unsupported manager or unsafe name throws before anything is ever spawned.
   const output = processHost.runPackageBin(assertSupportedPackageManager(packageManager), [
     'list',
-    assertSafeDependencyName(name),
+    assertSafeDependencyName(name, 'in angular.json (server externalDependencies)'),
   ]).toString();
   const match = output.match(`[^|s]${escapeRegExp(name)}[@| ][^s]+(s.+)?$`);
   return match ? match[0].split(new RegExp(`${escapeRegExp(name)}[@| ]`))[1].split(/\s/)[0] : null;
