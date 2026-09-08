@@ -41,10 +41,27 @@ export interface SupportedVertexCall {
   call: ts.CallExpression;
   /** The `location` option's source text when the call passed `{ location: ... }`, else undefined. */
   locationText?: string;
+
+  /**
+   * Falsy locations fall back to the `global` default.
+   * 'certain' is for falsy literals, 'possible' is for expressions resolved at runtime.
+   */
+  locationFallback?: 'certain' | 'possible';
   /** Set for `getVertexAI(...)` through a named import, undefined for `ns.getVertexAI(...)`. */
   binding?: VertexImport;
-  /** Set for `ns.getVertexAI(...)`. The backend class is then reached as `ns.VertexAIBackend`. */
+  /** Set for `ns.getVertexAI(...)`. The backend class is then reached as `ns.AgentPlatformBackend`. */
   namespaceAccess?: ts.PropertyAccessExpression;
+}
+
+/** One rewritten call whose region may have moved, and how that call names the backend class. */
+export interface RegionChange {
+  position: number;
+  /**
+   * How the emitted call reaches the class: a bare `AgentPlatformBackend` for a named import, or
+   * `ns.AgentPlatformBackend` for a namespace one. The line the warning tells the reader to type
+   * has to use the same form, or someone who copies it writes a name their file does not bind.
+   */
+  backendReference: string;
 }
 
 /** What classifying every getVertexAI reference in a file produced. */
@@ -107,9 +124,13 @@ export interface VertexEdits {
   edits: TextEdit[];
   /** Offsets of getVertexAI calls rewritten to the backend-preserving getAI form, for the log. */
   callPositions: number[];
+  /** Rewritten calls whose region changes due to no valid location being specified. */
+  defaultedLocations: RegionChange[];
+  /** Rewritten calls whose location depends on a value known only at runtime. */
+  conditionalLocations: RegionChange[];
   /** Offsets of rewritable calls skipped because the file's getVertexAI edits are blocked. */
   blockedCallPositions: number[];
-  /** Whether a getAI / VertexAIBackend binding from a non AI Logic source blocked the edits. */
+  /** Whether a getAI / AgentPlatformBackend binding from a non AI Logic source blocked the edits. */
   injectionBlocked: boolean;
 }
 
@@ -118,11 +139,15 @@ export interface FileRewrite {
   edits: TextEdit[];
   /** Offsets of getVertexAI calls rewritten to the backend-preserving getAI form, for the log. */
   vertexCallPositions: number[];
+  /** Rewritten calls whose region moves from `us-central1` to `global`, for the log. */
+  defaultedLocations: RegionChange[];
+  /** Rewritten calls whose region moves only when their location expression is falsy. */
+  conditionalLocations: RegionChange[];
   /** Offsets of rewritable calls skipped because the file's getVertexAI edits are blocked. */
   blockedCallPositions: number[];
   unsupportedVertexUsages: UnsupportedVertexUsage[];
   shadowedImports: ShadowedImport[];
-  /** Bindings of getAI / VertexAIBackend from a non AI Logic source that blocked the rewrite. */
+  /** Bindings of getAI / AgentPlatformBackend from a non AI Logic source that blocked the rewrite. */
   injectionConflicts: ShadowedImport[];
   /** `export * from '<old module>'` statements, always left for manual migration. */
   starExportPositions: number[];

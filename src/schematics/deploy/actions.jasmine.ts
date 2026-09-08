@@ -364,14 +364,22 @@ describe('deploy input validation (command-injection hardening)', () => {
   describe('assertSafeDependencyName', () => {
     ['rxjs', '@angular/core', '@angular/*', 'some-pkg', 'a.b_c'].forEach((name) => {
       it(`allows the valid dependency name "${name}"`, () => {
-        expect(assertSafeDependencyName(name)).toBe(name);
+        expect(assertSafeDependencyName(name, 'in a test')).toBe(name);
       });
     });
 
     ['evil; touch /tmp/pwned #', 'a b', '$(id)', '`id`', 'a|b', 'a&b', '-rf', '', 'a>b'].forEach((name) => {
       it(`rejects the unsafe dependency name ${JSON.stringify(name)}`, () => {
-        expect(() => assertSafeDependencyName(name)).toThrowError(/Invalid dependency name/);
+        expect(() => assertSafeDependencyName(name, 'in a test')).toThrowError(/Invalid dependency name/);
       });
+    });
+
+    it('names where the value came from, so the user knows what to go and edit', () => {
+      /* The context used to be part of the message unconditionally. Now that it is an argument,
+       * nothing but this asserts that the deploy call site still passes it, and a message reading
+       * only `Invalid dependency name "--registry=..."` says nothing about angular.json. */
+      expect(() => findPackageVersion('npm', '--registry=http://example.test'))
+        .toThrowError(/in angular\.json \(server externalDependencies\)/);
     });
   });
 

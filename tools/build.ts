@@ -37,9 +37,13 @@ const firestoreOverrides = {
   increment: { logLevel: LogLevel.VERBOSE },
   limit: { logLevel: LogLevel.VERBOSE },
   limitToLast: { logLevel: LogLevel.VERBOSE },
+  // maximum and minimum take no callback and return no promise; wrapping would not benefit them.
+  maximum: null,
   memoryEagerGarbageCollector: null,
   memoryLocalCache: null,
   memoryLruGarbageCollector: null,
+  // See maximum above.
+  minimum: null,
   namedQuery: { logLevel: LogLevel.VERBOSE },
   or: { logLevel: LogLevel.VERBOSE },
   orderBy: { logLevel: LogLevel.VERBOSE },
@@ -61,14 +65,30 @@ const firestoreOverrides = {
   writeBatch: { logLevel: LogLevel.VERBOSE },
 };
 
+/* Override keys the installed firebase's type declarations do not carry, which the generator
+ * would otherwise read as typos. Keyed by entry point, but two entry points sharing one overrides
+ * object share these names too, the way firestore and firestore/lite share firestoreOverrides.
+ * At a version bump, drop a name from here but KEEP its override entry. */
+const overridesFirebaseDoesNotDeclare: Record<string, string[]> = {};
+
+type Overrides = Record<string, OverrideOptions | null>;
+
 function zoneWrapExports() {
+  /* One overrides object can be applied to several entry points, so the keys it may legally name
+   * are the union of their export lists. firestoreOverrides covers both firestore and
+   * firestore/lite, and only firestore has persistentLocalCache and the rest. */
+  const exportsSeenPerOverrides = new Map<Overrides, Set<string>>();
   const reexport = async (
     module: string,
     name: string,
     path: string,
     exports: string[],
-    overrides: Record<string, OverrideOptions | null> = {}
+    overrides: Overrides = {}
   ) => {
+    const seen = exportsSeenPerOverrides.get(overrides) ?? new Set<string>();
+    exports.forEach(exportName => seen.add(exportName));
+    (overridesFirebaseDoesNotDeclare[path] ?? []).forEach(undeclared => seen.add(undeclared));
+    exportsSeenPerOverrides.set(overrides, seen);
     const imported = await import(path);
     const toBeExported: [string, string, boolean][] = exports.sort().
       filter(it => !it.startsWith('_') && overrides[it] !== null && overrides[it]?.override !== true).
@@ -113,13 +133,22 @@ ${exportedZoneWrappedFns}
 `;
     await writeFile(filePath, fileOutput);
   };
+  const failOnUnrecognizedOverrides = () => {
+    const unrecognized = [...exportsSeenPerOverrides].flatMap(([overrides, seen]) =>
+      Object.keys(overrides).filter(key => !seen.has(key) && overrides[key]?.override !== true));
+    if (unrecognized.length) {
+      throw new Error(
+        `Override keys their entry point does not declare: ${unrecognized.join(', ')}. ` +
+        'Overrides are matched by name, so this one is silently ignored and the symbol keeps the ' +
+        'default. Fix the spelling, move it to the right block, or add it to ' +
+        'overridesFirebaseDoesNotDeclare.'
+      );
+    }
+  };
   return Promise.all([
     reexport('ai', 'firebase', 'firebase/ai', tsKeys<typeof import('firebase/ai')>(), {
-      // Removed in @firebase/ai 2.15.0 (firebase 12.18.0), which the ^12.4.0 range
-      // resolves for fresh installs. A named import here would make consumer builds
-      // fail on that version, so only re-export it through the star export, which
-      // tracks whichever firebase is installed.
-      getImagenModel: null,
+      // Unwrapped via the star export: no callback, returns the model object directly.
+      getTemplateGenerativeModel: null,
     }),
     reexport('analytics', 'firebase', 'firebase/analytics', tsKeys<typeof import('firebase/analytics')>(), {
       isSupported: { blockUntilFirst: false },
@@ -138,7 +167,11 @@ ${exportedZoneWrappedFns}
     reexport('auth', 'rxfire', 'rxfire/auth', tsKeys<typeof import('rxfire/auth')>()),
     reexport('auth', 'firebase', 'firebase/auth', tsKeys<typeof import('firebase/auth')>(), {
       debugErrorMap: null,
+      /* These 5 persistence entries MUST stay unwrapped. Though their type declarations
+       * disagree, they are classes, and wrapping would replace them with ordinary functions
+       * that throw when used with `new`. */
       inMemoryPersistence: null,
+      browserCookiePersistence: null,
       browserLocalPersistence: null,
       browserSessionPersistence: null,
       indexedDBLocalPersistence: null,
@@ -209,6 +242,8 @@ ${exportedZoneWrappedFns}
       update: { logLevel: LogLevel.VERBOSE },
     }),
     reexport('data-connect', 'firebase', 'firebase/data-connect', tsKeys<typeof import('firebase/data-connect')>(), {
+      // Unwrapped via the star export: no callback, returns a plain settings value.
+      makeMemoryCacheProvider: null,
       mutationRef: { logLevel: LogLevel.VERBOSE },
       queryRef: { logLevel: LogLevel.VERBOSE },
       toQueryRef: { logLevel: LogLevel.VERBOSE },
@@ -225,10 +260,14 @@ ${exportedZoneWrappedFns}
     reexport('messaging', 'firebase', 'firebase/messaging', tsKeys<typeof import('firebase/messaging')>(), {
       isSupported: { blockUntilFirst: false },
       onMessage: { blockUntilFirst: false },
+      // `blockUntilFirst: false` otherwise `ApplicationRef.isStable` may never become `true`.
+      onRegistered: { blockUntilFirst: false },
+      onUnregistered: { blockUntilFirst: false },
       deleteToken: { logLevel: LogLevel.VERBOSE },
+      // Quiets the per-call log line, matching deleteToken above.
+      unregister: { logLevel: LogLevel.VERBOSE },
     }),
     reexport('remote-config', 'rxfire', 'rxfire/remote-config', tsKeys<typeof import('rxfire/remote-config')>(), {
-      isSupported: { blockUntilFirst: false },
       getValue: { exportName: 'getValueChanges' },
       getString: { exportName: 'getStringChanges' },
       getNumber: { exportName: 'getNumberChanges' },
@@ -259,7 +298,7 @@ ${exportedZoneWrappedFns}
       collection: { exportName: 'collectionSnapshots' },
     }),
     reexport('firestore/lite', 'firebase', 'firebase/firestore/lite', tsKeys<typeof import('firebase/firestore/lite')>(), firestoreOverrides),
-  ]);
+  ]).then(failOnUnrecognizedOverrides);
 }
 
 const src = (...args: string[]) => join(process.cwd(), 'src', ...args);
@@ -331,7 +370,6 @@ function spawnPromise(command: string, args: string[]) {
 // Path segments of each schematic entry point, relative to `schematics/` and without the file
 // extension: esbuild compiles the `.ts` and loadCompiledSchematics requires the emitted `.js`.
 const schematicEntryPoints = [
-  ['update', 'index'],
   ['deploy', 'actions'],
   ['deploy', 'builder'],
   ['add', 'index'],
@@ -409,7 +447,12 @@ async function buildLibrary() {
   ]);
 }
 
-buildLibrary().catch(err => {
-  console.error(err);
-  process.exit(1);
-})
+// Exported so `npm run generate` can run the code generation on its own.
+export { zoneWrapExports };
+
+if (require.main === module) {
+  buildLibrary().catch(err => {
+    console.error(err);
+    process.exit(1);
+  });
+}

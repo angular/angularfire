@@ -35,9 +35,19 @@ export const REMOVED_SYMBOL_GUIDANCE: Record<string, string> = {
 
 export const GET_VERTEX_AI = 'getVertexAI';
 export const GET_AI = 'getAI';
-export const BACKEND_CLASS = 'VertexAIBackend';
+export const BACKEND_CLASS = 'AgentPlatformBackend';
 
-// Modules whose getAI / VertexAIBackend are (or become, once rewritten) the AI Logic ones. A
+/** The firebase floor needed by each backend class the migration can emit.
+ *
+ * AgentPlatformBackend arrived in 12.17.0. VertexAIBackend is present at 12.4.0, the bottom of the
+ * range this package declares, so that is a safe bound, rather than the release that introduced it.
+ */
+export const BACKEND_CLASS_FIREBASE_FLOOR: Record<string, string> = {
+  VertexAIBackend: '12.4.0',
+  AgentPlatformBackend: '12.17.0',
+};
+
+// Modules whose getAI / AgentPlatformBackend are (or become, once rewritten) the AI Logic ones. A
 // binding of those names from anywhere else must not be captured by the rewritten calls.
 export const AI_MODULE_SPECIFIERS = new Set([
   ...Object.keys(MODULE_SPECIFIER_REWRITES),

@@ -41,7 +41,7 @@
     "typescript": { "optional": true }
   },
   "dependencies": {
-    "firebase": "^12.4.0",
+    "firebase": "^12.18.0",
     "rxfire": "^6.2.0",
     "@angular-devkit/architect": ">= 0.2100.0 < 0.2200.0",
     "@angular-devkit/core": "^21.0.0",

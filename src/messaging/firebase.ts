@@ -6,7 +6,11 @@ import {
   getMessaging as _getMessaging,
   getToken as _getToken,
   isSupported as _isSupported,
-  onMessage as _onMessage
+  onMessage as _onMessage,
+  onRegistered as _onRegistered,
+  onUnregistered as _onUnregistered,
+  register as _register,
+  unregister as _unregister
 } from 'firebase/messaging';
 
 export const deleteToken = ɵzoneWrap(_deleteToken, true, 2);
@@ -14,3 +18,7 @@ export const getMessaging = ɵzoneWrap(_getMessaging, true);
 export const getToken = ɵzoneWrap(_getToken, true);
 export const isSupported = ɵzoneWrap(_isSupported, false);
 export const onMessage = ɵzoneWrap(_onMessage, false);
+export const onRegistered = ɵzoneWrap(_onRegistered, false);
+export const onUnregistered = ɵzoneWrap(_onUnregistered, false);
+export const register = ɵzoneWrap(_register, true);
+export const unregister = ɵzoneWrap(_unregister, true, 2);

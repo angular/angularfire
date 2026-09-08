@@ -49,6 +49,19 @@ readonly refreshed$ = this.refresh$.pipe(switchMap(() => this.items$));
 
 Reach for `runInInjectionContext` only when the call genuinely must run inside the callback, as the per-user query above does (it needs the signed-in user's `uid`).
 
+### Why the injection context is required
+
+AngularFire cannot create an injection context, only borrow the one you are already in.
+
+When you call a wrapped API, the first thing AngularFire does is ask Angular for three things with `inject()`: its own scheduler service, Angular's `PendingTasks` register, and an `EnvironmentInjector`. `inject()` only works inside an injection context, so outside of one the first of them throws and the rest are never reached. AngularFire catches that, warns while in dev-mode as described under Logging below, and calls the Firebase API directly with nothing added.
+
+That division is worth knowing, because it explains what you are and are not responsible for:
+
+* **You** supply the context at the call site, from a field initializer, a constructor, or an explicit `runInInjectionContext`.
+* **AngularFire** re-enters the environment injector inside a callback you hand to the call itself, which is why you never wrap an `onSnapshot` handler yourself. That reaches anything provided at the application level, but not providers declared on a component, and it does not extend to subscribers of a returned Observable, which is what the `switchMap` and `runInInjectionContext` example above is for.
+
+What you lose depends on the call. A call that does asynchronous work, such as `onSnapshot`, `getDoc` or `collectionData`, is normally added to Angular's `PendingTasks` register, which is what server-side rendering waits on before it serializes the page. Called outside a context, it never is. A call that returns immediately, such as `getFirestore`, was never registered anyway, so it loses only the zone handling.
+
 ## Logging
 
 You may see a log warning, `Calling Firebase APIs outside of an Injection context may destabilize your application leading to subtle change-detection and hydration bugs. Find more at https://github.com/angular/angularfire/blob/main/docs/zones.md` when developing your application.
