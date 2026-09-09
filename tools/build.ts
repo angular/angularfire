@@ -1,5 +1,5 @@
 import { spawn } from 'cross-spawn';
-import { copy, writeFile } from 'fs-extra';
+import { copy, readFile, writeFile } from 'fs-extra';
 import { join, sep } from 'path';
 import { keys as tsKeys } from 'ts-transformer-keys';
 import * as esbuild from "esbuild";
@@ -414,7 +414,20 @@ async function compileSchematics() {
     copy(src('schematics', 'setup', 'schema.json'), dest('schematics', 'setup', 'schema.json')),
   ]);
   await replaceSchematicVersions();
+  await dropEsModulePackageType();
   await loadCompiledSchematics();
+}
+
+/**
+ * ng-packagr 21.2 writes a top-level `"type": "module"` into package.json, which makes Node read
+ * every `.js` in the package as an ES module, breaking the CommonJS `ng add`/`ng deploy`
+ * schematics bundles. Library entry points are `.mjs` and don't need the field.
+ */
+async function dropEsModulePackageType() {
+  const path = dest('package.json');
+  const manifest = JSON.parse(await readFile(path, 'utf8'));
+  delete manifest.type;
+  await writeFile(path, JSON.stringify(manifest, null, 2));
 }
 
 /**
