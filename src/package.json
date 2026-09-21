@@ -2,6 +2,7 @@
   "$schema": "../node_modules/ng-packagr/package.schema.json",
   "name": "@angular/fire",
   "version": "ANGULARFIRE2_VERSION",
+  "type": "commonjs",
   "description": "Angular + Firebase = ❤️",
   "publishConfig": {
     "registry": "https://wombat-dressing-room.appspot.com",

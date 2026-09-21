@@ -79,5 +79,5 @@ Two symbols were removed rather than renamed. The migration leaves their imports
 
 ## Other notes
 
-- **Angular 21 is required.** AngularFire 21 peers `@angular/* ^21.0.0` and does not support Angular 22 (a future AngularFire 22 will).
+- **Angular 21.2 is required.** AngularFire 21 peers `@angular/* ^21.2.0` and does not support Angular 22 (a future AngularFire 22 will).
 - The obsolete `@angular/platform-browser-dynamic` peer dependency was removed. No action is needed.
