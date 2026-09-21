@@ -14,7 +14,7 @@
     "@angular/common": "^21.0.0",
     "@angular/compiler": "^21.0.0",
     "@angular/core": "^21.0.0",
-    "@angular/fire": "file:../angular-fire-21.0.0-rc.0.tgz",
+    "@angular/fire": "file:../angular-fire-21.0.0-rc.1.tgz",
     "@angular/forms": "^21.0.0",
     "@angular/platform-browser": "^21.0.0",
     "@angular/platform-server": "^21.0.0",
