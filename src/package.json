@@ -2,6 +2,7 @@
   "$schema": "../node_modules/ng-packagr/package.schema.json",
   "name": "@angular/fire",
   "version": "ANGULARFIRE2_VERSION",
+  "type": "commonjs",
   "description": "Angular + Firebase = ❤️",
   "publishConfig": {
     "registry": "https://wombat-dressing-room.appspot.com",
@@ -27,10 +28,10 @@
   "author": "angular,firebase",
   "license": "MIT",
   "peerDependencies": {
-    "@angular/common": "^21.0.0",
-    "@angular/core": "^21.0.0",
-    "@angular/platform-browser": "^21.0.0",
-    "@angular/platform-server": "^21.0.0",
+    "@angular/common": "^21.2.0",
+    "@angular/core": "^21.2.0",
+    "@angular/platform-browser": "^21.2.0",
+    "@angular/platform-server": "^21.2.0",
     "rxjs": "~7.8.0",
     "firebase-tools": "^14.0.0 || ^15.0.0",
     "typescript": ">=5.8 <6.0"

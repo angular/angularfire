@@ -311,11 +311,15 @@ async function replacePackageCoreVersion() {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const replace = require('replace-in-file');
   const files = dest('package.json');
-  return replace({
+  const replacements = await replace({
     files,
     from: 'ANGULARFIRE2_VERSION',
     to: root.version
   });
+  if (!replacements.some(replacement => replacement.hasChanged)) {
+    throw new Error('No ANGULARFIRE2_VERSION placeholder found in the built package.json, so the package would ship with the placeholder as its version.');
+  }
+  return replacements;
 }
 
 async function writeVersionOverPlaceholder(root: { version: string }) {
@@ -425,7 +429,10 @@ async function loadCompiledSchematics() {
   const failures: string[] = [];
   for (const segments of schematicEntryPoints) {
     try {
-      require(`${dest('schematics', ...segments)}.js`);
+      const loaded = require(`${dest('schematics', ...segments)}.js`);
+      if (Object.keys(loaded).length === 0) {
+        failures.push(`  ${join(...segments)}.js: loaded but exported nothing`);
+      }
     } catch (error) {
       failures.push(`  ${join(...segments)}.js: ${error}`);
     }
