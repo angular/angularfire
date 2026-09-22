@@ -1,5 +1,7 @@
 # Firebase Tools Install and Setup
 
+> If you are installing this to run `ng add @angular/fire`, install version 14. With firebase-tools 15, setup stops with `Cannot read properties of undefined (reading 'email')` once you have chosen your features.
+
 ### 1. Install package
 
 ```bash

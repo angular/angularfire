@@ -12,10 +12,7 @@ App Check helps protect your API resources from abuse by preventing unauthorized
 
 ## Dependency Injection
 
-As a prerequisite, ensure that `AngularFire` has been added to your project via
-```bash
-ng add @angular/fire
-```
+As a prerequisite, ensure that `AngularFire` has been added to your project as described in the [Quickstart](./install-and-setup.md).
 
 Provide an App Check instance in the application's `app.config.ts`:
 

@@ -12,10 +12,7 @@ Google Analytics is an app measurement solution, available at no charge, that pr
 
 ## Dependency Injection
 
-As a prerequisite, ensure that `AngularFire` has been added to your project via
-```bash
-ng add @angular/fire
-```
+As a prerequisite, ensure that `AngularFire` has been added to your project as described in the [Quickstart](./install-and-setup.md).
 
 Provide an Analytics instance in the application's `app.config.ts`:
 

@@ -10,10 +10,7 @@ Firebase Data Connect (now known as "Firebase SQL Connect" in the Firebase docum
 
 ## Dependency Injection
 
-As a prerequisite, ensure that `AngularFire` has been added to your project via
-```bash
-ng add @angular/fire
-```
+As a prerequisite, ensure that `AngularFire` has been added to your project as described in the [Quickstart](./install-and-setup.md).
 
 Provide a Data Connect instance in the application's `app.config.ts`. `getDataConnect` takes a connector config that identifies your service, connector, and location; this is generated for you when you set up Data Connect and is also exported from your generated SDK:
 

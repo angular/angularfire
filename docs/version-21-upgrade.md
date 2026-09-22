@@ -1,15 +1,16 @@
-# Upgrading to AngularFire 21
+# Upgrading to the AngularFire 21 Release Candidate
 
 AngularFire 21 targets **Angular 21** and the **Firebase JS SDK v12**. Most of the upgrade is handled for you by `ng update`.
 
 ## Run the update
 
+The release candidate is published under the `next` tag. From an app on Angular 20 and AngularFire 20, run:
+
 ```bash
-ng update @angular/core @angular/cli    # move your app to Angular 21 first
-ng update @angular/fire                 # then AngularFire 21
+ng update @angular/core@21 @angular/cli@21 @angular/fire@next
 ```
 
-`ng update @angular/fire` runs a migration that:
+The AngularFire update runs a migration that:
 
 - **Aligns your `firebase` dependency to `^12.18.0`.** AngularFire 21 requires Firebase JS SDK 12, at 12.18 or later. If your app requested an older `firebase`, whether that is 11 or an earlier 12, npm would install both that copy and the one AngularFire needs side by side, and the two copies reject each other's objects at runtime. The migration updates the dependency and reinstalls so you end up with a single copy. Verify with `npm ls firebase`.
 - **Rewrites Vertex AI imports to AI Logic** (see below).
@@ -55,7 +56,7 @@ Firebase does not support the `global` location for the Live API models, so `get
 
 ### What the migration rewrites for you
 
-`ng update @angular/fire` rewrites these imports and identifiers for you and logs every `getVertexAI` call it rewrites. `getGenerativeModel` keeps its name.
+The AngularFire update rewrites these imports and identifiers for you and logs every `getVertexAI` call it rewrites. `getGenerativeModel` keeps its name.
 
 Imports straight from the Firebase SDK (`firebase/vertexai`, gone in SDK 12) are rewritten to `firebase/ai` under the same rules. The rewrite parses your sources with the `typescript` package (an optional peer dependency of `@angular/fire`). Every Angular workspace already has it, but if the migration warns that it could not be resolved, install `typescript` and re-run. See [ai.md](./ai.md) for current usage.
 
