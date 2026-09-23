@@ -2,8 +2,10 @@
 
 ## Before you begin
 
-- **Firebase CLI.** Setup uses the Firebase CLI (`firebase-tools`), version 14 or newer. `ng add` installs it if it is missing and prompts you to sign in, so you do not have to install it yourself first. It does not upgrade a copy you already have, so an older one stops setup with `firebase-tools version 14.0.0+ is required, please upgrade and run again`. To handle it ahead of time, or to clear that error, run `npm install -g firebase-tools` then `firebase login`.
-- **If setup stops with `Cannot read properties of undefined (reading 'email')`, use firebase-tools 14.** Setup fails that way when it finds firebase-tools 15, right after you choose your features. Run `npm install -g firebase-tools@14` and start `ng add` again.
+- **Firebase CLI**
+  - Setup uses the Firebase CLI (`firebase-tools`). Install version 14 first, with `npm install -g firebase-tools@14`, then `firebase login`.
+  - With no CLI on the machine, `ng add` installs the newest version for you, and on version 15 setup stops right after the features question with `Cannot read properties of undefined (reading 'email')` (#3768).
+  - A copy older than 14 stops setup with `firebase-tools version 14.0.0+ is required, please upgrade and run again`, and `ng add` does not upgrade a copy you already have.
 - **Harmless CLI noise.** The Firebase CLI may print a `punycode` deprecation warning or ask about enabling extra features (for example Gemini) during setup. These come from the CLI, not from AngularFire, and are safe to ignore.
 
 ### 1. Create a new project
