@@ -146,9 +146,9 @@ const angularFireVersion = 'ANGULARFIRE2_VERSION';
 
 /**
  * Pins the workspace's `@angular/fire` entry to the exact installed version when `ng add` wrote a
- * prerelease range. A prerelease range like `^21.0.0-rc.0` also matches the canary build published
- * for every merge to main, so a later fresh install can silently replace the version the user
- * chose. Stable ranges are left untouched.
+ * prerelease range. A prerelease range like `^21.0.0-rc.0` also matches every later prerelease of
+ * the same release, so a later fresh install can silently replace the version the user chose.
+ * Stable ranges are left untouched.
  */
 export const pinInstalledPrereleaseVersion = (
   host: Tree,
@@ -181,7 +181,7 @@ export const pinInstalledPrereleaseVersion = (
     overwriteIfExists(host, 'package.json', stringifyFormatted(packageJson));
     context.logger.info(
       `Pinned @angular/fire to the exact version ${installedVersion} — a prerelease range like ` +
-      `${declaredAngularFireVersion} also matches unreviewed canary builds, so a later install ` +
+      `${declaredAngularFireVersion} also matches later prereleases, so a later install ` +
       'could silently change versions.'
     );
   }

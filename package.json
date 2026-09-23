@@ -1,6 +1,6 @@
 {
   "name": "@angular/fire",
-  "version": "21.0.0-rc.1",
+  "version": "21.0.0",
   "description": "Angular + Firebase = ❤️",
   "publishConfig": {
     "registry": "https://wombat-dressing-room.appspot.com",
