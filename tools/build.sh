@@ -10,7 +10,15 @@ if [[ $GITHUB_REF =~ $TAG_TEST ]]; then
         NPM_TAG=next
     fi;
 else
-    OVERRIDE_VERSION=$(node -e "console.log(require('./package.json').version)")-canary.$SHORT_SHA
+    FULL_VERSION=$(node -e "console.log(require('./package.json').version)")
+    # Name the canary after the release itself, never after a prerelease of it. A canary built on
+    # `21.0.0-rc.1` sorts above it, so the caret range `ng add` writes into a user's package.json
+    # resolves to the canary rather than to the release candidate they asked for.
+    BASE_VERSION=${FULL_VERSION%%-*}
+    if [[ $BASE_VERSION != "$FULL_VERSION" ]]; then
+        echo "package.json version is $FULL_VERSION. Naming this canary after $BASE_VERSION instead, so it does not outrank $FULL_VERSION on npm. Prereleases are published from their own git tag, so this field is meant to hold a plain release number." >&2
+    fi
+    OVERRIDE_VERSION=$BASE_VERSION-canary.$SHORT_SHA
     NPM_TAG=canary
 fi;
 
