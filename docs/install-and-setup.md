@@ -2,45 +2,55 @@
 
 ## Before you begin
 
-- **Firebase CLI.** Setup uses the Firebase CLI (`firebase-tools`), version 14 or newer. `ng add` installs it if it is missing and prompts you to sign in, so you do not have to install it yourself first. It does not upgrade a copy you already have, so an older one stops setup with `firebase-tools version 14.0.0+ is required, please upgrade and run again`. To handle it ahead of time, or to clear that error, run `npm install -g firebase-tools` then `firebase login`.
-- **On the newest Angular major, use `@next`.** If `ng add @angular/fire` reports an Angular peer-dependency conflict, your Angular version is newer than AngularFire's default (`latest`) release. Install the version-matched pre-release instead: `ng add @angular/fire@next`.
+- **Firebase CLI**
+  - Setup uses the Firebase CLI (`firebase-tools`). Install version 14 first, with `npm install -g firebase-tools@14`, then `firebase login`.
+  - With no CLI on the machine, `ng add` installs the newest version for you, and on version 15 setup stops right after the features question with `Cannot read properties of undefined (reading 'email')` (#3768).
+  - A copy older than 14 stops setup with `firebase-tools version 14.0.0+ is required, please upgrade and run again`, and `ng add` does not upgrade a copy you already have.
 - **Harmless CLI noise.** The Firebase CLI may print a `punycode` deprecation warning or ask about enabling extra features (for example Gemini) during setup. These come from the CLI, not from AngularFire, and are safe to ignore.
 
 ### 1. Create a new project
 
 ```bash
 # Using yarn create
-yarn create @angular <project-name>
+yarn create @angular@21 <project-name>
 cd <project-name>
 ```
 or 
 
 ```bash
 # Using npm create
-npm create @angular <project-name>
+npm create @angular@21 <project-name>
 cd <project-name>
 ```
 
 optionally installing the tooling directly:
 ```bash
 # Installing the tooling directly
-npm install -g @angular/cli
+npm install -g @angular/cli@21
 ng new <project-name>
 cd <project-name>
 ```
 
-The Angular CLI's `new` command will set up the latest Angular build in a new project structure.
+These commands set up an Angular 21 project, the version AngularFire 21 supports.
 
 ### 2. Install AngularFire and Firebase
 
+AngularFire 21 is currently a release candidate, published under the `next` tag:
+
 ```bash
-ng add @angular/fire
+ng add @angular/fire@next
 ```
 
 This installs AngularFire and configures your project. `ng add` will:
 
 1. Prompt you to select the features to enable and the Firebase project to use, signing you in to Firebase if needed.
 2. Add `provideFirebaseApp(...)`, along with a provider for each feature you select, to your app configuration (for example `app.config.ts`), with your Firebase configuration inlined. No environment files are created.
+
+`ng add` writes the version it installed into your `package.json`, and today that is a canary release such as `21.0.0-rc.1-canary.95b3de1` rather than the release candidate. To replace it with the release candidate, `21.0.0-rc.1`, run:
+
+```bash
+npm install --save-exact @angular/fire@next
+```
 
 ### 3. Inject `Firestore`
 

@@ -14,10 +14,7 @@ Cloud Storage allows developers to upload and share user generated content such 
 
 AngularFire allows you to work with Firebase Storage via Angular's Dependency Injection.
 
-As a prerequisite, ensure that `AngularFire` has been added to your project via
-```bash
-ng add @angular/fire
-```
+As a prerequisite, ensure that `AngularFire` has been added to your project as described in the [Quickstart](./install-and-setup.md).
 
 Provide a Cloud Storage instance in the application's `app.config.ts`:
 
