@@ -8,14 +8,11 @@ Firebase AI Logic gives you access to the latest generative AI models from Googl
 
 [Learn more](https://firebase.google.com/docs/ai-logic)
 
-> Firebase AI Logic was previously called **Vertex AI in Firebase**. If you are upgrading from AngularFire 20, the module moved from `@angular/fire/vertexai` to `@angular/fire/ai` and most symbols were renamed (`provideVertexAI` to `provideAI`, `VertexAI` to `AI`). One is not a rename: plain `getAI()` uses the Gemini Developer API backend, so the old `getVertexAI()` maps to `getAI(app, { backend: new AgentPlatformBackend() })`. Running `ng update @angular/fire` rewrites all of this for you and keeps your app on the same backend, though a call that passed no `location` moves from `us-central1` to `global`. See the [AngularFire 20 to 21 upgrade guide](./version-21-upgrade.md).
+> Firebase AI Logic was previously called **Vertex AI in Firebase**. If you are upgrading from AngularFire 20, the module moved from `@angular/fire/vertexai` to `@angular/fire/ai` and most symbols were renamed (`provideVertexAI` to `provideAI`, `VertexAI` to `AI`). One is not a rename: plain `getAI()` uses the Gemini Developer API backend, so the old `getVertexAI()` maps to `getAI(app, { backend: new AgentPlatformBackend() })`. Running the `ng update` command in the [AngularFire 20 to 21 upgrade guide](./version-21-upgrade.md) rewrites all of this for you and keeps your app on the same backend, though a call that passed no `location` moves from `us-central1` to `global`.
 
 ## Dependency Injection
 
-As a prerequisite, ensure that `AngularFire` has been added to your project via
-```bash
-ng add @angular/fire
-```
+As a prerequisite, ensure that `AngularFire` has been added to your project as described in the [Quickstart](./install-and-setup.md).
 
 Provide an AI instance in the application's `app.config.ts`:
 

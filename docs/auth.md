@@ -15,10 +15,7 @@ Firebase Authentication integrates tightly with other Firebase services, and it 
 
 ## Dependency Injection
 
-As a prerequisite, ensure that `AngularFire` has been added to your project via
-```bash
-ng add @angular/fire
-```
+As a prerequisite, ensure that `AngularFire` has been added to your project as described in the [Quickstart](./install-and-setup.md).
 
 Provide an Auth instance in the application's `app.config.ts`:
 

@@ -12,10 +12,7 @@ The Cloud Functions for Firebase client SDKs let you call functions directly fro
 
 ## Dependency Injection
 
-As a prerequisite, ensure that `AngularFire` has been added to your project via
-```bash
-ng add @angular/fire
-```
+As a prerequisite, ensure that `AngularFire` has been added to your project as described in the [Quickstart](./install-and-setup.md).
 
 Provide a Cloud Functions instance in the application's `app.config.ts`:
 

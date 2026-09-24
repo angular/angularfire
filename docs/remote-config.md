@@ -12,10 +12,7 @@ Firebase Remote Config is a cloud service that lets you change the behavior and 
 
 ## Dependency Injection
 
-As a prerequisite, ensure that `AngularFire` has been added to your project via
-```bash
-ng add @angular/fire
-```
+As a prerequisite, ensure that `AngularFire` has been added to your project as described in the [Quickstart](./install-and-setup.md).
 
 Provide a Remote Config instance in the application's `app.config.ts`:
 

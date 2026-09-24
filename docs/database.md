@@ -12,10 +12,7 @@ The Firebase Realtime Database is a cloud-hosted database. Data is stored as JSO
 
 ## Dependency Injection
 
-As a prerequisite, ensure that `AngularFire` has been added to your project via
-```bash
-ng add @angular/fire
-```
+As a prerequisite, ensure that `AngularFire` has been added to your project as described in the [Quickstart](./install-and-setup.md).
 
 Provide a Database instance in the application's `app.config.ts`:
 
