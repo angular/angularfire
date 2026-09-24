@@ -46,6 +46,12 @@ This installs AngularFire and configures your project. `ng add` will:
 1. Prompt you to select the features to enable and the Firebase project to use, signing you in to Firebase if needed.
 2. Add `provideFirebaseApp(...)`, along with a provider for each feature you select, to your app configuration (for example `app.config.ts`), with your Firebase configuration inlined. No environment files are created.
 
+`ng add` writes the version it installed into your `package.json`, and today that is a canary release such as `21.0.0-rc.1-canary.95b3de1` rather than the release candidate. To replace it with the release candidate, `21.0.0-rc.1`, run:
+
+```bash
+npm install --save-exact @angular/fire@next
+```
+
 ### 3. Inject `Firestore`
 
 Open `/src/app/app.ts` and make the following changes:
