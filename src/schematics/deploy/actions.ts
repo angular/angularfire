@@ -11,6 +11,7 @@ import open from 'open';
 import { satisfies } from 'semver';
 import tripleBeam from 'triple-beam';
 import * as winston from 'winston';
+import { getActiveAccount } from '../firebaseTools.js';
 import { BuildTarget, CloudRunOptions, DeployBuilderSchema, FSHost, FirebaseTools } from '../interfaces';
 import { assertSafeDependencyName } from '../workspace.js';
 import { DEFAULT_FUNCTION_NAME, defaultFunction, defaultPackage, dockerfile, functionGen2 } from './functions-templates.js';
@@ -542,6 +543,12 @@ export const deployToCloudRun = async (
   });
 };
 
+/** Whether the Firebase CLI has at least one signed-in account. */
+const isSignedIn = async (firebaseTools: FirebaseTools) => {
+  const accounts = await firebaseTools.login.list();
+  return Array.isArray(accounts) && accounts.length > 0;
+};
+
 export default async function deploy(
   firebaseTools: FirebaseTools,
   context: BuilderContext,
@@ -555,9 +562,16 @@ export default async function deploy(
   const legacyNgDeploy = !options.version || options.version < 2;
 
   if (!firebaseToken && !process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-    await firebaseTools.login();
-    const user = await firebaseTools.login({ projectRoot: context.workspaceRoot });
-    console.log(`Logged into Firebase as ${user.email}.`);
+    if (!await isSignedIn(firebaseTools)) {
+      await firebaseTools.login();
+      if (!await isSignedIn(firebaseTools)) {
+        throw new Error('No Firebase account is signed in. Run `firebase login`, then run `ng deploy` again.');
+      }
+    }
+    const user = await getActiveAccount(firebaseTools, context.workspaceRoot);
+    if (user) {
+      console.log(`Logged into Firebase as ${user.email}.`);
+    }
   }
 
   if (!firebaseToken && process.env.GOOGLE_APPLICATION_CREDENTIALS) {
