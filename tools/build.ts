@@ -177,6 +177,8 @@ ${exportedZoneWrappedFns}
       indexedDBLocalPersistence: null,
       prodErrorMap: null,
       multiFactor: null,
+      // Its callback fires only on a sign-in or sign-out, so blocking would keep `ApplicationRef.isStable` false.
+      beforeAuthStateChanged: { blockUntilFirst: false },
       linkWithCredential: { logLevel: LogLevel.VERBOSE },
       linkWithPhoneNumber: { logLevel: LogLevel.VERBOSE },
       linkWithPopup: { logLevel: LogLevel.VERBOSE },
