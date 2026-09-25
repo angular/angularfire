@@ -1,7 +1,7 @@
 import { spawnSync } from 'child_process';
 import * as fuzzy from 'fuzzy';
 import * as inquirer from 'inquirer';
-import { getFirebaseTools } from '../firebaseTools';
+import { getActiveAccount, getFirebaseTools } from '../firebaseTools';
 import { FEATURES, FirebaseApp, FirebaseProject, featureOptions } from '../interfaces';
 import { shortAppId } from '../utils';
 
@@ -96,10 +96,15 @@ export const userPrompt = async (options: { projectRoot: string }): Promise<Reco
   const firebaseTools = await getFirebaseTools();
   let loginList = await firebaseTools.login.list();
   if (!Array.isArray(loginList) || loginList.length === 0) {
-    spawnSync('firebase login', { shell: true, cwd: options.projectRoot, stdio: 'inherit' });
-    return await firebaseTools.login(options);
+    // `--interactive` because firebase-tools 15.26+ otherwise skips the sign-in under an AI agent.
+    spawnSync('firebase login --interactive', { shell: true, cwd: options.projectRoot, stdio: 'inherit' });
+    loginList = await firebaseTools.login.list();
+    if (!Array.isArray(loginList) || loginList.length === 0) {
+      throw new Error('No Firebase account is signed in. Run `firebase login`, then run `ng add @angular/fire` again.');
+    }
+    return loginList[0].user;
   } else {
-    const defaultUser = await firebaseTools.login(options);
+    const defaultUser = await getActiveAccount(firebaseTools, options.projectRoot);
     const choices = loginList.map(({user}) => ({ name: user.email, value: user }));
     const newChoice = { name: '[Login in with another account]', value: NEW_OPTION };
     const { user } = await inquirer.prompt({
@@ -107,10 +112,10 @@ export const userPrompt = async (options: { projectRoot: string }): Promise<Reco
       name: 'user',
       choices: [newChoice].concat(choices as any), // TODO types
       message: 'Which Firebase account would you like to use?',
-      default: choices.find(it => it.value.email === defaultUser.email)?.value,
+      default: choices.find(it => it.value.email === defaultUser?.email)?.value,
     }) as any;
     if (user === NEW_OPTION) {
-      spawnSync('firebase login:add', { shell: true, cwd: options.projectRoot, stdio: 'inherit' });
+      spawnSync('firebase login:add --interactive', { shell: true, cwd: options.projectRoot, stdio: 'inherit' });
       loginList = await firebaseTools.login.list();
       if (!Array.isArray(loginList)) {
         throw new Error("firebase login:list did not respond as expected");

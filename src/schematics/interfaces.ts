@@ -125,7 +125,7 @@ export interface FirebaseTools {
     list(): Promise<{user: Record<string, any>}[] | { users: undefined }>;
     add(): Promise<Record<string, any>>;
     use(email: string, options?: unknown): Promise<string>;
-  } & ((options?: unknown) => Promise<Record<string, any>>);
+  } & ((options?: unknown) => Promise<Record<string, any> | undefined>);
 
   deploy(config: FirebaseDeployConfig): Promise<any>;
 

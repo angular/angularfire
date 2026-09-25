@@ -115,13 +115,44 @@ const initMocks = () => {
 describe('Deploy Angular apps', () => {
   beforeEach(() => initMocks());
 
+  /** Spies on `login()` and keeps a `login.list()`, which `spyOn` would otherwise drop. */
+  const spyOnLogin = (accounts: { user: Record<string, any> }[]) =>
+    Object.assign(spyOn(firebaseMock, 'login'), { list: () => Promise.resolve(accounts), add: login.add, use: login.use });
+
+  const signedIn = [{ user: { email: 'foo@bar.baz' } }];
+
   it('should call login', async () => {
-    const spy = spyOn(firebaseMock, 'login').and.resolveTo({ email: 'foo@bar.baz' });
+    const spy = spyOnLogin(signedIn).and.resolveTo({ email: 'foo@bar.baz' });
     await deploy(
       firebaseMock, context, STATIC_BUILD_TARGET, undefined,
       undefined, undefined, { projectId: FIREBASE_PROJECT, preview: false }
     );
     expect(spy).toHaveBeenCalled();
+  });
+
+  it('should read the signed-in account with interactive, which firebase-tools 15.26+ needs under an AI agent', async () => {
+    const spy = spyOnLogin(signedIn).and.resolveTo({ email: 'foo@bar.baz' });
+    await deploy(
+      firebaseMock, context, STATIC_BUILD_TARGET, undefined,
+      undefined, undefined, { projectId: FIREBASE_PROJECT, preview: false }
+    );
+    expect(spy).toHaveBeenCalledWith(jasmine.objectContaining({ interactive: true }));
+  });
+
+  it('should deploy when login returns no account for a signed-in user', async () => {
+    spyOnLogin(signedIn).and.resolveTo(undefined);
+    await expectAsync(deploy(
+      firebaseMock, context, STATIC_BUILD_TARGET, undefined,
+      undefined, undefined, { projectId: FIREBASE_PROJECT, preview: false }
+    )).toBeResolved();
+  });
+
+  it('should say to run firebase login when no account is signed in', async () => {
+    spyOnLogin([]).and.resolveTo(undefined);
+    await expectAsync(deploy(
+      firebaseMock, context, STATIC_BUILD_TARGET, undefined,
+      undefined, undefined, { projectId: FIREBASE_PROJECT, preview: false }
+    )).toBeRejectedWithError(/Run `firebase login`/);
   });
 
   it('should not call login', async () => {

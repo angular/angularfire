@@ -3,7 +3,7 @@ import { join } from 'path';
 import { asWindowsPath, normalize } from '@angular-devkit/core';
 import { SchematicContext, Tree, chain } from '@angular-devkit/schematics';
 import { addRootProvider } from '@schematics/angular/utility';
-import { getFirebaseTools } from '../firebaseTools';
+import { getActiveAccount, getFirebaseTools } from '../firebaseTools';
 import {
   DataConnectConnectorConfig,
   DeployOptions, FEATURES, FirebaseApp, FirebaseJSON, FirebaseProject,
@@ -91,7 +91,7 @@ export const ngAddSetupProject = (
     );
 
     const user = await userPrompt({ projectRoot });
-    const defaultUser = await firebaseTools.login(options);
+    const defaultUser = await getActiveAccount(firebaseTools, projectRoot);
     if (user.email !== defaultUser?.email) {
       await firebaseTools.login.use(user.email, { projectRoot });
     }
