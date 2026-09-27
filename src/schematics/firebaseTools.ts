@@ -8,6 +8,14 @@ declare global {
     var firebaseTools: FirebaseTools|undefined;
 }
 
+/**
+ * The account firebase-tools uses in `projectRoot`. Call it only once an account is signed in.
+ * Without `interactive`, firebase-tools 15.26+ returns undefined whenever it runs non-interactively,
+ * as it does under an AI agent.
+ */
+export const getActiveAccount = (firebaseTools: FirebaseTools, projectRoot: string) =>
+    firebaseTools.login({ projectRoot, interactive: true });
+
 export const getFirebaseTools = () => globalThis.firebaseTools ?
     Promise.resolve(globalThis.firebaseTools) :
     new Promise<FirebaseTools>((resolve, reject) => {
