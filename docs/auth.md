@@ -153,9 +153,7 @@ If you need a session the browser cannot read, use Firebase's [session cookies](
 
 #### `beforeAuthStateChanged` from `firebase/auth`
 
-One import in the code above is deliberately different from the rest of this guide. `beforeAuthStateChanged` comes from `firebase/auth` rather than `@angular/fire/auth`. AngularFire's version keeps the app marked as busy until its callback first runs, and this callback only runs when someone signs in or out.
-
-Importing it from `@angular/fire/auth` makes `ng build` hang during route extraction and fail with a timeout. That is a bug on our side, tracked in [#3748](https://github.com/angular/angularfire/issues/3748). Once the fix lands, this can be imported from `@angular/fire/auth` like everything else.
+One import in the code above is deliberately different from the rest of this guide. `beforeAuthStateChanged` comes from `firebase/auth` rather than `@angular/fire/auth`. In AngularFire 21.0.0-rc.1 and earlier, AngularFire's version keeps the app marked as busy until its callback first runs, and this callback only runs when someone signs in or out ([#3748](https://github.com/angular/angularfire/issues/3748)).
 
 ### 3. Pass the cookie into the render
 
