@@ -8,6 +8,14 @@ declare global {
     var firebaseTools: FirebaseTools|undefined;
 }
 
+/**
+ * The account firebase-tools uses in `projectRoot`. Call it only once an account is signed in.
+ * Without `interactive`, firebase-tools 15.26+ returns undefined whenever it runs non-interactively,
+ * as it does under an AI agent.
+ */
+export const getActiveAccount = (firebaseTools: FirebaseTools, projectRoot: string) =>
+    firebaseTools.login({ projectRoot, interactive: true });
+
 // The minimum firebase-tools version the schematics require.
 const minFirebaseToolsVersion = '14.0.0';
 
