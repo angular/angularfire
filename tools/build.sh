@@ -1,4 +1,3 @@
-SHORT_SHA=$(git rev-parse --short $GITHUB_SHA)
 TAG_TEST="^refs/tags/.+$"
 LATEST_TEST="^[^-]*$"
 
@@ -18,7 +17,9 @@ else
     if [[ $BASE_VERSION != "$FULL_VERSION" ]]; then
         echo "package.json version is $FULL_VERSION. Naming this canary after $BASE_VERSION instead, so it does not outrank $FULL_VERSION on npm. Prereleases are published from their own git tag, so this field is meant to hold a plain release number." >&2
     fi
-    OVERRIDE_VERSION=$BASE_VERSION-canary.$SHORT_SHA
+    # `sha-` stops npm dropping an all-digit sha's leading zero.
+    CANARY_ID=$(TZ=UTC git show -s --date=format-local:%Y%m%d%H%M%S --format=%cd.sha-%h $GITHUB_SHA)
+    OVERRIDE_VERSION=$BASE_VERSION-canary.$CANARY_ID
     NPM_TAG=canary
 fi;
 
