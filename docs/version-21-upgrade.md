@@ -82,3 +82,4 @@ Two symbols were removed rather than renamed. The migration leaves their imports
 
 - **Angular 21.2 is required.** AngularFire 21 peers `@angular/* ^21.2.0` and does not support Angular 22 (a future AngularFire 22 will).
 - The obsolete `@angular/platform-browser-dynamic` peer dependency was removed. No action is needed.
+- **`ng update` can stop with `The Angular CLI requires a minimum Node.js version of ...`.** This happens when the first `@angular/` package in the command has no version number: `ng update` then runs with the newest Angular CLI, which requires a newer Node.js than Angular 21 does. Either update Node.js, or give that package a version number, as the command above does and as in `ng update @angular/fire@21.0.0-rc.1`.
