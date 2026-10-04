@@ -190,8 +190,9 @@ jobs:
             NPM_CANARY=$(node -p "JSON.parse(process.argv[1]).canary" "$DIST_TAGS")
             # Order by position on main, not by version, which can be higher for an older commit.
             git clone --quiet --bare --filter=tree:0 "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" history.git
+            HOW_TO_FIX="Every canary publish fails until the canary dist-tag points at a build of a commit on main. Publish rights are required to fix it with: npm dist-tag add @angular/fire@<version> canary"
             if ! NPM_CANARY_COMMIT=$(git -C history.git rev-parse --verify --quiet "${NPM_CANARY##*[.-]}^{commit}"); then
-              echo "::error::Could not match the canary on npm, $NPM_CANARY, to a single commit in this repository."
+              echo "::error::Could not match the canary on npm, $NPM_CANARY, to a single commit in this repository. $HOW_TO_FIX"
               exit 1
             fi
             # `npm publish` always moves a dist-tag, so a canary that is not newer must not publish at all.
@@ -204,7 +205,7 @@ jobs:
               echo "::warning::Not publishing $VERSION, because the canary on npm, $NPM_CANARY, is from a later commit on main."
               echo "skip=true" >> "$GITHUB_OUTPUT"
             elif ! git -C history.git merge-base --is-ancestor "$NPM_CANARY_COMMIT" "$GITHUB_SHA"; then
-              echo "::error::Not publishing $VERSION, because its commit and the commit of the canary on npm, $NPM_CANARY, are not on the same line of history. One of them is not on main."
+              echo "::error::Not publishing $VERSION, because its commit and the commit of the canary on npm, $NPM_CANARY, are not on the same line of history. One of them is not on main. $HOW_TO_FIX"
               exit 1
             fi
           fi
