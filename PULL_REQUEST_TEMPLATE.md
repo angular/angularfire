@@ -25,6 +25,7 @@ before sending PRs. We cannot accept code without this.
    - Issue number for this PR: #nnn (required)
    - Docs included?: (yes/no; required for all API/functional changes) 
    - Test units included?: (yes/no; required) 
+   - Breaking change?: (yes/no, required. If yes, add a `BREAKING CHANGE:` footer to your commit message that says what an upgrading app must change, and put `!` before the colon in the PR title and the commit subject, like `fix(auth)!: ...`)
    - In a clean directory, `yarn install`, `yarn test` run successfully? (yes/no; required)
 
 ### Description
