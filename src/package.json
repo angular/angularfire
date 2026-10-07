@@ -31,14 +31,12 @@
     "@angular/common": "^21.2.0",
     "@angular/core": "^21.2.0",
     "@angular/platform-browser": "^21.2.0",
-    "@angular/platform-server": "^21.2.0",
     "rxjs": "~7.8.0",
     "firebase-tools": "^14.0.0 || ^15.0.0",
     "typescript": ">=5.8 <6.0"
   },
   "peerDependenciesMeta": {
     "firebase-tools": { "optional": true },
-    "@angular/platform-server": { "optional": true },
     "typescript": { "optional": true }
   },
   "dependencies": {
