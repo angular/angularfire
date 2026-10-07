@@ -38,11 +38,51 @@ const actions = {
   gitTags: () => git(['ls-remote', '--tags', '--refs', repositoryUrl()], { encoding: 'utf8' })
     .split('\n').filter(line => line).map(line => line.replace(/.*refs\/tags\//, '')),
   run: (command, args) => execFileSync(command, args, { stdio: 'inherit' }),
+  commit: () => process.env.GITHUB_SHA,
+  cloneHistory: () => git(['clone', '--quiet', '--bare', '--filter=tree:0', repositoryUrl(), 'history.git']),
+  resolveCommit: abbreviation => git(['-C', 'history.git', 'rev-parse', '--verify', '--quiet', `${abbreviation}^{commit}`], { encoding: 'utf8' }).trim(),
+  isAncestor: (ancestor, descendant) => {
+    try {
+      git(['-C', 'history.git', 'merge-base', '--is-ancestor', ancestor, descendant]);
+      return true;
+    } catch {
+      return false;
+    }
+  },
   sleep: seconds => new Promise(resolve => setTimeout(resolve, seconds * 1000)),
   now: () => Date.now(),
   setOutput: (name, value) => appendFileSync(process.env.GITHUB_OUTPUT, `${name}=${value}\n`),
   log: message => console.log(message),
 };
+
+/**
+ * Sets the step output `skip` for a canary whose commit is not after the commit of the canary on
+ * npm, since `npm publish` always moves the dist-tag. Ordered by position on main, not by version,
+ * which can be higher for an older commit.
+ */
+async function checkCanary(actions) {
+  const version = actions.version();
+  const npmCanary = (await actions.fetchDistTags()).canary;
+  actions.cloneHistory();
+  const commit = actions.commit();
+  const howToFix = 'Every canary publish fails until the canary dist-tag points at a build of a commit on main. Publish rights are required to fix it with: npm dist-tag add @angular/fire@<version> canary';
+
+  let npmCanaryCommit;
+  try { npmCanaryCommit = actions.resolveCommit(npmCanary.split(/[.-]/).pop()); }
+  catch { throw new Error(`Could not match the canary on npm, ${npmCanary}, to a single commit in this repository. ${howToFix}`); }
+
+  if (npmCanaryCommit === commit) {
+    if (version === npmCanary) {
+      actions.log(`::notice::Not publishing ${version}, because it is already the canary on npm.`);
+      actions.setOutput('skip', 'true');
+    }
+  } else if (actions.isAncestor(commit, npmCanaryCommit)) {
+    actions.log(`::warning::Not publishing ${version}, because the canary on npm, ${npmCanary}, is from a later commit on main.`);
+    actions.setOutput('skip', 'true');
+  } else if (!actions.isAncestor(npmCanaryCommit, commit)) {
+    throw new Error(`Not publishing ${version}, because its commit and the commit of the canary on npm, ${npmCanary}, are not on the same line of history. One of them is not on main. ${howToFix}`);
+  }
+}
 
 /**
  * Chooses the dist-tag a tagged release publishes under and sets the step output `tag`. On a re-run
@@ -111,6 +151,7 @@ async function moveNext(actions) {
 }
 
 const steps = {
+  'canary-check': actions => checkCanary(actions),
   'release-tag': actions => chooseReleaseTag(actions),
   'wait': (actions, tag) => waitUntilListed(actions, tag),
   'move-next': actions => moveNext(actions),

@@ -15,6 +15,9 @@ interface FakeActionsOptions {
   // Leave out to make any read of the repository's tags fail the spec.
   gitTags?: string[];
   npmFails?: boolean;
+  // The commit being published, and main's history as each commit's full list of ancestors.
+  commit?: string;
+  history?: Record<string, string[]>;
 }
 
 interface FakeRecord {
@@ -28,7 +31,7 @@ const unreadable = (url: string) => new Error(`Could not read ${url}: fetch fail
 const distTagsUrl = 'https://registry.npmjs.org/-/package/@angular/fire/dist-tags';
 
 /** A publish job with no network, no git, no npm and a clock that only `sleep` moves. */
-function fakeActions({ version, distTagReads, gitTags, npmFails = false }: FakeActionsOptions) {
+function fakeActions({ version, distTagReads, gitTags, npmFails = false, commit = '', history = {} }: FakeActionsOptions) {
   let clock = 0;
   const reads = [...distTagReads];
   const record: FakeRecord = { logs: [], outputs: {}, commands: [], sleeps: 0 };
@@ -47,6 +50,16 @@ function fakeActions({ version, distTagReads, gitTags, npmFails = false }: FakeA
       }
       return gitTags;
     },
+    commit: () => commit,
+    cloneHistory: () => undefined,
+    resolveCommit: (abbreviation: string) => {
+      const matches = Object.keys(history).filter(sha => sha.startsWith(abbreviation));
+      if (matches.length !== 1) {
+        throw new Error('fatal: Needed a single revision');
+      }
+      return matches[0];
+    },
+    isAncestor: (ancestor: string, descendant: string) => ancestor === descendant || (history[descendant] ?? []).includes(ancestor),
     run: (command: string, args: string[]) => {
       record.commands.push([command, ...args].join(' '));
       if (npmFails) {
@@ -70,6 +83,46 @@ function fakeActions({ version, distTagReads, gitTags, npmFails = false }: FakeA
 
 const tagsAfter21 = ['20.0.3', '20.1.0', '21.0.0-rc.1', '21.0.0'];
 const moveNextCommand = 'npm dist-tag add @angular/fire@21.0.0 next --registry https://wombat-dressing-room.appspot.com';
+
+describe('publish-job.js canary-check', () => {
+  // main: aaaaaaa1, then bbbbbbb2, then ccccccc3. ddddddd4 is on no line of main's history.
+  const history = { aaaaaaa1: [], bbbbbbb2: ['aaaaaaa1'], ccccccc3: ['aaaaaaa1', 'bbbbbbb2'], ddddddd4: [] };
+  const canaryOf = (sha: string) => `21.0.1-canary.20261001000000.sha-${sha.slice(0, 7)}`;
+  const check = (commit: string, npmCanary: string) =>
+    fakeActions({ version: canaryOf(commit), distTagReads: [{ canary: npmCanary }], commit, history });
+
+  it('publishes a canary of a later commit', async () => {
+    const { actions, record } = check('ccccccc3', canaryOf('bbbbbbb2'));
+    expect(await publishJob.runStep('canary-check', [], actions)).toBe(0);
+    expect([record.outputs, record.logs]).toEqual([{}, []]);
+  });
+
+  it('skips a canary of an earlier commit', async () => {
+    const { actions, record } = check('aaaaaaa1', canaryOf('bbbbbbb2'));
+    expect(await publishJob.runStep('canary-check', [], actions)).toBe(0);
+    expect(record.outputs).toEqual({ skip: 'true' });
+    expect(record.logs).toEqual([`::warning::Not publishing ${canaryOf('aaaaaaa1')}, because the canary on npm, ${canaryOf('bbbbbbb2')}, is from a later commit on main.`]);
+  });
+
+  it('skips the canary already on npm, and publishes another version of the same commit', async () => {
+    const same = check('bbbbbbb2', canaryOf('bbbbbbb2'));
+    expect(await publishJob.runStep('canary-check', [], same.actions)).toBe(0);
+    expect(same.record.outputs).toEqual({ skip: 'true' });
+    expect(same.record.logs[0]).toMatch(/^::notice::Not publishing .* because it is already the canary on npm\.$/);
+    const renamed = check('bbbbbbb2', '21.0.0-canary.bbbbbbb');
+    expect(await publishJob.runStep('canary-check', [], renamed.actions)).toBe(0);
+    expect(renamed.record.outputs).toEqual({});
+  });
+
+  it('fails when the canary on npm is not a commit on main\'s line', async () => {
+    const unrelated = check('ccccccc3', canaryOf('ddddddd4'));
+    expect(await publishJob.runStep('canary-check', [], unrelated.actions)).toBe(1);
+    expect(unrelated.record.logs[0]).toMatch(/^::error::Not publishing .* are not on the same line of history\. One of them is not on main\. Every canary publish fails/);
+    const unknown = check('ccccccc3', canaryOf('eeeeeee5'));
+    expect(await publishJob.runStep('canary-check', [], unknown.actions)).toBe(1);
+    expect(unknown.record.logs[0]).toMatch(/^::error::Could not match the canary on npm, .*sha-eeeeeee, to a single commit in this repository\./);
+  });
+});
 
 describe('publish-job.js release-tag', () => {
 
@@ -225,6 +278,14 @@ describe('publish-job.js actions', () => {
 
   it('lists the repository\'s tag names', () => {
     expect(publishJob.actions.gitTags().sort()).toEqual(['21.0.0', '21.0.1']);
+  });
+
+  it('resolves abbreviations and orders commits in the cloned history', () => {
+    publishJob.actions.cloneHistory();
+    const [one, two, three, unrelated] = commits;
+    expect(publishJob.actions.resolveCommit(three.slice(0, 7))).toBe(three);
+    expect(() => publishJob.actions.resolveCommit('0000000')).toThrow();
+    expect([publishJob.actions.isAncestor(one, three), publishJob.actions.isAncestor(three, two), publishJob.actions.isAncestor(one, unrelated)]).toEqual([true, false, false]);
   });
 
   it('appends step outputs as name=value lines', () => {
