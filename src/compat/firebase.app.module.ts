@@ -15,7 +15,7 @@ export function ɵfirebaseAppFactory(options: FirebaseOptions, zone: NgZone, nam
   const config = typeof nameOrConfig === 'object' && nameOrConfig || {};
   config.name = config.name || name;
   // Added any due to some inconsistency between @firebase/app and firebase types
-  const existingApp = firebase.apps.find(app => app && app.name === config.name);
+  const existingApp = firebase.apps.find(app => app?.name === config.name);
   // We support FirebaseConfig, initializeApp's public type only accepts string; need to cast as any
   // Could be solved with https://github.com/firebase/firebase-js-sdk/pull/1206
   const app = (existingApp || zone.runOutsideAngular(() => firebase.initializeApp(options, config as any)));
