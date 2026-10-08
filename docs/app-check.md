@@ -48,7 +48,7 @@ export class AppCheckComponent {
 
 ## Server-side rendering
 
-App Check's reCAPTCHA providers need a browser. So while a page renders on the server, AngularFire does not call the function you pass to `provideAppCheck`, and no App Check instance is created there. On the server, `inject(AppCheck)` returns `null`, although its type says `AppCheck`. Code that runs on both the server and the browser should check the platform before using it.
+App Check's reCAPTCHA providers need a browser, so AngularFire skips App Check during server rendering. While a page renders on the server, AngularFire does not call the function you pass to `provideAppCheck`, and no App Check instance is created there. On the server, `inject(AppCheck)` returns `null`, although its type says `AppCheck`. Code that runs on both the server and the browser should check the platform before using it.
 
 ### Firebase requests made during server rendering
 
