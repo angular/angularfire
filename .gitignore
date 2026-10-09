@@ -21,7 +21,6 @@ coverage
 api-*.json
 angularfire.tgz
 unpack.sh
-publish.sh
 .firebase
 .angular
 .vscode
