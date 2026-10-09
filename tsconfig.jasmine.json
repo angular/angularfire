@@ -14,6 +14,7 @@
     },
     "include": [
         "tools/jasmine.ts",
+        "tools/**/*.jasmine.ts",
         "src/**/*.jasmine.ts",
         // Not sure what is wrong here, but since upgrading karma it's fallen apart
         // "src/**/*.spec.ts",
