@@ -384,8 +384,24 @@ const schematicEntryPoints = [
   ['update', 'v21', 'index'],
 ];
 
+const externalPackages = [
+  "@angular-devkit/schematics",
+  "@angular-devkit/architect",
+  "@angular-devkit/core",
+  "rxjs",
+  "@schematics/angular",
+  "jsonc-parser",
+  "firebase-tools",
+  "typescript"
+];
+
+/* Allowed package subpaths for bundles. Each must be in that package's `exports` map, or the
+ * schematics cannot load with any version of the package that has one. */
+const exportedSubpaths = ['@angular-devkit/schematics/tasks', '@schematics/angular/utility', 'rxjs/operators'];
+const isPackageSubpath = (path: string) => externalPackages.some(name => path.startsWith(`${name}/`));
+
 async function compileSchematics() {
-  await esbuild.build({
+  const { metafile } = await esbuild.build({
     entryPoints: schematicEntryPoints.map(segments => `${src('schematics', ...segments)}.ts`),
     format: "cjs",
     // turns out schematics don't support ESM, need to use webpack or shim these
@@ -396,20 +412,22 @@ async function compileSchematics() {
     minify: true,
     platform: "node",
     target: "es2016",
-    external: [
-      "@angular-devkit/schematics",
-      "@angular-devkit/architect",
-      "@angular-devkit/core",
-      "rxjs",
-      "@schematics/angular",
-      "jsonc-parser",
-      "firebase-tools",
-      // The v21 migration parses user source with the TypeScript compiler; resolve it from
-      // the workspace at ng-update time instead of bundling ~3.5MB into the package.
-      "typescript"
-    ],
+    external: externalPackages,
+    alias: { "@angular-devkit/schematics/tasks/index.js": "@angular-devkit/schematics/tasks" },
     outdir: dest('schematics'),
+    metafile: true,
   });
+  const importersBySubpath = new Map<string, string[]>();
+  for (const [importer, { imports }] of Object.entries(metafile.inputs)) {
+    for (const { path } of imports.filter(entry => entry.external && isPackageSubpath(entry.path))) {
+      importersBySubpath.set(path, [...(importersBySubpath.get(path) ?? []), importer]);
+    }
+  }
+  const unlistedSubpaths = [...importersBySubpath.keys()].filter(subpath => !exportedSubpaths.includes(subpath));
+  if (unlistedSubpaths.length) {
+    const required = unlistedSubpaths.map(subpath => `\n  ${subpath}, imported by ${importersBySubpath.get(subpath)?.join(', ')}`);
+    throw new Error(`The schematics require package paths that exportedSubpaths does not list:${required.join('')}\nAdd an alias in compileSchematics to a path the package exports, or, if the exports map in the newest published version lists the path (npm view <package>@next exports), add it to exportedSubpaths.`);
+  }
   await Promise.all([
     copy(src('schematics', 'versions.json'), dest('schematics', 'versions.json')),
     copy(src('schematics', 'builders.json'), dest('schematics', 'builders.json')),
