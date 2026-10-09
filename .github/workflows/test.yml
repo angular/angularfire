@@ -163,12 +163,22 @@ jobs:
     name: Publish (NPM)
     needs: ['build', 'test', 'browser']
     if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'release' }}
-    # One canary publish at a time, so the check below reads the canary the previous one published.
+    # One npm publish at a time, each held until npm lists it (about 20 minutes at most), so every
+    # check below reads what the previous publish wrote.
+    timeout-minutes: 30
     concurrency:
-      group: ${{ github.event_name == 'release' && github.run_id || 'canary-publish' }}
+      group: npm-publish
       cancel-in-progress: false
       queue: max
     steps:
+      - name: Checkout the publish scripts
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            tools/publish-job.js
+            tools/release-tag.js
+          sparse-checkout-cone-mode: false
       - name: Setup node
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
@@ -182,38 +192,27 @@ jobs:
           path: dist
       - name: Skip a canary that is not newer than npm's
         id: canary_check
-        run: |
-          VERSION=$(node -p "require('./dist/packages-dist/package.json').version")
-          if [[ $VERSION == *-canary.* ]]; then
-            # The dist-tags endpoint is not CDN-cached, unlike the package data `npm view` reads.
-            DIST_TAGS=$(curl -fsS --retry 3 --max-time 30 https://registry.npmjs.org/-/package/@angular/fire/dist-tags)
-            NPM_CANARY=$(node -p "JSON.parse(process.argv[1]).canary" "$DIST_TAGS")
-            # Order by position on main, not by version, which can be higher for an older commit.
-            git clone --quiet --bare --filter=tree:0 "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" history.git
-            HOW_TO_FIX="Every canary publish fails until the canary dist-tag points at a build of a commit on main. Publish rights are required to fix it with: npm dist-tag add @angular/fire@<version> canary"
-            if ! NPM_CANARY_COMMIT=$(git -C history.git rev-parse --verify --quiet "${NPM_CANARY##*[.-]}^{commit}"); then
-              echo "::error::Could not match the canary on npm, $NPM_CANARY, to a single commit in this repository. $HOW_TO_FIX"
-              exit 1
-            fi
-            # `npm publish` always moves a dist-tag, so a canary that is not newer must not publish at all.
-            if [[ $NPM_CANARY_COMMIT == "$GITHUB_SHA" ]]; then
-              if [[ $VERSION == "$NPM_CANARY" ]]; then
-                echo "::notice::Not publishing $VERSION, because it is already the canary on npm."
-                echo "skip=true" >> "$GITHUB_OUTPUT"
-              fi
-            elif git -C history.git merge-base --is-ancestor "$GITHUB_SHA" "$NPM_CANARY_COMMIT"; then
-              echo "::warning::Not publishing $VERSION, because the canary on npm, $NPM_CANARY, is from a later commit on main."
-              echo "skip=true" >> "$GITHUB_OUTPUT"
-            elif ! git -C history.git merge-base --is-ancestor "$NPM_CANARY_COMMIT" "$GITHUB_SHA"; then
-              echo "::error::Not publishing $VERSION, because its commit and the commit of the canary on npm, $NPM_CANARY, are not on the same line of history. One of them is not on main. $HOW_TO_FIX"
-              exit 1
-            fi
-          fi
+        if: github.event_name != 'release'
+        run: node tools/publish-job.js canary-check
+      - name: Choose the release's dist-tag
+        id: release_tag
+        if: github.event_name == 'release'
+        run: node tools/publish-job.js release-tag
       - name: Publish
-        if: steps.canary_check.outputs.skip != 'true'
-        run: |
-          cd ./dist/packages-dist
-          chmod +x publish.sh
-          ./publish.sh
+        id: publish
+        if: steps.canary_check.outputs.skip != 'true' && steps.release_tag.outputs.published != 'true'
+        run: npm publish ./dist/packages-dist --access public --registry https://wombat-dressing-room.appspot.com --tag "$NPM_TAG"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TAG: ${{ steps.release_tag.outputs.tag || 'canary' }}
+      - name: Wait for npm to list the version
+        id: wait
+        if: steps.publish.outcome == 'success' || steps.release_tag.outputs.published == 'true'
+        run: node tools/publish-job.js wait "$NPM_TAG"
+        env:
+          NPM_TAG: ${{ steps.release_tag.outputs.tag || 'canary' }}
+      - name: Move next up to the release
+        if: steps.wait.outputs.listed == 'true' && steps.release_tag.outputs.tag == 'latest'
+        run: node tools/publish-job.js move-next
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
