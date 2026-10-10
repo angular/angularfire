@@ -10,12 +10,6 @@ The release candidate is published under the `next` tag. From an app on Angular 
 ng update @angular/core@21 @angular/cli@21 @angular/fire@next
 ```
 
-`ng update` writes the range `^21.0.0-rc.1` into your `package.json`. That range also matches canary releases, and npm currently installs one of them, such as `21.0.0-rc.1-canary.95b3de1`, instead of the release candidate. To install the release candidate itself, and stop npm from picking a canary release on a later install, change the entry to the exact version `21.0.0-rc.1` by running:
-
-```bash
-npm install --save-exact @angular/fire@next
-```
-
 The AngularFire update runs a migration that:
 
 - **Aligns your `firebase` dependency to `^12.18.0`.** AngularFire 21 requires Firebase JS SDK 12, at 12.18 or later. If your app requested an older `firebase`, whether that is 11 or an earlier 12, npm would install both that copy and the one AngularFire needs side by side, and the two copies reject each other's objects at runtime. The migration updates the dependency and reinstalls so you end up with a single copy. Verify with `npm ls firebase`.
@@ -88,3 +82,4 @@ Two symbols were removed rather than renamed. The migration leaves their imports
 
 - **Angular 21.2 is required.** AngularFire 21 peers `@angular/* ^21.2.0` and does not support Angular 22 (a future AngularFire 22 will).
 - The obsolete `@angular/platform-browser-dynamic` peer dependency was removed. No action is needed.
+- **`ng update` can stop with `The Angular CLI requires a minimum Node.js version of ...`.** This happens when the first `@angular/` package in the command has no version number: `ng update` then runs with the newest Angular CLI, which requires a newer Node.js than Angular 21 does. Either update Node.js, or give that package a version number, as the command above does (`ng update @angular/fire@21.0.0-rc.1` for the release candidate, `ng update @angular/fire@21` once 21.0.0 is published).

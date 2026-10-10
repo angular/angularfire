@@ -2,12 +2,9 @@ import { Observable } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { UploadTask, UploadTaskSnapshot } from '../interfaces';
 
-// need to import, else the types become import('firebase/compat/app').default.storage.UploadTask
-// and it no longer works w/Firebase v7
-
 // Things aren't working great, I'm having to put in a lot of work-arounds for what
 // appear to be Firebase JS SDK bugs https://github.com/firebase/firebase-js-sdk/issues/4158
-export function fromTask(task: UploadTask) {
+export function fromTask(task: UploadTask): Observable<UploadTaskSnapshot> {
   return new Observable<UploadTaskSnapshot>(subscriber => {
     const progress = (snap: UploadTaskSnapshot) => subscriber.next(snap);
     const error = e => subscriber.error(e);
