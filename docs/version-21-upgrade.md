@@ -81,5 +81,6 @@ Two symbols were removed rather than renamed. The migration leaves their imports
 ## Other notes
 
 - **Angular 21.2 is required.** AngularFire 21 peers `@angular/* ^21.2.0` and does not support Angular 22 (a future AngularFire 22 will).
-- The obsolete `@angular/platform-browser-dynamic` peer dependency was removed. No action is needed.
-- **`ng update` can stop with `The Angular CLI requires a minimum Node.js version of ...`.** This happens when the first `@angular/` package in the command has no version number: `ng update` then runs with the newest Angular CLI, which requires a newer Node.js than Angular 21 does. Either update Node.js, or give that package a version number, as the command above does (`ng update @angular/fire@21.0.0-rc.1` for the release candidate, `ng update @angular/fire@21` once 21.0.0 is published).
+- The obsolete `@angular/platform-browser-dynamic` and the unused optional `@angular/platform-server` peer dependencies were removed. No action is needed.
+- **App Check no longer runs during server rendering** (21.0.0-rc.2 and later). `inject(AppCheck)` returns `null` on the server. To keep it running there, provide `APP_CHECK_ON_SERVER` as `true` in your server config. See [App Check during server rendering](./app-check.md#server-side-rendering).
+- **`ng update` can stop with `The Angular CLI requires a minimum Node.js version of ...`.** This happens when the first `@angular/` package in the command has no version number: `ng update` then runs with the newest Angular CLI, which requires a newer Node.js than Angular 21 does. Either update Node.js, or give that package a version number, as the command above does (`ng update @angular/fire@21.0.0-rc.2` for the release candidate, `ng update @angular/fire@21` once 21.0.0 is published).
