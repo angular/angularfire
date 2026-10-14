@@ -53,6 +53,17 @@ Update the imports from `import { ... } from 'firebase/firestore'` to `import { 
 
 [Getting Started](https://firebase.google.com/docs/firestore/quickstart#web-modular-api) | [API Reference](https://firebase.google.com/docs/reference/js/firestore)
 
+### Pipeline operations
+
+Firestore Pipeline operations are available from dedicated entrypoints:
+
+```ts
+import { field, execute } from '@angular/fire/firestore/pipelines';
+import { field as liteField, execute as liteExecute } from '@angular/fire/firestore/lite/pipelines';
+```
+
+Choose the Lite path when using Firestore Lite. See Firebase's guides for [getting started with pipelines](https://firebase.google.com/docs/firestore/pipelines/get-started-with-pipelines?hl=en) and [performing joins with sub-pipelines](https://firebase.google.com/docs/firestore/pipelines/perform-joins-with-sub-pipelines).
+
 ### Reading data
 
 In Cloud Firestore data is stored in `documents` and `documents` are stored in `collections`. The path to data follows `<collection_name>/<document_id>` and continues if there are subcollections. For example, `"users/ABC12345/posts/XYZ6789"` represents:
