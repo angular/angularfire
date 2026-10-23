@@ -1,5 +1,7 @@
 # Deploying your Universal application on Cloud Functions for Firebase
 
+> **This page is out of date.** It describes the Angular Universal and `firebase-tools` setup of 2019. Deploy server-rendered apps with Firebase App Hosting instead, see the [App Hosting guide](../app-hosting.md).
+
 After [setting up your application with Angular Universal as outlined in Getting Started](getting-started.md), you're now ready to build your application for Firebase Hosting & Cloud Functions.
 
 > Cloud Functions for Firebase lets you automatically run backend code in response to events triggered by Firebase features and HTTPS requests. Your code is stored in Google's cloud and runs in a managed environment. There's no need to manage and scale your own servers. [Learn more about Cloud Functions for Firebase](https://firebase.google.com/docs/functions/).

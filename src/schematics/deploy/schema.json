@@ -31,7 +31,7 @@
     },
     "ssr": {
       "oneOf": [{ "type": "boolean" }, { "type": "string" }],
-      "description": "Should we attempt to deploy the function to Cloud Functions (true or 'cloud-functions') / Cloud Run ('cloud-run') or just Hosting (false)"
+      "description": "Deploy server-side rendering to Cloud Run ('cloud-run'), or just Hosting (false). Deploying to Cloud Functions (true or 'cloud-functions') is deprecated in AngularFire 22 and will be removed in AngularFire 23. Use Firebase App Hosting for server-rendered apps."
     },
     "prerender": {
       "type": "boolean",
@@ -61,7 +61,8 @@
     },
     "CF3v2": {
       "type": "boolean",
-      "description": "Generation of the Functions product to run on"
+      "description": "Generation of the Functions product to run on. Read only by the Cloud Functions mode, which AngularFire 22 deprecates and AngularFire 23 removes.",
+      "x-deprecated": "read only by the Cloud Functions mode of ng deploy, which AngularFire 22 deprecates and AngularFire 23 removes. Delete it unless ssr is true or 'cloud-functions'. Use Firebase App Hosting for server-rendered apps."
     },
     "region": {
       "type": "string",
@@ -74,7 +75,8 @@
     },
     "functionsRuntimeOptions": {
       "type": "object",
-      "description": "Runtime options for Cloud Functions, if deploying to Cloud Functions"
+      "description": "Runtime options for Cloud Functions. Read only by the Cloud Functions mode, which AngularFire 22 deprecates and AngularFire 23 removes.",
+      "x-deprecated": "read only by the Cloud Functions mode of ng deploy, which AngularFire 22 deprecates and AngularFire 23 removes. Delete it unless ssr is true or 'cloud-functions'. Use Firebase App Hosting for server-rendered apps."
     },
     "preview": {
       "type": "boolean",
