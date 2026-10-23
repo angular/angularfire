@@ -10,14 +10,14 @@
 			"prefix": "angularfire",
 			"architect": {
 				"build": {
-					"builder": "@angular-devkit/build-angular:ng-packagr",
+					"builder": "@angular/build:ng-packagr",
 					"options": {
 						"tsConfig": "tsconfig.json",
 						"project": "src/ng-package.json"
 					}
 				},
 				"test": {
-					"builder": "@angular-devkit/build-angular:karma",
+					"builder": "@angular/build:karma",
 					"options": {
 						"polyfills": [
 							"zone.js",
