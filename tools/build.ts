@@ -383,6 +383,7 @@ const schematicEntryPoints = [
   ['setup', 'index'],
   ['update', 'v7', 'index'],
   ['update', 'v21', 'index'],
+  ['update', 'v22', 'index'],
 ];
 
 const externalPackages = [

@@ -214,9 +214,9 @@ describe('alignFirebaseVersion', () => {
     expect(sectionIn(tree, 'devDependencies').firebase).toBe(firebaseVersionRange);
   });
 
-  it('matches the firebase range the library actually ships with', () => {
+  it('matches the firebase range the library declares as its peer dependency', () => {
     const libraryManifest = JSON.parse(readFileSync('src/package.json', 'utf8'));
-    expect(libraryManifest.dependencies.firebase).toBe(firebaseVersionRange);
+    expect(libraryManifest.peerDependencies.firebase).toBe(firebaseVersionRange);
   });
 
   it('is a no-op when run a second time', () => {
