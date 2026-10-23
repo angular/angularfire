@@ -7,6 +7,6 @@
   "allowedNonPeerDependencies": [
     "@angular-devkit/architect", "@angular-devkit/core",
     "@angular-devkit/schematics", "@schematics/angular",
-    "jsonc-parser", "firebase", "rxfire"
+    "jsonc-parser", "rxfire"
   ]
 }

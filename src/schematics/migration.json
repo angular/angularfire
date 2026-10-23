@@ -8,8 +8,13 @@
         },
         "migration-v21": {
             "version": "21.0.0",
-            "description": "Align the workspace's firebase dependency with the range @angular/fire 21 requires, and rewrite Vertex AI imports to Firebase AI Logic (getVertexAI callers keep the same backend, and a call that passed no location moves from us-central1 to global)",
+            "description": "Align the workspace's firebase dependency with the range @angular/fire requires, and rewrite Vertex AI imports to Firebase AI Logic (getVertexAI callers keep the same backend, and a call that passed no location moves from us-central1 to global)",
             "factory": "./update/v21#ngUpdate"
+        },
+        "migration-v22": {
+            "version": "22.0.0",
+            "description": "Add firebase to the workspace's package.json when it is missing, now that @angular/fire lists it as a peer dependency, and align an existing entry with the range @angular/fire requires",
+            "factory": "./update/v22#ngUpdate"
         }
     }
 }
