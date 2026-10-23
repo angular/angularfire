@@ -3,7 +3,6 @@ import { existsSync, readFileSync, renameSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { BuilderContext, targetFromTargetString } from '@angular-devkit/architect';
-import { SchematicsException } from '@angular-devkit/schematics';
 import crossSpawn from 'cross-spawn';
 import fsExtra from 'fs-extra';
 import * as inquirer from 'inquirer';
@@ -82,7 +81,7 @@ const escapeRegExp = (str: string) => str.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&
 // being read as a flag rather than a path.
 export const assertSafeOutputPath = (outputPath: string, targetName: string): void => {
   if (/['"`\\$\n\r]/.test(outputPath) || outputPath.startsWith('-')) {
-    throw new SchematicsException(
+    throw new Error(
       `Unsafe outputPath ${JSON.stringify(outputPath)} for target '${targetName}' in angular.json.`
     );
   }
@@ -95,7 +94,7 @@ export const assertSafeOutputPath = (outputPath: string, targetName: string): vo
 // example one containing a dash) into an explicit error.
 export const assertSafeFunctionName = (functionName: string | undefined): void => {
   if (functionName !== undefined && !/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(functionName)) {
-    throw new SchematicsException(
+    throw new Error(
       `Unsafe functionName ${JSON.stringify(functionName)} in angular.json; expected a plain identifier.`
     );
   }
@@ -113,7 +112,7 @@ const NODE_IMAGE_TAG = /^(?!latest$)[\w][\w.-]{0,127}$/;
 
 export const assertSafeNodeVersion = (version: string | number | undefined): void => {
   if (version !== undefined && !NODE_IMAGE_TAG.test(String(version))) {
-    throw new SchematicsException(
+    throw new Error(
       `Unsafe functionsNodeVersion ${JSON.stringify(version)} in angular.json; expected a node image tag, such as 22 or lts.`
     );
   }
@@ -185,7 +184,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = ['npm', 'yarn', 'pnpm', 'cnpm', 'bun']
 
 export const assertSupportedPackageManager = (packageManager: string): string => {
   if (!SUPPORTED_PACKAGE_MANAGERS.includes(packageManager)) {
-    throw new SchematicsException(
+    throw new Error(
       `Unsupported package manager "${packageManager}" in angular.json (cli.packageManager). ` +
       `Expected one of: ${SUPPORTED_PACKAGE_MANAGERS.join(', ')}.`
     );
@@ -217,7 +216,7 @@ export const processHost = {
     const result = crossSpawn.sync(command, args, options);
     if (result.error) { throw result.error; }
     if (result.status !== 0) {
-      throw new SchematicsException(
+      throw new Error(
         `Command "${command}" exited with ${result.signal ? `signal ${result.signal}` : `code ${result.status}`}.`
       );
     }
@@ -510,7 +509,7 @@ export const deployToCloudRun = async (
   }
 
   if (options.preview) {
-    throw new SchematicsException('Cloud Run preview not supported.');
+    throw new Error('Cloud Run preview not supported.');
   }
 
   const deployArguments: string[] = [];
