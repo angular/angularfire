@@ -9,6 +9,10 @@ AngularFire has a new tree-shakable API, you're looking at the documentation for
 
 [See the v7 upgrade guide for more information on this change.](version-7-upgrade.md).
 
+### Support status
+
+The compatibility API (`@angular/fire/compat/*`) is supported and is kept working on every Angular and Firebase version AngularFire supports. Its specs run in the same test suite as the modular API, and it receives bug fixes. It does not receive new features: new Firebase products and new AngularFire features land in the modular API only. There is no planned removal date. If you depend on the compatibility API, you can keep upgrading AngularFire without migrating, and migrate when the modular API offers something you need.
+
 ### Monitor usage of your application in production
 
 > `AngularFireAnalytics` provides a convenient method of interacting with Google Analytics in your Angular application. The provided `ScreenTrackingService` and `UserTrackingService` automatically log events when you're using the Angular Router or Firebase Authentication respectively. [Learn more about Google Analytics](https://firebase.google.com/docs/analytics).
