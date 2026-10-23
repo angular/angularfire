@@ -469,7 +469,6 @@ async function buildLibrary() {
   await Promise.all([
     copy(join(process.cwd(), '.npmignore'), dest('.npmignore')),
     copy(join(process.cwd(), 'README.md'), dest('README.md')),
-    copy(join(process.cwd(), 'docs'), dest('docs')),
     compileSchematics(),
     replacePackageCoreVersion(),
   ]);
