@@ -4,7 +4,7 @@ import { Script } from 'vm';
 import { BuilderContext, BuilderRun, ScheduleOptions, Target } from '@angular-devkit/architect';
 import { JsonObject, logging } from '@angular-devkit/core';
 import { BuildTarget, DeployBuilderSchema, FSHost, FirebaseDeployConfig, FirebaseTools } from '../interfaces';
-import deploy, { assertSafeDependencyName, assertSafeFunctionName, assertSafeNodeVersion, assertSafeOutputPath, assertSupportedPackageManager, buildCloudRunBuildsSubmitArgs, buildCloudRunDeployArgs, deployToCloudRun, deployToFunction, findPackageVersion, processHost } from './actions.js'
+import deploy, { CLOUD_FUNCTIONS_DEPRECATION, assertSafeDependencyName, assertSafeFunctionName, assertSafeNodeVersion, assertSafeOutputPath, assertSupportedPackageManager, buildCloudRunBuildsSubmitArgs, buildCloudRunDeployArgs, deployToCloudRun, deployToFunction, findPackageVersion, processHost } from './actions.js'
 import 'jasmine';
 
 let context: BuilderContext;
@@ -331,6 +331,55 @@ describe('universal deployment', () => {
     await deployToFunction(firebaseMock, context, '/home/user', projectTargets, true, fsHost);
     expect(spy).not.toHaveBeenCalled();
   });*/
+});
+
+describe('Cloud Functions deprecation', () => {
+  beforeEach(() => initMocks());
+
+  /* deploy() also warns about a Node version mismatch, so every assertion is about the
+   * deprecation text, never about the number of warn calls. */
+  const deprecationWarnings = (warnSpy: jasmine.Spy) =>
+    warnSpy.calls.allArgs().filter(([message]) => message === CLOUD_FUNCTIONS_DEPRECATION);
+
+  /* Makes the SSR routes throw at their first statement (the output path check), after the
+   * warning has or has not printed and before anything touches the file system or gcloud. */
+  const withUnreadableOutputPaths = () => {
+    context.getTargetOptions = () => Promise.resolve({});
+  };
+
+  it('warns before the build when deploying server-side rendering to Cloud Functions', async () => {
+    withUnreadableOutputPaths();
+    const warnSpy = spyOn(context.logger, 'warn');
+    const scheduleSpy = spyOn(context, 'scheduleTarget').and.callThrough();
+    await expectAsync(
+      deploy(firebaseMock, context, STATIC_BUILD_TARGET, SERVER_BUILD_TARGET, undefined, FIREBASE_PROJECT, { preview: false, ssr: true }, FIREBASE_TOKEN)
+    ).toBeRejectedWithError(/Cannot read the output path option/);
+    expect(deprecationWarnings(warnSpy).length).toBe(1);
+    expect(warnSpy).toHaveBeenCalledBefore(scheduleSpy);
+  });
+
+  it('does not warn on a hosting-only deploy', async () => {
+    const warnSpy = spyOn(context.logger, 'warn');
+    await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, undefined, FIREBASE_PROJECT, { preview: false }, FIREBASE_TOKEN);
+    expect(deprecationWarnings(warnSpy)).toEqual([]);
+  });
+
+  it('does not warn when version 2 routes an ssr target to hosting', async () => {
+    const warnSpy = spyOn(context.logger, 'warn');
+    const deploySpy = spyOn(firebaseMock, 'deploy').and.callThrough();
+    await deploy(firebaseMock, context, STATIC_BUILD_TARGET, SERVER_BUILD_TARGET, undefined, FIREBASE_PROJECT, { preview: false, version: 2, ssr: true }, FIREBASE_TOKEN);
+    expect(deploySpy).toHaveBeenCalledWith(jasmine.objectContaining({ only: 'hosting:' + PROJECT }));
+    expect(deprecationWarnings(warnSpy)).toEqual([]);
+  });
+
+  it('does not warn on a Cloud Run deploy', async () => {
+    withUnreadableOutputPaths();
+    const warnSpy = spyOn(context.logger, 'warn');
+    await expectAsync(
+      deploy(firebaseMock, context, STATIC_BUILD_TARGET, SERVER_BUILD_TARGET, undefined, FIREBASE_PROJECT, { preview: false, ssr: 'cloud-run' }, FIREBASE_TOKEN)
+    ).toBeRejectedWithError(/Cannot read the output path option/);
+    expect(deprecationWarnings(warnSpy)).toEqual([]);
+  });
 });
 
 describe('Cloud Run gcloud argv construction', () => {

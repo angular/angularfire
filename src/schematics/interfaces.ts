@@ -191,9 +191,11 @@ export interface DeployBuilderSchema {
   prerender?: boolean;
   functionName?: string;
   functionsNodeVersion?: number|string;
+  /** @deprecated Read only by the Cloud Functions mode, which will be removed in AngularFire 23. */
   functionsRuntimeOptions?: HttpsOptions;
   cloudRunOptions?: Partial<CloudRunOptions>;
   outputPath?: string;
+  /** @deprecated Read only by the Cloud Functions mode, which will be removed in AngularFire 23. */
   CF3v2?: boolean;
   version?: number;
 }
