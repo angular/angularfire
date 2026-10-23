@@ -5,6 +5,6 @@
   },
   "dest": "../dist/packages-dist",
   "allowedNonPeerDependencies": [
-    "@angular-devkit/architect", "firebase", "rxfire"
+    "@angular-devkit/architect", "rxfire"
   ]
 }
