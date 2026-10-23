@@ -23,7 +23,7 @@ Through AngularFire 21, `@angular/fire` listed `firebase` under `dependencies`, 
 
 AngularFire 22 lists `firebase` under `peerDependencies` instead. So your app should declare `firebase` in its `package.json` (on Yarn it must, since Yarn installs no peer dependencies). This gives you exactly one copy of `firebase`, and an incompatible version is refused at install time instead of failing at runtime.
 
-`ng update @angular/fire@canary` updates an older `firebase` entry in your `package.json` to the current 12.x release. If your app doesn't list `firebase` in `package.json` the migration adds `"firebase": "^12.18.0"` and reinstalls. Verify with `npm ls firebase`, which should show exactly one copy.
+`ng update @angular/fire@canary` updates an older `firebase` entry in your `package.json` to `^12.18.0` when it requests a version outside that range. If your app doesn't list `firebase` in `package.json` the migration adds `"firebase": "^12.18.0"` and reinstalls. Verify with `npm ls firebase`, which should show exactly one copy.
 
 ### If you install with `npm install` instead of `ng update`
 
@@ -53,6 +53,6 @@ An older version installs anyway with a warning (`has incorrect peer dependency 
 
 ### pnpm
 
-pnpm 8 and later install a missing `firebase` automatically. An older version installs anyway with `unmet peer firebase@^12.18.0: found 11.x`, and pnpm prints that warning only once, when it first resolves the tree, never on a later install from the committed lockfile.
+pnpm 8 and later install a missing `firebase` automatically. An older version installs anyway with a warning (`unmet peer firebase@^12.18.0: found 11.x` on pnpm 9 and 10, `Issues with peer dependencies found. Run "pnpm peers check" to list them.` on pnpm 11 and 12), and pnpm prints that warning only once, when it first resolves the tree, never on a later install from the committed lockfile.
 
 Set `strict-peer-dependencies=true` in `.npmrc` to make pnpm refuse the mismatch outright.
