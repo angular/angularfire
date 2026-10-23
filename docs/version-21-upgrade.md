@@ -1,13 +1,13 @@
-# Upgrading to the AngularFire 21 Release Candidate
+# Upgrading to AngularFire 21
 
 AngularFire 21 targets **Angular 21** and the **Firebase JS SDK v12**. Most of the upgrade is handled for you by `ng update`.
 
 ## Run the update
 
-The release candidate is published under the `next` tag. From an app on Angular 20 and AngularFire 20, run:
+From an app on Angular 20 and AngularFire 20, run:
 
 ```bash
-ng update @angular/core@21 @angular/cli@21 @angular/fire@next
+ng update @angular/core@21 @angular/cli@21 @angular/fire
 ```
 
 The AngularFire update runs a migration that:
@@ -82,5 +82,5 @@ Two symbols were removed rather than renamed. The migration leaves their imports
 
 - **Angular 21.2 is required.** AngularFire 21 peers `@angular/* ^21.2.0` and does not support Angular 22 (a future AngularFire 22 will).
 - The obsolete `@angular/platform-browser-dynamic` and the unused optional `@angular/platform-server` peer dependencies were removed. No action is needed.
-- **App Check no longer runs during server rendering** (21.0.0-rc.2 and later). `inject(AppCheck)` returns `null` on the server. To keep it running there, provide `APP_CHECK_ON_SERVER` as `true` in your server config. See [App Check during server rendering](./app-check.md#server-side-rendering).
-- **`ng update` can stop with `The Angular CLI requires a minimum Node.js version of ...`.** This happens when the first `@angular/` package in the command has no version number: `ng update` then runs with the newest Angular CLI, which requires a newer Node.js than Angular 21 does. Either update Node.js, or give that package a version number, as the command above does (`ng update @angular/fire@21.0.0-rc.2` for the release candidate, `ng update @angular/fire@21` once 21.0.0 is published).
+- **App Check no longer runs during server rendering** (since 21.0.0-rc.2). `inject(AppCheck)` returns `null` on the server. To keep it running there, provide `APP_CHECK_ON_SERVER` as `true` in your server config. See [App Check during server rendering](./app-check.md#server-side-rendering).
+- **`ng update` can stop with `The Angular CLI requires a minimum Node.js version of ...`.** This happens when the first `@angular/` package in the command has no version number: `ng update` then runs with the newest Angular CLI, which requires a newer Node.js than Angular 21 does. Either update Node.js, or give that package a version number, as the command above does. Updating AngularFire on its own needs the version too: run `ng update @angular/fire@21`, not `ng update @angular/fire`.
