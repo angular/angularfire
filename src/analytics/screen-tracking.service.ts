@@ -1,4 +1,4 @@
-import { ComponentFactoryResolver, Injectable, Injector, NgZone, OnDestroy, Optional } from '@angular/core';
+import { Injectable, Injector, NgZone, OnDestroy, Optional, reflectComponentType } from '@angular/core';
 import { VERSION } from '@angular/fire';
 import { Title } from '@angular/platform-browser';
 import { ActivationEnd, Router, ɵEmptyOutletComponent } from '@angular/router';
@@ -49,7 +49,6 @@ const getScreenInstanceID = (params: Record<string, any>) => {
 export const ɵscreenViewEvent = (
   router: Router,
   title: Title|null,
-  componentFactoryResolver: ComponentFactoryResolver,
 ): Observable<{
   [SCREEN_NAME_KEY]: string,
   [PAGE_PATH_KEY]: string,
@@ -111,8 +110,8 @@ export const ɵscreenViewEvent = (
       if (typeof component === 'string') {
         return of({ ...params, [SCREEN_CLASS_KEY]: component });
       } else if (component) {
-        const componentFactory = componentFactoryResolver.resolveComponentFactory(component);
-        return of({ ...params, [SCREEN_CLASS_KEY]: componentFactory.selector });
+        const selector = reflectComponentType(component)?.selector;
+        return of(selector ? { ...params, [SCREEN_CLASS_KEY]: selector } : null);
       }
       // lazy loads cause extra activations, ignore
       return of(null);
@@ -148,7 +147,6 @@ export class ScreenTrackingService implements OnDestroy {
   constructor(
     @Optional() router: Router,
     @Optional() title: Title,
-    componentFactoryResolver: ComponentFactoryResolver,
     zone: NgZone,
     @Optional() userTrackingService: UserTrackingService,
     injector: Injector,
@@ -161,7 +159,7 @@ export class ScreenTrackingService implements OnDestroy {
       const analytics = injector.get(Analytics);
       if (!router || !analytics) { return; }
       zone.runOutsideAngular(() => {
-        this.disposable = ɵscreenViewEvent(router, title, componentFactoryResolver).pipe(
+        this.disposable = ɵscreenViewEvent(router, title).pipe(
           switchMap(async params => {
             if (userTrackingService) { await userTrackingService.initialized; }
             return logEvent(analytics, SCREEN_VIEW_EVENT, params);

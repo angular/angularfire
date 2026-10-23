@@ -2,11 +2,10 @@
     "compileOnSave": false,
     "compilerOptions": {
       "allowSyntheticDefaultImports": true,
-      "baseUrl": "./",
+      "strict": false,
       "outDir": "./dist",
       "sourceMap": true,
       "declaration": false,
-      "downlevelIteration": true,
       "emitDecoratorMetadata": true,
       "experimentalDecorators": true,
       "module": "preserve",
@@ -22,8 +21,8 @@
         "dom"
       ],
       "paths": {
-        "@angular/fire": ["dist/packages-dist"],
-        "@angular/fire/*": ["dist/packages-dist/*"]
+        "@angular/fire": ["./dist/packages-dist"],
+        "@angular/fire/*": ["./dist/packages-dist/*"]
       }
     }
   }
