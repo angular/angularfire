@@ -1,4 +1,4 @@
-import { ComponentFactoryResolver, Injectable, NgZone, OnDestroy, Optional } from '@angular/core';
+import { Injectable, NgZone, OnDestroy, Optional } from '@angular/core';
 import { VERSION } from '@angular/fire';
 import { ɵscreenViewEvent } from '@angular/fire/analytics';
 import { Title } from '@angular/platform-browser';
@@ -20,14 +20,13 @@ export class ScreenTrackingService implements OnDestroy {
     analytics: AngularFireAnalytics,
     @Optional() router: Router,
     @Optional() title: Title,
-    componentFactoryResolver: ComponentFactoryResolver,
     zone: NgZone,
     @Optional() userTrackingService: UserTrackingService,
   ) {
     firebase.registerVersion('angularfire', VERSION.full, 'compat-screen-tracking');
     if (!router || !analytics) { return this; }
     zone.runOutsideAngular(() => {
-      this.disposable = ɵscreenViewEvent(router, title, componentFactoryResolver).pipe(
+      this.disposable = ɵscreenViewEvent(router, title).pipe(
           switchMap(async params => {
             if (userTrackingService) {
               await userTrackingService.initialized;
