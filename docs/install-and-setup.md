@@ -4,10 +4,8 @@
 
 - **Firebase CLI**
   - Setup uses the Firebase CLI (`firebase-tools`). Install it with `npm install -g firebase-tools`, then run `firebase login`. If `ng add` can't find a copy, it installs the newest version for you.
-  - Run `ng add` yourself, not through an AI agent.
-    - In AngularFire 21.0.0-rc.1 and earlier, `ng add` run by an agent with firebase-tools 15.26 or later stops after you choose features, with `Cannot read properties of undefined (reading 'email')`.
-    - If it already stopped, run `ng add @angular/fire@next` again yourself. The stopped run leaves only an empty `firebase.json`, which the second run reuses.
   - A copy older than 14 stops setup with `firebase-tools version 14.0.0+ is required, please upgrade and run again`, and `ng add` does not upgrade a copy you already have.
+  - If `ng add` stops before finishing, run it again. A stopped run leaves only an empty `firebase.json`, which the next run reuses.
 - **npm 11.6 or later**, if you use npm. Older versions, including the npm 10 that ships with Node.js 20 and 22, cannot install a new Angular 21 project ([npm/cli#9787](https://github.com/npm/cli/issues/9787), `Cannot read properties of null (reading 'edgesOut')`). Update with `npm install -g npm@11`.
   - If it already failed, delete the project folder it left behind before running the command again.
 - **Harmless CLI noise.** The Firebase CLI may print a `punycode` deprecation warning or ask about enabling extra features (for example Gemini) during setup. These come from the CLI, not from AngularFire, and are safe to ignore.
@@ -39,10 +37,8 @@ These commands set up an Angular 21 project, the version AngularFire 21 supports
 
 ### 2. Install AngularFire and Firebase
 
-AngularFire 21 is currently a release candidate, published under the `next` tag:
-
 ```bash
-ng add @angular/fire@next
+ng add @angular/fire
 ```
 
 This installs AngularFire and configures your project. `ng add` will:
