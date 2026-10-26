@@ -62,7 +62,27 @@ import { field, execute } from '@angular/fire/firestore/pipelines';
 import { field as liteField, execute as liteExecute } from '@angular/fire/firestore/lite/pipelines';
 ```
 
-Choose the Lite path when using Firestore Lite. See Firebase's guides for [getting started with pipelines](https://firebase.google.com/docs/firestore/pipelines/get-started-with-pipelines?hl=en) and [performing joins with sub-pipelines](https://firebase.google.com/docs/firestore/pipelines/perform-joins-with-sub-pipelines).
+Choose the Lite path when using Firestore Lite. Inject `Firestore`, create a pipeline with `firestore.pipeline()`, then pass it to `execute()`:
+
+```ts
+import { inject } from '@angular/core';
+import { Firestore } from '@angular/fire/firestore/lite';
+import { execute, field, greaterThan } from '@angular/fire/firestore/lite/pipelines';
+
+class BooksComponent {
+  private firestore = inject(Firestore);
+
+  loadBooks() {
+    const pipeline = this.firestore.pipeline()
+      .collection('books')
+      .where(field('rating').greaterThan(4.5));
+
+    return execute(pipeline);
+  }
+}
+```
+
+Pipelines require a Firestore Enterprise edition database. Standard edition is limited to Firestore Core operations. See Firebase's [edition comparison](https://firebase.google.com/docs/firestore/compare-editions-for-native-mode), [getting started with pipelines](https://firebase.google.com/docs/firestore/pipelines/get-started-with-pipelines?hl=en), and [performing joins with sub-pipelines](https://firebase.google.com/docs/firestore/pipelines/perform-joins-with-sub-pipelines).
 
 ### Reading data
 
