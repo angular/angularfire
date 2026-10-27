@@ -1,6 +1,6 @@
 import { spawn } from 'cross-spawn';
-import { copy, writeFile } from 'fs-extra';
-import { join, sep } from 'path';
+import { copy, readJson, writeFile } from 'fs-extra';
+import { join, resolve, sep } from 'path';
 import { keys as tsKeys } from 'ts-transformer-keys';
 import * as esbuild from "esbuild";
 import type { ReplaceResult } from 'replace-in-file';
@@ -256,6 +256,7 @@ ${exportedZoneWrappedFns}
       collection: { exportName: 'collectionSnapshots' },
     }),
     reexport('firestore', 'firebase', 'firebase/firestore', tsKeys<typeof import('firebase/firestore')>(), firestoreOverrides),
+    reexport('firestore/pipelines', 'firebase', 'firebase/firestore/pipelines', tsKeys<typeof import('firebase/firestore/pipelines')>()),
     reexport('functions', 'rxfire', 'rxfire/functions', ["httpsCallable"], {
       httpsCallable: { exportName: 'httpsCallableData' },
     }),
@@ -301,6 +302,7 @@ ${exportedZoneWrappedFns}
       collection: { exportName: 'collectionSnapshots' },
     }),
     reexport('firestore/lite', 'firebase', 'firebase/firestore/lite', tsKeys<typeof import('firebase/firestore/lite')>(), firestoreOverrides),
+    reexport('firestore/lite/pipelines', 'firebase', 'firebase/firestore/lite/pipelines', tsKeys<typeof import('firebase/firestore/lite/pipelines')>()),
   ]).then(failOnUnrecognizedOverrides);
 }
 
@@ -392,7 +394,6 @@ const externalPackages = [
   "@angular-devkit/core",
   "rxjs",
   "@schematics/angular",
-  "jsonc-parser",
   "firebase-tools",
   "typescript"
 ];
@@ -401,6 +402,17 @@ const externalPackages = [
  * schematics cannot load with any version of the package that has one. */
 const exportedSubpaths = ['@angular-devkit/schematics/tasks', '@schematics/angular/utility', 'rxjs/operators'];
 const isPackageSubpath = (path: string) => externalPackages.some(name => path.startsWith(`${name}/`));
+
+/* The Angular CLI runs schematics through a loader that supplies @angular-devkit/* and
+ * @schematics/* from its own copy, so the published manifest does not declare them. The deploy
+ * builder is loaded by @angular-devkit/architect without that loader, so every package its bundles
+ * require must be declared in src/package.json. */
+const builderEntryPoints = schematicEntryPoints.filter(([first]) => first === 'deploy');
+// The installed @types/node predates module.isBuiltin, so the list is read untyped.
+const nodeModule: { builtinModules: string[] } = require('module');
+const isNodeBuiltin = (importPath: string) => nodeModule.builtinModules.includes(importPath.replace(/^node:/, ''));
+const packageNameOf = (importPath: string) =>
+  importPath.split('/').slice(0, importPath.startsWith('@') ? 2 : 1).join('/');
 
 async function compileSchematics() {
   const { metafile } = await esbuild.build({
@@ -415,7 +427,10 @@ async function compileSchematics() {
     platform: "node",
     target: "es2016",
     external: externalPackages,
-    alias: { "@angular-devkit/schematics/tasks/index.js": "@angular-devkit/schematics/tasks" },
+    alias: {
+      "@angular-devkit/schematics/tasks/index.js": "@angular-devkit/schematics/tasks",
+      "jsonc-parser": "jsonc-parser/lib/esm/main.js",
+    },
     outdir: dest('schematics'),
     metafile: true,
   });
@@ -429,6 +444,35 @@ async function compileSchematics() {
   if (unlistedSubpaths.length) {
     const required = unlistedSubpaths.map(subpath => `\n  ${subpath}, imported by ${importersBySubpath.get(subpath)?.join(', ')}`);
     throw new Error(`The schematics require package paths that exportedSubpaths does not list:${required.join('')}\nAdd an alias in compileSchematics to a path the package exports, or, if the exports map in the newest published version lists the path (npm view <package>@next exports), add it to exportedSubpaths.`);
+  }
+  /* Every package the deploy builder bundles require at run time must be a dependency or peer of
+   * the published package (src/package.json), because nothing else resolves them for the builder. */
+  const publishedManifest = await readJson(src('package.json'));
+  const declaredPackages = new Set([
+    ...Object.keys(publishedManifest.dependencies ?? {}),
+    ...Object.keys(publishedManifest.peerDependencies ?? {}),
+  ]);
+  const undeclaredInBuilder: string[] = [];
+  for (const segments of builderEntryPoints) {
+    /* Find the bundle esbuild wrote for this entry point. The metafile records entry points
+     * relative to the working directory, so compare absolute paths. */
+    const entryFile = `${src('schematics', ...segments)}.ts`;
+    const outputs = Object.entries(metafile.outputs)
+      .filter(([, output]) => output.entryPoint && resolve(output.entryPoint) === entryFile);
+    if (outputs.length !== 1) {
+      throw new Error(`Expected exactly one bundle for ${join(...segments)}, found ${outputs.length}. The builder dependency check cannot run.`);
+    }
+    /* The bundle's `imports` are the requires esbuild left in place (the externals). Each one must
+     * be a Node builtin or belong to a declared package. */
+    const [file, output] = outputs[0];
+    for (const entry of output.imports) {
+      if (entry.external && !isNodeBuiltin(entry.path) && !declaredPackages.has(packageNameOf(entry.path))) {
+        undeclaredInBuilder.push(`\n  ${file} requires ${entry.path}`);
+      }
+    }
+  }
+  if (undeclaredInBuilder.length) {
+    throw new Error(`The deploy builder bundles require packages that src/package.json does not declare:${undeclaredInBuilder.join('')}\n@angular-devkit/architect loads the builder outside the Angular CLI's schematic loader, which supplies @angular-devkit/* and @schematics/* to schematics only. Declare the package in src/package.json, or remove the import from the builder's import graph (a module-level import in a shared file is enough to pull it in).`);
   }
   await Promise.all([
     copy(src('schematics', 'versions.json'), dest('schematics', 'versions.json')),

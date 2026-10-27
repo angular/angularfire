@@ -13,7 +13,6 @@
 
 import { existsSync, readFileSync } from 'fs';
 import { dirname, join } from 'path';
-import { SchematicsException } from '@angular-devkit/schematics';
 import { parse as parseJsonWithComments } from 'jsonc-parser';
 
 /**
@@ -102,7 +101,7 @@ export const workspaceRootFor = (startDirectory: string): string => {
 export const assertSafeDependencyName = (name: string, source: string): string => {
   if (typeof name !== 'string' || name.length === 0 || name.startsWith('-') ||
       /[\s;&|$`(){}<>!\\'"]/.test(name)) {
-    throw new SchematicsException(`Invalid dependency name ${JSON.stringify(name)} ${source}.`);
+    throw new Error(`Invalid dependency name ${JSON.stringify(name)} ${source}.`);
   }
   return name;
 };
