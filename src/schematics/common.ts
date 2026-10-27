@@ -72,22 +72,20 @@ export const addDependencies = (
   overwriteIfExists(host, 'package.json', stringifyFormatted(packageJson));
 };
 
-/* Must stay identical to `dependencies.firebase` in `src/package.json`: if the two drift, the
- * alignment below can pin workspaces outside the range the library actually installs against,
- * re-creating duplicate-SDK trees. */
+/* Must stay identical to `peerDependencies.firebase` in `src/package.json`: if the two drift, the
+ * alignment below writes a range the peer dependency then rejects. */
 export const firebaseVersionRange = '^12.18.0';
 
 /**
  * Aligns the workspace's `firebase` entry with the range `@angular/fire` requires.
  *
- * `@angular/fire` bundles its own `firebase` dependency, so a workspace pinned to an older
- * major never conflicts at install time; npm silently nests a second SDK copy under
- * `@angular/fire`, and the two copies reject each other's objects at runtime (#3684, #3681,
- * #3682). Rewriting the workspace's range before the install runs is the only point where
- * that class of breakage can be headed off.
+ * `firebase` is a peer dependency of `@angular/fire`. Depending on the package manager and its
+ * settings, a workspace range outside it is refused at install time or installs a `firebase`
+ * the library was not built against, and a workspace that never declared `firebase` gets no
+ * entry written. Rewriting the entry before the install runs heads both off.
  *
  * Returns whether `package.json` was modified, so callers can skip scheduling an install
- * when nothing changed (`ng update` re-runs the v21 migration on rc-to-stable updates).
+ * when nothing changed (`ng update` re-runs a migration on rc-to-stable updates).
  */
 export const alignFirebaseVersion = (
   host: Tree,
@@ -119,8 +117,8 @@ export const alignFirebaseVersion = (
     } catch (_) {
       context.logger.warn(
         `⚠️ The firebase version in your package.json (${declaredFirebaseVersion}) is not a semver ` +
-        `range, so it was left as-is; make sure it resolves inside ${firebaseVersionRange}, the ` +
-        'range @angular/fire requires; a version outside it can leave the install with two copies of the firebase SDK.'
+        `range, so it was left as-is. Make sure it resolves inside ${firebaseVersionRange}, the ` +
+        'range @angular/fire requires. A version outside it either fails to install or installs a firebase that @angular/fire was not built against.'
       );
       continue;
     }
@@ -128,8 +126,8 @@ export const alignFirebaseVersion = (
     packageJson[section].firebase = firebaseVersionRange;
     context.logger.info(
       `Updated the firebase version in your package.json from ${declaredFirebaseVersion} to ` +
-      `${firebaseVersionRange}, the range @angular/fire requires; a workspace range outside it ` +
-      'can leave the install with a second copy of the firebase SDK, which fails at runtime.'
+      `${firebaseVersionRange}, the range @angular/fire requires. A range outside it either fails ` +
+      'to install or installs a firebase that @angular/fire was not built against.'
     );
     changed = true;
   }

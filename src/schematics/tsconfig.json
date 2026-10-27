@@ -5,6 +5,7 @@
         "inlineSources": false,
         "declaration": false,
         "removeComments": true,
+        "strict": false,
         "strictNullChecks": true,
         "resolveJsonModule": true,
         "esModuleInterop": true,
@@ -16,9 +17,9 @@
             "es2015.iterable"
         ],
         "skipLibCheck": true,
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "target": "es2018",
-        "module": "commonjs",
+        "module": "preserve",
         "outDir": "../../dist/packages-dist/schematics"
     },
     "files": [
@@ -28,5 +29,6 @@
         "setup/index.ts",
         "update/v7/index.ts",
         "update/v21/index.ts",
+        "update/v22/index.ts",
     ]
 }

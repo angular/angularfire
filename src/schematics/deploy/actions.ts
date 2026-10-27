@@ -273,6 +273,10 @@ const getPackageJson = (context: BuilderContext, workspaceRoot: string, options:
   return defaultPackage(dependencies, devDependencies, options, main);
 };
 
+export const CLOUD_FUNCTIONS_DEPRECATION = `⚠️ Deploying server-side rendering to Cloud Functions with ng deploy is deprecated in AngularFire 22 and will be removed in AngularFire 23.
+Deploy server-rendered apps with Firebase App Hosting instead: https://firebase.google.com/docs/app-hosting
+AngularFire's guide: https://github.com/angular/angularfire/blob/main/docs/app-hosting.md`;
+
 export const deployToFunction = async (
   firebaseTools: FirebaseTools,
   context: BuilderContext,
@@ -560,6 +564,8 @@ export default async function deploy(
   firebaseToken?: string,
 ) {
   const legacyNgDeploy = !options.version || options.version < 2;
+  const deploysToCloudRun = legacyNgDeploy && !!serverBuildTarget && options.ssr === 'cloud-run';
+  const deploysToCloudFunctions = legacyNgDeploy && !!serverBuildTarget && !deploysToCloudRun;
 
   if (!firebaseToken && !process.env.GOOGLE_APPLICATION_CREDENTIALS) {
     if (!await isSignedIn(firebaseTools)) {
@@ -579,10 +585,9 @@ export default async function deploy(
     console.log(`Using Google Application Credentials.`);
   }
 
-  if (legacyNgDeploy) {
-    console.error(`Legacy ng-deploy Firebase is deprecated.
-Please migrate to Firebase Hosting's integration with Angular https://firebase.google.com/docs/hosting/frameworks/angular
-or the new Firebase App Hosting product https://firebase.google.com/docs/app-hosting`);
+  // Before the build, so a failed or interrupted build still displays the warning.
+  if (deploysToCloudFunctions) {
+    context.logger.warn(CLOUD_FUNCTIONS_DEPRECATION);
   }
 
   if (prerenderBuildTarget) {
@@ -649,28 +654,26 @@ or the new Firebase App Hosting product https://firebase.google.com/docs/app-hos
 
   firebaseTools.logger.logger.add(logger);
 
-  if (legacyNgDeploy && serverBuildTarget) {
-    if (options.ssr === 'cloud-run') {
-      await deployToCloudRun(
-        firebaseTools,
-        context,
-        context.workspaceRoot,
-        staticBuildTarget,
-        serverBuildTarget,
-        options,
-        firebaseToken,
-      );
-    } else {
-      await deployToFunction(
-        firebaseTools,
-        context,
-        context.workspaceRoot,
-        staticBuildTarget,
-        serverBuildTarget,
-        options,
-        firebaseToken,
-      );
-    }
+  if (deploysToCloudRun) {
+    await deployToCloudRun(
+      firebaseTools,
+      context,
+      context.workspaceRoot,
+      staticBuildTarget,
+      serverBuildTarget,
+      options,
+      firebaseToken,
+    );
+  } else if (deploysToCloudFunctions) {
+    await deployToFunction(
+      firebaseTools,
+      context,
+      context.workspaceRoot,
+      staticBuildTarget,
+      serverBuildTarget,
+      options,
+      firebaseToken,
+    );
   } else {
     await deployToHosting(
       firebaseTools,

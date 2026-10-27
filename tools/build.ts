@@ -3,6 +3,7 @@ import { copy, writeFile } from 'fs-extra';
 import { join, sep } from 'path';
 import { keys as tsKeys } from 'ts-transformer-keys';
 import * as esbuild from "esbuild";
+import type { ReplaceResult } from 'replace-in-file';
 
 enum LogLevel {
   "WARN" = 1,
@@ -320,7 +321,7 @@ async function replacePackageCoreVersion() {
     from: 'ANGULARFIRE2_VERSION',
     to: root.version
   });
-  if (!replacements.some(replacement => replacement.hasChanged)) {
+  if (!replacements.some((replacement: ReplaceResult) => replacement.hasChanged)) {
     throw new Error('No ANGULARFIRE2_VERSION placeholder found in the built package.json, so the package would ship with the placeholder as its version.');
   }
   return replacements;
@@ -336,7 +337,7 @@ async function writeVersionOverPlaceholder(root: { version: string }) {
     // Zero matches should reach the guard below, not replace-in-file's generic rejection.
     allowEmptyPaths: true,
   });
-  if (!replacements.some(replacement => replacement.hasChanged)) {
+  if (!replacements.some((replacement: ReplaceResult) => replacement.hasChanged)) {
     throw new Error('No ANGULARFIRE2_VERSION placeholder found in the compiled schematics — the version pin would ship disabled.');
   }
 }
@@ -384,6 +385,7 @@ const schematicEntryPoints = [
   ['setup', 'index'],
   ['update', 'v7', 'index'],
   ['update', 'v21', 'index'],
+  ['update', 'v22', 'index'],
 ];
 
 const externalPackages = [

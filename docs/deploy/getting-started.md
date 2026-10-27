@@ -1,6 +1,6 @@
 # Deploy your application on Firebase Hosting & Functions
 
-> **This page is out of date.** It describes a setup flow that `ng add @angular/fire` no longer performs, and wiring the deploy target by hand from the samples below puts you on a deprecated path that warns on every deploy. For current guidance see [the Quickstart](../install-and-setup.md), step 6, and for server-side rendered apps see the [App Hosting guide](../app-hosting.md).
+> **This page is out of date.** It describes a setup flow that `ng add @angular/fire` no longer performs. Deploying server-side rendering to Cloud Functions with `ng deploy` (a deploy target with `ssr: true`, and the `functionsRuntimeOptions` and `CF3v2` options only it reads) is deprecated in AngularFire 22 and will be removed in AngularFire 23. Hosting-only deploys (`ssr` absent or `false`) are not deprecated. For current guidance see [the Quickstart](../install-and-setup.md), step 6, and for server-side rendered apps see the [App Hosting guide](../app-hosting.md).
 
 In this guide, we'll look at how to use `@angular/fire` to automatically deploy an Angular application to Firebase hosting or functions by using the Angular CLI.
 
