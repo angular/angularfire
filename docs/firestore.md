@@ -53,6 +53,44 @@ Update the imports from `import { ... } from 'firebase/firestore'` to `import { 
 
 [Getting Started](https://firebase.google.com/docs/firestore/quickstart#web-modular-api) | [API Reference](https://firebase.google.com/docs/reference/js/firestore)
 
+### Pipeline operations
+
+Firestore Pipeline operations are available from dedicated entrypoints:
+
+```ts
+import { field, execute } from '@angular/fire/firestore/pipelines';
+import { field as liteField, execute as liteExecute } from '@angular/fire/firestore/lite/pipelines';
+```
+
+Choose the Lite path when using Firestore Lite. Inject `Firestore`, create a pipeline with `firestore.pipeline()`, then pass it to `execute()`:
+
+```ts
+import { inject, Component } from '@angular/core';
+import { Firestore } from '@angular/fire/firestore/lite';
+import { execute, field, greaterThan } from '@angular/fire/firestore/lite/pipelines';
+
+@Component({ ... })
+class BooksComponent {
+  private firestore = inject(Firestore);
+
+  loadBooks() {
+    // Method Chaining
+    const pipeline = this.firestore.pipeline()
+      .collection('books')
+      .where(field('rating').greaterThan(4.5));
+
+    // Functional Approach
+    const pipeline = this.firestore.pipeline()
+      .collection('books')
+      .where(greaterThan(field('rating'), 4.5));
+
+    return execute(pipeline);
+  }
+}
+```
+
+Pipelines require a Firestore Enterprise edition database. Standard edition is limited to Firestore Core operations. See Firebase's [edition comparison](https://firebase.google.com/docs/firestore/compare-editions-for-native-mode), [getting started with pipelines](https://firebase.google.com/docs/firestore/pipelines/get-started-with-pipelines?hl=en), and [performing joins with sub-pipelines](https://firebase.google.com/docs/firestore/pipelines/perform-joins-with-sub-pipelines).
+
 ### Reading data
 
 In Cloud Firestore data is stored in `documents` and `documents` are stored in `collections`. The path to data follows `<collection_name>/<document_id>` and continues if there are subcollections. For example, `"users/ABC12345/posts/XYZ6789"` represents:
