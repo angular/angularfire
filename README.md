@@ -5,7 +5,7 @@ AngularFire smooths over the rough edges an Angular developer might encounter wh
 [Firebase JS SDK](https://github.com/firebase/firebase-js-sdk) & aims to provide a more natural developer experience
 by conforming to Angular conventions.
 
-<strong><pre>ng add @angular/fire@next</pre></strong>
+<strong><pre>ng add @angular/fire</pre></strong>
 
 - **Dependency injection** - Provide and Inject Firebase services in your components.
 - **Zone.js wrappers** - Stable zones allow proper functionality of service workers, forms, SSR, and pre-rendering.
@@ -74,6 +74,8 @@ export class App {
 [Upgrading from v6.0? Check out our guide.](docs/version-7-upgrade.md)
 
 [Upgrading from AngularFire 20? See the v21 upgrade guide.](docs/version-21-upgrade.md)
+
+[Upgrading from AngularFire 21? See the v22 upgrade guide.](docs/version-22-upgrade.md)
 
 ### Sample app
 

@@ -5,8 +5,6 @@
   },
   "dest": "../dist/packages-dist",
   "allowedNonPeerDependencies": [
-    "@angular-devkit/architect", "@angular-devkit/core",
-    "@angular-devkit/schematics", "@schematics/angular",
-    "jsonc-parser", "firebase", "rxfire"
+    "@angular-devkit/architect", "rxfire"
   ]
 }
