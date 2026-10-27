@@ -1,7 +1,7 @@
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { getFirebaseTools } from '../firebaseTools';
+import { getFirebaseProjectNameFromFs } from '../firebaserc';
 import { BuildTarget } from '../interfaces';
-import { getFirebaseProjectNameFromFs } from '../utils';
 import deploy, { DeployBuilderOptions } from './actions';
 
 // Call the createBuilder() function to create a builder. This mirrors
