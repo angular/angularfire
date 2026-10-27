@@ -1,10 +1,10 @@
 import { Component, EnvironmentInjector, inject, makeStateKey, OnDestroy, PLATFORM_ID, runInInjectionContext, TransferState } from '@angular/core';
-import { Auth, signInAnonymously, signOut, User } from '@angular/fire/auth';
+import { Auth, beforeAuthStateChanged, signInAnonymously, signOut, User } from '@angular/fire/auth';
 import { map, startWith, switchMap, tap } from 'rxjs/operators';
 import { AsyncPipe, isPlatformBrowser, isPlatformServer } from '@angular/common';
 import cookies from 'js-cookie';
 import { from, Observable } from 'rxjs';
-import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, beforeAuthStateChanged, onIdTokenChanged } from "firebase/auth";
+import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, onIdTokenChanged } from "firebase/auth";
 import { ɵzoneWrap } from "@angular/fire";
 
 // TODO bring this to RxFire
