@@ -93,8 +93,8 @@ Add the cookie sync to your `app.config.ts`. AngularFire's `idToken` observable 
 import { DestroyRef, PLATFORM_ID, inject, provideAppInitializer } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Auth, idToken } from '@angular/fire/auth';
-import { beforeAuthStateChanged } from 'firebase/auth';
+// on AngularFire 20.1.0 and earlier, or 21.0.0-rc.0 and rc.1, import beforeAuthStateChanged from firebase/auth (see note below)
+import { Auth, beforeAuthStateChanged, idToken } from '@angular/fire/auth';
 import cookies from 'js-cookie';
 
 // add to appConfig.providers
@@ -151,9 +151,9 @@ This cookie carries a short-lived ID token that scripts on your page can read. F
 
 If you need a session the browser cannot read, use Firebase's [session cookies](https://firebase.google.com/docs/auth/admin/manage-cookies) with the Admin SDK instead. Those cannot be handed to `initializeServerApp`, so that approach means verifying the cookie yourself and building your own server-side Auth context.
 
-#### `beforeAuthStateChanged` from `firebase/auth`
+#### On AngularFire 20.1.0 and earlier, or 21.0.0-rc.0 and rc.1
 
-One import in the code above is deliberately different from the rest of this guide. `beforeAuthStateChanged` comes from `firebase/auth` rather than `@angular/fire/auth`. In AngularFire 21.0.0-rc.1 and earlier, AngularFire's version keeps the app marked as busy until its callback first runs, and this callback only runs when someone signs in or out ([#3748](https://github.com/angular/angularfire/issues/3748)).
+On these releases, import `beforeAuthStateChanged` from `firebase/auth` instead of `@angular/fire/auth`. Otherwise it keeps the app marked as busy until its callback first runs, and this callback only runs when someone signs in or out ([#3748](https://github.com/angular/angularfire/issues/3748)). The fix shipped in AngularFire 20.1.1 and 21.0.0-rc.2.
 
 ### 3. Pass the cookie into the render
 

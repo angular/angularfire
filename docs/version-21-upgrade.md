@@ -77,6 +77,8 @@ Two symbols were removed rather than renamed. The migration leaves their imports
 
 - `VertexAIOptions`: the new `AIOptions` takes a `backend` instead of a `location`, so rebuild the options by hand using the table above.
 - `getImagenModel`: Firebase shut the Imagen models down in August 2026 and removed the API in firebase 12.18 (`@firebase/ai` 2.15), so move image generation to the Gemini image models through [`getGenerativeModel`](https://firebase.google.com/docs/ai-logic/generate-images-gemini).
+  - The same release removed every other `Imagen*` export too, such as `ImagenModel`, `ImagenAspectRatio` and `ImagenGenerationConfig`.
+  - The migration does not warn about those. It warns about `getImagenModel` only in files that imported an old Vertex AI entry point, so check imports from `@angular/fire/ai` and `firebase/ai` by hand.
 
 ## Other notes
 
