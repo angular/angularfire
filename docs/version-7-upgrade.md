@@ -18,7 +18,7 @@ AngularFire v7.0 has a compatibility layer that supports the AngularFire v6.0 AP
 
 While not as tree-shakable as the new modular SDK, this allows you to upgrade and take advantage of the benefits of the new SDK ASAP.
 
-**Most developers can stop here for now as the new API isn't feature complete.**
+**You can stop here if the compatibility API covers your needs.** It stays supported and receives bug fixes, but new features land in the modular API only. See [the compatibility guide's support status](compat.md#support-status).
 
 ## **NEW** Modular SDK
 
