@@ -65,17 +65,24 @@ import { field as liteField, execute as liteExecute } from '@angular/fire/firest
 Choose the Lite path when using Firestore Lite. Inject `Firestore`, create a pipeline with `firestore.pipeline()`, then pass it to `execute()`:
 
 ```ts
-import { inject } from '@angular/core';
+import { inject, Component } from '@angular/core';
 import { Firestore } from '@angular/fire/firestore/lite';
 import { execute, field, greaterThan } from '@angular/fire/firestore/lite/pipelines';
 
+@Component({ ... })
 class BooksComponent {
   private firestore = inject(Firestore);
 
   loadBooks() {
+    // Method Chaining
     const pipeline = this.firestore.pipeline()
       .collection('books')
       .where(field('rating').greaterThan(4.5));
+
+    // Functional Approach
+    const pipeline = this.firestore.pipeline()
+      .collection('books')
+      .where(greaterThan(field('rating'), 4.5));
 
     return execute(pipeline);
   }
