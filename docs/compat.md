@@ -11,7 +11,9 @@ AngularFire has a new tree-shakable API, you're looking at the documentation for
 
 ### Support status
 
-The compatibility API (`@angular/fire/compat/*`) is supported and is kept working on every Angular and Firebase version AngularFire supports. Its specs run in the same test suite as the modular API, and it receives bug fixes. It does not receive new features: new Firebase products and new AngularFire features land in the modular API only. There is no planned removal date. If you depend on the compatibility API, you can keep upgrading AngularFire without migrating, and migrate when the modular API offers something you need.
+The compatibility API (`@angular/fire/compat/*`) is still supported. It gets bug fixes but no new features, which go into the modular API only. There are no plans to remove it, so you can keep upgrading AngularFire without migrating.
+
+Some of its tests are turned off right now: the ones for `AngularFirestoreCollection`, `AngularFirestoreCollectionGroup` and `AngularFirestoreDocument`, and one Cloud Storage upload test. Until [#3822](https://github.com/angular/angularfire/issues/3822) turns them back on, a bug in those APIs may not be caught before a release, so please report any you find.
 
 ### Monitor usage of your application in production
 
