@@ -56,3 +56,9 @@ An older version installs anyway with a warning (`has incorrect peer dependency 
 pnpm 8 and later install a missing `firebase` automatically. An older version installs anyway with a warning (`unmet peer firebase@^12.18.0: found 11.x` on pnpm 9 and 10, `Issues with peer dependencies found. Run "pnpm peers check" to list them.` on pnpm 11 and 12), and pnpm prints that warning only once, when it first resolves the tree, never on a later install from the committed lockfile.
 
 Set `strict-peer-dependencies=true` in `.npmrc` to make pnpm refuse the mismatch outright.
+
+## Fewer build-time packages
+
+`@angular/fire` no longer installs `@angular-devkit/schematics`, `@angular-devkit/core` or `@schematics/angular`. The Angular CLI supplies them when it runs `ng add` and `ng update`, so nothing changes for an Angular CLI or Nx workspace.
+
+If you run AngularFire's schematics with the standalone `schematics` command on pnpm with `hoist=false`, add those three packages to your own `package.json`.

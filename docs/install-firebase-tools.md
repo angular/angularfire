@@ -1,7 +1,5 @@
 # Firebase Tools Install and Setup
 
-> Setting up AngularFire? Run `ng add @angular/fire` yourself, not through an AI agent. In AngularFire 21.0.0-rc.1 and earlier, `ng add` run by an agent with firebase-tools 15.26 or later stops after you choose AngularFire features, with `Cannot read properties of undefined (reading 'email')`.
-
 ### 1. Install package
 
 ```bash
