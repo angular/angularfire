@@ -255,6 +255,7 @@ ${exportedZoneWrappedFns}
       collection: { exportName: 'collectionSnapshots' },
     }),
     reexport('firestore', 'firebase', 'firebase/firestore', tsKeys<typeof import('firebase/firestore')>(), firestoreOverrides),
+    reexport('firestore/pipelines', 'firebase', 'firebase/firestore/pipelines', tsKeys<typeof import('firebase/firestore/pipelines')>()),
     reexport('functions', 'rxfire', 'rxfire/functions', ["httpsCallable"], {
       httpsCallable: { exportName: 'httpsCallableData' },
     }),
@@ -300,6 +301,7 @@ ${exportedZoneWrappedFns}
       collection: { exportName: 'collectionSnapshots' },
     }),
     reexport('firestore/lite', 'firebase', 'firebase/firestore/lite', tsKeys<typeof import('firebase/firestore/lite')>(), firestoreOverrides),
+    reexport('firestore/lite/pipelines', 'firebase', 'firebase/firestore/lite/pipelines', tsKeys<typeof import('firebase/firestore/lite/pipelines')>()),
   ]).then(failOnUnrecognizedOverrides);
 }
 
