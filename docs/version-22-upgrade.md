@@ -74,5 +74,5 @@ Hosting-only deploys (`ssr` absent or `false`) and Cloud Run deploys (`ssr: 'clo
 - **Node.js 20 is not supported.** Angular 22 requires Node.js `^22.22.3 || ^24.15.0 || >=26.0.0`. Node.js 20 reached end of life on 2026-04-30.
 - **TypeScript 6.0 is required** (AngularFire 22 peers `typescript >=6.0 <6.1`). TypeScript 6 turns `strict` on by default, drops `downlevelIteration` and deprecates `baseUrl` and `moduleResolution: "node"`, so an app carrying those settings in its `tsconfig.json` may see new compiler errors that Angular's own update does not fix.
 - **Coming from a 21 release candidate** (`21.0.0-rc.0`, `rc.1` or `rc.2`), the v21 migration runs once more and reports "No changes made", because `21.0.0` lies between your version and `22.0.0`. That is expected.
-- **Coming from a 22 canary build.** A canary build was saved as an exact version in your `package.json`, so it does not move on its own. Run `ng update @angular/fire@next`.
+- **Coming from a 22 canary build.** On `22.0.0-canary.*`, run `ng update @angular/fire@next`. On `22.0.1-canary.*`, run `ng update @angular/fire@canary`.
 - **Screen tracking** (`ScreenTrackingService`) reads the routed component's selector through Angular's `reflectComponentType`, because `ComponentFactoryResolver` is gone from Angular 22. Nothing changes for your app.
