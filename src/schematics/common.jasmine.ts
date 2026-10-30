@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, readFileSync, rmdirSync, writeFileSync } from 'fs';
+import { lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmdirSync, unlinkSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { logging, normalize, virtualFs } from '@angular-devkit/core';
@@ -147,6 +147,16 @@ const treeWithFirebase = (firebaseVersion?: string, section = 'dependencies') =>
 const withInstalledFirebase = (tree: HostTree, version: string) => {
   tree.create('node_modules/firebase/package.json', JSON.stringify({ name: 'firebase', version }));
   return tree;
+};
+
+/* Not rmSync, which this repo's @types/node predates, and not rmdirSync's recursive option,
+ * which Node 26 removed. */
+const removeDirectory = (target: string) => {
+  for (const entry of readdirSync(target)) {
+    const entryPath = join(target, entry);
+    if (lstatSync(entryPath).isDirectory()) { removeDirectory(entryPath); } else { unlinkSync(entryPath); }
+  }
+  rmdirSync(target);
 };
 
 describe('alignFirebaseVersion', () => {
@@ -304,8 +314,7 @@ describe('alignFirebaseVersion', () => {
       expect(alignFirebaseVersion(tree, context)).toBeTrue();
       expect(dependenciesIn(tree).firebase).toBe(firebase13VersionRange);
     } finally {
-      // rmdirSync, not rmSync: this repo's @types/node predates fs.rmSync.
-      rmdirSync(repository, { recursive: true });
+      removeDirectory(repository);
     }
   });
 
