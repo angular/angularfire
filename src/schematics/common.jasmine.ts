@@ -1,8 +1,17 @@
-import { readFileSync } from 'fs';
-import { logging } from '@angular-devkit/core';
+import { mkdirSync, mkdtempSync, readFileSync, rmdirSync, writeFileSync } from 'fs';
+import { tmpdir } from 'os';
+import { join } from 'path';
+import { logging, normalize, virtualFs } from '@angular-devkit/core';
+import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { HostTree, SchematicContext } from '@angular-devkit/schematics';
 import { minVersion as semverMinVersion } from 'semver';
-import { alignFirebaseVersion, firebaseVersionRange, pinInstalledPrereleaseVersion } from './common.js';
+import {
+  alignFirebaseVersion,
+  firebase13VersionRange,
+  firebaseVersionRange,
+  pinInstalledPrereleaseVersion,
+  supportedFirebaseRange,
+} from './common.js';
 import 'jasmine';
 
 const context = { logger: new logging.Logger('test') } as unknown as SchematicContext;
@@ -135,6 +144,11 @@ const treeWithFirebase = (firebaseVersion?: string, section = 'dependencies') =>
   return tree;
 };
 
+const withInstalledFirebase = (tree: HostTree, version: string) => {
+  tree.create('node_modules/firebase/package.json', JSON.stringify({ name: 'firebase', version }));
+  return tree;
+};
+
 describe('alignFirebaseVersion', () => {
 
   it('rewrites a previous-major range', () => {
@@ -214,9 +228,116 @@ describe('alignFirebaseVersion', () => {
     expect(sectionIn(tree, 'devDependencies').firebase).toBe(firebaseVersionRange);
   });
 
+  it('leaves a firebase 13 range untouched', () => {
+    for (const declared of ['^13.0.0', '^13.1.0', '~13.1.0', supportedFirebaseRange]) {
+      const tree = treeWithFirebase(declared);
+      expect(alignFirebaseVersion(tree, context)).withContext(declared).toBeFalse();
+      expect(dependenciesIn(tree).firebase).withContext(declared).toBe(declared);
+    }
+  });
+
+  it('rewrites an out-of-range entry that starts at firebase 13 to the 13 range, not back to 12', () => {
+    for (const declared of ['>=13.0.0', '^13.0.0-20260929163754']) {
+      const tree = treeWithFirebase(declared);
+      expect(alignFirebaseVersion(tree, context)).withContext(declared).toBeTrue();
+      expect(dependenciesIn(tree).firebase).withContext(declared).toBe(firebase13VersionRange);
+    }
+  });
+
+  it('rewrites an out-of-range entry that reaches below firebase 13 to the 12 range when nothing is installed', () => {
+    for (const declared of ['*', '>=12.18.0']) {
+      const tree = treeWithFirebase(declared);
+      expect(alignFirebaseVersion(tree, context)).withContext(declared).toBeTrue();
+      expect(dependenciesIn(tree).firebase).withContext(declared).toBe(firebaseVersionRange);
+    }
+  });
+
+  it('adds the range of the firebase major already installed', () => {
+    for (const [installed, expected] of [['13.1.0', firebase13VersionRange], ['12.19.0', firebaseVersionRange]]) {
+      const tree = withInstalledFirebase(treeWithFirebase(undefined), installed);
+      expect(alignFirebaseVersion(tree, context)).withContext(installed).toBeTrue();
+      expect(dependenciesIn(tree).firebase).withContext(installed).toBe(expected);
+    }
+  });
+
+  it('rewrites an out-of-range entry to the range of the firebase major already installed', () => {
+    for (const [installed, expected] of [['13.1.0', firebase13VersionRange], ['12.19.0', firebaseVersionRange]]) {
+      const tree = withInstalledFirebase(treeWithFirebase('*'), installed);
+      expect(alignFirebaseVersion(tree, context)).withContext(installed).toBeTrue();
+      expect(dependenciesIn(tree).firebase).withContext(installed).toBe(expected);
+    }
+  });
+
+  it('falls back to the declared range when the installed firebase is outside both majors', () => {
+    for (const [installed, declared, expected] of [
+      ['11.10.0', '^11.0.0', firebaseVersionRange],
+      ['13.0.0-20260929163754', '^13.0.0-20260929163754', firebase13VersionRange],
+    ]) {
+      const tree = withInstalledFirebase(treeWithFirebase(declared), installed);
+      expect(alignFirebaseVersion(tree, context)).withContext(installed).toBeTrue();
+      expect(dependenciesIn(tree).firebase).withContext(installed).toBe(expected);
+    }
+  });
+
+  it('ignores an installed copy that the workspace entry excludes', () => {
+    for (const [installed, declared, expected] of [
+      ['13.1.0', '~12.10.0', firebaseVersionRange],
+      ['12.19.0', '>=13.0.0', firebase13VersionRange],
+    ]) {
+      const tree = withInstalledFirebase(treeWithFirebase(declared), installed);
+      expect(alignFirebaseVersion(tree, context)).withContext(declared).toBeTrue();
+      expect(dependenciesIn(tree).firebase).withContext(declared).toBe(expected);
+    }
+  });
+
+  it('finds firebase installed at a monorepo root above the workspace', () => {
+    const repository = mkdtempSync(join(tmpdir(), 'angularfire-monorepo-'));
+    try {
+      const workspace = join(repository, 'apps', 'web');
+      mkdirSync(workspace, { recursive: true });
+      mkdirSync(join(repository, 'node_modules', 'firebase'), { recursive: true });
+      writeFileSync(join(repository, 'node_modules', 'firebase', 'package.json'),
+        JSON.stringify({ name: 'firebase', version: '13.1.0', exports: { './package.json': './package.json' } }));
+      writeFileSync(join(workspace, 'package.json'), JSON.stringify({ name: 'web' }));
+      // The host `ng add` and `ng update` give a schematic: the real filesystem, scoped to the workspace.
+      const tree = new HostTree(new virtualFs.ScopedHost(new NodeJsSyncHost(), normalize(workspace)));
+      expect(alignFirebaseVersion(tree, context)).toBeTrue();
+      expect(dependenciesIn(tree).firebase).toBe(firebase13VersionRange);
+    } finally {
+      // rmdirSync, not rmSync: this repo's @types/node predates fs.rmSync.
+      rmdirSync(repository, { recursive: true });
+    }
+  });
+
+  it('ignores an installed firebase manifest it cannot read', () => {
+    const tree = treeWithFirebase(undefined);
+    tree.create('node_modules/firebase/package.json', 'not json');
+    expect(alignFirebaseVersion(tree, context)).toBeTrue();
+    expect(dependenciesIn(tree).firebase).toBe(firebaseVersionRange);
+  });
+
+  it('mentions the supported range when it rewrites an entry', () => {
+    const infoSpy = spyOn(context.logger, 'info');
+    alignFirebaseVersion(treeWithFirebase('^11.0.0'), context);
+    expect(infoSpy).toHaveBeenCalledWith(jasmine.stringContaining(supportedFirebaseRange));
+  });
+
   it('matches the firebase range the library declares as its peer dependency', () => {
     const libraryManifest = JSON.parse(readFileSync('src/package.json', 'utf8'));
-    expect(libraryManifest.peerDependencies.firebase).toBe(firebaseVersionRange);
+    expect(libraryManifest.peerDependencies.firebase).toBe(supportedFirebaseRange);
+  });
+
+  it('builds against the oldest firebase major the peer dependency accepts', () => {
+    /* tools/build.ts imports wrapped functions by name from the installed firebase, so building
+     * on a newer major can emit an import that the older major does not export. */
+    const rootManifest = JSON.parse(readFileSync('package.json', 'utf8'));
+    expect(semverMinVersion(rootManifest.dependencies.firebase)?.major)
+      .toBe(semverMinVersion(supportedFirebaseRange)?.major);
+  });
+
+  it('writes a range for exactly the majors the peer dependency accepts', () => {
+    expect(supportedFirebaseRange.split('||').map(range => range.trim()).sort())
+      .toEqual([firebaseVersionRange, firebase13VersionRange].sort());
   });
 
   it('is a no-op when run a second time', () => {
