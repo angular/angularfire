@@ -14,12 +14,15 @@ import {
   SchedulerAction,
   SchedulerLike,
   Subscription,
-  asyncScheduler,
   queueScheduler
 } from 'rxjs';
+import { AsapAction } from 'rxjs/internal/scheduler/AsapAction';
+import { AsapScheduler } from 'rxjs/internal/scheduler/AsapScheduler';
 import { observeOn, subscribeOn } from 'rxjs/operators';
 
 declare const Zone: {current: unknown} | undefined;
+
+const microtaskScheduler = new AsapScheduler(AsapAction);
 
 export enum LogLevel {
   "SILENT" = 0, 
@@ -57,9 +60,11 @@ export class ɵZoneScheduler implements SchedulerLike {
       }
     };
 
-    // Scheduling itself needs to be run in zone to ensure setInterval calls for async scheduling are done
-    // inside the correct zone. This scheduler needs to schedule asynchronously always to ensure that
-    // firebase emissions are never synchronous. Specifying a delay causes issues with the queueScheduler delegate.
+    /* Delivery re-enters the target zone through runGuarded above, whatever zone the delegate's
+     * microtask or timer runs in. The delegate must always schedule asynchronously, so firebase
+     * emissions are never synchronous, and with the asap delegate a positive delay falls back to a
+     * timer, so callers must keep the delay at zero to keep microtask delivery. Specifying a delay
+     * causes issues with the queueScheduler delegate. */
     return this.delegate.schedule(workInZone, delay, state);
   }
 }
@@ -79,7 +84,7 @@ export class ɵAngularFireSchedulers {
     this.insideAngular = ngZone.run(
       () => new ɵZoneScheduler(
         typeof Zone === 'undefined' ? undefined : Zone.current,
-        asyncScheduler
+        microtaskScheduler
       )
     );
   }
