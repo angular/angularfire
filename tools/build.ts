@@ -164,6 +164,8 @@ ${exportedZoneWrappedFns}
     reexport('app', 'firebase', 'firebase/app', tsKeys<typeof import('firebase/app')>()),
     reexport('app-check', 'firebase', 'firebase/app-check', tsKeys<typeof import('firebase/app-check')>(), {
       getLimitedUseToken: { logLevel: LogLevel.VERBOSE },
+      // The callback runs only once a token is obtained, which a first visit may never request: `blockUntilFirst: false` otherwise `ApplicationRef.isStable` may never become `true`.
+      onTokenChanged: { blockUntilFirst: false, logLevel: LogLevel.WARN },
     }),
     reexport('auth', 'rxfire', 'rxfire/auth', tsKeys<typeof import('rxfire/auth')>()),
     reexport('auth', 'firebase', 'firebase/auth', tsKeys<typeof import('firebase/auth')>(), {
@@ -278,7 +280,10 @@ ${exportedZoneWrappedFns}
       getBoolean: { exportName: 'getBooleanChanges' },
       getAll: { exportName: 'getAllChanges' },
     }),
-    reexport('remote-config', 'firebase', 'firebase/remote-config', tsKeys<typeof import('firebase/remote-config')>()),
+    reexport('remote-config', 'firebase', 'firebase/remote-config', tsKeys<typeof import('firebase/remote-config')>(), {
+      // The observer runs only when a fetched template differs from the active one, which a normal load never produces.
+      onConfigUpdate: { blockUntilFirst: false, logLevel: LogLevel.WARN },
+    }),
     reexport('storage', 'rxfire', 'rxfire/storage', tsKeys<typeof import('rxfire/storage')>(), {
       getDownloadURL: null,
       getMetadata: null,
