@@ -200,10 +200,7 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, logLevel
         () => {
           const removeTask = pendingTasks.add();
           return new Promise((resolve, reject) => {
-            ret.then(
-              (it) => runInInjectionContext(injector, () => run(() => resolve(it))),
-              (reason) => runInInjectionContext(injector, () => run(() => reject(reason)))
-            ).finally(removeTask);
+            ret.then(resolve, reject).finally(removeTask);
         });
       });
     } else if (typeof ret === 'function' && taskDone) {

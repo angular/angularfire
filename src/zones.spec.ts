@@ -49,6 +49,10 @@ function fakeDataConnectSubscribe(observer: FakeDataConnectObserver): () => void
   return () => clearTimeout(timer);
 }
 
+function fakeAsyncCall(): Promise<string> {
+  return new Promise(resolve => setTimeout(() => resolve('done'), 20));
+}
+
 const flushTimers = () => new Promise<void>(resolve => setTimeout(resolve, 10));
 
 const waitFor = async (condition: () => boolean, timeoutMs = 500) => {
@@ -238,6 +242,13 @@ function describeZoneWrap(zoneJs: boolean) {
       await waitFor(() => releases.count === 1);
       expect(releases.count).toBe(1);
       expect(lastHandlerError).toEqual(new Error('handler failed'));
+    });
+
+    it('settles a wrapped promise even when it resolves after the injector is destroyed', async () => {
+      const wrapped = ɵzoneWrap(fakeAsyncCall, true);
+      const promise = TestBed.runInInjectionContext(() => wrapped());
+      TestBed.resetTestingModule();
+      await expectAsync(promise).toBeResolvedTo('done');
     });
   });
 }
