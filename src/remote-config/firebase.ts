@@ -29,6 +29,6 @@ export const getRemoteConfig = ɵzoneWrap(_getRemoteConfig, true);
 export const getString = ɵzoneWrap(_getString, true);
 export const getValue = ɵzoneWrap(_getValue, true);
 export const isSupported = ɵzoneWrap(_isSupported, true);
-export const onConfigUpdate = ɵzoneWrap(_onConfigUpdate, true);
+export const onConfigUpdate = ɵzoneWrap(_onConfigUpdate, false, 1);
 export const setCustomSignals = ɵzoneWrap(_setCustomSignals, true);
 export const setLogLevel = ɵzoneWrap(_setLogLevel, true);

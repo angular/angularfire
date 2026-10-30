@@ -121,6 +121,29 @@ const zoneWrapFn = (
   };
 };
 
+/* Firebase also takes a handler as an object, and data-connect's subscribe spells its members onNext, onErr, onComplete. */
+const observerKeys = ['next', 'error', 'complete', 'onNext', 'onErr', 'onComplete'];
+
+const isObserverLike = (value: unknown): value is object =>
+  typeof value === 'object' && value !== null &&
+  observerKeys.some(key => typeof Reflect.get(value, key) === 'function');
+
+/* A copy is handed to Firebase so the caller can reuse the same observer for several calls. */
+const zoneWrapObserver = (
+  observer: object,
+  taskDone: VoidFunction | undefined,
+  injector: EnvironmentInjector,
+): object => {
+  const wrapped: Record<string, unknown> = { ...observer };
+  for (const key of observerKeys) {
+    const member = Reflect.get(observer, key);
+    if (typeof member === 'function') {
+      wrapped[key] = zoneWrapFn(member.bind(observer), taskDone, injector);
+    }
+  }
+  return wrapped;
+};
+
 export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, logLevel?: LogLevel): T => {
   logLevel ||= blockUntilFirst ? LogLevel.WARN : LogLevel.VERBOSE;
   // function() is needed for the arguments object
@@ -138,16 +161,21 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, logLevel
       warnOutsideInjectionContext(it, logLevel);
       return (it as any).apply(this, _arguments);
     }
-    // if this is a callback function, e.g, onSnapshot, we should create a pending task and complete it
-    // only once one of the callback functions is tripped.
+    /* if this is a callback, a function or an observer object, e.g. onSnapshot, we should create a
+     * pending task and complete it only once one of the callback functions is tripped. */
     for (let i = 0; i < arguments.length; i++) {
-      if (typeof _arguments[i] === 'function') {
-        if (blockUntilFirst) {
-          taskDone ||= run(() => pendingTasks.add());
-        }
-        // TODO create a microtask to track callback functions
-        _arguments[i] = zoneWrapFn(_arguments[i], taskDone, injector);
+      const argument = _arguments[i];
+      const isFunction = typeof argument === 'function';
+      if (!isFunction && !isObserverLike(argument)) {
+        continue;
       }
+      if (blockUntilFirst) {
+        taskDone ||= run(() => pendingTasks.add());
+      }
+      // TODO create a microtask to track callback functions
+      _arguments[i] = isFunction
+        ? zoneWrapFn(argument, taskDone, injector)
+        : zoneWrapObserver(argument, taskDone, injector);
     }
     const ret = runOutsideAngular(() => (it as any).apply(this, _arguments));
     if (!blockUntilFirst) {
