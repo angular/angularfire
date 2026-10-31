@@ -44,7 +44,7 @@ import {
 
 export const child = ɵzoneWrap(_child, true, 2);
 export const connectDatabaseEmulator = ɵzoneWrap(_connectDatabaseEmulator, true);
-export const enableLogging = ɵzoneWrap(_enableLogging, true);
+export const enableLogging = ɵzoneWrap(_enableLogging, false, 1);
 export const endAt = ɵzoneWrap(_endAt, true, 2);
 export const endBefore = ɵzoneWrap(_endBefore, true, 2);
 export const equalTo = ɵzoneWrap(_equalTo, true, 2);
@@ -57,11 +57,11 @@ export const goOnline = ɵzoneWrap(_goOnline, true);
 export const increment = ɵzoneWrap(_increment, true, 2);
 export const limitToFirst = ɵzoneWrap(_limitToFirst, true, 2);
 export const limitToLast = ɵzoneWrap(_limitToLast, true, 2);
-export const off = ɵzoneWrap(_off, true);
-export const onChildAdded = ɵzoneWrap(_onChildAdded, true);
-export const onChildChanged = ɵzoneWrap(_onChildChanged, true);
-export const onChildMoved = ɵzoneWrap(_onChildMoved, true);
-export const onChildRemoved = ɵzoneWrap(_onChildRemoved, true);
+export const off = ɵzoneWrap(_off, false, 1);
+export const onChildAdded = ɵzoneWrap(_onChildAdded, false, 1);
+export const onChildChanged = ɵzoneWrap(_onChildChanged, false, 1);
+export const onChildMoved = ɵzoneWrap(_onChildMoved, false, 1);
+export const onChildRemoved = ɵzoneWrap(_onChildRemoved, false, 1);
 export const onDisconnect = ɵzoneWrap(_onDisconnect, true);
 export const onValue = ɵzoneWrap(_onValue, true);
 export const orderByChild = ɵzoneWrap(_orderByChild, true, 2);

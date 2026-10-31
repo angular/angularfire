@@ -3,7 +3,6 @@ import { ɵzoneWrap } from '@angular/fire';
 import {
   auditTrail as _auditTrail,
   changeToData as _changeToData,
-  fromRef as _fromRef,
   list as _list,
   listVal as _listVal,
   object as _object,
@@ -16,11 +15,14 @@ export {
   ListenerMethods
 } from 'rxfire/database';
 
-export const auditTrail = ɵzoneWrap(_auditTrail, true);
+export {
+  fromRef
+} from './overrides';
+
+export const auditTrail = ɵzoneWrap(_auditTrail, false, 1);
 export const changeToData = ɵzoneWrap(_changeToData, true);
-export const fromRef = ɵzoneWrap(_fromRef, true);
 export const list = ɵzoneWrap(_list, true);
 export const listVal = ɵzoneWrap(_listVal, true);
 export const object = ɵzoneWrap(_object, true);
 export const objectVal = ɵzoneWrap(_objectVal, true);
-export const stateChanges = ɵzoneWrap(_stateChanges, true);
+export const stateChanges = ɵzoneWrap(_stateChanges, false, 1);
