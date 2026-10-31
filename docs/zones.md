@@ -10,6 +10,8 @@ These wrappers ensure Firebase APIs are called outside of the Angular zone. This
 
 Observables, Promise-based APIs, and those with callbacks will purposely destabilize your application until a initial value is returned, this ensures that server-side rendering (SSR) and static site generation (SSG/pre-rendering) wait for data before rendering the page's HTML.
 
+Some calls are exceptions. They are still zone wrapped, but they do not hold the application unstable, because their first callback may never come or a render has no reason to wait for them: `onLog`, `onTokenChanged`, `beforeAuthStateChanged`, `onMessage`, `onRegistered`, `onUnregistered`, `logEvent`, `isSupported`, and in the Realtime Database `onChildAdded`, `onChildChanged`, `onChildMoved`, `onChildRemoved`, `off`, `enableLogging`, `stateChanges`, `auditTrail`, and `fromRef` with a child event. To make a server render wait for Realtime Database data, use `onValue`, `object`, `list`, `listVal`, or `fromRef` with `ListenEvent.value`.
+
 ## Consequences of not Zone wrapping
 
 When using a Firebase or RxFire API without importing from AngularFire or if AngularFire APIs are used outside of an injection context you _may_ experience instability.
