@@ -96,10 +96,18 @@ describe('Database', () => {
           expect(addTask).not.toHaveBeenCalled();
       });
 
-      it('fromRef does not hold the application unstable', () => {
-          const subscription = TestBed.runInInjectionContext(() => fromRef(ref(database, rando()), ListenEvent.added)).subscribe();
+      [ListenEvent.added, ListenEvent.changed, ListenEvent.moved, ListenEvent.removed].forEach(event => {
+          it(`fromRef on ${event} does not hold the application unstable`, () => {
+              const subscription = TestBed.runInInjectionContext(() => fromRef(ref(database, rando()), event)).subscribe();
+              cleanups.push(() => subscription.unsubscribe());
+              expect(addTask).not.toHaveBeenCalled();
+          });
+      });
+
+      it('fromRef on the value event registers a pending task', () => {
+          const subscription = TestBed.runInInjectionContext(() => fromRef(ref(database, rando()), ListenEvent.value)).subscribe();
           cleanups.push(() => subscription.unsubscribe());
-          expect(addTask).not.toHaveBeenCalled();
+          expect(addTask).toHaveBeenCalledTimes(1);
       });
 
       it('stateChanges does not hold the application unstable', () => {

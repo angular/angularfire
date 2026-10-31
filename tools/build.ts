@@ -226,8 +226,10 @@ ${exportedZoneWrappedFns}
     reexport('database', 'rxfire', 'rxfire/database', tsKeys<typeof import('rxfire/database')>(), {
       // These emit only on child events, which an empty node never produces: `blockUntilFirst: false` otherwise `ApplicationRef.isStable` may never become `true`.
       auditTrail: { blockUntilFirst: false, logLevel: LogLevel.WARN },
-      fromRef: { blockUntilFirst: false, logLevel: LogLevel.WARN },
       stateChanges: { blockUntilFirst: false, logLevel: LogLevel.WARN },
+
+      // Hand-written in `src/database/overrides.ts`, which determines `blockUntilFirst` per event.
+      fromRef: { override: true },
     }),
     reexport('database', 'firebase', 'firebase/database', tsKeys<typeof import('firebase/database')>(), {
       child: { logLevel: LogLevel.VERBOSE },
