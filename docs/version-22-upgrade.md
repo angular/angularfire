@@ -88,6 +88,19 @@ Deploying server-side rendering to Cloud Functions with `ng deploy` (a deploy ta
 
 Hosting-only deploys (`ssr` absent or `false`) and Cloud Run deploys (`ssr: 'cloud-run'`) are not deprecated. They no longer print the old "Legacy ng-deploy Firebase is deprecated" message.
 
+## Observable reads deliver as microtasks
+
+Every Observable read (`collectionData`, `docData`, `authState`, `user`, `objectVal`, `listVal` and the rest) used to hand each value to your subscriber on a timer (`setInterval` with no delay), one event-loop turn later. It now does so at the next microtask checkpoint, which is sooner. The compat `AngularFireAuth` streams change the same way. What arrives, in which order, and when change detection runs do not change.
+
+What an upgrading app may notice:
+
+- A test that waits only for microtasks (a few awaited promises, vitest fake timers without advancing, `fakeAsync` with `flushMicrotasks()` alone) now sees a value whose source emits in a microtask, as Auth and a promise-based mock do.
+  - In a test that fakes timers, a Firestore value still arrives only after the clock is advanced with `tick()` or `vi.advanceTimersByTime()`, because the Firestore SDK hands each snapshot over inside a `setTimeout`.
+  - A test that already advances the clock, or waits for a real timer, sees the value exactly as before.
+- Code that registers its own `setTimeout` when a read emits sees that timer run after the value arrives, not before.
+- In a zoneless server render, a value arriving between the app reporting stable and serialization now reaches a `TransferState` entry you write by hand but not the HTML, because the zoneless change-detection pass is itself a later timer.
+  - Before this change such a value reached neither. AngularFire itself writes nothing into `TransferState`.
+
 ## Other notes
 
 - **Node.js 20 is not supported.** Angular 22 requires Node.js `^22.22.3 || ^24.15.0 || >=26.0.0`. Node.js 20 reached end of life on 2026-04-30.
