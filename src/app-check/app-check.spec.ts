@@ -1,7 +1,7 @@
-import { PLATFORM_ID } from '@angular/core';
+import { PLATFORM_ID, PendingTasks } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { FirebaseApp, getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
-import { APP_CHECK_ON_SERVER, AppCheck, CustomProvider, initializeAppCheck, provideAppCheck } from '@angular/fire/app-check';
+import { FirebaseApp, deleteApp, getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { APP_CHECK_ON_SERVER, AppCheck, CustomProvider, initializeAppCheck, onTokenChanged, provideAppCheck } from '@angular/fire/app-check';
 import { Auth, connectAuthEmulator, getAuth, provideAuth } from '@angular/fire/auth';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../utils';
@@ -107,6 +107,41 @@ describe('AppCheck', () => {
     expect(setupCalls).toBe(1);
     expect(appCheck).toBeTruthy();
     expect(appCheck.app).toEqual(TestBed.inject(FirebaseApp));
+  });
+
+  describe('zone wrapping', () => {
+    let appCheck: AppCheck;
+    let addTask: jasmine.Spy;
+    let cleanups: (() => void)[];
+
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        providers: [
+          provideFirebaseApp(() => initializeApp(COMMON_CONFIG, appName)),
+          provideTestAppCheck(),
+        ],
+      });
+      appCheck = TestBed.inject(AppCheck);
+      addTask = spyOn(TestBed.inject(PendingTasks), 'add').and.callThrough();
+      cleanups = [];
+    });
+
+    afterEach(() => {
+      // Listeners re-enter this test's injector, so none may outlive the TestBed.
+      cleanups.forEach(cleanup => cleanup());
+    });
+
+    it('onTokenChanged does not hold the application unstable', () => {
+      const unsubscribe = TestBed.runInInjectionContext(() => onTokenChanged(appCheck, () => undefined));
+      cleanups.push(unsubscribe);
+      expect(addTask).not.toHaveBeenCalled();
+    });
+
+    it('a blocking call in the same context does register a task', async () => {
+      await TestBed.runInInjectionContext(() => deleteApp(initializeApp(COMMON_CONFIG, rando())));
+      expect(addTask).toHaveBeenCalled();
+    });
+
   });
 
 });
