@@ -1,6 +1,6 @@
 # Upgrading to the AngularFire 22 release candidate
 
-AngularFire 22 targets **Angular 22** and the **Firebase JS SDK v12**. Most of the upgrade is handled for you by `ng update`.
+AngularFire 22 targets **Angular 22** and the **Firebase JS SDK v12 or v13**. Most of the upgrade is handled for you by `ng update`.
 
 ## Run the update
 
@@ -14,8 +14,10 @@ Include `@angular/fire@next` in the same command as Angular. On its own, `ng upd
 
 The AngularFire update runs a migration that:
 
-- **Adds** `firebase` **to your** `package.json` **if it is missing**, as `"firebase": "^12.18.0"`, and reinstalls. See the next section for why.
-- **Aligns an existing** `firebase` **entry to** `^12.18.0` when it requests a version outside that range.
+- **Adds** `firebase` **to your** `package.json` **if it is missing**, and reinstalls. See the next section for why.
+- **Aligns an existing** `firebase` **entry** when it requests a version outside `^12.18.0 || ^13.0.0`, the range AngularFire 22 supports.
+
+Either way, the migration writes `^13.0.0` when firebase 13 is already installed and `^12.18.0` otherwise, so an app on firebase 12 stays on 12 and an app on firebase 13 stays on 13.
 
 ## Your app now owns the Firebase SDK
 
@@ -23,7 +25,7 @@ Through AngularFire 21, `@angular/fire` listed `firebase` under `dependencies`, 
 
 AngularFire 22 lists `firebase` under `peerDependencies` instead. So your app should declare `firebase` in its `package.json` (on Yarn it must, since Yarn installs no peer dependencies). This gives you exactly one copy of `firebase`, and an incompatible version is refused at install time instead of failing at runtime.
 
-`ng update @angular/fire@next` updates an older `firebase` entry in your `package.json` to `^12.18.0` when it requests a version outside that range. If your app doesn't list `firebase` in `package.json` the migration adds `"firebase": "^12.18.0"` and reinstalls. Verify with `npm ls firebase`, which should show exactly one copy.
+`ng update @angular/fire@next` updates an older `firebase` entry in your `package.json` when it requests a version outside `^12.18.0 || ^13.0.0`. If your app doesn't list `firebase` in `package.json`, the migration adds it and reinstalls. Verify with `npm ls firebase`, which should show exactly one copy.
 
 ### If you install with `npm install` instead of `ng update`
 
@@ -49,13 +51,30 @@ Do not use `--force` or `--legacy-peer-deps` to get past this message. Both inst
 
 Yarn doesn't install peer dependencies. Add `firebase` to your own `package.json` as shown above, or run `ng update @angular/fire@next`, which adds it.
 
-An older version installs anyway with a warning (`has incorrect peer dependency "firebase@^12.18.0"` on Yarn 1, `YN0060: INCOMPATIBLE_PEER_DEPENDENCY` on Yarn 2+), so treat that warning as an upgrade step you still have to do.
+An older version installs anyway with a warning (`has incorrect peer dependency "firebase@^12.18.0 || ^13.0.0"` on Yarn 1, `YN0060: INCOMPATIBLE_PEER_DEPENDENCY` on Yarn 2+), so treat that warning as an upgrade step you still have to do.
 
 ### pnpm
 
-pnpm 8 and later install a missing `firebase` automatically. An older version installs anyway with a warning (`unmet peer firebase@^12.18.0: found 11.x` on pnpm 9 and 10, `Issues with peer dependencies found. Run "pnpm peers check" to list them.` on pnpm 11 and 12), and pnpm prints that warning only once, when it first resolves the tree, never on a later install from the committed lockfile.
+pnpm 8 and later install a missing `firebase` automatically. An older version installs anyway with a warning (`unmet peer firebase@"^12.18.0 || ^13.0.0": found 11.x` on pnpm 9 and 10, `Issues with peer dependencies found. Run "pnpm peers check" to list them.` on pnpm 11 and 12), and pnpm prints that warning only once, when it first resolves the tree, never on a later install from the committed lockfile.
 
 Set `strict-peer-dependencies=true` in `.npmrc` to make pnpm refuse the mismatch outright.
+
+## Firebase 13 is optional
+
+AngularFire 22 works with firebase 12 (`^12.18.0`) and firebase 13 (`^13.0.0`). `ng update` keeps the firebase major your app already has, so moving to firebase 13 is a separate step you can take when you are ready:
+
+```bash
+npm install firebase@^13.0.0
+```
+
+Before you update, check these firebase 13 changes:
+
+- **`VertexAIBackend` is removed** from `firebase/ai`, and so from `@angular/fire/ai`. Use `AgentPlatformBackend`, which firebase 12.18 also exports, so you can switch before you upgrade.
+  - `VertexAIBackend` defaults to the `us-central1` location and `AgentPlatformBackend` to `global`, so replace `new VertexAIBackend()` with `new AgentPlatformBackend('us-central1')` to keep the same location.
+  - A call that already passes a location keeps it as is.
+- **Node.js 24.12 or later.** firebase 13's packages declare `"node": ">=24.12.0"`, so on Node.js 22 npm prints `EBADENGINE` warnings when it installs them.
+
+For everything else that changed, see the [Firebase JavaScript SDK release notes](https://firebase.google.com/support/release-notes/js).
 
 ## Fewer build-time packages
 
