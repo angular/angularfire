@@ -119,10 +119,12 @@ const zoneWrapFn = (
   injector: EnvironmentInjector,
 ) => {
   return (...args: any[]) => {
-    if (taskDone) {
-      setTimeout(taskDone, 0);
+    // The pending task is removed right after the callback body, in a finally so a callback that throws does not leave it behind.
+    try {
+      return runInInjectionContext(injector, () => run(() => it.apply(this, args)));
+    } finally {
+      taskDone?.();
     }
-    return runInInjectionContext(injector, () => run(() => it.apply(this, args)));
   };
 };
 
@@ -150,7 +152,6 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, logLevel
         if (blockUntilFirst) {
           taskDone ||= run(() => pendingTasks.add());
         }
-        // TODO create a microtask to track callback functions
         _arguments[i] = zoneWrapFn(_arguments[i], taskDone, injector);
       }
     }
@@ -187,8 +188,11 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, logLevel
       // Handle unsubscribe
       // function() is needed for the arguments object
       return function () {
-        setTimeout(taskDone, 0);
-        return ret.apply(this, arguments);
+        try {
+          return ret.apply(this, arguments);
+        } finally {
+          taskDone();
+        }
       };
     } else {
       // TODO how do we handle storage uploads in Zone? and other stuff with cancel() etc?
