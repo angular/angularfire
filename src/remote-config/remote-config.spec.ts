@@ -1,6 +1,7 @@
+import { PendingTasks } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { FirebaseApp, getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
-import { RemoteConfig, getRemoteConfig, provideRemoteConfig } from '@angular/fire/remote-config';
+import { RemoteConfig, getRemoteConfig, isSupported, provideRemoteConfig } from '@angular/fire/remote-config';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../utils';
 
@@ -31,6 +32,13 @@ describe('RemoteConfig', () => {
         expect(providedRemoteConfig).toBeTruthy();
         expect(remoteConfig).toEqual(providedRemoteConfig);
         expect(remoteConfig.app).toEqual(app);
+    });
+
+    it('isSupported does not hold the application unstable', async () => {
+        const addTask = spyOn(TestBed.inject(PendingTasks), 'add').and.callThrough();
+        const supported = TestBed.runInInjectionContext(isSupported);
+        expect(addTask).not.toHaveBeenCalled();
+        expect(typeof await supported).toBe('boolean');
     });
 
   });

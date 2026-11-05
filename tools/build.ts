@@ -238,7 +238,10 @@ ${exportedZoneWrappedFns}
       setUserId: { logLevel: LogLevel.VERBOSE },
       setUserProperties: { logLevel: LogLevel.VERBOSE },
     }),
-    reexport('app', 'firebase', 'firebase/app', tsKeys<typeof import('firebase/app')>()),
+    reexport('app', 'firebase', 'firebase/app', tsKeys<typeof import('firebase/app')>(), {
+      // The callback runs only when an SDK logs: `blockUntilFirst: false` otherwise `ApplicationRef.isStable` may never become `true`.
+      onLog: { blockUntilFirst: false, logLevel: LogLevel.WARN },
+    }),
     reexport('app-check', 'firebase', 'firebase/app-check', tsKeys<typeof import('firebase/app-check')>(), {
       getLimitedUseToken: { logLevel: LogLevel.VERBOSE },
       // The callback runs only once a token is obtained, which a first visit may never request: `blockUntilFirst: false` otherwise `ApplicationRef.isStable` may never become `true`.
@@ -297,15 +300,32 @@ ${exportedZoneWrappedFns}
       verifyBeforeUpdateEmail: { logLevel: LogLevel.VERBOSE },
       verifyPasswordResetCode: { logLevel: LogLevel.VERBOSE },
     }),
-    reexport('database', 'rxfire', 'rxfire/database', tsKeys<typeof import('rxfire/database')>()),
+    reexport('database', 'rxfire', 'rxfire/database', tsKeys<typeof import('rxfire/database')>(), {
+      // These emit only on child events, which an empty node never produces: `blockUntilFirst: false` otherwise `ApplicationRef.isStable` may never become `true`.
+      auditTrail: { blockUntilFirst: false, logLevel: LogLevel.WARN },
+      stateChanges: { blockUntilFirst: false, logLevel: LogLevel.WARN },
+
+      // Hand-written in `src/database/overrides.ts`, which determines `blockUntilFirst` per event.
+      fromRef: { override: true },
+    }),
     reexport('database', 'firebase', 'firebase/database', tsKeys<typeof import('firebase/database')>(), {
       child: { logLevel: LogLevel.VERBOSE },
+      // The logger callback runs only when a live connection logs: `blockUntilFirst: false` otherwise `ApplicationRef.isStable` may never become `true`.
+      enableLogging: { blockUntilFirst: false, logLevel: LogLevel.WARN },
+
       endAt: { logLevel: LogLevel.VERBOSE },
       endBefore: { logLevel: LogLevel.VERBOSE },
       equalTo: { logLevel: LogLevel.VERBOSE },
       increment: { logLevel: LogLevel.VERBOSE },
       limitToFirst: { logLevel: LogLevel.VERBOSE },
       limitToLast: { logLevel: LogLevel.VERBOSE },
+      // The detach call never runs the callback it is given, and a child listener's callback first runs on a later change, or never on an empty node: `blockUntilFirst: false` otherwise `ApplicationRef.isStable` may never become `true`.
+      off: { blockUntilFirst: false, logLevel: LogLevel.WARN },
+      onChildAdded: { blockUntilFirst: false, logLevel: LogLevel.WARN },
+      onChildChanged: { blockUntilFirst: false, logLevel: LogLevel.WARN },
+      onChildMoved: { blockUntilFirst: false, logLevel: LogLevel.WARN },
+      onChildRemoved: { blockUntilFirst: false, logLevel: LogLevel.WARN },
+
       orderByChild: { logLevel: LogLevel.VERBOSE },
       orderByKey: { logLevel: LogLevel.VERBOSE },
       orderByPriority: { logLevel: LogLevel.VERBOSE },
@@ -358,6 +378,7 @@ ${exportedZoneWrappedFns}
       getAll: { exportName: 'getAllChanges' },
     }),
     reexport('remote-config', 'firebase', 'firebase/remote-config', tsKeys<typeof import('firebase/remote-config')>(), {
+      isSupported: { blockUntilFirst: false },
       // The observer runs only when a fetched template differs from the active one, so it may never fire.
       onConfigUpdate: { blockUntilFirst: false, logLevel: LogLevel.WARN },
     }),
