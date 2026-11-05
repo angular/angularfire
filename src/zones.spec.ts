@@ -2,6 +2,7 @@ import {
   EnvironmentInjector,
   NgZone,
   PendingTasks,
+  createEnvironmentInjector,
   inject,
   provideZoneChangeDetection,
   provideZonelessChangeDetection,
@@ -275,6 +276,17 @@ function describeZoneWrap(zoneJs: boolean) {
       expect(lastHandlerError).toEqual(new Error('handler failed'));
     });
 
+    it('removes the pending task when the handler fires after its child environment injector is destroyed', async () => {
+      const received: number[] = [];
+      const childInjector = createEnvironmentInjector([], TestBed.inject(EnvironmentInjector));
+      const wrapped = ɵzoneWrap(fakeSubscribe, true, undefined, true);
+      cleanups.push(runInInjectionContext(childInjector, () => wrapped((value: number) => received.push(value))));
+      childInjector.destroy();
+      await waitFor(() => received.length === 1);
+      expect(received).toEqual([1]);
+      expect(releases.count).toBe(1);
+    });
+
     it('still calls a handler that fires after the injector is destroyed, in both forms', async () => {
       const received: unknown[] = [];
       subscribeWrapped(true, value => received.push(value));
@@ -356,8 +368,8 @@ describe('ɵzoneWrap delivery timing', () => {
 
 describe('ɵzoneWrap callback pending-task removal', () => {
 
-  // What had happened by the time the wrapper called the task remover.
-  interface Release { afterCallbackBody: boolean; afterBodyMicrotask: boolean; afterMicrotask: boolean; afterTimer: boolean; }
+  // Whether the wrapper called the task remover, and what had happened by then.
+  interface Release { released: boolean; afterCallbackBody: boolean; afterBodyMicrotask: boolean; afterMicrotask: boolean; afterTimer: boolean; }
   interface Listener { callback?: (value: number) => void; unsubscribed: boolean; }
 
   let ngZone: NgZone;
@@ -377,11 +389,11 @@ describe('ɵzoneWrap callback pending-task removal', () => {
   };
 
   /* Hands the wrapper a remover that records which markers had fired when it was called. A
-   * remover call that never comes resolves as all false after the fallback timer, not as a spec timeout. */
+   * remover call that never comes resolves with released false after the fallback timer, not as a spec timeout. */
   const observeRelease = () => new Promise<Release>(resolve => {
     spyOn(TestBed.inject(PendingTasks), 'add').and.returnValue(() =>
-      resolve({ afterCallbackBody: markers.body, afterBodyMicrotask: markers.bodyMicrotask, afterMicrotask: markers.microtask, afterTimer: markers.timer }));
-    ngZone.runOutsideAngular(() => setTimeout(() => resolve({ afterCallbackBody: false, afterBodyMicrotask: false, afterMicrotask: false, afterTimer: false }), 500));
+      resolve({ released: true, afterCallbackBody: markers.body, afterBodyMicrotask: markers.bodyMicrotask, afterMicrotask: markers.microtask, afterTimer: markers.timer }));
+    ngZone.runOutsideAngular(() => setTimeout(() => resolve({ released: false, afterCallbackBody: false, afterBodyMicrotask: false, afterMicrotask: false, afterTimer: false }), 500));
   });
 
   // A setTimeout(fn, 0) and a microtask, registered just before the delivery they are compared with.
@@ -419,7 +431,7 @@ describe('ɵzoneWrap callback pending-task removal', () => {
     const release = observeRelease();
     wrapAndCall(fakeListen(listener), callbackBody);
     deliverOutsideAngular(() => listener.callback?.(1));
-    expect(await release).toEqual({ afterCallbackBody: true, afterBodyMicrotask: false, afterMicrotask: false, afterTimer: false });
+    expect(await release).toEqual({ released: true, afterCallbackBody: true, afterBodyMicrotask: false, afterMicrotask: false, afterTimer: false });
   });
 
   it('removes the pending task the same way when the callback is invoked inside the registering call', async () => {
@@ -427,7 +439,7 @@ describe('ɵzoneWrap callback pending-task removal', () => {
     const release = observeRelease();
     ngZone.runOutsideAngular(plantMarkers);
     wrapAndCall(fakeListenSynchronously(listener), callbackBody);
-    expect(await release).toEqual({ afterCallbackBody: true, afterBodyMicrotask: false, afterMicrotask: false, afterTimer: false });
+    expect(await release).toEqual({ released: true, afterCallbackBody: true, afterBodyMicrotask: false, afterMicrotask: false, afterTimer: false });
   });
 
   it('removes the pending task on unsubscribe before a setTimeout(fn, 0) registered just before the unsubscribe call', async () => {
@@ -435,7 +447,7 @@ describe('ɵzoneWrap callback pending-task removal', () => {
     const release = observeRelease();
     const unsubscribe = wrapAndCall(fakeListen(listener), callbackBody);
     deliverOutsideAngular(() => unsubscribe());
-    expect(await release).toEqual({ afterCallbackBody: false, afterBodyMicrotask: false, afterMicrotask: false, afterTimer: false });
+    expect(await release).toEqual({ released: true, afterCallbackBody: false, afterBodyMicrotask: false, afterMicrotask: false, afterTimer: false });
     expect(listener.unsubscribed).toBe(true);
   });
 
@@ -447,7 +459,7 @@ describe('ɵzoneWrap callback pending-task removal', () => {
     deliverOutsideAngular(() => {
       try { listener.callback?.(1); } catch (error) { thrown = error; }
     });
-    expect(await release).toEqual({ afterCallbackBody: true, afterBodyMicrotask: false, afterMicrotask: false, afterTimer: false });
+    expect(await release).toEqual({ released: true, afterCallbackBody: true, afterBodyMicrotask: false, afterMicrotask: false, afterTimer: false });
     expect(thrown).toEqual(new Error('deliberate'));
   });
 
