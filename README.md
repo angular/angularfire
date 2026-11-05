@@ -35,10 +35,19 @@ export const appConfig: ApplicationConfig = {
 ```ts
 import { AsyncPipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { Firestore, collectionData, collection } from '@angular/fire/firestore';
+import { Firestore, FirestoreDataConverter, collectionData, collection } from '@angular/fire/firestore';
 
 interface Item {
   name: string;
+}
+
+// Types the collection and checks every document on its way in
+const itemConverter: FirestoreDataConverter<Item> = {
+  toFirestore: item => item,
+  fromFirestore: (snapshot, options) => {
+    const data = snapshot.data(options);
+    return { name: typeof data['name'] === 'string' ? data['name'] : '' };
+  },
 };
 
 @Component({
@@ -56,10 +65,12 @@ interface Item {
 })
 export class App {
   firestore = inject(Firestore);
-  itemCollection = collection(this.firestore, 'items');
-  items$ = collectionData<Item>(this.itemCollection);
+  itemCollection = collection(this.firestore, 'items').withConverter(itemConverter);
+  items$ = collectionData(this.itemCollection); // Observable<Item[]>
 }
 ```
+
+The converter is what gives the read its type. `collection()` alone returns an untyped reference. See [Typed reads](docs/firestore.md#typed-reads).
 
 ## Resources
 
