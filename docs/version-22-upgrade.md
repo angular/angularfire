@@ -101,6 +101,15 @@ What an upgrading app may notice:
 - In a zoneless server render, a value arriving between the app reporting stable and serialization now reaches a `TransferState` entry you write by hand but not the HTML, because the zoneless change-detection pass is itself a later timer.
   - Before this change such a value reached neither. AngularFire itself writes nothing into `TransferState`.
 
+## Callback reads give up their pending task right after the callback
+
+Every callback read (`onSnapshot`, `onAuthStateChanged`, `onValue` and the other callback-taking functions wrapped with a pending task) used to keep Angular's pending task for one more `setTimeout(fn, 0)` delay after its first callback ran, and again after unsubscribe. It now removes the task right after the callback body returns, and right after the unsubscribe call. What the callback receives, and when change detection runs, do not change.
+
+### What an upgrading app may notice:
+
+- `ApplicationRef.whenStable()` and a server render follow a callback read's first value one `setTimeout(fn, 0)` delay sooner.
+- A test that inspects Angular's pending tasks sees the task gone as soon as the callback has run, with no timer to advance. A test that awaits `whenStable()` under fake timers still needs the clock advanced, because Angular's own change-detection tick runs on a timer.
+
 ## Other notes
 
 - **Node.js 20 is not supported.** Angular 22 requires Node.js `^22.22.3 || ^24.15.0 || >=26.0.0`. Node.js 20 reached end of life on 2026-04-30.
