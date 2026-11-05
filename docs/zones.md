@@ -60,7 +60,7 @@ When you call a wrapped API, the first thing AngularFire does is ask Angular for
 That division is worth knowing, because it explains what you are and are not responsible for:
 
 * **You** supply the context at the call site, from a field initializer, a constructor, or an explicit `runInInjectionContext`.
-* **AngularFire** re-enters the environment injector inside a callback you hand to the call itself, which is why you never wrap an `onSnapshot` handler yourself. That reaches anything provided at the application level, but not providers declared on a component, and it does not extend to subscribers of a returned Observable, which is what the `switchMap` and `runInInjectionContext` example above is for.
+* **AngularFire** re-enters the environment injector inside a callback you hand to the call itself, whether you pass it as a function or as an observer object such as `{ next, error }`, which is why you never wrap an `onSnapshot` handler yourself. That reaches anything provided at the application level, but not providers declared on a component, and it does not extend to subscribers of a returned Observable, which is what the `switchMap` and `runInInjectionContext` example above is for.
 
 What you lose depends on the call. A call that does asynchronous work, such as `onSnapshot`, `getDoc` or `collectionData`, is normally added to Angular's `PendingTasks` register, which is what server-side rendering waits on before it serializes the page. Called outside a context, it never is. A call that returns immediately, such as `getFirestore`, was never registered anyway, so it loses only the zone handling.
 
