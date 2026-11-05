@@ -4,6 +4,7 @@ import { join, resolve, sep } from 'path';
 import { keys as tsKeys } from 'ts-transformer-keys';
 import * as esbuild from "esbuild";
 import type { ReplaceResult } from 'replace-in-file';
+import * as ts from 'typescript';
 
 enum LogLevel {
   "WARN" = 1,
@@ -74,6 +75,69 @@ const overridesFirebaseDoesNotDeclare: Record<string, string[]> = {};
 
 type Overrides = Record<string, OverrideOptions | null>;
 
+/* Must match observerKeys in src/zones.ts, which applies the same test at runtime. */
+const observerMemberNames = ['next', 'error', 'complete', 'onNext', 'onErr', 'onComplete'];
+
+const checkerOptions: ts.CompilerOptions = {
+  target: ts.ScriptTarget.ES2022,
+  module: ts.ModuleKind.ESNext,
+  moduleResolution: ts.ModuleResolutionKind.Bundler,
+  strict: true,
+  skipLibCheck: true,
+  lib: ['lib.es2022.d.ts', 'lib.dom.d.ts'],
+  types: [],
+};
+
+/** The members of a union other than undefined, null and void, so an optional type is judged by what it can hold. */
+const withoutEmptyTypes = (type: ts.Type): ts.Type[] =>
+  (type.isUnion() ? type.types : [type])
+    .filter(part => !(part.flags & (ts.TypeFlags.Undefined | ts.TypeFlags.Null | ts.TypeFlags.Void)));
+
+const isCallable = (type: ts.Type) => withoutEmptyTypes(type).some(part => part.getCallSignatures().length > 0);
+
+/** An object type, not a function, with at least one observer member that is a function. */
+const isObserverShaped = (checker: ts.TypeChecker, type: ts.Type) =>
+  withoutEmptyTypes(type).some(part => !isCallable(part) && observerMemberNames.some(memberName => {
+    const member = part.getProperty(memberName);
+    return member !== undefined && isCallable(checker.getTypeOfSymbol(member));
+  }));
+
+interface CheckedModule {
+  checker: ts.TypeChecker;
+  moduleSymbol: ts.Symbol;
+}
+
+/** Type-checks an in-memory file that imports `path`, to read that entry point's declarations. */
+function checkModule(path: string): CheckedModule {
+  // TypeScript reports file names with forward slashes, also on Windows.
+  const fileName = join(process.cwd(), '__observer-check__.ts').split(sep).join('/');
+  const source = ts.createSourceFile(fileName, `import * as checked from '${path}';\n`, ts.ScriptTarget.ES2022);
+  const host = ts.createCompilerHost(checkerOptions);
+  const getSourceFile = host.getSourceFile.bind(host);
+  const fileExists = host.fileExists.bind(host);
+  host.getSourceFile = (requested, languageVersion) =>
+    requested === fileName ? source : getSourceFile(requested, languageVersion);
+  host.fileExists = requested => requested === fileName || fileExists(requested);
+  const checker = ts.createProgram([fileName], checkerOptions, host).getTypeChecker();
+  const importDeclaration = source.statements.find(ts.isImportDeclaration);
+  const moduleSymbol = importDeclaration && checker.getSymbolAtLocation(importDeclaration.moduleSpecifier);
+  if (!moduleSymbol) {
+    throw new Error(`Could not read the type declarations of ${path} to find its observer parameters.`);
+  }
+  return { checker, moduleSymbol };
+}
+
+/** The exports of `path` with a parameter shaped like an observer, read from its type declarations. */
+function exportsTakingAnObserver(path: string): Set<string> {
+  const { checker, moduleSymbol } = checkModule(path);
+  const takesAnObserver = (exported: ts.Symbol) => {
+    const declared = exported.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(exported) : exported;
+    return checker.getTypeOfSymbol(declared).getCallSignatures().some(signature =>
+      signature.getParameters().some(parameter => isObserverShaped(checker, checker.getTypeOfSymbol(parameter))));
+  };
+  return new Set(checker.getExportsOfModule(moduleSymbol).filter(takesAnObserver).map(exported => exported.name));
+}
+
 function zoneWrapExports() {
   /* One overrides object can be applied to several entry points, so the keys it may legally name
    * are the union of their export lists. firestoreOverrides covers both firestore and
@@ -111,8 +175,21 @@ function zoneWrapExports() {
     const rawExportedFns = rawExport.map(([importName, exportName]) =>
       `${importName}${exportName === importName ? '' : `as ${exportName}`}`).join(',\n  ');
     const overriddenFns = overridden.join(',\n  ');
+    /* The ɵzoneWrap arguments after the wrapped function, in order: blockUntilFirst, logLevel,
+     * acceptsObserver. The arguments are positional, so a function that takes an observer gets
+     * logLevel written out, as `undefined` when it has no override, to reach the observer flag. */
+    const observerTakingExports = exportsTakingAnObserver(path);
+    const zoneWrapArguments = (importName: string) => {
+      const logLevel = overrides[importName]?.logLevel;
+      const acceptsObserver = observerTakingExports.has(importName);
+      return [
+        `${overrides[importName]?.blockUntilFirst ?? true}`,
+        ...(logLevel || acceptsObserver ? [`${logLevel ?? 'undefined'}`] : []),
+        ...(acceptsObserver ? ['true'] : []),
+      ].join(', ');
+    };
     const exportedZoneWrappedFns = zoneWrapped.map(([importName, exportName]) =>
-      `export const ${exportName} = ɵzoneWrap(_${importName}, ${overrides[importName]?.blockUntilFirst ?? true}${overrides[importName]?.logLevel ? `, ${overrides[importName].logLevel}` : ""});`)
+      `export const ${exportName} = ɵzoneWrap(_${importName}, ${zoneWrapArguments(importName)});`)
         .join('\n');
     const filePath = join(process.cwd(), 'src', `${module}/${name}.ts`);
     // TODO(davideast): Create a builder pattern for this file for readability
@@ -302,6 +379,8 @@ ${exportedZoneWrappedFns}
     }),
     reexport('remote-config', 'firebase', 'firebase/remote-config', tsKeys<typeof import('firebase/remote-config')>(), {
       isSupported: { blockUntilFirst: false },
+      // The observer runs only when a fetched template differs from the active one, so it may never fire.
+      onConfigUpdate: { blockUntilFirst: false, logLevel: LogLevel.WARN },
     }),
     reexport('storage', 'rxfire', 'rxfire/storage', tsKeys<typeof import('rxfire/storage')>(), {
       getDownloadURL: null,
