@@ -193,8 +193,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Branch protection
     needs: ['test', 'contribute', 'browser', 'firebase-13']
+    # A skipped job satisfies a required status check, so this job must run on every outcome of
+    # the jobs above and fail itself. Keep always(), not !cancelled(): a cancelled run must stay red.
+    if: ${{ always() }}
     steps:
-      - run: true
+      - name: Fail unless every needed job succeeded
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped') }}
+        run: exit 1
 
   publish:
     runs-on: ubuntu-latest
