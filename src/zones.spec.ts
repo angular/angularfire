@@ -19,13 +19,13 @@ interface FakeOptions {
   failWith?: Error;
 }
 
+let lastReceived: { handler: unknown; options: unknown } | undefined;
+let lastHandlerError: unknown;
+
 /* Stands in for a Firebase subscribe function such as onSnapshot: accepts the handler as a function
  * or as an observer object, delivers one value from a timer the way the SDK delivers from its own
  * async work, and returns an unsubscribe function. The timer is created while ɵzoneWrap runs the
  * call outside the Angular zone, so an unwrapped handler runs there with no injection context. */
-let lastReceived: { handler: unknown; options: unknown } | undefined;
-let lastHandlerError: unknown;
-
 function fakeSubscribe(nextOrObserver: NextHandler | FakeObserver, options?: FakeOptions): () => void {
   lastReceived = { handler: nextOrObserver, options };
   const observer: FakeObserver = typeof nextOrObserver === 'function' ? { next: nextOrObserver } : nextOrObserver;
@@ -51,6 +51,22 @@ function fakeDataConnectSubscribe(observer: FakeDataConnectObserver): () => void
 
 function fakeAsyncCall(): Promise<string> {
   return new Promise(resolve => setTimeout(() => resolve('done'), 20));
+}
+
+/* A model class like one an app saves through a Firestore converter, with a method that happens to
+ * share a name with an observer member. */
+class Task {
+  constructor(public title: string) {}
+  complete() {
+    return this.title;
+  }
+}
+
+// Stands in for a Firebase data call such as setDoc: takes a data object and returns a Promise.
+let lastSaved: unknown;
+function fakeSave(data: object): Promise<void> {
+  lastSaved = data;
+  return new Promise(resolve => setTimeout(resolve, 0));
 }
 
 const flushTimers = () => new Promise<void>(resolve => setTimeout(resolve, 10));
@@ -115,6 +131,7 @@ function describeZoneWrap(zoneJs: boolean) {
       cleanups = [];
       lastReceived = undefined;
       lastHandlerError = undefined;
+      lastSaved = undefined;
     });
 
     afterEach(async () => {
@@ -124,10 +141,15 @@ function describeZoneWrap(zoneJs: boolean) {
     });
 
     const subscribeWrapped = (blockUntilFirst: boolean, ...callArguments: Parameters<typeof fakeSubscribe>) => {
-      const wrapped = ɵzoneWrap(fakeSubscribe, blockUntilFirst);
+      const wrapped = ɵzoneWrap(fakeSubscribe, blockUntilFirst, undefined, true);
       const unsubscribe = TestBed.runInInjectionContext(() => wrapped(...callArguments));
       cleanups.push(unsubscribe);
       return unsubscribe;
+    };
+
+    const subscribeWrappedWithoutObserver = (blockUntilFirst: boolean, ...callArguments: Parameters<typeof fakeSubscribe>) => {
+      const wrapped = ɵzoneWrap(fakeSubscribe, blockUntilFirst);
+      cleanups.push(TestBed.runInInjectionContext(() => wrapped(...callArguments)));
     };
 
     it('gives a handler passed as a function the injection context, the zone and a pending task', async () => {
@@ -182,7 +204,7 @@ function describeZoneWrap(zoneJs: boolean) {
 
     it('recognizes the onNext member data-connect observers use', async () => {
       const { report, next } = reportingHandler();
-      const wrapped = ɵzoneWrap(fakeDataConnectSubscribe, true);
+      const wrapped = ɵzoneWrap(fakeDataConnectSubscribe, true, undefined, true);
       cleanups.push(TestBed.runInInjectionContext(() => wrapped({ onNext: next })));
       expect(addTask).toHaveBeenCalledTimes(1);
       await waitFor(() => releases.count === 1);
@@ -242,6 +264,36 @@ function describeZoneWrap(zoneJs: boolean) {
       await waitFor(() => releases.count === 1);
       expect(releases.count).toBe(1);
       expect(lastHandlerError).toEqual(new Error('handler failed'));
+    });
+
+    it('still calls a handler that fires after the injector is destroyed, in both forms', async () => {
+      const received: unknown[] = [];
+      subscribeWrapped(true, value => received.push(value));
+      subscribeWrapped(true, { next: value => received.push(value) });
+      TestBed.resetTestingModule();
+      await flushTimers();
+      expect(received).toEqual([1, 1]);
+      expect(lastHandlerError).toBeUndefined();
+    });
+
+    it('leaves a data object with an observer-named method alone when the call takes no observer', async () => {
+      const wrapped = ɵzoneWrap(fakeSave, true);
+      const task = new Task('write the spec');
+      await TestBed.runInInjectionContext(() => wrapped(task));
+      await flushTimers();
+      expect(lastSaved).toBe(task);
+      expect(addTask).toHaveBeenCalledTimes(1);
+      expect(releases.count).toBe(1);
+    });
+
+    it('does not treat an observer object as one when the call takes no observer', async () => {
+      const { report, next } = reportingHandler();
+      const observer: FakeObserver = { next };
+      subscribeWrappedWithoutObserver(true, observer);
+      expect(addTask).not.toHaveBeenCalled();
+      expect(lastReceived?.handler).toBe(observer);
+      await waitFor(() => report.values.length === 1);
+      expect(report.injectWorked).toBeFalse();
     });
 
     it('settles a wrapped promise even when it resolves after the injector is destroyed', async () => {

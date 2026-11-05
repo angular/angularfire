@@ -117,18 +117,22 @@ const zoneWrapFn = (
     if (taskDone) {
       setTimeout(taskDone, 0);
     }
+    // Firebase can call a handler after the app is destroyed, and entering a destroyed injector throws NG0205.
+    if (injector.destroyed) {
+      return it.apply(this, args);
+    }
     return runInInjectionContext(injector, () => run(() => it.apply(this, args)));
   };
 };
 
-/* Firebase also takes a handler as an object, and data-connect's subscribe spells its members onNext, onErr, onComplete. */
+/** Firebase also takes a handler as an object, and data-connect's subscribe spells its members onNext, onErr, onComplete. */
 const observerKeys = ['next', 'error', 'complete', 'onNext', 'onErr', 'onComplete'];
 
 const isObserverLike = (value: unknown): value is object =>
   typeof value === 'object' && value !== null &&
   observerKeys.some(key => typeof Reflect.get(value, key) === 'function');
 
-/* A copy is handed to Firebase so the caller can reuse the same observer for several calls. */
+/** A copy is handed to Firebase so the caller can reuse the same observer for several calls. */
 const zoneWrapObserver = (
   observer: object,
   taskDone: VoidFunction | undefined,
@@ -144,7 +148,12 @@ const zoneWrapObserver = (
   return wrapped;
 };
 
-export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, logLevel?: LogLevel): T => {
+/**
+ * `acceptsObserver` is set by tools/build.ts only for functions whose declared parameters include an
+ * observer, so a data object that happens to have a next, error or complete method reaches every
+ * other function untouched.
+ */
+export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, logLevel?: LogLevel, acceptsObserver = false): T => {
   logLevel ||= blockUntilFirst ? LogLevel.WARN : LogLevel.VERBOSE;
   // function() is needed for the arguments object
   return function () {
@@ -166,7 +175,7 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, logLevel
     for (let i = 0; i < arguments.length; i++) {
       const argument = _arguments[i];
       const isFunction = typeof argument === 'function';
-      if (!isFunction && !isObserverLike(argument)) {
+      if (!isFunction && !(acceptsObserver && isObserverLike(argument))) {
         continue;
       }
       if (blockUntilFirst) {
