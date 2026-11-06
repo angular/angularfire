@@ -119,14 +119,16 @@ const zoneWrapFn = (
   injector: EnvironmentInjector,
 ) => {
   return (...args: any[]) => {
-    if (taskDone) {
-      setTimeout(taskDone, 0);
+    // The pending task is removed right after the callback body, in a finally so a callback that throws does not leave it behind.
+    try {
+      // Firebase can call a handler after the app is destroyed, and entering a destroyed injector throws NG0205.
+      if (injector.destroyed) {
+        return it.apply(this, args);
+      }
+      return runInInjectionContext(injector, () => run(() => it.apply(this, args)));
+    } finally {
+      taskDone?.();
     }
-    // Firebase can call a handler after the app is destroyed, and entering a destroyed injector throws NG0205.
-    if (injector.destroyed) {
-      return it.apply(this, args);
-    }
-    return runInInjectionContext(injector, () => run(() => it.apply(this, args)));
   };
 };
 
@@ -186,7 +188,6 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, logLevel
       if (blockUntilFirst) {
         taskDone ||= run(() => pendingTasks.add());
       }
-      // TODO create a microtask to track callback functions
       _arguments[i] = isFunction
         ? zoneWrapFn(argument, taskDone, injector)
         : zoneWrapObserver(argument, taskDone, injector);
@@ -221,8 +222,11 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, logLevel
       // Handle unsubscribe
       // function() is needed for the arguments object
       return function () {
-        setTimeout(taskDone, 0);
-        return ret.apply(this, arguments);
+        try {
+          return ret.apply(this, arguments);
+        } finally {
+          taskDone();
+        }
       };
     } else {
       // TODO how do we handle storage uploads in Zone? and other stuff with cancel() etc?

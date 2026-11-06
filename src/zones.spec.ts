@@ -2,6 +2,7 @@ import {
   EnvironmentInjector,
   NgZone,
   PendingTasks,
+  createEnvironmentInjector,
   inject,
   provideZoneChangeDetection,
   provideZonelessChangeDetection,
@@ -116,9 +117,8 @@ function describeZoneWrap(zoneJs: boolean) {
 
   describe(`ɵzoneWrap ${mode}`, () => {
     let addTask: jasmine.Spy;
-    /* One counter object per spec, captured by that spec's spy. The wrapped unsubscribe releases
-     * the task through a 0 ms timer, so a release can land after the spec that created it ends,
-     * and it must not count toward the next spec. */
+    /* One counter object per spec, captured by that spec's spy, so a removal that lands after the
+     * spec ends, such as a wrapped promise's, does not count toward the next spec. */
     let releases: { count: number };
     let cleanups: (() => void)[];
 
@@ -276,6 +276,17 @@ function describeZoneWrap(zoneJs: boolean) {
       expect(lastHandlerError).toEqual(new Error('handler failed'));
     });
 
+    it('removes the pending task when the handler fires after its child environment injector is destroyed', async () => {
+      const received: number[] = [];
+      const childInjector = createEnvironmentInjector([], TestBed.inject(EnvironmentInjector));
+      const wrapped = ɵzoneWrap(fakeSubscribe, true, undefined, true);
+      cleanups.push(runInInjectionContext(childInjector, () => wrapped((value: number) => received.push(value))));
+      childInjector.destroy();
+      await waitFor(() => received.length === 1);
+      expect(received).toEqual([1]);
+      expect(releases.count).toBe(1);
+    });
+
     it('still calls a handler that fires after the injector is destroyed, in both forms', async () => {
       const received: unknown[] = [];
       subscribeWrapped(true, value => received.push(value));
@@ -351,6 +362,105 @@ describe('ɵzoneWrap delivery timing', () => {
     const delegate = Reflect.get(TestBed.inject(ɵAngularFireSchedulers).insideAngular, 'delegate');
     expect(delegate).toBeInstanceOf(AsapScheduler);
     expect(delegate).not.toBe(asapScheduler);
+  });
+
+});
+
+describe('ɵzoneWrap callback pending-task removal', () => {
+
+  // Whether the wrapper called the task remover, and what had happened by then.
+  interface Release { released: boolean; afterCallbackBody: boolean; afterBodyMicrotask: boolean; afterMicrotask: boolean; afterTimer: boolean; }
+  interface Listener { callback?: (value: number) => void; unsubscribed: boolean; }
+
+  let ngZone: NgZone;
+  let injector: EnvironmentInjector;
+  let markers: { body: boolean; bodyMicrotask: boolean; microtask: boolean; timer: boolean };
+
+  // Stands in for a callback-taking Firebase function: keeps the callback, returns an unsubscribe.
+  const fakeListen = (listener: Listener) => (callback: (value: number) => void) => {
+    listener.callback = callback;
+    return () => { listener.unsubscribed = true; };
+  };
+
+  // Stands in for Realtime Database on cached data: invokes the callback inside the registering call.
+  const fakeListenSynchronously = (listener: Listener) => (callback: (value: number) => void) => {
+    callback(1);
+    return () => { listener.unsubscribed = true; };
+  };
+
+  /* Hands the wrapper a remover that records which markers had fired when it was called. A
+   * remover call that never comes resolves with released false after the fallback timer, not as a spec timeout. */
+  const observeRelease = () => new Promise<Release>(resolve => {
+    spyOn(TestBed.inject(PendingTasks), 'add').and.returnValue(() =>
+      resolve({ released: true, afterCallbackBody: markers.body, afterBodyMicrotask: markers.bodyMicrotask, afterMicrotask: markers.microtask, afterTimer: markers.timer }));
+    ngZone.runOutsideAngular(() => setTimeout(() => resolve({ released: false, afterCallbackBody: false, afterBodyMicrotask: false, afterMicrotask: false, afterTimer: false }), 500));
+  });
+
+  // A setTimeout(fn, 0) and a microtask, registered just before the delivery they are compared with.
+  const plantMarkers = () => {
+    setTimeout(() => { markers.timer = true; }, 0);
+    queueMicrotask(() => { markers.microtask = true; });
+  };
+
+  /* Runs `deliver` the way Firestore delivers, from a setTimeout(fn, 0) outside Angular, planting the
+   * markers in that same task first. */
+  const deliverOutsideAngular = (deliver: () => void) => ngZone.runOutsideAngular(() => setTimeout(() => {
+    plantMarkers();
+    deliver();
+  }, 0));
+
+  // The callback body records that it ran and queues a microtask of its own.
+  const callbackBody = () => {
+    markers.body = true;
+    queueMicrotask(() => { markers.bodyMicrotask = true; });
+  };
+
+  const wrapAndCall = (listen: (callback: (value: number) => void) => () => void, callback: (value: number) => void) => {
+    const wrapped = ɵzoneWrap(listen, true);
+    return runInInjectionContext(injector, () => ngZone.run(() => wrapped(callback)));
+  };
+
+  beforeEach(() => {
+    ngZone = TestBed.inject(NgZone);
+    injector = TestBed.inject(EnvironmentInjector);
+    markers = { body: false, bodyMicrotask: false, microtask: false, timer: false };
+  });
+
+  it('removes the pending task after the callback body ran and before its microtasks, before a setTimeout(fn, 0) registered just before delivery', async () => {
+    const listener: Listener = { unsubscribed: false };
+    const release = observeRelease();
+    wrapAndCall(fakeListen(listener), callbackBody);
+    deliverOutsideAngular(() => listener.callback?.(1));
+    expect(await release).toEqual({ released: true, afterCallbackBody: true, afterBodyMicrotask: false, afterMicrotask: false, afterTimer: false });
+  });
+
+  it('removes the pending task the same way when the callback is invoked inside the registering call', async () => {
+    const listener: Listener = { unsubscribed: false };
+    const release = observeRelease();
+    ngZone.runOutsideAngular(plantMarkers);
+    wrapAndCall(fakeListenSynchronously(listener), callbackBody);
+    expect(await release).toEqual({ released: true, afterCallbackBody: true, afterBodyMicrotask: false, afterMicrotask: false, afterTimer: false });
+  });
+
+  it('removes the pending task on unsubscribe before a setTimeout(fn, 0) registered just before the unsubscribe call', async () => {
+    const listener: Listener = { unsubscribed: false };
+    const release = observeRelease();
+    const unsubscribe = wrapAndCall(fakeListen(listener), callbackBody);
+    deliverOutsideAngular(() => unsubscribe());
+    expect(await release).toEqual({ released: true, afterCallbackBody: false, afterBodyMicrotask: false, afterMicrotask: false, afterTimer: false });
+    expect(listener.unsubscribed).toBe(true);
+  });
+
+  it('removes the pending task even when the callback throws', async () => {
+    const listener: Listener = { unsubscribed: false };
+    const release = observeRelease();
+    wrapAndCall(fakeListen(listener), () => { markers.body = true; throw new Error('deliberate'); });
+    let thrown: unknown;
+    deliverOutsideAngular(() => {
+      try { listener.callback?.(1); } catch (error) { thrown = error; }
+    });
+    expect(await release).toEqual({ released: true, afterCallbackBody: true, afterBodyMicrotask: false, afterMicrotask: false, afterTimer: false });
+    expect(thrown).toEqual(new Error('deliberate'));
   });
 
 });
