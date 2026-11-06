@@ -129,6 +129,8 @@ So developing with the new AngularFire is easy, you can use it just like the van
 
 #### Alternatives to v6 APIs
 
+In the modular column, `docRef` is a `DocumentReference<T>` typed through `withConverter(converter)`, where `converter` is a `FirestoreDataConverter<T>`. A reference from a plain `doc()` or `collection()` call is typed `DocumentData`, and the `<T>` calls below do not compile on one. See [Typed reads](firestore.md#typed-reads).
+
 <table>
     <thead>
         <tr>
@@ -207,7 +209,7 @@ deleteDoc(docRef) // Promise<void>
 
 ```ts
 import { collection } from '@angular/fire/firestore';
-collection<T>(docRef, 'bar') // CollectionReference<T>
+collection(docRef, 'bar').withConverter(converter) // CollectionReference<T>
 ```
 </td>
         </tr>
@@ -229,7 +231,7 @@ docSnapshots<T>(docRef) // Observable<DocumentSnapshot<T>>
 
 ```ts
 import { docData } from '@angular/fire/firestore';
-docData<T>(docRef) // Observable<T>
+docData<T>(docRef) // Observable<T | undefined>
 ```
 </td>
         </tr>
@@ -259,14 +261,15 @@ import {
     collection,
     getFirestore
 } from '@angular/fire/firestore';
-import { first } from 'rxjs/operators';
-import { IFoo } from '../interfaces';
+import { concatMap, first } from 'rxjs/operators';
+// a FirestoreDataConverter<IFoo>, see firestore.md "Typed reads"
+import { fooConverter } from '../foo-converter';
 
 export { getFirestore };
 
 export const fooData = firestoreInstance$.pipe(
     first(),
-    concatMap(firestore => collectionData<IFoo>(collection(firestore, 'foo'))),
+    concatMap(firestore => collectionData(collection(firestore, 'foo').withConverter(fooConverter))),
 );
 ```
 
