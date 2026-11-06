@@ -105,9 +105,26 @@ Let's explore reading data in Angular using the `collection` and `collectionData
 In `user-profile.component.ts`:
 
 ```typescript
-import { Firestore, collection, collectionData} from '@angular/fire/firestore';
+import { Firestore, FirestoreDataConverter, collection, collectionData } from '@angular/fire/firestore';
 import { Component, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+
+export interface UserProfile {
+    username: string;
+}
+
+/* A converter translates between stored documents and your own type.
+ * fromFirestore runs on every document read, so it is where a missing
+ * or wrong field gets its default. */
+export const userProfileConverter: FirestoreDataConverter<UserProfile> = {
+    toFirestore: profile => profile,
+    fromFirestore: (snapshot, options) => {
+        const data = snapshot.data(options);
+        return {
+            username: typeof data['username'] === 'string' ? data['username'] : '',
+        };
+    },
+};
 
 @Component ({
     selector: 'app-user-profile',
@@ -119,17 +136,15 @@ export class UserProfileComponent {
     users$: Observable<UserProfile[]>;
 
     constructor() {
-        // get a reference to the user-profile collection
-        const userProfileCollection = collection(this.firestore, 'users');
+        // get a reference to the users collection, typed through the converter
+        const userProfileCollection = collection(this.firestore, 'users').withConverter(userProfileConverter);
 
         // get documents (data) from the collection using collectionData
-        this.users$ = collectionData(userProfileCollection) as Observable<UserProfile[]>;
+        this.users$ = collectionData(userProfileCollection); // Observable<UserProfile[]>
     }
 }
-export interface UserProfile {
-    username: string;
-}
 ```
+
 `collectionData` returns an `observable` that can we can use to display the data in the template. In `user-profile.component.html`:
 
 ```html
@@ -144,6 +159,17 @@ export interface UserProfile {
 ```
 
 The `async` pipe handles unsubscribing from observables.
+
+#### Typed reads
+
+`collection()` and `doc()` return references typed as `DocumentData`, and `collectionData()` and `docData()` return whatever type the reference carries (`docData()` adds `undefined` for a document that does not exist). Two tempting shortcuts do not give you a typed read:
+
+* `collectionData<UserProfile>(collection(this.firestore, 'users'))` does not compile (`TS2345`), because the reference says `DocumentData` and the type argument says `UserProfile`.
+* `collectionData(...) as Observable<UserProfile[]>` compiles, but it only tells the compiler what you hope is stored. Nothing checks the documents.
+
+`withConverter()` is the Firebase SDK's way to type a reference. Attach a `FirestoreDataConverter<T>` and every read through that reference returns `T`, with no type argument and no cast. Because `fromFirestore` runs on every document, it is also where you decide what happens to a document that does not match your type. The example above substitutes a default, so one malformed document does not stop the list from rendering. Throwing inside `fromFirestore` instead would error the `collectionData` observable at the first bad document, and the subscription would end.
+
+The `idField` option, `collectionData(ref, { idField: 'id' })`, copies each document's id onto the returned object. It does not validate any other field. With a converter you can do the same inside `fromFirestore` with `snapshot.id`.
 
 ### Writing data
 
