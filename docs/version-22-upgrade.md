@@ -23,7 +23,7 @@ Either way, the migration writes `^13.0.0` when firebase 13 is already installed
 
 Through AngularFire 21, `@angular/fire` listed `firebase` under `dependencies`, so npm could install a second copy of the SDK under `node_modules/` whenever your app asked for a different version. The two copies reject each other's objects at runtime, with errors such as `Expected type '_Query', but it was: a custom _CollectionReference object` or `toDate is not a function`.
 
-AngularFire 22 lists `firebase` under `peerDependencies` instead. So your app should declare `firebase` in its `package.json` (on Yarn it must, since Yarn installs no peer dependencies). This gives you exactly one copy of `firebase`, and an incompatible version is refused at install time instead of failing at runtime.
+AngularFire 22 lists `firebase` under `peerDependencies` instead. So your app should declare `firebase` in its `package.json` (on Yarn it must, since Yarn installs no peer dependencies). This gives you exactly one copy of `firebase`. When your `package.json` requests an incompatible version, npm refuses to install it and Yarn and pnpm warn (see below), instead of the app failing at runtime.
 
 `ng update @angular/fire@next` updates an older `firebase` entry in your `package.json` when it requests a version outside `^12.18.0 || ^13.0.0`. If your app doesn't list `firebase` in `package.json`, the migration adds it and reinstalls. Verify with `npm ls firebase`, which should show exactly one copy.
 
