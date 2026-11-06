@@ -10,7 +10,7 @@ The guide below demonstrates how to retrieve, save, and remove data as lists.
 
 ## Injecting the `AngularFireDatabase` service
 
-**Make sure you have bootstrapped your application for AngularFire. See the Installation guide for bootstrap setup.**
+**Make sure you have set up AngularFire for the compat API, see [Setup](../../compat.md#setup).**
 
 AngularFireDatabase is a service which can be injected through the constructor of your Angular component or `@Injectable()` service.
 In the previous step, we modified the `/src/app/app.component.ts` to retrieve data as an object. In this step, let's start with a clean slate.

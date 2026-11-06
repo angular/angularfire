@@ -27,6 +27,8 @@ import { environment } from '../environments/environment';
 export class AppModule {}
 ```
 
+For a standalone application, and the compat module of every product, see the [compat guide's Setup section](../../compat.md#setup).
+
 The page load trace breaks down into the following default metrics:
 
 * [first paint traces](https://firebase.google.com/docs/perf-mon/automatic-web#first-paint) — measure the time between when the user navigates to a page and when any visual change happens

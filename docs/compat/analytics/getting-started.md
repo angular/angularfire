@@ -40,6 +40,8 @@ import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
 export class AppModule { }
 ```
 
+For a standalone application, and the compat module of every product, see the [compat guide's Setup section](../../compat.md#setup).
+
 `AngularFireAnalyticsModule` will dynamically import and configure `firebase/analytics`. A `page_view` event will automatically be logged (see `CONFIG` below if you wish to disable this behavior.)
 
 In your component you can then dependency inject `AngularFireAnalytics` and make calls against the SDK:

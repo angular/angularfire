@@ -132,3 +132,5 @@ constructor(remoteConfig: AngularFireRemoteConfig) {
   remoteConfig.lastFetchStatus.then(status => ...);
 }
 ```
+
+For a standalone application, and the compat module of every product, see the [compat guide's Setup section](../../compat.md#setup).
