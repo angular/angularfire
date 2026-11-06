@@ -21,6 +21,6 @@ export const getDataConnect = ɵzoneWrap(_getDataConnect, true);
 export const mutationRef = ɵzoneWrap(_mutationRef, true, 2);
 export const queryRef = ɵzoneWrap(_queryRef, true, 2);
 export const setLogLevel = ɵzoneWrap(_setLogLevel, true);
-export const subscribe = ɵzoneWrap(_subscribe, true);
+export const subscribe = ɵzoneWrap(_subscribe, true, undefined, true);
 export const terminate = ɵzoneWrap(_terminate, true);
 export const toQueryRef = ɵzoneWrap(_toQueryRef, true, 2);
