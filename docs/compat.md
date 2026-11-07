@@ -15,6 +15,75 @@ The compatibility API (`@angular/fire/compat/*`) is still supported. It gets bug
 
 Some of its tests are turned off right now: the ones for `AngularFirestoreCollection`, `AngularFirestoreCollectionGroup` and `AngularFirestoreDocument`, and one Cloud Storage upload test. Until [#3822](https://github.com/angular/angularfire/issues/3822) turns them back on, a bug in those APIs may not be caught before a release, so please report any you find.
 
+### Setup
+
+Install AngularFire and Firebase with `ng add @angular/fire`, as in [the quickstart](install-and-setup.md#2-install-angularfire-and-firebase) (its "Before you begin" notes apply here too), or with `npm install @angular/fire firebase`.
+
+At the `ng add` feature prompt, select the products you use: `ng add` then writes the modular providers (`provideFirebaseApp(...)` and one per selected feature) into your app configuration with your Firebase configuration inlined, and with nothing selected it installs the packages and sets up nothing.
+
+The compat API does not use the modular providers. It needs `AngularFireModule.initializeApp(...)` with your Firebase configuration, plus the compat module of each Firebase product you use.
+
+The modular providers can stay if `AngularFireModule.initializeApp(...)` gets the same configuration object, both APIs then share one Firebase app. With two different configurations, whichever API starts second fails with `app/duplicate-app`.
+
+In a standalone application, add them to `app.config.ts`:
+
+```ts
+import { ApplicationConfig, importProvidersFrom } from '@angular/core';
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    importProvidersFrom(
+      AngularFireModule.initializeApp({ /* your Firebase configuration */ }),
+      AngularFireDatabaseModule,
+    ),
+  ],
+};
+```
+
+In an NgModule application, import them in `app-module.ts`:
+
+```ts
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
+import { App } from './app';
+
+@NgModule({
+  declarations: [App],
+  imports: [
+    BrowserModule,
+    AngularFireModule.initializeApp({ /* your Firebase configuration */ }),
+    AngularFireDatabaseModule,
+  ],
+  bootstrap: [App],
+})
+export class AppModule {}
+```
+
+Without `AngularFireModule.initializeApp(...)`, injecting a compat service fails with `NG0201`, which a development build reports as:
+
+```
+NG0201: No provider found for `InjectionToken angularfire2.app.options`.
+```
+
+The compat module for each product:
+
+| Product | Module | Import from |
+|---|---|---|
+| Analytics | `AngularFireAnalyticsModule` | `@angular/fire/compat/analytics` |
+| Authentication | `AngularFireAuthModule` | `@angular/fire/compat/auth` |
+| Authentication route guards | `AngularFireAuthGuardModule` | `@angular/fire/compat/auth-guard` |
+| Cloud Firestore | `AngularFirestoreModule` | `@angular/fire/compat/firestore` |
+| Cloud Functions | `AngularFireFunctionsModule` | `@angular/fire/compat/functions` |
+| Cloud Messaging | `AngularFireMessagingModule` | `@angular/fire/compat/messaging` |
+| Cloud Storage | `AngularFireStorageModule` | `@angular/fire/compat/storage` |
+| Performance Monitoring | `AngularFirePerformanceModule` | `@angular/fire/compat/performance` |
+| Realtime Database | `AngularFireDatabaseModule` | `@angular/fire/compat/database` |
+| Remote Config | `AngularFireRemoteConfigModule` | `@angular/fire/compat/remote-config` |
+
 ### Monitor usage of your application in production
 
 > `AngularFireAnalytics` provides a convenient method of interacting with Google Analytics in your Angular application. The provided `ScreenTrackingService` and `UserTrackingService` automatically log events when you're using the Angular Router or Firebase Authentication respectively. [Learn more about Google Analytics](https://firebase.google.com/docs/analytics).

@@ -1,6 +1,6 @@
 # Upgrading to the AngularFire 22 release candidate
 
-AngularFire 22 targets **Angular 22** and the **Firebase JS SDK v12**. Most of the upgrade is handled for you by `ng update`.
+AngularFire 22 targets **Angular 22** and the **Firebase JS SDK v12 or v13**. Most of the upgrade is handled for you by `ng update`.
 
 ## Run the update
 
@@ -14,16 +14,18 @@ Include `@angular/fire@next` in the same command as Angular. On its own, `ng upd
 
 The AngularFire update runs a migration that:
 
-- **Adds** `firebase` **to your** `package.json` **if it is missing**, as `"firebase": "^12.18.0"`, and reinstalls. See the next section for why.
-- **Aligns an existing** `firebase` **entry to** `^12.18.0` when it requests a version outside that range.
+- **Adds** `firebase` **to your** `package.json` **if it is missing**, and reinstalls. See the next section for why.
+- **Aligns an existing** `firebase` **entry** when it requests a version outside `^12.18.0 || ^13.0.0`, the range AngularFire 22 supports.
+
+Either way, the migration writes `^13.0.0` when firebase 13 is already installed and `^12.18.0` otherwise, so an app on firebase 12 stays on 12 and an app on firebase 13 stays on 13.
 
 ## Your app now owns the Firebase SDK
 
 Through AngularFire 21, `@angular/fire` listed `firebase` under `dependencies`, so npm could install a second copy of the SDK under `node_modules/` whenever your app asked for a different version. The two copies reject each other's objects at runtime, with errors such as `Expected type '_Query', but it was: a custom _CollectionReference object` or `toDate is not a function`.
 
-AngularFire 22 lists `firebase` under `peerDependencies` instead. So your app should declare `firebase` in its `package.json` (on Yarn it must, since Yarn installs no peer dependencies). This gives you exactly one copy of `firebase`, and an incompatible version is refused at install time instead of failing at runtime.
+AngularFire 22 lists `firebase` under `peerDependencies` instead. So your app should declare `firebase` in its `package.json` (on Yarn it must, since Yarn installs no peer dependencies). This gives you exactly one copy of `firebase`. When your `package.json` requests an incompatible version, npm refuses to install it and Yarn and pnpm warn (see below), instead of the app failing at runtime.
 
-`ng update @angular/fire@next` updates an older `firebase` entry in your `package.json` to `^12.18.0` when it requests a version outside that range. If your app doesn't list `firebase` in `package.json` the migration adds `"firebase": "^12.18.0"` and reinstalls. Verify with `npm ls firebase`, which should show exactly one copy.
+`ng update @angular/fire@next` updates an older `firebase` entry in your `package.json` when it requests a version outside `^12.18.0 || ^13.0.0`. If your app doesn't list `firebase` in `package.json`, the migration adds it and reinstalls. Verify with `npm ls firebase`, which should show exactly one copy.
 
 ### If you install with `npm install` instead of `ng update`
 
@@ -49,13 +51,30 @@ Do not use `--force` or `--legacy-peer-deps` to get past this message. Both inst
 
 Yarn doesn't install peer dependencies. Add `firebase` to your own `package.json` as shown above, or run `ng update @angular/fire@next`, which adds it.
 
-An older version installs anyway with a warning (`has incorrect peer dependency "firebase@^12.18.0"` on Yarn 1, `YN0060: INCOMPATIBLE_PEER_DEPENDENCY` on Yarn 2+), so treat that warning as an upgrade step you still have to do.
+An older version installs anyway with a warning (`has incorrect peer dependency "firebase@^12.18.0 || ^13.0.0"` on Yarn 1, `YN0060: INCOMPATIBLE_PEER_DEPENDENCY` on Yarn 2+), so treat that warning as an upgrade step you still have to do.
 
 ### pnpm
 
-pnpm 8 and later install a missing `firebase` automatically. An older version installs anyway with a warning (`unmet peer firebase@^12.18.0: found 11.x` on pnpm 9 and 10, `Issues with peer dependencies found. Run "pnpm peers check" to list them.` on pnpm 11 and 12), and pnpm prints that warning only once, when it first resolves the tree, never on a later install from the committed lockfile.
+pnpm 8 and later install a missing `firebase` automatically. An older version installs anyway with a warning (`unmet peer firebase@"^12.18.0 || ^13.0.0": found 11.x` on pnpm 9 and 10, `Issues with peer dependencies found. Run "pnpm peers check" to list them.` on pnpm 11 and 12), and pnpm prints that warning only once, when it first resolves the tree, never on a later install from the committed lockfile.
 
 Set `strict-peer-dependencies=true` in `.npmrc` to make pnpm refuse the mismatch outright.
+
+## Firebase 13 is optional
+
+AngularFire 22 works with firebase 12 (`^12.18.0`) and firebase 13 (`^13.0.0`). `ng update` keeps the firebase major your app already has, so moving to firebase 13 is a separate step you can take when you are ready:
+
+```bash
+npm install firebase@^13.0.0
+```
+
+Before you update, check these firebase 13 changes:
+
+- **`VertexAIBackend` is removed** from `firebase/ai`, and so from `@angular/fire/ai`. Use `AgentPlatformBackend`, which firebase 12.18 also exports, so you can switch before you upgrade.
+  - `VertexAIBackend` defaults to the `us-central1` location and `AgentPlatformBackend` to `global`, so replace `new VertexAIBackend()` with `new AgentPlatformBackend('us-central1')` to keep the same location.
+  - A call that already passes a location keeps it as is.
+- **Node.js 24.12 or later.** firebase 13's packages declare `"node": ">=24.12.0"`, so on Node.js 22 npm prints `EBADENGINE` warnings when it installs them.
+
+For everything else that changed, see the [Firebase JavaScript SDK release notes](https://firebase.google.com/support/release-notes/js).
 
 ## Fewer build-time packages
 
@@ -68,6 +87,28 @@ If you run AngularFire's schematics with the standalone `schematics` command on 
 Deploying server-side rendering to Cloud Functions with `ng deploy` (a deploy target with `ssr: true` or `ssr: 'cloud-functions'`, and the `functionsRuntimeOptions` and `CF3v2` options only it reads) is deprecated in AngularFire 22 and will be removed in AngularFire 23. `ng deploy` prints a warning before the build when it runs in that mode. Server-rendered apps should move to [Firebase App Hosting](./app-hosting.md).
 
 Hosting-only deploys (`ssr` absent or `false`) and Cloud Run deploys (`ssr: 'cloud-run'`) are not deprecated. They no longer print the old "Legacy ng-deploy Firebase is deprecated" message.
+
+## Observable reads deliver as microtasks
+
+Every Observable read (`collectionData`, `docData`, `authState`, `user`, `objectVal`, `listVal` and the rest) used to hand each value to your subscriber on a timer (`setInterval` with no delay), one event-loop turn later. It now does so at the next microtask checkpoint, which is sooner. The compat `AngularFireAuth` streams change the same way. What arrives, in which order, and when change detection runs do not change.
+
+What an upgrading app may notice:
+
+- A test that waits only for microtasks (a few awaited promises, vitest fake timers without advancing, `fakeAsync` with `flushMicrotasks()` alone) now sees a value whose source emits in a microtask, as Auth and a promise-based mock do.
+  - In a test that fakes timers, a Firestore value still arrives only after the clock is advanced with `tick()` or `vi.advanceTimersByTime()`, because the Firestore SDK hands each snapshot over inside a `setTimeout`.
+  - A test that already advances the clock, or waits for a real timer, sees the value exactly as before.
+- Code that registers its own `setTimeout` when a read emits sees that timer run after the value arrives, not before.
+- In a zoneless server render, a value arriving between the app reporting stable and serialization now reaches a `TransferState` entry you write by hand but not the HTML, because the zoneless change-detection pass is itself a later timer.
+  - Before this change such a value reached neither. AngularFire itself writes nothing into `TransferState`.
+
+## Callback reads give up their pending task right after the callback
+
+Every callback read (`onSnapshot`, `onAuthStateChanged`, `onValue` and the other callback-taking functions wrapped with a pending task) used to keep Angular's pending task for one more `setTimeout(fn, 0)` delay after its first callback ran, and again after unsubscribe. It now removes the task right after the callback body returns, and right after the unsubscribe call. What the callback receives, and when change detection runs, do not change.
+
+### What an upgrading app may notice:
+
+- `ApplicationRef.whenStable()` and a server render follow a callback read's first value one `setTimeout(fn, 0)` delay sooner.
+- A test that inspects Angular's pending tasks sees the task gone as soon as the callback has run, with no timer to advance. A test that awaits `whenStable()` under fake timers still needs the clock advanced, because Angular's own change-detection tick runs on a timer.
 
 ## Other notes
 

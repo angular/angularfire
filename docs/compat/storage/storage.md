@@ -28,6 +28,8 @@ import { environment } from '../environments/environment';
 export class AppModule {}
 ```
 
+For a standalone application, and the compat module of every product, see the [compat guide's Setup section](../../compat.md#setup).
+
 The `BUCKET` injection token can be used to customise the storage bucket.
 
 ```ts
