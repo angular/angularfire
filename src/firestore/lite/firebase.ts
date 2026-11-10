@@ -3,82 +3,32 @@ export * from 'firebase/firestore/lite';
 import { ɵzoneWrap } from '@angular/fire';
 import {
   addDoc as _addDoc,
-  aggregateFieldEqual as _aggregateFieldEqual,
-  aggregateQuerySnapshotEqual as _aggregateQuerySnapshotEqual,
-  and as _and,
-  collection as _collection,
-  collectionGroup as _collectionGroup,
   connectFirestoreEmulator as _connectFirestoreEmulator,
   deleteDoc as _deleteDoc,
-  deleteField as _deleteField,
-  doc as _doc,
-  documentId as _documentId,
-  endAt as _endAt,
-  endBefore as _endBefore,
   getAggregate as _getAggregate,
   getCount as _getCount,
   getDoc as _getDoc,
   getDocs as _getDocs,
   getFirestore as _getFirestore,
-  increment as _increment,
   initializeFirestore as _initializeFirestore,
-  limit as _limit,
-  limitToLast as _limitToLast,
-  or as _or,
-  orderBy as _orderBy,
-  query as _query,
-  queryEqual as _queryEqual,
-  refEqual as _refEqual,
   runTransaction as _runTransaction,
   setDoc as _setDoc,
-  setLogLevel as _setLogLevel,
-  snapshotEqual as _snapshotEqual,
-  startAfter as _startAfter,
-  startAt as _startAt,
-  sum as _sum,
   terminate as _terminate,
   updateDoc as _updateDoc,
-  vector as _vector,
-  where as _where,
   writeBatch as _writeBatch
 } from 'firebase/firestore/lite';
 
 export const addDoc = ɵzoneWrap(_addDoc, true, 2);
-export const aggregateFieldEqual = ɵzoneWrap(_aggregateFieldEqual, true, 2);
-export const aggregateQuerySnapshotEqual = ɵzoneWrap(_aggregateQuerySnapshotEqual, true, 2);
-export const and = ɵzoneWrap(_and, true, 2);
-export const collection = ɵzoneWrap(_collection, true, 2);
-export const collectionGroup = ɵzoneWrap(_collectionGroup, true, 2);
 export const connectFirestoreEmulator = ɵzoneWrap(_connectFirestoreEmulator, true);
 export const deleteDoc = ɵzoneWrap(_deleteDoc, true, 2);
-export const deleteField = ɵzoneWrap(_deleteField, true, 2);
-export const doc = ɵzoneWrap(_doc, true, 2);
-export const documentId = ɵzoneWrap(_documentId, true, 2);
-export const endAt = ɵzoneWrap(_endAt, true, 2);
-export const endBefore = ɵzoneWrap(_endBefore, true, 2);
 export const getAggregate = ɵzoneWrap(_getAggregate, true);
 export const getCount = ɵzoneWrap(_getCount, true);
 export const getDoc = ɵzoneWrap(_getDoc, true);
 export const getDocs = ɵzoneWrap(_getDocs, true);
 export const getFirestore = ɵzoneWrap(_getFirestore, true);
-export const increment = ɵzoneWrap(_increment, true, 2);
 export const initializeFirestore = ɵzoneWrap(_initializeFirestore, true);
-export const limit = ɵzoneWrap(_limit, true, 2);
-export const limitToLast = ɵzoneWrap(_limitToLast, true, 2);
-export const or = ɵzoneWrap(_or, true, 2);
-export const orderBy = ɵzoneWrap(_orderBy, true, 2);
-export const query = ɵzoneWrap(_query, true, 2);
-export const queryEqual = ɵzoneWrap(_queryEqual, true, 2);
-export const refEqual = ɵzoneWrap(_refEqual, true, 2);
 export const runTransaction = ɵzoneWrap(_runTransaction, true);
 export const setDoc = ɵzoneWrap(_setDoc, true, 2);
-export const setLogLevel = ɵzoneWrap(_setLogLevel, true);
-export const snapshotEqual = ɵzoneWrap(_snapshotEqual, true, 2);
-export const startAfter = ɵzoneWrap(_startAfter, true, 2);
-export const startAt = ɵzoneWrap(_startAt, true, 2);
-export const sum = ɵzoneWrap(_sum, true, 2);
 export const terminate = ɵzoneWrap(_terminate, true);
 export const updateDoc = ɵzoneWrap(_updateDoc, true, 2);
-export const vector = ɵzoneWrap(_vector, true, 2);
-export const where = ɵzoneWrap(_where, true, 2);
 export const writeBatch = ɵzoneWrap(_writeBatch, true, 2);
