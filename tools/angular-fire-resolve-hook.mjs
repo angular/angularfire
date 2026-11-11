@@ -43,7 +43,10 @@ export function resolve(specifier, context, nextResolve) {
   }
   const subpath = specifier === packageName ? '.' : `./${specifier.slice(packageName.length + 1)}`;
   const mapped = exportsMap[subpath];
-  const entry = typeof mapped === 'string' ? mapped : mapped?.default;
+  // Node's rule: the first key, in the map's own order, that is an active condition or "default".
+  const entry = typeof mapped === 'string'
+    ? mapped
+    : Object.entries(mapped ?? {}).find(([condition]) => condition === 'default' || context.conditions.includes(condition))?.[1];
   if (typeof entry !== 'string') {
     throw new Error(`The built ${packageName} has no "${subpath}" entry in its exports map, so "${specifier}" cannot be resolved for the Node specs.`);
   }

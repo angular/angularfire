@@ -1,5 +1,5 @@
 import { isPlatformServer } from '@angular/common';
-import { DestroyRef, PLATFORM_ID, REQUEST, REQUEST_CONTEXT, assertInInjectionContext, inject, isDevMode } from '@angular/core';
+import { DestroyRef, Injectable, PLATFORM_ID, REQUEST, REQUEST_CONTEXT, assertInInjectionContext, inject, isDevMode } from '@angular/core';
 import { VERSION } from '@angular/fire';
 import {
   FirebaseApp,
@@ -59,6 +59,15 @@ export const ɵresetBrowserOrServerAppWarnings = (): void => {
   warningCounts.clear();
   notedMissingRequestContext = false;
 };
+
+/**
+ * Lives as long as the request's root injector and is handed to the SDK as `releaseOnDeref`, so
+ * the server app is released when the garbage collector reclaims it. As a service it is dropped
+ * in the `finally` of that injector's destroy, which runs even when a service's `ngOnDestroy`
+ * throws.
+ */
+@Injectable({ providedIn: 'root' })
+export class ɵRequestLifetime {}
 
 /** The two tokens a render can carry, each `undefined` when absent. */
 interface RenderTokens {
@@ -148,19 +157,13 @@ const buildServerApp = (
   const { releaseOnDeref: _releaseOnDeref, releaseAfterRender, automaticDataCollectionEnabled: _automaticDataCollectionEnabled, ...serverSettings } = settings;
   const timedRelease = releaseAfterRender !== undefined || typeof FinalizationRegistry === 'undefined';
 
-  // Kept reachable only through the injector's destroy hooks, which Angular empties at destroy, so the SDK can collect it right after the render.
-  const renderHolder = {};
-  if (!timedRelease) {
-    destroyRef.onDestroy(() => renderHolder);
-  }
-
   let serverApp: FirebaseServerApp;
   try {
     serverApp = initializeServerApp(options, {
       ...serverSettings,
       ...appSettings,
       ...tokens,
-      ...(timedRelease ? {} : { releaseOnDeref: renderHolder }),
+      ...(timedRelease ? {} : { releaseOnDeref: inject(ɵRequestLifetime) }),
     });
   } catch (error) {
     if (!isTokenParseError(error)) {

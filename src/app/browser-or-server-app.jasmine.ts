@@ -1,4 +1,4 @@
-import { EnvironmentInjector, PLATFORM_ID, Provider, REQUEST, REQUEST_CONTEXT, createEnvironmentInjector } from '@angular/core';
+import { EnvironmentInjector, Injectable, OnDestroy, PLATFORM_ID, Provider, REQUEST, REQUEST_CONTEXT, createEnvironmentInjector } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import {
   BrowserOrServerAppSettings,
@@ -45,6 +45,9 @@ const configure = (providers: Provider[], settings?: BrowserOrServerAppSettings,
 const UNPARSEABLE_PAYLOAD = Buffer.from('not json').toString('base64url');
 const UNPARSEABLE_TOKEN = `h.${UNPARSEABLE_PAYLOAD}.s`;
 
+/** A token whose payload decodes to "null": JSON.parse accepts it, and the SDK's read of `exp` on it throws a TypeError. */
+const NULL_PAYLOAD_TOKEN = `h.${Buffer.from('null').toString('base64url')}.s`;
+
 /** Everything a `console.warn` spy was called with, joined into one string for `toContain` checks. */
 const warningText = (warn: jasmine.Spy): string => warn.calls.allArgs().flat().join(' ');
 
@@ -60,6 +63,20 @@ const serverAppOrFail = (app: FirebaseApp): FirebaseServerApp => {
 };
 
 const wait = (milliseconds: number): Promise<void> => new Promise(resolve => setTimeout(resolve, milliseconds));
+
+/**
+ * Forces a garbage collection and lets the SDK's FinalizationRegistry callbacks run. Node exposes
+ * `globalThis.gc` only when started with `--expose-gc`, which the `test:node` scripts in
+ * package.json pass.
+ */
+const collectGarbage = async (): Promise<void> => {
+  const collect = Reflect.get(globalThis, 'gc');
+  if (typeof collect !== 'function') {
+    throw new Error('this spec needs Node started with --expose-gc, as the test:node scripts do');
+  }
+  collect();
+  await wait(0);
+};
 
 /** Reading `settings` on a deleted server app throws `app/server-app-deleted`, the public sign of a release. */
 const isDeleted = (app: FirebaseServerApp): boolean => {
@@ -88,8 +105,11 @@ const spyOnRegistry = () => spyOn(FinalizationRegistry.prototype, 'register').an
  * registration in the process would also reach. The SDK registers each `releaseOnDeref` object
  * with the app as the held value.
  */
-const registrationsFor = (register: jasmine.Spy, app: FirebaseApp): unknown[] =>
-  register.calls.allArgs().filter(([, heldValue]) => heldValue === app).map(([holder]) => holder);
+const registrationsFor = (register: jasmine.Spy, app: FirebaseApp): object[] =>
+  register.calls.allArgs()
+    .filter(([, heldValue]) => heldValue === app)
+    .map(([registered]) => registered)
+    .filter((registered): registered is object => typeof registered === 'object' && registered !== null);
 
 describe('initializeBrowserOrServerApp', () => {
   beforeEach(() => ɵresetBrowserOrServerAppWarnings());
@@ -160,14 +180,36 @@ describe('initializeBrowserOrServerApp', () => {
       const context = { authIdToken: buildToken({}) };
       const settings: BrowserOrServerAppSettings = {};
       const app = serverAppOrFail(configure([{ provide: REQUEST_CONTEXT, useValue: context }], settings));
-      const holders = registrationsFor(register, app);
-      expect(holders.length).toBe(1);
-      expect(typeof holders[0]).toBe('object');
-      expect(holders[0]).not.toBe(context);
-      expect(holders[0]).not.toBe(settings);
+      const registered = registrationsFor(register, app);
+      expect(registered.length).toBe(1);
+      expect(typeof registered[0]).toBe('object');
+      expect(registered[0]).not.toBe(context);
+      expect(registered[0]).not.toBe(settings);
       TestBed.resetTestingModule();
       await wait(50);
       expect(isDeleted(app)).toBeFalse();
+    });
+
+    it('by default keeps the app alive through the render and releases it once the render is collected', async () => {
+      const register = spyOnRegistry();
+      const app = serverAppOrFail(configure([], { authIdToken: buildToken({}) }));
+      const lifetime = new WeakRef(registrationsFor(register, app)[0]);
+      // The spy's call record would keep the registered object reachable.
+      register.calls.reset();
+      // Two collections with a pause between: an object nothing keeps alive is gone after the first, and the SDK's cleanup has run by the second.
+      for (let round = 0; round < 2; round++) {
+        await collectGarbage();
+        await wait(50);
+      }
+      expect(lifetime.deref()).toBeDefined();
+      expect(isDeleted(app)).toBeFalse();
+      TestBed.resetTestingModule();
+      for (let attempt = 0; attempt < 50 && !isDeleted(app); attempt++) {
+        await collectGarbage();
+        await wait(10);
+      }
+      expect(lifetime.deref()).toBeUndefined();
+      expect(isDeleted(app)).toBeTrue();
     });
 
     it('releases the app when the render ends with releaseAfterRender 0', async () => {
@@ -223,7 +265,22 @@ describe('initializeBrowserOrServerApp', () => {
       await untilDeleted(app);
     });
 
-    it('registers one release object per render in the default mode', () => {
+    it('releases a shared app once per render with a positive releaseAfterRender', async () => {
+      const authIdToken = buildToken({});
+      const providers = [provideFirebaseApp(() => initializeBrowserOrServerApp(SPEC_OPTIONS, { authIdToken, releaseAfterRender: 100 }))];
+      const parent = TestBed.inject(EnvironmentInjector);
+      const first = createEnvironmentInjector(providers, parent);
+      const second = createEnvironmentInjector(providers, parent);
+      const app = serverAppOrFail(first.get(FirebaseApp));
+      expect(second.get(FirebaseApp)).toBe(app);
+      first.destroy();
+      await wait(250);
+      expect(isDeleted(app)).toBeFalse();
+      second.destroy();
+      await untilDeleted(app);
+    });
+
+    it('registers one release per render in the default mode', () => {
       const register = spyOnRegistry();
       const authIdToken = buildToken({});
       const providers = [provideFirebaseApp(() => initializeBrowserOrServerApp(SPEC_OPTIONS, { authIdToken }))];
@@ -232,11 +289,34 @@ describe('initializeBrowserOrServerApp', () => {
       const second = createEnvironmentInjector(providers, parent);
       const app = first.get(FirebaseApp);
       expect(second.get(FirebaseApp)).toBe(app);
-      const holders = registrationsFor(register, app);
-      expect(holders.length).toBe(2);
-      expect(holders[0]).not.toBe(holders[1]);
+      // Both child injectors share the TestBed's root injector, so they share one ɵRequestLifetime, registered once per render.
+      expect(registrationsFor(register, app).length).toBe(2);
       first.destroy();
       second.destroy();
+    });
+
+    it('by default still releases the app when a service ngOnDestroy throws and a listener keeps the injector alive', async () => {
+      @Injectable({ providedIn: 'root' })
+      class ThrowingService implements OnDestroy {
+        ngOnDestroy(): void {
+          throw new Error('spec');
+        }
+      }
+      const app = serverAppOrFail(configure([], { authIdToken: buildToken({}) }));
+      TestBed.inject(ThrowingService);
+      // Stands in for a Firebase listener that captured the injector and was never unsubscribed.
+      const retainedInjector = TestBed.inject(EnvironmentInjector);
+      try {
+        TestBed.resetTestingModule();
+      } catch {
+        // the throwing ngOnDestroy
+      }
+      for (let attempt = 0; attempt < 50 && !isDeleted(app); attempt++) {
+        await collectGarbage();
+        await wait(10);
+      }
+      expect(isDeleted(app)).toBeTrue();
+      expect(retainedInjector.destroyed).toBeTrue();
     });
 
     it('never hands the SDK a releaseOnDeref the type could not see', () => {
@@ -246,9 +326,9 @@ describe('initializeBrowserOrServerApp', () => {
       loose.releaseOnDeref = callerObject;
       const app = configure([], loose);
       expect(isServerApp(app)).toBeTrue();
-      const holders = registrationsFor(register, app);
-      expect(holders.length).toBe(1);
-      expect(holders[0]).not.toBe(callerObject);
+      const registered = registrationsFor(register, app);
+      expect(registered.length).toBe(1);
+      expect(registered[0]).not.toBe(callerObject);
     });
 
     it('never hands the SDK a releaseOnDeref in the timed mode either', () => {
@@ -283,6 +363,15 @@ describe('initializeBrowserOrServerApp', () => {
       TestBed.resetTestingModule();
       expect(configure([{ provide: REQUEST_CONTEXT, useValue: { authIdToken: UNPARSEABLE_TOKEN } }])).toBe(getApp());
       expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('renders signed out when a token payload is JSON but not an object', () => {
+      const warn = spyOn(console, 'warn');
+      const app = configure([{ provide: REQUEST_CONTEXT, useValue: { authIdToken: NULL_PAYLOAD_TOKEN } }]);
+      expect(isServerApp(app)).toBeFalse();
+      expect(app).toBe(getApp());
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(warningText(warn)).toContain('could not be parsed');
     });
 
     it('leaves a junk token to the SDK and still releases the app it builds', async () => {
@@ -413,6 +502,18 @@ describe('initializeBrowserOrServerApp', () => {
       await deleteApp(existing);
       await wait(100);
       expect(isDeleted(existing)).toBeFalse();
+    });
+
+    it('compares the App Check token too', async () => {
+      const token = buildToken({ kind: 'appCheck' });
+      const existing = initializeServerApp(SPEC_OPTIONS, { appCheckToken: token });
+      existing.settings.appCheckToken = buildToken({ kind: 'appCheck' });
+      const warn = spyOn(console, 'warn');
+      const app = configure([], { appCheckToken: token, releaseAfterRender: 0 });
+      expect(isServerApp(app)).toBeFalse();
+      expect(warn).toHaveBeenCalledTimes(1);
+      await deleteApp(existing);
+      await untilDeleted(existing);
     });
 
     it('warns on the first occurrence and then every hundredth', async () => {
