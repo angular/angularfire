@@ -245,7 +245,7 @@ A runtime without `FinalizationRegistry` cannot release at garbage collection, s
 
 With `releaseAfterRender` set, the release runs when Angular destroys the render, after your services' `ngOnDestroy` hooks. A service whose `ngOnDestroy` throws stops that teardown, so the server app is never released and one stays behind for every signed-in render. The default release does not depend on teardown and is not affected.
 
-AngularFire's [sample app](https://github.com/angular/angularfire/tree/main/sample) gives the browser and the server their own `app.config.client.ts` and `app.config.server.ts`. `initializeBrowserOrServerApp` works there too, in the server file, with the client file keeping `initializeApp`.
+AngularFire's [sample app](https://github.com/angular/angularfire/tree/main/sample) is an example of this step: one `provideFirebaseApp(() => initializeBrowserOrServerApp(...))` in its shared `app.config.ts`, with `app.config.server.ts` adding only `provideServerRendering`.
 
 ID tokens are short-lived, and a returning visitor's browser can send one that expired while the tab was closed. The server cannot refresh it, because a user restored from an ID token has no refresh token, so Firebase logs an error and the page renders signed out. The browser then refreshes the token and the page updates. A token that cannot be parsed at all, such as a cookie another site set under the same name, also renders signed out, with one warning in the server console.
 
