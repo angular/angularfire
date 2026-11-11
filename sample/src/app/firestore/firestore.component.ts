@@ -30,6 +30,7 @@ export class FirestoreComponent {
       connectFirestoreEmulator(this.firestore, "localhost", environment.emulatorPorts.firestore);
     }
 
+    // AngularFire does not wrap doc, so it needs no injection context. It wraps docData, which gets the constructor's.
     this.testDocValue = docData(doc(this.firestore, 'test/1')).pipe(
       traceUntilFirst('firestore'),
       isPlatformServer(inject(PLATFORM_ID)) ?

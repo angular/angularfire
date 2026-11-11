@@ -63,6 +63,7 @@ export class UpboatsComponent {
       connectFirestoreEmulator(this.firestore, "localhost", environment.emulatorPorts.firestore);
     }
 
+    // AngularFire does not wrap collection, query or orderBy, so they need no injection context.
     const animalsCollection = collection(this.firestore, 'animals').withConverter<Animal>({
       fromFirestore: snapshot => {
         const { name, upboats } = snapshot.data();
@@ -85,31 +86,27 @@ export class UpboatsComponent {
   }
 
   async upboat(id: string) {
-    return await runInInjectionContext(this.injector, () =>
-      updateDoc(doc(this.firestore, `animals/${id}`), {
-        upboats: increment(1),
-        updatedAt: serverTimestamp(),
-      })
-    );
+    // runInInjectionContext is not needed for doc, increment and serverTimestamp: AngularFire does not wrap them.
+    const animal = doc(this.firestore, `animals/${id}`);
+    const changes = { upboats: increment(1), updatedAt: serverTimestamp() };
+    // AngularFire wraps updateDoc, and an event handler runs outside the injection context, so it is given one here.
+    return await runInInjectionContext(this.injector, () => updateDoc(animal, changes));
   }
 
   async downboat(id: string) {
-    return await runInInjectionContext(this.injector, () =>
-      updateDoc(doc(this.firestore, `animals/${id}`), {
-        upboats: increment(-1),
-        updatedAt: serverTimestamp(),
-      })
-    );
+    // runInInjectionContext is not needed for doc, increment and serverTimestamp: AngularFire does not wrap them.
+    const animal = doc(this.firestore, `animals/${id}`);
+    const changes = { upboats: increment(-1), updatedAt: serverTimestamp() };
+    // AngularFire wraps updateDoc, and an event handler runs outside the injection context, so it is given one here.
+    return await runInInjectionContext(this.injector, () => updateDoc(animal, changes));
   }
 
   async newAnimal() {
-    return await runInInjectionContext(this.injector, () =>
-      addDoc(collection(this.firestore, 'animals'), {
-        name: prompt('Can haz name?'),
-        upboats: 1,
-        updatedAt: serverTimestamp(),
-      })
-    );
+    // runInInjectionContext is not needed for collection and serverTimestamp: AngularFire does not wrap them.
+    const animals = collection(this.firestore, 'animals');
+    const animal = { name: prompt('Can haz name?'), upboats: 1, updatedAt: serverTimestamp() };
+    // AngularFire wraps addDoc, and an event handler runs outside the injection context, so it is given one here.
+    return await runInInjectionContext(this.injector, () => addDoc(animals, animal));
   }
 
 }

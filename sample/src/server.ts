@@ -11,7 +11,10 @@ import cookieParser from "cookie-parser";
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
-const angularApp = new AngularNodeAppEngine();
+const angularApp = new AngularNodeAppEngine({
+  // Behind a TLS-terminating proxy such as Firebase App Hosting or Cloud Run, these two forwarded headers carry the real host and protocol.
+  trustProxyHeaders: ['x-forwarded-host', 'x-forwarded-proto'],
+});
 
 app.use(
   express.static(browserDistFolder, {

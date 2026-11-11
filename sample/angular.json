@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ng21-test": {
+    "ng22-test": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -28,7 +28,7 @@
             "server": "src/main.server.ts",
             "outputMode": "server",
             "security": {
-              "allowedHosts": []
+              "allowedHosts": ["localhost"]
             },
             "ssr": {
               "entry": "src/server.ts"
@@ -63,10 +63,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "ng21-test:build:production"
+              "buildTarget": "ng22-test:build:production"
             },
             "development": {
-              "buildTarget": "ng21-test:build:development"
+              "buildTarget": "ng22-test:build:development"
             }
           },
           "defaultConfiguration": "development"
