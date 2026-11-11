@@ -12,8 +12,8 @@ import { concatMap, distinct } from 'rxjs/operators';
 // back when we constructed our own class. Then in the "new class" we just return the FirebaseApp in the
 // constructor, this also has the added benefit of Firebase methods taking our DI class without
 // casting. E.g,
-//   constructor(private app: FirebaseApp) { }
-//   ngOnDestroy() { deleteApp(this.app); }
+//   private readonly app = inject(FirebaseApp);
+//   readonly firestore = getFirestore(this.app);
 //
  
 export interface FirebaseApp extends IFirebaseApp {}
