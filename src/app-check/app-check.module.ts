@@ -39,12 +39,17 @@ const isLocalhost = typeof window !== 'undefined' && LOCALHOSTS.includes(window.
 
 let warnedServerSkip = false;
 
+/** Resets the server-rendering warning for specs, which share one process. */
+export const ɵresetAppCheckServerWarning = (): void => {
+  warnedServerSkip = false;
+};
+
 export function appCheckInstanceFactory(fn: (injector: Injector) => FirebaseAppCheck) {
    return (zone: NgZone, injector: Injector, platformId: unknown) => {
     if (isPlatformServer(platformId) && !injector.get(APP_CHECK_ON_SERVER)) {
       if (isDevMode() && !warnedServerSkip) {
         warnedServerSkip = true;
-        console.warn("AngularFire skips App Check during server rendering, so server-side Firebase requests carry no App Check token. To run App Check there, provide APP_CHECK_ON_SERVER as true in your server config. Find more at https://github.com/angular/angularfire/blob/main/docs/app-check.md");
+        console.warn("AngularFire skips App Check during server rendering, so server renders without a relayed App Check token send none. To relay the browser's App Check token, build the app with initializeBrowserOrServerApp and hand the token to the render as the appCheckToken key of the request context. To run App Check on the server instead, provide APP_CHECK_ON_SERVER as true in your server config. Find more at https://github.com/angular/angularfire/blob/main/docs/app-check.md");
       }
       return undefined;
     }
