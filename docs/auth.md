@@ -233,17 +233,19 @@ export const appConfig: ApplicationConfig = {
 
 #### When the server app is released
 
-By default the server app is released once the render has been garbage collected, which is also what the manual setup below does. Until then, a repeat request from the same visitor, such as a reload or a link opened in a new tab, reuses the app, and that reuse is what keeps such a request as fast as a signed-out one. A fresh server app costs a new Firestore connection and an account lookup, about 300 to 400 ms before the HTML is sent.
+By default the server app is released once the garbage collector has reclaimed the finished request, which is also what the manual setup below does. Until then, a repeat request from the same visitor, such as a reload or a link opened in a new tab, reuses the app, and that reuse is what keeps such a request as fast as a signed-out one. A fresh server app costs a new Firestore connection and an account lookup, about 300 to 400 ms before the HTML is sent.
 
-To release at a fixed time instead, pass `releaseAfterRender`: `0` releases the app when the render ends, which bounds memory to the renders in flight and pays that cost on every repeat request, and a positive number keeps the app for that many milliseconds after the render ends.
+To release at a fixed time instead, pass `releaseAfterRender`: `0` releases the app as soon as the page has been rendered, which bounds memory to the requests in flight and pays that cost on every repeat request, and a positive number keeps the app for that many milliseconds after the page has been rendered.
 
 ```ts
 provideFirebaseApp(() => initializeBrowserOrServerApp(firebaseConfig, { releaseAfterRender: 60_000 })),
 ```
 
-A runtime without `FinalizationRegistry` cannot release at garbage collection, so the app is released when the render ends there whatever the setting.
+A JavaScript runtime without `FinalizationRegistry` cannot release at garbage collection, so there the app is released as soon as the page has been rendered, whatever the setting.
 
-With `releaseAfterRender` set, the release runs when Angular destroys the render, after your services' `ngOnDestroy` hooks. A service whose `ngOnDestroy` throws stops that teardown, so the server app is never released and one stays behind for every signed-in render. The default release does not depend on teardown and is not affected.
+With `releaseAfterRender` set, the Firebase app release is done in a `DestroyRef.onDestroy` callback, which Angular runs after every service's and component's `ngOnDestroy` when it destroys the request's injector. If an `ngOnDestroy` method or an `ApplicationRef.onDestroy` listener throws, Angular stops there, the release never runs, and the server app stays in memory, one per signed-in render. The default release does not run during that teardown and is not affected.
+
+Call `initializeBrowserOrServerApp` in `app.config.ts`, not in a route's `providers`. A route's `providers` create a child injector that Angular does not destroy when the request finishes, so a `releaseAfterRender` release registered there never runs.
 
 AngularFire's [sample app](https://github.com/angular/angularfire/tree/main/sample) is an example of this step: one `provideFirebaseApp(() => initializeBrowserOrServerApp(...))` in its shared `app.config.ts`, with `app.config.server.ts` adding only `provideServerRendering`.
 
