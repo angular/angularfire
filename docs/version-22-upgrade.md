@@ -115,6 +115,9 @@ Every callback read (`onSnapshot`, `onAuthStateChanged`, `onValue` and the other
 - **Node.js 20 is not supported.** Angular 22 requires Node.js `^22.22.3 || ^24.15.0 || >=26.0.0`. Node.js 20 reached end of life on 2026-04-30.
 - **TypeScript 6.0 is required** (AngularFire 22 peers `typescript >=6.0 <6.1`). TypeScript 6 turns `strict` on by default, drops `downlevelIteration` and deprecates `baseUrl` and `moduleResolution: "node"`, so an app carrying those settings in its `tsconfig.json` may see new compiler errors that Angular's own update does not fix.
 - **Coming from a 21 release candidate** (`21.0.0-rc.0`, `rc.1` or `rc.2`), the v21 migration runs once more and reports "No changes made", because `21.0.0` lies between your version and `22.0.0`. That is expected.
+- **Coming from `22.0.0-rc.0`,** run `ng update @angular/fire@next`.
+  - `ng add` saved the release candidate as an exact version, so it does not move on its own.
+  - The v22 migration runs once more and reports "No changes made" when your `firebase` entry is already inside the supported range.
 - **Coming from a 22 canary build.** On `22.0.0-canary.*`, run `ng update @angular/fire@next`. On `22.0.1-canary.*`, run `ng update @angular/fire@canary`.
 - **Screen tracking** (`ScreenTrackingService`) reads the routed component's selector through Angular's `reflectComponentType`, because `ComponentFactoryResolver` is gone from Angular 22. Nothing changes for your app.
 - **Server rendering in one call.** `initializeBrowserOrServerApp` from `@angular/fire/app` replaces the `provideFirebaseApp` callback the Authentication guide used to ask server-rendered apps to write. It builds the ordinary app in the browser and a `FirebaseServerApp` for the visitor's tokens on the server, releases it, and renders signed out instead of failing on a token Firebase cannot parse. See [Server-side Rendering](auth.md#server-side-rendering). Existing callbacks keep working.
