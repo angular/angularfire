@@ -245,7 +245,7 @@ A JavaScript runtime without `FinalizationRegistry` cannot release at garbage co
 
 With `releaseAfterRender` set, the Firebase app release is done in a `DestroyRef.onDestroy` callback, which Angular runs after every service's and component's `ngOnDestroy` when it destroys the request's injector. If an `ngOnDestroy` method or an `ApplicationRef.onDestroy` listener throws, Angular stops there, the release never runs, and the server app stays in memory, one per signed-in render. The default release does not run during that teardown and is not affected.
 
-Call `initializeBrowserOrServerApp` in `app.config.ts`, not in a route's `providers`. A route's `providers` create a child injector that Angular does not destroy when the request finishes, so a `releaseAfterRender` release registered there never runs.
+Call `initializeBrowserOrServerApp` in `app.config.ts`, not in a route's `providers`. A route's `providers` create a child injector that Angular does not destroy when the request finishes, so a `releaseAfterRender` release registered there never runs. The default release is tied to the request's root injector and still happens.
 
 AngularFire's [sample app](https://github.com/angular/angularfire/tree/main/sample) is an example of this step: one `provideFirebaseApp(() => initializeBrowserOrServerApp(...))` in its shared `app.config.ts`, with `app.config.server.ts` adding only `provideServerRendering`.
 
