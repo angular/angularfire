@@ -1,6 +1,6 @@
 import { PendingTasks } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { FirebaseApp, deleteApp, initializeApp, onLog, provideFirebaseApp } from '@angular/fire/app';
+import { FirebaseApp, deleteApp, getApp, initializeApp, initializeBrowserOrServerApp, onLog, provideFirebaseApp } from '@angular/fire/app';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../utils';
 
@@ -51,6 +51,22 @@ describe('FirebaseApp', () => {
     it('a blocking call in the same context does register a task', async () => {
         await TestBed.runInInjectionContext(() => deleteApp(initializeApp(COMMON_CONFIG, rando())));
         expect(addTask).toHaveBeenCalled();
+    });
+
+  });
+
+  describe('initializeBrowserOrServerApp', () => {
+
+    // The default app is shared with other specs that build it from COMMON_CONFIG, so no other settings and no deleteApp here.
+    it('returns the default app in the browser whatever tokens it is given', () => {
+        TestBed.configureTestingModule({
+            providers: [
+                provideFirebaseApp(() => initializeBrowserOrServerApp(COMMON_CONFIG, { authIdToken: 'h.e.s', appCheckToken: 'h.e.s' })),
+            ],
+        });
+        const browserApp = TestBed.inject(FirebaseApp);
+        expect(browserApp).toBe(getApp());
+        expect('settings' in browserApp).toBeFalse();
     });
 
   });
