@@ -1,5 +1,6 @@
+import { PendingTasks } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { FirebaseApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { FirebaseApp, deleteApp, getApp, initializeApp, initializeBrowserOrServerApp, onLog, provideFirebaseApp } from '@angular/fire/app';
 import { COMMON_CONFIG } from '../test-config';
 import { rando } from '../utils';
 
@@ -26,6 +27,46 @@ describe('FirebaseApp', () => {
     it('should be injectable', () => {
         expect(app).toBeTruthy();
         expect(app).toEqual(providedApp);
+    });
+
+  });
+
+  describe('zone wrapping', () => {
+    let addTask: jasmine.Spy;
+
+    beforeEach(() => {
+        addTask = spyOn(TestBed.inject(PendingTasks), 'add').and.callThrough();
+    });
+
+    afterEach(() => {
+        // The handler onLog installs re-enters this test's injector, so it must not outlive the TestBed.
+        TestBed.runInInjectionContext(() => onLog(null));
+    });
+
+    it('onLog does not hold the application unstable', () => {
+        TestBed.runInInjectionContext(() => onLog(() => undefined));
+        expect(addTask).not.toHaveBeenCalled();
+    });
+
+    it('a blocking call in the same context does register a task', async () => {
+        await TestBed.runInInjectionContext(() => deleteApp(initializeApp(COMMON_CONFIG, rando())));
+        expect(addTask).toHaveBeenCalled();
+    });
+
+  });
+
+  describe('initializeBrowserOrServerApp', () => {
+
+    // The default app is shared with other specs that build it from COMMON_CONFIG, so no other settings and no deleteApp here.
+    it('returns the default app in the browser whatever tokens it is given', () => {
+        TestBed.configureTestingModule({
+            providers: [
+                provideFirebaseApp(() => initializeBrowserOrServerApp(COMMON_CONFIG, { authIdToken: 'h.e.s', appCheckToken: 'h.e.s' })),
+            ],
+        });
+        const browserApp = TestBed.inject(FirebaseApp);
+        expect(browserApp).toBe(getApp());
+        expect('settings' in browserApp).toBeFalse();
     });
 
   });

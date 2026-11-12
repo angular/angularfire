@@ -1,10 +1,14 @@
-# AngularFire 21 Sample App
+# AngularFire 22 Sample App
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.0.
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.6.
+
+## Node.js
+
+Use Node.js 24.15 or later for every command below. The sample declares `firebase` 13, whose packages require Node.js 24.12 or later, and Angular 22 requires 24.15 on that line. On Node.js 22.22.3 or later the install still works but prints `EBADENGINE` warnings for the `firebase` packages.
 
 ## AngularFire tarball
 
-The sample consumes the library as `file:../angular-fire-21.0.0.tgz`. Produce that file from the repository root before installing here:
+The sample consumes the library as `file:../angular-fire-22.0.0.tgz`. Produce that file from the repository root before installing here:
 
 ```bash
 npm ci
@@ -16,7 +20,7 @@ The root build ends with `npm pack ./dist/packages-dist`, which writes `angular-
 Then, from this `sample/` folder, install the dependencies by naming the tarball explicitly:
 
 ```bash
-npm install ../angular-fire-21.0.0.tgz
+npm install ../angular-fire-22.0.0.tgz
 ```
 
 A plain `npm install` is not reliable here. `package-lock.json` records the integrity hash of the tarball built by whoever committed the lockfile, and a tarball you build yourself can hash differently. With a cold npm cache the install then fails with an `EINTEGRITY` error. With a warm cache that holds the recorded hash, npm installs the stale cached copy and exits successfully, so you would be testing a library you did not build. Naming the tarball installs the file on disk and rewrites the recorded hash in your local `package-lock.json`. Leave that lockfile change uncommitted.
@@ -64,6 +68,10 @@ ng build
 ```
 
 This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+
+## Running the server build
+
+`npm run serve:ssr:ng22-test` starts the built Express server on port 4000. Angular 22 answers `400 Bad Request` to any host it was not told about, and `angular.json` allows only `localhost` (`security.allowedHosts`). A deployment adds its own hostnames there or in the `NG_ALLOWED_HOSTS` environment variable.
 
 ## Running unit tests
 

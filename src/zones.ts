@@ -14,12 +14,15 @@ import {
   SchedulerAction,
   SchedulerLike,
   Subscription,
-  asyncScheduler,
   queueScheduler
 } from 'rxjs';
+import { AsapAction } from 'rxjs/internal/scheduler/AsapAction';
+import { AsapScheduler } from 'rxjs/internal/scheduler/AsapScheduler';
 import { observeOn, subscribeOn } from 'rxjs/operators';
 
 declare const Zone: {current: unknown} | undefined;
+
+const microtaskScheduler = new AsapScheduler(AsapAction);
 
 export enum LogLevel {
   "SILENT" = 0, 
@@ -57,9 +60,11 @@ export class ɵZoneScheduler implements SchedulerLike {
       }
     };
 
-    // Scheduling itself needs to be run in zone to ensure setInterval calls for async scheduling are done
-    // inside the correct zone. This scheduler needs to schedule asynchronously always to ensure that
-    // firebase emissions are never synchronous. Specifying a delay causes issues with the queueScheduler delegate.
+    /* Delivery re-enters the target zone through runGuarded above, whatever zone the delegate's
+     * microtask or timer runs in. The delegate must always schedule asynchronously, so firebase
+     * emissions are never synchronous, and with the asap delegate a positive delay falls back to a
+     * timer, so callers must keep the delay at zero to keep microtask delivery. Specifying a delay
+     * causes issues with the queueScheduler delegate. */
     return this.delegate.schedule(workInZone, delay, state);
   }
 }
@@ -79,7 +84,7 @@ export class ɵAngularFireSchedulers {
     this.insideAngular = ngZone.run(
       () => new ɵZoneScheduler(
         typeof Zone === 'undefined' ? undefined : Zone.current,
-        asyncScheduler
+        microtaskScheduler
       )
     );
   }
@@ -114,14 +119,48 @@ const zoneWrapFn = (
   injector: EnvironmentInjector,
 ) => {
   return (...args: any[]) => {
-    if (taskDone) {
-      setTimeout(taskDone, 0);
+    // The pending task is removed right after the callback body, in a finally so a callback that throws does not leave it behind.
+    try {
+      // Firebase can call a handler after the app is destroyed, and entering a destroyed injector throws NG0205.
+      if (injector.destroyed) {
+        return it.apply(this, args);
+      }
+      return runInInjectionContext(injector, () => run(() => it.apply(this, args)));
+    } finally {
+      taskDone?.();
     }
-    return runInInjectionContext(injector, () => run(() => it.apply(this, args)));
   };
 };
 
-export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, logLevel?: LogLevel): T => {
+/** Firebase also takes a handler as an object, and data-connect's subscribe spells its members onNext, onErr, onComplete. */
+const observerKeys = ['next', 'error', 'complete', 'onNext', 'onErr', 'onComplete'];
+
+const isObserverLike = (value: unknown): value is object =>
+  typeof value === 'object' && value !== null &&
+  observerKeys.some(key => typeof Reflect.get(value, key) === 'function');
+
+/** A copy is handed to Firebase so the caller can reuse the same observer for several calls. */
+const zoneWrapObserver = (
+  observer: object,
+  taskDone: VoidFunction | undefined,
+  injector: EnvironmentInjector,
+): object => {
+  const wrapped: Record<string, unknown> = { ...observer };
+  for (const key of observerKeys) {
+    const member = Reflect.get(observer, key);
+    if (typeof member === 'function') {
+      wrapped[key] = zoneWrapFn(member.bind(observer), taskDone, injector);
+    }
+  }
+  return wrapped;
+};
+
+/**
+ * `acceptsObserver` is set by tools/build.ts only for functions whose declared parameters include an
+ * observer, so a data object that happens to have a next, error or complete method reaches every
+ * other function untouched.
+ */
+export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, logLevel?: LogLevel, acceptsObserver = false): T => {
   logLevel ||= blockUntilFirst ? LogLevel.WARN : LogLevel.VERBOSE;
   // function() is needed for the arguments object
   return function () {
@@ -138,16 +177,20 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, logLevel
       warnOutsideInjectionContext(it, logLevel);
       return (it as any).apply(this, _arguments);
     }
-    // if this is a callback function, e.g, onSnapshot, we should create a pending task and complete it
-    // only once one of the callback functions is tripped.
+    /* if this is a callback, a function or an observer object, e.g. onSnapshot, we should create a
+     * pending task and complete it only once one of the callback functions is tripped. */
     for (let i = 0; i < arguments.length; i++) {
-      if (typeof _arguments[i] === 'function') {
-        if (blockUntilFirst) {
-          taskDone ||= run(() => pendingTasks.add());
-        }
-        // TODO create a microtask to track callback functions
-        _arguments[i] = zoneWrapFn(_arguments[i], taskDone, injector);
+      const argument = _arguments[i];
+      const isFunction = typeof argument === 'function';
+      if (!isFunction && !(acceptsObserver && isObserverLike(argument))) {
+        continue;
       }
+      if (blockUntilFirst) {
+        taskDone ||= run(() => pendingTasks.add());
+      }
+      _arguments[i] = isFunction
+        ? zoneWrapFn(argument, taskDone, injector)
+        : zoneWrapObserver(argument, taskDone, injector);
     }
     const ret = runOutsideAngular(() => (it as any).apply(this, _arguments));
     if (!blockUntilFirst) {
@@ -172,18 +215,18 @@ export const ɵzoneWrap = <T= unknown>(it: T, blockUntilFirst: boolean, logLevel
         () => {
           const removeTask = pendingTasks.add();
           return new Promise((resolve, reject) => {
-            ret.then(
-              (it) => runInInjectionContext(injector, () => run(() => resolve(it))),
-              (reason) => runInInjectionContext(injector, () => run(() => reject(reason)))
-            ).finally(removeTask);
+            ret.then(resolve, reject).finally(removeTask);
         });
       });
     } else if (typeof ret === 'function' && taskDone) {
       // Handle unsubscribe
       // function() is needed for the arguments object
       return function () {
-        setTimeout(taskDone, 0);
-        return ret.apply(this, arguments);
+        try {
+          return ret.apply(this, arguments);
+        } finally {
+          taskDone();
+        }
       };
     } else {
       // TODO how do we handle storage uploads in Zone? and other stuff with cancel() etc?

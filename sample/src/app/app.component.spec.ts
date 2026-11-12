@@ -1,8 +1,7 @@
-import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
-import { provideClientHydration, withIncrementalHydration } from '@angular/platform-browser';
+import { provideClientHydration } from '@angular/platform-browser';
 import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
 
@@ -11,10 +10,9 @@ describe('AppComponent', () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent],
       providers: [
-        provideZonelessChangeDetection(),
         provideFirebaseApp(() => initializeApp(environment.firebase)),
         provideAuth(() => getAuth()),
-        provideClientHydration(withIncrementalHydration()),
+        provideClientHydration(),
       ],
     }).compileComponents();
   });
@@ -25,10 +23,10 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have the 'ng21-test' title`, () => {
+  it(`should have the 'ng22-test' title`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('ng21-test');
+    expect(app.title).toEqual('ng22-test');
   });
 
   it('should render title', () => {

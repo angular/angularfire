@@ -3,27 +3,17 @@ export * from 'firebase/firestore';
 import { ɵzoneWrap } from '@angular/fire';
 import {
   addDoc as _addDoc,
-  aggregateFieldEqual as _aggregateFieldEqual,
-  aggregateQuerySnapshotEqual as _aggregateQuerySnapshotEqual,
-  and as _and,
   clearIndexedDbPersistence as _clearIndexedDbPersistence,
-  collection as _collection,
-  collectionGroup as _collectionGroup,
   connectFirestoreEmulator as _connectFirestoreEmulator,
   deleteAllPersistentCacheIndexes as _deleteAllPersistentCacheIndexes,
   deleteDoc as _deleteDoc,
-  deleteField as _deleteField,
   disableNetwork as _disableNetwork,
   disablePersistentCacheIndexAutoCreation as _disablePersistentCacheIndexAutoCreation,
-  doc as _doc,
-  documentId as _documentId,
   documentSnapshotFromJSON as _documentSnapshotFromJSON,
   enableIndexedDbPersistence as _enableIndexedDbPersistence,
   enableMultiTabIndexedDbPersistence as _enableMultiTabIndexedDbPersistence,
   enableNetwork as _enableNetwork,
   enablePersistentCacheIndexAutoCreation as _enablePersistentCacheIndexAutoCreation,
-  endAt as _endAt,
-  endBefore as _endBefore,
   getAggregateFromServer as _getAggregateFromServer,
   getCountFromServer as _getCountFromServer,
   getDoc as _getDoc,
@@ -34,59 +24,34 @@ import {
   getDocsFromServer as _getDocsFromServer,
   getFirestore as _getFirestore,
   getPersistentCacheIndexManager as _getPersistentCacheIndexManager,
-  increment as _increment,
   initializeFirestore as _initializeFirestore,
-  limit as _limit,
-  limitToLast as _limitToLast,
   loadBundle as _loadBundle,
   namedQuery as _namedQuery,
   onSnapshot as _onSnapshot,
   onSnapshotResume as _onSnapshotResume,
   onSnapshotsInSync as _onSnapshotsInSync,
-  or as _or,
-  orderBy as _orderBy,
-  query as _query,
-  queryEqual as _queryEqual,
   querySnapshotFromJSON as _querySnapshotFromJSON,
-  refEqual as _refEqual,
   runTransaction as _runTransaction,
   setDoc as _setDoc,
   setIndexConfiguration as _setIndexConfiguration,
-  setLogLevel as _setLogLevel,
-  snapshotEqual as _snapshotEqual,
-  startAfter as _startAfter,
-  startAt as _startAt,
-  sum as _sum,
   terminate as _terminate,
   updateDoc as _updateDoc,
-  vector as _vector,
   waitForPendingWrites as _waitForPendingWrites,
-  where as _where,
   writeBatch as _writeBatch
 } from 'firebase/firestore';
 
 export const addDoc = ɵzoneWrap(_addDoc, true, 2);
-export const aggregateFieldEqual = ɵzoneWrap(_aggregateFieldEqual, true, 2);
-export const aggregateQuerySnapshotEqual = ɵzoneWrap(_aggregateQuerySnapshotEqual, true, 2);
-export const and = ɵzoneWrap(_and, true, 2);
 export const clearIndexedDbPersistence = ɵzoneWrap(_clearIndexedDbPersistence, true);
-export const collection = ɵzoneWrap(_collection, true, 2);
-export const collectionGroup = ɵzoneWrap(_collectionGroup, true, 2);
 export const connectFirestoreEmulator = ɵzoneWrap(_connectFirestoreEmulator, true);
 export const deleteAllPersistentCacheIndexes = ɵzoneWrap(_deleteAllPersistentCacheIndexes, true);
 export const deleteDoc = ɵzoneWrap(_deleteDoc, true, 2);
-export const deleteField = ɵzoneWrap(_deleteField, true, 2);
 export const disableNetwork = ɵzoneWrap(_disableNetwork, true);
 export const disablePersistentCacheIndexAutoCreation = ɵzoneWrap(_disablePersistentCacheIndexAutoCreation, true);
-export const doc = ɵzoneWrap(_doc, true, 2);
-export const documentId = ɵzoneWrap(_documentId, true, 2);
 export const documentSnapshotFromJSON = ɵzoneWrap(_documentSnapshotFromJSON, true);
 export const enableIndexedDbPersistence = ɵzoneWrap(_enableIndexedDbPersistence, true);
 export const enableMultiTabIndexedDbPersistence = ɵzoneWrap(_enableMultiTabIndexedDbPersistence, true);
 export const enableNetwork = ɵzoneWrap(_enableNetwork, true);
 export const enablePersistentCacheIndexAutoCreation = ɵzoneWrap(_enablePersistentCacheIndexAutoCreation, true);
-export const endAt = ɵzoneWrap(_endAt, true, 2);
-export const endBefore = ɵzoneWrap(_endBefore, true, 2);
 export const getAggregateFromServer = ɵzoneWrap(_getAggregateFromServer, true);
 export const getCountFromServer = ɵzoneWrap(_getCountFromServer, true);
 export const getDoc = ɵzoneWrap(_getDoc, true);
@@ -97,32 +62,17 @@ export const getDocsFromCache = ɵzoneWrap(_getDocsFromCache, true);
 export const getDocsFromServer = ɵzoneWrap(_getDocsFromServer, true);
 export const getFirestore = ɵzoneWrap(_getFirestore, true);
 export const getPersistentCacheIndexManager = ɵzoneWrap(_getPersistentCacheIndexManager, true);
-export const increment = ɵzoneWrap(_increment, true, 2);
 export const initializeFirestore = ɵzoneWrap(_initializeFirestore, true);
-export const limit = ɵzoneWrap(_limit, true, 2);
-export const limitToLast = ɵzoneWrap(_limitToLast, true, 2);
 export const loadBundle = ɵzoneWrap(_loadBundle, true);
 export const namedQuery = ɵzoneWrap(_namedQuery, true, 2);
-export const onSnapshot = ɵzoneWrap(_onSnapshot, true);
-export const onSnapshotResume = ɵzoneWrap(_onSnapshotResume, true);
-export const onSnapshotsInSync = ɵzoneWrap(_onSnapshotsInSync, true);
-export const or = ɵzoneWrap(_or, true, 2);
-export const orderBy = ɵzoneWrap(_orderBy, true, 2);
-export const query = ɵzoneWrap(_query, true, 2);
-export const queryEqual = ɵzoneWrap(_queryEqual, true, 2);
+export const onSnapshot = ɵzoneWrap(_onSnapshot, true, undefined, true);
+export const onSnapshotResume = ɵzoneWrap(_onSnapshotResume, true, undefined, true);
+export const onSnapshotsInSync = ɵzoneWrap(_onSnapshotsInSync, true, undefined, true);
 export const querySnapshotFromJSON = ɵzoneWrap(_querySnapshotFromJSON, true);
-export const refEqual = ɵzoneWrap(_refEqual, true, 2);
 export const runTransaction = ɵzoneWrap(_runTransaction, true);
 export const setDoc = ɵzoneWrap(_setDoc, true, 2);
 export const setIndexConfiguration = ɵzoneWrap(_setIndexConfiguration, true);
-export const setLogLevel = ɵzoneWrap(_setLogLevel, true);
-export const snapshotEqual = ɵzoneWrap(_snapshotEqual, true, 2);
-export const startAfter = ɵzoneWrap(_startAfter, true, 2);
-export const startAt = ɵzoneWrap(_startAt, true, 2);
-export const sum = ɵzoneWrap(_sum, true, 2);
 export const terminate = ɵzoneWrap(_terminate, true);
 export const updateDoc = ɵzoneWrap(_updateDoc, true, 2);
-export const vector = ɵzoneWrap(_vector, true, 2);
 export const waitForPendingWrites = ɵzoneWrap(_waitForPendingWrites, true);
-export const where = ɵzoneWrap(_where, true, 2);
 export const writeBatch = ɵzoneWrap(_writeBatch, true, 2);

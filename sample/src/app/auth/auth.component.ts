@@ -1,13 +1,14 @@
 import { Component, EnvironmentInjector, inject, makeStateKey, OnDestroy, PLATFORM_ID, runInInjectionContext, TransferState } from '@angular/core';
-import { Auth, beforeAuthStateChanged, signInAnonymously, signOut, User } from '@angular/fire/auth';
+import { Auth, beforeAuthStateChanged, GoogleAuthProvider, onIdTokenChanged, signInAnonymously, signInWithPopup, signOut, User } from '@angular/fire/auth';
 import { map, startWith, switchMap, tap } from 'rxjs/operators';
 import { AsyncPipe, isPlatformBrowser, isPlatformServer } from '@angular/common';
 import cookies from 'js-cookie';
 import { from, Observable } from 'rxjs';
-import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, onIdTokenChanged } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import { ɵzoneWrap } from "@angular/fire";
 
 // TODO bring this to RxFire
+// The SDK's own onAuthStateChanged, because AngularFire's wrapper is applied to this whole function below.
 function _authState(auth: Auth): Observable<User|null> {
   return from(auth.authStateReady()).pipe(
     switchMap(() => new Observable<User|null>((subscriber) => {
@@ -100,6 +101,7 @@ export class AuthComponent implements OnDestroy {
       this.unsubscribeFromOnIdTokenChanged?.();
   }
 
+  // Event handlers run outside the injection context, and AngularFire wraps these three calls, so each one is given the context back.
   async logout() {
     return await runInInjectionContext(this.injector, () => signOut(this.auth));
   }
@@ -109,7 +111,8 @@ export class AuthComponent implements OnDestroy {
   }
 
   async loginWithGoogle() {
-    return await signInWithPopup(this.auth, new GoogleAuthProvider());
+    const provider = new GoogleAuthProvider();
+    return await runInInjectionContext(this.injector, () => signInWithPopup(this.auth, provider));
   }
 
 }
