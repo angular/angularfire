@@ -1,5 +1,5 @@
 {
-  "name": "ng21-test",
+  "name": "ng22-test",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -7,39 +7,39 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:ng21-test": "node dist/ng21-test/server/server.mjs"
+    "serve:ssr:ng22-test": "node dist/ng22-test/server/server.mjs"
   },
   "private": true,
   "dependencies": {
-    "@angular/common": "^21.0.0",
-    "@angular/compiler": "^21.0.0",
-    "@angular/core": "^21.0.0",
-    "@angular/fire": "file:../angular-fire-21.0.0.tgz",
-    "@angular/forms": "^21.0.0",
-    "@angular/platform-browser": "^21.0.0",
-    "@angular/platform-server": "^21.0.0",
-    "@angular/router": "^21.0.0",
-    "@angular/ssr": "^21.0.0",
+    "@angular/common": "^22.2.5",
+    "@angular/compiler": "^22.2.5",
+    "@angular/core": "^22.2.5",
+    "@angular/fire": "file:../angular-fire-22.0.0.tgz",
+    "@angular/forms": "^22.2.5",
+    "@angular/platform-browser": "^22.2.5",
+    "@angular/platform-server": "^22.2.5",
+    "@angular/router": "^22.2.5",
+    "@angular/ssr": "^22.2.6",
     "cookie-parser": "^1.4.7",
     "express": "^5.1.0",
-    "firebase": "^12.18.0",
+    "firebase": "^13.0.0",
     "firebase-admin": "^13.0.1",
     "js-cookie": "^3.0.5",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@angular/build": "^21.0.0",
-    "@angular/cli": "^21.0.0",
-    "@angular/compiler-cli": "^21.0.0",
+    "@angular/build": "^22.2.6",
+    "@angular/cli": "^22.2.6",
+    "@angular/compiler-cli": "^22.2.5",
     "@types/cookie-parser": "^1.4.8",
-    "@types/express": "^5.0.0",
+    "@types/express": "^5.0.1",
     "@types/js-cookie": "^3.0.6",
-    "@types/node": "^20.17.19",
-    "@vitest/coverage-v8": "^4.0.8",
+    "@types/node": "^22.12.0",
+    "@vitest/coverage-v8": "^5.0.0",
     "firebase-tools": "^15.0.0",
-    "jsdom": "^28.0.0",
-    "typescript": "~5.9.2",
-    "vitest": "^4.0.8"
+    "jsdom": "^30.0.0",
+    "typescript": "~6.0.3",
+    "vitest": "^5.0.0"
   }
 }
