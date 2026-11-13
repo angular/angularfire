@@ -52,7 +52,9 @@ App Check's reCAPTCHA providers need a browser, so AngularFire skips App Check d
 
 ### Firebase requests made during server rendering
 
-With no App Check instance on the server, requests to Firebase made while the server renders a page carry no App Check token. If you [enforce App Check](https://firebase.google.com/docs/app-check/enable-enforcement) for a Firebase product, those requests are rejected. Firebase's recommended fix is to hand a token from the browser to the server and pass it to `initializeServerApp` as `appCheckToken`, described in [Use App Check in SSR environments](https://firebase.google.com/docs/web/ssr-apps#use-app-check).
+With no App Check instance on the server, requests to Firebase made while the server renders a page carry no App Check token unless the browser relays one. If you [enforce App Check](https://firebase.google.com/docs/app-check/enable-enforcement) for a Firebase product, requests without a token are rejected. The fix is to hand the browser's token to the server and build the server app with `initializeBrowserOrServerApp`, which passes it on as `appCheckToken`. [Relaying the App Check token](auth.md#relaying-the-app-check-token) in the Authentication guide walks through it. A relayed token wins over `APP_CHECK_ON_SERVER` for Firestore, which sends the server app's token whatever App Check instance the server holds.
+
+In development mode the server console says so once per process: "AngularFire skips App Check during server rendering, so server renders without a relayed App Check token send none", followed by the two ways to change that.
 
 ### Running App Check during server rendering
 

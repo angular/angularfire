@@ -8,6 +8,8 @@ the Firebase docs for more information on what methods are available.](https://f
 
 > **NOTE**: [AngularFire has a new tree-shakable API](../../../README.md#developer-guide), you're looking at the documentation for the compatability version of the library. [See the v7 upgrade guide for more information on this change.](../../version-7-upgrade.md).
 
+Setup for the compat API, `AngularFireModule.initializeApp(...)` plus `AngularFireAuthModule`, is in the [compat guide's Setup section](../../compat.md#setup).
+
 **Example app:**
 
 ```ts

@@ -57,7 +57,7 @@ Update the imports from `import { ... } from 'firebase/auth'` to `import { ... }
 
 ## Server-side Rendering
 
-When Angular renders your app on the server, the server does not know which user is visiting. To render the page as that user, pass their Auth ID token to `initializeServerApp`, which gives you a Firebase app that is already signed in as them.
+When Angular renders your app on the server, the server does not know which user is visiting. To render the page as that user, hand their Auth ID token to `initializeBrowserOrServerApp`, which gives you a Firebase app that is already signed in as them on the server, and the ordinary Firebase app in the browser.
 
 Getting the token to the server is your app's job. This guide keeps it in a cookie, because the browser attaches cookies to every request on its own.
 
@@ -77,6 +77,12 @@ export const serverRoutes: ServerRoute[] = [
 ```
 
 The rest of this guide has no effect on routes rendered any other way.
+
+The request context that step 3 fills and step 4 reads is provided by `AngularNodeAppEngine` and `AngularAppEngine`, the engines `ng new --ssr` sets up. An app still rendering through the older `CommonEngine` has to provide it itself, on every render:
+
+```ts
+engine.render({ ...renderOptions, providers: [{ provide: REQUEST_CONTEXT, useValue: { authIdToken } }] })
+```
 
 ### 2. Keep the ID token in a cookie
 
@@ -173,6 +179,8 @@ import cookieParser from 'cookie-parser';
 app.use(cookieParser());
 
 app.use((req, res, next) => {
+  // A page rendered for one visitor must never be served to another from a cache.
+  res.setHeader('Cache-Control', 'private, no-store');
   angularApp
     .handle(req, { authIdToken: req.cookies?.__session })
     .then((response) =>
@@ -184,26 +192,17 @@ app.use((req, res, next) => {
 
 Keep it where the generated block already was, below the block that serves static files, so real files are still served before Angular tries to render them. The rest of the file, including the part that starts the server, stays as it is.
 
-The second argument to `handle` is what the render reads back as `REQUEST_CONTEXT`.
+The second argument to `handle` is what the render reads back as `REQUEST_CONTEXT`, and `initializeBrowserOrServerApp` reads the `authIdToken` key from it. If you forget the second argument, AngularFire says so once in the server console in development mode.
 
-### 4. Build the server app from the token
+The `Cache-Control` header is not optional. A signed-in render puts that visitor's data into the HTML, so a CDN or proxy that cached the response would hand it to the next visitor.
 
-In `app.config.ts`, choose the Firebase app based on where the code is running, and pass that app to every Firebase provider:
+### 4. Build the app with `initializeBrowserOrServerApp`
+
+In `app.config.ts`, build the Firebase app with `initializeBrowserOrServerApp` and pass that app to every Firebase provider:
 
 ```ts
-import {
-  ApplicationConfig,
-  PLATFORM_ID,
-  REQUEST_CONTEXT,
-  inject,
-} from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
-import {
-  FirebaseApp,
-  initializeApp,
-  initializeServerApp,
-  provideFirebaseApp,
-} from '@angular/fire/app';
+import { ApplicationConfig, inject } from '@angular/core';
+import { FirebaseApp, initializeBrowserOrServerApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 
@@ -211,21 +210,7 @@ const firebaseConfig = { /* ...your Firebase configuration... */ };
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideFirebaseApp(() => {
-      if (isPlatformBrowser(inject(PLATFORM_ID))) {
-        return initializeApp(firebaseConfig);
-      }
-      const requestContext = inject(REQUEST_CONTEXT, { optional: true }) as
-        | { authIdToken?: string }
-        | null;
-      if (!requestContext?.authIdToken) {
-        return initializeApp(firebaseConfig);
-      }
-      return initializeServerApp(firebaseConfig, {
-        authIdToken: requestContext.authIdToken,
-        releaseOnDeref: requestContext,
-      });
-    }),
+    provideFirebaseApp(() => initializeBrowserOrServerApp(firebaseConfig)),
     provideAuth(() => getAuth(inject(FirebaseApp))),
     provideFirestore(() => getFirestore(inject(FirebaseApp))),
     // ...
@@ -233,42 +218,162 @@ export const appConfig: ApplicationConfig = {
 };
 ```
 
-#### Five details make this work
+`initializeBrowserOrServerApp` returns the right kind of app for where the code is running:
 
-- **Keep exactly one `provideFirebaseApp`.** AngularFire hands you the app you provided only when a single one is registered, and falls back to the default app otherwise. A second registration anywhere in your configuration would make the server app be silently ignored.
-- **Pass `inject(FirebaseApp)` to every provider, not just `provideAuth`.** `ng add @angular/fire` writes them without an argument, which resolves the default app. On a signed-in request the factory above builds a server app instead, so a provider that asks for the default app fails outright on a freshly started server.
-- **Keep the signed-out fallback.** There is no request context when Angular prerenders a page, and no token when the visitor is signed out, so the fallback builds an ordinary Firebase app and the page renders signed out.
-- **Pass `releaseOnDeref`.** It tells the SDK when it may release the server app. The SDK watches the object you give it and releases once that object is garbage collected, so pass one that lives exactly as long as the render, such as the request context itself. Leave it out and the SDK requires you to call `deleteApp` yourself for each server app you create.
-- **The cast is needed** because Angular types `REQUEST_CONTEXT` as `unknown`.
+- In the browser, the ordinary Firebase app, as `initializeApp(firebaseConfig)` would.
+- On the server, when the request context carries an `authIdToken`, a [`FirebaseServerApp`](https://firebase.google.com/docs/web/ssr-apps) signed in as that visitor. The same goes for an `appCheckToken`, see [Relaying the App Check token](#relaying-the-app-check-token).
+- On the server with neither token, which is what prerendering and a signed-out visitor look like, the ordinary Firebase app, so the page renders signed out.
+- On the server with a token Firebase cannot parse, the ordinary Firebase app after a warning in the server console, so the page renders signed out instead of failing the request.
 
-AngularFire's [sample app](https://github.com/angular/angularfire/tree/main/sample) does this differently, giving the browser and the server their own `app.config.client.ts` and `app.config.server.ts` instead of deciding at runtime, inside a single `provideFirebaseApp` factory, which of `initializeApp` and `initializeServerApp` to call. That is also fine, and it keeps the server-only code out of the browser bundle, at the cost of an extra file to wire up.
+#### Three details make this work
 
-ID tokens are short-lived, and a returning visitor's browser can send one that expired while the tab was closed. The server cannot refresh it, because a user restored from an ID token has no refresh token, so Firebase logs an error and the page renders signed out. The browser then refreshes the token and the page updates.
+- **Keep exactly one `provideFirebaseApp`.** AngularFire hands you the app you provided only when a single one is registered, and falls back to the default app otherwise. With a second registration anywhere in your configuration, a signed-in render uses the default app instead of the server app, and the page renders signed out without an error. If no registration creates the default app, as with two `initializeBrowserOrServerApp` registrations, signed-in renders fail instead until a signed-out request has created it.
+- **Pass `inject(FirebaseApp)` to every provider, not just `provideAuth`.** `ng add @angular/fire` writes them without an argument, which resolves the default app. On a signed-in request the app is a server app instead, so a provider that asks for the default app fails outright on a freshly started server.
+- **Never call `deleteApp` on the injected app.** `initializeBrowserOrServerApp` releases the server app itself. A second release from your code can delete an app another render is still using.
+
+#### When the server app is released
+
+By default the server app is released once the garbage collector has reclaimed the finished request, which is also what the manual setup below does. Until then, a repeat request from the same visitor, such as a reload or a link opened in a new tab, reuses the app, and that reuse is what keeps such a request as fast as a signed-out one. A fresh server app costs a new Firestore connection and an account lookup, about 300 to 400 ms before the HTML is sent.
+
+To release at a fixed time instead, pass `releaseAfterRender`: `0` releases the app as soon as the page has been rendered, which bounds memory to the requests in flight and pays that cost on every repeat request, and a positive number keeps the app for that many milliseconds after the page has been rendered.
+
+```ts
+provideFirebaseApp(() => initializeBrowserOrServerApp(firebaseConfig, { releaseAfterRender: 60_000 })),
+```
+
+A JavaScript runtime without `FinalizationRegistry` cannot release at garbage collection, so there the app is released as soon as the page has been rendered, whatever the setting.
+
+With `releaseAfterRender` set, the Firebase app release is done in a `DestroyRef.onDestroy` callback, which Angular runs after every service's and component's `ngOnDestroy` when it destroys the request's injector. If an `ngOnDestroy` method or an `ApplicationRef.onDestroy` listener throws, Angular stops there, the release never runs, and the server app stays in memory, one per signed-in render. The default release does not run during that teardown and is not affected.
+
+Call `initializeBrowserOrServerApp` in `app.config.ts`, not in a route's `providers`. A route's `providers` create a child injector that Angular does not destroy when the request finishes, so a `releaseAfterRender` release registered there never runs. The default release is tied to the request's root injector and still happens.
+
+AngularFire's [sample app](https://github.com/angular/angularfire/tree/main/sample) is an example of this step: one `provideFirebaseApp(() => initializeBrowserOrServerApp(...))` in its shared `app.config.ts`, with `app.config.server.ts` adding only `provideServerRendering`.
+
+ID tokens are short-lived, and a returning visitor's browser can send one that expired while the tab was closed. The server cannot refresh it, because a user restored from an ID token has no refresh token, so Firebase logs an error and the page renders signed out. The browser then refreshes the token and the page updates. A token that cannot be parsed at all, such as a cookie another site set under the same name, also renders signed out, with one warning in the server console.
+
+If you would rather build the app yourself, or your AngularFire version has no `initializeBrowserOrServerApp`, see [Building the app yourself](#building-the-app-yourself) below.
 
 ### Using `REQUEST` instead of a cookie
 
-Angular also exposes the request itself through the `REQUEST` token, so you can read the ID token from an `Authorization` header rather than a cookie. Firebase's [session management with service workers](https://firebase.google.com/docs/auth/web/service-worker-sessions) guide covers attaching that header. Steps 1, 3 and 4 stay the same apart from the server half of the factory, which becomes:
+Angular also exposes the request itself through the `REQUEST` token, so you can read the ID token from an `Authorization` header rather than a cookie. Firebase's [session management with service workers](https://firebase.google.com/docs/auth/web/service-worker-sessions) guide covers attaching that header. Steps 1, 3 and 4 stay the same apart from the call in step 4, which passes the token explicitly:
 
 ```ts
-import { PLATFORM_ID, REQUEST, inject } from '@angular/core';
+import { REQUEST, inject } from '@angular/core';
+
+provideFirebaseApp(() => initializeBrowserOrServerApp(firebaseConfig, {
+  authIdToken: inject(REQUEST, { optional: true })?.headers.get('authorization')?.split('Bearer ')[1],
+})),
+```
+
+`REQUEST` is a standard [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request), so headers are read with `headers.get(...)`. Angular sets it to `null` during builds, during static site generation, and during route extraction in development, and it is only supplied at all on `RenderMode.Server` routes. A missing header gives `undefined`, and `initializeBrowserOrServerApp` then looks in the request context and falls back to the ordinary app.
+
+### Relaying the App Check token
+
+If you [enforce App Check](https://firebase.google.com/docs/app-check/enable-enforcement) for a Firebase product, server renders need an App Check token too, or their requests are rejected. The server cannot mint one, so the browser relays its own, and `initializeBrowserOrServerApp` passes it to the server app as `appCheckToken`.
+
+Relay the ordinary token from `getToken`, not a limited-use one. Replay protection only applies where a backend consumes the token, such as a callable Cloud Function with `consumeAppCheckToken`, and product enforcement for Firestore, Realtime Database and Storage does not.
+
+Keep both tokens in the one `__session` cookie, since behind Firebase Hosting no other cookie reaches your server. In the cookie sync from step 2, write the cookie as JSON and rewrite it whenever either token changes:
+
+```ts
+import { AppCheck } from '@angular/fire/app-check';
+// imported from firebase/app-check so a token that never arrives does not hold the app busy
+import { getToken, onTokenChanged } from 'firebase/app-check';
+
+const appCheck = inject(AppCheck, { optional: true });
+let authIdToken: string | undefined;
+let appCheckToken: string | undefined;
+
+const writeSessionCookie = () => {
+  if (!authIdToken && !appCheckToken) {
+    cookies.remove('__session');
+    return;
+  }
+  cookies.set('__session', JSON.stringify({ authIdToken, appCheckToken }), { secure: true, sameSite: 'lax' });
+};
+
+idToken(auth)
+  .pipe(takeUntilDestroyed(destroyRef))
+  .subscribe((token) => {
+    authIdToken = token ?? undefined;
+    writeSessionCookie();
+  });
+
+if (appCheck) {
+  destroyRef.onDestroy(onTokenChanged(appCheck, (result) => {
+    appCheckToken = result.token;
+    writeSessionCookie();
+  }));
+  getToken(appCheck).then((result) => {
+    appCheckToken = result.token;
+    writeSessionCookie();
+  });
+}
+```
+
+The `beforeAuthStateChanged` part of step 2 stays as it is, writing `authIdToken` and calling `writeSessionCookie()` instead of passing the token in. In `server.ts`, unpack the cookie and pass both keys:
+
+```ts
+const readSessionCookie = (value: unknown): { authIdToken?: string; appCheckToken?: string } => {
+  if (typeof value !== 'string') {
+    return {};
+  }
+  try {
+    return JSON.parse(value);
+  } catch {
+    return {};
+  }
+};
+
+app.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'private, no-store');
+  angularApp
+    .handle(req, readSessionCookie(req.cookies?.__session))
+    .then((response) =>
+      response ? writeResponseToNodeResponse(response, res) : next(),
+    )
+    .catch(next);
+});
+```
+
+Three things to know before relaying it:
+
+- **Every visitor's first server render builds a server app.** An App Check token is per device, so even signed-out visitors get a server app carrying it, and that first render pays the 300 to 400 ms described above. Relay the token only if you enforce App Check.
+- **A stale cookie fails the first request after the token's lifetime.** The browser rewrites the cookie only after the page's JavaScript has run and Firebase has refreshed the token. A visitor who returns after about an hour sends the old one, so that first server render's Firebase requests are rejected under enforcement, and the page shows whatever your app shows for a failed read until it hydrates and reads again. For the ID token the same stale first request only means a signed-out render. If that first render must succeed, Firebase's [service-worker relay](https://firebase.google.com/docs/web/ssr-apps#use-app-check) refreshes the token before the request leaves the browser, at the cost of a service worker your app registers itself.
+- **A relayed token wins over `APP_CHECK_ON_SERVER` for Firestore.** When the server app carries an `appCheckToken`, Firestore sends it whatever App Check instance the server holds.
+
+### Building the app yourself
+
+If you would rather build the app yourself, or your AngularFire version does not export `initializeBrowserOrServerApp`, choose the app in step 4 with your own callback. The `try` around `initializeServerApp` is what keeps a token Firebase cannot parse from failing the request with an HTTP 500, and `releaseOnDeref` is what releases the server app, the way `initializeBrowserOrServerApp` does by default:
+
+```ts
+import { PLATFORM_ID, REQUEST_CONTEXT, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { initializeApp, initializeServerApp } from '@angular/fire/app';
+
+const hasAuthIdToken = (value: unknown): value is { authIdToken: string } =>
+  typeof value === 'object' && value !== null && typeof Reflect.get(value, 'authIdToken') === 'string';
 
 provideFirebaseApp(() => {
   if (isPlatformBrowser(inject(PLATFORM_ID))) {
     return initializeApp(firebaseConfig);
   }
-  const request = inject(REQUEST, { optional: true });
-  const authIdToken = request?.headers.get('authorization')?.split('Bearer ')[1];
-  if (!authIdToken) {
+  const requestContext = inject(REQUEST_CONTEXT, { optional: true });
+  if (!hasAuthIdToken(requestContext) || !requestContext.authIdToken) {
     return initializeApp(firebaseConfig);
   }
-  return initializeServerApp(firebaseConfig, {
-    authIdToken,
-    releaseOnDeref: request,
-  });
+  try {
+    return initializeServerApp(firebaseConfig, {
+      authIdToken: requestContext.authIdToken,
+      releaseOnDeref: requestContext,
+    });
+  } catch {
+    return initializeApp(firebaseConfig);
+  }
 }),
 ```
 
-`REQUEST` is a standard [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request), so headers are read with `headers.get(...)`. Angular sets it to `null` during builds, during static site generation, and during route extraction in development, and it is only supplied at all on `RenderMode.Server` routes, so keep the signed-out fallback for those passes.
+Keep the signed-out fallback, since there is no request context when Angular prerenders a page and no token when the visitor is signed out, and keep the first two of the three details above. An app that already has this callback can switch to `initializeBrowserOrServerApp` in one deploy. The callback keeps working on later versions too.
 
 ## Convenience observables
 

@@ -100,6 +100,8 @@ The `listVal()` function creates an observable that emits an object mapped to it
 
 The `stateChanges()` function creates an observable that emits each time a change occurs at the reference or query passed. This is useful for tracking the changes in your list. The optional `events` parameter will filter which child events populate the array.
 
+It emits only on child events, which an empty list never produces, so it does not hold the application unstable and a server render does not wait for it. Use `list()` when the render should wait for a list's initial contents.
+
 |                 |                                                      |
 |-----------------|------------------------------------------------------|
 | **function**    | `stateChanges(ref, options?)`                                     |
@@ -110,6 +112,8 @@ The `stateChanges()` function creates an observable that emits each time a chang
 
 The `auditTrail()` function creates an observable that emits the entire state trail. This is useful for debugging or replaying the state of a list in your app. The optional `events` parameter will filter which child events populate the array.
 
+Like `stateChanges()`, it waits for child events, so it does not hold the application unstable and a server render does not wait for it.
+
 |                 |                                                      |
 |-----------------|------------------------------------------------------|
 | **function**    | `auditTrail(ref, options?)`                                       |
@@ -119,6 +123,8 @@ The `auditTrail()` function creates an observable that emits the entire state tr
 ### `fromRef`
 
 The `fromRef()` function creates an observable that emits reference changes.
+
+With `ListenEvent.value` it holds the application unstable until the first value is emitted, so a server render waits for the data. With a child event it does not, because it may never emit.
 
 |                 |                                          |
 |-----------------|------------------------------------------|
