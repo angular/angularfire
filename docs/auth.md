@@ -227,7 +227,7 @@ export const appConfig: ApplicationConfig = {
 
 #### Three details make this work
 
-- **Keep exactly one `provideFirebaseApp`.** AngularFire hands you the app you provided only when a single one is registered, and falls back to the default app otherwise. With a second registration anywhere in your configuration, a signed-in render asks for a default app that does not exist on a freshly started server and fails.
+- **Keep exactly one `provideFirebaseApp`.** AngularFire hands you the app you provided only when a single one is registered, and falls back to the default app otherwise. With a second registration anywhere in your configuration, a signed-in render uses the default app instead of the server app, and the page renders signed out without an error. If no registration creates the default app, as with two `initializeBrowserOrServerApp` registrations, signed-in renders fail instead until a signed-out request has created it.
 - **Pass `inject(FirebaseApp)` to every provider, not just `provideAuth`.** `ng add @angular/fire` writes them without an argument, which resolves the default app. On a signed-in request the app is a server app instead, so a provider that asks for the default app fails outright on a freshly started server.
 - **Never call `deleteApp` on the injected app.** `initializeBrowserOrServerApp` releases the server app itself. A second release from your code can delete an app another render is still using.
 
