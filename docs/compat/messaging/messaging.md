@@ -38,6 +38,8 @@ import { environment } from '../environments/environment';
 export class AppModule {}
 ```
 
+For a standalone application, and the compat module of every product, see the [compat guide's Setup section](../../compat.md#setup).
+
 ### Setting up the Firebase Messaging Service Worker
 
 There are two parts to Firebase Messaging, a Service Worker and the DOM API. AngularFireMessaging allows you to request permission, get tokens, delete tokens, and subscribe to messages on the DOM side. To register to receive notifications you need to set up the Service Worker. [The official Firebase documentation for setting up the details exactly how to do that](https://firebase.google.com/docs/cloud-messaging/js/client). 

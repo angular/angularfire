@@ -5,6 +5,8 @@ Each *document* contains a set of key-value pairs. Cloud Firestore is optimized 
 
 > **NOTE**: [AngularFire has a new tree-shakable API](../../../README.md#developer-guide), you're looking at the documentation for the compatability version of the library. [See the v7 upgrade guide for more information on this change.](../../version-7-upgrade.md).
 
+Setup for the compat API, `AngularFireModule.initializeApp(...)` plus `AngularFirestoreModule`, is in the [compat guide's Setup section](../../compat.md#setup).
+
 ## Using `AngularFirestoreCollection`
 
 The `AngularFirestoreCollection` service is a wrapper around the native Firestore SDK's [`CollectionReference`](https://firebase.google.com/docs/reference/js/v8/firebase.firestore.CollectionReference) and [`Query`](https://firebase.google.com/docs/reference/js/v8/firebase.firestore.Query) types. It is a generic service that provides you with a strongly typed set of methods for manipulating and streaming data. This service is designed for use as an `@Injectable()`.

@@ -28,6 +28,8 @@ import { environment } from '../environments/environment';
 export class AppModule {}
 ```
 
+For a standalone application, and the compat module of every product, see the [compat guide's Setup section](../../compat.md#setup).
+
 ### Injecting the AngularFireFunctions service
 
 Once the `AngularFireFunctionsModule` is registered you can inject the `AngularFireFunctions` service.
