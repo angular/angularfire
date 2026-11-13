@@ -32,6 +32,8 @@ export class AppModule {}
 
 ```
 
+For a standalone application, and the compat module of every product, see the [compat guide's Setup section](../../compat.md#setup).
+
 While offline your listeners will receive listen events when the locally cached data changes. You can use to Documents and Collections normally.
 
 To check whether you're receiving data from the server or the cache, use the `fromCache` property on the `SnapshotMetadata` in your snapshot event. If `fromCache` is true, the data came from the cache and might be stale or incomplete. If `fromCache` is false, the data is complete and current with the latest updates on the server.

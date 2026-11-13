@@ -10,6 +10,10 @@ These wrappers ensure Firebase APIs are called outside of the Angular zone. This
 
 Observables, Promise-based APIs, and those with callbacks will purposely destabilize your application until a initial value is returned, this ensures that server-side rendering (SSR) and static site generation (SSG/pre-rendering) wait for data before rendering the page's HTML.
 
+Some calls are exceptions. They are still zone wrapped, but they do not hold the application unstable, because their first callback may never come or a render has no reason to wait for them: `onLog`, `onTokenChanged`, `beforeAuthStateChanged`, `onMessage`, `onRegistered`, `onUnregistered`, `onConfigUpdate`, `logEvent`, `isSupported`, and in the Realtime Database `onChildAdded`, `onChildChanged`, `onChildMoved`, `onChildRemoved`, `off`, `enableLogging`, `stateChanges`, `auditTrail`, and `fromRef` with a child event. To make a server render wait for Realtime Database data, use `onValue`, `object`, `list`, `listVal`, or `fromRef` with `ListenEvent.value`.
+
+Some functions are not wrapped at all, because they only build or compare values and schedule no work. In `@angular/fire/firestore` and `@angular/fire/firestore/lite` these are the query and reference builders such as `where`, `orderBy`, `query`, `collection` and `doc`, field values such as `increment` and `serverTimestamp`, the `*Equal` comparators, and Firestore's own `setLogLevel`. They are the Firebase SDK's own functions, so they never destabilize your application and never print the warnings described under Logging, wherever you call them.
+
 ## Consequences of not Zone wrapping
 
 When using a Firebase or RxFire API without importing from AngularFire or if AngularFire APIs are used outside of an injection context you _may_ experience instability.
@@ -20,7 +24,7 @@ There are a number of situations where AngularFire's Zone wrapping is inconseque
 
 ## Keeping calls inside an injection context
 
-A common way to trip the warning is calling an AngularFire API from inside an asynchronous callback, for example building a Firestore query inside a `switchMap` on the signed-in user. The surrounding service is created inside an injection context, but the callback runs *later*, after that context is gone, so AngularFire can no longer wrap the call.
+A common way to trip the warning is calling an AngularFire API from inside an asynchronous callback, for example reading a Firestore query with `collectionData` inside a `switchMap` on the signed-in user. The surrounding service is created inside an injection context, but the callback runs *later*, after that context is gone, so AngularFire can no longer wrap the call.
 
 Capture an `EnvironmentInjector` while the context is still active (any field initializer or constructor), then re-establish it inside the callback with [`runInInjectionContext`](https://angular.dev/api/core/runInInjectionContext):
 
@@ -58,7 +62,7 @@ When you call a wrapped API, the first thing AngularFire does is ask Angular for
 That division is worth knowing, because it explains what you are and are not responsible for:
 
 * **You** supply the context at the call site, from a field initializer, a constructor, or an explicit `runInInjectionContext`.
-* **AngularFire** re-enters the environment injector inside a callback you hand to the call itself, which is why you never wrap an `onSnapshot` handler yourself. That reaches anything provided at the application level, but not providers declared on a component, and it does not extend to subscribers of a returned Observable, which is what the `switchMap` and `runInInjectionContext` example above is for.
+* **AngularFire** re-enters the environment injector inside a callback you hand to the call itself, whether you pass it as a function or as an observer object such as `{ next, error }`, which is why you never wrap an `onSnapshot` handler yourself. That reaches anything provided at the application level, but not providers declared on a component, and it does not extend to subscribers of a returned Observable, which is what the `switchMap` and `runInInjectionContext` example above is for.
 
 What you lose depends on the call. A call that does asynchronous work, such as `onSnapshot`, `getDoc` or `collectionData`, is normally added to Angular's `PendingTasks` register, which is what server-side rendering waits on before it serializes the page. Called outside a context, it never is. A call that returns immediately, such as `getFirestore`, was never registered anyway, so it loses only the zone handling.
 
@@ -72,7 +76,7 @@ There are three logging levels in AngularFire:
 
 * **Silent**: when the logging level is set to silent only the above banner is displayed when AngularFire APIs are called outside of an injection context, this is the default when using Zoneless change-detection.
 * **Warn**: when the logging level is set to warn, only blocking reads, long-lived tasks, and APIs with high risk of destabilizing your application are logged, this is the default when using ZoneJS.
-* **Verbose**: when the logging level is set to verbose, all AngularFire APIs called outside of an injection context are logged—helping you track down APIs that may be destabilizing your application
+* **Verbose**: when the logging level is set to verbose, every wrapped AngularFire API called outside of an injection context is logged, helping you track down APIs that may be destabilizing your application. The unwrapped functions described above never log.
 
 You can change the log-level like so:
 
