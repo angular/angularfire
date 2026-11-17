@@ -11,7 +11,7 @@ eleventyNavigation:
 
 `AngularFireAuth` promise proxies an initialized
 `firebase.auth.Auth` instance, allowing you to log users in, out, etc. [See
-the Firebase docs for more information on what methods are available.](https://firebase.google.com/docs/reference/js/firebase.auth.Auth)
+the Firebase docs for more information on what methods are available.](https://firebase.google.com/docs/reference/js/v8/firebase.auth.Auth)
 
 **Example app:**
 

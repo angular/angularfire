@@ -1,6 +1,6 @@
 # Getting started with Google Analytics
 
-`AngularFireAnalytics` dynamically imports the `firebase/analytics` library and provides a promisified version of the [Firebase Analytics SDK (`firebase.analytics.Analytics`)](https://firebase.google.com/docs/reference/js/firebase.analytics.Analytics.html).
+`AngularFireAnalytics` dynamically imports the `firebase/analytics` library and provides a promisified version of the [Firebase Analytics SDK (`firebase.analytics.Analytics`)](https://firebase.google.com/docs/reference/js/v8/firebase.analytics.Analytics.html).
 
 > **NOTE**: [AngularFire has a new tree-shakable API](../../../README.md#developer-guide), you're looking at the documentation for the compatability version of the library. [See the v7 upgrade guide for more information on this change.](../../version-7-upgrade.md).
 
@@ -56,7 +56,7 @@ constructor(analytics: AngularFireAnalytics) {
 
 ## Tracking Screen Views
 
-You can log [`screen_view` events](https://firebase.google.com/docs/reference/js/firebase.analytics.Analytics.html#parameters_10) yourself of course, but AngularFire provides the `ScreenTrackingService` which automatically integrates with the Angular Router to provide Firebase with screen view tracking. You simply can integrate like so:
+You can log [`screen_view` events](https://firebase.google.com/docs/reference/js/v8/firebase.analytics.Analytics.html#parameters_10) yourself of course, but AngularFire provides the `ScreenTrackingService` which automatically integrates with the Angular Router to provide Firebase with screen view tracking. You simply can integrate like so:
 
 ```ts
 import { AngularFireAnalyticsModule, ScreenTrackingService } from '@angular/fire/compat/analytics';
@@ -77,7 +77,7 @@ export class AppModule { }
 
 ## Tracking User Identifiers
 
-To enrich your Analytics data you can track the currently signed in user by setting [`setuserid`](https://firebase.google.com/docs/reference/js/firebase.analytics.Analytics.html#setuserid) and [`setUserProperties`](https://firebase.google.com/docs/reference/js/firebase.analytics.Analytics.html#set-user-properties). AngularFire provides a `UserTrackingService` which will dynamically import `firebase/auth`, monitor for changes in the logged in user, and call `setuserid` for you automatically.
+To enrich your Analytics data you can track the currently signed in user by setting [`setuserid`](https://firebase.google.com/docs/reference/js/v8/firebase.analytics.Analytics.html#setuserid) and [`setUserProperties`](https://firebase.google.com/docs/reference/js/v8/firebase.analytics.Analytics.html#setuserproperties). AngularFire provides a `UserTrackingService` which will dynamically import `firebase/auth`, monitor for changes in the logged in user, and call `setuserid` for you automatically.
 
 
 ```ts
