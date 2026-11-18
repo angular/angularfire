@@ -4,7 +4,7 @@
 
 ## Creating a query with primitive/scalar values
 
-Queries are created by building on the [`firebase.database.Reference`](https://firebase.google.com/docs/reference/js/firebase.database.Reference).
+Queries are created by building on the [`firebase.database.Reference`](https://firebase.google.com/docs/reference/js/v8/firebase.database.Reference).
 
 ```ts
 db.list('/items', ref => ref.orderByChild('size').equalTo('large'))
@@ -26,7 +26,7 @@ db.list('/items', ref => ref.orderByChild('size').equalTo('large'))
 
 <sup>1</sup> [This is the old way of doing things and is no longer recommended for use](https://youtu.be/3WTQZV5-roY?t=3m). Anything you can achieve with `orderByPriority` you should be doing with `orderByChild`.
 
-<sup>2</sup> The Firebase SDK supports an optional `key` parameter for [`startAt`](https://firebase.google.com/docs/reference/js/firebase.database.Reference#startAt), [`endAt`](https://firebase.google.com/docs/reference/js/firebase.database.Reference#endAt), and [`equalTo`](https://firebase.google.com/docs/reference/js/firebase.database.Reference#equalTo) when ordering by child, value, or priority. You can specify the `key` parameter using an object literal that contains the `value` and the `key`. For example: `startAt: { value: 'some-value', key: 'some-key' }`.
+<sup>2</sup> The Firebase SDK supports an optional `key` parameter for [`startAt`](https://firebase.google.com/docs/reference/js/v8/firebase.database.Reference#startat), [`endAt`](https://firebase.google.com/docs/reference/js/v8/firebase.database.Reference#endat), and [`equalTo`](https://firebase.google.com/docs/reference/js/v8/firebase.database.Reference#equalto) when ordering by child, value, or priority. You can specify the `key` parameter using an object literal that contains the `value` and the `key`. For example: `startAt: { value: 'some-value', key: 'some-key' }`.
 
 To learn more about how sorting and ordering data works in Firebase, check out the Firebase documentation on [working with lists of data](https://firebase.google.com/docs/database/web/lists-of-data#sorting_and_filtering_data).
 
