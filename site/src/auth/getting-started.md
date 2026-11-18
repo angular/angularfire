@@ -47,9 +47,4 @@ export class AppComponent {
 
 ## UI Libraries
 
-- Material Design : [ngx-auth-firebaseui](https://github.com/AnthonyNahas/ngx-auth-firebaseui)
-- Bootstrap : [@firebaseui/ng-bootstrap](https://github.com/firebaseui/ng-bootstrap)
-
-## Cordova
-
-Learn how to [setup Firebase Authentication with Cordova](https://firebase.google.com/docs/auth/web/cordova) in the Firebase Guides.
+- FirebaseUI: An open-source JS library for web that provides simple yet customizable UI bindings on top of Firebase SDKs. This is officially maintained by Firebase. Check out the Angular setup guide at [firebaseui-web](https://github.com/firebase/firebaseui-web#getting-started) and [Firebase Docs](https://firebase.google.com/docs/auth/web/firebaseui#angular).
