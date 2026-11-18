@@ -247,7 +247,7 @@ With `releaseAfterRender` set, the Firebase app release is done in a `DestroyRef
 
 Call `initializeBrowserOrServerApp` in `app.config.ts`, not in a route's `providers`. A route's `providers` create a child injector that Angular does not destroy when the request finishes, so a `releaseAfterRender` release registered there never runs. The default release is tied to the request's root injector and still happens.
 
-AngularFire's [sample app](https://github.com/angular/angularfire/tree/main/sample) is an example of this step: one `provideFirebaseApp(() => initializeBrowserOrServerApp(...))` in its shared `app.config.ts`, with `app.config.server.ts` adding only `provideServerRendering`.
+The [sample app on the `main` branch](https://github.com/angular/angularfire/tree/main/sample) is an example of this step: one `provideFirebaseApp(() => initializeBrowserOrServerApp(...))` in its shared `app.config.ts`, with `app.config.server.ts` adding only `provideServerRendering`. That sample is an Angular 22 app. The `initializeBrowserOrServerApp` call is the same on Angular 21.
 
 ID tokens are short-lived, and a returning visitor's browser can send one that expired while the tab was closed. The server cannot refresh it, because a user restored from an ID token has no refresh token, so Firebase logs an error and the page renders signed out. The browser then refreshes the token and the page updates. A token that cannot be parsed at all, such as a cookie another site set under the same name, also renders signed out, with one warning in the server console.
 
