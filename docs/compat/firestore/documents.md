@@ -9,7 +9,7 @@ Setup for the compat API, `AngularFireModule.initializeApp(...)` plus `AngularFi
 
 ## Using `AngularFirestoreDocument`
 
-The `AngularFirestoreDocument` service is a wrapper around the native Firestore SDK's [`DocumentReference` type](https://firebase.google.com/docs/reference/js/firebase.firestore.DocumentReference). It is a generic service that provides you with a strongly typed set of methods for manipulating and streaming data. This service is designed for use as an `@Injectable()`.
+The `AngularFirestoreDocument` service is a wrapper around the native Firestore SDK's [`DocumentReference` type](https://firebase.google.com/docs/reference/js/v8/firebase.firestore.DocumentReference). It is a generic service that provides you with a strongly typed set of methods for manipulating and streaming data. This service is designed for use as an `@Injectable()`.
 
 ```ts
 import { Component } from '@angular/core';
