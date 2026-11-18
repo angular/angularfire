@@ -7,7 +7,7 @@ eleventyNavigation:
 
 ## Getting started with Remote Config (BETA)
 
-`AngularFireRemoteConfig` dynamically imports the `firebase/remote-config` library on demand, provides convenience observables, pipes, and a promisified version of the [Firebase Remote Config SDK (`firebase.remoteConfig.RemoteConfig`)](https://firebase.google.com/docs/reference/js/firebase.remoteconfig.RemoteConfig).
+`AngularFireRemoteConfig` dynamically imports the `firebase/remote-config` library on demand, provides convenience observables, pipes, and a promisified version of the [Firebase Remote Config SDK (`firebase.remoteConfig.RemoteConfig`)](https://firebase.google.com/docs/reference/js/v8/firebase.remoteconfig.RemoteConfig).
 
 ## API
 
@@ -60,7 +60,7 @@ SETTINGS = InjectionToken<remoteConfig.Settings>;
 DEFAULTS = InjectionToken<ConfigTemplate>;
 ```
 
-Using the `SETTINGS` DI Token (*default: {}*) will allow you to [configure Firebase Remote Config](https://firebase.google.com/docs/reference/js/firebase.remoteconfig.Settings.html).
+Using the `SETTINGS` DI Token (*default: {}*) will allow you to [configure Firebase Remote Config](https://firebase.google.com/docs/reference/js/v8/firebase.remoteconfig.Settings.html).
 
 ## Configure default values
 
