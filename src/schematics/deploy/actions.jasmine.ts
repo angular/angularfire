@@ -1,10 +1,14 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
+import { mkdtempSync, writeFileSync } from 'fs';
+import { tmpdir } from 'os';
 import { join } from 'path';
 import { Script } from 'vm';
 import { BuilderContext, BuilderRun, ScheduleOptions, Target } from '@angular-devkit/architect';
 import { JsonObject, logging } from '@angular-devkit/core';
+import fsExtra from 'fs-extra';
+import inquirer from 'inquirer';
 import { BuildTarget, DeployBuilderSchema, FSHost, FirebaseDeployConfig, FirebaseTools } from '../interfaces';
-import deploy, { CLOUD_FUNCTIONS_DEPRECATION, assertSafeDependencyName, assertSafeFunctionName, assertSafeNodeVersion, assertSafeOutputPath, assertSupportedPackageManager, buildCloudRunBuildsSubmitArgs, buildCloudRunDeployArgs, deployToCloudRun, deployToFunction, findPackageVersion, processHost } from './actions.js'
+import deploy, { CLOUD_FUNCTIONS_DEPRECATION, HOSTING_SERVER_BUILD_WARNING, assertSafeDependencyName, assertSafeFunctionName, assertSafeNodeVersion, assertSafeOutputPath, assertSupportedPackageManager, buildCloudRunBuildsSubmitArgs, buildCloudRunDeployArgs, deployToAppHosting, deployToCloudRun, deployToFunction, findPackageVersion, processHost } from './actions.js'
 import 'jasmine';
 
 let context: BuilderContext;
@@ -108,7 +112,8 @@ const initMocks = () => {
     reportRunning: () => {
     },
     scheduleBuilder: (_: string, __?: JsonObject, ___?: ScheduleOptions) => Promise.resolve({} as BuilderRun),
-    scheduleTarget: (_: Target, __?: JsonObject, ___?: ScheduleOptions) => Promise.resolve({} as BuilderRun)
+    scheduleTarget: (_: Target, __?: JsonObject, ___?: ScheduleOptions) =>
+      Promise.resolve({ result: Promise.resolve({ success: true }) })
   } as any);
 };
 
@@ -212,6 +217,29 @@ describe('Deploy Angular apps', () => {
       } catch (e) {
         expect(e.message).toMatch(/Cannot execute the build target/);
       }
+    });
+
+    it('stops before deploying when the build fails', async () => {
+      Object.assign(context, {
+        scheduleTarget: () => Promise.resolve({ result: Promise.resolve({ success: false }) }),
+      });
+      const deploySpy = spyOn(firebaseMock, 'deploy');
+      await expectAsync(
+        deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, undefined, FIREBASE_PROJECT, { preview: false }, FIREBASE_TOKEN)
+      ).toBeRejectedWithError(/failed, so nothing was deployed/);
+      expect(deploySpy).not.toHaveBeenCalled();
+    });
+
+    it('stops before deploying when the prerender build fails', async () => {
+      Object.assign(context, {
+        scheduleTarget: () => Promise.resolve({ result: Promise.resolve({ success: false }) }),
+      });
+      const prerenderBuildTarget: BuildTarget = { name: `${PROJECT}:prerender:production` };
+      const deploySpy = spyOn(firebaseMock, 'deploy');
+      await expectAsync(
+        deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, prerenderBuildTarget, FIREBASE_PROJECT, { preview: false }, FIREBASE_TOKEN)
+      ).toBeRejectedWithError(/failed, so nothing was deployed/);
+      expect(deploySpy).not.toHaveBeenCalled();
     });
   });
 });
@@ -719,4 +747,283 @@ describe('generated artifact validation is wired into the builders', () => {
     expect(copySpy).not.toHaveBeenCalled();
     expect(writeSpy).not.toHaveBeenCalled();
   });
+});
+
+describe('App Hosting deployment', () => {
+  const BACKEND = 'my-backend';
+
+  /** A real folder, because the deploy code reads firebase.json from disk. */
+  let appHostingRoot: string;
+
+  /** Each lookup of a backend that firebase-tools received: the backend id, and a copy of the options as given. */
+  let backendLookups: { backendId: string, options: Record<string, unknown> }[];
+
+  const writeFirebaseJson = (content: string) => writeFileSync(join(appHostingRoot, 'firebase.json'), content);
+
+  beforeEach(() => {
+    initMocks();
+    appHostingRoot = mkdtempSync(join(tmpdir(), 'angularfire-test-'));
+    writeFirebaseJson(JSON.stringify({ apphosting: { backendId: BACKEND, rootDir: '.' } }));
+    Object.assign(context, { workspaceRoot: appHostingRoot });
+
+    backendLookups = [];
+    firebaseMock.cli = { version: () => '15.28.1' };
+    firebaseMock.apphosting = {
+      backends: {
+        list: () => Promise.resolve([]),
+        create: () => Promise.resolve(),
+        get: (backendId: string, options: Record<string, unknown>) => {
+          backendLookups.push({ backendId, options: { ...options } });
+
+          // firebase-tools adds its loaded config to the options object it is given.
+          options.config = 'added by firebase-tools';
+          return Promise.resolve({ name: `projects/${FIREBASE_PROJECT}/locations/us-central1/backends/${BACKEND}` });
+        },
+      },
+    };
+  });
+
+  afterEach(() => {
+    fsExtra.removeSync(appHostingRoot);
+  });
+
+  const deployBackend = () =>
+    deployToAppHosting(firebaseMock, context, appHostingRoot, FIREBASE_PROJECT, BACKEND, FIREBASE_TOKEN);
+
+  describe('deployToAppHosting', () => {
+
+    it('deploys only the backend, from the workspace root, without questions from firebase-tools', async () => {
+      const deploySpy = spyOn(firebaseMock, 'deploy').and.callThrough();
+      await deployBackend();
+      expect(deploySpy).toHaveBeenCalledOnceWith({
+        only: `apphosting:${BACKEND}`,
+        project: FIREBASE_PROJECT,
+        cwd: appHostingRoot,
+        projectRoot: appHostingRoot,
+        token: FIREBASE_TOKEN,
+        nonInteractive: true,
+      });
+    });
+
+    it('looks that backend up first, in the same project and with the same sign-in, without questions', async () => {
+      await deployBackend();
+      expect(backendLookups).toEqual([{
+        backendId: BACKEND,
+        options: {
+          project: FIREBASE_PROJECT,
+          cwd: appHostingRoot,
+          projectRoot: appHostingRoot,
+          token: FIREBASE_TOKEN,
+          nonInteractive: true,
+        },
+      }]);
+    });
+
+    it('gives the deploy call an options object that the lookup call has not changed', async () => {
+      const deploySpy = spyOn(firebaseMock, 'deploy').and.callThrough();
+      await deployBackend();
+      expect(Object.keys(deploySpy.calls.mostRecent().args[0])).not.toContain('config');
+    });
+
+    it('finds the entry of the backend in a list of entries', async () => {
+      writeFirebaseJson(JSON.stringify({ apphosting: [{ backendId: 'other-backend' }, { backendId: BACKEND }] }));
+      const deploySpy = spyOn(firebaseMock, 'deploy').and.callThrough();
+      await deployBackend();
+      expect(deploySpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('reads a firebase.json that has comments, as the Firebase CLI does', async () => {
+      writeFirebaseJson(`{\n  // deployed with ng deploy\n  "apphosting": { "backendId": "${BACKEND}" }\n}`);
+      const deploySpy = spyOn(firebaseMock, 'deploy').and.callThrough();
+      await deployBackend();
+      expect(deploySpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('accepts firebase-tools 15.9.0, the oldest version that reports a failed rollout', async () => {
+      firebaseMock.cli = { version: () => '15.9.0' };
+      const deploySpy = spyOn(firebaseMock, 'deploy').and.callThrough();
+      await deployBackend();
+      expect(deploySpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('stops before any firebase-tools call when firebase-tools is older than 15.9.0', async () => {
+      firebaseMock.cli = { version: () => '15.8.0' };
+      const deploySpy = spyOn(firebaseMock, 'deploy');
+      await expectAsync(deployBackend())
+        .toBeRejectedWithError(/needs firebase-tools 15\.9\.0 or newer.*and this is 15\.8\.0/);
+      expect(backendLookups.length).toBe(0);
+      expect(deploySpy).not.toHaveBeenCalled();
+    });
+
+    it('stops when firebase-tools has no App Hosting commands', async () => {
+      firebaseMock.apphosting = undefined;
+      await expectAsync(deployBackend()).toBeRejectedWithError(/needs firebase-tools 15\.9\.0 or newer/);
+    });
+
+    it('stops when firebase.json has no entry for the backend', async () => {
+      writeFirebaseJson(JSON.stringify({ apphosting: { backendId: 'other-backend' } }));
+      const deploySpy = spyOn(firebaseMock, 'deploy');
+      await expectAsync(deployBackend()).toBeRejectedWithError(
+        new RegExp(`backend "${BACKEND}", but firebase\\.json has no apphosting entry with that backendId`)
+      );
+      expect(deploySpy).not.toHaveBeenCalled();
+    });
+
+    it('stops when there is no firebase.json', async () => {
+      fsExtra.removeSync(join(appHostingRoot, 'firebase.json'));
+      await expectAsync(deployBackend())
+        .toBeRejectedWithError(/firebase\.json has no apphosting entry with that backendId/);
+    });
+
+    it('stops when firebase.json tells firebase-tools to skip the backend', async () => {
+      writeFirebaseJson(JSON.stringify({ apphosting: { backendId: BACKEND, alwaysDeployFromSource: false } }));
+      const deploySpy = spyOn(firebaseMock, 'deploy');
+      await expectAsync(deployBackend()).toBeRejectedWithError(/sets alwaysDeployFromSource to false/);
+      expect(deploySpy).not.toHaveBeenCalled();
+    });
+
+    it('deploys when only the entry of another backend tells firebase-tools to skip it', async () => {
+      writeFirebaseJson(JSON.stringify({
+        apphosting: [{ backendId: 'other-backend', alwaysDeployFromSource: false }, { backendId: BACKEND }],
+      }));
+      const deploySpy = spyOn(firebaseMock, 'deploy').and.callThrough();
+      await deployBackend();
+      expect(deploySpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('deploys to a backend whose entry has alwaysDeployFromSource set to true', async () => {
+      writeFirebaseJson(JSON.stringify({ apphosting: { backendId: BACKEND, alwaysDeployFromSource: true } }));
+      const deploySpy = spyOn(firebaseMock, 'deploy').and.callThrough();
+      await deployBackend();
+      expect(deploySpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('stops when the backend does not exist in the Firebase project', async () => {
+      firebaseMock.apphosting = {
+        backends: {
+          list: () => Promise.resolve([]),
+          create: () => Promise.resolve(),
+          get: () => Promise.resolve(undefined),
+        },
+      };
+      const deploySpy = spyOn(firebaseMock, 'deploy');
+      await expectAsync(deployBackend())
+        .toBeRejectedWithError(new RegExp(`"${BACKEND}" does not exist in the Firebase project ${FIREBASE_PROJECT}`));
+      expect(deploySpy).not.toHaveBeenCalled();
+    });
+
+  });
+
+  describe('through ng deploy', () => {
+
+    const appHostingOptions = { version: 2, appHostingBackend: BACKEND };
+
+    const runDeploy = (options: DeployBuilderSchema, firebaseToken: string | undefined = FIREBASE_TOKEN) =>
+      deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, undefined, FIREBASE_PROJECT, options, firebaseToken);
+
+    it('uploads to the backend without building the app locally', async () => {
+      const buildSpy = spyOn(context, 'scheduleTarget').and.callThrough();
+      const deploySpy = spyOn(firebaseMock, 'deploy').and.callThrough();
+      await runDeploy(appHostingOptions);
+      expect(buildSpy).not.toHaveBeenCalled();
+      expect(deploySpy).toHaveBeenCalledOnceWith(jasmine.objectContaining({
+        only: `apphosting:${BACKEND}`,
+        project: FIREBASE_PROJECT,
+        token: FIREBASE_TOKEN,
+      }));
+    });
+
+    it('fails when the rollout fails', async () => {
+      spyOn(firebaseMock, 'deploy').and.rejectWith(new Error('Rollout failed'));
+      await expectAsync(runDeploy(appHostingOptions)).toBeRejectedWithError('Rollout failed');
+    });
+
+    it('refuses the preview option and deploys nothing', async () => {
+      const deploySpy = spyOn(firebaseMock, 'deploy');
+      await expectAsync(runDeploy({ ...appHostingOptions, preview: true }))
+        .toBeRejectedWithError(/preview option is not available for Firebase App Hosting/);
+      expect(deploySpy).not.toHaveBeenCalled();
+    });
+
+    it('does not refuse the preview option for a Hosting deploy', async () => {
+      const serveSpy = spyOn(firebaseMock, 'serve').and.callThrough();
+      spyOn(inquirer, 'prompt').and.resolveTo({ deployProject: false });
+      const deploySpy = spyOn(firebaseMock, 'deploy');
+      await runDeploy({ version: 2, preview: true });
+      expect(serveSpy).toHaveBeenCalledTimes(1);
+      expect(deploySpy).not.toHaveBeenCalled();
+    });
+
+    it('says which deploy options it ignores', async () => {
+      const warnSpy = spyOn(context.logger, 'warn');
+      const buildTarget = `${PROJECT}:build:staging`;
+      await runDeploy({ ...appHostingOptions, ssr: true, prerender: true, buildTarget, browserTarget: buildTarget });
+      expect(warnSpy).toHaveBeenCalledWith(
+        'Deploying to App Hosting ignores these deploy options: prerender, ssr, buildTarget, browserTarget.'
+      );
+    });
+
+    it('says so for a single ignored option too', async () => {
+      const warnSpy = spyOn(context.logger, 'warn');
+      await runDeploy({ ...appHostingOptions, ssr: true });
+      expect(warnSpy).toHaveBeenCalledWith('Deploying to App Hosting ignores these deploy options: ssr.');
+    });
+
+    it('prints no warning about ignored options when there are none', async () => {
+      const warnSpy = spyOn(context.logger, 'warn');
+      await runDeploy(appHostingOptions);
+      expect(warnSpy).not.toHaveBeenCalled();
+    });
+
+    it('does not warn that Hosting cannot run a server, since App Hosting can', async () => {
+      Object.assign(context, { getTargetOptions: () => ({ outputMode: 'server', server: 'src/main.server.ts' }) });
+      const warnSpy = spyOn(context.logger, 'warn');
+      await runDeploy(appHostingOptions);
+      expect(warnSpy).not.toHaveBeenCalledWith(HOSTING_SERVER_BUILD_WARNING);
+    });
+
+  });
+
+});
+
+describe('Hosting warning for a server-rendered build', () => {
+  beforeEach(() => initMocks());
+
+  const runHostingDeploy = () =>
+    deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, undefined, FIREBASE_PROJECT, { version: 2 }, FIREBASE_TOKEN);
+
+  it('warns before the build when the build renders pages on a server', async () => {
+    Object.assign(context, { getTargetOptions: () => ({ outputMode: 'server', server: 'src/main.server.ts' }) });
+    const events: string[] = [];
+    spyOn(context.logger, 'warn').and.callFake(message => { events.push(message); });
+    spyOn(context, 'scheduleTarget').and.callFake(() => {
+      events.push('build');
+      return Promise.resolve({ result: Promise.resolve({ success: true }) } as BuilderRun);
+    });
+    await runHostingDeploy();
+    expect(events).toEqual([HOSTING_SERVER_BUILD_WARNING, 'build']);
+  });
+
+  it('warns for a deploy entry from before version 2 as well', async () => {
+    Object.assign(context, { getTargetOptions: () => ({ outputMode: 'server', server: 'src/main.server.ts' }) });
+    const warnSpy = spyOn(context.logger, 'warn');
+    await deploy(firebaseMock, context, STATIC_BUILD_TARGET, undefined, undefined, FIREBASE_PROJECT, { preview: false }, FIREBASE_TOKEN);
+    expect(warnSpy).toHaveBeenCalledWith(HOSTING_SERVER_BUILD_WARNING);
+  });
+
+  it('does not warn for a client-rendered build', async () => {
+    const warnSpy = spyOn(context.logger, 'warn');
+    await runHostingDeploy();
+    expect(warnSpy).not.toHaveBeenCalled();
+  });
+
+  it('deploys without the warning when the build options cannot be read', async () => {
+    Object.assign(context, { getTargetOptions: () => Promise.reject(new Error('no such target')) });
+    const warnSpy = spyOn(context.logger, 'warn');
+    const deploySpy = spyOn(firebaseMock, 'deploy').and.callThrough();
+    await runHostingDeploy();
+    expect(warnSpy).not.toHaveBeenCalled();
+    expect(deploySpy).toHaveBeenCalledTimes(1);
+  });
+
 });

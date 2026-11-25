@@ -9,9 +9,9 @@ import {
 } from "@angular-devkit/schematics";
 import { NodePackageInstallTask } from "@angular-devkit/schematics/tasks/index.js";
 import { addRootProvider } from "@schematics/angular/utility";
+import { parse as parseJsonWithComments } from "jsonc-parser";
 import { parse } from "yaml";
 import { overwriteIfExists, safeReadJSON, stringifyFormatted } from "./common.js";
-import { projectFromRc } from "./firebaserc.js";
 import {
   ConnectorConfig,
   ConnectorYaml,
@@ -20,7 +20,6 @@ import {
   DeployOptions,
   FEATURES,
   FirebaseApp,
-  FirebaseRc,
   PackageJson,
   Workspace,
 } from "./interfaces";
@@ -39,10 +38,7 @@ export function getWorkspace(host: Tree): {
     throw new SchematicsException(`Could not find angular.json`);
   }
 
-   
-  const { parse } = require("jsonc-parser");
-
-  const workspace = parse(configBuffer.toString()) as Workspace | undefined;
+  const workspace = parseJsonWithComments(configBuffer.toString()) as Workspace | undefined;
   if (!workspace) {
     throw new SchematicsException("Could not parse angular.json");
   }
@@ -78,18 +74,6 @@ export const getProject = (options: DeployOptions, host: Tree) => {
 
   return { project, projectName };
 };
-
-export function getFirebaseProjectNameFromHost(
-  host: Tree,
-  target: string
-): [string | undefined, string | undefined] {
-  const buffer = host.read("/.firebaserc");
-  if (!buffer) {
-    return [undefined, undefined];
-  }
-  const rc: FirebaseRc = JSON.parse(buffer.toString());
-  return projectFromRc(rc, target);
-}
 
 // TODO rewrite using typescript
 export function addFixesToServer(host: Tree) {

@@ -5,14 +5,18 @@ import { fileURLToPath } from 'url';
 import { BuilderContext, targetFromTargetString } from '@angular-devkit/architect';
 import crossSpawn from 'cross-spawn';
 import fsExtra from 'fs-extra';
-import * as inquirer from 'inquirer';
+import inquirer from 'inquirer';
 import open from 'open';
 import { satisfies } from 'semver';
 import tripleBeam from 'triple-beam';
 import * as winston from 'winston';
-import { getActiveAccount } from '../firebaseTools.js';
-import { BuildTarget, CloudRunOptions, DeployBuilderSchema, FSHost, FirebaseTools } from '../interfaces';
-import { assertSafeDependencyName } from '../workspace.js';
+import { rendersOnServer } from '../buildOptions.js';
+import { appHostingMinVersion, getActiveAccount, supportsAppHosting } from '../firebaseTools.js';
+import {
+  BuildTarget, CloudRunOptions, DeployBuilderSchema, FSHost, FirebaseAppHostingConfig, FirebaseJSON, FirebaseTools,
+  FirebaseToolsCommandOptions,
+} from '../interfaces';
+import { assertSafeDependencyName, readJson } from '../workspace.js';
 import { DEFAULT_FUNCTION_NAME, defaultFunction, defaultPackage, dockerfile, functionGen2 } from './functions-templates.js';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -136,6 +140,9 @@ const deployToHosting = async (
 
   if (options.preview) {
 
+    context.logger.info('Previewing locally. Press Ctrl+C to stop the preview and choose whether to deploy.');
+
+    // Resolves once the user stops the local server with Ctrl+C.
     await firebaseTools.serve({
       port: DEFAULT_EMULATOR_PORT,
       host: DEFAULT_EMULATOR_HOST,
@@ -275,6 +282,18 @@ const getPackageJson = (context: BuilderContext, workspaceRoot: string, options:
 export const CLOUD_FUNCTIONS_DEPRECATION = `⚠️ Deploying server-side rendering to Cloud Functions with ng deploy is deprecated in AngularFire 22 and will be removed in AngularFire 23.
 Deploy server-rendered apps with Firebase App Hosting instead: https://firebase.google.com/docs/app-hosting
 AngularFire's guide: https://github.com/angular/angularfire/blob/main/docs/app-hosting.md`;
+
+export const HOSTING_SERVER_BUILD_WARNING = `⚠️ This app uses server-side rendering, which Firebase Hosting cannot run: every route that is not prerendered loads as a client-rendered page.
+Run ng add @angular/fire and choose Firebase App Hosting to keep server-side rendering.`;
+
+/** Whether the build target `ng deploy` is about to build produces a server. Unknown counts as no. */
+const buildRendersOnServer = async (context: BuilderContext, buildTarget: BuildTarget) => {
+  try {
+    return rendersOnServer(await context.getTargetOptions(targetFromTargetString(buildTarget.name)));
+  } catch {
+    return false;
+  }
+};
 
 export const deployToFunction = async (
   firebaseTools: FirebaseTools,
@@ -546,6 +565,95 @@ export const deployToCloudRun = async (
   });
 };
 
+/**
+ * The App Hosting backends that firebase.json lists under its `apphosting` key. Each entry is for
+ * one backend (`backendId`) and holds the settings for deploying to it, and firebase-tools deploys
+ * only to backends listed there. firebase.json holds either a single entry or a list of them,
+ * and this always returns a list, empty when the file is missing, unreadable or has none.
+ */
+const appHostingEntries = (workspaceRoot: string): FirebaseAppHostingConfig[] => {
+  // The Firebase CLI accepts comments in firebase.json, so this reader has to accept them too.
+  const firebaseJson = readJson<FirebaseJSON>(join(workspaceRoot, 'firebase.json')) ?? {};
+
+  const { apphosting } = firebaseJson;
+  if (apphosting === undefined) { return []; }
+  return Array.isArray(apphosting) ? apphosting : [apphosting];
+};
+
+/**
+ * Deploys to Firebase App Hosting by uploading the workspace's source to the backend `backendId`.
+ * App Hosting builds the app from that source in Google Cloud and runs the app's Node.js server
+ * there, on Cloud Run. So nothing is built locally, unlike a deploy to Firebase Hosting.
+ */
+export const deployToAppHosting = async (
+  firebaseTools: FirebaseTools,
+  context: BuilderContext,
+  workspaceRoot: string,
+  firebaseProject: string,
+  backendId: string,
+  firebaseToken?: string,
+) => {
+  if (!firebaseTools.apphosting || !supportsAppHosting(firebaseTools)) {
+    throw new Error(
+      `Deploying to App Hosting needs firebase-tools ${appHostingMinVersion} or newer with its ` +
+      `App Hosting commands enabled, and this is ${firebaseTools.cli.version()}. Upgrade firebase-tools, then run ng deploy again.`
+    );
+  }
+
+  // The backend id lives in angular.json and in firebase.json, and firebase-tools reads only the latter.
+  const entry = appHostingEntries(workspaceRoot).find(candidate => candidate.backendId === backendId);
+  if (!entry) {
+    throw new Error(
+      `angular.json deploys to the App Hosting backend "${backendId}", but firebase.json has no apphosting ` +
+      'entry with that backendId. Run ng add @angular/fire again, or add ' +
+      `{ "apphosting": { "backendId": "${backendId}", "rootDir": "." } } to firebase.json.`
+    );
+  }
+  if (entry.alwaysDeployFromSource === false) {
+    throw new Error(
+      `firebase.json sets alwaysDeployFromSource to false for the App Hosting backend "${backendId}", ` +
+      'which makes firebase-tools skip it. Remove that setting to deploy local files with ng deploy.'
+    );
+  }
+
+  // A function instead of one shared object. Each Firebase CLI call needs a new options object.
+  const newCallOptions = (): FirebaseToolsCommandOptions & { cwd: string } => ({
+    project: firebaseProject,
+    cwd: workspaceRoot,
+    projectRoot: workspaceRoot,
+    token: firebaseToken,
+    nonInteractive: true,
+  });
+
+  /* When the backend does not exist, firebase-tools responds by asking whether to create it.
+   * Questions are turned off for this deploy (`nonInteractive`), so that would surface as an
+   * error about an unanswerable question. Checking first gives an error that says what is wrong. */
+  const backend = await firebaseTools.apphosting.backends.get(backendId, newCallOptions());
+  if (!backend) {
+    throw new Error(
+      `The App Hosting backend "${backendId}" does not exist in the Firebase project ${firebaseProject}. ` +
+      'Run ng add @angular/fire again, or create it with firebase apphosting:backends:create.'
+    );
+  }
+
+  context.logger.info(`📦 Uploading the workspace to the App Hosting backend "${backendId}", which builds it`);
+
+  // The Firebase CLI prints the address of the deployed backend itself.
+  await firebaseTools.deploy({ ...newCallOptions(), only: `apphosting:${backendId}` });
+};
+
+/**
+ * Runs one of the Angular project's build targets and waits for it to finish. Throws when the
+ * build fails, which stops the deploy before anything is uploaded.
+ */
+const runBuildTarget = async (context: BuilderContext, buildTarget: BuildTarget): Promise<void> => {
+  const run = await context.scheduleTarget(targetFromTargetString(buildTarget.name), buildTarget.options);
+  const result = await run.result;
+  if (!result.success) {
+    throw new Error(`The build "${buildTarget.name}" failed, so nothing was deployed.`);
+  }
+};
+
 /** Whether the Firebase CLI has at least one signed-in account. */
 const isSignedIn = async (firebaseTools: FirebaseTools) => {
   const accounts = await firebaseTools.login.list();
@@ -562,9 +670,19 @@ export default async function deploy(
   options: DeployBuilderOptions,
   firebaseToken?: string,
 ) {
+  const { appHostingBackend } = options;
   const legacyNgDeploy = !options.version || options.version < 2;
-  const deploysToCloudRun = legacyNgDeploy && !!serverBuildTarget && options.ssr === 'cloud-run';
-  const deploysToCloudFunctions = legacyNgDeploy && !!serverBuildTarget && !deploysToCloudRun;
+  const deploysToCloudRun = !appHostingBackend && legacyNgDeploy && !!serverBuildTarget && options.ssr === 'cloud-run';
+  const deploysToCloudFunctions = !appHostingBackend && legacyNgDeploy && !!serverBuildTarget && !deploysToCloudRun;
+  const deploysToHosting = !appHostingBackend && !deploysToCloudRun && !deploysToCloudFunctions;
+
+  // App Hosting has nothing to preview locally, and ignoring the option would deploy when the user asked not to.
+  if (appHostingBackend && options.preview) {
+    throw new Error(
+      'The preview option is not available for Firebase App Hosting, which builds the app in Google Cloud, ' +
+      'so there is no local build to preview. Nothing was deployed. Run ng deploy without --preview to deploy.'
+    );
+  }
 
   if (!firebaseToken && !process.env.GOOGLE_APPLICATION_CREDENTIALS) {
     if (!await isSignedIn(firebaseTools)) {
@@ -580,7 +698,11 @@ export default async function deploy(
   }
 
   if (!firebaseToken && process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-    await spawnAsync('gcloud', ['auth', 'activate-service-account', '--key-file', process.env.GOOGLE_APPLICATION_CREDENTIALS]);
+    /* An App Hosting deploy runs no gcloud command, so it skips this gcloud sign-in and works on a
+     * machine without gcloud. The Firebase CLI reads the key file by itself. */
+    if (!appHostingBackend) {
+      await spawnAsync('gcloud', ['auth', 'activate-service-account', '--key-file', process.env.GOOGLE_APPLICATION_CREDENTIALS]);
+    }
     console.log(`Using Google Application Credentials.`);
   }
 
@@ -589,12 +711,17 @@ export default async function deploy(
     context.logger.warn(CLOUD_FUNCTIONS_DEPRECATION);
   }
 
-  if (prerenderBuildTarget) {
-    const run = await context.scheduleTarget(
-      targetFromTargetString(prerenderBuildTarget.name),
-      prerenderBuildTarget.options
-    );
-    await run.result;
+  if (deploysToHosting && await buildRendersOnServer(context, staticBuildTarget)) {
+    context.logger.warn(HOSTING_SERVER_BUILD_WARNING);
+  }
+
+  if (appHostingBackend) {
+    const ignored = ['prerender', 'ssr', 'buildTarget', 'browserTarget'].filter(name => options[name]);
+    if (ignored.length) {
+      context.logger.warn(`Deploying to App Hosting ignores these deploy options: ${ignored.join(', ')}.`);
+    }
+  } else if (prerenderBuildTarget) {
+    await runBuildTarget(context, prerenderBuildTarget);
 
   } else {
 
@@ -604,21 +731,13 @@ export default async function deploy(
 
     context.logger.info(`📦 Building "${context.target.project}"`);
 
-    const builders = [
-      context.scheduleTarget(
-        targetFromTargetString(staticBuildTarget.name),
-        staticBuildTarget.options
-      ).then(run => run.result)
-    ];
+    const builds = [runBuildTarget(context, staticBuildTarget)];
 
     if (serverBuildTarget) {
-      builders.push(context.scheduleTarget(
-        targetFromTargetString(serverBuildTarget.name),
-        serverBuildTarget.options
-      ).then(run => run.result));
+      builds.push(runBuildTarget(context, serverBuildTarget));
     }
 
-    await Promise.all(builders);
+    await Promise.all(builds);
   }
 
 
@@ -653,7 +772,16 @@ export default async function deploy(
 
   firebaseTools.logger.logger.add(logger);
 
-  if (deploysToCloudRun) {
+  if (appHostingBackend) {
+    await deployToAppHosting(
+      firebaseTools,
+      context,
+      context.workspaceRoot,
+      firebaseProject,
+      appHostingBackend,
+      firebaseToken,
+    );
+  } else if (deploysToCloudRun) {
     await deployToCloudRun(
       firebaseTools,
       context,

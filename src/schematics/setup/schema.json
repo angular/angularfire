@@ -10,6 +10,11 @@
         "$default": {
           "$source": "projectName"
         }
+      },
+      "deploy": {
+        "type": "string",
+        "enum": ["apphosting", "hosting", "none"],
+        "description": "Where ng deploy should deploy the app: Firebase App Hosting (apphosting), Firebase Hosting (hosting), or no deploy setup (none). Asked interactively when omitted."
       }
     },
     "required": []

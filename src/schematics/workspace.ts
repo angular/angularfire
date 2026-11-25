@@ -40,7 +40,7 @@ export const lockfiles: [PackageManager, string][] = [
  * (a workspace `package.json`, an `angular.json`), so callers branch on the result instead of
  * wrapping every call.
  */
-export const readJson = (path: string): unknown => {
+export const readJson = <Content = unknown>(path: string): Content | undefined => {
   try {
     /* jsonc, not JSON.parse: Angular tolerates comments in angular.json and this repo already
      * reads it that way (`utils.ts`). Strict parsing silently dropped a commented file's

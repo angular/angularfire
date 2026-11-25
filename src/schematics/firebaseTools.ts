@@ -19,6 +19,16 @@ export const getActiveAccount = (firebaseTools: FirebaseTools, projectRoot: stri
 // The minimum firebase-tools version the schematics require.
 const minFirebaseToolsVersion = '14.0.0';
 
+/**
+ * The oldest firebase-tools that `ng add` and `ng deploy` accept for App Hosting. Older versions
+ * report a failed App Hosting rollout as a successful deploy.
+ */
+export const appHostingMinVersion = '15.9.0';
+
+/** Whether firebase-tools exposes its App Hosting commands and is at least `appHostingMinVersion`. */
+export const supportsAppHosting = (firebaseTools: FirebaseTools): boolean =>
+    !!firebaseTools.apphosting && semverCompare(firebaseTools.cli.version(), appHostingMinVersion) >= 0;
+
 export const getFirebaseTools = () => globalThis.firebaseTools ?
     Promise.resolve(globalThis.firebaseTools) :
     new Promise<FirebaseTools>((resolve, reject) => {

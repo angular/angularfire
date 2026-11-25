@@ -48,8 +48,12 @@ export interface NgAddNormalizedOptions {
   ssrRegion: string|undefined;
 }
 
+/** Where `ng add` sets up `ng deploy` to deploy to. `none` writes no deploy target. */
+export type DeployChoice = 'apphosting' | 'hosting' | 'none';
+
 export interface DeployOptions {
   project?: string;
+  deploy?: DeployChoice;
 }
 
 export interface FirebaseProject {
@@ -89,6 +93,51 @@ export interface FirebaseSDKConfig {
   sdkConfig: Record<string, string>;
 }
 
+/**
+ * The options this package passes to Firebase CLI commands it calls as library functions.
+ * Build a new object for every call. The Firebase CLI adds fields of its own to the object it is
+ * given, and a later call fails on an object that already has them.
+ */
+export interface FirebaseToolsCommandOptions {
+  /** The Firebase project id to act on. */
+  project?: string;
+  /** The workspace root. The Firebase CLI itself looks for firebase.json from `cwd` or the current directory. */
+  projectRoot?: string;
+  cwd?: string;
+  /** The email of the signed-in account to act as. */
+  account?: string;
+  /** A CI token to authenticate with, in place of a signed-in account. */
+  token?: string;
+  /** True stops the Firebase CLI from asking the user questions of its own. */
+  nonInteractive?: boolean;
+}
+
+/** What the Firebase CLI needs to create an App Hosting backend without asking questions. */
+export interface AppHostingBackendCreateOptions extends FirebaseToolsCommandOptions {
+  /** The id of the new backend. */
+  backend: string;
+  /** The Google Cloud region the backend runs in, such as `us-central1`. */
+  primaryRegion: string;
+  /** The directory holding the app's package.json, relative to the uploaded workspace. */
+  rootDir: string;
+  /** The id of the Firebase web app the backend is linked to. */
+  app: string;
+}
+
+/**
+ * A Firebase App Hosting backend, as the Firebase CLI's backend commands return it. A backend is
+ * what App Hosting deploys an app to. App Hosting builds the app from its source in Google Cloud
+ * and runs the app's Node.js server there, on Cloud Run, in the backend's region.
+ */
+export interface AppHostingBackend {
+  /** `projects/<project>/locations/<region>/backends/<backendId>` */
+  name: string;
+  /** The backend's address, without `https://`. */
+  uri?: string;
+  /** Present when the backend deploys from a linked GitHub repository. */
+  codebase?: { repository?: string };
+}
+
 export interface FirebaseTools {
   projects: {
     list(options: any): Promise<FirebaseProject[]>;
@@ -105,6 +154,15 @@ export interface FirebaseTools {
     sites: {
       list(options: any): Promise<{ sites: FirebaseHostingSite[]}>;
       create(siteId: string, options: any): Promise<FirebaseHostingSite>;
+    }
+  };
+
+  /** Missing when firebase-tools predates App Hosting or has its `apphosting` experiment off. */
+  apphosting?: {
+    backends: {
+      list(options: FirebaseToolsCommandOptions): Promise<AppHostingBackend[]>;
+      create(options: AppHostingBackendCreateOptions): Promise<unknown>;
+      get(backendId: string, options: FirebaseToolsCommandOptions): Promise<AppHostingBackend | undefined>;
     }
   };
 
@@ -146,7 +204,11 @@ export interface FirebaseHostingConfig {
   public?: string;
   ignore?: string[];
   target?: string;
+  site?: string;
   rewrites?: FirebaseHostingRewrite[];
+  /** Written by AngularFire before 17.1. Firebase's web frameworks integration, which `public` replaces. */
+  source?: string;
+  frameworksBackend?: unknown;
 }
 
 export type FirebaseFunctionsConfig = Record<string, any>;
@@ -160,15 +222,32 @@ export interface FirebaseFirestoreConfig {
   indexes?: string;
 }
 
+/** One App Hosting backend as listed under `apphosting` in firebase.json. */
+export interface FirebaseAppHostingConfig {
+  /** The id of the backend that this entry holds the settings for. */
+  backendId: string;
+  /** The directory holding the app's package.json, relative to firebase.json. */
+  rootDir?: string;
+  /** Paths left out of the upload. */
+  ignore?: string[];
+  /**
+   * False makes the Firebase CLI skip the backend `backendId` when it deploys. True tells the CLI
+   * that uploading local files to that backend is intended although it is connected to a GitHub
+   * repository.
+   */
+  alwaysDeployFromSource?: boolean;
+}
+
 export interface FirebaseJSON {
   hosting?: FirebaseHostingConfig[] | FirebaseHostingConfig;
+  apphosting?: FirebaseAppHostingConfig[] | FirebaseAppHostingConfig;
   functions?: FirebaseFunctionsConfig;
   firestore?: FirebaseFirestoreConfig;
   dataconnect?: DataConnectConfig;
 }
 
 export interface FirebaseRcTarget {
-  hosting: Record<string, string[]>;
+  hosting?: Record<string, string[]>;
 }
 
 export interface FirebaseRc {
@@ -198,6 +277,8 @@ export interface DeployBuilderSchema {
   /** @deprecated Read only by the Cloud Functions mode, which will be removed in AngularFire 23. */
   CF3v2?: boolean;
   version?: number;
+  /** The App Hosting backend to deploy to. When set, `ng deploy` deploys there instead of to Hosting. */
+  appHostingBackend?: string;
 }
 
 export interface CloudRunOptions {
