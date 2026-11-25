@@ -42,6 +42,8 @@ export class AppComponent {
 }
 ```
 
+`Messaging` is `null` during server rendering and in a browser with no service worker support, such as an iOS in-app browser or a page served over plain HTTP to another device, so check it before use.
+
 # Create a Firebase Messaging Service Worker 
 
 There are two parts to Firebase Messaging, a Service Worker and the DOM API. Angular Fire Messaging allows you to request permission, register this app instance, observe when it is registered or unregistered, and subscribe to messages on the DOM side. To register to receive notifications you need to set up the Service Worker. [The official Firebase documentation for setting up the details exactly how to do that](https://firebase.google.com/docs/cloud-messaging/js/client).
@@ -96,10 +98,15 @@ export class FcmService {
   /* `onMessage` converted to an observable. Returns the unsubscribe function returned by
    * `onMessage` to stop the listener when the last subscriber unsubscribes. */
   message$ = new Observable<MessagePayload>(
-    subscriber => onMessage(this.msg, (msg) => subscriber.next(msg))
+    subscriber => this.msg ? onMessage(this.msg, (msg) => subscriber.next(msg)) : undefined
   ).pipe(tap((msg) => console.log("My Firebase Cloud Message", msg)));
 
   constructor(private msg: Messaging) {
+    // `Messaging` is null during server rendering and where the browser has no service workers.
+    if (!this.msg) {
+      return;
+    }
+
     // Set listeners before calling `register` to avoid throwing.
     this.listenForRegistrationChanges();
     this.registerForMessages();
@@ -144,6 +151,10 @@ export class FcmService {
 
   // Called from your app, for example when a user turns notifications off.
   async unregister() {
+    if (!this.msg) {
+      return;
+    }
+
     // This calls the imported unregister, not this method. Class methods are not in lexical scope.
     await unregister(this.msg);
   }
