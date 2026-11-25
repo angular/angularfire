@@ -44,6 +44,8 @@ export class RemoteConfigComponent {
 }
 ```
 
+`RemoteConfig` is `null` during server rendering, so check it before use.
+
 ## Firebase API
 
 AngularFire wraps the Firebase JS SDK to ensure proper functionality in Angular, while providing the same API.
