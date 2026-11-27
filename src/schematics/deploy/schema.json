@@ -78,6 +78,17 @@
       "description": "Runtime options for Cloud Functions. Read only by the Cloud Functions mode, which AngularFire 22 deprecates and AngularFire 23 removes.",
       "x-deprecated": "read only by the Cloud Functions mode of ng deploy, which AngularFire 22 deprecates and AngularFire 23 removes. Delete it unless ssr is true or 'cloud-functions'. Use Firebase App Hosting for server-rendered apps."
     },
+    "version": {
+      "type": "number",
+      "description": "The deploy target format. 2 is what ng add @angular/fire writes. Leave it out only for targets that deploy server-side rendering to Cloud Functions or Cloud Run."
+    },
+    "appHostingBackend": {
+      "type": "string",
+      "pattern": "^[a-z](?:[a-z0-9-]*[a-z0-9])?$",
+      "minLength": 3,
+      "maxLength": 30,
+      "description": "The Firebase App Hosting backend to deploy to. When set, ng deploy uploads the workspace to App Hosting, which builds it, instead of building locally and deploying to Firebase Hosting. The backend must also be listed under apphosting in firebase.json."
+    },
     "preview": {
       "type": "boolean",
       "description": "Do not deploy the application, just set up the Firebase Function in the project output directory. Can be used for testing the Firebase Function with `firebase serve`."

@@ -1,14 +1,20 @@
 import { spawnSync } from 'child_process';
-import * as fuzzy from 'fuzzy';
-import * as inquirer from 'inquirer';
-import { getActiveAccount, getFirebaseTools } from '../firebaseTools';
-import { FEATURES, FirebaseApp, FirebaseProject, featureOptions } from '../interfaces';
-import { shortAppId } from '../utils';
+import fuzzy from 'fuzzy';
+import inquirer from 'inquirer';
+import inquirerAutocompletePrompt from 'inquirer-autocomplete-prompt';
+import { getActiveAccount, getFirebaseTools } from '../firebaseTools.js';
+import { FEATURES, FirebaseApp, FirebaseProject, featureOptions } from '../interfaces.js';
+import { shortAppId } from '../utils.js';
 
- 
-inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
 
-const NEW_OPTION = '~~angularfire-new~~';
+inquirer.registerPrompt('autocomplete', inquirerAutocompletePrompt);
+
+/**
+ * The value of the extra choice that a prompt adds to its list of existing items, such as
+ * "create a new one", "another region" or "log in with another account". No real id can equal
+ * it, so a prompt can tell that choice apart from a pick of something that already exists.
+ */
+export const NEW_OPTION = '~~angularfire-new~~';
 
 // `fuzzy` passes either the original list of projects or an internal object
 // which contains the project as a property.
@@ -78,6 +84,16 @@ type Prompt = <K extends string, U= unknown>(questions: { name: K, source: (...a
 
 const autocomplete: Prompt = (questions) => inquirer.prompt(questions);
 
+/** Asks a yes-or-no question. Pressing Enter answers no. */
+export const confirmPrompt = async (message: string): Promise<boolean> => {
+  const { confirmed } = await inquirer.prompt<{ confirmed: boolean }>({
+    type: 'confirm',
+    name: 'confirmed',
+    message,
+    default: false,
+  });
+  return confirmed;
+};
 
 export const featuresPromptMessage = 'What features would you like to setup?';
 
