@@ -26,8 +26,16 @@ export function defaultMessagingInstanceFactory(provided: FirebaseMessaging[]|un
 export function messagingInstanceFactory(fn: (injector: Injector) => FirebaseMessaging) {
   return (zone: NgZone, injector: Injector, platformId: object) => {
     if (isPlatformServer(platformId)) { return null; }
-    const messaging = zone.runOutsideAngular(() => fn(injector));
-    return new Messaging(messaging);
+
+    try {
+      const messaging = zone.runOutsideAngular(() => fn(injector));
+      return new Messaging(messaging);
+    } catch (error) {
+      // Firebase's `getMessaging` throws where `navigator.serviceWorker` is missing.
+      if ('serviceWorker' in navigator) { throw error; }
+
+      return null;
+    }
   };
 }
 

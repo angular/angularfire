@@ -18,7 +18,10 @@ export function ɵgetDefaultInstanceOf<T= unknown>(identifier: string, provided:
   if (provided) {
     // Was provide* only called once? If so grab that
     if (provided.length === 1) { return provided[0]; }
-    const providedUsingDefaultApp = provided.filter((it: any) => it.app === defaultApp);
+
+    // An entry is null where its product is unavailable, such as messaging on the server.
+    const providedUsingDefaultApp = provided.filter((it: any) => it?.app === defaultApp);
+
     // Was provide* only called once, using the default app? If so use that
     if (providedUsingDefaultApp.length === 1) { return providedUsingDefaultApp[0]; }
   }
